@@ -1,16 +1,16 @@
 #pragma once
 
-#include <SDL.h>
+#include <SDL.h>																				// External library includes.
 #include <SDL_image.h>
 #include <string>
 
-class WindowManager
+class WindowManager																				// Declare WindowManager class.
 {
-private:
-	SDL_Window* window = nullptr;
+private:																						// Declare private member variables below.
+	SDL_Window* window;																			// Declare SDL_Window*
 
-public:
-	WindowManager(const char* windowTitle, const int pixelWidth, const int pixelHeight);
-	SDL_Window* getWindow() const;
-	void free();
+public:																							// Public member functions declared below.
+	WindowManager(const char* windowTitle, const int pixelWidth, const int pixelHeight);		// Declare WindowManager constructor.
+	SDL_Window* getWindow() const;																// Declare getWindow function.
+	void free();																				// Declare free function.
 };
