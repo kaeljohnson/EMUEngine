@@ -20,8 +20,8 @@ project "v1"
 
 	files
 	{
-		"%{prj.name}/Application/include/**.h",
-		"%{prj.name}/Application/source/**.cpp",
+		"%{prj.name}/Game/include/**.h",
+		"%{prj.name}/Game/source/**.cpp",
 		"%{prj.name}/Engine/include/**.h",
 		"%{prj.name}/Engine/source/**.cpp"
 	}
