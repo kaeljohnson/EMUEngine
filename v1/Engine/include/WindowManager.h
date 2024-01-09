@@ -4,13 +4,18 @@
 #include <SDL_image.h>
 #include <string>
 
-class WindowManager																				// Declare WindowManager class.
+namespace Engine
 {
-private:																						// Declare private member variables below.
-	SDL_Window* window;																			// Declare SDL_Window*
 
-public:																							// Public member functions declared below.
-	WindowManager(const char* windowTitle, const int pixelWidth, const int pixelHeight);		// Declare WindowManager constructor.
-	SDL_Window* getWindow() const;																// Declare getWindow function.
-	void free();																				// Declare free function.
-};
+	class WindowManager																				// Declare WindowManager class.
+	{
+	private:																						// Declare private member variables below.
+		SDL_Window* window;																			// Declare SDL_Window*
+
+	public:																							// Public member functions declared below.
+		WindowManager(const char* windowTitle, const int pixelWidth, const int pixelHeight);		// Declare WindowManager constructor.
+		SDL_Window* getWindow() const;																// Declare getWindow function.
+		void free();																				// Declare free function.
+	};
+
+}
