@@ -10,7 +10,7 @@
 namespace Engine
 {
 
-	WindowManager::WindowManager(const char* windowTitle, int pixelWidth, int pixelHeight)									// Definition of WindowManager constructor.
+	WindowManager::WindowManager(const char* windowTitle, const uint16_t pixelWidth, const uint16_t pixelHeight)									// Definition of WindowManager constructor.
 		: window(nullptr)																									// Initialization list for WindowManager constructor.
 	{
 		window = SDL_CreateWindow(																							// Call to SDL_CreateWindow function. Hover over function to understand arguments.
@@ -25,6 +25,7 @@ namespace Engine
 	SDL_Window* WindowManager::getWindow() const																			// Getter for window stored in WindowManager.
 	{
 		return window;
+
 	}
 
 	void WindowManager::free()																								// Definition for free function in WindowManager.
