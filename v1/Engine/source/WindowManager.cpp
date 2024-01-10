@@ -14,7 +14,7 @@ namespace Engine
 		: window(nullptr)																									// Initialization list for WindowManager constructor.
 	{
 		window = SDL_CreateWindow(																							// Call to SDL_CreateWindow function. Hover over function to understand arguments.
-			windowTitle, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, pixelWidth, pixelHeight, SDL_WINDOW_SHOWN
+			windowTitle, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, pixelWidth, pixelHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN
 		);
 		if (window == nullptr)																								// If the window is still a nullptr, print an error.
 		{
@@ -25,7 +25,11 @@ namespace Engine
 	SDL_Window* WindowManager::getWindow() const																			// Getter for window stored in WindowManager.
 	{
 		return window;
+	}
 
+	void WindowManager::resize(const int newWindowWidth, const int newWindowHeight)
+	{
+		SDL_SetWindowSize(window, newWindowWidth, newWindowHeight);
 	}
 
 	void WindowManager::free()																								// Definition for free function in WindowManager.

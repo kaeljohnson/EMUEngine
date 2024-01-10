@@ -17,14 +17,33 @@ namespace Engine
 
 	void Application::handleInput(SDL_Event& e)												// Function definition for handling input. On each interation of the game loop, user input will have to be interpereted.
 	{
-		if (e.type == SDL_QUIT)															// If the SDL_event reference has a value of "SDL_QUIT" the game will stop.
+		switch (e.type)
 		{
-			end();
+			case (SDL_QUIT):
+			{
+				end();
+				break;
+			}
+			case (SDL_WINDOWEVENT):
+			{
+				if (e.window.event == SDL_WINDOWEVENT_RESIZED)
+				{
+					// Need to resize camera first.
+					m_windowManager.resize(e.window.data1, e.window.data2);
+				}
+				break;
+			}
+			default:
+			{
+				if (e.key.keysym.sym == SDLK_ESCAPE)
+				{
+					end();
+				}
+				break;
+			}
 		}
-		else if (e.key.keysym.sym == SDLK_ESCAPE)										// If the SDL_event reference has a value of "SDLK_ESCAPE" the game will stop.
-		{
-			end();
-		}
+		
+		
 	}
 
 	void Application::run()																	// Definition for The Game class start function.
