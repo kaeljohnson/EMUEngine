@@ -17,19 +17,46 @@ namespace Engine
 
 	void Application::handleInput(SDL_Event& e)												// Function definition for handling input. On each interation of the game loop, user input will have to be interpereted.
 	{
+		// Need to put all the following code into own modules.
 		switch (e.type)
 		{
 			case (SDL_QUIT):
 			{
+				printf("end1.");
 				end();
 				break;
 			}
 			case (SDL_WINDOWEVENT):
 			{
+
 				if (e.window.event == SDL_WINDOWEVENT_RESIZED)
 				{
 					// Need to resize camera first.
 					m_windowManager.resize(e.window.data1, e.window.data2);
+				}
+				break;
+			} 
+			case (SDL_KEYDOWN):
+			{
+				switch (e.key.keysym.sym)
+				{
+					case (SDLK_k):
+					{
+						// Bug here: Figure out why "SDL_WINDOW_FULLSCREEN" does not work.
+						// Incompatibility with native video mode?
+						bool isFullscreen = SDL_GetWindowFlags(m_windowManager.getWindow()) & SDL_WINDOW_FULLSCREEN_DESKTOP;
+						if (SDL_SetWindowFullscreen(m_windowManager.getWindow(), isFullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)
+						{
+							printf("Fullscreen failed! SDL_Error: %s\n", SDL_GetError());
+						}
+						else
+						{
+							SDL_SetWindowSize(m_windowManager.getWindow(), 1800, 900);	// Go back to user set size?
+							SDL_SetWindowPosition(m_windowManager.getWindow(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+						}
+						// SDL_SetWindowDisplayMode(m_windowManager.getWindow(), NULL);
+					}
+					break;
 				}
 				break;
 			}
@@ -37,7 +64,9 @@ namespace Engine
 			{
 				if (e.key.keysym.sym == SDLK_ESCAPE)
 				{
-					end();
+					printf("end2");
+					// bug here: This function is getting called seemingly randomly.
+					//end();
 				}
 				break;
 			}

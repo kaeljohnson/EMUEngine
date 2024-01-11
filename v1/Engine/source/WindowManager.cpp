@@ -14,7 +14,7 @@ namespace Engine
 		: window(nullptr)																									// Initialization list for WindowManager constructor.
 	{
 		window = SDL_CreateWindow(																							// Call to SDL_CreateWindow function. Hover over function to understand arguments.
-			windowTitle, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, pixelWidth, pixelHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN
+			windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, pixelWidth, pixelHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN
 		);
 		if (window == nullptr)																								// If the window is still a nullptr, print an error.
 		{
