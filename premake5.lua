@@ -23,7 +23,9 @@ project "v1"
 		"%{prj.name}/Game/include/**.h",
 		"%{prj.name}/Game/source/**.cpp",
 		"%{prj.name}/Engine/include/**.h",
-		"%{prj.name}/Engine/source/**.cpp"
+		"%{prj.name}/Engine/source/**.cpp",
+		"%{prj.name}/Engine/include/Events/**.h",
+		"%{prj.name}/Engine/source/Events/**.cpp"
 	}
 
 	includedirs

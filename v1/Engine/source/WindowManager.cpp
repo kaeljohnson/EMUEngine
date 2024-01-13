@@ -14,18 +14,45 @@ namespace Engine
 		: window(nullptr)																									// Initialization list for WindowManager constructor.
 	{
 		window = SDL_CreateWindow(																							// Call to SDL_CreateWindow function. Hover over function to understand arguments.
-			windowTitle, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, pixelWidth, pixelHeight, SDL_WINDOW_SHOWN
+			windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, pixelWidth, pixelHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN
 		);
+
 		if (window == nullptr)																								// If the window is still a nullptr, print an error.
 		{
 			printf("Window not created! SDL_Error: %s\n", SDL_GetError());
+		}
+
+		if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0)
+		{
+			printf("Fullscreen mode not set! SDL Error: %s\n", SDL_GetError());
 		}
 	}
 
 	SDL_Window* WindowManager::getWindow() const																			// Getter for window stored in WindowManager.
 	{
 		return window;
+	}
 
+	void WindowManager::resize(const int newWindowWidth, const int newWindowHeight)
+	{
+		SDL_SetWindowSize(window, newWindowWidth, newWindowHeight);
+	}
+
+	void WindowManager::toggleFullscreen()
+	{
+		// Bug here: Figure out why "SDL_WINDOW_FULLSCREEN" does not work.
+		// Incompatibility with native video mode?
+		bool isFullscreen = SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
+		if (SDL_SetWindowFullscreen(window, isFullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)
+		{
+			printf("Fullscreen failed! SDL_Error: %s\n", SDL_GetError());
+		}
+		else
+		{
+			SDL_SetWindowSize(window, 1800, 900);	// Go back to user set size?
+			SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+		}
+		// SDL_SetWindowDisplayMode(m_windowManager.getWindow(), NULL);
 	}
 
 	void WindowManager::free()																								// Definition for free function in WindowManager.
