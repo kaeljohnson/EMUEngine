@@ -1,18 +1,16 @@
 #pragma once
 
-#include <SDL.h>
-#include <SDL_image.h>
+#include "Event.h"
 
 namespace Engine
 {
 	class EventManager
 	{
 	private:
+		// Need key array.
+		// Need mouse event array.
 
 	public:
-		void propogateEventQueue(SDL_Event& e);
-		bool pollEvents(SDL_Event& e);
-
 
 	};
 }

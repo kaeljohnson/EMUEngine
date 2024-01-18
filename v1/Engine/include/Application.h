@@ -6,6 +6,7 @@
 #include "WindowManager.h"
 #include "RendererManager.h"												// Include header files.
 #include "Events/EventManager.h"
+#include "Events/EventHandlers.h"
 
 
 namespace Engine
@@ -15,20 +16,20 @@ namespace Engine
 	{
 	private:																	// Declare private memeber variables below.
 		bool running;
-		SDL_Event m_applicationEvent;											// Maybe we should wrap SDL event in our own custom event class.
 
 		WindowManager m_windowManager;
 		RendererManager m_rendererManager;									    // Reference to the games RendererManager.
 		EventManager m_eventManager;
+		EventHandlers m_eventHandlers;
+
 
 	public:
 		Application(const char* appName, const uint16_t screenWidth, const uint16_t screenHeight);								// Declare Game constructor.
 
-		void handleInput(SDL_Event& e);											// Declare handleInpute function.
 		void run();															    // Declare start function.
 		void end();																// Declare stop function.
 
-		void dispatchEvents(SDL_Event& e);
+		void dispatchEvent(SDL_Event& e);
 
 		Application(const Application&) = delete;												// These four functions are declared and set to "delete" to ensure our game instance cannot be copied or moved. We only want one game instance.
 		Application& operator=(const Application&) = delete;
