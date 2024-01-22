@@ -46,12 +46,6 @@ namespace Engine
 		printf("handle window event.");
 	}
 	
-	/*void defKeydownHandler(keydown_handler_t);
-	void defKeyUpHandler(keyup_handler_t);
-	void defMouseMoveHandler(mouse_move_handler_t);
-	void defMouseButtonDownHandler(mouse_button_down_event_t);
-	void defMouseButtonUpHandler(mouse_button_up_event_t);
-	void defMouseScrollEvent(mouse_scroll_event_t);*/
 
 	EventHandlers::EventHandlers()
 		: quit(handleQuitEvent),

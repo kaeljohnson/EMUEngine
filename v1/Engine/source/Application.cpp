@@ -59,56 +59,44 @@ namespace Engine
 		case (SDL_WINDOWEVENT):
 		{
 			// Call window event handler.
-			m_eventHandlers.windowEvent();
-			if (e.window.event == SDL_WINDOWEVENT_RESIZED)
-			{
-				// Need to resize camera first.
-				m_windowManager.resize(e.window.data1, e.window.data2);
-			}
+			dispatchWindowEvent(e.window);
 			break;
 		}
 		case (SDL_KEYDOWN):
 		{
 			// Call keydown event handler.
-			m_eventHandlers.keydown();
-			switch (e.key.keysym.sym)
-			{
-			case (SDLK_k):
-			{
-				m_windowManager.toggleFullscreen();
-			}
-			break;
-			}
+			// m_eventHandlers.keydown();
+			dispatchKeydownEvent(e.key.keysym.sym);
 			break;
 		}
 		case (SDL_KEYUP):
 		{
 			// Call key up event handler.
-			m_eventHandlers.keyup();
+			dispatchKeyupEvent(e.key.keysym.sym);
 			break;
 		}
 		case (SDL_MOUSEBUTTONDOWN):
 		{
 			// Call mouse button down event handler.
-			m_eventHandlers.mouseButtonDown();
+			dispatchMouseButtonDownEvent(e.button);
 			break;
 		}
 		case (SDL_MOUSEBUTTONUP):
 		{
 			// Call mouse button up event handler.
-			m_eventHandlers.mouseButtonUp();
+			dispatchMouseButtonUpEvent(e.button);
 			break;
 		}
 		case (SDL_MOUSEMOTION):
 		{
 			// Call mouse move event handler.
-			m_eventHandlers.mouseMove();
+			dispatchMouseMoveEvent(e.motion);
 			break;
 		}
 		case (SDL_MOUSEWHEEL):
 		{
 			// Call mouse wheel event handler.
-			m_eventHandlers.mouseScroll();
+			dispatchMouseScrollEvent(e.wheel);
 			break;
 		}
 		default:
@@ -121,6 +109,150 @@ namespace Engine
 			}
 			break;
 		}
+		}
+	}
+
+	void Application::dispatchWindowEvent(SDL_WindowEvent& windowEvent)
+	{
+		switch (windowEvent.type)
+		{
+		case (SDL_WINDOWEVENT_RESIZED): m_windowManager.resize(windowEvent.data1, windowEvent.data2); break;
+		}
+	}
+
+	void Application::dispatchKeydownEvent(SDL_Keycode& keyCode)
+	{
+		printf("dispatch keydown event.\n");
+		switch (keyCode)
+		{
+		case (SDLK_ESCAPE): printf("esc down\n"); break;
+		case (SDLK_EQUALS): m_windowManager.toggleFullscreen(); break;
+		case (SDLK_0): printf("0 down\n"); break;
+		case (SDLK_1): printf("1 down\n"); break;
+		case (SDLK_2): printf("2 down\n"); break;
+		case (SDLK_3): printf("3 down\n"); break;
+		case (SDLK_4): printf("4 down\n"); break;
+		case (SDLK_5): printf("5 down\n"); break;
+		case (SDLK_6): printf("6 down\n"); break;
+		case (SDLK_7): printf("7 down\n"); break;
+		case (SDLK_8): printf("8 down\n"); break;
+		case (SDLK_9): printf("9 down\n"); break;
+		case (SDLK_q): printf("q down\n"); break;
+		case (SDLK_w): printf("w down\n"); break;
+		case (SDLK_e): printf("e down\n"); break;
+		case (SDLK_r): printf("r down\n"); break;
+		case (SDLK_t): printf("t down\n"); break;
+		case (SDLK_y): printf("y down\n"); break;
+		case (SDLK_u): printf("u down\n"); break;
+		case (SDLK_i): printf("i down\n"); break;
+		case (SDLK_o): printf("o down\n"); break;
+		case (SDLK_p): printf("p down\n"); break;
+		case (SDLK_a): printf("a down\n"); break;
+		case (SDLK_s): printf("s down\n"); break;
+		case (SDLK_d): printf("d down\n"); break;
+		case (SDLK_f): printf("f down\n"); break;
+		case (SDLK_g): printf("g down\n"); break;
+		case (SDLK_h): printf("h down\n"); break;
+		case (SDLK_j): printf("j down\n"); break;
+		case (SDLK_k): printf("k down\n"); break;
+		case (SDLK_l): printf("l down\n"); break;
+		case (SDLK_z): printf("z down\n"); break;
+		case (SDLK_x): printf("x down\n"); break;
+		case (SDLK_c): printf("c down\n"); break;
+		case (SDLK_v): printf("v down\n"); break;
+		case (SDLK_b): printf("b down\n"); break;
+		case (SDLK_n): printf("n down\n"); break;
+		case (SDLK_m): printf("m down\n"); break;
+		case (SDLK_TAB): printf("tab down\n"); break;
+		case (SDLK_CAPSLOCK): printf("caps lock down\n"); break;
+		case (SDLK_LSHIFT): printf("left shift down\n"); break;
+		case (SDLK_RETURN): printf("enter down\n"); break;
+		case (SDLK_SPACE): printf("space down.\n"); break;
+		}
+	}
+
+	void Application::dispatchKeyupEvent(SDL_Keycode& keyCode) 
+	{
+		switch (keyCode)
+		{
+		case (SDLK_ESCAPE): printf("escape down\n"); break;
+		case (SDLK_PLUS): printf("plus up\n"); break;
+		case (SDLK_0): printf("0 up\n"); break;
+		case (SDLK_1): printf("1 up\n"); break;
+		case (SDLK_2): printf("2 up\n"); break;
+		case (SDLK_3): printf("3 up\n"); break;
+		case (SDLK_4): printf("4 up\n"); break;
+		case (SDLK_5): printf("5 up\n"); break;
+		case (SDLK_6): printf("6 up\n"); break;
+		case (SDLK_7): printf("7 up\n"); break;
+		case (SDLK_8): printf("8 up\n"); break;
+		case (SDLK_9): printf("9 up\n"); break;
+		case (SDLK_q): printf("q up\n"); break;
+		case (SDLK_w): printf("w up\n"); break;
+		case (SDLK_e): printf("e up\n"); break;
+		case (SDLK_r): printf("r up\n"); break;
+		case (SDLK_t): printf("t up\n"); break;
+		case (SDLK_y): printf("y up\n"); break;
+		case (SDLK_u): printf("u up\n"); break;
+		case (SDLK_i): printf("i up\n"); break;
+		case (SDLK_o): printf("o up\n"); break;
+		case (SDLK_p): printf("p up\n"); break;
+		case (SDLK_a): printf("a up\n"); break;
+		case (SDLK_s): printf("s up\n"); break;
+		case (SDLK_d): printf("d up\n"); break;
+		case (SDLK_f): printf("f up\n"); break;
+		case (SDLK_g): printf("g up\n"); break;
+		case (SDLK_h): printf("h up\n"); break;
+		case (SDLK_j): printf("j up\n"); break;
+		case (SDLK_k): printf("k up\n"); break;
+		case (SDLK_l): printf("l up\n"); break;
+		case (SDLK_z): printf("z up\n"); break;
+		case (SDLK_x): printf("x up\n"); break;
+		case (SDLK_c): printf("c up\n"); break;
+		case (SDLK_v): printf("v up\n"); break;
+		case (SDLK_b): printf("b up\n"); break;
+		case (SDLK_n): printf("n up\n"); break;
+		case (SDLK_m): printf("m up\n"); break;
+		case (SDLK_TAB): printf("tab up\n"); break;
+		case (SDLK_CAPSLOCK): printf("caps lock up\n"); break;
+		case (SDLK_LSHIFT): printf("left shift up\n"); break;
+		case (SDLK_RETURN): printf("enter up\n"); break;
+		case (SDLK_SPACE): printf("space up.\n"); break;
+		}
+	}
+	void Application::dispatchMouseMoveEvent(SDL_MouseMotionEvent& mouseMotion) 
+	{
+		printf("%d, %d\n", mouseMotion.x, mouseMotion.y);
+	}
+	void Application::dispatchMouseButtonDownEvent(SDL_MouseButtonEvent& mouseButtonEvent) 
+	{
+		switch (mouseButtonEvent.button)
+		{
+		case (SDL_BUTTON_LEFT): printf("left mouse button clicked.\n"); break;
+		case (SDL_BUTTON_MIDDLE): printf("middle mouse button clicked.\n"); break;
+		case (SDL_BUTTON_RIGHT): printf("right mouse button clicked.\n"); break;
+
+		default: break;
+		}
+	}
+	void Application::dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent) 
+	{
+		switch (mouseButtonEvent.button)
+		{
+		case (SDL_BUTTON_LEFT): printf("left mouse button up.\n"); break;
+		case (SDL_BUTTON_MIDDLE): printf("middle mouse button up.\n"); break;
+		case (SDL_BUTTON_RIGHT): printf("right mouse button up.\n"); break;
+
+		default: break;
+		}
+	}
+	void Application::dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent) 
+	{
+		printf("x: %d, y: %d\n", mouseWheelEvent.x, mouseWheelEvent.y);
+		switch (mouseWheelEvent.direction)
+		{
+		case (SDL_MOUSEWHEEL_NORMAL): printf("mouse wheel normal.\n"); break;
+		case (SDL_MOUSEWHEEL_FLIPPED): printf("mouse wheel flipped.\n"); break;
 		}
 	}
 }

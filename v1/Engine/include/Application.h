@@ -29,7 +29,18 @@ namespace Engine
 		void run();															    // Declare start function.
 		void end();																// Declare stop function.
 
+
+		// Event dispatch functions.
 		void dispatchEvent(SDL_Event& e);
+		void dispatchWindowEvent(SDL_WindowEvent& windowEvent);
+		void dispatchKeydownEvent(SDL_Keycode& keyCode);
+		void dispatchKeyupEvent(SDL_Keycode& keyCode);
+		void dispatchMouseMoveEvent(SDL_MouseMotionEvent& mouseMotion);
+		void dispatchMouseButtonDownEvent(SDL_MouseButtonEvent& mouseButtonEvent);
+		void dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent);
+		void dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent);
+		
+
 
 		Application(const Application&) = delete;												// These four functions are declared and set to "delete" to ensure our game instance cannot be copied or moved. We only want one game instance.
 		Application& operator=(const Application&) = delete;
