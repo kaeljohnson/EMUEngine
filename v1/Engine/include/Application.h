@@ -2,9 +2,10 @@
 
 #include <SDL.h>															// Include external libraries.
 #include <SDL_image.h>														//
+#include <queue>
 
 #include "WindowManager.h"
-#include "RendererManager.h"												// Include header files.
+#include "RendererManager.h"
 #include "Events/EventManager.h"
 #include "Events/EventHandlers.h"
 
@@ -17,28 +18,28 @@ namespace Engine
 	private:																	// Declare private memeber variables below.
 		bool running;
 
+		EventHandlers m_eventHandlers;
+		std::queue<Actions> m_actionsQ;
+
 		WindowManager m_windowManager;
 		RendererManager m_rendererManager;									    // Reference to the games RendererManager.
 		EventManager m_eventManager;
-		EventHandlers m_eventHandlers;
+
+
+		// Possible event held arrays? Should not go here.
+		bool letterKeys[26] = { false };
+
+		void processActions();
 
 
 	public:
-		Application(const char* appName, const uint16_t screenWidth, const uint16_t screenHeight);								// Declare Game constructor.
+		Application(const char* appName);								// Declare Game constructor.
 
 		void run();															    // Declare start function.
 		void end();																// Declare stop function.
 
 
-		// Event dispatch functions.
-		void dispatchEvent(SDL_Event& e);
-		void dispatchWindowEvent(SDL_WindowEvent& windowEvent);
-		void dispatchKeydownEvent(SDL_Keycode& keyCode);
-		void dispatchKeyupEvent(SDL_Keycode& keyCode);
-		void dispatchMouseMoveEvent(SDL_MouseMotionEvent& mouseMotion);
-		void dispatchMouseButtonDownEvent(SDL_MouseButtonEvent& mouseButtonEvent);
-		void dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent);
-		void dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent);
+		EventHandlers& getEventHandlers();
 		
 
 

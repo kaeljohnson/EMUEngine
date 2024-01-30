@@ -13,7 +13,7 @@ namespace Engine
 		SDL_Window* window;																			// Declare SDL_Window*
 
 	public:																							// Public member functions declared below.
-		WindowManager(const char* windowTitle, const uint16_t pixelWidth, const uint16_t pixelHeight);		// Declare WindowManager constructor.
+		WindowManager(const char* windowTitle);		// Declare WindowManager constructor.
 		SDL_Window* getWindow() const;				// Declare getWindow function.
 		void resize(const int newWindowWidth, const int newWindowHeight);
 		void toggleFullscreen();

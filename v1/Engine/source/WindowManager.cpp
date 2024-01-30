@@ -2,19 +2,18 @@
 
 #include <stdio.h>																										// External library includes.
 #include <SDL.h>																										//
-#include <SDL_image.h>																									//
-#include <string>																										//
+#include <SDL_image.h>																											//
 
 #include "../include/WindowManager.h"																					// Include header files.
 
 namespace Engine
 {
 
-	WindowManager::WindowManager(const char* windowTitle, const uint16_t pixelWidth, const uint16_t pixelHeight)									// Definition of WindowManager constructor.
+	WindowManager::WindowManager(const char* windowTitle)									// Definition of WindowManager constructor.
 		: window(nullptr)																									// Initialization list for WindowManager constructor.
 	{
 		window = SDL_CreateWindow(																							// Call to SDL_CreateWindow function. Hover over function to understand arguments.
-			windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, pixelWidth, pixelHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN
+			windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0,0, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN
 		);
 
 		if (window == nullptr)																								// If the window is still a nullptr, print an error.
