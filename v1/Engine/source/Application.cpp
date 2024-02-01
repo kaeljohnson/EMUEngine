@@ -37,7 +37,10 @@ namespace Engine
 
 	void Application::processActions()
 	{
-		// Should each layer have its own processActions functions which takes the actions queue and does what it needs before passing the queue to the next layer?
+		// Should each layer have its own processActions 
+		// functions which takes the actions queue and 
+		// does what it needs before passing the queue to the next layer?
+
 		while (!m_actionsQ.empty())
 		{
 			switch (m_actionsQ.front())

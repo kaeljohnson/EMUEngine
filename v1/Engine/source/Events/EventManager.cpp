@@ -185,9 +185,4 @@ namespace Engine
 		}
 	}
 
-	EventHandlers& EventManager::getEventHandlers()
-	{
-		return refEventHandlers;
-	}
-
 }

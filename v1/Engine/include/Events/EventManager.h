@@ -16,9 +16,6 @@ namespace Engine
 
 		std::queue<Actions>& refActionsQ;
 
-		// Used for held events.
-		bool keys[256] = { false };
-
 	public:
 		EventManager(EventHandlers& eventHandlers, std::queue<Actions>& actionsQ);
 
@@ -31,12 +28,9 @@ namespace Engine
 		void dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent);
 		void dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent);
 
-		EventHandlers& getEventHandlers();
-
 		EventManager(const EventManager&) = delete;											
 		EventManager& operator=(const EventManager&) = delete;
 		EventManager(EventManager&&) = delete;
 		EventManager& operator=(EventManager&&) = delete;
-
 	};
 }

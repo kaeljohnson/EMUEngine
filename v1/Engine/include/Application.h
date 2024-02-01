@@ -33,10 +33,7 @@ namespace Engine
 		void run();															    // Declare start function.
 		void end();																// Declare stop function.
 
-
 		EventHandlers& getEventHandlers();
-		
-
 
 		Application(const Application&) = delete;												// These four functions are declared and set to "delete" to ensure our game instance cannot be copied or moved. We only want one game instance.
 		Application& operator=(const Application&) = delete;
