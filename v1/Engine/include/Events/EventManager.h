@@ -12,14 +12,17 @@ namespace Engine
 	class EventManager
 	{
 	private:
-		EventHandlers refEventHandlers;
+		EventHandlers& refEventHandlers;
 
 		std::queue<Actions>& refActionsQ;
+
+		// Used for held events.
+		bool keys[256] = { false };
 
 	public:
 		EventManager(EventHandlers& eventHandlers, std::queue<Actions>& actionsQ);
 
-		void handleEvents(SDL_Event& e);
+		void handleEvents();
 		void dispatchWindowEvent(SDL_WindowEvent& windowEvent);
 		void dispatchKeydownEvent(SDL_Keycode& keyCode);
 		void dispatchKeyupEvent(SDL_Keycode& keyCode);
@@ -29,6 +32,11 @@ namespace Engine
 		void dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent);
 
 		EventHandlers& getEventHandlers();
+
+		EventManager(const EventManager&) = delete;											
+		EventManager& operator=(const EventManager&) = delete;
+		EventManager(EventManager&&) = delete;
+		EventManager& operator=(EventManager&&) = delete;
 
 	};
 }

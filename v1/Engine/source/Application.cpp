@@ -1,6 +1,5 @@
 #pragma once																		// Ensures there are no units compiled more than once.
-
-#include <SDL.h>																	// External library includes.
+															// External library includes.
 #include <stdio.h>
 #include <queue>
 
@@ -22,14 +21,11 @@ namespace Engine
 
 	void Application::run()																	// Definition for The Game class start function.
 	{
-		static std::queue<Actions> actionsQ;
-
-		SDL_Event e;
 		running = true;																	// Once the game is started, the running variable is set to "true" so the game loop runs indefinitely.
 
 		while (running)																	// Game loop.
 		{
-			m_eventManager.handleEvents(e);
+			m_eventManager.handleEvents();
 
 			processActions();
 
@@ -41,6 +37,7 @@ namespace Engine
 
 	void Application::processActions()
 	{
+		// Should each layer have its own processActions functions which takes the actions queue and does what it needs before passing the queue to the next layer?
 		while (!m_actionsQ.empty())
 		{
 			switch (m_actionsQ.front())

@@ -11,11 +11,14 @@ namespace Engine
 	EventManager::EventManager(EventHandlers& eventHandlers, std::queue<Actions>& actionsQ) 
 		:  refEventHandlers(eventHandlers), refActionsQ(actionsQ) {}
 
-	void EventManager::handleEvents(SDL_Event& e)
+	void EventManager::handleEvents()
 	{
+		SDL_Event e;
 
 		while (SDL_PollEvent(&e))
-		{
+		{ 
+			if (e.type == SDL_KEYDOWN && e.key.repeat == 1) return;
+
 			switch (e.type)
 			{
 			case (SDL_QUIT): refEventHandlers.quit(refActionsQ); break;
@@ -26,16 +29,7 @@ namespace Engine
 			case (SDL_MOUSEBUTTONUP): dispatchMouseButtonUpEvent(e.button); break;
 			case (SDL_MOUSEMOTION): dispatchMouseMoveEvent(e.motion); break;
 			case (SDL_MOUSEWHEEL): dispatchMouseScrollEvent(e.wheel); break;
-			default:
-			{
-				if (e.key.keysym.sym == SDLK_ESCAPE)
-				{
-					printf("end2");
-					// bug here: This function is getting called seemingly randomly.
-					//end();
-				}
-				break;
-			}
+			default: {}
 			}
 		}
 	}

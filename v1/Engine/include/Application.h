@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SDL.h>															// Include external libraries.
-#include <SDL_image.h>														//
 #include <queue>
 
 #include "WindowManager.h"
@@ -25,9 +23,6 @@ namespace Engine
 		RendererManager m_rendererManager;									    // Reference to the games RendererManager.
 		EventManager m_eventManager;
 
-
-		// Possible event held arrays? Should not go here.
-		bool letterKeys[26] = { false };
 
 		void processActions();
 
