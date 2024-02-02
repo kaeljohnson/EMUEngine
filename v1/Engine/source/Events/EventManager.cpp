@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SDL.h>
 #include <queue>
 
 #include "../../include/Events/EventManager.h"
@@ -184,5 +185,4 @@ namespace Engine
 		case (SDL_MOUSEWHEEL_NORMAL): refEventHandlers.mouseScroll(mouseWheelEvent.x, mouseWheelEvent.y); break;
 		}
 	}
-
 }
