@@ -1,3 +1,5 @@
+#pragma once
+
 #include <SDL.h>													// External includes.
 #include <SDL_image.h>
 #include <stdio.h>
