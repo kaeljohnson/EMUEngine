@@ -3,23 +3,20 @@
 #include <SDL.h>
 #include <queue>
 
-#include "EventHandlers.h"
-#include "../Actions/ActionsEnum.h"
-
+#include "../Events/Event.h"
 
 namespace Engine
 {
 	class EventManager
 	{
 	private:
-		EventHandlers& refEventHandlers;
-
-		std::queue<Actions>& refActionsQ;
+		std::queue<Event>& refEventQ;
 
 	public:
-		EventManager(EventHandlers& eventHandlers, std::queue<Actions>& actionsQ);
+		EventManager(std::queue<Event>& eventQ);
 
 		void handleEvents();
+		void dispatchQuitEvent();
 		void dispatchWindowEvent(SDL_WindowEvent& windowEvent);
 		void dispatchKeydownEvent(SDL_Keycode& keyCode);
 		void dispatchKeyupEvent(SDL_Keycode& keyCode);

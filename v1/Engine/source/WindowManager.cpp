@@ -3,7 +3,9 @@
 #include <stdio.h>																										// External library includes.
 #include <SDL.h>																										//
 #include <SDL_image.h>																											//
+#include <queue>
 
+#include "../include/Events/Event.h"
 #include "../include/WindowManager.h"																					// Include header files.
 
 namespace Engine
@@ -27,6 +29,26 @@ namespace Engine
 		}
 	}
 
+	void WindowManager::processEvents(std::queue<Event>& refEventQ)
+	{
+		// Call window manager callbacks which are user defined?
+		size_t eventQCounter = 0;
+		bool doneProcessingEvents = refEventQ.empty();
+		while (!doneProcessingEvents)
+		{
+			Event& currentEvent = refEventQ.front();
+
+			switch (currentEvent.m_eventType)
+			{
+				case (F_KEY_DOWN): toggleFullscreen(); refEventQ.pop(); break;
+				case (RESIZE_WINDOW): resize(currentEvent.m_xPos, currentEvent.m_yPos); refEventQ.pop(); break;
+				default: ++eventQCounter; break;
+			}
+
+			doneProcessingEvents = refEventQ.empty() || eventQCounter > refEventQ.size();
+		}
+	}
+
 	SDL_Window* WindowManager::getWindow() const																			// Getter for window stored in WindowManager.
 	{
 		return window;
@@ -34,6 +56,7 @@ namespace Engine
 
 	void WindowManager::resize(const int newWindowWidth, const int newWindowHeight)
 	{
+		printf("%d, %d", newWindowWidth, newWindowHeight);
 		SDL_SetWindowSize(window, newWindowWidth, newWindowHeight);
 	}
 
@@ -51,7 +74,6 @@ namespace Engine
 			SDL_SetWindowSize(window, 1800, 900);	// Go back to user set size?
 			SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
-		// SDL_SetWindowDisplayMode(m_windowManager.getWindow(), NULL);
 	}
 
 	void WindowManager::free()																								// Definition for free function in WindowManager.

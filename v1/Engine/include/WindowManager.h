@@ -3,10 +3,13 @@
 #include <SDL.h>																				// External library includes.
 #include <SDL_image.h>
 #include <string>
+#include <queue>
+
+#include "Events/Event.h"
+
 
 namespace Engine
 {
-
 	class WindowManager																				// Declare WindowManager class.
 	{
 	private:																						// Declare private member variables below.
@@ -14,10 +17,12 @@ namespace Engine
 
 	public:																							// Public member functions declared below.
 		WindowManager(const char* windowTitle);		// Declare WindowManager constructor.
+
 		SDL_Window* getWindow() const;				// Declare getWindow function.
+
+		void processEvents(std::queue<Event>& refEventQ);
 		void resize(const int newWindowWidth, const int newWindowHeight);
 		void toggleFullscreen();
 		void free();																				// Declare free function.
 	};
-
 }

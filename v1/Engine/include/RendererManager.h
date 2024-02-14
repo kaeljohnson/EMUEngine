@@ -5,7 +5,6 @@
 
 namespace Engine
 {
-
 	class RendererManager												// RendererManager class decleration.
 	{
 	private:
@@ -19,5 +18,4 @@ namespace Engine
 		void display();													// Declare display function.
 		void free();													// Declare free function.
 	};
-
 }
