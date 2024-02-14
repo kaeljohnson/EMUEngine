@@ -8,7 +8,6 @@
 
 namespace Engine
 {
-
 	RendererManager::RendererManager(SDL_Window* window)																			// Rendere manager constructor.
 		: renderer(nullptr)																											// Initialization list.
 	{

@@ -4,13 +4,12 @@
 #include <queue>
 
 #include "../../include/Events/EventManager.h"
-#include "../../include/Events/EventHandlers.h"
-#include "../../include/Actions/ActionsEnum.h"
+#include "../../include/Events/Event.h"
 
 namespace Engine
 {
-	EventManager::EventManager(EventHandlers& eventHandlers, std::queue<Actions>& actionsQ) 
-		:  refEventHandlers(eventHandlers), refActionsQ(actionsQ) {}
+	EventManager::EventManager(std::queue<Event>& eventQ)
+		: refEventQ(eventQ) {}
 
 	void EventManager::handleEvents()
 	{
@@ -22,7 +21,7 @@ namespace Engine
 
 			switch (e.type)
 			{
-			case (SDL_QUIT): refEventHandlers.quit(refActionsQ); break;
+			case (SDL_QUIT): dispatchQuitEvent(); break;
 			case (SDL_WINDOWEVENT): dispatchWindowEvent(e.window); break;
 			case (SDL_KEYDOWN): dispatchKeydownEvent(e.key.keysym.sym); break;
 			case (SDL_KEYUP): dispatchKeyupEvent(e.key.keysym.sym); break;
@@ -30,72 +29,81 @@ namespace Engine
 			case (SDL_MOUSEBUTTONUP): dispatchMouseButtonUpEvent(e.button); break;
 			case (SDL_MOUSEMOTION): dispatchMouseMoveEvent(e.motion); break;
 			case (SDL_MOUSEWHEEL): dispatchMouseScrollEvent(e.wheel); break;
-			default: {}
+			default: break;
 			}
 		}
+	}
+
+	void EventManager::dispatchQuitEvent()
+	{
+		refEventQ.push({QUIT});
 	}
 
 	void EventManager::dispatchWindowEvent(SDL_WindowEvent& windowEvent)
 	{
 		switch (windowEvent.type)
 		{
-		// case (SDL_WINDOWEVENT_RESIZED): m_windowManager.resize(windowEvent.data1, windowEvent.data2); break;
-		case (SDL_WINDOWEVENT_RESIZED): refEventHandlers.windowResize(refActionsQ);
+			case (SDL_WINDOWEVENT_RESIZED): refEventQ.push({ RESIZE_WINDOW, windowEvent.data1, windowEvent.data2 }); break;
+			default: break;
 		}
 	}
 
 	void EventManager::dispatchKeydownEvent(SDL_Keycode& keyCode)
 	{
-		printf("dispatch keydown event.\n");
 		switch (keyCode)
 		{
-		case (SDLK_ESCAPE): refEventHandlers.escapeKeyDown(); break;
-		case (SDLK_EQUALS): refEventHandlers.equalsDown(refActionsQ); break;
-		case (SDLK_0): refEventHandlers.zeroKeyDown(); break;
-		case (SDLK_1): refEventHandlers.oneKeyDown(); break;
-		case (SDLK_2): refEventHandlers.twoKeyDown(); break;
-		case (SDLK_3): refEventHandlers.threeKeyDown(); break;
-		case (SDLK_4): refEventHandlers.fourKeyDown(); break;
-		case (SDLK_5): refEventHandlers.fiveKeyDown(); break;
-		case (SDLK_6): refEventHandlers.sixKeyDown(); break;
-		case (SDLK_7): refEventHandlers.sevenKeyDown(); break;
-		case (SDLK_8): refEventHandlers.eightKeyDown(); break;
-		case (SDLK_9): refEventHandlers.nineKeyDown(); break;
-		case (SDLK_q): refEventHandlers.qKeyDown(); break;
-		case (SDLK_w): refEventHandlers.wKeyDown(); break;
-		case (SDLK_e): refEventHandlers.eKeyDown(); break;
-		case (SDLK_r): refEventHandlers.rKeyDown(); break;
-		case (SDLK_t): refEventHandlers.tKeyDown(); break;
-		case (SDLK_y): refEventHandlers.yKeyDown(); break;
-		case (SDLK_u): refEventHandlers.uKeyDown(); break;
-		case (SDLK_i): refEventHandlers.iKeyDown(); break;
-		case (SDLK_o): refEventHandlers.oKeyDown(); break;
-		case (SDLK_p): refEventHandlers.pKeyDown(); break;
-		case (SDLK_a): refEventHandlers.aKeyDown(); break;
-		case (SDLK_s): refEventHandlers.sKeyDown(); break;
-		case (SDLK_d): refEventHandlers.dKeyDown(); break;
-		case (SDLK_f): refEventHandlers.fKeyDown(); break;
-		case (SDLK_g): refEventHandlers.gKeyDown(); break;
-		case (SDLK_h): refEventHandlers.hKeyDown(); break;
-		case (SDLK_j): refEventHandlers.jKeyDown(); break;
-		case (SDLK_k): refEventHandlers.kKeyDown(); break;
-		case (SDLK_l): refEventHandlers.lKeyDown(); break;
-		case (SDLK_z): refEventHandlers.zKeyDown(); break;
-		case (SDLK_x): refEventHandlers.xKeyDown(); break;
-		case (SDLK_c): refEventHandlers.cKeyDown(); break;
-		case (SDLK_v): refEventHandlers.vKeyDown(); break;
-		case (SDLK_b): refEventHandlers.bKeyDown(); break;
-		case (SDLK_n): refEventHandlers.nKeyDown(); break;
-		case (SDLK_m): refEventHandlers.mKeyDown(); break;
-		case (SDLK_TAB): refEventHandlers.tabKeyDown(); break;
-		case (SDLK_CAPSLOCK): refEventHandlers.capslockKeyDown(); break;
-		case (SDLK_LSHIFT): refEventHandlers.lShiftKeyDown(); break;
-		case (SDLK_RETURN): refEventHandlers.enterKeyDown(); break;
-		case (SDLK_LEFT): refEventHandlers.leftArrowKeyDown(); break;
-		case (SDLK_UP): refEventHandlers.upArrowKeyDown(); break;
-		case (SDLK_RIGHT):refEventHandlers.rightArrowKeyDown(); break;
-		case (SDLK_DOWN): refEventHandlers.downArrowKeyDown(); break;
-		case (SDLK_SPACE): refEventHandlers.spaceKeyDown(); break;
+			case (SDLK_ESCAPE): refEventQ.push({ESCAPE_KEY_DOWN}); break;
+			case (SDLK_EQUALS): refEventQ.push({EQUALS_KEY_DOWN}); break;
+			case (SDLK_0): refEventQ.push({ZERO_KEY_DOWN}); break;
+			case (SDLK_1): refEventQ.push({ONE_KEY_DOWN}); break;
+			case (SDLK_2): refEventQ.push({TWO_KEY_DOWN}); break;
+			case (SDLK_3): refEventQ.push({THREE_KEY_DOWN}); break;
+			case (SDLK_4): refEventQ.push({FOUR_KEY_DOWN}); break;
+			case (SDLK_5): refEventQ.push({FIVE_KEY_DOWN}); break;
+			case (SDLK_6): refEventQ.push({SIX_KEY_DOWN}); break;
+			case (SDLK_7): refEventQ.push({SEVEN_KEY_DOWN}); break;
+			case (SDLK_8): refEventQ.push({EIGHT_KEY_DOWN}); break;
+			case (SDLK_9): refEventQ.push({NINE_KEY_DOWN}); break;
+			case (SDLK_q): refEventQ.push({Q_KEY_DOWN}); break;
+			case (SDLK_w): refEventQ.push({W_KEY_DOWN}); break;
+			case (SDLK_e): refEventQ.push({E_KEY_DOWN}); break;
+			case (SDLK_r): refEventQ.push({R_KEY_DOWN}); break;
+			case (SDLK_t): refEventQ.push({T_KEY_DOWN}); break;
+			case (SDLK_y): refEventQ.push({Y_KEY_DOWN}); break;
+			case (SDLK_u): refEventQ.push({U_KEY_DOWN}); break;
+			case (SDLK_i): refEventQ.push({I_KEY_DOWN}); break;
+			case (SDLK_o): refEventQ.push({O_KEY_DOWN}); break;
+			case (SDLK_p): refEventQ.push({P_KEY_DOWN}); break;
+			case (SDLK_a): refEventQ.push({A_KEY_DOWN}); break;
+			case (SDLK_s): refEventQ.push({S_KEY_DOWN}); break;
+			case (SDLK_d): refEventQ.push({D_KEY_DOWN}); break;
+			case (SDLK_f): refEventQ.push({F_KEY_DOWN}); break;
+			case (SDLK_g): refEventQ.push({G_KEY_DOWN}); break;
+			case (SDLK_h): refEventQ.push({H_KEY_DOWN}); break;
+			case (SDLK_j): refEventQ.push({J_KEY_DOWN}); break;
+			case (SDLK_k): refEventQ.push({K_KEY_DOWN}); break;
+			case (SDLK_l): refEventQ.push({L_KEY_DOWN}); break;
+			case (SDLK_z): refEventQ.push({Z_KEY_DOWN}); break;
+			case (SDLK_x): refEventQ.push({X_KEY_DOWN}); break;
+			case (SDLK_c): refEventQ.push({C_KEY_DOWN}); break;
+			case (SDLK_v): refEventQ.push({V_KEY_DOWN}); break;
+			case (SDLK_b): refEventQ.push({B_KEY_DOWN}); break;
+			case (SDLK_n): refEventQ.push({N_KEY_DOWN}); break;
+			case (SDLK_m): refEventQ.push({M_KEY_DOWN}); break;
+			case (SDLK_TAB): refEventQ.push({TAB_KEY_DOWN}); break;
+			case (SDLK_CAPSLOCK): refEventQ.push({CAPS_LOCK_KEY_DOWN}); break;
+			case (SDLK_LSHIFT): refEventQ.push({LEFT_SHIFT_KEY_DOWN}); break;
+			case (SDLK_RSHIFT): refEventQ.push({RIGHT_SHIFT_KEY_DOWN}); break;
+			case (SDLK_RETURN): refEventQ.push({ENTER_KEY_DOWN}); break;
+			case (SDLK_LEFT): refEventQ.push({LEFT_ARROW_KEY_DOWN}); break;
+			case (SDLK_UP): refEventQ.push({UP_ARROW_KEY_DOWN}); break;
+			case (SDLK_RIGHT): refEventQ.push({RIGHT_ARROW_KEY_DOWN}); break;
+			case (SDLK_DOWN): refEventQ.push({DOWN_ARROW_KEY_DOWN}); break;
+			case (SDLK_SPACE): refEventQ.push({SPACE_KEY_DOWN}); break;
+			case (SDLK_MINUS): refEventQ.push({MINUS_KEY_DOWN}); break;
+			case (SDLK_BACKSPACE): refEventQ.push({BACKSPACE_KEY_DOWN}); break;
+			default: break;
+
 		}
 	}
 
@@ -103,86 +111,89 @@ namespace Engine
 	{
 		switch (keyCode)
 		{
-		case (SDLK_ESCAPE): refEventHandlers.escapeKeyUp(); break;
-		case (SDLK_EQUALS): refEventHandlers.equalsUp(); break;
-		case (SDLK_0): refEventHandlers.zeroKeyUp(); break;
-		case (SDLK_1): refEventHandlers.oneKeyUp(); break;
-		case (SDLK_2): refEventHandlers.twoKeyUp(); break;
-		case (SDLK_3): refEventHandlers.threeKeyUp(); break;
-		case (SDLK_4): refEventHandlers.fourKeyUp(); break;
-		case (SDLK_5): refEventHandlers.fiveKeyUp(); break;
-		case (SDLK_6): refEventHandlers.sixKeyUp(); break;
-		case (SDLK_7): refEventHandlers.sevenKeyUp(); break;
-		case (SDLK_8): refEventHandlers.eightKeyUp(); break;
-		case (SDLK_9): refEventHandlers.nineKeyUp(); break;
-		case (SDLK_q): refEventHandlers.qKeyUp(); break;
-		case (SDLK_w): refEventHandlers.wKeyUp(); break;
-		case (SDLK_e): refEventHandlers.eKeyUp(); break;
-		case (SDLK_r): refEventHandlers.rKeyUp(); break;
-		case (SDLK_t): refEventHandlers.tKeyUp(); break;
-		case (SDLK_y): refEventHandlers.yKeyUp(); break;
-		case (SDLK_u): refEventHandlers.uKeyUp(); break;
-		case (SDLK_i): refEventHandlers.iKeyUp(); break;
-		case (SDLK_o): refEventHandlers.oKeyUp(); break;
-		case (SDLK_p): refEventHandlers.pKeyUp(); break;
-		case (SDLK_a): refEventHandlers.aKeyUp(); break;
-		case (SDLK_s): refEventHandlers.sKeyUp(); break;
-		case (SDLK_d): refEventHandlers.dKeyUp(); break;
-		case (SDLK_f): refEventHandlers.fKeyUp(); break;
-		case (SDLK_g): refEventHandlers.gKeyUp(); break;
-		case (SDLK_h): refEventHandlers.hKeyUp(); break;
-		case (SDLK_j): refEventHandlers.jKeyUp(); break;
-		case (SDLK_k): refEventHandlers.kKeyUp(); break;
-		case (SDLK_l): refEventHandlers.lKeyUp(); break;
-		case (SDLK_z): refEventHandlers.zKeyUp(); break;
-		case (SDLK_x): refEventHandlers.xKeyUp(); break;
-		case (SDLK_c): refEventHandlers.cKeyUp(); break;
-		case (SDLK_v): refEventHandlers.vKeyUp(); break;
-		case (SDLK_b): refEventHandlers.bKeyUp(); break;
-		case (SDLK_n): refEventHandlers.nKeyUp(); break;
-		case (SDLK_m): refEventHandlers.mKeyUp(); break;
-		case (SDLK_TAB): refEventHandlers.tabKeyUp(); break;
-		case (SDLK_CAPSLOCK): refEventHandlers.capslockKeyUp(); break;
-		case (SDLK_LSHIFT): refEventHandlers.lShiftKeyUp(); break;
-		case (SDLK_RETURN): refEventHandlers.enterKeyUp(); break;
-		case (SDLK_LEFT): refEventHandlers.leftArrowKeyUp(); break;
-		case (SDLK_UP): refEventHandlers.upArrowKeyUp(); break;
-		case (SDLK_RIGHT): refEventHandlers.rightArrowKeyUp(); break;
-		case (SDLK_DOWN): refEventHandlers.downArrowKeyUp(); break;
-		case (SDLK_SPACE): refEventHandlers.spaceKeyUp(); break;
+			case (SDLK_ESCAPE): refEventQ.push({ESCAPE_KEY_UP}); break;
+			case (SDLK_EQUALS): refEventQ.push({EQUALS_KEY_UP}); break;
+			case (SDLK_0): refEventQ.push({ZERO_KEY_UP}); break;
+			case (SDLK_1): refEventQ.push({ONE_KEY_UP}); break;
+			case (SDLK_2): refEventQ.push({TWO_KEY_UP}); break;
+			case (SDLK_3): refEventQ.push({THREE_KEY_UP}); break;
+			case (SDLK_4): refEventQ.push({FOUR_KEY_UP}); break;
+			case (SDLK_5): refEventQ.push({FIVE_KEY_UP}); break;
+			case (SDLK_6): refEventQ.push({SIX_KEY_UP}); break;
+			case (SDLK_7): refEventQ.push({SEVEN_KEY_UP}); break;
+			case (SDLK_8): refEventQ.push({EIGHT_KEY_UP}); break;
+			case (SDLK_9): refEventQ.push({NINE_KEY_UP}); break;
+			case (SDLK_q): refEventQ.push({Q_KEY_UP}); break;
+			case (SDLK_w): refEventQ.push({W_KEY_UP}); break;
+			case (SDLK_e): refEventQ.push({E_KEY_UP}); break;
+			case (SDLK_r): refEventQ.push({R_KEY_UP}); break;
+			case (SDLK_t): refEventQ.push({T_KEY_UP}); break;
+			case (SDLK_y): refEventQ.push({Y_KEY_UP}); break;
+			case (SDLK_u): refEventQ.push({U_KEY_UP}); break;
+			case (SDLK_i): refEventQ.push({I_KEY_UP}); break;
+			case (SDLK_o): refEventQ.push({O_KEY_UP}); break;
+			case (SDLK_p): refEventQ.push({P_KEY_UP}); break;
+			case (SDLK_a): refEventQ.push({A_KEY_UP}); break;
+			case (SDLK_s): refEventQ.push({S_KEY_UP}); break;
+			case (SDLK_d): refEventQ.push({D_KEY_UP}); break;
+			case (SDLK_f): refEventQ.push({F_KEY_UP}); break;
+			case (SDLK_g): refEventQ.push({G_KEY_UP}); break;
+			case (SDLK_h): refEventQ.push({H_KEY_UP}); break;
+			case (SDLK_j): refEventQ.push({J_KEY_UP}); break;
+			case (SDLK_k): refEventQ.push({K_KEY_UP}); break;
+			case (SDLK_l): refEventQ.push({L_KEY_UP}); break;
+			case (SDLK_z): refEventQ.push({Z_KEY_UP}); break;
+			case (SDLK_x): refEventQ.push({X_KEY_UP}); break;
+			case (SDLK_c): refEventQ.push({C_KEY_UP}); break;
+			case (SDLK_v): refEventQ.push({V_KEY_UP}); break;
+			case (SDLK_b): refEventQ.push({B_KEY_UP}); break;
+			case (SDLK_n): refEventQ.push({N_KEY_UP}); break;
+			case (SDLK_m): refEventQ.push({M_KEY_UP}); break;
+			case (SDLK_TAB): refEventQ.push({TAB_KEY_UP}); break;
+			case (SDLK_CAPSLOCK): refEventQ.push({CAPS_LOCK_KEY_UP}); break;
+			case (SDLK_LSHIFT): refEventQ.push({LEFT_SHIFT_KEY_UP}); break;
+			case (SDLK_RSHIFT): refEventQ.push({RIGHT_SHIFT_KEY_UP}); break;
+			case (SDLK_RETURN): refEventQ.push({ENTER_KEY_UP}); break;
+			case (SDLK_LEFT): refEventQ.push({LEFT_ARROW_KEY_UP}); break;
+			case (SDLK_UP): refEventQ.push({UP_ARROW_KEY_UP}); break;
+			case (SDLK_RIGHT): refEventQ.push({RIGHT_ARROW_KEY_UP}); break;
+			case (SDLK_DOWN): refEventQ.push({DOWN_ARROW_KEY_UP}); break;
+			case (SDLK_SPACE): refEventQ.push({SPACE_KEY_UP}); break;
+			case (SDLK_MINUS): refEventQ.push({MINUS_KEY_UP}); break;
+			case (SDLK_BACKSPACE): refEventQ.push({BACKSPACE_KEY_UP}); break;
+			default: break;
 		}
 	}
 	void EventManager::dispatchMouseMoveEvent(SDL_MouseMotionEvent& mouseMotion)
 	{
-		refEventHandlers.mouseMove(mouseMotion.x, mouseMotion.y);
+		refEventQ.push({ MOUSE_MOVED, mouseMotion.x, mouseMotion.y });
 	}
 	void EventManager::dispatchMouseButtonDownEvent(SDL_MouseButtonEvent& mouseButtonEvent)
 	{
 		switch (mouseButtonEvent.button)
 		{
-		case (SDL_BUTTON_LEFT): refEventHandlers.leftMouseButtonDown(); break;
-		case (SDL_BUTTON_MIDDLE): refEventHandlers.middleMouseButtonDown(); break;
-		case (SDL_BUTTON_RIGHT): refEventHandlers.rightMouseButtonDown(); break;
-
-		default: break;
+			case (SDL_BUTTON_LEFT): refEventQ.push({ LEFT_MOUSE_BUTTON_DOWN }); break;
+			case (SDL_BUTTON_MIDDLE): refEventQ.push({ MIDDLE_MOUSE_BUTTON_DOWN }); break;
+			case (SDL_BUTTON_RIGHT): refEventQ.push({ RIGHT_MOUSE_BUTTON_DOWN }); break;
+			default: break;
 		}
 	}
 	void EventManager::dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent)
 	{
 		switch (mouseButtonEvent.button)
 		{
-		case (SDL_BUTTON_LEFT): refEventHandlers.leftMouseButtonUp(); break;
-		case (SDL_BUTTON_MIDDLE): refEventHandlers.middleMouseButtonUp(); break;
-		case (SDL_BUTTON_RIGHT): refEventHandlers.rightMouseButtonUp(); break;
-
-		default: break;
+			case (SDL_BUTTON_LEFT): refEventQ.push({ LEFT_MOUSE_BUTTON_UP }); break;
+			case (SDL_BUTTON_MIDDLE): refEventQ.push({ MIDDLE_MOUSE_BUTTON_UP }); break;
+			case (SDL_BUTTON_RIGHT): refEventQ.push({ RIGHT_MOUSE_BUTTON_UP }); break;
+			default: break;
 		}
 	}
 	void EventManager::dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent)
 	{
 		switch (mouseWheelEvent.direction)
 		{
-		case (SDL_MOUSEWHEEL_NORMAL): refEventHandlers.mouseScroll(mouseWheelEvent.x, mouseWheelEvent.y); break;
+			case (SDL_MOUSEWHEEL_NORMAL): refEventQ.push({ MOUSE_WHEEL_MOVED, mouseWheelEvent.x, mouseWheelEvent.y }); break;
+			default: break;
 		}
 	}
 }

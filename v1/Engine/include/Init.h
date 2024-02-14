@@ -2,11 +2,9 @@
 
 namespace Engine
 {
-
 	class Init
 	{
 	public:
 		Init();
 	};
-
 }

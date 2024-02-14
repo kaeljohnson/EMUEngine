@@ -5,8 +5,7 @@
 
 #include "../include/Application.h"													// Header files includes.
 #include "../include/RendererManager.h"
-
-#include "../include/Actions/ActionsEnum.h"
+#include "../include/Events/Event.h"
 
 namespace Engine
 {
@@ -14,8 +13,7 @@ namespace Engine
 	Application::Application(const char* appName)										// Definition for Game constructor. Note: "<Class>::<Function>" the function on the right side of the "::" comes from the class on the left side.
 		: m_windowManager(appName),
 		m_rendererManager(m_windowManager.getWindow()),
-		m_eventHandlers(),
-		m_eventManager(m_eventHandlers, m_actionsQ),
+		m_eventManager(m_eventQ),
 		running(false)																							// Initialization list for the Game constructor. Initialization lists are more optimal than setting variables within the square brackets of the constructor.
 	{}
 
@@ -26,7 +24,6 @@ namespace Engine
 		while (running)																	// Game loop.
 		{
 			m_eventManager.handleEvents();
-
 			processActions();
 
 			m_rendererManager.clearScreen();											// Call to clear screen function on RendererManager object reference. Screen must be cleared once a game loop.
@@ -41,16 +38,25 @@ namespace Engine
 		// functions which takes the actions queue and 
 		// does what it needs before passing the queue to the next layer?
 
-		while (!m_actionsQ.empty())
+	    // Need to send event queue to each layer/component.
+		// Each layer can do what they need with the event 
+		// queue and remove or put event back on end of queue.
+
+		// for layer in layer stack
+		// layer.processEvents(eventQ);
+		m_windowManager.processEvents(m_eventQ);
+
+		while (!m_eventQ.empty())
 		{
-			switch (m_actionsQ.front())
+			Event& currentEvent = m_eventQ.front();
+
+			switch (currentEvent.m_eventType) 
 			{
-			case (QUIT): end(); break;
-			case (TOGGLE_FULLSCREEN): m_windowManager.toggleFullscreen(); break;
-			case (RESIZE_WINDOW): m_windowManager.resize(100, 100); break;
-			default: break;
+				case (QUIT): end(); break;
+				case (ESCAPE_KEY_DOWN): end(); break;
+				default: printf("Unhandled Event: %d\n", currentEvent.m_eventType);  break;
 			}
-			m_actionsQ.pop();
+			m_eventQ.pop();
 		}
 	}
 
@@ -60,10 +66,4 @@ namespace Engine
 		m_rendererManager.free();
 		m_windowManager.free();
 	}
-
-	EventHandlers& Application::getEventHandlers()
-	{
-		return m_eventHandlers;
-	}
-
 }
