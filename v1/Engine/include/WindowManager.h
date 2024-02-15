@@ -10,19 +10,22 @@
 
 namespace Engine
 {
-	class WindowManager																				// Declare WindowManager class.
+	// WindowManager class. Manages the window of the application.
+	class WindowManager
 	{
-	private:																						// Declare private member variables below.
-		SDL_Window* window;																			// Declare SDL_Window*
+	private:
+		// SDL_Window* pointer. This is the window that will be used to display the application.
+		SDL_Window* window;
 
-	public:																							// Public member functions declared below.
-		WindowManager(const char* windowTitle);		// Declare WindowManager constructor.
+	public:
+		// WindowManager constructor.
+		WindowManager(const char* windowTitle);
 
-		SDL_Window* getWindow() const;				// Declare getWindow function.
-
+		// Declare WindowManager functions.
+		SDL_Window* getWindow() const;
 		void processEvents(std::queue<Event>& refEventQ);
 		void resize(const int newWindowWidth, const int newWindowHeight);
 		void toggleFullscreen();
-		void free();																				// Declare free function.
+		void free();
 	};
 }

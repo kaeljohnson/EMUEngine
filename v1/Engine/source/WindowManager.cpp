@@ -1,24 +1,24 @@
 #pragma once
 
-#include <stdio.h>																										// External library includes.
-#include <SDL.h>																										//
-#include <SDL_image.h>																											//
+#include <stdio.h>
+#include <SDL.h>
+#include <SDL_image.h>
 #include <queue>
 
 #include "../include/Events/Event.h"
-#include "../include/WindowManager.h"																					// Include header files.
+#include "../include/WindowManager.h"
 
 namespace Engine
 {
 
-	WindowManager::WindowManager(const char* windowTitle)									// Definition of WindowManager constructor.
-		: window(nullptr)																									// Initialization list for WindowManager constructor.
+	WindowManager::WindowManager(const char* windowTitle)
+		: window(nullptr)
 	{
-		window = SDL_CreateWindow(																							// Call to SDL_CreateWindow function. Hover over function to understand arguments.
+		window = SDL_CreateWindow(
 			windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0,0, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN
 		);
 
-		if (window == nullptr)																								// If the window is still a nullptr, print an error.
+		if (window == nullptr)
 		{
 			printf("Window not created! SDL_Error: %s\n", SDL_GetError());
 		}
@@ -31,25 +31,33 @@ namespace Engine
 
 	void WindowManager::processEvents(std::queue<Event>& refEventQ)
 	{
+		// Better way to do this function?
+
 		// Call window manager callbacks which are user defined?
 		size_t eventQCounter = 0;
 		bool doneProcessingEvents = refEventQ.empty();
 		while (!doneProcessingEvents)
 		{
-			Event& currentEvent = refEventQ.front();
+			Event currentEvent = refEventQ.front();
 
 			switch (currentEvent.m_eventType)
 			{
-				case (F_KEY_DOWN): toggleFullscreen(); refEventQ.pop(); break;
-				case (RESIZE_WINDOW): resize(currentEvent.m_xPos, currentEvent.m_yPos); refEventQ.pop(); break;
-				default: ++eventQCounter; break;
+				case (F_KEY_DOWN): toggleFullscreen(); refEventQ.pop(); printf("Handled event: %d\n", F_KEY_DOWN);  break;
+				case (RESIZE_WINDOW): resize(currentEvent.m_xPos, currentEvent.m_yPos); printf("Handled event: %d", RESIZE_WINDOW); refEventQ.pop(); break;
+				default: 
+				{
+					refEventQ.pop();
+					refEventQ.push(currentEvent);
+					++eventQCounter;
+					break;
+				}
 			}
 
 			doneProcessingEvents = refEventQ.empty() || eventQCounter > refEventQ.size();
 		}
 	}
 
-	SDL_Window* WindowManager::getWindow() const																			// Getter for window stored in WindowManager.
+	SDL_Window* WindowManager::getWindow() const
 	{
 		return window;
 	}
@@ -76,10 +84,10 @@ namespace Engine
 		}
 	}
 
-	void WindowManager::free()																								// Definition for free function in WindowManager.
+	void WindowManager::free()
 	{
-		SDL_DestroyWindow(window);																							// Free dynamically allocated window.
-		window = nullptr;																									// Make sure window is not still attached to the freed memory.
+		SDL_DestroyWindow(window);
+		window = nullptr;
 	}
 
 }

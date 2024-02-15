@@ -2,22 +2,23 @@
 
 #include <stdio.h>
 
-#include "../include/EngineIncludes.h"														    /// Need engine code
+#include "../include/EngineIncludes.h"
 
 const char* APPLICATION_NAME = "Wizard Game v1";\
 
-int main(int argc, char* args[])																// Main function. Starting point for all C++ programs.
+// Main function. Starting point for all C++ programs.
+int main(int argc, char* args[])
 {
 
 	Engine::Init;
-
-	Engine::Application app(APPLICATION_NAME);													// Call to Game constructor. Creates or "instantiates" and object of type "Game" named game.
+	// Call to Game constructor. Creates or "instantiates" and object of type "Game" named game.
+	Engine::Application app(APPLICATION_NAME);
 	// Log a warning if app was instantiated without initializing the engine.
 
 
-	app.run();																				    // Call start function on newly created Game object. This starts the game loop.
+	app.run();
 
 	app.end();
 
-	return 0;																					// main function is declared as int so it must return an int.
+	return 0;
 } 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL.h>													// External includes.
+#include <SDL.h>
 #include <SDL_image.h>
 #include <stdio.h>
 
@@ -10,10 +10,16 @@ namespace Engine
 {
 	Init::Init()
 	{
-		if (!IMG_Init(IMG_INIT_PNG))													// Call to SDL "IMG_Init" function.
-			printf("IMG Init failed! SDL_Error: %s\n", SDL_GetError());					// If "IMG_Init" function fails, print the last SDL error to the console. We will need more robust error logging later.
+		/*
+			Call to SDL "IMG_Init" and "SDL_Init" functions.
+			If these function fail, print the last 
+			SDL error to the console. We will need more robust error logging later.
+		*/
 
-		if (SDL_Init(SDL_INIT_VIDEO) < 0)												// Call to SDL "SDL_Init" function.
-			printf("SDL Init failed! SDL_Error: %s\n", SDL_GetError());					// If "SDL_Init" fails, print last SDL error to the console.
+		if (!IMG_Init(IMG_INIT_PNG))
+			printf("IMG Init failed! SDL_Error: %s\n", SDL_GetError());
+
+		if (SDL_Init(SDL_INIT_VIDEO) < 0)
+			printf("SDL Init failed! SDL_Error: %s\n", SDL_GetError());
 	}
 }

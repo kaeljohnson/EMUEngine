@@ -11,24 +11,30 @@ namespace Engine
 {
 	class Application
 	{
-	private:																	// Declare private memeber variables below.
+	private:
+		// bool to indicate if the application is running or not.
 		bool running;
 
+		// Event queue to hold all events.
 		std::queue<Event> m_eventQ;
 
+		// All of the different managers that the application will use.
 		WindowManager m_windowManager;
-		RendererManager m_rendererManager;									    // Reference to the games RendererManager.
+		RendererManager m_rendererManager;
 		EventManager m_eventManager;
 
-		void processActions();
+		void processEventQueue();
 
 	public:
-		Application(const char* appName);								// Declare Game constructor.
+		// Application constructor.
+		Application(const char* appName);
 
-		void run();															    // Declare start function.
-		void end();																// Declare stop function.
+		// Application functions.
+		void run();
+		void end();
 
-		Application(const Application&) = delete;												// These four functions are declared and set to "delete" to ensure our game instance cannot be copied or moved. We only want one game instance.
+		// Deleted functions to ensure our game instance cannot be copied or moved.
+		Application(const Application&) = delete;
 		Application& operator=(const Application&) = delete;
 		Application(Application&&) = delete;
 		Application& operator=(Application&&) = delete;

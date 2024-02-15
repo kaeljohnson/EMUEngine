@@ -7,6 +7,7 @@
 
 namespace Engine
 {
+	// EventManager class. Polls for events and dispatches them to the event queue.
 	class EventManager
 	{
 	private:
@@ -15,6 +16,7 @@ namespace Engine
 	public:
 		EventManager(std::queue<Event>& eventQ);
 
+		// event handling and dispatching functions.
 		void handleEvents();
 		void dispatchQuitEvent();
 		void dispatchWindowEvent(SDL_WindowEvent& windowEvent);
