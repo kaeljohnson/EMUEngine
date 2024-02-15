@@ -67,12 +67,12 @@ namespace Engine
 	private:
 		
 	public:
-		const EventType m_eventType;	// The type of event that occurred.
-		const int m_xPos;				// The x position of the event if applicable.
-		const int m_yPos;				// The y position of the event if applicable.
+		const EventType m_eventType;
+		const int m_xPos;
+		const int m_yPos;
 
-		Event(const EventType);														// Constructor for the Event class.
-		Event(const EventType actionType, const int xPos, const int yPos);			// Constructor for the Event class with associated data.	
+		Event(const EventType);
+		Event(const EventType actionType, const int xPos, const int yPos);	
 	};
 }
  
