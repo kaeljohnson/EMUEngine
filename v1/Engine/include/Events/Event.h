@@ -2,6 +2,7 @@
 
 namespace Engine
 {
+	// Custom event types to hide the SDL2 event types from the user.
 	enum EventType
 	{
 		QUIT = 0,
@@ -59,18 +60,19 @@ namespace Engine
 		// Mouse wheel events
 		MOUSE_WHEEL_MOVED,
 	};
-
+	
+	// Custom event class to hide the SDL2 event from the user.
 	class Event
 	{
 	private:
 		
 	public:
-		const EventType m_eventType;
-		const int m_xPos;
-		const int m_yPos;
+		const EventType m_eventType;	// The type of event that occurred.
+		const int m_xPos;				// The x position of the event if applicable.
+		const int m_yPos;				// The y position of the event if applicable.
 
-		Event(const EventType);
-		Event(const EventType actionType, const int xPos, const int yPos);
+		Event(const EventType);														// Constructor for the Event class.
+		Event(const EventType actionType, const int xPos, const int yPos);			// Constructor for the Event class with associated data.	
 	};
 }
  

@@ -13,10 +13,21 @@ namespace Engine
 
 	void EventManager::handleEvents()
 	{
+		/* 
+			Poll for SDLevents and dispatch them to their respective event types.
+			The dispatch functions will push the event to the event queue based 
+			on their sub type. Key down and key up events are handled differently, 
+			as they have to be checked for their key code. Key held events are 
+			handled separately, based on how the user implements respective event 
+			handling. The reason for this is that the SDL_KEYDOWN event has a delay 
+			before it starts repeating when key is held, making it hard to handle.
+		*/
+
 		SDL_Event e;
 
 		while (SDL_PollEvent(&e))
 		{ 
+			// If the event is a keydown event and the key is repeating, we don't want to handle it.
 			if (e.type == SDL_KEYDOWN && e.key.repeat == 1) return;
 
 			switch (e.type)

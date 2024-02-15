@@ -1,50 +1,71 @@
-#pragma once																		// Ensures there are no units compiled more than once.
-															// External library includes.
+#pragma once
+
 #include <stdio.h>
 #include <queue>
 
-#include "../include/Application.h"													// Header files includes.
+#include "../include/Application.h"
 #include "../include/RendererManager.h"
 #include "../include/Events/Event.h"
 
 namespace Engine
 {
-
-	Application::Application(const char* appName)										// Definition for Game constructor. Note: "<Class>::<Function>" the function on the right side of the "::" comes from the class on the left side.
+	// Definition for Game constructor. Note: "<Class>::<Function>" the function
+	// on the right side of the "::" comes from the class on the left side.
+	Application::Application(const char* appName)
+		/* 
+			Initialization list for the Application constructor.
+			Initialization lists are more optimal than setting 
+			variables within the square brackets of the constructor.
+		*/
 		: m_windowManager(appName),
 		m_rendererManager(m_windowManager.getWindow()),
 		m_eventManager(m_eventQ),
-		running(false)																							// Initialization list for the Game constructor. Initialization lists are more optimal than setting variables within the square brackets of the constructor.
+		running(false)
 	{}
 
-	void Application::run()																	// Definition for The Game class start function.
+	void Application::run()
 	{
-		running = true;																	// Once the game is started, the running variable is set to "true" so the game loop runs indefinitely.
+		running = true;
 
-		while (running)																	// Game loop.
+		// Application loop.
+		while (running)
 		{
-			m_eventManager.handleEvents();
-			processActions();
+			/*
+			Each game loop iteration should:
+				1. Handle events.
+				2. Process actions.
+				3. Clear the screen.
+				4. Render game objects.
+				5. Display the rendered game objects.
+			*/
 
-			m_rendererManager.clearScreen();											// Call to clear screen function on RendererManager object reference. Screen must be cleared once a game loop.
-			// m_rendererManager.render(/* Rect */);									// Here is where we will need to render all of our game objects: Player, entities, tiles, etc.
-			m_rendererManager.display();												// Call to display function on RendererManager object reference. Once everything is rendered, we must display it on the screen.
+			m_eventManager.handleEvents();
+			processEventQueue();
+
+			m_rendererManager.clearScreen();
+			// m_rendererManager.render(/* Rect */);
+			m_rendererManager.display();
 		}
 	}
 
-	void Application::processActions()
+	void Application::processEventQueue()
 	{
-		// Should each layer have its own processActions 
-		// functions which takes the actions queue and 
-		// does what it needs before passing the queue to the next layer?
+		/*
+			Each layer will have its own processEvents function.
+			These functions will be called in the order that the layers are added.
+			The user needs to decide in what order layers are added.
+			This is because the user needs to decide which layer has priority over the others,
+			and which layer should handle the events first. The user also needs to determine 
+			what order the layers should be rendered in.
+		*/
 
-	    // Need to send event queue to each layer/component.
-		// Each layer can do what they need with the event 
-		// queue and remove or put event back on end of queue.
-
-		// for layer in layer stack
-		// layer.processEvents(eventQ);
 		m_windowManager.processEvents(m_eventQ);
+
+		/* 
+			After all the layers process their events, the event 
+			queue will be processed by the application to ensure all
+			events are handled.
+		*/
 
 		while (!m_eventQ.empty())
 		{
@@ -60,7 +81,7 @@ namespace Engine
 		}
 	}
 
-	void Application::end()																// Definition for end function on game. Stops the game.
+	void Application::end()
 	{
 		running = false;
 		m_rendererManager.free();

@@ -5,17 +5,23 @@
 
 namespace Engine
 {
-	class RendererManager												// RendererManager class decleration.
+	// RendererManager class. Manages the rendering of the application.
+	class RendererManager												
 	{
 	private:
-		SDL_Renderer* renderer = nullptr;								// Declare and set SDL_Renderer* to nullptr
-	public:																// Public declerations below.
-		RendererManager(SDL_Window* window);							// Declare RendererManager constructor.
-		const SDL_Renderer* getRenderer() const;						// Declare getRenderer function.
-		const SDL_Texture* loadTexture(const char* filePath);			// Declare loadTexture function.
-		void clearScreen();												// Declare clearScreen function.
-		void render(SDL_Rect& rect);									// Declare render function.
-		void display();													// Declare display function.
-		void free();													// Declare free function.
+
+		// SDL2 renderer pointer. This is the renderer that will be used to render all of the game objects.
+		SDL_Renderer* renderer;
+	public:
+		// RendererManager constructor.
+		RendererManager(SDL_Window* window);
+
+		// RendererManager functions.
+		const SDL_Renderer* getRenderer() const;
+		const SDL_Texture* loadTexture(const char* filePath);
+		void clearScreen();
+		void render(SDL_Rect& rect);
+		void display();
+		void free();
 	};
 }
