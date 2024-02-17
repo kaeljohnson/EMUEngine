@@ -4,7 +4,6 @@
 #include <queue>
 
 #include "../include/Application.h"
-#include "../include/RendererManager.h"
 #include "../include/Events/Event.h"
 
 namespace Engine
@@ -69,13 +68,13 @@ namespace Engine
 
 		while (!m_eventQ.empty())
 		{
-			Event& currentEvent = m_eventQ.front();
+			const Event& currentEvent = m_eventQ.front();
 
 			switch (currentEvent.m_eventType) 
 			{
 				case (QUIT): end(); break;
 				case (ESCAPE_KEY_DOWN): end(); break;
-				default: printf("Unhandled Event: %d\n", currentEvent.m_eventType);  break;
+				default: printf("Unhandled Event: %d\n", currentEvent.m_eventType); break;
 			}
 			m_eventQ.pop();
 		}
