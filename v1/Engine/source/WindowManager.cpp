@@ -10,7 +10,6 @@
 
 namespace Engine
 {
-
 	WindowManager::WindowManager(const char* windowTitle)
 		: window(nullptr)
 	{
@@ -38,15 +37,15 @@ namespace Engine
 		bool doneProcessingEvents = refEventQ.empty();
 		while (!doneProcessingEvents)
 		{
-			Event currentEvent = refEventQ.front();
+			const Event currentEvent = refEventQ.front();
+			refEventQ.pop();
 
 			switch (currentEvent.m_eventType)
 			{
-				case (F_KEY_DOWN): toggleFullscreen(); refEventQ.pop(); printf("Handled event: %d\n", F_KEY_DOWN);  break;
-				case (RESIZE_WINDOW): resize(currentEvent.m_xPos, currentEvent.m_yPos); printf("Handled event: %d", RESIZE_WINDOW); refEventQ.pop(); break;
+				case (F_KEY_DOWN): toggleFullscreen(); printf("Handled event: %d\n", F_KEY_DOWN); break;
+				case (RESIZE_WINDOW): resize(currentEvent.m_xPos, currentEvent.m_yPos); printf("Handled event: %d", RESIZE_WINDOW); break;
 				default: 
 				{
-					refEventQ.pop();
 					refEventQ.push(currentEvent);
 					++eventQCounter;
 					break;
