@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <queue>
 
+#include "spdlog/spdlog.h"
+
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
 
@@ -24,6 +26,8 @@ namespace Engine
 
 	void Application::run()
 	{
+		spdlog::info("Welcome to spdlog!");
+
 		running = true;
 
 		// Application loop.

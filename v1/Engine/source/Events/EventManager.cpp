@@ -177,7 +177,7 @@ namespace Engine
 	}
 	void EventManager::dispatchMouseMoveEvent(SDL_MouseMotionEvent& mouseMotion)
 	{
-		refEventQ.push({ MOUSE_MOVED, mouseMotion.x, mouseMotion.y });
+		refEventQ.push({ MOUSE_MOVE, mouseMotion.x, mouseMotion.y });
 	}
 	void EventManager::dispatchMouseButtonDownEvent(SDL_MouseButtonEvent& mouseButtonEvent)
 	{

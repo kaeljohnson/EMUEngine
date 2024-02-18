@@ -31,7 +31,8 @@ project "v1"
 	includedirs
 	{
 		"%{prj.name}/external/sdl2/SDL2-2.24.1/include",
-		"%{prj.name}/external/sdl2/SDL2_image-2.6.2/include"
+		"%{prj.name}/external/sdl2/SDL2_image-2.6.2/include",
+		"%{prj.name}/external/spdlog/include"
 	}
 
 	libdirs

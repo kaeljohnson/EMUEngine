@@ -55,7 +55,7 @@ namespace Engine
 		LEFT_MOUSE_BUTTON_UP, RIGHT_MOUSE_BUTTON_UP, MIDDLE_MOUSE_BUTTON_UP,
 
 		// Mouse movement events
-		MOUSE_MOVED, MOUSE_DRAGGED,
+		MOUSE_MOVE, MOUSE_DRAGGED,
 
 		// Mouse wheel events
 		MOUSE_WHEEL_MOVED,
