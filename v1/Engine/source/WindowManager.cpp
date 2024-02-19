@@ -7,6 +7,7 @@
 
 #include "../include/Events/Event.h"
 #include "../include/WindowManager.h"
+#include "../include/Logging/Logger.h"
 
 namespace Engine
 {
@@ -19,12 +20,12 @@ namespace Engine
 
 		if (window == nullptr)
 		{
-			printf("Window not created! SDL_Error: %s\n", SDL_GetError());
+			ENGINE_CRITICAL("Window not created! SDL_Error: {}", SDL_GetError());
 		}
 
 		if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0)
 		{
-			printf("Fullscreen mode not set! SDL Error: %s\n", SDL_GetError());
+			ENGINE_CRITICAL("Fullscreen mode not set! SDL Error: {}", SDL_GetError());
 		}
 	}
 
@@ -42,8 +43,8 @@ namespace Engine
 
 			switch (currentEvent.m_eventType)
 			{
-				case (F_KEY_DOWN): toggleFullscreen(); printf("Handled event: %d\n", F_KEY_DOWN); break;
-				case (RESIZE_WINDOW): resize(currentEvent.m_xPos, currentEvent.m_yPos); printf("Handled event: %d", RESIZE_WINDOW); break;
+				case (F_KEY_DOWN): toggleFullscreen(); ENGINE_INFO("Handled event: {}", F_KEY_DOWN); break;
+				case (RESIZE_WINDOW): resize(currentEvent.m_xPos, currentEvent.m_yPos); ENGINE_INFO("Handled event: {}", RESIZE_WINDOW); break;
 				default: 
 				{
 					refEventQ.push(currentEvent);
@@ -63,7 +64,7 @@ namespace Engine
 
 	void WindowManager::resize(const int newWindowWidth, const int newWindowHeight)
 	{
-		printf("%d, %d", newWindowWidth, newWindowHeight);
+		ENGINE_INFO("{}, {}", newWindowWidth, newWindowHeight);
 		SDL_SetWindowSize(window, newWindowWidth, newWindowHeight);
 	}
 
@@ -74,7 +75,7 @@ namespace Engine
 		bool isFullscreen = SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
 		if (SDL_SetWindowFullscreen(window, isFullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)
 		{
-			printf("Fullscreen failed! SDL_Error: %s\n", SDL_GetError());
+			ENGINE_ERROR("Fullscreen failed! SDL_Error: {}", SDL_GetError());
 		}
 		else
 		{

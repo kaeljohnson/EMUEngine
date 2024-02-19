@@ -5,6 +5,7 @@
 #include <SDL_image.h>
 
 #include "../include/RendererManager.h"
+#include "../include/Logging/Logger.h"
 
 namespace Engine
 {
@@ -16,7 +17,7 @@ namespace Engine
 		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // rendering driver?
 		if (renderer == nullptr)
 		{
-			printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
+			ENGINE_CRITICAL("Renderer could not be created! SDL Error: {}", SDL_GetError());
 		}
 
 		SDL_SetRenderDrawColor(renderer, 'd3', 'd3', 'd3', SDL_ALPHA_OPAQUE);
@@ -35,7 +36,7 @@ namespace Engine
 		SDL_Texture* texture =  IMG_LoadTexture(renderer, filePath);
 		if (texture == nullptr)
 		{
-			printf("Failed to load texture. SDL Error: %s\n", SDL_GetError());
+			ENGINE_CRITICAL("Failed to load texture. SDL Error: {}", SDL_GetError());
 		}
 		return texture;
 	}

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <queue>
 
-#include "spdlog/spdlog.h"
+#include "../include/Logging/Logger.h"
 
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
@@ -26,7 +26,7 @@ namespace Engine
 
 	void Application::run()
 	{
-		spdlog::info("Welcome to spdlog!");
+		ENGINE_TRACE("Application running!");
 
 		running = true;
 
@@ -78,7 +78,7 @@ namespace Engine
 			{
 				case (QUIT): end(); break;
 				case (ESCAPE_KEY_DOWN): end(); break;
-				default: printf("Unhandled Event: %d\n", currentEvent.m_eventType); break;
+				default: ENGINE_INFO("Unhandled Event: {}", currentEvent.m_eventType); break;
 			}
 			m_eventQ.pop();
 		}
