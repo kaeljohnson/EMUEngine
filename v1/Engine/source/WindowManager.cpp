@@ -43,8 +43,8 @@ namespace Engine
 
 			switch (currentEvent.m_eventType)
 			{
-				case (F_KEY_DOWN): toggleFullscreen(); ENGINE_INFO("Handled event: {}", F_KEY_DOWN); break;
-				case (RESIZE_WINDOW): resize(currentEvent.m_xPos, currentEvent.m_yPos); ENGINE_INFO("Handled event: {}", RESIZE_WINDOW); break;
+				case (F_KEY_DOWN): toggleFullscreen(); ENGINE_INFO("Handled event: {}", static_cast<int>(F_KEY_DOWN)); break;
+				case (RESIZE_WINDOW): resize(currentEvent.m_xPos, currentEvent.m_yPos); ENGINE_INFO("Handled event: {}", static_cast<int>(RESIZE_WINDOW)); break;
 				default: 
 				{
 					refEventQ.push(currentEvent);

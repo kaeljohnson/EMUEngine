@@ -41,7 +41,6 @@ project "v1"
 		"%{prj.name}/external/sdl2/SDL2_image-2.6.2/lib/x64"
 	}
 
-
 	links
 	{
 		"SDL2",

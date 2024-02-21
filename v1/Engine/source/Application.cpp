@@ -78,7 +78,7 @@ namespace Engine
 			{
 				case (QUIT): end(); break;
 				case (ESCAPE_KEY_DOWN): end(); break;
-				default: ENGINE_INFO("Unhandled Event: {}", currentEvent.m_eventType); break;
+				default: ENGINE_INFO("Unhandled Event: {}", static_cast<int>(currentEvent.m_eventType)); break;
 			}
 			m_eventQ.pop();
 		}
