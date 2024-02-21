@@ -55,10 +55,16 @@ namespace Engine
 		LEFT_MOUSE_BUTTON_UP, RIGHT_MOUSE_BUTTON_UP, MIDDLE_MOUSE_BUTTON_UP,
 
 		// Mouse movement events
-		MOUSE_MOVED, MOUSE_DRAGGED,
+		MOUSE_MOVE, MOUSE_DRAGGED,
 
 		// Mouse wheel events
 		MOUSE_WHEEL_MOVED,
+
+		// Engine processig events
+		ENGINE_NOT_INITIALIZED, ENGINE_INITIALIZED, ENGINE_SHUTDOWN, ENGINE_ERROR  
+		// When the client tries to use the event queue without initializing the engine, we need to let them know there is no app listening for events.
+		// When there is an error in the engine, we need to put an engine error in the event queue to know what to do.
+
 	};
 	
 	// Custom event class to hide the SDL2 event from the user.

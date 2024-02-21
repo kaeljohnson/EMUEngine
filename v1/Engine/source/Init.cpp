@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "../include/Init.h"
+#include "../include/Logging/Logger.h"
 
 namespace Engine
 {
@@ -16,10 +17,13 @@ namespace Engine
 			SDL error to the console. We will need more robust error logging later.
 		*/
 
+		Logger::Init();
+		ENGINE_TRACE("Logger initialized!");
+
 		if (!IMG_Init(IMG_INIT_PNG))
-			printf("IMG Init failed! SDL_Error: %s\n", SDL_GetError());
+			ENGINE_CRITICAL("IMG Init failed! SDL_Error: {}", SDL_GetError());
 
 		if (SDL_Init(SDL_INIT_VIDEO) < 0)
-			printf("SDL Init failed! SDL_Error: %s\n", SDL_GetError());
+			ENGINE_CRITICAL("SDL Init failed! SDL_Error: {}", SDL_GetError());
 	}
 }
