@@ -12,7 +12,7 @@
 namespace Engine
 {
 	WindowManager::WindowManager(const char* windowTitle)
-		: window(nullptr)
+		: window(nullptr), m_fullscreenHeight(0), m_fullscreenWidth(0)
 	{
 		window = SDL_CreateWindow(
 			windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0,0, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN
@@ -27,6 +27,19 @@ namespace Engine
 		{
 			ENGINE_CRITICAL("Fullscreen mode not set! SDL Error: {}", SDL_GetError());
 		}
+
+		// Gotta be an easier way?
+		SDL_DisplayMode displayMode;
+
+		if (SDL_GetDesktopDisplayMode(0, &displayMode) != 0)
+		{
+			// Maybe should just use SDL log?
+			// SDL_Log("SDL_GetDesktopDisplayMode failed: %s", SDL_GetError());
+			ENGINE_CRITICAL("Get desktop display mode failed: {}", SDL_GetError());
+		}
+
+		m_fullscreenWidth = displayMode.w;
+		m_fullscreenHeight = displayMode.h;
 	}
 
 	void WindowManager::processEvents(std::queue<Event>& refEventQ)
@@ -79,7 +92,7 @@ namespace Engine
 		}
 		else
 		{
-			SDL_SetWindowSize(window, 1800, 900);	// Go back to user set size?
+			SDL_SetWindowSize(window, m_fullscreenWidth / 2, m_fullscreenHeight / 2);	// Go back to user set size?
 			SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
 	}
