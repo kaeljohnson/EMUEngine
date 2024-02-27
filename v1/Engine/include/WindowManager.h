@@ -17,6 +17,9 @@ namespace Engine
 		// SDL_Window* pointer. This is the window that will be used to display the application.
 		SDL_Window* window;
 
+		// Holds useful information about the display.
+		SDL_DisplayMode m_displayMode;
+
 	public:
 		// WindowManager constructor.
 		WindowManager(const char* windowTitle);
