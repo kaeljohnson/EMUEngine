@@ -88,7 +88,9 @@ namespace Engine
 		}
 		else
 		{
-			SDL_SetWindowSize(window, m_displayMode.w / 2, m_displayMode.h / 2);	// Go back to user set size?
+			// Default behavior for now will be to toggle fullscreen on for client.
+			// When the screen is toggled to windowed, the size will be half of the width and height.
+			SDL_SetWindowSize(window, m_displayMode.w / 2, m_displayMode.h / 2);
 			SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
 	}
