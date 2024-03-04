@@ -6,6 +6,12 @@
 #include "RendererManager.h"
 #include "Events/EventManager.h" 
 #include "Events/Event.h"
+#include "Layers/LayersManager.h"
+#include "Layers/BackgroundLayer.h"
+#include "Layers/GameLayer.h"
+#include "Layers/DebugLayer.h"
+#include "Layers/ForegroundLayer.h"
+#include "Layers/UILayer.h"
 
 namespace Engine
 {
@@ -23,11 +29,21 @@ namespace Engine
 		RendererManager m_rendererManager;
 		EventManager m_eventManager;
 
+		// Application Layers
+		BackgroundLayer m_backgroundLayer;
+		GameLayer m_gameLayer;
+		DebugLayer m_debugLayer;
+		ForegroundLayer m_foregroundLayer;
+		UILayer m_uiLayer;
+
 		void processEventQueue();
 
 	public:
 		// Application constructor.
 		Application(const char* appName);
+
+		// Utility functions.
+		void addToEventQ(Event& e);
 
 		// Application functions.
 		void run();
