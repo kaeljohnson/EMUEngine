@@ -21,12 +21,17 @@ namespace Engine
 		: m_windowManager(appName),
 		m_rendererManager(m_windowManager.getWindow()),
 		m_eventManager(m_eventQ),
+		m_backgroundLayer(m_eventQ),
+		m_gameLayer(m_eventQ),
+		m_debugLayer(m_eventQ),
+		m_foregroundLayer(m_eventQ),
+		m_uiLayer(m_eventQ),
 		running(false)
 	{}
 
 	void Application::run()
 	{
-		ENGINE_TRACE("Application running!");
+		ENGINE_INFO("Application running!");
 
 		running = true;
 
@@ -62,9 +67,24 @@ namespace Engine
 			what order the layers should be rendered in.
 		*/
 
+		// Process order for layers is opporsite of render order.
+
+		// Render order for layers:
+		// Background Layer -> Filled with Background textures.
+		// Game Layer -> Filled with Engine supported GameObjects type.
+		// Foreground Layer -> Filled with Foreground textures.
+		// Debug Layer -> Wrapper for Game Layer. Shows important info like hit boxes, etc.
+		// UI Layer -> Filled with Engine supported UI type.
+
+		m_uiLayer.processEvents();
+		m_debugLayer.processEvents();
+		m_foregroundLayer.processEvents();
+		m_gameLayer.processEvents();
+		m_backgroundLayer.processEvents();
+
 		m_windowManager.processEvents(m_eventQ);
 
-		/* 
+		/*
 			After all the layers process their events, the event 
 			queue will be processed by the application to ensure all
 			events are handled.
@@ -78,7 +98,7 @@ namespace Engine
 			{
 				case (QUIT): end(); break;
 				case (ESCAPE_KEY_DOWN): end(); break;
-				default: ENGINE_INFO("Unhandled Event: {}", static_cast<int>(currentEvent.m_eventType)); break;
+				default: ENGINE_TRACE("Unhandled Event: {}", static_cast<int>(currentEvent.m_eventType)); break;
 			}
 			m_eventQ.pop();
 		}
@@ -89,5 +109,10 @@ namespace Engine
 		running = false;
 		m_rendererManager.free();
 		m_windowManager.free();
+	}
+
+	void Application::addToEventQ(Event& e)
+	{
+		m_eventQ.push(e);
 	}
 }
