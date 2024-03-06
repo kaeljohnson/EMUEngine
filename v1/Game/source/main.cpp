@@ -17,6 +17,10 @@ int main(int argc, char* args[])
 
 	CLIENT_TRACE("Client Running!");
 
+	Engine::GameObject go(20, 20, true, true);
+
+	app.addToLayerStack(go);
+	
 	app.run();
 
 	app.end();
