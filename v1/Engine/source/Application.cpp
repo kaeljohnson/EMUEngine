@@ -7,6 +7,7 @@
 
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
+#include "../include/GameObjects/GameObject.h"
 
 namespace Engine
 {
@@ -114,5 +115,10 @@ namespace Engine
 	void Application::addToEventQ(Event& e)
 	{
 		m_eventQ.push(e);
+	}
+
+	void Application::addToLayerStack(GameObject& gameObject)
+	{
+		m_gameLayer.push(gameObject);
 	}
 }

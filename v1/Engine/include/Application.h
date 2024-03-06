@@ -12,6 +12,7 @@
 #include "Layers/DebugLayer.h"
 #include "Layers/ForegroundLayer.h"
 #include "Layers/UILayer.h"
+#include "GameObjects/GameObject.h"
 
 namespace Engine
 {
@@ -44,6 +45,8 @@ namespace Engine
 
 		// Utility functions.
 		void addToEventQ(Event& e);
+
+		void addToLayerStack(GameObject& gameObject);
 
 		// Application functions.
 		void run();
