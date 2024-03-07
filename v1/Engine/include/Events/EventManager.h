@@ -15,6 +15,7 @@ namespace Engine
 
 	public:
 		EventManager(std::queue<Event>& eventQ);
+		~EventManager() = default;
 
 		// event handling and dispatching functions.
 		void handleEvents();

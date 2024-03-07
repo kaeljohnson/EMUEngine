@@ -6,13 +6,8 @@
 #include "RendererManager.h"
 #include "Events/EventManager.h" 
 #include "Events/Event.h"
-#include "Layers/LayersManager.h"
-#include "Layers/BackgroundLayer.h"
-#include "Layers/GameLayer.h"
-#include "Layers/DebugLayer.h"
-#include "Layers/ForegroundLayer.h"
-#include "Layers/UILayer.h"
-#include "GameObjects/GameObject.h"
+#include "Layers/LayerStack.h"
+#include "Layers/Layer.h"
 
 namespace Engine
 {
@@ -30,12 +25,8 @@ namespace Engine
 		RendererManager m_rendererManager;
 		EventManager m_eventManager;
 
-		// Application Layers
-		BackgroundLayer m_backgroundLayer;
-		GameLayer m_gameLayer;
-		DebugLayer m_debugLayer;
-		ForegroundLayer m_foregroundLayer;
-		UILayer m_uiLayer;
+		// layer stack holds user defined layers.
+		LayerStack m_layerStack;
 
 		void processEventQueue();
 
@@ -45,8 +36,10 @@ namespace Engine
 
 		// Utility functions.
 		void addToEventQ(Event& e);
-
-		void addToLayerStack(GameObject& gameObject);
+		void addToLayerStack(Layer* layer);
+		void popLayerFromStack(std::string layerName);
+		void popLayerFromStack();
+		LayerStack& getLayerStack() { return m_layerStack; }
 
 		// Application functions.
 		void run();

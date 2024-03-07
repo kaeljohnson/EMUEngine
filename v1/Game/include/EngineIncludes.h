@@ -5,3 +5,4 @@
 #include "../../Engine/include/Events/Event.h"
 #include "../../Engine/include/Logging/Logger.h"
 #include "../../Engine/include/GameObjects/GameObject.h"
+#include "../../Engine/include/Layers/Layer.h"

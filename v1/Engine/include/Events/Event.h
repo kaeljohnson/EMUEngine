@@ -76,6 +76,7 @@ namespace Engine
 		const EventType m_eventType;
 		const int m_xPos;
 		const int m_yPos;
+		bool handled;
 
 		Event(const EventType);
 		Event(const EventType actionType, const int xPos, const int yPos);	

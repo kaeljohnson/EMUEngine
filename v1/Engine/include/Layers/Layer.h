@@ -1,6 +1,6 @@
 #pragma once
 
-#include <queue>
+#include <string>
 
 #include "../Events/Event.h"
 #include "../Events/Event.h"
@@ -9,13 +9,20 @@ namespace Engine
 {
 	class Layer
 	{
+	protected:
+		std::string m_name;
+		bool m_enabled;
 	public:
-		std::queue<Event>& refEventQ;
+		Layer(std::string name);
+		virtual void free();
+		virtual	~Layer();
 
-		Layer(std::queue<Event>& eventQ);
-		~Layer() = default;
+		virtual void onAttach();
+		virtual void onDetach();
+		virtual void onUpdate();
+		virtual void processEvent(Event& e);
 
-		virtual void processEvents() = 0;
+		const std::string& getName() const;
 	};
 }
 

@@ -8,6 +8,7 @@
 #include "../include/Events/Event.h"
 #include "../include/WindowManager.h"
 #include "../include/Logging/Logger.h"
+#include "../include/Layers/Layer.h"
 
 namespace Engine
 {
@@ -38,31 +39,17 @@ namespace Engine
 		}
 	}
 
-	void WindowManager::processEvents(std::queue<Event>& refEventQ)
+	void WindowManager::processEvent(Event& e)
 	{
-		// Better way to do this function?
-
-		// Call window manager callbacks which are user defined?
-		size_t eventQCounter = 0;
-		bool doneProcessingEvents = refEventQ.empty();
-		while (!doneProcessingEvents)
+		ENGINE_INFO("Processing event for window manager.");
+		switch (e.m_eventType)
 		{
-			const Event currentEvent = refEventQ.front();
-			refEventQ.pop();
-
-			switch (currentEvent.m_eventType)
+			case (F_KEY_DOWN): toggleFullscreen(); ENGINE_INFO("Handled event: {}", static_cast<int>(F_KEY_DOWN)); e.handled = true; break;
+			case (RESIZE_WINDOW): resize(e.m_xPos, e.m_yPos); ENGINE_INFO("Handled event: {}", static_cast<int>(RESIZE_WINDOW)); e.handled = true; break;
+			default: 
 			{
-				case (F_KEY_DOWN): toggleFullscreen(); ENGINE_INFO("Handled event: {}", static_cast<int>(F_KEY_DOWN)); break;
-				case (RESIZE_WINDOW): resize(currentEvent.m_xPos, currentEvent.m_yPos); ENGINE_INFO("Handled event: {}", static_cast<int>(RESIZE_WINDOW)); break;
-				default: 
-				{
-					refEventQ.push(currentEvent);
-					++eventQCounter;
-					break;
-				}
+				break;
 			}
-
-			doneProcessingEvents = refEventQ.empty() || eventQCounter > refEventQ.size();
 		}
 	}
 

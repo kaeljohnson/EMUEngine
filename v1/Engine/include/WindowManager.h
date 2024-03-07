@@ -6,6 +6,7 @@
 #include <queue>
 
 #include "Events/Event.h"
+#include "Layers/Layer.h"
 
 
 namespace Engine
@@ -26,7 +27,7 @@ namespace Engine
 
 		// Declare WindowManager functions.
 		SDL_Window* getWindow() const;
-		void processEvents(std::queue<Event>& refEventQ);
+		void processEvent(Event& e);
 		void resize(const int newWindowWidth, const int newWindowHeight);
 		void toggleFullscreen();
 		void free();

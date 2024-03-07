@@ -25,8 +25,9 @@ namespace Engine
 
 	public:
 		GameObject(int startingX, int startingY, bool visible, bool collidable/* Sprite Sheet, State& initialState */);
+		void free();
 		
-		void processEvents(const std::queue<Event>& eventQ);
+		void processEvent(Event& e);
 		void update();
 		void render();
 		void display();
