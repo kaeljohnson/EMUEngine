@@ -13,7 +13,6 @@ namespace Engine
 
 	public:
 		LayerStack();
-		void free();
 		~LayerStack();
 
 		void pushLayer(Layer* layer);

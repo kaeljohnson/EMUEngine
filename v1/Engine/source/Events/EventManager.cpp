@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <queue>
 
+#include "../../include/Actions/ActionTypes.h"
 #include "../../include/Events/EventManager.h"
 #include "../../include/Events/Event.h"
 
@@ -10,6 +11,16 @@ namespace Engine
 {
 	EventManager::EventManager(std::queue<Event>& eventQ)
 		: refEventQ(eventQ) {}
+
+	void EventManager::newEventCallback(const ActionType actionType, EventCallback callback)
+	{
+		m_eventCallbacks[actionType] = callback;
+	}
+
+	void EventManager::triggerEventCallback(const ActionType actionType)
+	{
+		m_eventCallbacks[actionType]();
+	}
 
 	void EventManager::handleEvents()
 	{

@@ -25,6 +25,21 @@ namespace Engine
 		m_eventManager(m_eventQ),
 		running(false)
 	{
+		m_eventManager.newEventCallback(ActionType::ToggleFullscreen, [this]() 
+		{
+			m_windowManager.toggleFullscreen();
+		});
+
+	}
+
+	void Application::newEventCallback(const ActionType actionType, EventCallback callback)
+	{
+		m_eventManager.newEventCallback(actionType, callback);
+	}
+
+	void Application::triggerEventCallback(const ActionType actionType)
+	{
+		m_eventManager.triggerEventCallback(actionType);
 	}
 
 	void Application::run()
@@ -33,7 +48,7 @@ namespace Engine
 
 		if (m_layerStack.size() > 0)
 		{
-			ENGINE_INFO("Layer stack size: {}", m_layerStack.size());
+			ENGINE_TRACE("Layer stack size: {}", m_layerStack.size());
 		}
 		else
 		{
@@ -51,8 +66,8 @@ namespace Engine
 				1. Handle events.
 				2. Process actions.
 				3. Clear the screen.
-				4. Render game objects.
-				5. Display the rendered game objects.
+				4. Render layer.
+				5. Display the rendered layers.
 			*/
 
 			m_eventManager.handleEvents();
@@ -92,7 +107,6 @@ namespace Engine
 			{
 				
 				(*--it_layer)->processEvent(currentEvent);
-				ENGINE_INFO("Application: Processing event for layer: {}", (*it_layer)->getName());
 				if (currentEvent.handled)
 				{
 					break;
@@ -103,7 +117,7 @@ namespace Engine
 			{
 
 				// For now, put any non-layer event handling here.
-				m_windowManager.processEvent(currentEvent);
+				// m_windowManager.processEvent(currentEvent);
 
 				switch (currentEvent.m_eventType)
 				{
@@ -116,14 +130,16 @@ namespace Engine
 		}
 	}
 
+	WindowManager* Application::getWindowManager()
+	{
+		return &m_windowManager;
+	}
+
 	void Application::end()
 	{
 		ENGINE_INFO("Application ending!");
 
 		running = false;
-		m_layerStack.free();
-		m_rendererManager.free();
-		m_windowManager.free();
 	}
 
 	void Application::addToEventQ(Event& e)
@@ -133,6 +149,16 @@ namespace Engine
 
 	void Application::addToLayerStack(Layer* layer)
 	{
+		if (layer == nullptr) return;
+		for (auto it = m_layerStack.begin(); it != m_layerStack.end(); ++it)
+		{
+			if ((*it)->getName() == layer->getName())
+			{
+				ENGINE_CRITICAL("Layer with name: {} already exists in the layer stack!", layer->getName());
+				return;
+			}
+		}
+
 		m_layerStack.pushLayer(layer);
 	}
 

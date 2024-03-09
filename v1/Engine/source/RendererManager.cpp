@@ -70,6 +70,7 @@ namespace Engine
 	}
 	void RendererManager::free()
 	{
+		ENGINE_INFO("Freeing Renderer.");
 		// Destroy the render, which SDL uses dynamic memory to allocate.
 		SDL_DestroyRenderer(renderer);
 
@@ -78,4 +79,9 @@ namespace Engine
 		renderer = nullptr;																											
 	}
 
+	// Definition for the RendererManager destructor. Calls the free function.
+	RendererManager::~RendererManager()
+	{
+		free();
+	}
 }

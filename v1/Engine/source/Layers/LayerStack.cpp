@@ -11,21 +11,10 @@ namespace Engine
 	LayerStack::LayerStack() {}
 	LayerStack::~LayerStack() 
 	{
-		ENGINE_INFO("Deleting LayerStack");
+		ENGINE_INFO("Freeing LayerStack.");
 		for (Layer* layer : m_layers)
 		{
 			//delete layer;
-		}
-	}
-
-	void LayerStack::free()
-	{
-		ENGINE_INFO("Freeing LayerStack");
-		for (Layer* layer : m_layers)
-		{
-			ENGINE_INFO("Freeing Layer: {0}", layer->getName());
-			layer->onDetach();
-			layer->free();
 		}
 	}
 

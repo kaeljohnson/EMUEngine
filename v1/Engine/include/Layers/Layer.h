@@ -14,7 +14,6 @@ namespace Engine
 		bool m_enabled;
 	public:
 		Layer(std::string name);
-		virtual void free();
 		virtual	~Layer();
 
 		virtual void onAttach();
