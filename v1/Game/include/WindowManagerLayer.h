@@ -7,9 +7,9 @@ namespace Engine
 	class WindowManagerLayer : public Layer
 	{
 	private:
-		IEventSystem& refEventSystem;
+		IEventSystem* ptrEventSystem;
 	public:
-		WindowManagerLayer(IEventSystem& eventSystem);
+		WindowManagerLayer(IEventSystem* eventSystem);
 		~WindowManagerLayer();
 
 		void onAttach() override;

@@ -2,16 +2,22 @@
 
 #include "../Actions/ActionTypes.h"
 
+#include <variant>
+#include <unordered_map>
 #include <functional>
+#include <string>
 
 namespace Engine
 {
     class IEventSystem
-    {
+    { 
     private:
-        using EventCallback = std::function<void()>;
+        using EventData = std::variant<std::monostate, int, float, std::string, std::pair<int, int>>;
+        using ActionCallback = std::function<void(EventData)>;
+
+        std::unordered_map<ActionType, ActionCallback> m_eventCallbacks;
     public:
-        virtual void newEventCallback(ActionType actionType, EventCallback callback) = 0;
-        virtual void triggerEventCallback(ActionType actionType) = 0;
+        void newEventCallback(ActionType actionType, ActionCallback callback);
+        void triggerEventCallback(ActionType actionType, EventData eventData);
     };
 }

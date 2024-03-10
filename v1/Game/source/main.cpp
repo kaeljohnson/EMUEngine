@@ -5,7 +5,7 @@
 #include "../include/EngineIncludes.h"
 #include "../include/WindowManagerLayer.h"
 
-const char* APPLICATION_NAME = "Wizard Game v1";\
+const char* APPLICATION_NAME = "Wizard Game v1";
 
 // Main function. Starting point for all C++ programs.
 int main(int argc, char* args[])
@@ -17,17 +17,14 @@ int main(int argc, char* args[])
 	
 	// Call to Init function. Initializes the logger, the SDL2 and SDL2_image libraries.
 	Engine::Init();
-	// Call to Application constructor. Creates or "instantiates" and object of type "Application" named app./
+
+	// Call to Application constructor. Instantiates an object of type "Application" named app.
 	Engine::Application app(APPLICATION_NAME);
 
-	// Probably should not be able to do this. Figure out a better way to handle this.
-	// Could make app a singleton and have a getter for anything needed in the window manager. 
-	// Instead of letting the client have the whole thing.
-	
-	
-	Engine::WindowManager* ptrWindowManager = app.getWindowManager();
+	// Get the event system interface from the application.
+	Engine::IEventSystem* eventSystem = app.getEventSystem();
 
-	Engine::WindowManagerLayer windowManagerLayer(app);
+	Engine::WindowManagerLayer windowManagerLayer(eventSystem);
 	app.addToLayerStack(&windowManagerLayer);
 
 	CLIENT_INFO("Client Running!");
@@ -46,7 +43,7 @@ int main(int argc, char* args[])
 	
 	app.run();
 
-	// End client application. Engine cleanup handled in Engine app class.	
+	// End client application. Engine cleanup handled in Engine app class.
 	// end();
 
 	return 0;

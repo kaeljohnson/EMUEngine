@@ -39,17 +39,6 @@ namespace Engine
 		}
 	}
 
-	void WindowManager::processEvent(Event& e)
-	{
-		// ENGINE_TRACE("Processing event for window manager.");
-		/*switch (e.m_eventType)
-		{
-			case (F_KEY_DOWN): toggleFullscreen(); ENGINE_TRACE("Handled event: {}", static_cast<int>(F_KEY_DOWN)); e.handled = true; break;
-			case (RESIZE_WINDOW): resize(e.m_xPos, e.m_yPos); ENGINE_TRACE("Handled event: {}", static_cast<int>(RESIZE_WINDOW)); e.handled = true; break;
-			default: break;
-		}*/
-	}
-
 	SDL_Window* WindowManager::getWindow() const
 	{
 		return window;

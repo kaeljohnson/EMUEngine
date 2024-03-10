@@ -4,7 +4,7 @@
 
 namespace Engine
 {
-	WindowManagerLayer::WindowManagerLayer(IEventSystem& eventSystem) : refEventSystem(eventSystem), Layer("WindowManagerLayer")
+	WindowManagerLayer::WindowManagerLayer(IEventSystem* eventSystem) : ptrEventSystem(eventSystem), Layer("WindowManagerLayer")
 	{
 	}
 
@@ -26,24 +26,20 @@ namespace Engine
 
 	void WindowManagerLayer::processEvent(Event& e)
 	{
-	
-		switch (e.m_eventType)
+		switch (e.eventType)
 		{
-			case (F_KEY_DOWN): 
-				/*ptrWindowManager->toggleFullscreen();*/ 
-				refEventSystem.triggerEventCallback(ActionType::ToggleFullscreen); 
-				ENGINE_TRACE("Handled event: {}", static_cast<int>(F_KEY_DOWN)); 
-				e.handled = true; 
+			case (F_KEY_DOWN):
+				ptrEventSystem->triggerEventCallback(ActionType::ToggleFullscreen, std::monostate{});
+				ENGINE_TRACE("Handled event: {}", static_cast<int>(F_KEY_DOWN));
+				e.handled = true;
 				break;
-			case (RESIZE_WINDOW): 
-				/*ptrWindowManager->resize(e.m_xPos, e.m_yPos);*/ 
-				//refEventSystem.triggerEventCallback(ActionType::ResizeWindow); 
-				ENGINE_TRACE("Handled event: {}", static_cast<int>(RESIZE_WINDOW)); 
-				e.handled = true; 
+			case (RESIZE_WINDOW):
+				ptrEventSystem->triggerEventCallback(ActionType::ResizeWindow, std::make_pair(e.xPos, e.yPos));
+				ENGINE_TRACE("Handled event: {}", static_cast<int>(RESIZE_WINDOW));
+				e.handled = true;
 				break;
-			default: 
+			default:
 				break;
 		}
-		
 	}
 }

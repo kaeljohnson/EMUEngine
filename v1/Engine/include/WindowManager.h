@@ -2,11 +2,6 @@
 
 #include <SDL.h>																				// External library includes.
 #include <SDL_image.h>
-#include <string>
-#include <queue>
-
-#include "Events/Event.h"
-#include "Layers/Layer.h"
 
 
 namespace Engine
@@ -28,7 +23,6 @@ namespace Engine
 
 		// Declare WindowManager functions.
 		SDL_Window* getWindow() const;
-		void processEvent(Event& e);
 		void resize(const int newWindowWidth, const int newWindowHeight);
 		void toggleFullscreen();
 		void free();

@@ -24,4 +24,3 @@ namespace Engine
 		const std::string& getName() const;
 	};
 }
-

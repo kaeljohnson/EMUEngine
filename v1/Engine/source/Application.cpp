@@ -25,21 +25,15 @@ namespace Engine
 		m_eventManager(m_eventQ),
 		running(false)
 	{
-		m_eventManager.newEventCallback(ActionType::ToggleFullscreen, [this]() 
+		m_eventSystem.newEventCallback(ActionType::ToggleFullscreen, [this](EventData data)
 		{
 			m_windowManager.toggleFullscreen();
 		});
-
 	}
 
-	void Application::newEventCallback(const ActionType actionType, EventCallback callback)
+	IEventSystem* Application::getEventSystem()
 	{
-		m_eventManager.newEventCallback(actionType, callback);
-	}
-
-	void Application::triggerEventCallback(const ActionType actionType)
-	{
-		m_eventManager.triggerEventCallback(actionType);
+		return &m_eventSystem;
 	}
 
 	void Application::run()
@@ -115,24 +109,15 @@ namespace Engine
 
 			if (!currentEvent.handled)
 			{
-
-				// For now, put any non-layer event handling here.
-				// m_windowManager.processEvent(currentEvent);
-
-				switch (currentEvent.m_eventType)
+				switch (currentEvent.eventType)
 				{
 					case (QUIT): end(); break;
 					case (ESCAPE_KEY_DOWN): end(); break;
-					default: ENGINE_TRACE("Unhandled Event: {}", static_cast<int>(currentEvent.m_eventType)); break;
+					default: ENGINE_TRACE("Unhandled Event: {}", static_cast<int>(currentEvent.eventType)); break;
 				}
 			}
 			m_eventQ.pop();
 		}
-	}
-
-	WindowManager* Application::getWindowManager()
-	{
-		return &m_windowManager;
 	}
 
 	void Application::end()
