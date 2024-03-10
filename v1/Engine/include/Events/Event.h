@@ -61,21 +61,17 @@ namespace Engine
 		MOUSE_WHEEL_MOVED,
 
 		// Engine processig events
-		ENGINE_NOT_INITIALIZED, ENGINE_INITIALIZED, ENGINE_SHUTDOWN, ENGINE_ERROR  
-		// When the client tries to use the event queue without initializing the engine, we need to let them know there is no app listening for events.
-		// When there is an error in the engine, we need to put an engine error in the event queue to know what to do.
-
+		ENGINE_NOT_INITIALIZED, ENGINE_INITIALIZED, ENGINE_SHUTDOWN, ENGINE_ERROR
 	};
 	
 	// Custom event class to hide the SDL2 event from the user.
 	class Event
-	{
-	private:
-		
+	{	
 	public:
-		const EventType m_eventType;
-		const int m_xPos;
-		const int m_yPos;
+		const EventType eventType;
+		const int xPos;
+		const int yPos;
+		bool handled;
 
 		Event(const EventType);
 		Event(const EventType actionType, const int xPos, const int yPos);	

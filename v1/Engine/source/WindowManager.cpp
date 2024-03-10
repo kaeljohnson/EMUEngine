@@ -8,6 +8,7 @@
 #include "../include/Events/Event.h"
 #include "../include/WindowManager.h"
 #include "../include/Logging/Logger.h"
+#include "../include/Layers/Layer.h"
 
 namespace Engine
 {
@@ -38,34 +39,6 @@ namespace Engine
 		}
 	}
 
-	void WindowManager::processEvents(std::queue<Event>& refEventQ)
-	{
-		// Better way to do this function?
-
-		// Call window manager callbacks which are user defined?
-		size_t eventQCounter = 0;
-		bool doneProcessingEvents = refEventQ.empty();
-		while (!doneProcessingEvents)
-		{
-			const Event currentEvent = refEventQ.front();
-			refEventQ.pop();
-
-			switch (currentEvent.m_eventType)
-			{
-				case (F_KEY_DOWN): toggleFullscreen(); ENGINE_INFO("Handled event: {}", static_cast<int>(F_KEY_DOWN)); break;
-				case (RESIZE_WINDOW): resize(currentEvent.m_xPos, currentEvent.m_yPos); ENGINE_INFO("Handled event: {}", static_cast<int>(RESIZE_WINDOW)); break;
-				default: 
-				{
-					refEventQ.push(currentEvent);
-					++eventQCounter;
-					break;
-				}
-			}
-
-			doneProcessingEvents = refEventQ.empty() || eventQCounter > refEventQ.size();
-		}
-	}
-
 	SDL_Window* WindowManager::getWindow() const
 	{
 		return window;
@@ -73,7 +46,7 @@ namespace Engine
 
 	void WindowManager::resize(const int newWindowWidth, const int newWindowHeight)
 	{
-		ENGINE_INFO("{}, {}", newWindowWidth, newWindowHeight);
+		ENGINE_TRACE("{}, {}", newWindowWidth, newWindowHeight);
 		SDL_SetWindowSize(window, newWindowWidth, newWindowHeight);
 	}
 
@@ -97,7 +70,13 @@ namespace Engine
 
 	void WindowManager::free()
 	{
+		ENGINE_INFO("Freeing Window.");
 		SDL_DestroyWindow(window);
 		window = nullptr;
+	}
+
+	WindowManager::~WindowManager()
+	{
+		free();
 	}
 }

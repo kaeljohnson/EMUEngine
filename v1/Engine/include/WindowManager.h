@@ -2,10 +2,6 @@
 
 #include <SDL.h>																				// External library includes.
 #include <SDL_image.h>
-#include <string>
-#include <queue>
-
-#include "Events/Event.h"
 
 
 namespace Engine
@@ -23,12 +19,18 @@ namespace Engine
 	public:
 		// WindowManager constructor.
 		WindowManager(const char* windowTitle);
+		~WindowManager();
 
 		// Declare WindowManager functions.
 		SDL_Window* getWindow() const;
-		void processEvents(std::queue<Event>& refEventQ);
 		void resize(const int newWindowWidth, const int newWindowHeight);
 		void toggleFullscreen();
 		void free();
+
+		// Deleted functions to ensure our game instance cannot be copied or moved.
+		WindowManager(const WindowManager&) = delete;
+		WindowManager& operator=(const WindowManager&) = delete;
+		WindowManager(WindowManager&&) = delete;
+		WindowManager& operator=(WindowManager&&) = delete;
 	};
 }

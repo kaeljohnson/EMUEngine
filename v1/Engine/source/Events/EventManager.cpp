@@ -11,6 +11,7 @@ namespace Engine
 	EventManager::EventManager(std::queue<Event>& eventQ)
 		: refEventQ(eventQ) {}
 
+
 	void EventManager::handleEvents()
 	{
 		/* 

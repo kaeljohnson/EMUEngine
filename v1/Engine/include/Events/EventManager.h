@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 #include <queue>
+#include <string>
 
 #include "../Events/Event.h"
 
@@ -15,6 +16,7 @@ namespace Engine
 
 	public:
 		EventManager(std::queue<Event>& eventQ);
+		~EventManager() = default;
 
 		// event handling and dispatching functions.
 		void handleEvents();

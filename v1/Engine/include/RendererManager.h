@@ -15,6 +15,7 @@ namespace Engine
 	public:
 		// RendererManager constructor.
 		RendererManager(SDL_Window* window);
+		~RendererManager();
 
 		// RendererManager functions.
 		const SDL_Renderer* getRenderer() const;
