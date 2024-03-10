@@ -20,7 +20,6 @@ namespace Engine
 	{
 	private:
 		using EventData = std::variant<std::monostate, int, float, std::string, std::pair<int, int>>;
-		using ActionCallback = std::function<void(EventData)>;
 
 		// bool to indicate if the application is running or not.
 		bool running;
