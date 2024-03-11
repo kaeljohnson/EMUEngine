@@ -2,7 +2,6 @@
 
 #include <SDL.h>
 #include <queue>
-#include <string>
 
 #include "../Events/Event.h"
 

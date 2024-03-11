@@ -9,17 +9,14 @@
 #include "Events/IEventSystem.h"
 #include "Layers/LayerStack.h"
 #include "Layers/Layer.h"
-#include "Actions/ActionTypes.h"
-
-#include <variant>
-#include <functional>
+#include "Layers/ApplicationLayer.h"
+#include "Layers/WindowManagerLayer.h"
 
 namespace Engine
 {
 	class Application
 	{
 	private:
-		using EventData = std::variant<std::monostate, int, float, std::string, std::pair<int, int>>;
 
 		// bool to indicate if the application is running or not.
 		bool running;
@@ -34,6 +31,9 @@ namespace Engine
 
 		// Event system for loose coupling between client code and application.
 		IEventSystem m_eventSystem;
+
+		ApplicationLayer m_appLayer;
+		WindowManagerLayer m_windowManagerLayer;
 
 		// layer stack holds user defined layers.
 		LayerStack m_layerStack;
@@ -51,9 +51,12 @@ namespace Engine
 		IEventSystem* getEventSystem();
 
 		// Layer stack functions.
-		void addToLayerStack(Layer* layer);
-		void popLayerFromStack(std::string layerName);
+		void pushToLayerStack(Layer* layer);
+		void popLayerFromStack(Layer* layer);
 		void popLayerFromStack();
+
+		// Temp
+		LayerStack& getLayerStack() { return m_layerStack; }
 
 		// Application functions.
 		void run();

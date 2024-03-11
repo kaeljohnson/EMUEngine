@@ -1,6 +1,7 @@
 #pragma once
 
-#include "EngineIncludes.h"
+#include "../Layers/Layer.h"
+#include "../Events/IEventSystem.h"
 
 namespace Engine
 {
