@@ -1,7 +1,5 @@
 #pragma once
 
-
-#include "../../include/Events/Event.h"
 #include "../../include/GameObjects/GameObject.h"
 #include "../../include/Logging/Logger.h"
 

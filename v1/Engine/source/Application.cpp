@@ -76,6 +76,7 @@ namespace Engine
 
 			m_eventManager.handleEvents();
 			processEventQueue();
+
 			// update simulation.
 
 			m_rendererManager.clearScreen();
@@ -123,11 +124,6 @@ namespace Engine
 		ENGINE_INFO("Application ending!");
 
 		running = false;
-	}
-
-	void Application::addToEventQ(Event& e)
-	{
-		m_eventQ.push(e);
 	}
 
 	void Application::pushToLayerStack(Layer* layer)

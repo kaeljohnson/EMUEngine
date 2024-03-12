@@ -45,9 +45,6 @@ namespace Engine
 		Application(const char* appName);
 		~Application() = default;
 
-		// Event queue functions.
-		void addToEventQ(Event& e);
-
 		IEventSystem* getEventSystem();
 
 		// Layer stack functions.
