@@ -2,7 +2,6 @@
 
 #include <sdl.h>
 #include <sdl_image.h>
-#include <queue>
 
 #include "../Events/Event.h"
 

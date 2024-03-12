@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <queue>
+#include <string>
 
 #include "../include/Logging/Logger.h"
 
@@ -9,25 +10,28 @@
 #include "../include/Events/Event.h"
 #include "../include/Layers/Layer.h"
 #include "../include/GameObjects/GameObject.h"
+#include "../include/Layers/ApplicationLayer.h"
+#include "../include/Layers/WindowManagerLayer.h"
 
 namespace Engine
 {
-	// Definition for Game constructor. Note: "<Class>::<Function>" the function
-	// on the right side of the "::" comes from the class on the left side.
 	Application::Application(const char* appName)
-		/* 
-			Initialization list for the Application constructor.
-			Initialization lists are more optimal than setting 
-			variables within the square brackets of the constructor.
-		*/
 		: m_windowManager(appName),
 		m_rendererManager(m_windowManager.getWindow()),
 		m_eventManager(m_eventQ),
+		m_appLayer(&m_eventSystem),
+		m_windowManagerLayer(&m_eventSystem),
+		m_layerStack({&m_appLayer, &m_windowManagerLayer}),
 		running(false)
 	{
 		m_eventSystem.newEventCallback(ActionType::ToggleFullscreen, [this](EventData data)
 		{
 			m_windowManager.toggleFullscreen();
+		});
+
+		m_eventSystem.newEventCallback(ActionType::EndApplication, [this](EventData data)
+		{
+			end();
 		});
 	}
 
@@ -38,15 +42,21 @@ namespace Engine
 
 	void Application::run()
 	{
+
+		for (auto& layer : m_layerStack)
+		{
+			ENGINE_TRACE("Layer: {}", layer->getName());
+		}
+
 		ENGINE_INFO("Application running!");
 
-		if (m_layerStack.size() > 0)
+		if (m_layerStack.size() > 1)
 		{
 			ENGINE_TRACE("Layer stack size: {}", m_layerStack.size());
 		}
 		else
 		{
-			ENGINE_CRITICAL("Layer stack is empty! Application must have at least one layer to be valid!");
+			ENGINE_CRITICAL("Layer stack is empty! Application must have at least two layers to be valid!");
 			end();
 		}
 
@@ -67,6 +77,8 @@ namespace Engine
 			m_eventManager.handleEvents();
 			processEventQueue();
 
+			// update simulation.
+
 			m_rendererManager.clearScreen();
 			// m_rendererManager.render(m_layerStack);
 			m_rendererManager.display();
@@ -75,15 +87,6 @@ namespace Engine
 
 	void Application::processEventQueue()
 	{
-		/*
-			Each layer will have its own processEvents function.
-			These functions will be called in the order that the layers are added.
-			The user needs to decide in what order layers are added.
-			This is because the user needs to decide which layer has priority over the others,
-			and which layer should handle the events first. The user also needs to determine
-			what order the layers should be rendered in.
-		*/
-
 		// Process order for layers is opporsite of render order.
 
 		// Render order for layers:
@@ -109,13 +112,9 @@ namespace Engine
 
 			if (!currentEvent.handled)
 			{
-				switch (currentEvent.eventType)
-				{
-					case (QUIT): end(); break;
-					case (ESCAPE_KEY_DOWN): end(); break;
-					default: ENGINE_TRACE("Unhandled Event: {}", static_cast<int>(currentEvent.eventType)); break;
-				}
+				ENGINE_TRACE("Unhandled Event: {}", static_cast<int>(currentEvent.eventType));
 			}
+
 			m_eventQ.pop();
 		}
 	}
@@ -127,29 +126,14 @@ namespace Engine
 		running = false;
 	}
 
-	void Application::addToEventQ(Event& e)
+	void Application::pushToLayerStack(Layer* layer)
 	{
-		m_eventQ.push(e);
-	}
-
-	void Application::addToLayerStack(Layer* layer)
-	{
-		if (layer == nullptr) return;
-		for (auto it = m_layerStack.begin(); it != m_layerStack.end(); ++it)
-		{
-			if ((*it)->getName() == layer->getName())
-			{
-				ENGINE_CRITICAL("Layer with name: {} already exists in the layer stack!", layer->getName());
-				return;
-			}
-		}
-
 		m_layerStack.pushLayer(layer);
 	}
 
-	void Application::popLayerFromStack(std::string layerName)
+	void Application::popLayerFromStack(Layer* layer)
 	{
-		m_layerStack.popLayer(layerName);
+		m_layerStack.popLayer(layer);
 	}
 
 	void Application::popLayerFromStack()

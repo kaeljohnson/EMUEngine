@@ -10,11 +10,7 @@ namespace Engine
 	Layer::Layer(std::string name)
 		: m_name(name), m_enabled(true) {}
 	
-
-	Layer::~Layer()
-	{
-
-	}
+	Layer::~Layer() {}
 
 	void Layer::onAttach() { ENGINE_TRACE("Inside layer {} attach function.", m_name); };
 	void Layer::onDetach() { ENGINE_TRACE("Inside layer {} detach function.", m_name); };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include "Layer.h"
 
@@ -13,10 +14,11 @@ namespace Engine
 
 	public:
 		LayerStack();
+		LayerStack(std::vector<Layer*> layers);
 		~LayerStack();
 
 		void pushLayer(Layer* layer);
-		void popLayer(std::string layerName);
+		void popLayer(Layer* layer);
 		void popLayer();
 
 		std::vector<Layer*>::iterator begin() { return m_layers.begin(); }

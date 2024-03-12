@@ -9,7 +9,6 @@ namespace Engine
 	class RendererManager												
 	{
 	private:
-
 		// SDL2 renderer pointer. This is the renderer that will be used to render all of the game objects.
 		SDL_Renderer* renderer;
 	public:
