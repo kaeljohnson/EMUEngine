@@ -1,13 +1,13 @@
 #pragma once
 
 #include "../../include/Layers/WindowManagerLayer.h"
-#include "../../include/Events/IEventSystem.h"
+#include "../../include/Events/IEventAction.h"
 #include "../../include/Events/Event.h"
 #include "../../include/Logging/Logger.h"
 
 namespace Engine
 {
-	WindowManagerLayer::WindowManagerLayer(IEventSystem* eventSystem) : ptrEventSystem(eventSystem), Layer("WindowManagerLayer")
+	WindowManagerLayer::WindowManagerLayer(IEventAction* eventSystem) : ptrEventSystem(eventSystem), Layer("WindowManagerLayer")
 	{
 	}
 
@@ -29,17 +29,17 @@ namespace Engine
 
 	void WindowManagerLayer::processEvent(Event& e)
 	{
-		switch (e.eventType)
+		switch (e.Type)
 		{
 		case (Engine::F_KEY_DOWN):
-			ptrEventSystem->triggerEventCallback(ActionType::ToggleFullscreen, std::monostate{});
+			ptrEventSystem->triggerActionCallback(ActionType::ToggleFullscreen, std::monostate{});
 			ENGINE_TRACE("Handled event: {}", static_cast<int>(F_KEY_DOWN));
-			e.handled = true;
+			e.Handled = true;
 			break;
 		case (Engine::RESIZE_WINDOW):
-			ptrEventSystem->triggerEventCallback(ActionType::ResizeWindow, std::make_pair(e.xPos, e.yPos));
+			ptrEventSystem->triggerActionCallback(ActionType::ResizeWindow, std::make_pair(e.X_POS, e.Y_POS));
 			ENGINE_TRACE("Handled event: {}", static_cast<int>(RESIZE_WINDOW));
-			e.handled = true;
+			e.Handled = true;
 			break;
 		default:
 			break;

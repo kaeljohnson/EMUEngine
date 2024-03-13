@@ -19,8 +19,7 @@ int main(int argc, char* args[])
 	Engine::Application app(APPLICATION_NAME);
 	
 	// Get the event system interface from the application.
-	Engine::IEventSystem* eventSystem = app.getEventSystem();
-
+	Engine::IEventAction* eventActionInterface = app.getEventActionInterface();
 
 	CLIENT_INFO("Client Running!");
 
@@ -29,6 +28,7 @@ int main(int argc, char* args[])
 	Engine::Layer testLayer2("Test Layer 2");
 
 	CLIENT_TRACE("STOP 1");
+
 	app.pushToLayerStack(&testLayer);
 	app.pushToLayerStack(&testLayer2);
 	

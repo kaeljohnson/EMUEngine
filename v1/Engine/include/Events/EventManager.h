@@ -13,12 +13,6 @@ namespace Engine
 	private:
 		std::queue<Event>& refEventQ;
 
-	public:
-		EventManager(std::queue<Event>& eventQ);
-		~EventManager() = default;
-
-		// event handling and dispatching functions.
-		void handleEvents();
 		void dispatchQuitEvent();
 		void dispatchWindowEvent(SDL_WindowEvent& windowEvent);
 		void dispatchKeydownEvent(SDL_Keycode& keyCode);
@@ -27,6 +21,12 @@ namespace Engine
 		void dispatchMouseButtonDownEvent(SDL_MouseButtonEvent& mouseButtonEvent);
 		void dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent);
 		void dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent);
+	public:
+		EventManager(std::queue<Event>& eventQ);
+		~EventManager() = default;
+
+		// event handling and dispatching functions.
+		void handleEvents();
 
 		EventManager(const EventManager&) = delete;											
 		EventManager& operator=(const EventManager&) = delete;

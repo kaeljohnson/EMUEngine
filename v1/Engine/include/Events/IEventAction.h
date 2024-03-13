@@ -12,12 +12,12 @@ using ActionCallback = std::function<void(EventData)>;
 
 namespace Engine
 {
-    class IEventSystem
+    class IEventAction
     { 
     private:
-        std::unordered_map<ActionType, ActionCallback> m_eventCallbacks;
+        std::unordered_map<ActionType, ActionCallback> m_actionCallbacks;
     public:
-        void newEventCallback(ActionType actionType, ActionCallback callback);
-        void triggerEventCallback(ActionType actionType, EventData eventData);
+        void newActionCallback(ActionType actionType, ActionCallback callback);
+        void triggerActionCallback(ActionType actionType, EventData eventData);
     };
 }
