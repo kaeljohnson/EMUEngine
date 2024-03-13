@@ -6,7 +6,7 @@
 #include "RendererManager.h"
 #include "Events/EventManager.h" 
 #include "Events/Event.h"
-#include "Events/IEventSystem.h"
+#include "Events/IEventAction.h"
 #include "Layers/LayerStack.h"
 #include "Layers/Layer.h"
 #include "Layers/ApplicationLayer.h"
@@ -30,7 +30,7 @@ namespace Engine
 		EventManager m_eventManager;
 
 		// Event system for loose coupling between client code and application.
-		IEventSystem m_eventSystem;
+		IEventAction m_eventActionInterface;
 
 		ApplicationLayer m_appLayer;
 		WindowManagerLayer m_windowManagerLayer;
@@ -45,7 +45,7 @@ namespace Engine
 		Application(const char* appName);
 		~Application() = default;
 
-		IEventSystem* getEventSystem();
+		IEventAction* getEventActionInterface();
 
 		// Layer stack functions.
 		void pushToLayerStack(Layer* layer);
@@ -53,7 +53,7 @@ namespace Engine
 		void popLayerFromStack();
 
 		// Temp
-		LayerStack& getLayerStack() { return m_layerStack; }
+		const LayerStack& getLayerStack() { return m_layerStack; }
 
 		// Application functions.
 		void run();

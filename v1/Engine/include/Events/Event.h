@@ -68,10 +68,10 @@ namespace Engine
 	class Event
 	{	
 	public:
-		const EventType eventType;
-		const int xPos;
-		const int yPos;
-		bool handled;
+		const EventType Type;
+		const int X_POS;
+		const int Y_POS;
+		bool Handled;
 
 		Event(const EventType);
 		Event(const EventType actionType, const int xPos, const int yPos);	

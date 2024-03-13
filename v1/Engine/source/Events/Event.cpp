@@ -4,8 +4,8 @@
 
 namespace Engine
 {
-	Event::Event(const EventType eventType) : eventType(eventType), xPos(-1), yPos(-1), handled(false) {}
+	Event::Event(const EventType eventType) : Type(eventType), X_POS(-1), Y_POS(-1), Handled(false) {}
 	Event::Event(const EventType eventType, const int xPos, const int yPos)
-		: eventType(eventType), xPos(xPos), yPos(yPos), handled(false)
+		: Type(eventType), X_POS(xPos), Y_POS(yPos), Handled(false)
 	{}
 }
