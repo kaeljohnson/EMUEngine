@@ -13,6 +13,9 @@
 #include "../include/Layers/ApplicationLayer.h"
 #include "../include/Layers/WindowManagerLayer.h"
 
+#include "box2d/box2d.h"
+#include "box2d/b2_world.h"
+
 namespace Engine
 {
 	Application::Application(const char* appName)
@@ -22,6 +25,9 @@ namespace Engine
 		m_appLayer(&m_eventActionInterface),
 		m_windowManagerLayer(&m_eventActionInterface),
 		m_layerStack({&m_appLayer, &m_windowManagerLayer}),
+		// Client should define gravity vector.
+		m_gravity({ 0.0f, -10.f }),
+		m_world(m_gravity),
 		running(false)
 	{
 		m_eventActionInterface.newActionCallback(ActionType::ToggleFullscreen, [this](EventData data)

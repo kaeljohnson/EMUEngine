@@ -11,6 +11,8 @@
 #include "Layers/Layer.h"
 #include "Layers/ApplicationLayer.h"
 #include "Layers/WindowManagerLayer.h"
+#include "box2d/box2d.h"
+#include "box2d/b2_world.h"
 
 namespace Engine
 {
@@ -37,6 +39,11 @@ namespace Engine
 
 		// layer stack holds user defined layers.
 		LayerStack m_layerStack;
+
+		// Box2D world.
+		// Need to move this to a wrapper class.
+		b2Vec2 m_gravity;
+		b2World m_world;
 
 		void processEventQueue();
 

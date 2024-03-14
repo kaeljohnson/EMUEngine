@@ -32,20 +32,23 @@ project "v1"
 	{
 		"%{prj.name}/external/sdl2/SDL2-2.24.1/include",
 		"%{prj.name}/external/sdl2/SDL2_image-2.6.2/include",
-		"%{prj.name}/external/spdlog/include"
+		"%{prj.name}/external/spdlog/include",
+		"%{prj.name}/external/box2d/include"
 	}
 
 	libdirs
 	{
 		"%{prj.name}/external/sdl2/SDL2-2.24.1/lib/x64",
-		"%{prj.name}/external/sdl2/SDL2_image-2.6.2/lib/x64"
+		"%{prj.name}/external/sdl2/SDL2_image-2.6.2/lib/x64",
+		"%{prj.name}/external/box2d/build/bin/Debug"
 	}
 
 	links
 	{
 		"SDL2",
 		"SDL2main",
-		"SDL2_image"
+		"SDL2_image",
+		"box2d"
 	}
 
 	filter "system:windows"
