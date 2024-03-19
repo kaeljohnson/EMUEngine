@@ -2,6 +2,7 @@
 
 #include "../../include/Physics/World.h"
 #include "../../include/Physics/Box.h"
+#include "../../include/Logging/Logger.h"
 
 namespace Engine
 {
@@ -19,5 +20,7 @@ namespace Engine
 	{
 		box.setBody( m_world.CreateBody(&box.getBodyDef()) );
 		box.createFixture();
+		ENGINE_INFO("Box added to world at position: {0}, {1}. With width: {2}, height: {3}",
+			box.getCenterX(), box.getCenterY(), box.getWidth(), box.getHeight());
 	}
 }
