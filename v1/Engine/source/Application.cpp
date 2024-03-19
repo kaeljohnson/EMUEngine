@@ -5,13 +5,13 @@
 #include <string>
 
 #include "../include/Logging/Logger.h"
-
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
 #include "../include/Layers/Layer.h"
 #include "../include/GameObjects/GameObject.h"
 #include "../include/Layers/ApplicationLayer.h"
 #include "../include/Layers/WindowManagerLayer.h"
+#include "../include/Physics/Box.h"
 
 namespace Engine
 {
@@ -22,7 +22,12 @@ namespace Engine
 		m_appLayer(&m_eventActionInterface),
 		m_windowManagerLayer(&m_eventActionInterface),
 		m_layerStack({&m_appLayer, &m_windowManagerLayer}),
-		running(false)
+		running(false),
+		timeStep(1.0f / 60.0f),
+		// The client will define the world.
+		m_world(0.0f, 10.0f, 1.0f / 60.0f, 6, 2),
+		tempGround({ 1, 50.0f, 1000.0f, 10.0f, 10.0f, 0.0f, 0.0f }),
+		tempBox({ 2, 50.0f, 15.0f, 5.0f, 5.0f, 1.0f, 0.3f })
 	{
 		m_eventActionInterface.newActionCallback(ActionType::ToggleFullscreen, [this](EventData data)
 		{
@@ -33,6 +38,15 @@ namespace Engine
 		{
 			end();
 		});
+
+
+		// Temp
+		SDL_Surface* surface = SDL_CreateRGBSurface(0, 1000, 1000, 32, 0, 0, 0, 0);
+		SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 0, 0));
+		m_textureRed = SDL_CreateTextureFromSurface(m_rendererManager.getRenderer(), surface);
+		SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 255, 0));
+		m_textureBlue = SDL_CreateTextureFromSurface(m_rendererManager.getRenderer(), surface);
+		SDL_FreeSurface(surface);
 	}
 
 	IEventAction* Application::getEventActionInterface() { return &m_eventActionInterface; }
@@ -59,6 +73,12 @@ namespace Engine
 
 		running = true;
 
+		m_world.addBox(tempGround);
+		m_world.addBox(tempBox);
+
+		double currentTime = SDL_GetTicks() / 1000.0;
+		double accumulator = 0.0;
+
 		// Application loop.
 		while (running)
 		{
@@ -71,14 +91,36 @@ namespace Engine
 				5. Display the rendered layers.
 			*/
 
-			m_eventManager.handleEvents();
-			processEventQueue();
+			double newTime = SDL_GetTicks() / 1000.0;
+			double frameTime = newTime - currentTime;
+			currentTime = newTime;
 
-			// update simulation.
+			accumulator += frameTime;
+
+			while (accumulator >= timeStep)
+			{
+				m_eventManager.handleEvents();
+				processEventQueue();
+			
+				// update simulation.
+				m_world.update();
+
+				accumulator -= timeStep;
+			}
+
+			// Temp
+			// The "+5" is due to the fact that box2ds collision detection runs a conservative resolution algorith, 
+			// so the box2d body is slightly larger than the actual box. Therefore, visually, there is a gap between the box and the ground.
+			// To fix this, we add 5 to the width and height of the box2d body, and render that size. This will need to be abstracted to separate
+			// handling.
+
+			SDL_Rect dynBody = { tempBox.getTopLeftX(), tempBox.getTopLeftY(), tempBox.getWidth() + 5, tempBox.getHeight() + 5 };
+			SDL_Rect groundBody = { tempGround.getTopLeftX(), tempGround.getTopLeftY(), tempGround.getWidth() + 5, tempGround.getHeight() + 5 };
 
 			m_rendererManager.clearScreen();
-			// m_rendererManager.render(m_layerStack);
-			m_rendererManager.display();
+			m_rendererManager.render(groundBody, m_textureBlue);
+			m_rendererManager.render(dynBody, m_textureRed);
+			m_rendererManager.display();      
 		}
 	}
 

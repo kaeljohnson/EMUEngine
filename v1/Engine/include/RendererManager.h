@@ -17,10 +17,10 @@ namespace Engine
 		~RendererManager();
 
 		// RendererManager functions.
-		const SDL_Renderer* getRenderer() const;
+		SDL_Renderer* getRenderer() const;
 		const SDL_Texture* loadTexture(const char* filePath);
 		void clearScreen();
-		void render(SDL_Rect& rect);
+		void render(SDL_Rect& rect, SDL_Texture* texture);
 		void display();
 		void free();
 	};

@@ -11,6 +11,8 @@
 #include "Layers/Layer.h"
 #include "Layers/ApplicationLayer.h"
 #include "Layers/WindowManagerLayer.h"
+#include "Physics/Box.h"
+#include "Physics/World.h"
 
 namespace Engine
 {
@@ -37,6 +39,19 @@ namespace Engine
 
 		// layer stack holds user defined layers.
 		LayerStack m_layerStack;
+
+		// Game loop management.
+		const double timeStep = 1.0 / 60.0;
+
+		// Physics
+		World m_world;
+
+		Box tempGround;
+		Box tempBox;
+
+		// Temp
+		SDL_Texture* m_textureBlue;
+		SDL_Texture* m_textureRed;
 
 		void processEventQueue();
 
