@@ -40,6 +40,9 @@ namespace Engine
 		// layer stack holds user defined layers.
 		LayerStack m_layerStack;
 
+		// Game loop management.
+		const double timeStep = 1.0 / 60.0;
+
 		// Physics
 		World m_world;
 

@@ -20,10 +20,10 @@ namespace Engine
 		
 		int m_bodyType;
 
-		float m_halfWidth;
-		float m_halfHeight;
-		float m_width;
-		float m_height;
+		int m_halfWidth;
+		int m_halfHeight;
+		int m_width;
+		int m_height;
 
 	public:
 		Box() = default;
