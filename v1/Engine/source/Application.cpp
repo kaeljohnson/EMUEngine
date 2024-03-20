@@ -25,9 +25,9 @@ namespace Engine
 		running(false),
 		timeStep(1.0f / 60.0f),
 		// The client will define the world.
-		m_world(0.0f, 10.0f, 1.0f / 60.0f, 6, 2),
-		tempGround({ 1, 50.0f, 1000.0f, 10.0f, 10.0f, 0.0f, 0.0f }),
-		tempBox({ 2, 50.0f, 15.0f, 5.0f, 5.0f, 1.0f, 0.3f })
+		m_world(0.0f, 9.8f, timeStep, 6, 2),
+		tempBox({ 2, 115.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.3f }),
+		tempGround({ 1, 115.0f, 120.0f, 2.0f, 2.0f, 0.0f, 0.0f })
 	{
 		m_eventActionInterface.newActionCallback(ActionType::ToggleFullscreen, [this](EventData data)
 		{
@@ -38,7 +38,6 @@ namespace Engine
 		{
 			end();
 		});
-
 
 		// Temp
 		SDL_Surface* surface = SDL_CreateRGBSurface(0, 1000, 1000, 32, 0, 0, 0, 0);
@@ -108,18 +107,24 @@ namespace Engine
 				accumulator -= timeStep;
 			}
 
-			// Temp
-			// The "+5" is due to the fact that box2ds collision detection runs a conservative resolution algorith, 
-			// so the box2d body is slightly larger than the actual box. Therefore, visually, there is a gap between the box and the ground.
-			// To fix this, we add 5 to the width and height of the box2d body, and render that size. This will need to be abstracted to separate
-			// handling.
+			// Calculate interpolation factor. This will be used in the future.
+			const double interpolation = accumulator / timeStep;
 
-			SDL_Rect dynBody = { tempBox.getTopLeftX(), tempBox.getTopLeftY(), tempBox.getWidth() + 5, tempBox.getHeight() + 5 };
-			SDL_Rect groundBody = { tempGround.getTopLeftX(), tempGround.getTopLeftY(), tempGround.getWidth() + 5, tempGround.getHeight() + 5 };
+			// Temp
+			// There may be a slight gp between the box and the ground (or any collision) 
+			// due to how box2d handles collision. It leaves a "gap" to prevent objects from tunneling through each other.
+
+			float dynAngle = tempBox.getAngle();
+			float groundAngle = tempGround.getAngle();
+			SDL_Rect dynBody = { tempBox.getTopLeftXInPixels(), tempBox.getTopLeftYInPixels(), tempBox.getWidthInPixels(), tempBox.getHeightInPixels() };
+			SDL_Rect groundBody = { tempGround.getTopLeftXInPixels(), tempGround.getTopLeftYInPixels(), tempGround.getWidthInPixels(), tempGround.getHeightInPixels() };
+
 
 			m_rendererManager.clearScreen();
-			m_rendererManager.render(groundBody, m_textureBlue);
-			m_rendererManager.render(dynBody, m_textureRed);
+
+			// Need interpolation for smooth rendering.
+			m_rendererManager.render(groundBody, m_textureBlue, groundAngle);
+			m_rendererManager.render(dynBody, m_textureRed, dynAngle);
 			m_rendererManager.display();      
 		}
 	}
@@ -127,7 +132,7 @@ namespace Engine
 	void Application::processEventQueue()
 	{
 		// Process order for layers is opporsite of render order.
-
+		
 		// Render order for layers:
 		// EX:
 		// Background Layer -> Filled with Background textures.
