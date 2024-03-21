@@ -21,15 +21,16 @@ namespace Engine
 		
 		const int m_bodyType;
 
-		float m_halfWidthInMeters;
-		float m_halfHeightInMeters;
-		float m_widthInMeters;
-		float m_heightInMeters;
+		const float m_halfWidthInMeters;
+		const float m_halfHeightInMeters;
+		const float m_widthInMeters;
+		const float m_heightInMeters;
 
 	public:
 		Box() = default;
 		Box(const int bodyType, const float startingXInMeters, const float startingYInMeters, 
 			const float halfWidthInMeters, const float halfHeightInMeters, const float density, const float friction);
+
 		const b2Body* getBody() const;
 		void setBody(b2Body* body);
 		const b2BodyDef& getBodyDef() const;
@@ -51,7 +52,5 @@ namespace Engine
 		const int getHeightInPixels() const;
 
 		const float getAngle() const;
-
-		void setNoRotation();
 	};
 }

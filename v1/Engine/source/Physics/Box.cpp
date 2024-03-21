@@ -2,6 +2,7 @@
 
 #include "../../include/Physics/Box.h"
 #include "../../include/Logging/Logger.h"
+#include "../../include/Physics/ConversionFunctions.h"
 
 namespace Engine
 {
@@ -9,7 +10,8 @@ namespace Engine
 	Box::Box(const int bodyType, const float startingXInMeters, const float startingYInMeters, 
 		const float halfWidthInMeters, const float halfHeightInMeters, const float density, const float friction)
 		: m_halfWidthInMeters(halfWidthInMeters), m_halfHeightInMeters(halfHeightInMeters), 
-		m_bodyType(bodyType), m_widthInMeters(0), m_heightInMeters(0), m_body(nullptr)
+		m_widthInMeters(m_halfWidthInMeters * 2.0f), m_heightInMeters(m_halfHeightInMeters * 2.0f),
+		m_bodyType(bodyType), m_body(nullptr)
 	{
 		switch (bodyType)
 		{
@@ -39,15 +41,9 @@ namespace Engine
 		m_bodyDef.position.Set(startingXInMeters, startingYInMeters);
 		m_shape.SetAsBox(m_halfWidthInMeters, m_halfHeightInMeters);
 		m_fixtureDef.shape = &m_shape;
-		
 
-		// m_widthInMeters = static_cast<int>((m_shape.m_vertices[1].x - m_shape.m_vertices[0].x) * 2);
-		// m_heightInMeters = static_cast<int>((m_shape.m_vertices[2].y - m_shape.m_vertices[0].y) * 2);		
-
-		m_widthInMeters = m_halfWidthInMeters * 2.0f;
-		m_heightInMeters = m_halfHeightInMeters * 2.0f;
-
-		ENGINE_INFO("Box created at position: {0}, {1}. With width: {2}, height: {3}", startingXInMeters, startingYInMeters, m_widthInMeters, m_heightInMeters);
+		ENGINE_INFO("Box created at position: {0}, {1}. With width: {2}, height: {3}", 
+			startingXInMeters, startingYInMeters, m_widthInMeters, m_heightInMeters);
 	}
 
 	const b2Body* Box::getBody() const { return m_body; }
@@ -73,6 +69,4 @@ namespace Engine
 	const int Box::getTopLeftYInPixels() const { return (metersToPixels(m_body->GetPosition().y - m_heightInMeters / 2)); }
 
 	const float Box::getAngle() const { return m_body->GetAngle(); }
-
-	void Box::setNoRotation() { ENGINE_INFO("IN SETNOROTATION."); m_body->SetFixedRotation(true); m_body->SetAngularDamping(200000); }
 }

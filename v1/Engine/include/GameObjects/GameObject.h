@@ -23,7 +23,7 @@ namespace Engine
 		SDL_Texture* m_texture = nullptr;
 
 	public:
-		GameObject(int startingX, int startingY, bool visible, bool collidable/* Sprite Sheet, State& initialState */);
+		GameObject(const int startingX, const int startingY, const bool visible, const bool collidable/* Sprite Sheet, State& initialState */);
 		~GameObject() = default;
 
 		void processEvent(Event& e);
