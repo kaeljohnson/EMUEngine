@@ -16,14 +16,18 @@ namespace Engine
 
 		int m_x;
 		int m_y;
+		const int m_width;
+		const int m_height;
 		bool m_visible;
 		bool m_collidable;
+		bool m_fixed;
 
 		SDL_Rect m_rect;
 		SDL_Texture* m_texture = nullptr;
 
 	public:
-		GameObject(const int startingX, const int startingY, const bool visible, const bool collidable/* Sprite Sheet, State& initialState */);
+		GameObject(const int startingX, const int startingY, const int width, const int height, 
+			const bool visible, const bool fixed, const bool collidable);
 		~GameObject() = default;
 
 		void processEvent(Event& e);

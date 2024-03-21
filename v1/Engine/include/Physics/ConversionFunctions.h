@@ -16,4 +16,4 @@ namespace Engine
         // Can't have half a pixel, so round to the nearest pixel.
         return static_cast<int>(round(meters * PIXELS_PER_METER));
     }
-}
+} 

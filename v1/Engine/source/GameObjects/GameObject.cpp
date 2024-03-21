@@ -5,9 +5,11 @@
 
 namespace Engine
 {
-	GameObject::GameObject(const int startingX, const int startingY, bool visible, bool collidable)
-		: m_x(startingX), m_y(startingY), m_visible(visible), m_collidable(collidable), 
-		  m_rect({ startingX, startingY, 80, 80 }), m_texture(nullptr)
+	GameObject::GameObject(const int startingX, const int startingY, const int width, const int height, 
+		const bool visible, const bool fixed, const bool collidable)
+		: m_x(startingX), m_y(startingY), m_width(width), m_height(height), 
+		m_visible(visible), m_collidable(collidable), 
+		m_rect({ startingX, startingY, width, height }), m_texture(nullptr)
 	{
 		ENGINE_INFO("GameObject created at: ({0}, {1})", m_x, m_y);
 	}
