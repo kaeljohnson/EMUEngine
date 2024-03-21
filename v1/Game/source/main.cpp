@@ -23,7 +23,8 @@ int main(int argc, char* args[])
 
 	CLIENT_INFO("Client Running!");
 
-	Engine::GameObject go(20, 20, true, true);
+	Engine::GameObject go = { 20, 20, 20, 20, true, true, true };
+
 	Engine::Layer testLayer("Test Layer 1");
 	Engine::Layer testLayer2("Test Layer 2");
 

@@ -56,19 +56,10 @@ namespace Engine
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void RendererManager::render(SDL_Rect& rect, SDL_Texture* texture)
+	void RendererManager::render(SDL_Rect& rect, SDL_Texture* texture, float angle)
 	{
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDL_Rect src = { 0, 0, 0, 0 };						
-
-		// TEMP //
-
-		float xPixels = 50.0f * rect.x;
-		float yPixels = 50.0f * rect.y;
-
-		
-
-		/////////
 
 
 		// The x and y coordinates correspond to the coordinates on the screen in pixels. 
@@ -78,7 +69,9 @@ namespace Engine
 		// Render the rect to the screen. The second argument in this function takes
 		//  the texture we want to pull the src rect from. It is nullptr right now 
 		// because we don't have any textures to render.
-		SDL_RenderCopy(renderer, texture, nullptr, &dst);
+		// SDL_RenderCopy(renderer, texture, nullptr, &dst);
+
+		SDL_RenderCopyEx(renderer, texture, nullptr, &dst, angle, nullptr, SDL_FLIP_NONE);
 	}
 	void RendererManager::free()
 	{

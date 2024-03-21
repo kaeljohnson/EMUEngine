@@ -6,8 +6,8 @@
 
 namespace Engine
 {
-	World::World(float gravityX, float gravityY, float deltaTime, int velocityIterations, int positionIterations)
-		: m_gravity({ gravityX, gravityY }), m_world({ gravityX, gravityY }), m_deltaTime(deltaTime),
+	World::World(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations)
+		: m_gravity({ gravityX, gravityY }), m_world({ gravityX * PIXELS_PER_METER, gravityY * PIXELS_PER_METER}), m_deltaTime(deltaTime),
 		m_velocityIterations(velocityIterations), m_positionIterations(positionIterations)
 	{}
 
@@ -20,7 +20,8 @@ namespace Engine
 	{
 		box.setBody( m_world.CreateBody(&box.getBodyDef()) );
 		box.createFixture();
+
 		ENGINE_INFO("Box added to world at position: {0}, {1}. With width: {2}, height: {3}",
-			box.getCenterX(), box.getCenterY(), box.getWidth(), box.getHeight());
+			box.getCenterXInMeters(), box.getCenterYInMeters(), box.getWidthInMeters(), box.getHeightInMeters());
 	}
 }

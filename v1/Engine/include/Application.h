@@ -41,7 +41,7 @@ namespace Engine
 		LayerStack m_layerStack;
 
 		// Game loop management.
-		const double timeStep = 1.0 / 60.0;
+		const float timeStep;
 
 		// Physics
 		World m_world;

@@ -20,7 +20,7 @@ namespace Engine
 		SDL_Renderer* getRenderer() const;
 		const SDL_Texture* loadTexture(const char* filePath);
 		void clearScreen();
-		void render(SDL_Rect& rect, SDL_Texture* texture);
+		void render(SDL_Rect& rect, SDL_Texture* texture, float angle);
 		void display();
 		void free();
 	};

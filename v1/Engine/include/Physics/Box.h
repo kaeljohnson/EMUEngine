@@ -2,6 +2,7 @@
 
 #include "../Logging/Logger.h"
 #include "box2d/box2d.h"
+#include "ConversionFunctions.h"
 
 namespace Engine
 {
@@ -18,28 +19,38 @@ namespace Engine
 		b2FixtureDef m_fixtureDef;
 		b2PolygonShape m_shape;
 		
-		int m_bodyType;
+		const int m_bodyType;
 
-		int m_halfWidth;
-		int m_halfHeight;
-		int m_width;
-		int m_height;
+		const float m_halfWidthInMeters;
+		const float m_halfHeightInMeters;
+		const float m_widthInMeters;
+		const float m_heightInMeters;
 
 	public:
 		Box() = default;
-		Box(int bodyType, float x, float y, float halfWidth, float halfHeight, float density, float friction);
+		Box(const int bodyType, const float startingXInMeters, const float startingYInMeters, 
+			const float halfWidthInMeters, const float halfHeightInMeters, const float density, const float friction);
+
 		const b2Body* getBody() const;
 		void setBody(b2Body* body);
 		const b2BodyDef& getBodyDef() const;
 
 		void createFixture();
 
-		const int getCenterX() const;
-		const int getCenterY() const;
-		const int getTopLeftX() const;
-		const int getTopLeftY() const;
-		const int getWidth() const; 
-		const int getHeight() const;
+		const float getCenterXInMeters() const;
+		const float getCenterYInMeters() const;
+		const float getTopLeftXInMeters() const;
+		const float getTopLeftYInMeters() const;
+		const float getWidthInMeters() const; 
+		const float getHeightInMeters() const;
+
+		const int getCenterXInPixels() const;
+		const int getCenterYInPixels() const;
+		const int getTopLeftXInPixels() const;
+		const int getTopLeftYInPixels() const;
+		const int getWidthInPixels() const;
+		const int getHeightInPixels() const;
+
 		const float getAngle() const;
 	};
 }

@@ -2,6 +2,7 @@
 
 #include "box2d/box2d.h"
 #include "Box.h"
+#include "ConversionFunctions.h"
 
 namespace Engine
 {
@@ -17,11 +18,11 @@ namespace Engine
 			b2World m_world;
 			b2Vec2 m_gravity;
 
-			float m_deltaTime;
-			int m_velocityIterations;
-			int m_positionIterations;
+			const float m_deltaTime;
+			const int m_velocityIterations;
+			const int m_positionIterations;
 	public:
-		World(float gravityX, float gravityY, float deltaTime, int velocityIterations, int positionIterations);
+		World(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations);
 		void update();
 		void addBox(Box& body);
 	};
