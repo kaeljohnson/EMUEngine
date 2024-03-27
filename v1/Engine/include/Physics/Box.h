@@ -3,6 +3,7 @@
 #include "../Logging/Logger.h"
 #include "box2d/box2d.h"
 #include "ConversionFunctions.h"
+#include "BodyTypes.h"
 
 namespace Engine
 {
@@ -19,7 +20,7 @@ namespace Engine
 		b2FixtureDef m_fixtureDef;
 		b2PolygonShape m_shape;
 		
-		const int m_bodyType;
+		const BodyType m_bodyType;
 
 		const float m_halfWidthInMeters;
 		const float m_halfHeightInMeters;
@@ -28,10 +29,10 @@ namespace Engine
 
 	public:
 		Box() = default;
-		Box(const int bodyType, const float startingXInMeters, const float startingYInMeters, 
+		Box(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters, 
 			const float halfWidthInMeters, const float halfHeightInMeters, const float density, const float friction);
 
-		const b2Body* getBody() const;
+		b2Body* getBody() const;
 		void setBody(b2Body* body);
 		const b2BodyDef& getBodyDef() const;
 
@@ -51,6 +52,10 @@ namespace Engine
 		const int getWidthInPixels() const;
 		const int getHeightInPixels() const;
 
-		const float getAngle() const;
+		const float getAngleInRadians() const;
+		const double getAngleInDegrees() const;
+
+		const BodyType getBodyType() const;
+		void bodyNotInWorldAlert() const;
 	};
 }

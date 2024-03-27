@@ -6,11 +6,14 @@
 
 #include "../include/RendererManager.h"
 #include "../include/Logging/Logger.h"
+#include "../include/GameObjects/GameObject.h"
+#include "../include/Actions/ActionTypes.h"
+#include "../include/Events/IEventAction.h"
 
 namespace Engine
 {
-	RendererManager::RendererManager(SDL_Window* window)
-		: renderer(nullptr)
+	RendererManager::RendererManager(SDL_Window* window, IEventAction* eventSystemInterface)
+		: renderer(nullptr), ptrEventActionInterface(eventSystemInterface)
 	{
 		// Assign SDL renderer pointer to the return value of the SDL_CreateRenderer function. 
 		// Note: Hover over function to understand the arguments it takes.
@@ -56,22 +59,40 @@ namespace Engine
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void RendererManager::render(SDL_Rect& rect, SDL_Texture* texture, float angle)
+	void RendererManager::render(GameObject* gameObject)
 	{
 		// The x, y, height, and width of the portion of the texture we want to render.
-		SDL_Rect src = { 0, 0, 0, 0 };						
+		SDL_Rect src = { 0, 0, 0, 0 };
 
 
 		// The x and y coordinates correspond to the coordinates on the screen in pixels. 
 		// The width and height are the width and height of the rect we want to render.
-		SDL_Rect dst = { rect.x, rect.y, rect.w, rect.h };
 
+		if (gameObject->getTexture() == nullptr)
+		{
+			ENGINE_CRITICAL("Texture is nullptr. Cannot render GameObject.");
+			ptrEventActionInterface->triggerActionCallback(ActionType::EndApplication, std::monostate{});
+		}
+		if (gameObject->getBody() == nullptr)
+		{
+			ENGINE_CRITICAL("Body is nullptr. Cannot render GameObject.");
+			ptrEventActionInterface->triggerActionCallback(ActionType::EndApplication, std::monostate{});
+		}
+
+		SDL_Rect dst
+		{
+			gameObject->getTopLeftXInPixels(),
+			gameObject->getTopLeftYInPixels(),
+			gameObject->getWidthInPixels(),
+			gameObject->getHeightInPixels()
+		};
+		
 		// Render the rect to the screen. The second argument in this function takes
 		//  the texture we want to pull the src rect from. It is nullptr right now 
 		// because we don't have any textures to render.
 		// SDL_RenderCopy(renderer, texture, nullptr, &dst);
 
-		SDL_RenderCopyEx(renderer, texture, nullptr, &dst, angle, nullptr, SDL_FLIP_NONE);
+		SDL_RenderCopyEx(renderer, gameObject->getTexture(), nullptr, &dst, gameObject->getAngleInDegrees(), nullptr, SDL_FLIP_NONE);
 	}
 	void RendererManager::free()
 	{

@@ -4,10 +4,12 @@
 #include "../../include/Events/IEventAction.h"
 #include "../../include/Events/Event.h"
 #include "../../include/Logging/Logger.h"
+#include "../../include/Layers/ILayerEvent.h"
+#include "../../include/Layers/LayerEvents.h"
 
 namespace Engine
 {
-	WindowManagerLayer::WindowManagerLayer(IEventAction* eventSystem) : ptrEventSystem(eventSystem), Layer("WindowManagerLayer")
+	WindowManagerLayer::WindowManagerLayer(IEventAction* eventSystem, ILayerEvent* ptrLayerEventSystem) : ptrEventSystem(eventSystem), Layer("WindowManagerLayer", ptrLayerEventSystem)
 	{
 	}
 

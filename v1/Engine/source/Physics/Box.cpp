@@ -3,11 +3,13 @@
 #include "../../include/Physics/Box.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/ConversionFunctions.h"
+#include "../../include/Physics/BodyTypes.h"
 
 namespace Engine
 {
+	void Box::bodyNotInWorldAlert() const { ENGINE_CRITICAL("Body not in world. Cannot get position."); }
 
-	Box::Box(const int bodyType, const float startingXInMeters, const float startingYInMeters, 
+	Box::Box(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters, 
 		const float halfWidthInMeters, const float halfHeightInMeters, const float density, const float friction)
 		: m_halfWidthInMeters(halfWidthInMeters), m_halfHeightInMeters(halfHeightInMeters), 
 		m_widthInMeters(m_halfWidthInMeters * 2.0f), m_heightInMeters(m_halfHeightInMeters * 2.0f),
@@ -15,14 +17,14 @@ namespace Engine
 	{
 		switch (bodyType)
 		{
-		case 1:
+		case STATIC:
 			m_bodyDef.type = b2_staticBody;
 			m_fixtureDef.density = 0;
 			m_fixtureDef.friction = 0;
 			m_bodyDef.fixedRotation = true;
 			ENGINE_TRACE("Creating static body.");
 			break;
-		case 2:
+		case DYNAMIC:
 			m_bodyDef.type = b2_dynamicBody;
 			m_fixtureDef.density = density;
 			m_fixtureDef.friction = friction;
@@ -46,7 +48,7 @@ namespace Engine
 			startingXInMeters, startingYInMeters, m_widthInMeters, m_heightInMeters);
 	}
 
-	const b2Body* Box::getBody() const { return m_body; }
+	b2Body* Box::getBody() const { return m_body; }
 	const b2BodyDef& Box::getBodyDef() const { return m_bodyDef; }
 
 	const float Box::getWidthInMeters() const { return m_widthInMeters; }
@@ -65,8 +67,11 @@ namespace Engine
 
 	const int Box::getCenterXInPixels() const { return (metersToPixels(m_body->GetPosition().x)); }
 	const int Box::getCenterYInPixels() const { return (metersToPixels(m_body->GetPosition().y)); }
-	const int Box::getTopLeftXInPixels() const { return (metersToPixels(m_body->GetPosition().x - m_widthInMeters / 2)); }
+	const int Box::getTopLeftXInPixels() const { return metersToPixels(m_body->GetPosition().x - m_widthInMeters / 2); }
 	const int Box::getTopLeftYInPixels() const { return (metersToPixels(m_body->GetPosition().y - m_heightInMeters / 2)); }
 
-	const float Box::getAngle() const { return m_body->GetAngle(); }
+	const float Box::getAngleInRadians() const { return m_body->GetAngle(); }
+	const double Box::getAngleInDegrees() const { return radiansToDegrees(m_body->GetAngle()); }
+
+	const BodyType Box::getBodyType() const { return m_bodyType; }
 }

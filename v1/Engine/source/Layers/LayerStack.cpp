@@ -33,8 +33,15 @@ namespace Engine
 			}
 		}
 
-		m_layers.push_back(layer);
+		// Stuff engine needs to do when a layer is pushed.
+		// Game objects added to the application world when layer is pushed to application layer stack.
+		layer->addToWorld();
+
+		// Stuff the client needs to do when a layer is pushed.
 		layer->onAttach();
+
+		// Add the layer to the layer stack.
+		m_layers.push_back(layer);
 	}
 
 	void LayerStack::popLayer(Layer* layer) 
@@ -50,7 +57,14 @@ namespace Engine
 		{
 			if ((*it)->getName() == layer->getName())
 			{
+
+				// Stuff engine needs to do when a layer is popped.
+				(*it)->removeFromWorld();
+
+				// Stuff the client needs to do when a layer is popped.
 				(*it)->onDetach();
+
+				// Remove the layer from the layer stack.
 				m_layers.erase(it);
 				break;
 			}
@@ -66,7 +80,13 @@ namespace Engine
 			return;
 		}
 
+		// Stuff engine needs to do when a layer is popped.
+		m_layers.back()->removeFromWorld();
+
+		// Stuff the client needs to do when a layer is popped.
 		m_layers.back()->onDetach();
+
+		// Remove the layer from the layer stack.
 		m_layers.pop_back();
 	}
 }
