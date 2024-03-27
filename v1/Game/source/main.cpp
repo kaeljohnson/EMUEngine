@@ -20,12 +20,8 @@ int main(int argc, char* args[])
 	// Call to Application constructor. Instantiates an object of type "Application" named app.
 	Engine::Application app(APPLICATION_NAME);
 
-	// Get the event system interface from the application.
-	Engine::IEventAction* eventActionInterface = app.getEventActionInterface();
-	Engine::ILayerEvent* layerEventSystem = app.getLayerEventInterface();
-
-	Engine::Layer testLayer("Test Layer 1", layerEventSystem);
-	Engine::Layer testLayer2("Test Layer 2", layerEventSystem);
+	Engine::Layer testLayer("Test Layer 1", &app.CallbackSystem);
+	Engine::Layer testLayer2("Test Layer 2", &app.CallbackSystem);
 
 	// Temp
 	SDL_Surface* surface = SDL_CreateRGBSurface(0, 1000, 1000, 32, 0, 0, 0, 0);

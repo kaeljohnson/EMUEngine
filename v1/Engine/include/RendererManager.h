@@ -4,7 +4,8 @@
 #include <SDL_image.h>
 
 #include "GameObjects/GameObject.h"
-#include "Events/IEventAction.h"
+
+#include "CallbackSystem/CallbackSystem.h"
 
 
 namespace Engine
@@ -16,10 +17,10 @@ namespace Engine
 		// SDL2 renderer pointer. This is the renderer that will be used to render all of the game objects.
 		SDL_Renderer* renderer;
 
-		IEventAction* ptrEventActionInterface;
+		ICallbackSystem* ptrICallbackSystem;
 	public:
 		// RendererManager constructor.
-		RendererManager(SDL_Window* window, IEventAction* eventActionInterface);
+		RendererManager(SDL_Window* window, ICallbackSystem* ptrICallbackSystem);
 		~RendererManager();
 
 		// RendererManager functions.

@@ -8,7 +8,6 @@
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
 #include "../include/Layers/Layer.h"
-#include "../include/Layers/ILayerEvent.h"
 #include "../include/GameObjects/GameObject.h"
 #include "../include/Layers/ApplicationLayer.h"
 #include "../include/Layers/WindowManagerLayer.h"
@@ -18,10 +17,10 @@ namespace Engine
 {
 	Application::Application(const char* appName)
 		: m_windowManager(appName),
-		m_rendererManager(m_windowManager.getWindow(), &m_eventActionInterface),
+		m_rendererManager(m_windowManager.getWindow(), &CallbackSystem),
 		m_eventManager(m_eventQ),
-		m_appLayer(&m_eventActionInterface, &m_layerEventSystem),
-		m_windowManagerLayer(&m_eventActionInterface, &m_layerEventSystem),
+		m_appLayer(&CallbackSystem),
+		m_windowManagerLayer(&CallbackSystem),
 		m_layerStack({&m_appLayer, &m_windowManagerLayer}),
 		running(false),
 		timeStep(1.0f / 60.0f),
@@ -30,9 +29,6 @@ namespace Engine
 	{
 		defineDefaultApplicationCallbacks();
 	}
-
-	IEventAction* Application::getEventActionInterface() { return &m_eventActionInterface; }
-	ILayerEvent* Application::getLayerEventInterface() { return &m_layerEventSystem; }
 
 	void Application::run()
 	{
@@ -170,24 +166,24 @@ namespace Engine
 
 	void Application::defineDefaultApplicationCallbacks()
 	{
-		m_eventActionInterface.newActionCallback(ActionType::ToggleFullscreen, [this](EventData data)
+		CallbackSystem.newCallback(Type::ToggleFullscreen, [this](Data data)
 			{
 				m_windowManager.toggleFullscreen();
 			});
 
-		m_eventActionInterface.newActionCallback(ActionType::EndApplication, [this](EventData data)
+		CallbackSystem.newCallback(Type::EndApplication, [this](Data data)
 			{
 				end();
 			});
 
-		m_layerEventSystem.newLayerEventCallback(LayerEvent::AddToWorld, [this](LayerEventData layerEventData)
+		CallbackSystem.newCallback(Type::AddToWorld, [this](Data layerEventData)
 			{
 				GameObject* gameObject = std::get<GameObject*>(layerEventData);
 
 				m_world.addBox(*gameObject);
 			});
 
-		m_layerEventSystem.newLayerEventCallback(LayerEvent::RemoveFromWorld, [this](LayerEventData layerEventData)
+		CallbackSystem.newCallback(Type::RemoveFromWorld, [this](Data layerEventData)
 			{
 				GameObject* gameObject = std::get<GameObject*>(layerEventData);
 

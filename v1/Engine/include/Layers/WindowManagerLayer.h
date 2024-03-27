@@ -2,18 +2,15 @@
 
 #include "../Layers/Layer.h"
 #include "../Events/Event.h"
-#include "../Events/IEventAction.h"
-#include "ILayerEvent.h"
-#include "LayerEvents.h"
-
+#include "../CallbackSystem/CallbackSystem.h"
 namespace Engine
 {
 	class WindowManagerLayer : public Layer
 	{
 	private:
-		IEventAction* ptrEventSystem;
+		ICallbackSystem* ptrICallbackSystem;
 	public:
-		WindowManagerLayer(IEventAction* eventSystem, ILayerEvent* ptrLayerEventSystem);
+		WindowManagerLayer(ICallbackSystem* ptrICallbackSystem);
 		~WindowManagerLayer();
 
 		void onAttach() override;

@@ -2,18 +2,17 @@
 
 #include "../Layers/Layer.h"
 #include "../Events/Event.h"
-#include "../Events/IEventAction.h"
-#include "ILayerEvent.h"
-#include "LayerEvents.h"
+#include "../CallbackSystem/CallbackSystem.h"
+
 
 namespace Engine
 { 
 	class ApplicationLayer : public Layer
 	{
 	private:
-		IEventAction* ptrEventSystem;
+		ICallbackSystem* ptrEventSystem;
 	public:
-		ApplicationLayer(IEventAction* eventSystem, ILayerEvent* ptrLayerEventSystem);
+		ApplicationLayer(ICallbackSystem* ptrICallbackSystem);
 		~ApplicationLayer();
 
 		void onAttach() override;

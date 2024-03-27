@@ -4,10 +4,8 @@
 
 #include "../Events/Event.h"
 #include "../GameObjects/GameObject.h"
-#include "LayerEvents.h"
-#include "ILayerEvent.h"
-#include "../../include/Layers/ILayerEvent.h"
-#include "../../include/Layers/LayerEvents.h"
+#include "../CallbackSystem/CallbackSystem.h"
+
 
 namespace Engine
 {
@@ -21,9 +19,9 @@ namespace Engine
 		// This would make it easy to avoid the box2d bug where if dynamic objects are added before static objects,
 		// the collision detection will cause the dynamic objects to inch to the right.
 		std::vector<GameObject*> m_gameObjects;
-		ILayerEvent* ptrLayerEventSystem;
+		ICallbackSystem* ptrICallbackSystem;
 	public:
-		Layer(std::string name, ILayerEvent* ptrLayerEventSystem);
+		Layer(std::string name, ICallbackSystem* ptrLayerEventSystem);
 		virtual	~Layer();
 
 		bool isAttached;

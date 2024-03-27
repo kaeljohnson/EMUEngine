@@ -2,15 +2,12 @@
 
 #include "../../include/Layers/ApplicationLayer.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/Events/IEventAction.h"
 #include "../../include/Events/Event.h"
-#include "../../include/Actions/ActionTypes.h"
-#include "../../include/Layers/ILayerEvent.h"
-#include "../../include/Layers/LayerEvents.h"
+#include "../../include/CallbackSystem/CallbackSystem.h"
 
 namespace Engine
 {
-	ApplicationLayer::ApplicationLayer(IEventAction* eventSystem, ILayerEvent* ptrLayerEventSystem) : ptrEventSystem(eventSystem), Layer("ApplicationLayer", ptrLayerEventSystem)
+	ApplicationLayer::ApplicationLayer(ICallbackSystem* ptrICallbackSystem) : Layer("ApplicationLayer", ptrICallbackSystem)
 	{
 	}
 
@@ -36,12 +33,12 @@ namespace Engine
 		{
 		case (ESCAPE_KEY_DOWN):
 			ENGINE_TRACE("Handled event: {}", static_cast<int>(ESCAPE_KEY_DOWN));
-			ptrEventSystem->triggerActionCallback(ActionType::EndApplication, std::monostate{});
+			ptrICallbackSystem->triggerCallback(Type::EndApplication, std::monostate{});
 			e.Handled = true;
 			break;
 		case (QUIT):
 			ENGINE_TRACE("Handled event: {}", static_cast<int>(QUIT));
-			ptrEventSystem->triggerActionCallback(ActionType::EndApplication, std::monostate{});
+			ptrICallbackSystem->triggerCallback(Type::EndApplication, std::monostate{});
 			e.Handled = true;
 			break;
 		default:

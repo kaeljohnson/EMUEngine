@@ -7,13 +7,12 @@
 #include "../include/RendererManager.h"
 #include "../include/Logging/Logger.h"
 #include "../include/GameObjects/GameObject.h"
-#include "../include/Actions/ActionTypes.h"
-#include "../include/Events/IEventAction.h"
+#include "../include/CallbackSystem/CallbackSystem.h"
 
 namespace Engine
 {
-	RendererManager::RendererManager(SDL_Window* window, IEventAction* eventSystemInterface)
-		: renderer(nullptr), ptrEventActionInterface(eventSystemInterface)
+	RendererManager::RendererManager(SDL_Window* window, ICallbackSystem* ptrICallbackSystem)
+		: renderer(nullptr), ptrICallbackSystem(ptrICallbackSystem)
 	{
 		// Assign SDL renderer pointer to the return value of the SDL_CreateRenderer function. 
 		// Note: Hover over function to understand the arguments it takes.
@@ -24,8 +23,6 @@ namespace Engine
 		}
 
 		SDL_SetRenderDrawColor(renderer, 'd3', 'd3', 'd3', SDL_ALPHA_OPAQUE);
-
-		
 	}
 
 	SDL_Renderer* RendererManager::getRenderer() const
@@ -71,12 +68,12 @@ namespace Engine
 		if (gameObject->getTexture() == nullptr)
 		{
 			ENGINE_CRITICAL("Texture is nullptr. Cannot render GameObject.");
-			ptrEventActionInterface->triggerActionCallback(ActionType::EndApplication, std::monostate{});
+			ptrICallbackSystem->triggerCallback(Type::EndApplication, std::monostate{});
 		}
 		if (gameObject->getBody() == nullptr)
 		{
 			ENGINE_CRITICAL("Body is nullptr. Cannot render GameObject.");
-			ptrEventActionInterface->triggerActionCallback(ActionType::EndApplication, std::monostate{});
+			ptrICallbackSystem->triggerCallback(Type::EndApplication, std::monostate{});
 		}
 
 		SDL_Rect dst

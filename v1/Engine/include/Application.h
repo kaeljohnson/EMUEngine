@@ -6,10 +6,9 @@
 #include "RendererManager.h"
 #include "Events/EventManager.h" 
 #include "Events/Event.h"
-#include "Events/IEventAction.h"
 #include "Layers/LayerStack.h"
 #include "Layers/Layer.h"
-#include "../include/Layers/ILayerEvent.h"
+#include "CallbackSystem/CallbackSystem.h"
 #include "Layers/ApplicationLayer.h"
 #include "Layers/WindowManagerLayer.h"
 #include "Physics/Box.h"
@@ -33,7 +32,8 @@ namespace Engine
 		EventManager m_eventManager;
 
 		// Event system for loose coupling between client code and application.
-		IEventAction m_eventActionInterface;
+		// IEventAction m_eventActionInterface;
+		// ILayerEvent m_layerEventSystem;
 
 		ApplicationLayer m_appLayer;
 		WindowManagerLayer m_windowManagerLayer;
@@ -42,7 +42,7 @@ namespace Engine
 		// layer stack holds user defined layers.
 		LayerStack m_layerStack;
 
-		ILayerEvent m_layerEventSystem;
+		
 
 		// Game loop management.
 		const float timeStep;
@@ -59,11 +59,7 @@ namespace Engine
 		Application(const char* appName);
 		~Application() = default;
 
-		// Application should have just one callback interface. This interface
-		// can utilize different types but there is no reason to separate the interfaces themselves
-		// as they are just messaging systems.
-		IEventAction* getEventActionInterface();
-		ILayerEvent* getLayerEventInterface();
+		ICallbackSystem CallbackSystem;
 
 		// TEMP
 		SDL_Renderer* getRenderer() { return m_rendererManager.getRenderer(); }

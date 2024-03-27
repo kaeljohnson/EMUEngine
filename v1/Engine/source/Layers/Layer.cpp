@@ -5,13 +5,12 @@
 #include "../../include/Layers/Layer.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/GameObjects/GameObject.h"
-#include "../../include/Layers/LayerEvents.h"
-#include "../../include/Layers/ILayerEvent.h"
+#include "../../include/CallbackSystem/CallbackSystem.h"
 
 namespace Engine
 {
-	Layer::Layer(std::string name, ILayerEvent* ptrLayerEventSystem)
-		: m_name(name), m_enabled(true), isAttached(false), ptrLayerEventSystem(ptrLayerEventSystem) {}
+	Layer::Layer(std::string name, ICallbackSystem* ptrICallbackSystem)
+		: m_name(name), m_enabled(true), isAttached(false), ptrICallbackSystem(ptrICallbackSystem) {}
 	
 	Layer::~Layer() {}
 
@@ -21,7 +20,7 @@ namespace Engine
 
 		for (GameObject* gameObject : m_gameObjects)
 		{
-			ptrLayerEventSystem->triggerLayerEventCallback(LayerEvent::AddToWorld, gameObject);
+			ptrICallbackSystem->triggerCallback(Type::AddToWorld, gameObject);
 		}
 	};
 
@@ -35,7 +34,7 @@ namespace Engine
 
 		for (GameObject* gameObject : m_gameObjects)
 		{
-			ptrLayerEventSystem->triggerLayerEventCallback(LayerEvent::RemoveFromWorld, gameObject);
+			ptrICallbackSystem->triggerCallback(Type::RemoveFromWorld, gameObject);
 		}
 	};
 
@@ -65,7 +64,7 @@ namespace Engine
 		// If the layer is already attached to the worlds layer stack, add the object to the world as well.
 		if (isAttached)
 		{
-			ptrLayerEventSystem->triggerLayerEventCallback(LayerEvent::AddToWorld, gameObject);
+			ptrICallbackSystem->triggerCallback(Type::AddToWorld, gameObject);
 		}
 	}
 
@@ -76,7 +75,7 @@ namespace Engine
 		{
 			if (isAttached)
 			{
-				ptrLayerEventSystem->triggerLayerEventCallback(LayerEvent::RemoveFromWorld, gameObject);
+				ptrICallbackSystem->triggerCallback(Type::RemoveFromWorld, gameObject);
 			}
 
 			m_gameObjects.erase(it);

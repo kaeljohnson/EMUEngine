@@ -1,15 +1,13 @@
 #pragma once
 
 #include "../../include/Layers/WindowManagerLayer.h"
-#include "../../include/Events/IEventAction.h"
 #include "../../include/Events/Event.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/Layers/ILayerEvent.h"
-#include "../../include/Layers/LayerEvents.h"
+#include "../../include/CallbackSystem/CallbackSystem.h"
 
 namespace Engine
 {
-	WindowManagerLayer::WindowManagerLayer(IEventAction* eventSystem, ILayerEvent* ptrLayerEventSystem) : ptrEventSystem(eventSystem), Layer("WindowManagerLayer", ptrLayerEventSystem)
+	WindowManagerLayer::WindowManagerLayer(ICallbackSystem* ptrICallbackSystem) : ptrICallbackSystem(ptrICallbackSystem), Layer("WindowManagerLayer", ptrICallbackSystem)
 	{
 	}
 
@@ -34,12 +32,12 @@ namespace Engine
 		switch (e.Type)
 		{
 		case (Engine::F_KEY_DOWN):
-			ptrEventSystem->triggerActionCallback(ActionType::ToggleFullscreen, std::monostate{});
+			ptrICallbackSystem->triggerCallback(Type::ToggleFullscreen, std::monostate{});
 			ENGINE_TRACE("Handled event: {}", static_cast<int>(F_KEY_DOWN));
 			e.Handled = true;
 			break;
 		case (Engine::RESIZE_WINDOW):
-			ptrEventSystem->triggerActionCallback(ActionType::ResizeWindow, std::make_pair(e.X_POS, e.Y_POS));
+			ptrICallbackSystem->triggerCallback(Type::ResizeWindow, std::make_pair(e.X_POS, e.Y_POS));
 			ENGINE_TRACE("Handled event: {}", static_cast<int>(RESIZE_WINDOW));
 			e.Handled = true;
 			break;
