@@ -3,6 +3,8 @@
 #include "../Layers/Layer.h"
 #include "../Events/Event.h"
 #include "../Events/IEventAction.h"
+#include "ILayerEvent.h"
+#include "LayerEvents.h"
 
 namespace Engine
 {
@@ -11,7 +13,7 @@ namespace Engine
 	private:
 		IEventAction* ptrEventSystem;
 	public:
-		WindowManagerLayer(IEventAction* eventSystem);
+		WindowManagerLayer(IEventAction* eventSystem, ILayerEvent* ptrLayerEventSystem);
 		~WindowManagerLayer();
 
 		void onAttach() override;

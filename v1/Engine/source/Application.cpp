@@ -8,6 +8,7 @@
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
 #include "../include/Layers/Layer.h"
+#include "../include/Layers/ILayerEvent.h"
 #include "../include/GameObjects/GameObject.h"
 #include "../include/Layers/ApplicationLayer.h"
 #include "../include/Layers/WindowManagerLayer.h"
@@ -17,38 +18,21 @@ namespace Engine
 {
 	Application::Application(const char* appName)
 		: m_windowManager(appName),
-		m_rendererManager(m_windowManager.getWindow()),
+		m_rendererManager(m_windowManager.getWindow(), &m_eventActionInterface),
 		m_eventManager(m_eventQ),
-		m_appLayer(&m_eventActionInterface),
-		m_windowManagerLayer(&m_eventActionInterface),
+		m_appLayer(&m_eventActionInterface, &m_layerEventSystem),
+		m_windowManagerLayer(&m_eventActionInterface, &m_layerEventSystem),
 		m_layerStack({&m_appLayer, &m_windowManagerLayer}),
 		running(false),
 		timeStep(1.0f / 60.0f),
 		// The client will define the world.
-		m_world(0.0f, 9.8f, timeStep, 6, 2),
-		tempBox({ 2, 115.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.3f }),
-		tempGround({ 1, 115.0f, 120.0f, 2.0f, 2.0f, 0.0f, 0.0f })
+		m_world(0.0f, 9.8f, timeStep, 6, 2)
 	{
-		m_eventActionInterface.newActionCallback(ActionType::ToggleFullscreen, [this](EventData data)
-		{
-			m_windowManager.toggleFullscreen();
-		});
-
-		m_eventActionInterface.newActionCallback(ActionType::EndApplication, [this](EventData data)
-		{
-			end();
-		});
-
-		// Temp
-		SDL_Surface* surface = SDL_CreateRGBSurface(0, 1000, 1000, 32, 0, 0, 0, 0);
-		SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 0, 0));
-		m_textureRed = SDL_CreateTextureFromSurface(m_rendererManager.getRenderer(), surface);
-		SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 255, 0));
-		m_textureBlue = SDL_CreateTextureFromSurface(m_rendererManager.getRenderer(), surface);
-		SDL_FreeSurface(surface);
+		defineDefaultApplicationCallbacks();
 	}
 
 	IEventAction* Application::getEventActionInterface() { return &m_eventActionInterface; }
+	ILayerEvent* Application::getLayerEventInterface() { return &m_layerEventSystem; }
 
 	void Application::run()
 	{
@@ -71,9 +55,6 @@ namespace Engine
 		}
 
 		running = true;
-
-		m_world.addBox(tempGround);
-		m_world.addBox(tempBox);
 
 		double currentTime = SDL_GetTicks() / 1000.0;
 		double accumulator = 0.0;
@@ -110,22 +91,22 @@ namespace Engine
 			// Calculate interpolation factor. This will be used in the future.
 			const double interpolation = accumulator / timeStep;
 
-			// Temp
-			// There may be a slight gp between the box and the ground (or any collision) 
-			// due to how box2d handles collision. It leaves a "gap" to prevent objects from tunneling through each other.
-
-			float dynAngle = tempBox.getAngle();
-			float groundAngle = tempGround.getAngle();
-			SDL_Rect dynBody = { tempBox.getTopLeftXInPixels(), tempBox.getTopLeftYInPixels(), tempBox.getWidthInPixels(), tempBox.getHeightInPixels() };
-			SDL_Rect groundBody = { tempGround.getTopLeftXInPixels(), tempGround.getTopLeftYInPixels(), tempGround.getWidthInPixels(), tempGround.getHeightInPixels() };
-
-
 			m_rendererManager.clearScreen();
 
 			// Need interpolation for smooth rendering.
-			m_rendererManager.render(groundBody, m_textureBlue, groundAngle);
-			m_rendererManager.render(dynBody, m_textureRed, dynAngle);
+			renderLayers();
 			m_rendererManager.display();      
+		}
+	}
+
+	void Application::renderLayers()
+	{
+		for (Layer* layer : m_layerStack)
+		{
+			for (GameObject* gameObject : *layer)
+			{
+				m_rendererManager.render(gameObject);
+			}
 		}
 	}
 
@@ -173,15 +154,44 @@ namespace Engine
 	void Application::pushToLayerStack(Layer* layer)
 	{
 		m_layerStack.pushLayer(layer);
+		layer->isAttached = true;
 	}
 
 	void Application::popLayerFromStack(Layer* layer)
 	{
 		m_layerStack.popLayer(layer);
+		layer->isAttached = false;
 	}
 
 	void Application::popLayerFromStack()
 	{
 		m_layerStack.popLayer();
+	}
+
+	void Application::defineDefaultApplicationCallbacks()
+	{
+		m_eventActionInterface.newActionCallback(ActionType::ToggleFullscreen, [this](EventData data)
+			{
+				m_windowManager.toggleFullscreen();
+			});
+
+		m_eventActionInterface.newActionCallback(ActionType::EndApplication, [this](EventData data)
+			{
+				end();
+			});
+
+		m_layerEventSystem.newLayerEventCallback(LayerEvent::AddToWorld, [this](LayerEventData layerEventData)
+			{
+				GameObject* gameObject = std::get<GameObject*>(layerEventData);
+
+				m_world.addBox(*gameObject);
+			});
+
+		m_layerEventSystem.newLayerEventCallback(LayerEvent::RemoveFromWorld, [this](LayerEventData layerEventData)
+			{
+				GameObject* gameObject = std::get<GameObject*>(layerEventData);
+
+				m_world.removeBox(*gameObject);
+			});
 	}
 }

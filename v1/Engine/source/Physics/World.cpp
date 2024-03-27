@@ -24,4 +24,9 @@ namespace Engine
 		ENGINE_INFO("Box added to world at position: {0}, {1}. With width: {2}, height: {3}",
 			box.getCenterXInMeters(), box.getCenterYInMeters(), box.getWidthInMeters(), box.getHeightInMeters());
 	}
+
+	void World::removeBox(Box& body)
+	{
+		m_world.DestroyBody(body.getBody());
+	}
 }

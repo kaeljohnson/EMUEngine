@@ -3,6 +3,11 @@
 #include <string>
 
 #include "../Events/Event.h"
+#include "../GameObjects/GameObject.h"
+#include "LayerEvents.h"
+#include "ILayerEvent.h"
+#include "../../include/Layers/ILayerEvent.h"
+#include "../../include/Layers/LayerEvents.h"
 
 namespace Engine
 {
@@ -11,9 +16,23 @@ namespace Engine
 	protected:
 		std::string m_name;
 		bool m_enabled;
+
+		// Maybe there should be two vectors, one for static objects and one for dynamic objects.
+		// This would make it easy to avoid the box2d bug where if dynamic objects are added before static objects,
+		// the collision detection will cause the dynamic objects to inch to the right.
+		std::vector<GameObject*> m_gameObjects;
+		ILayerEvent* ptrLayerEventSystem;
 	public:
-		Layer(std::string name);
+		Layer(std::string name, ILayerEvent* ptrLayerEventSystem);
 		virtual	~Layer();
+
+		bool isAttached;
+
+		const std::vector<GameObject*>::iterator begin() { return m_gameObjects.begin(); }
+		const std::vector<GameObject*>::iterator end() { return m_gameObjects.end(); }
+
+		void addToWorld();
+		void removeFromWorld();
 
 		virtual void onAttach();
 		virtual void onDetach();
@@ -21,5 +40,8 @@ namespace Engine
 		virtual void processEvent(Event& e);
 
 		const std::string& getName() const;
+
+		void addGameObject(GameObject* gameObject);
+		void removeGameObject(GameObject* gameObject);
 	};
 }

@@ -4,10 +4,13 @@
 #include "../../include/Logging/Logger.h"
 #include "../../include/Events/IEventAction.h"
 #include "../../include/Events/Event.h"
+#include "../../include/Actions/ActionTypes.h"
+#include "../../include/Layers/ILayerEvent.h"
+#include "../../include/Layers/LayerEvents.h"
 
 namespace Engine
 {
-	ApplicationLayer::ApplicationLayer(IEventAction* eventSystem) : ptrEventSystem(eventSystem), Layer("ApplicationLayer")
+	ApplicationLayer::ApplicationLayer(IEventAction* eventSystem, ILayerEvent* ptrLayerEventSystem) : ptrEventSystem(eventSystem), Layer("ApplicationLayer", ptrLayerEventSystem)
 	{
 	}
 

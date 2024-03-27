@@ -9,6 +9,7 @@
 #include "Events/IEventAction.h"
 #include "Layers/LayerStack.h"
 #include "Layers/Layer.h"
+#include "../include/Layers/ILayerEvent.h"
 #include "Layers/ApplicationLayer.h"
 #include "Layers/WindowManagerLayer.h"
 #include "Physics/Box.h"
@@ -28,7 +29,7 @@ namespace Engine
 
 		// All of the different managers that the application will use.
 		WindowManager m_windowManager;
-		RendererManager m_rendererManager;
+		
 		EventManager m_eventManager;
 
 		// Event system for loose coupling between client code and application.
@@ -36,9 +37,12 @@ namespace Engine
 
 		ApplicationLayer m_appLayer;
 		WindowManagerLayer m_windowManagerLayer;
+		RendererManager m_rendererManager;
 
 		// layer stack holds user defined layers.
 		LayerStack m_layerStack;
+
+		ILayerEvent m_layerEventSystem;
 
 		// Game loop management.
 		const float timeStep;
@@ -46,21 +50,23 @@ namespace Engine
 		// Physics
 		World m_world;
 
-		Box tempGround;
-		Box tempBox;
-
-		// Temp
-		SDL_Texture* m_textureBlue;
-		SDL_Texture* m_textureRed;
-
 		void processEventQueue();
+		void renderLayers();
+		void defineDefaultApplicationCallbacks();
 
 	public:
 		// Application constructor.
 		Application(const char* appName);
 		~Application() = default;
 
+		// Application should have just one callback interface. This interface
+		// can utilize different types but there is no reason to separate the interfaces themselves
+		// as they are just messaging systems.
 		IEventAction* getEventActionInterface();
+		ILayerEvent* getLayerEventInterface();
+
+		// TEMP
+		SDL_Renderer* getRenderer() { return m_rendererManager.getRenderer(); }
 
 		// Layer stack functions.
 		void pushToLayerStack(Layer* layer);
