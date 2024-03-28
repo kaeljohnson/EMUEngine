@@ -46,13 +46,6 @@ namespace Engine
 
 	void LayerStack::popLayer(Layer* layer) 
 	{
-		if (layer->getName() == "ApplicationLayer"
-			|| layer->getName() == "WindowManagerLayer")
-		{
-			ENGINE_CRITICAL("Cannot pop the ApplicationLayer or WindowManagerLayer from the layer stack!");
-			return;
-		}
-
 		for (auto it = m_layers.begin(); it != m_layers.end(); it++)
 		{
 			if ((*it)->getName() == layer->getName())
@@ -73,13 +66,6 @@ namespace Engine
 
 	void LayerStack::popLayer() 
 	{
-		if (m_layers.back()->getName() == "ApplicationLayer"
-			|| m_layers.back()->getName() == "WindowManagerLayer")
-		{
-			ENGINE_CRITICAL("Cannot pop the ApplicationLayer or WindowManagerLayer from the layer stack!");
-			return;
-		}
-
 		// Stuff engine needs to do when a layer is popped.
 		m_layers.back()->removeFromWorld();
 

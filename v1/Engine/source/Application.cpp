@@ -9,8 +9,6 @@
 #include "../include/Events/Event.h"
 #include "../include/Layers/Layer.h"
 #include "../include/GameObjects/GameObject.h"
-#include "../include/Layers/ApplicationLayer.h"
-#include "../include/Layers/WindowManagerLayer.h"
 #include "../include/Physics/Box.h"
 
 namespace Engine
@@ -19,9 +17,7 @@ namespace Engine
 		: m_windowManager(appName),
 		m_rendererManager(m_windowManager.getWindow(), &CallbackSystem),
 		m_eventManager(m_eventQ),
-		m_appLayer(&CallbackSystem),
-		m_windowManagerLayer(&CallbackSystem),
-		m_layerStack({&m_appLayer, &m_windowManagerLayer}),
+		m_layerStack(),
 		running(false),
 		timeStep(1.0f / 60.0f),
 		// The client will define the world.

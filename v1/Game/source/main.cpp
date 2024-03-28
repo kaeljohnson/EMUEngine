@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../include/EngineIncludes.h"
+#include "../include/Layers/AppManagementLayer.h"
 
 const char* APPLICATION_NAME = "Wizard Game v1";
 
@@ -20,6 +21,7 @@ int main(int argc, char* args[])
 	// Call to Application constructor. Instantiates an object of type "Application" named app.
 	Engine::Application app(APPLICATION_NAME);
 
+	AppManagementLayer appLayer(&app.CallbackSystem);
 	Engine::Layer testLayer("Test Layer 1", &app.CallbackSystem);
 	Engine::Layer testLayer2("Test Layer 2", &app.CallbackSystem);
 
@@ -39,7 +41,7 @@ int main(int argc, char* args[])
 	testLayer.removeGameObject(&testGround);
 
 	CLIENT_TRACE("STOP 1");
-
+	app.pushToLayerStack(&appLayer);
 	app.pushToLayerStack(&testLayer);
 	app.pushToLayerStack(&testLayer2);
 	

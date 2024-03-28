@@ -9,8 +9,6 @@
 #include "Layers/LayerStack.h"
 #include "Layers/Layer.h"
 #include "CallbackSystem/CallbackSystem.h"
-#include "Layers/ApplicationLayer.h"
-#include "Layers/WindowManagerLayer.h"
 #include "Physics/Box.h"
 #include "Physics/World.h"
 
@@ -28,21 +26,12 @@ namespace Engine
 
 		// All of the different managers that the application will use.
 		WindowManager m_windowManager;
+		RendererManager m_rendererManager;
 		
 		EventManager m_eventManager;
 
-		// Event system for loose coupling between client code and application.
-		// IEventAction m_eventActionInterface;
-		// ILayerEvent m_layerEventSystem;
-
-		ApplicationLayer m_appLayer;
-		WindowManagerLayer m_windowManagerLayer;
-		RendererManager m_rendererManager;
-
 		// layer stack holds user defined layers.
 		LayerStack m_layerStack;
-
-		
 
 		// Game loop management.
 		const float timeStep;
