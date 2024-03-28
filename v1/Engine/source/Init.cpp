@@ -5,10 +5,14 @@
 #include <stdio.h>
 
 #include "../include/Init.h"
+#include "../include/Application.h"
 #include "../include/Logging/Logger.h"
 
 namespace Engine
 {
+	// Application singleton.
+	// Engine::Application* Engine::Application::s_application = nullptr;
+
 	Init::Init()
 	{
 		/*

@@ -17,7 +17,6 @@ namespace Engine
 	class Application
 	{
 	private:
-
 		// bool to indicate if the application is running or not.
 		bool running;
 
@@ -45,7 +44,7 @@ namespace Engine
 
 	public:
 		// Application constructor.
-		Application(const char* appName);
+		Application();
 		~Application() = default;
 
 		ICallbackSystem CallbackSystem;

@@ -13,8 +13,8 @@
 
 namespace Engine
 {
-	Application::Application(const char* appName)
-		: m_windowManager(appName),
+	Application::Application()
+		: m_windowManager("appName"),
 		m_rendererManager(m_windowManager.getWindow(), &CallbackSystem),
 		m_eventManager(m_eventQ),
 		m_layerStack(),

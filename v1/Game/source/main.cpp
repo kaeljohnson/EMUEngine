@@ -3,7 +3,7 @@
 #include "../include/EngineIncludes.h"
 #include "../include/Layers/AppManagementLayer.h"
 
-const char* APPLICATION_NAME = "Wizard Game v1";
+
 
 // Main function. Starting point for all C++ programs.
 int main(int argc, char* args[])
@@ -19,7 +19,7 @@ int main(int argc, char* args[])
 	CLIENT_INFO("Client Running!");
 
 	// Call to Application constructor. Instantiates an object of type "Application" named app.
-	Engine::Application app(APPLICATION_NAME);
+	Engine::Application app;
 
 	AppManagementLayer appLayer(&app.CallbackSystem);
 	Engine::Layer testLayer("Test Layer 1", &app.CallbackSystem);
@@ -30,7 +30,7 @@ int main(int argc, char* args[])
 	SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 0, 0));
 	SDL_Texture* tempTextureRed = SDL_CreateTextureFromSurface(app.getRenderer(), surface);
 	SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 255, 0));
-	SDL_Texture* tempTextureBlue = SDL_CreateTextureFromSurface(app.getRenderer(), surface);
+	SDL_Texture* tempTextureBlue = SDL_CreateTextureFromSurface(app.getRenderer(), surface);  
 	SDL_FreeSurface(surface);
 
 	Engine::GameObject testGO(Engine::DYNAMIC, 115.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, true, false, true, tempTextureRed);
@@ -55,6 +55,10 @@ int main(int argc, char* args[])
 
 	// End client application. Engine cleanup handled in Engine app class.
 	// end();
+	// delete appLayer;
+	// delete testLayer;
+	// delete testLayer2;
+	// delete app;
 
 	return 0;
 }
