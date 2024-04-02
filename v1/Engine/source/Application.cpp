@@ -18,12 +18,27 @@ namespace Engine
 		m_rendererManager(m_windowManager.getWindow(), &CallbackSystem),
 		m_eventManager(m_eventQ),
 		m_layerStack(),
+		m_locked(true),
 		running(false),
 		timeStep(1.0f / 60.0f),
 		// The client will define the world.
 		m_world(0.0f, 9.8f, timeStep, 6, 2)
 	{
 		defineDefaultApplicationCallbacks();
+	}
+
+	Application* Application::getInstance()
+	{
+		if (instance == nullptr)
+		{
+			instance = new Application();
+			return instance;
+		}
+		
+		// Don't want client to reference 
+		// multiple instances of the application.
+		ENGINE_CRITICAL("Warning! Instance of application already exists. Multiple usage only recommended for testing.");
+		return instance;
 	}
 
 	void Application::run()

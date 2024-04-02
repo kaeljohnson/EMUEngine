@@ -17,6 +17,10 @@ namespace Engine
 	class Application
 	{
 	private:
+		static Application* instance;
+		const bool m_locked;
+		Application();
+
 		// bool to indicate if the application is running or not.
 		bool running;
 
@@ -43,8 +47,7 @@ namespace Engine
 		void defineDefaultApplicationCallbacks();
 
 	public:
-		// Application constructor.
-		Application();
+		static Application* getInstance();
 		~Application() = default;
 
 		ICallbackSystem CallbackSystem;

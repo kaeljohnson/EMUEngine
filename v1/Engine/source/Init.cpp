@@ -11,7 +11,7 @@
 namespace Engine
 {
 	// Application singleton.
-	// Engine::Application* Engine::Application::s_application = nullptr;
+	Engine::Application* Engine::Application::instance = nullptr;
 
 	Init::Init()
 	{
