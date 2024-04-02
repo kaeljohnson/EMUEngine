@@ -18,28 +18,27 @@ namespace Engine
 	{
 	private:
 		static Application* instance;
-		const bool m_locked;
 		Application();
 
 		// bool to indicate if the application is running or not.
 		bool running;
+		// Game loop management.
+		const float timeStep;
 
 		// Event queue to hold all events.
 		std::queue<Event> m_eventQ;
 
-		// All of the different managers that the application will use.
+		// Managers for major engine components.
 		WindowManager m_windowManager;
 		RendererManager m_rendererManager;
 		
+		// Manages events.
 		EventManager m_eventManager;
 
-		// layer stack holds user defined layers.
+		// Hold applications layers.
 		LayerStack m_layerStack;
 
-		// Game loop management.
-		const float timeStep;
-
-		// Physics
+		// World the app exists in.
 		World m_world;
 
 		void processEventQueue();

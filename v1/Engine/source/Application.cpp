@@ -18,7 +18,6 @@ namespace Engine
 		m_rendererManager(m_windowManager.getWindow(), &CallbackSystem),
 		m_eventManager(m_eventQ),
 		m_layerStack(),
-		m_locked(true),
 		running(false),
 		timeStep(1.0f / 60.0f),
 		// The client will define the world.

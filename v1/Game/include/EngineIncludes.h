@@ -8,3 +8,4 @@
 #include "../../Engine/include/GameObjects/GameObject.h"
 #include "../../Engine/include/Layers/Layer.h"
 #include "../../Engine/include/Physics/BodyTypes.h"
+#include "../../Engine/include/Textures/Texture.h"

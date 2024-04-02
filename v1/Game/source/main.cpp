@@ -24,38 +24,21 @@ int main(int argc, char* args[])
 	Engine::Layer testLayer2("Test Layer 2", &appInstance->CallbackSystem);
 
 	// Temp
-	SDL_Surface* surface = SDL_CreateRGBSurface(0, 1000, 1000, 32, 0, 0, 0, 0);
-	SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 0, 0));
-	SDL_Texture* tempTextureRed = SDL_CreateTextureFromSurface(appInstance->getRenderer(), surface);
-	SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 255, 0));
-	SDL_Texture* tempTextureBlue = SDL_CreateTextureFromSurface(appInstance->getRenderer(), surface);  
-	SDL_FreeSurface(surface);
+	Engine::Texture tempTextureRed(255, 0, 0);
+	Engine::Texture tempTextureBlue(0, 0, 255);
 
-	Engine::GameObject testGO(Engine::DYNAMIC, 115.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, true, false, true, tempTextureRed);
-	Engine::GameObject testGround(Engine::STATIC, 115.0f, 120.0f, 120.0f, 2.0f, 0.0f, 0.0f, true, true, true, tempTextureBlue);
+	Engine::GameObject testGO(Engine::DYNAMIC, 115.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, true, false, true, &tempTextureRed);
+	Engine::GameObject testGround(Engine::STATIC, 115.0f, 120.0f, 120.0f, 2.0f, 0.0f, 0.0f, true, true, true, &tempTextureBlue);
 
 	testLayer.addGameObject(&testGround);
 	testLayer.addGameObject(&testGO);
-	testLayer.removeGameObject(&testGround);
 
-	CLIENT_TRACE("STOP 1");
 	appInstance->pushToLayerStack(&appLayer);
 	appInstance->pushToLayerStack(&testLayer);
-	appInstance->pushToLayerStack(&testLayer2);
-	
-	appInstance->popLayerFromStack(&testLayer2);
-
-	testLayer.addGameObject(&testGround);
-
-	CLIENT_TRACE("STOP 2");
 	
 	appInstance->run();
 
-	// End client application. Engine cleanup handled in Engine app class.
-	// end();
-	// delete appLayer;
-	// delete testLayer;
-	// delete testLayer2;
+
 	delete appInstance;
 	appInstance = nullptr;
 

@@ -89,7 +89,7 @@ namespace Engine
 		// because we don't have any textures to render.
 		// SDL_RenderCopy(renderer, texture, nullptr, &dst);
 
-		SDL_RenderCopyEx(renderer, gameObject->getTexture(), nullptr, &dst, gameObject->getAngleInDegrees(), nullptr, SDL_FLIP_NONE);
+		SDL_RenderCopyEx(renderer, gameObject->getTexture()->m_texture, nullptr, &dst, gameObject->getAngleInDegrees(), nullptr, SDL_FLIP_NONE);
 	}
 	void RendererManager::free()
 	{

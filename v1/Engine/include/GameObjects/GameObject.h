@@ -6,6 +6,7 @@
 #include "../Events/Event.h"
 #include "../Physics/Box.h"
 #include "../Physics/BodyTypes.h"
+#include "../Textures/Texture.h"
 
 namespace Engine
 {
@@ -29,13 +30,16 @@ namespace Engine
 		bool m_collidable;
 		bool m_fixed;
 
-		// This class should not know about SDL2.
-		SDL_Texture* m_texture;
+		Texture* m_texture;
+
+		// Each game object will use a rect to hold the texture that needs to be rendered.
+		// Box2d will handle the position of the object, and the physics.
+		SDL_Rect m_rect;
 
 	public:
 		GameObject(const BodyType bodyType, const float startingX, const float startingY, const float width, const float height,
 			const float density, const float friction,
-			const bool visible, const bool fixed, const bool collidable, SDL_Texture* texture);
+			const bool visible, const bool fixed, const bool collidable, Texture* texture);
 		~GameObject() = default;
 
 		void processEvent(Event& e);
@@ -44,6 +48,6 @@ namespace Engine
 		void display();
 		const SDL_Rect& getRect() const;
 
-		SDL_Texture* getTexture();
+		Texture* getTexture();
 	};
 }
