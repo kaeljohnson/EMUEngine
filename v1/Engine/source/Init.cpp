@@ -10,8 +10,13 @@
 
 namespace Engine
 {
+
+	// Callback system singleton.
+	Engine::ICallbackSystem* Engine::ICallbackSystem::instance = nullptr;
+
 	// Application singleton.
 	Engine::Application* Engine::Application::instance = nullptr;
+
 
 	Init::Init()
 	{

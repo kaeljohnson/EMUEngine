@@ -20,9 +20,7 @@ namespace Engine
 		static Application* instance;
 		Application();
 
-		// bool to indicate if the application is running or not.
 		bool running;
-		// Game loop management.
 		const float timeStep;
 
 		// Event queue to hold all events.
@@ -49,18 +47,14 @@ namespace Engine
 		static Application* getInstance();
 		~Application() = default;
 
-		ICallbackSystem CallbackSystem;
-
 		// TEMP
 		SDL_Renderer* getRenderer() { return m_rendererManager.getRenderer(); }
+		const LayerStack* getLayerStack() { return &m_layerStack; }
 
 		// Layer stack functions.
 		void pushToLayerStack(Layer* layer);
 		void popLayerFromStack(Layer* layer);
 		void popLayerFromStack();
-
-		// Temp
-		const LayerStack& getLayerStack() { return m_layerStack; }
 
 		// Application functions.
 		void run();

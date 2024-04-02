@@ -3,7 +3,7 @@
 #include "../../include/Layers/AppManagementLayer.h"
 
 
-AppManagementLayer::AppManagementLayer(Engine::ICallbackSystem* ptrICallbackSystem) : Engine::Layer("AppManagementLayer", ptrICallbackSystem)
+AppManagementLayer::AppManagementLayer(std::string name) : Engine::Layer(name)
 {
 }
 

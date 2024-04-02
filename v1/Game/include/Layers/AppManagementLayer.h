@@ -8,7 +8,7 @@
 class AppManagementLayer : public Engine::Layer
 {
 public:
-	AppManagementLayer(Engine::ICallbackSystem* ptrICallbackSystem);
+	AppManagementLayer(std::string name);
 	~AppManagementLayer();
 
 	void onAttach() override;

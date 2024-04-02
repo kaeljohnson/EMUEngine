@@ -10,7 +10,6 @@ namespace Engine
 {
 	Texture::Texture(int r, int g, int b)
 	{
-
 		// TEMP
 		Application* appInstance = Application::getInstance();
 

@@ -15,7 +15,7 @@ namespace Engine
 {
 	Application::Application()
 		: m_windowManager("appName"),
-		m_rendererManager(m_windowManager.getWindow(), &CallbackSystem),
+		m_rendererManager(m_windowManager.getWindow()),
 		m_eventManager(m_eventQ),
 		m_layerStack(),
 		running(false),
@@ -176,24 +176,26 @@ namespace Engine
 
 	void Application::defineDefaultApplicationCallbacks()
 	{
-		CallbackSystem.newCallback(Type::ToggleFullscreen, [this](Data data)
+		ICallbackSystem* ptrICallbackSystem = ICallbackSystem::getInstance();
+
+		ptrICallbackSystem->newCallback(Type::ToggleFullscreen, [this](Data data)
 			{
 				m_windowManager.toggleFullscreen();
 			});
 
-		CallbackSystem.newCallback(Type::EndApplication, [this](Data data)
+		ptrICallbackSystem->newCallback(Type::EndApplication, [this](Data data)
 			{
 				end();
 			});
 
-		CallbackSystem.newCallback(Type::AddToWorld, [this](Data layerEventData)
+		ptrICallbackSystem->newCallback(Type::AddToWorld, [this](Data layerEventData)
 			{
 				GameObject* gameObject = std::get<GameObject*>(layerEventData);
 
 				m_world.addBox(*gameObject);
 			});
 
-		CallbackSystem.newCallback(Type::RemoveFromWorld, [this](Data layerEventData)
+		ptrICallbackSystem->newCallback(Type::RemoveFromWorld, [this](Data layerEventData)
 			{
 				GameObject* gameObject = std::get<GameObject*>(layerEventData);
 

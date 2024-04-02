@@ -16,8 +16,12 @@ namespace Engine
     class ICallbackSystem
     {
     private:
+		static ICallbackSystem* instance;
+		ICallbackSystem() = default;
+
         std::unordered_map<Type, Callback> m_callbacks;
     public:
+        static ICallbackSystem* getInstance();
         void newCallback(Type callbackType, Callback callback);
         void triggerCallback(Type layerEventType, Data eventData);
     };

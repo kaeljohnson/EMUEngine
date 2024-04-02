@@ -11,8 +11,8 @@
 
 namespace Engine
 {
-	RendererManager::RendererManager(SDL_Window* window, ICallbackSystem* ptrICallbackSystem)
-		: renderer(nullptr), ptrICallbackSystem(ptrICallbackSystem)
+	RendererManager::RendererManager(SDL_Window* window)
+		: renderer(nullptr), ptrICallbackSystem(ICallbackSystem::getInstance())
 	{
 		// Assign SDL renderer pointer to the return value of the SDL_CreateRenderer function. 
 		// Note: Hover over function to understand the arguments it takes.

@@ -9,11 +9,11 @@
 
 namespace Engine
 {
-	Layer::Layer(std::string name, ICallbackSystem* ptrICallbackSystem)
-		: m_name(name), m_enabled(true), isAttached(false), ptrICallbackSystem(ptrICallbackSystem) {}
+	Layer::Layer(std::string name) : ptrICallbackSystem(ICallbackSystem::getInstance()), 
+		m_name(name), m_enabled(true), isAttached(false) {}
 	
 	Layer::~Layer() {}
-
+	 
 	void Layer::addToWorld()
 	{
 		ENGINE_TRACE("Adding layer {} to the world.", m_name);
@@ -61,7 +61,7 @@ namespace Engine
 			m_gameObjects.push_back(gameObject);
 		}
 
-		// If the layer is already attached to the worlds layer stack, add the object to the world as well.
+		// If the layer is already attached to the applications layer stack, add the object to the world as well.
 		if (isAttached)
 		{
 			ptrICallbackSystem->triggerCallback(Type::AddToWorld, gameObject);
