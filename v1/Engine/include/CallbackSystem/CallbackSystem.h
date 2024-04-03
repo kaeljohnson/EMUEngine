@@ -21,8 +21,8 @@ namespace Engine
 
         std::unordered_map<Type, Callback> m_callbacks;
     public:
-        static ICallbackSystem* getInstance();
-        void newCallback(Type callbackType, Callback callback);
-        void triggerCallback(Type layerEventType, Data eventData);
+        static ICallbackSystem* GetInstance();
+        void NewCallback(Type callbackType, Callback callback);
+        void TriggerCallback(Type layerEventType, Data eventData);
     };
 }

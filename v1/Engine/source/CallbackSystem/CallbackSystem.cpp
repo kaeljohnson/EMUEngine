@@ -6,7 +6,7 @@
 namespace Engine
 {
 
-    ICallbackSystem* ICallbackSystem::getInstance()
+    ICallbackSystem* ICallbackSystem::GetInstance()
     {
         if (instance == nullptr)
         {
@@ -16,7 +16,7 @@ namespace Engine
 		return instance;
     }
 
-    void ICallbackSystem::newCallback(Type callbackType, Callback callback)
+    void ICallbackSystem::NewCallback(Type callbackType, Callback callback)
     {
         if (instance == nullptr)
         {
@@ -27,7 +27,7 @@ namespace Engine
         m_callbacks[callbackType] = callback;
     }
 
-    void ICallbackSystem::triggerCallback(Type callbackType, Data eventData)
+    void ICallbackSystem::TriggerCallback(Type callbackType, Data eventData)
     {
         if (instance == nullptr)
         {

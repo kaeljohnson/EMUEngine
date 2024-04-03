@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	inline const float PIXELS_PER_METER = 10.0f;
+	inline const float PIXELS_PER_METER = 20.0f;
 
     // Convert a length from pixels to meters.
     inline float pixelsToMeters(float pixels)

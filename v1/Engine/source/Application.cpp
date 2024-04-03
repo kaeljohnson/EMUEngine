@@ -25,7 +25,7 @@ namespace Engine
 		defineDefaultApplicationCallbacks();
 	}
 
-	void Application::createSimulation(float gravityX, float gravityY, float timeStep)
+	void Application::SetSimulation(float gravityX, float gravityY, float timeStep)
 	{
 		m_timeStep = timeStep;
 		m_world.SetGravity(gravityX, gravityY);
@@ -36,7 +36,7 @@ namespace Engine
 		ENGINE_INFO("Client creating simulation with gravity: ({}, {}) and time step: {}", gravityX, gravityY, timeStep);
 	}
 
-	Application* Application::getInstance()
+	Application* Application::GetInstance()
 	{
 		if (instance == nullptr)
 		{
@@ -50,12 +50,12 @@ namespace Engine
 		return instance;
 	}
 
-	void Application::run()
+	void Application::Run()
 	{
 
 		for (auto& layer : m_layerStack)
 		{
-			ENGINE_TRACE("Layer: {}", layer->getName());
+			ENGINE_TRACE("Layer: {}", layer->GetName());
 		}
 
 		ENGINE_INFO("Application running!");
@@ -67,7 +67,7 @@ namespace Engine
 		else
 		{
 			ENGINE_CRITICAL("Layer stack is empty! Application must have at least two layers to be valid!");
-			end();
+			End();
 		}
 
 		running = true;
@@ -97,8 +97,7 @@ namespace Engine
 			{
 				m_eventManager.handleEvents();
 				processEventQueue();
-			
-				// update simulation.
+
 				m_world.update();
 
 				accumulator -= m_timeStep;
@@ -130,7 +129,7 @@ namespace Engine
 	{
 		// Process order for layers is opporsite of render order.
 		
-		// Render order for layers:
+		// Render order for layers
 		// EX:
 		// Background Layer -> Filled with Background textures.
 		// Game Layer -> Filled with Engine supported GameObjects type.
@@ -144,7 +143,7 @@ namespace Engine
 			for (auto it_layer = m_layerStack.end(); it_layer != m_layerStack.begin();)
 			{
 				
-				(*--it_layer)->processEvent(currentEvent);
+				(*--it_layer)->ProcessEvent(currentEvent);
 				if (currentEvent.Handled)
 				{
 					break;
@@ -160,52 +159,52 @@ namespace Engine
 		}
 	}
 
-	void Application::end()
+	void Application::End()
 	{
 		ENGINE_INFO("Application ending!");
 
 		running = false;
 	}
 
-	void Application::pushToLayerStack(Layer* layer)
+	void Application::PushToLayerStack(Layer* layer)
 	{
 		m_layerStack.pushLayer(layer);
 		layer->isAttached = true;
 	}
 
-	void Application::popLayerFromStack(Layer* layer)
+	void Application::PopLayerFromStack(Layer* layer)
 	{
 		m_layerStack.popLayer(layer);
 		layer->isAttached = false;
 	}
 
-	void Application::popLayerFromStack()
+	void Application::PopLayerFromStack()
 	{
 		m_layerStack.popLayer();
 	}
 
 	void Application::defineDefaultApplicationCallbacks()
 	{
-		ICallbackSystem* ptrICallbackSystem = ICallbackSystem::getInstance();
+		ICallbackSystem* ptrICallbackSystem = ICallbackSystem::GetInstance();
 
-		ptrICallbackSystem->newCallback(Type::ToggleFullscreen, [this](Data data)
+		ptrICallbackSystem->NewCallback(Type::ToggleFullscreen, [this](Data data)
 			{
 				m_windowManager.toggleFullscreen();
 			});
 
-		ptrICallbackSystem->newCallback(Type::EndApplication, [this](Data data)
+		ptrICallbackSystem->NewCallback(Type::EndApplication, [this](Data data)
 			{
-				end();
+				End();
 			});
 
-		ptrICallbackSystem->newCallback(Type::AddToWorld, [this](Data layerEventData)
+		ptrICallbackSystem->NewCallback(Type::AddToWorld, [this](Data layerEventData)
 			{
 				GameObject* gameObject = std::get<GameObject*>(layerEventData);
 
 				m_world.addBox(*gameObject);
 			});
 
-		ptrICallbackSystem->newCallback(Type::RemoveFromWorld, [this](Data layerEventData)
+		ptrICallbackSystem->NewCallback(Type::RemoveFromWorld, [this](Data layerEventData)
 			{
 				GameObject* gameObject = std::get<GameObject*>(layerEventData);
 

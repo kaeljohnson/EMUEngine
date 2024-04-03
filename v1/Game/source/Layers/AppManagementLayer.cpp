@@ -11,40 +11,40 @@ AppManagementLayer::~AppManagementLayer()
 {
 }
 
-void AppManagementLayer::onAttach()
+void AppManagementLayer::OnAttach()
 {
 }
 
-void AppManagementLayer::onDetach()
+void AppManagementLayer::OnDetach()
 {
 }
 
-void AppManagementLayer::onUpdate()
+void AppManagementLayer::OnUpdate()
 {
 }
 
-void AppManagementLayer::processEvent(Engine::Event& e)
+void AppManagementLayer::ProcessEvent(Engine::Event& e)
 {
 	switch (e.Type)
 	{
 		case (Engine::F_KEY_DOWN):
-			ptrICallbackSystem->triggerCallback(Engine::Type::ToggleFullscreen, std::monostate{});
+			ptrICallbackSystem->TriggerCallback(Engine::Type::ToggleFullscreen, std::monostate{});
 			CLIENT_TRACE("Handled event: {}", static_cast<int>(Engine::F_KEY_DOWN));
 			e.Handled = true;
 			break;
 		case (Engine::RESIZE_WINDOW):
-			ptrICallbackSystem->triggerCallback(Engine::Type::ResizeWindow, std::make_pair(e.X_POS, e.Y_POS));
+			ptrICallbackSystem->TriggerCallback(Engine::Type::ResizeWindow, std::make_pair(e.X_POS, e.Y_POS));
 			CLIENT_TRACE("Handled event: {}", static_cast<int>(Engine::RESIZE_WINDOW));
 			e.Handled = true;
 			break;
 		case (Engine::ESCAPE_KEY_DOWN):
 			ENGINE_TRACE("Handled event: {}", static_cast<int>(Engine::ESCAPE_KEY_DOWN));
-			ptrICallbackSystem->triggerCallback(Engine::Type::EndApplication, std::monostate{});
+			ptrICallbackSystem->TriggerCallback(Engine::Type::EndApplication, std::monostate{});
 			e.Handled = true;
 			break;
 		case (Engine::QUIT):
 			ENGINE_TRACE("Handled event: {}", static_cast<int>(Engine::QUIT));
-			ptrICallbackSystem->triggerCallback(Engine::Type::EndApplication, std::monostate{});
+			ptrICallbackSystem->TriggerCallback(Engine::Type::EndApplication, std::monostate{});
 			e.Handled = true;
 			break;
 		default:

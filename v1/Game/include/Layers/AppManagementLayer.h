@@ -11,8 +11,8 @@ public:
 	AppManagementLayer(std::string name);
 	~AppManagementLayer();
 
-	void onAttach() override;
-	void onDetach() override;
-	void onUpdate() override;
-	void processEvent(Engine::Event& e) override;
+	void OnAttach() override;
+	void OnDetach() override;
+	void OnUpdate() override;
+	void ProcessEvent(Engine::Event& e) override;
 };

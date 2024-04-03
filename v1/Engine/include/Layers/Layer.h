@@ -29,17 +29,17 @@ namespace Engine
 		const std::vector<GameObject*>::iterator begin() { return m_gameObjects.begin(); }
 		const std::vector<GameObject*>::iterator end() { return m_gameObjects.end(); }
 
-		void addToWorld();
-		void removeFromWorld();
+		void AddToWorld();
+		void RemoveFromWorld();
 
-		virtual void onAttach();
-		virtual void onDetach();
-		virtual void onUpdate();
-		virtual void processEvent(Event& e);
+		virtual void OnAttach();
+		virtual void OnDetach();
+		virtual void OnUpdate();
+		virtual void ProcessEvent(Event& e);
 
-		const std::string& getName() const;
+		const std::string& GetName() const;
 
-		void addGameObject(GameObject* gameObject);
-		void removeGameObject(GameObject* gameObject);
+		void AddGameObject(GameObject* gameObject);
+		void RemoveGameObject(GameObject* gameObject);
 	};
 }

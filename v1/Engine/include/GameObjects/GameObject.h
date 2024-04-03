@@ -42,12 +42,12 @@ namespace Engine
 			const bool visible, const bool fixed, const bool collidable, Texture* texture);
 		~GameObject() = default;
 
-		void processEvent(Event& e);
-		void update();
-		void render();
-		void display();
-		const SDL_Rect& getRect() const;
+		void ProcessEvent(Event& e);
+		void Update();
+		void Render();
+		void Display();
+		const SDL_Rect& GetRect() const;
 
-		Texture* getTexture();
+		Texture* GetTexture();
 	};
 }

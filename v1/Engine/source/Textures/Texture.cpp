@@ -11,7 +11,7 @@ namespace Engine
 	Texture::Texture(int r, int g, int b)
 	{
 		// TEMP
-		Application* appInstance = Application::getInstance();
+		Application* appInstance = Application::GetInstance();
 
 		// Temp
 		SDL_Surface* surface = SDL_CreateRGBSurface(0, 1000, 1000, 32, 0, 0, 0, 0);

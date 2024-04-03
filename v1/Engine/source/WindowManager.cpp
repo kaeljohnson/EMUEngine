@@ -33,8 +33,6 @@ namespace Engine
 		// Is there a way to get the full screen size without toggling fullscreen by default?
 		if (SDL_GetDesktopDisplayMode(0, &m_displayMode) != 0)
 		{
-			// Maybe should just use SDL log?
-			// SDL_Log("SDL_GetDesktopDisplayMode failed: %s", SDL_GetError());
 			ENGINE_CRITICAL("Get desktop display mode failed: {}", SDL_GetError());
 		}
 	}

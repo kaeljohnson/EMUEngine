@@ -44,23 +44,23 @@ namespace Engine
 		void defineDefaultApplicationCallbacks();
 
 	public:
-		static Application* getInstance();
+		static Application* GetInstance();
 		~Application() = default;
 
-		void createSimulation(float gravityX, float gravityY, float timeStep);
+		void SetSimulation(float gravityX, float gravityY, float timeStep);
 
 		// TEMP
 		SDL_Renderer* getRenderer() { return m_rendererManager.getRenderer(); }
 		const LayerStack* getLayerStack() { return &m_layerStack; }
 
 		// Layer stack functions.
-		void pushToLayerStack(Layer* layer);
-		void popLayerFromStack(Layer* layer);
-		void popLayerFromStack();
+		void PushToLayerStack(Layer* layer);
+		void PopLayerFromStack(Layer* layer);
+		void PopLayerFromStack();
 
 		// Application functions.
-		void run();
-		void end();
+		void Run();
+		void End();
 
 		// Deleted functions to ensure our game instance cannot be copied or moved.
 		Application(const Application&) = delete;

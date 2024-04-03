@@ -12,7 +12,7 @@
 namespace Engine
 {
 	RendererManager::RendererManager(SDL_Window* window)
-		: renderer(nullptr), ptrICallbackSystem(ICallbackSystem::getInstance())
+		: renderer(nullptr), ptrICallbackSystem(ICallbackSystem::GetInstance())
 	{
 		// Assign SDL renderer pointer to the return value of the SDL_CreateRenderer function. 
 		// Note: Hover over function to understand the arguments it takes.
@@ -65,31 +65,29 @@ namespace Engine
 		// The x and y coordinates correspond to the coordinates on the screen in pixels. 
 		// The width and height are the width and height of the rect we want to render.
 
-		if (gameObject->getTexture() == nullptr)
+		if (gameObject->GetTexture() == nullptr)
 		{
 			ENGINE_CRITICAL("Texture is nullptr. Cannot render GameObject.");
-			ptrICallbackSystem->triggerCallback(Type::EndApplication, std::monostate{});
+			ptrICallbackSystem->TriggerCallback(Type::EndApplication, std::monostate{});
 		}
 		if (gameObject->getBody() == nullptr)
 		{
 			ENGINE_CRITICAL("Body is nullptr. Cannot render GameObject.");
-			ptrICallbackSystem->triggerCallback(Type::EndApplication, std::monostate{});
+			ptrICallbackSystem->TriggerCallback(Type::EndApplication, std::monostate{});
 		}
 
 		SDL_Rect dst
 		{
+			// This rect will eventually be the outline of the texture we want to render,
+			// not the collidable object tracked by the underlying box2d body.
+
 			gameObject->getTopLeftXInPixels(),
 			gameObject->getTopLeftYInPixels(),
 			gameObject->getWidthInPixels(),
 			gameObject->getHeightInPixels()
 		};
-		
-		// Render the rect to the screen. The second argument in this function takes
-		//  the texture we want to pull the src rect from. It is nullptr right now 
-		// because we don't have any textures to render.
-		// SDL_RenderCopy(renderer, texture, nullptr, &dst);
 
-		SDL_RenderCopyEx(renderer, gameObject->getTexture()->m_texture, nullptr, &dst, gameObject->getAngleInDegrees(), nullptr, SDL_FLIP_NONE);
+		SDL_RenderCopyEx(renderer, gameObject->GetTexture()->m_texture, nullptr, &dst, gameObject->getAngleInDegrees(), nullptr, SDL_FLIP_NONE);
 	}
 	void RendererManager::free()
 	{
@@ -98,7 +96,7 @@ namespace Engine
 		SDL_DestroyRenderer(renderer);
 
 		// Now that we freed the renderer, the pointer is still attached to that memory.
-		//  This is bad because we don't control what is there anymore, so it needs to be set back to nullptr.
+		// This is bad because we don't control what is there anymore, so it needs to be set back to nullptr.
 		renderer = nullptr;																											
 	}
 

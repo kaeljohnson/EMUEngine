@@ -19,7 +19,7 @@ namespace Engine
 		ENGINE_INFO("GameObject created at: ({0}, {1})", startingX, m_x);
 	}
 
-	Texture* GameObject::getTexture()
+	Texture* GameObject::GetTexture()
 	{
 		return m_texture;
 	}
