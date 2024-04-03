@@ -21,7 +21,7 @@ namespace Engine
 		Application();
 
 		bool running;
-		const float timeStep;
+		float m_timeStep;
 
 		// Event queue to hold all events.
 		std::queue<Event> m_eventQ;
@@ -46,6 +46,8 @@ namespace Engine
 	public:
 		static Application* getInstance();
 		~Application() = default;
+
+		void createSimulation(float gravityX, float gravityY, float timeStep);
 
 		// TEMP
 		SDL_Renderer* getRenderer() { return m_rendererManager.getRenderer(); }

@@ -18,13 +18,19 @@ namespace Engine
 			b2World m_world;
 			b2Vec2 m_gravity;
 
-			const float m_deltaTime;
-			const int m_velocityIterations;
-			const int m_positionIterations;
+			float m_deltaTime;
+			int m_velocityIterations;
+			int m_positionIterations;
 	public:
+		World();
 		World(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations);
 		void update();
 		void addBox(Box& body);
 		void removeBox(Box& body);
+
+		void SetGravity(const float gravityX, const float gravityY);
+		void SetTimeStep(const float timeStep);
+		void SetVelocityIterations(const int velocityIterations);
+		void SetPositionIterations(const int positionIterations);
 	};
 }

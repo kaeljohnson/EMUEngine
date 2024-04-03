@@ -14,16 +14,26 @@
 namespace Engine
 {
 	Application::Application()
-		: m_windowManager("appName"),
+		: m_windowManager("Default App Name"),
 		m_rendererManager(m_windowManager.getWindow()),
 		m_eventManager(m_eventQ),
 		m_layerStack(),
 		running(false),
-		timeStep(1.0f / 60.0f),
-		// The client will define the world.
-		m_world(0.0f, 9.8f, timeStep, 6, 2)
+		m_timeStep(1.0f / 60.0f),
+		m_world(0.0f, 9.8f, m_timeStep, 6, 2)
 	{
 		defineDefaultApplicationCallbacks();
+	}
+
+	void Application::createSimulation(float gravityX, float gravityY, float timeStep)
+	{
+		m_timeStep = timeStep;
+		m_world.SetGravity(gravityX, gravityY);
+		m_world.SetTimeStep(timeStep);
+		m_world.SetVelocityIterations(6);
+		m_world.SetPositionIterations(2);
+
+		ENGINE_INFO("Client creating simulation with gravity: ({}, {}) and time step: {}", gravityX, gravityY, timeStep);
 	}
 
 	Application* Application::getInstance()
@@ -83,7 +93,7 @@ namespace Engine
 
 			accumulator += frameTime;
 
-			while (accumulator >= timeStep)
+			while (accumulator >= m_timeStep)
 			{
 				m_eventManager.handleEvents();
 				processEventQueue();
@@ -91,11 +101,11 @@ namespace Engine
 				// update simulation.
 				m_world.update();
 
-				accumulator -= timeStep;
+				accumulator -= m_timeStep;
 			}
 
 			// Calculate interpolation factor. This will be used in the future.
-			const double interpolation = accumulator / timeStep;
+			const double interpolation = accumulator / m_timeStep;
 
 			m_rendererManager.clearScreen();
 

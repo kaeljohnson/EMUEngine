@@ -19,7 +19,7 @@ int main(int argc, char* args[])
 	// Keep instance on heap? Probably don't want this to be a singleton.
 	Engine::Application* appInstance = Engine::Application::getInstance();
 
-	// app->createSimulation(0.0f, 9.8f, 1.0f / 60.0f, 6, 2);
+	appInstance->createSimulation(0.0f, 9.8f, 1.0f / 60.0f);
 
 	AppManagementLayer appLayer("App management layer");
 	Engine::Layer testLayer("Test Layer 1");

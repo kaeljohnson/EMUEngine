@@ -6,6 +6,8 @@
 
 namespace Engine
 {
+	World::World() : m_world({ 0.0f, 0.0f }), m_gravity({ 0.0f, 0.0f }), m_deltaTime(0), m_velocityIterations(0), m_positionIterations(0) {}
+
 	World::World(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations)
 		: m_gravity({ gravityX, gravityY }), m_world({ gravityX * PIXELS_PER_METER, gravityY * PIXELS_PER_METER}), m_deltaTime(deltaTime),
 		m_velocityIterations(velocityIterations), m_positionIterations(positionIterations)
@@ -28,5 +30,25 @@ namespace Engine
 	void World::removeBox(Box& body)
 	{
 		m_world.DestroyBody(body.getBody());
+	}
+
+	void World::SetGravity(const float gravityX, const float gravityY)
+	{
+		m_gravity = { gravityX, gravityY };
+		m_world.SetGravity({ gravityX * PIXELS_PER_METER, gravityY * PIXELS_PER_METER });
+	}
+
+	void World::SetTimeStep(const float timeStep)
+	{
+		m_deltaTime = timeStep;
+	}
+
+	void World::SetVelocityIterations(const int velocityIterations)
+	{
+		m_velocityIterations = velocityIterations;
+	}
+	void World::SetPositionIterations(const int positionIterations)
+{
+		m_positionIterations = positionIterations;
 	}
 }
