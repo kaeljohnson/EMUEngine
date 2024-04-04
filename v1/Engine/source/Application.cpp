@@ -19,16 +19,18 @@ namespace Engine
 		m_eventManager(m_eventQ),
 		m_layerStack(),
 		running(false),
+		m_pixelsPerMeter(20),
 		m_timeStep(1.0f / 60.0f),
-		m_world(0.0f, 9.8f, m_timeStep, 6, 2)
+		m_world(0.0f * m_pixelsPerMeter, 9.8f * m_pixelsPerMeter, m_timeStep, 6, 2)
 	{
 		defineDefaultApplicationCallbacks();
 	}
 
-	void Application::SetSimulation(float gravityX, float gravityY, float timeStep)
+	void Application::SetSimulation(float gravityX, float gravityY, float timeStep, int pixelsPerMeter)
 	{
 		m_timeStep = timeStep;
-		m_world.SetGravity(gravityX, gravityY);
+		m_pixelsPerMeter = pixelsPerMeter;
+		m_world.SetGravity(gravityX * pixelsPerMeter, gravityY * pixelsPerMeter);
 		m_world.SetTimeStep(timeStep);
 		m_world.SetVelocityIterations(6);
 		m_world.SetPositionIterations(2);
@@ -120,7 +122,7 @@ namespace Engine
 		{
 			for (GameObject* gameObject : *layer)
 			{
-				m_rendererManager.render(gameObject);
+				m_rendererManager.render(gameObject, m_pixelsPerMeter);
 			}
 		}
 	}
@@ -189,7 +191,7 @@ namespace Engine
 
 		ptrICallbackSystem->NewCallback(Type::ToggleFullscreen, [this](Data data)
 			{
-				m_windowManager.toggleFullscreen();
+				m_windowManager.toggleFullscreen(m_pixelsPerMeter);
 			});
 
 		ptrICallbackSystem->NewCallback(Type::EndApplication, [this](Data data)

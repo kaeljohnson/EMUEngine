@@ -28,7 +28,7 @@ namespace Engine
 		SDL_Renderer* getRenderer() const;
 		const SDL_Texture* loadTexture(const char* filePath);
 		void clearScreen();
-		void render(GameObject* gameObject);
+		void render(GameObject* gameObject, const int pixelsPerMeter);
 		void display();
 		void free();
 	};

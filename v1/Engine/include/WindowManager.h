@@ -24,7 +24,7 @@ namespace Engine
 		// Declare WindowManager functions.
 		SDL_Window* getWindow() const;
 		void resize(const int newWindowWidth, const int newWindowHeight);
-		void toggleFullscreen();
+		void toggleFullscreen(int& refPixelsPerMeter);
 		void free();
 
 		// Deleted functions to ensure our game instance cannot be copied or moved.

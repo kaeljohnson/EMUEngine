@@ -48,11 +48,16 @@ namespace Engine
 		SDL_SetWindowSize(window, newWindowWidth, newWindowHeight);
 	}
 
-	void WindowManager::toggleFullscreen()
+	void WindowManager::toggleFullscreen(int& pixelsPerMeter)
 	{
 		// Bug here: Figure out why "SDL_WINDOW_FULLSCREEN" does not work.
 		// Incompatibility with native video mode?
 		bool isFullscreen = SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
+
+		// Need way to adjust where pixels are rendered and at what size based on size of window.
+		// This is a lazy solution for now. Maybe just dont allow resizing?
+		!isFullscreen ? pixelsPerMeter *= 2 : pixelsPerMeter /= 2;
+
 		if (SDL_SetWindowFullscreen(window, isFullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)
 		{
 			ENGINE_ERROR("Fullscreen failed! SDL_Error: {}", SDL_GetError());

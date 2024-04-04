@@ -23,6 +23,8 @@ namespace Engine
 		bool running;
 		float m_timeStep;
 
+		int m_pixelsPerMeter;
+
 		// Event queue to hold all events.
 		std::queue<Event> m_eventQ;
 
@@ -47,7 +49,7 @@ namespace Engine
 		static Application* GetInstance();
 		~Application() = default;
 
-		void SetSimulation(float gravityX, float gravityY, float timeStep);
+		void SetSimulation(float gravityX, float gravityY, float timeStep, int pixelsPerMeter);
 
 		// TEMP
 		SDL_Renderer* getRenderer() { return m_rendererManager.getRenderer(); }
