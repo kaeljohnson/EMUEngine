@@ -9,7 +9,6 @@ int main(int argc, char* args[])
 
 	CLIENT_INFO("Client Running!");
 
-	// Keep instance on heap? Probably don't want this to be a singleton.
 	Engine::Application* ptrAppInstance = Engine::Application::GetInstance();
 
 	ptrAppInstance->SetSimulation(0.0f, 9.8f, 1.0f / 60.0f, 20);
@@ -29,6 +28,11 @@ int main(int argc, char* args[])
 
 	ptrAppInstance->PushToLayerStack(&appLayer);
 	ptrAppInstance->PushToLayerStack(&testLayer);
+
+	// Note in documentation that the client must keep in mind
+	// which order they want layers processed and rendered in.
+	ptrAppInstance->PopLayerFromStack(&appLayer);
+	ptrAppInstance->PushToLayerStack(&appLayer);
 	
 	ptrAppInstance->Run();
 

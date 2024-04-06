@@ -14,9 +14,8 @@ namespace Engine
 		std::string m_name;
 		bool m_enabled;
 
-		// Maybe there should be two vectors, one for static objects and one for dynamic objects.
-		// This would make it easy to avoid the box2d bug where if dynamic objects are added before static objects,
-		// the collision detection will cause the dynamic objects to inch to the right.
+		// Note: common box2d bug where collisions won't work if dynamic objects are
+		// created and simulated before static objects.
 		std::vector<GameObject*> m_gameObjects;
 
 		ICallbackSystem* ptrICallbackSystem;

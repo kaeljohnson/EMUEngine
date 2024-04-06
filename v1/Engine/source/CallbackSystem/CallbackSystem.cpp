@@ -5,7 +5,6 @@
 
 namespace Engine
 {
-
     ICallbackSystem* ICallbackSystem::GetInstance()
     {
         if (instance == nullptr)

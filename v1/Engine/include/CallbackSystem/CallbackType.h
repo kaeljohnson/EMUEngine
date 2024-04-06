@@ -12,5 +12,8 @@ namespace Engine
 		EndApplication,
 		ToggleFullscreen,
 		ResizeWindow,
+
+		// Texture interaction
+		LoadDefaultTexture,
 	};
 }

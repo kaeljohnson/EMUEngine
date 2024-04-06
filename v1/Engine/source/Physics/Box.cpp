@@ -50,12 +50,10 @@ namespace Engine
 
 	b2Body* Box::getBody() const { return m_body; }
 	const b2BodyDef& Box::getBodyDef() const { return m_bodyDef; }
+	const BodyType Box::getBodyType() const { return m_bodyType; }
 
 	const int Box::getWidthInMeters() const { return static_cast<int>(m_widthInMeters); }
 	const int Box::getHeightInMeters() const { return static_cast<int>(m_heightInMeters); }
-
-	const int Box::getWidthInPixels() const { return static_cast<int>(m_widthInMeters); }
-	const int Box::getHeightInPixels() const { return static_cast<int>(m_heightInMeters); }
 
 	void Box::setBody(b2Body* body) { m_body = body; }
 	void Box::createFixture() { m_body->CreateFixture(&m_fixtureDef); }
@@ -65,13 +63,6 @@ namespace Engine
 	const double Box::getTopLeftXInMeters() const { return (m_body->GetPosition().x - m_widthInMeters / 2.0); }
 	const double Box::getTopLeftYInMeters() const { return (m_body->GetPosition().y - m_heightInMeters / 2.0); }
 
-	const int Box::getCenterXInPixels() const { return static_cast<int>(round(m_body->GetPosition().x)); }
-	const int Box::getCenterYInPixels() const { return static_cast<int>(round(m_body->GetPosition().y)); }
-	const int Box::getTopLeftXInPixels() const { return static_cast<int>(round(m_body->GetPosition().x - m_widthInMeters / 2.0f)); }
-	const int Box::getTopLeftYInPixels() const { return static_cast<int>(round(m_body->GetPosition().y - m_heightInMeters / 2.0f)); }
-
 	const float Box::getAngleInRadians() const { return m_body->GetAngle(); }
 	const double Box::getAngleInDegrees() const { return radiansToDegrees(m_body->GetAngle()); }
-
-	const BodyType Box::getBodyType() const { return m_bodyType; }
 }

@@ -38,12 +38,12 @@ void AppManagementLayer::ProcessEvent(Engine::Event& e)
 			e.Handled = true;
 			break;
 		case (Engine::ESCAPE_KEY_DOWN):
-			ENGINE_TRACE("Handled event: {}", static_cast<int>(Engine::ESCAPE_KEY_DOWN));
+			CLIENT_TRACE("Handled event: {}", static_cast<int>(Engine::ESCAPE_KEY_DOWN));
 			ptrICallbackSystem->TriggerCallback(Engine::Type::EndApplication, std::monostate{});
 			e.Handled = true;
 			break;
 		case (Engine::QUIT):
-			ENGINE_TRACE("Handled event: {}", static_cast<int>(Engine::QUIT));
+			CLIENT_TRACE("Handled event: {}", static_cast<int>(Engine::QUIT));
 			ptrICallbackSystem->TriggerCallback(Engine::Type::EndApplication, std::monostate{});
 			e.Handled = true;
 			break;

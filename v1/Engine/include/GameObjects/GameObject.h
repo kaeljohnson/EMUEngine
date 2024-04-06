@@ -13,7 +13,6 @@ namespace Engine
 	class GameObject : public Box
 	{
 	private:
-		// Some wrapper data structure for Box2D.
 		// SpriteSheet m_spriteSheet;
 		// State m_state;
 

@@ -118,6 +118,9 @@ namespace Engine
 
 	void Application::renderLayers()
 	{
+		// Should not be renderering every layer every frame.
+	    // Should only render layers that are visible and have changed.
+
 		for (Layer* layer : m_layerStack)
 		{
 			for (GameObject* gameObject : *layer)
@@ -130,6 +133,8 @@ namespace Engine
 	void Application::processEventQueue()
 	{
 		// Process order for layers is opporsite of render order.
+
+		// Potential for multithreading if there are a lot of events.
 		
 		// Render order for layers
 		// EX:
@@ -191,7 +196,7 @@ namespace Engine
 
 		ptrICallbackSystem->NewCallback(Type::ToggleFullscreen, [this](Data data)
 			{
-				m_windowManager.toggleFullscreen(m_pixelsPerMeter);
+				m_windowManager.toggleFullscreen();
 			});
 
 		ptrICallbackSystem->NewCallback(Type::EndApplication, [this](Data data)

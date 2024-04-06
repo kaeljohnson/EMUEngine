@@ -52,8 +52,7 @@ namespace Engine
 		void SetSimulation(float gravityX, float gravityY, float timeStep, int pixelsPerMeter);
 
 		// TEMP
-		SDL_Renderer* getRenderer() { return m_rendererManager.getRenderer(); }
-		const LayerStack* getLayerStack() { return &m_layerStack; }
+		SDL_Renderer* GetRenderer() { return m_rendererManager.getRenderer(); }
 
 		// Layer stack functions.
 		void PushToLayerStack(Layer* layer);
@@ -64,7 +63,7 @@ namespace Engine
 		void Run();
 		void End();
 
-		// Deleted functions to ensure our game instance cannot be copied or moved.
+		// Deleted functions to ensure our app instance cannot be copied or moved.
 		Application(const Application&) = delete;
 		Application& operator=(const Application&) = delete;
 		Application(Application&&) = delete;

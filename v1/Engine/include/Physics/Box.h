@@ -46,13 +46,6 @@ namespace Engine
 		const int getWidthInMeters() const; 
 		const int getHeightInMeters() const;
 
-		const int getCenterXInPixels() const;
-		const int getCenterYInPixels() const;
-		const int getTopLeftXInPixels() const;
-		const int getTopLeftYInPixels() const;
-		const int getWidthInPixels() const;
-		const int getHeightInPixels() const;
-
 		const float getAngleInRadians() const;
 		const double getAngleInDegrees() const;
 

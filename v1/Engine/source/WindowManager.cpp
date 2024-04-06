@@ -48,15 +48,15 @@ namespace Engine
 		SDL_SetWindowSize(window, newWindowWidth, newWindowHeight);
 	}
 
-	void WindowManager::toggleFullscreen(int& pixelsPerMeter)
+	void WindowManager::toggleFullscreen()
 	{
 		// Bug here: Figure out why "SDL_WINDOW_FULLSCREEN" does not work.
 		// Incompatibility with native video mode?
 		bool isFullscreen = SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
 
-		// Need way to adjust where pixels are rendered and at what size based on size of window.
-		// This is a lazy solution for now. Maybe just dont allow resizing?
-		!isFullscreen ? pixelsPerMeter *= 2 : pixelsPerMeter /= 2;
+		// Engine should not support resizing the simulation. That is, the pixels per meter should not change.
+		// What will happen when the window size changes is that the camera will center on the player, or 
+		// whatever object the camera is locked onto, until it hits the edge of the screen.
 
 		if (SDL_SetWindowFullscreen(window, isFullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)
 		{

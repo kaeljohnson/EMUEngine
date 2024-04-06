@@ -8,5 +8,6 @@ namespace Engine
 		SDL_Texture* m_texture;
 
 		Texture(int r, int g, int b);
+		~Texture();
 	};
 }
