@@ -8,38 +8,56 @@
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
 #include "../include/Layers/Layer.h"
-#include "../include/Layers/ILayerEvent.h"
 #include "../include/GameObjects/GameObject.h"
-#include "../include/Layers/ApplicationLayer.h"
-#include "../include/Layers/WindowManagerLayer.h"
 #include "../include/Physics/Box.h"
 
 namespace Engine
 {
-	Application::Application(const char* appName)
-		: m_windowManager(appName),
-		m_rendererManager(m_windowManager.getWindow(), &m_eventActionInterface),
+	Application::Application()
+		: m_windowManager("Default App Name"),
+		m_rendererManager(m_windowManager.getWindow()),
 		m_eventManager(m_eventQ),
-		m_appLayer(&m_eventActionInterface, &m_layerEventSystem),
-		m_windowManagerLayer(&m_eventActionInterface, &m_layerEventSystem),
-		m_layerStack({&m_appLayer, &m_windowManagerLayer}),
+		m_layerStack(),
 		running(false),
-		timeStep(1.0f / 60.0f),
-		// The client will define the world.
-		m_world(0.0f, 9.8f, timeStep, 6, 2)
+		m_pixelsPerMeter(20),
+		m_timeStep(1.0f / 60.0f),
+		m_world(0.0f * m_pixelsPerMeter, 9.8f * m_pixelsPerMeter, m_timeStep, 6, 2)
 	{
 		defineDefaultApplicationCallbacks();
 	}
 
-	IEventAction* Application::getEventActionInterface() { return &m_eventActionInterface; }
-	ILayerEvent* Application::getLayerEventInterface() { return &m_layerEventSystem; }
+	void Application::SetSimulation(const float gravityX, const float gravityY, const float timeStep, const int pixelsPerMeter)
+	{
+		m_timeStep = timeStep;
+		m_pixelsPerMeter = pixelsPerMeter;
+		m_world.SetGravity(gravityX * pixelsPerMeter, gravityY * pixelsPerMeter);
+		m_world.SetTimeStep(timeStep);
+		m_world.SetVelocityIterations(6);
+		m_world.SetPositionIterations(2);
 
-	void Application::run()
+		ENGINE_INFO("Client creating simulation with gravity: ({}, {}) and time step: {}", gravityX, gravityY, timeStep);
+	}
+
+	Application* Application::GetInstance()
+	{
+		if (instance == nullptr)
+		{
+			instance = new Application();
+			return instance;
+		}
+		
+		// Don't want client to reference 
+		// multiple instances of the application.
+		ENGINE_CRITICAL("Warning! Instance of application already exists. Multiple usage only recommended for testing.");
+		return instance;
+	}
+
+	void Application::Run()
 	{
 
 		for (auto& layer : m_layerStack)
 		{
-			ENGINE_TRACE("Layer: {}", layer->getName());
+			ENGINE_TRACE("Layer: {}", layer->GetName());
 		}
 
 		ENGINE_INFO("Application running!");
@@ -51,7 +69,7 @@ namespace Engine
 		else
 		{
 			ENGINE_CRITICAL("Layer stack is empty! Application must have at least two layers to be valid!");
-			end();
+			End();
 		}
 
 		running = true;
@@ -77,19 +95,18 @@ namespace Engine
 
 			accumulator += frameTime;
 
-			while (accumulator >= timeStep)
+			while (accumulator >= m_timeStep)
 			{
 				m_eventManager.handleEvents();
 				processEventQueue();
-			
-				// update simulation.
+
 				m_world.update();
 
-				accumulator -= timeStep;
+				accumulator -= m_timeStep;
 			}
 
 			// Calculate interpolation factor. This will be used in the future.
-			const double interpolation = accumulator / timeStep;
+			const double interpolation = accumulator / m_timeStep;
 
 			m_rendererManager.clearScreen();
 
@@ -101,11 +118,14 @@ namespace Engine
 
 	void Application::renderLayers()
 	{
+		// Should not be renderering every layer every frame.
+	    // Should only render layers that are visible and have changed.
+
 		for (Layer* layer : m_layerStack)
 		{
 			for (GameObject* gameObject : *layer)
 			{
-				m_rendererManager.render(gameObject);
+				m_rendererManager.render(gameObject, m_pixelsPerMeter);
 			}
 		}
 	}
@@ -113,8 +133,10 @@ namespace Engine
 	void Application::processEventQueue()
 	{
 		// Process order for layers is opporsite of render order.
+
+		// Potential for multithreading if there are a lot of events.
 		
-		// Render order for layers:
+		// Render order for layers
 		// EX:
 		// Background Layer -> Filled with Background textures.
 		// Game Layer -> Filled with Engine supported GameObjects type.
@@ -128,7 +150,7 @@ namespace Engine
 			for (auto it_layer = m_layerStack.end(); it_layer != m_layerStack.begin();)
 			{
 				
-				(*--it_layer)->processEvent(currentEvent);
+				(*--it_layer)->ProcessEvent(currentEvent);
 				if (currentEvent.Handled)
 				{
 					break;
@@ -144,50 +166,52 @@ namespace Engine
 		}
 	}
 
-	void Application::end()
+	void Application::End()
 	{
 		ENGINE_INFO("Application ending!");
 
 		running = false;
 	}
 
-	void Application::pushToLayerStack(Layer* layer)
+	void Application::PushToLayerStack(Layer* layer)
 	{
 		m_layerStack.pushLayer(layer);
 		layer->isAttached = true;
 	}
 
-	void Application::popLayerFromStack(Layer* layer)
+	void Application::PopLayerFromStack(Layer* layer)
 	{
 		m_layerStack.popLayer(layer);
 		layer->isAttached = false;
 	}
 
-	void Application::popLayerFromStack()
+	void Application::PopLayerFromStack()
 	{
 		m_layerStack.popLayer();
 	}
 
 	void Application::defineDefaultApplicationCallbacks()
 	{
-		m_eventActionInterface.newActionCallback(ActionType::ToggleFullscreen, [this](EventData data)
+		ICallbackSystem* ptrICallbackSystem = ICallbackSystem::GetInstance();
+
+		ptrICallbackSystem->NewCallback(Type::ToggleFullscreen, [this](Data data)
 			{
 				m_windowManager.toggleFullscreen();
 			});
 
-		m_eventActionInterface.newActionCallback(ActionType::EndApplication, [this](EventData data)
+		ptrICallbackSystem->NewCallback(Type::EndApplication, [this](Data data)
 			{
-				end();
+				End();
 			});
 
-		m_layerEventSystem.newLayerEventCallback(LayerEvent::AddToWorld, [this](LayerEventData layerEventData)
+		ptrICallbackSystem->NewCallback(Type::AddToWorld, [this](Data layerEventData)
 			{
 				GameObject* gameObject = std::get<GameObject*>(layerEventData);
 
 				m_world.addBox(*gameObject);
 			});
 
-		m_layerEventSystem.newLayerEventCallback(LayerEvent::RemoveFromWorld, [this](LayerEventData layerEventData)
+		ptrICallbackSystem->NewCallback(Type::RemoveFromWorld, [this](Data layerEventData)
 			{
 				GameObject* gameObject = std::get<GameObject*>(layerEventData);
 

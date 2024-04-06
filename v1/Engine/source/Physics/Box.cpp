@@ -50,28 +50,19 @@ namespace Engine
 
 	b2Body* Box::getBody() const { return m_body; }
 	const b2BodyDef& Box::getBodyDef() const { return m_bodyDef; }
+	const BodyType Box::getBodyType() const { return m_bodyType; }
 
-	const float Box::getWidthInMeters() const { return m_widthInMeters; }
-	const float Box::getHeightInMeters() const { return m_heightInMeters; }
-
-	const int Box::getWidthInPixels() const { return metersToPixels(m_widthInMeters); }
-	const int Box::getHeightInPixels() const { return metersToPixels(m_heightInMeters); }
+	const int Box::getWidthInMeters() const { return static_cast<int>(m_widthInMeters); }
+	const int Box::getHeightInMeters() const { return static_cast<int>(m_heightInMeters); }
 
 	void Box::setBody(b2Body* body) { m_body = body; }
 	void Box::createFixture() { m_body->CreateFixture(&m_fixtureDef); }
 
-	const float Box::getCenterXInMeters() const { return m_body->GetPosition().x; }
-	const float Box::getCenterYInMeters() const { return m_body->GetPosition().y; }
-	const float Box::getTopLeftXInMeters() const { return m_body->GetPosition().x - m_widthInMeters / 2; }
-	const float Box::getTopLeftYInMeters() const { return m_body->GetPosition().y - m_heightInMeters / 2; }
-
-	const int Box::getCenterXInPixels() const { return (metersToPixels(m_body->GetPosition().x)); }
-	const int Box::getCenterYInPixels() const { return (metersToPixels(m_body->GetPosition().y)); }
-	const int Box::getTopLeftXInPixels() const { return metersToPixels(m_body->GetPosition().x - m_widthInMeters / 2); }
-	const int Box::getTopLeftYInPixels() const { return (metersToPixels(m_body->GetPosition().y - m_heightInMeters / 2)); }
+	const double Box::getCenterXInMeters() const { return (m_body->GetPosition().x); }
+	const double Box::getCenterYInMeters() const { return (m_body->GetPosition().y); }
+	const double Box::getTopLeftXInMeters() const { return (m_body->GetPosition().x - m_widthInMeters / 2.0); }
+	const double Box::getTopLeftYInMeters() const { return (m_body->GetPosition().y - m_heightInMeters / 2.0); }
 
 	const float Box::getAngleInRadians() const { return m_body->GetAngle(); }
 	const double Box::getAngleInDegrees() const { return radiansToDegrees(m_body->GetAngle()); }
-
-	const BodyType Box::getBodyType() const { return m_bodyType; }
 }

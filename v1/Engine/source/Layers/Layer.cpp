@@ -5,27 +5,26 @@
 #include "../../include/Layers/Layer.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/GameObjects/GameObject.h"
-#include "../../include/Layers/LayerEvents.h"
-#include "../../include/Layers/ILayerEvent.h"
+#include "../../include/CallbackSystem/CallbackSystem.h"
 
 namespace Engine
 {
-	Layer::Layer(std::string name, ILayerEvent* ptrLayerEventSystem)
-		: m_name(name), m_enabled(true), isAttached(false), ptrLayerEventSystem(ptrLayerEventSystem) {}
+	Layer::Layer(std::string name) : ptrICallbackSystem(ICallbackSystem::GetInstance()), 
+		m_name(name), m_enabled(true), isAttached(false) {}
 	
 	Layer::~Layer() {}
-
-	void Layer::addToWorld()
+	 
+	void Layer::AddToWorld()
 	{
 		ENGINE_TRACE("Adding layer {} to the world.", m_name);
 
 		for (GameObject* gameObject : m_gameObjects)
 		{
-			ptrLayerEventSystem->triggerLayerEventCallback(LayerEvent::AddToWorld, gameObject);
+			ptrICallbackSystem->TriggerCallback(Type::AddToWorld, gameObject);
 		}
 	};
 
-	void Layer::removeFromWorld()
+	void Layer::RemoveFromWorld()
 	{
 		ENGINE_TRACE("Removing layer {} from the world.", m_name);
 
@@ -35,20 +34,26 @@ namespace Engine
 
 		for (GameObject* gameObject : m_gameObjects)
 		{
-			ptrLayerEventSystem->triggerLayerEventCallback(LayerEvent::RemoveFromWorld, gameObject);
+			ptrICallbackSystem->TriggerCallback(Type::RemoveFromWorld, gameObject);
 		}
 	};
 
-	void Layer::onAttach() { ENGINE_TRACE("Inside layer {} attach function.", m_name); };
-	void Layer::onDetach() { ENGINE_TRACE("Inside layer {} detach function.", m_name); };
-	void Layer::onUpdate() { ENGINE_TRACE("Update layer {}", m_name); };
-	void Layer::processEvent(Event& e) { ENGINE_TRACE("Process event for layer {}", m_name); };
+	void Layer::OnAttach() { ENGINE_TRACE("Inside layer {} attach function.", m_name); };
+	void Layer::OnDetach() { ENGINE_TRACE("Inside layer {} detach function.", m_name); };
+	void Layer::Free() { ENGINE_TRACE("Freeing layer {}.", m_name); /*Depending on clients use case they may need "delete layer" here.*/ };
+	void Layer::OnUpdate() { ENGINE_TRACE("Update layer {}", m_name); };
+	void Layer::ProcessEvent(Event& e) { ENGINE_TRACE("Process event for layer {}", m_name); };
 
-	const std::string& Layer::getName() const { return m_name; }
+	const std::string& Layer::GetName() const { return m_name; }
 
-	void Layer::addGameObject(GameObject* gameObject)
+	void Layer::AddGameObject(GameObject* gameObject)
 	{
-		if (gameObject->getBodyType() == BodyType::STATIC) {
+		// Box2d performs better when it simulates static objects before dynamic objects.
+		// Collisions are more accurate when static objects are simulated first.
+		// Thus, we need to add static objects to the beginning of the list.
+
+		if (gameObject->getBodyType() == BodyType::STATIC) 
+		{
 			auto it = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [](const GameObject* gameObject) 
 				{
 					return !gameObject->getBodyType();
@@ -57,26 +62,27 @@ namespace Engine
 			// Insert the static object before the first dynamic object.
 			m_gameObjects.insert(it, gameObject);
 		}
-		else {
+		else 
+		{
 			// Add rest of objects to the end of the list.
 			m_gameObjects.push_back(gameObject);
 		}
 
-		// If the layer is already attached to the worlds layer stack, add the object to the world as well.
+		// If the layer is already attached to the applications layer stack, add the object to the world as well.
 		if (isAttached)
 		{
-			ptrLayerEventSystem->triggerLayerEventCallback(LayerEvent::AddToWorld, gameObject);
+			ptrICallbackSystem->TriggerCallback(Type::AddToWorld, gameObject);
 		}
 	}
 
-	void Layer::removeGameObject(GameObject* gameObject)
+	void Layer::RemoveGameObject(GameObject* gameObject)
 	{
 		auto it = std::find(m_gameObjects.begin(), m_gameObjects.end(), gameObject);
 		if (it != m_gameObjects.end())
 		{
 			if (isAttached)
 			{
-				ptrLayerEventSystem->triggerLayerEventCallback(LayerEvent::RemoveFromWorld, gameObject);
+				ptrICallbackSystem->TriggerCallback(Type::RemoveFromWorld, gameObject);
 			}
 
 			m_gameObjects.erase(it);

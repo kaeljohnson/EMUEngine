@@ -5,10 +5,19 @@
 #include <stdio.h>
 
 #include "../include/Init.h"
+#include "../include/Application.h"
 #include "../include/Logging/Logger.h"
 
 namespace Engine
 {
+
+	// Callback system singleton.
+	Engine::ICallbackSystem* Engine::ICallbackSystem::instance = nullptr;
+
+	// Application singleton.
+	Engine::Application* Engine::Application::instance = nullptr;
+
+
 	Init::Init()
 	{
 		/*

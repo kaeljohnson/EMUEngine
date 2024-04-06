@@ -12,10 +12,15 @@ namespace Engine
 	LayerStack::LayerStack(std::vector<Layer*> layers) : m_layers(layers) {}
 	LayerStack::~LayerStack()
 	{
+		// Once layers are pushed to the applications layer stack, the application takes the
+		// ownership of the layer and therefore the responsibility of deleting the layers.
+		// If the client pops the layer from the stack, the client is responsible for 
+		// deleting the layer.
+
 		ENGINE_INFO("Freeing LayerStack.");
 		for (Layer* layer : m_layers)
 		{
-			//delete layer;
+			layer->Free();
 		}
 	}
 
@@ -26,19 +31,19 @@ namespace Engine
 		if (layer == nullptr) return;
 		for (auto it = m_layers.begin(); it != m_layers.end(); ++it)
 		{
-			if ((*it)->getName() == layer->getName())
+			if ((*it)->GetName() == layer->GetName())
 			{
-				ENGINE_CRITICAL("Layer with name: {} already exists in the layer stack!", layer->getName());
+				ENGINE_CRITICAL("Layer with name: {} already exists in the layer stack!", layer->GetName());
 				return;
 			}
 		}
 
 		// Stuff engine needs to do when a layer is pushed.
 		// Game objects added to the application world when layer is pushed to application layer stack.
-		layer->addToWorld();
+		layer->AddToWorld();
 
 		// Stuff the client needs to do when a layer is pushed.
-		layer->onAttach();
+		layer->OnAttach();
 
 		// Add the layer to the layer stack.
 		m_layers.push_back(layer);
@@ -46,23 +51,16 @@ namespace Engine
 
 	void LayerStack::popLayer(Layer* layer) 
 	{
-		if (layer->getName() == "ApplicationLayer"
-			|| layer->getName() == "WindowManagerLayer")
-		{
-			ENGINE_CRITICAL("Cannot pop the ApplicationLayer or WindowManagerLayer from the layer stack!");
-			return;
-		}
-
 		for (auto it = m_layers.begin(); it != m_layers.end(); it++)
 		{
-			if ((*it)->getName() == layer->getName())
+			if ((*it)->GetName() == layer->GetName())
 			{
 
 				// Stuff engine needs to do when a layer is popped.
-				(*it)->removeFromWorld();
+				(*it)->RemoveFromWorld();
 
 				// Stuff the client needs to do when a layer is popped.
-				(*it)->onDetach();
+				(*it)->OnDetach();
 
 				// Remove the layer from the layer stack.
 				m_layers.erase(it);
@@ -73,18 +71,11 @@ namespace Engine
 
 	void LayerStack::popLayer() 
 	{
-		if (m_layers.back()->getName() == "ApplicationLayer"
-			|| m_layers.back()->getName() == "WindowManagerLayer")
-		{
-			ENGINE_CRITICAL("Cannot pop the ApplicationLayer or WindowManagerLayer from the layer stack!");
-			return;
-		}
-
 		// Stuff engine needs to do when a layer is popped.
-		m_layers.back()->removeFromWorld();
+		m_layers.back()->RemoveFromWorld();
 
 		// Stuff the client needs to do when a layer is popped.
-		m_layers.back()->onDetach();
+		m_layers.back()->OnDetach();
 
 		// Remove the layer from the layer stack.
 		m_layers.pop_back();

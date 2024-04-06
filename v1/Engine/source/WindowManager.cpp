@@ -33,8 +33,6 @@ namespace Engine
 		// Is there a way to get the full screen size without toggling fullscreen by default?
 		if (SDL_GetDesktopDisplayMode(0, &m_displayMode) != 0)
 		{
-			// Maybe should just use SDL log?
-			// SDL_Log("SDL_GetDesktopDisplayMode failed: %s", SDL_GetError());
 			ENGINE_CRITICAL("Get desktop display mode failed: {}", SDL_GetError());
 		}
 	}
@@ -55,6 +53,11 @@ namespace Engine
 		// Bug here: Figure out why "SDL_WINDOW_FULLSCREEN" does not work.
 		// Incompatibility with native video mode?
 		bool isFullscreen = SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
+
+		// Engine should not support resizing the simulation. That is, the pixels per meter should not change.
+		// What will happen when the window size changes is that the camera will center on the player, or 
+		// whatever object the camera is locked onto, until it hits the edge of the screen.
+
 		if (SDL_SetWindowFullscreen(window, isFullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)
 		{
 			ENGINE_ERROR("Fullscreen failed! SDL_Error: {}", SDL_GetError());

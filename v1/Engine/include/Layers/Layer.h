@@ -4,10 +4,7 @@
 
 #include "../Events/Event.h"
 #include "../GameObjects/GameObject.h"
-#include "LayerEvents.h"
-#include "ILayerEvent.h"
-#include "../../include/Layers/ILayerEvent.h"
-#include "../../include/Layers/LayerEvents.h"
+#include "../CallbackSystem/CallbackSystem.h"
 
 namespace Engine
 {
@@ -17,13 +14,13 @@ namespace Engine
 		std::string m_name;
 		bool m_enabled;
 
-		// Maybe there should be two vectors, one for static objects and one for dynamic objects.
-		// This would make it easy to avoid the box2d bug where if dynamic objects are added before static objects,
-		// the collision detection will cause the dynamic objects to inch to the right.
+		// Note: common box2d bug where collisions won't work if dynamic objects are
+		// created and simulated before static objects.
 		std::vector<GameObject*> m_gameObjects;
-		ILayerEvent* ptrLayerEventSystem;
+
+		ICallbackSystem* ptrICallbackSystem;
 	public:
-		Layer(std::string name, ILayerEvent* ptrLayerEventSystem);
+		Layer(std::string name);
 		virtual	~Layer();
 
 		bool isAttached;
@@ -31,17 +28,18 @@ namespace Engine
 		const std::vector<GameObject*>::iterator begin() { return m_gameObjects.begin(); }
 		const std::vector<GameObject*>::iterator end() { return m_gameObjects.end(); }
 
-		void addToWorld();
-		void removeFromWorld();
+		void AddToWorld();
+		void RemoveFromWorld();
 
-		virtual void onAttach();
-		virtual void onDetach();
-		virtual void onUpdate();
-		virtual void processEvent(Event& e);
+		virtual void OnAttach();
+		virtual void OnDetach();
+		virtual void Free();
+		virtual void OnUpdate();
+		virtual void ProcessEvent(Event& e);
 
-		const std::string& getName() const;
+		const std::string& GetName() const;
 
-		void addGameObject(GameObject* gameObject);
-		void removeGameObject(GameObject* gameObject);
+		void AddGameObject(GameObject* gameObject);
+		void RemoveGameObject(GameObject* gameObject);
 	};
 }

@@ -1,62 +1,43 @@
 #pragma once
 
 #include "../include/EngineIncludes.h"
+#include "../include/Layers/AppManagementLayer.h"
 
-const char* APPLICATION_NAME = "Wizard Game v1";
-
-// Main function. Starting point for all C++ programs.
 int main(int argc, char* args[])
 {
-	// Once layers are pushed to the applications layer stack, the application takes the
-	// ownership of the layer and therefore the responsibility of deleting the layers.
-	// If the client pops the layer from the stack, the client is responsible for 
-	// deleting the layer.
-	
-	// Call to Init function. Initializes the logger, the SDL2 and SDL2_image libraries.
 	Engine::Init();
 
 	CLIENT_INFO("Client Running!");
 
-	// Call to Application constructor. Instantiates an object of type "Application" named app.
-	Engine::Application app(APPLICATION_NAME);
+	Engine::Application* ptrAppInstance = Engine::Application::GetInstance();
 
-	// Get the event system interface from the application.
-	Engine::IEventAction* eventActionInterface = app.getEventActionInterface();
-	Engine::ILayerEvent* layerEventSystem = app.getLayerEventInterface();
+	ptrAppInstance->SetSimulation(0.0f, 9.8f, 1.0f / 60.0f, 20);
 
-	Engine::Layer testLayer("Test Layer 1", layerEventSystem);
-	Engine::Layer testLayer2("Test Layer 2", layerEventSystem);
+	AppManagementLayer appLayer("App management layer");
+	Engine::Layer testLayer("Test Layer 1");
 
 	// Temp
-	SDL_Surface* surface = SDL_CreateRGBSurface(0, 1000, 1000, 32, 0, 0, 0, 0);
-	SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 0, 0));
-	SDL_Texture* tempTextureRed = SDL_CreateTextureFromSurface(app.getRenderer(), surface);
-	SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 255, 0));
-	SDL_Texture* tempTextureBlue = SDL_CreateTextureFromSurface(app.getRenderer(), surface);
-	SDL_FreeSurface(surface);
+	Engine::Texture tempTextureRed(255, 0, 0);
+	Engine::Texture tempTextureBlue(0, 0, 265);
 
-	Engine::GameObject testGO(Engine::DYNAMIC, 115.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, true, false, true, tempTextureRed);
-	Engine::GameObject testGround(Engine::STATIC, 115.0f, 120.0f, 120.0f, 2.0f, 0.0f, 0.0f, true, true, true, tempTextureBlue);
+	Engine::GameObject testGO(Engine::DYNAMIC, 63.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, true, false, true, &tempTextureRed);
+	Engine::GameObject testGround(Engine::STATIC, 63.5f, 70.0f, 120.0f, 2.0f, 0.0f, 0.0f, true, true, true, &tempTextureBlue);
 
-	testLayer.addGameObject(&testGround);
-	testLayer.addGameObject(&testGO);
-	testLayer.removeGameObject(&testGround);
+	testLayer.AddGameObject(&testGround);
+	testLayer.AddGameObject(&testGO);
 
-	CLIENT_TRACE("STOP 1");
+	ptrAppInstance->PushToLayerStack(&appLayer);
+	ptrAppInstance->PushToLayerStack(&testLayer);
 
-	app.pushToLayerStack(&testLayer);
-	app.pushToLayerStack(&testLayer2);
+	// Note in documentation that the client must keep in mind
+	// which order they want layers processed and rendered in.
+	ptrAppInstance->PopLayerFromStack(&appLayer);
+	ptrAppInstance->PushToLayerStack(&appLayer);
 	
-	app.popLayerFromStack(&testLayer2);
+	ptrAppInstance->Run();
 
-	testLayer.addGameObject(&testGround);
-
-	CLIENT_TRACE("STOP 2");
-	
-	app.run();
-
-	// End client application. Engine cleanup handled in Engine app class.
-	// end();
+	delete ptrAppInstance;
+	ptrAppInstance = nullptr;
 
 	return 0;
 }

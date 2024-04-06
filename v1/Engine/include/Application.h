@@ -6,12 +6,9 @@
 #include "RendererManager.h"
 #include "Events/EventManager.h" 
 #include "Events/Event.h"
-#include "Events/IEventAction.h"
 #include "Layers/LayerStack.h"
 #include "Layers/Layer.h"
-#include "../include/Layers/ILayerEvent.h"
-#include "Layers/ApplicationLayer.h"
-#include "Layers/WindowManagerLayer.h"
+#include "CallbackSystem/CallbackSystem.h"
 #include "Physics/Box.h"
 #include "Physics/World.h"
 
@@ -20,34 +17,28 @@ namespace Engine
 	class Application
 	{
 	private:
+		static Application* instance;
+		Application();
 
-		// bool to indicate if the application is running or not.
 		bool running;
+		float m_timeStep;
+
+		int m_pixelsPerMeter;
 
 		// Event queue to hold all events.
 		std::queue<Event> m_eventQ;
 
-		// All of the different managers that the application will use.
+		// Managers for major engine components.
 		WindowManager m_windowManager;
+		RendererManager m_rendererManager;
 		
+		// Manages events.
 		EventManager m_eventManager;
 
-		// Event system for loose coupling between client code and application.
-		IEventAction m_eventActionInterface;
-
-		ApplicationLayer m_appLayer;
-		WindowManagerLayer m_windowManagerLayer;
-		RendererManager m_rendererManager;
-
-		// layer stack holds user defined layers.
+		// Hold applications layers.
 		LayerStack m_layerStack;
 
-		ILayerEvent m_layerEventSystem;
-
-		// Game loop management.
-		const float timeStep;
-
-		// Physics
+		// World the app exists in.
 		World m_world;
 
 		void processEventQueue();
@@ -55,32 +46,24 @@ namespace Engine
 		void defineDefaultApplicationCallbacks();
 
 	public:
-		// Application constructor.
-		Application(const char* appName);
+		static Application* GetInstance();
 		~Application() = default;
 
-		// Application should have just one callback interface. This interface
-		// can utilize different types but there is no reason to separate the interfaces themselves
-		// as they are just messaging systems.
-		IEventAction* getEventActionInterface();
-		ILayerEvent* getLayerEventInterface();
+		void SetSimulation(const float gravityX, const float gravityY, const float timeStep, const int pixelsPerMeter);
 
 		// TEMP
-		SDL_Renderer* getRenderer() { return m_rendererManager.getRenderer(); }
+		SDL_Renderer* GetRenderer() { return m_rendererManager.getRenderer(); }
 
 		// Layer stack functions.
-		void pushToLayerStack(Layer* layer);
-		void popLayerFromStack(Layer* layer);
-		void popLayerFromStack();
-
-		// Temp
-		const LayerStack& getLayerStack() { return m_layerStack; }
+		void PushToLayerStack(Layer* layer);
+		void PopLayerFromStack(Layer* layer);
+		void PopLayerFromStack();
 
 		// Application functions.
-		void run();
-		void end();
+		void Run();
+		void End();
 
-		// Deleted functions to ensure our game instance cannot be copied or moved.
+		// Deleted functions to ensure our app instance cannot be copied or moved.
 		Application(const Application&) = delete;
 		Application& operator=(const Application&) = delete;
 		Application(Application&&) = delete;

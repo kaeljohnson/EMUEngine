@@ -10,21 +10,27 @@ namespace Engine
 	// all physics objects are created and updated. Game objects which needs to adhere to physics will be added to 
 	// the world object. Every application will have one world object. So, when the client adds an object, which is a
 	// box2d body, to the application, they are by definition adding it to the world object. Essentially, the "game layer"
-	// will be the layer which the world lies in. Foreground layers, background layers and UI layers  will adhere to separate systems.
+	// will be the layer which the world lies in. Foreground layers, background layers and UI layers will adhere to separate systems.
 
 	class World
 	{
 	private:
-			b2World m_world;
-			b2Vec2 m_gravity;
+		b2World m_world;
+		b2Vec2 m_gravity;
 
-			const float m_deltaTime;
-			const int m_velocityIterations;
-			const int m_positionIterations;
+		float m_deltaTime;
+		int m_velocityIterations;
+		int m_positionIterations;
 	public:
+		World();
 		World(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations);
 		void update();
 		void addBox(Box& body);
 		void removeBox(Box& body);
+
+		void SetGravity(const float gravityX, const float gravityY);
+		void SetTimeStep(const float timeStep);
+		void SetVelocityIterations(const int velocityIterations);
+		void SetPositionIterations(const int positionIterations);
 	};
 }

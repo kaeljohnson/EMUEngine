@@ -38,19 +38,13 @@ namespace Engine
 
 		void createFixture();
 
-		const float getCenterXInMeters() const;
-		const float getCenterYInMeters() const;
-		const float getTopLeftXInMeters() const;
-		const float getTopLeftYInMeters() const;
-		const float getWidthInMeters() const; 
-		const float getHeightInMeters() const;
+		const double getCenterXInMeters() const;
+		const double getCenterYInMeters() const;
+		const double getTopLeftXInMeters() const;
+		const double getTopLeftYInMeters() const;
 
-		const int getCenterXInPixels() const;
-		const int getCenterYInPixels() const;
-		const int getTopLeftXInPixels() const;
-		const int getTopLeftYInPixels() const;
-		const int getWidthInPixels() const;
-		const int getHeightInPixels() const;
+		const int getWidthInMeters() const; 
+		const int getHeightInMeters() const;
 
 		const float getAngleInRadians() const;
 		const double getAngleInDegrees() const;
