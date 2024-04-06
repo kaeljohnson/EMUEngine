@@ -40,6 +40,7 @@ namespace Engine
 
 	void Layer::OnAttach() { ENGINE_TRACE("Inside layer {} attach function.", m_name); };
 	void Layer::OnDetach() { ENGINE_TRACE("Inside layer {} detach function.", m_name); };
+	void Layer::Free() { ENGINE_TRACE("Freeing layer {}.", m_name); /*Depending on clients use case they may need "delete layer" here.*/ };
 	void Layer::OnUpdate() { ENGINE_TRACE("Update layer {}", m_name); };
 	void Layer::ProcessEvent(Event& e) { ENGINE_TRACE("Process event for layer {}", m_name); };
 

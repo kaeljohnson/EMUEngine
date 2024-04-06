@@ -20,7 +20,7 @@ namespace Engine
 		ENGINE_INFO("Freeing LayerStack.");
 		for (Layer* layer : m_layers)
 		{
-			//delete layer;
+			layer->Free();
 		}
 	}
 

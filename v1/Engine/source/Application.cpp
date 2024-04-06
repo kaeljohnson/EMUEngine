@@ -26,7 +26,7 @@ namespace Engine
 		defineDefaultApplicationCallbacks();
 	}
 
-	void Application::SetSimulation(float gravityX, float gravityY, float timeStep, int pixelsPerMeter)
+	void Application::SetSimulation(const float gravityX, const float gravityY, const float timeStep, const int pixelsPerMeter)
 	{
 		m_timeStep = timeStep;
 		m_pixelsPerMeter = pixelsPerMeter;

@@ -33,6 +33,7 @@ namespace Engine
 
 		virtual void OnAttach();
 		virtual void OnDetach();
+		virtual void Free();
 		virtual void OnUpdate();
 		virtual void ProcessEvent(Event& e);
 

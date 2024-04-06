@@ -49,7 +49,7 @@ namespace Engine
 		static Application* GetInstance();
 		~Application() = default;
 
-		void SetSimulation(float gravityX, float gravityY, float timeStep, int pixelsPerMeter);
+		void SetSimulation(const float gravityX, const float gravityY, const float timeStep, const int pixelsPerMeter);
 
 		// TEMP
 		SDL_Renderer* GetRenderer() { return m_rendererManager.getRenderer(); }
