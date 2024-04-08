@@ -1,7 +1,6 @@
 #pragma once
 
-#include <sdl.h>
-#include <sdl_image.h>
+#include "../SDLWrapper/SDLWrapper.h"
 
 #include "../Events/Event.h"
 #include "../Physics/Box.h"
@@ -33,7 +32,7 @@ namespace Engine
 
 		// Each game object will use a rect to hold the texture that needs to be rendered.
 		// Box2d will handle the position of the object, and the physics.
-		SDL_Rect m_rect;
+		SDLRect m_rect;
 
 	public:
 		GameObject(const BodyType bodyType, const float startingX, const float startingY, const float width, const float height,
@@ -45,7 +44,7 @@ namespace Engine
 		void Update();
 		void Render();
 		void Display();
-		const SDL_Rect& GetRect() const;
+		const SDLRect& GetRect() const;
 
 		Texture* GetTexture();
 	};

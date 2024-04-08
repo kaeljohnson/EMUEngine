@@ -1,6 +1,5 @@
 #pragma once
 
-#include <SDL.h>
 #include <queue>
 
 #include "../Events/Event.h"

@@ -1,7 +1,6 @@
 #pragma once
 
-#include <SDL.h>
-#include <SDL_image.h>
+#include "../include/SDLWrapper/SDLWrapper.h"
 
 #include "GameObjects/GameObject.h"
 #include "CallbackSystem/CallbackSystem.h"
@@ -13,7 +12,7 @@ namespace Engine
 	{
 	private:
 		// SDL2 renderer pointer. This is the renderer that will be used to render all of the game objects.
-		SDL_Renderer* renderer;
+		SDLRenderer* renderer;
 
 		// Pointer to the ICallbackSystem instance. Having a member variable that points
 		// to a singleton is typically not a good practice,
@@ -21,11 +20,11 @@ namespace Engine
 		ICallbackSystem* ptrICallbackSystem;
 	
 	public:
-		RendererManager(SDL_Window* window);
+		RendererManager(SDLWindow* window);
 		~RendererManager();
 
-		SDL_Renderer* getRenderer() const;
-		const SDL_Texture* loadTexture(const char* filePath);
+		SDLRenderer* getRenderer() const;
+		const SDLTexture* loadTexture(const char* filePath);
 		void clearScreen();
 		void render(GameObject* gameObject, const int pixelsPerMeter);
 		void display();

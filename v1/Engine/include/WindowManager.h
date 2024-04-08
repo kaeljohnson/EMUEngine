@@ -1,7 +1,6 @@
 #pragma once
 
-#include <SDL.h>																				// External library includes.
-#include <SDL_image.h>
+#include "../include/SDLWrapper/SDLWrapper.h"
 
 
 namespace Engine
@@ -11,16 +10,16 @@ namespace Engine
 	{
 	private:
 		// SDL_Window* pointer. This is the window that will be used to display the application.
-		SDL_Window* window;
+		SDLWindow* window;
 
 		// Holds useful information about the display.
-		SDL_DisplayMode m_displayMode;
+		SDLDisplayMode m_displayMode;
 
 	public:
 		WindowManager(const char* windowTitle);
 		~WindowManager();
 
-		SDL_Window* getWindow() const;
+		SDLWindow* getWindow() const;
 		void resize(const int newWindowWidth, const int newWindowHeight);
 		void toggleFullscreen();
 		void free();
