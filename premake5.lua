@@ -30,14 +30,14 @@ project "v1"
 
 	includedirs
 	{
-		"vcpkg/installed/x64-windows/include",
+		"%{prj.name}/external/vcpkg/installed/x64-windows/include",
 		"%{prj.name}/external/spdlog/include",
 		"%{prj.name}/external/box2d/include"
 	}
 
 	libdirs
 	{
-		"vcpkg/installed/x64-windows/lib",
+		"%{prj.name}/external/vcpkg/installed/x64-windows/lib",
 		"%{prj.name}/external/box2d/build/bin/Debug"
 	}
 

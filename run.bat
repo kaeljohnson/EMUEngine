@@ -1,12 +1,13 @@
 if exist vcpkg\ (
     echo vcpkg exists
 ) else (
+    cd v1/external
     call git clone https://github.com/microsoft/vcpkg.git
     cd vcpkg
     call bootstrap-vcpkg.bat
     call vcpkg integrate install
     call vcpkg install sdl2 sdl2-image
-    cd ..
+    cd ../../..
 )
 
 cd v1\external\box2d\
