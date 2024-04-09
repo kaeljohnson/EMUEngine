@@ -15,7 +15,7 @@ namespace Engine
 {
 	Application::Application()
 		: m_windowManager("Default App Name"),
-		m_rendererManager(m_windowManager.getWindow(), m_windowManager.getDisplayMode()),
+		m_rendererManager(m_windowManager.getWindow()),
 		m_eventManager(m_eventQ),
 		m_layerStack(),
 		running(false),
@@ -197,6 +197,7 @@ namespace Engine
 		ptrICallbackSystem->NewCallback(Type::ToggleFullscreen, [this](Data data)
 			{
 				m_windowManager.toggleFullscreen();
+				m_rendererManager.setViewport(m_windowManager.getWindow());
 			});
 
 		ptrICallbackSystem->NewCallback(Type::EndApplication, [this](Data data)
@@ -216,6 +217,18 @@ namespace Engine
 				GameObject* gameObject = std::get<GameObject*>(layerEventData);
 
 				m_world.removeBox(*gameObject);
+			});
+
+		ptrICallbackSystem->NewCallback(Type::ResizeWindow, [this](Data data)
+			{
+				const std::pair<int, int> windowSize = std::get<const std::pair<int, int>>(data);
+
+				// Resize is being called and pushing the resize event to the queue,
+				// but the window is being resized regardless of the event triggered
+				// by SDL detecting a resize event. This needs to be fixed because
+				// there needs to be a limit on how small a window can be.
+				//m_windowManager.resize(windowSize.first, windowSize.second);
+				m_rendererManager.setViewport(m_windowManager.getWindow());
 			});
 	}
 }

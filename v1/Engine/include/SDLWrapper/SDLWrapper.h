@@ -17,6 +17,8 @@ namespace Engine
 	#define IMG_INIT(flags) IMG_Init(flags)
 	#define SDL_QUIT() SDL_Quit()
 	#define SDL_CREATE_WINDOW(title, x, y, w, h, flags) SDL_CreateWindow(title, x, y, w, h, flags)
+	#define SDL_GET_WINDOW_SIZE(ptrWindow, ptrWidth, ptrHeight) SDL_GetWindowSize(ptrWindow, ptrWidth, ptrHeight);
+	#define SDL_RENDER_SET_VIEWPORT(ptrRenderer, ptrViewport) SDL_RenderSetViewport(ptrRenderer, ptrViewport);
 	#define SDL_CREATE_RENDERER(window, index, flags) SDL_CreateRenderer(window, index, flags)
 	#define SDL_DESTROY_WINDOW(window) SDL_DestroyWindow(window)
 	#define SDL_POLL_EVENT(event) SDL_PollEvent(event)

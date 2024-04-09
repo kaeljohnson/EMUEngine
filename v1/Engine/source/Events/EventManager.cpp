@@ -5,6 +5,7 @@
 #include "../../include/SDLWrapper/SDLWrapper.h"
 #include "../../include/Events/EventManager.h"
 #include "../../include/Events/Event.h"
+#include "../../include/Logging/Logger.h"
 
 namespace Engine
 {
@@ -53,9 +54,10 @@ namespace Engine
 
 	void EventManager::dispatchWindowEvent(SDL_WindowEvent& windowEvent)
 	{
-		switch (windowEvent.type)
+		ENGINE_CRITICAL("INSIDE WINDOW EVENT");
+		switch (windowEvent.event)
 		{
-			case (SDL_WINDOWEVENT_RESIZED): refEventQ.push({ RESIZE_WINDOW, windowEvent.data1, windowEvent.data2 }); break;
+			case (SDL_WINDOWEVENT_RESIZED): ENGINE_INFO("PUSHING RESIZE EVENT"); refEventQ.push({RESIZE_WINDOW, windowEvent.data1, windowEvent.data2}); break;
 			default: break;
 		}
 	}

@@ -22,9 +22,9 @@ namespace Engine
 		const int VIRTUAL_WIDTH;
 		const int VIRTUAL_HEIGHT;
 
-		const float SCALE_X;
-		const float SCALE_Y;
-		const float SCALE;
+		float SCALE_X;
+		float SCALE_Y;
+		float SCALE;
 
 		int viewportWidth;
 		int viewportHeight;
@@ -32,13 +32,14 @@ namespace Engine
 		int viewportY;
 	
 	public:
-		RendererManager(SDLWindow* window, SDLDisplayMode& refDM);
+		RendererManager(SDLWindow* window);
 		~RendererManager();
 
 		SDLRenderer* getRenderer() const;
 		const SDLTexture* loadTexture(const char* filePath);
 		void clearScreen();
 		void render(GameObject* gameObject, const int pixelsPerMeter);
+		void setViewport(SDLWindow* ptrWindow);
 		void display();
 		void free();
 	};

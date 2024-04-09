@@ -49,6 +49,9 @@ namespace Engine
 	void WindowManager::resize(const int newWindowWidth, const int newWindowHeight)
 	{
 		ENGINE_TRACE("{}, {}", newWindowWidth, newWindowHeight);
+
+		// There is still a bug here. The window does not resize properly.
+		// Something else changes the window size thats not SDL2.
 		SDL_SET_WINDOW_SIZE(window, newWindowWidth, newWindowHeight);
 	}
 

@@ -10,13 +10,9 @@
 
 namespace Engine
 {
-	RendererManager::RendererManager(SDLWindow* window, SDLDisplayMode& refDM)
+	RendererManager::RendererManager(SDLWindow* window)
 		: renderer(nullptr), ptrICallbackSystem(ICallbackSystem::GetInstance()),
-		VIRTUAL_WIDTH(1280), VIRTUAL_HEIGHT(720), SCALE_X(static_cast<float>(refDM.w) / VIRTUAL_WIDTH),
-		SCALE_Y(static_cast<float>(refDM.h) / VIRTUAL_HEIGHT), SCALE(std::min(SCALE_X, SCALE_Y)),
-		viewportWidth(static_cast<int>(VIRTUAL_WIDTH * SCALE)), 
-		viewportHeight(static_cast<int>(VIRTUAL_HEIGHT* SCALE)),
-		viewportX((refDM.w - viewportWidth) / 2), viewportY((refDM.h - viewportHeight) / 2)
+		VIRTUAL_WIDTH(1280), VIRTUAL_HEIGHT(720)
 	{
 		// Assign SDL renderer pointer to the return value of the SDL_CreateRenderer function. 
 		// Note: Hover over function to understand the arguments it takes.
@@ -28,9 +24,7 @@ namespace Engine
 
 		SDL_SetRenderDrawColor(renderer, 'd3', 'd3', 'd3', SDL_ALPHA_OPAQUE);
 
-		SDLRect viewport = { viewportX, viewportY, viewportWidth, viewportHeight };
-		SDL_RenderSetViewport(renderer, &viewport);
-
+		setViewport(window);
 	}
 
 	SDLRenderer* RendererManager::getRenderer() const
@@ -96,6 +90,27 @@ namespace Engine
 
 		SDL_RENDER_COPY_EX(renderer, gameObject->GetTexture()->m_texture, nullptr, &dst, gameObject->getAngleInDegrees(), nullptr, SDL_FLIP_NONE);
 	}
+
+	void RendererManager::setViewport(SDLWindow* ptrWindow)
+	{
+		int windowWidth, windowHeight;
+		SDL_GET_WINDOW_SIZE(ptrWindow, &windowWidth, &windowHeight);
+
+		SCALE_X = static_cast<float>(windowWidth) / VIRTUAL_WIDTH;
+		SCALE_Y = static_cast<float>(windowHeight) / VIRTUAL_HEIGHT;
+
+		SCALE = std::min(SCALE_X, SCALE_Y);
+
+		viewportWidth = static_cast<int>(VIRTUAL_WIDTH * SCALE);
+		viewportHeight = static_cast<int>(VIRTUAL_HEIGHT * SCALE);
+
+		viewportX = (windowWidth - viewportWidth) / 2;
+		viewportY = (windowHeight - viewportHeight) / 2;
+
+		SDLRect viewport = { viewportX, viewportY, viewportWidth, viewportHeight };
+		SDL_RENDER_SET_VIEWPORT(renderer, &viewport);
+	}
+
 	void RendererManager::free()
 	{
 		ENGINE_INFO("Freeing Renderer.");
