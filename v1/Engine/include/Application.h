@@ -52,7 +52,7 @@ namespace Engine
 		void SetSimulation(const float gravityX, const float gravityY, const float timeStep, const int pixelsPerMeter);
 
 		// TEMP
-		SDL_Renderer* GetRenderer() { return m_rendererManager.getRenderer(); }
+		SDLRenderer* GetRenderer() { return m_rendererManager.getRenderer(); }
 
 		// Layer stack functions.
 		void PushToLayerStack(Layer* layer);

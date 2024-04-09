@@ -1,8 +1,8 @@
 #pragma once
 
-#include <SDL.h>
 #include <queue>
 
+#include "../../include/SDLWrapper/SDLWrapper.h"
 #include "../../include/Events/EventManager.h"
 #include "../../include/Events/Event.h"
 
@@ -24,9 +24,9 @@ namespace Engine
 			before it starts repeating when key is held, making it hard to handle.
 		*/
 
-		SDL_Event e;
+		SDLEvent e;
 
-		while (SDL_PollEvent(&e))
+		while (SDL_POLL_EVENT(&e))
 		{ 
 			// If the event is a keydown event and the key is repeating, we don't want to handle it.
 			if (e.type == SDL_KEYDOWN && e.key.repeat == 1) return;

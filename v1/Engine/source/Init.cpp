@@ -1,7 +1,6 @@
 #pragma once
 
-#include <SDL.h>
-#include <SDL_image.h>
+#include "../include/Init.h"
 #include <stdio.h>
 
 #include "../include/Init.h"
@@ -29,10 +28,10 @@ namespace Engine
 		Logger::Init();
 		ENGINE_TRACE("Logger initialized!");
 
-		if (!IMG_Init(IMG_INIT_PNG))
+		if (!IMG_INIT(IMG_INIT_PNG))
 			ENGINE_CRITICAL("IMG Init failed! SDL_Error: {}", SDL_GetError());
 
-		if (SDL_Init(SDL_INIT_VIDEO) < 0)
+		if (SDL_INIT() < 0)
 			ENGINE_CRITICAL("SDL Init failed! SDL_Error: {}", SDL_GetError());
 	}
 }

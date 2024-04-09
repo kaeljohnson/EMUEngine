@@ -1,8 +1,7 @@
 #pragma once
 
 #include <stdio.h>
-#include <SDL.h>
-#include <SDL_image.h>
+#include "../include/SDLWrapper/SDLWrapper.h"
 
 #include "../include/RendererManager.h"
 #include "../include/Logging/Logger.h"
@@ -11,21 +10,21 @@
 
 namespace Engine
 {
-	RendererManager::RendererManager(SDL_Window* window)
+	RendererManager::RendererManager(SDLWindow* window)
 		: renderer(nullptr), ptrICallbackSystem(ICallbackSystem::GetInstance())
 	{
 		// Assign SDL renderer pointer to the return value of the SDL_CreateRenderer function. 
 		// Note: Hover over function to understand the arguments it takes.
-		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // rendering driver?
+		renderer = SDL_CREATE_RENDERER(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // rendering driver?
 		if (renderer == nullptr)
 		{
-			ENGINE_CRITICAL("Renderer could not be created! SDL Error: {}", SDL_GetError());
+			ENGINE_CRITICAL("Renderer could not be created! SDL Error: {}", SDL_GET_ERROR());
 		}
 
 		SDL_SetRenderDrawColor(renderer, 'd3', 'd3', 'd3', SDL_ALPHA_OPAQUE);
 	}
 
-	SDL_Renderer* RendererManager::getRenderer() const
+	SDLRenderer* RendererManager::getRenderer() const
 	{
 		return renderer;
 	}
@@ -33,12 +32,12 @@ namespace Engine
 	// Definition for loadTexture function in RendererManager. 
 	// Returns a const SDL_Texture*. Takes a file (probably a sprite sheet) 
 	// full of the textures we want to load.
-	const SDL_Texture* RendererManager::loadTexture(const char* filePath)
+	const SDLTexture* RendererManager::loadTexture(const char* filePath)
 	{
-		SDL_Texture* texture =  IMG_LoadTexture(renderer, filePath);
+		SDLTexture* texture =  IMG_LoadTexture(renderer, filePath);
 		if (texture == nullptr)
 		{
-			ENGINE_CRITICAL("Failed to load texture. SDL Error: {}", SDL_GetError());
+			ENGINE_CRITICAL("Failed to load texture. SDL Error: {}", SDL_GET_ERROR());
 		}
 		return texture;
 	}
@@ -46,20 +45,20 @@ namespace Engine
 	// Wrapper for SDL_RenderClear. Clears the screen.
 	void RendererManager::clearScreen()
 	{
-		SDL_RenderClear(renderer);
+		SDL_RENDER_CLEAR(renderer);
 	}
 
 	// Wrapper for SDL_RenderPresent. Talks to the actual hardwares renderer to display the renderer.
 	void RendererManager::display()
 	{
-		SDL_RenderPresent(renderer);
+		SDL_RENDER_PRESENT(renderer);
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
 	void RendererManager::render(GameObject* gameObject, const int pixelsPerMeter)
 	{
 		// The x, y, height, and width of the portion of the texture we want to render.
-		SDL_Rect src = { 0, 0, 0, 0 };
+		SDLRect src = { 0, 0, 0, 0 };
 
 
 		// The x and y coordinates correspond to the coordinates on the screen in pixels. 
@@ -76,7 +75,7 @@ namespace Engine
 			ptrICallbackSystem->TriggerCallback(Type::EndApplication, std::monostate{});
 		}
 
-		SDL_Rect dst
+		SDLRect dst
 		{
 			// This rect will eventually be the outline of the texture we want to render,
 			// not the collidable object tracked by the underlying box2d body.
@@ -87,13 +86,13 @@ namespace Engine
 			static_cast<int>(round(gameObject->getHeightInMeters() * pixelsPerMeter))
 		};
 
-		SDL_RenderCopyEx(renderer, gameObject->GetTexture()->m_texture, nullptr, &dst, gameObject->getAngleInDegrees(), nullptr, SDL_FLIP_NONE);
+		SDL_RENDER_COPY_EX(renderer, gameObject->GetTexture()->m_texture, nullptr, &dst, gameObject->getAngleInDegrees(), nullptr, SDL_FLIP_NONE);
 	}
 	void RendererManager::free()
 	{
 		ENGINE_INFO("Freeing Renderer.");
 		// Destroy the render, which SDL uses dynamic memory to allocate.
-		SDL_DestroyRenderer(renderer);
+		SDL_DESTROY_RENDERER(renderer);
 
 		// Now that we freed the renderer, the pointer is still attached to that memory.
 		// This is bad because we don't control what is there anymore, so it needs to be set back to nullptr.
