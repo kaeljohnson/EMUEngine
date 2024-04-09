@@ -18,9 +18,21 @@ namespace Engine
 		// to a singleton is typically not a good practice,
 		// but since the CallbackSystem is a basic messaging system, it is ok.
 		ICallbackSystem* ptrICallbackSystem;
+
+		const int VIRTUAL_WIDTH;
+		const int VIRTUAL_HEIGHT;
+
+		const float SCALE_X;
+		const float SCALE_Y;
+		const float SCALE;
+
+		int viewportWidth;
+		int viewportHeight;
+		int viewportX;
+		int viewportY;
 	
 	public:
-		RendererManager(SDLWindow* window);
+		RendererManager(SDLWindow* window, SDLDisplayMode& refDM);
 		~RendererManager();
 
 		SDLRenderer* getRenderer() const;

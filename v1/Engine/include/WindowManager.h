@@ -20,6 +20,7 @@ namespace Engine
 		~WindowManager();
 
 		SDLWindow* getWindow() const;
+		SDLDisplayMode& getDisplayMode();
 		void resize(const int newWindowWidth, const int newWindowHeight);
 		void toggleFullscreen();
 		void free();

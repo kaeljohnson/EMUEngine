@@ -41,6 +41,11 @@ namespace Engine
 		return window;
 	}
 
+	SDLDisplayMode& WindowManager::getDisplayMode()
+	{
+		return m_displayMode;
+	}
+
 	void WindowManager::resize(const int newWindowWidth, const int newWindowHeight)
 	{
 		ENGINE_TRACE("{}, {}", newWindowWidth, newWindowHeight);

@@ -15,7 +15,7 @@ namespace Engine
 {
 	Application::Application()
 		: m_windowManager("Default App Name"),
-		m_rendererManager(m_windowManager.getWindow()),
+		m_rendererManager(m_windowManager.getWindow(), m_windowManager.getDisplayMode()),
 		m_eventManager(m_eventQ),
 		m_layerStack(),
 		running(false),
