@@ -58,7 +58,7 @@ namespace Engine
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void RendererManager::render(GameObject* gameObject, const int pixelsPerMeter)
+	void RendererManager::render(GameObject* gameObject, const int pixelsPerMeter, const double interpolation)
 	{
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
@@ -82,8 +82,9 @@ namespace Engine
 			// This rect will eventually be the outline of the texture we want to render,
 			// not the collidable object tracked by the underlying box2d body.
 
-			static_cast<int>(round(gameObject->getTopLeftXInMeters() * pixelsPerMeter * SCALE)),
-			static_cast<int>(round(gameObject->getTopLeftYInMeters() * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((gameObject->prevX * (1.0 - interpolation) + gameObject->getTopLeftXInMeters() * interpolation) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((gameObject->prevY * (1.0 - interpolation) + gameObject->getTopLeftYInMeters() * interpolation) * pixelsPerMeter * SCALE)),
+			
 			static_cast<int>(round(gameObject->getWidthInMeters() * pixelsPerMeter * SCALE)),
 			static_cast<int>(round(gameObject->getHeightInMeters() * pixelsPerMeter * SCALE))
 		};

@@ -42,7 +42,7 @@ namespace Engine
 		World m_world;
 
 		void processEventQueue();
-		void renderLayers();
+		void renderLayers(const double interpolation);
 		void defineDefaultApplicationCallbacks();
 
 	public:

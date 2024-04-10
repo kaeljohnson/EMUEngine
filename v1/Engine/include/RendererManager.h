@@ -38,7 +38,7 @@ namespace Engine
 		SDLRenderer* getRenderer() const;
 		const SDLTexture* loadTexture(const char* filePath);
 		void clearScreen();
-		void render(GameObject* gameObject, const int pixelsPerMeter);
+		void render(GameObject* gameObject, const int pixelsPerMeter, const double interpolation);
 		void setViewport(SDLWindow* ptrWindow);
 		void display();
 		void free();

@@ -100,6 +100,18 @@ namespace Engine
 				m_eventManager.handleEvents();
 				processEventQueue();
 
+				// Faster way to do this? Should only have to update objects
+				// prev values if they have changed. In fact, should only update
+				// objects that have changed in general
+				for (Layer* layer : m_layerStack)
+				{
+					for (GameObject* gameObject : *layer)
+					{
+						gameObject->prevX = gameObject->getTopLeftXInMeters();
+						gameObject->prevY = gameObject->getTopLeftYInMeters();
+					}
+				}
+
 				m_world.update();
 
 				accumulator -= m_timeStep;
@@ -111,12 +123,12 @@ namespace Engine
 			m_rendererManager.clearScreen();
 
 			// Need interpolation for smooth rendering.
-			renderLayers();
+			renderLayers(interpolation);
 			m_rendererManager.display();      
 		}
 	}
 
-	void Application::renderLayers()
+	void Application::renderLayers(const double interpolation)
 	{
 		// Should not be renderering every layer every frame.
 	    // Should only render layers that are visible and have changed.
@@ -125,7 +137,7 @@ namespace Engine
 		{
 			for (GameObject* gameObject : *layer)
 			{
-				m_rendererManager.render(gameObject, m_pixelsPerMeter);
+				m_rendererManager.render(gameObject, m_pixelsPerMeter, interpolation);
 			}
 		}
 	}

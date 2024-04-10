@@ -15,8 +15,7 @@ namespace Engine
 		// SpriteSheet m_spriteSheet;
 		// State m_state;
 
-		float m_x;
-		float m_y;
+		
 
 		const float m_width;
 		const float m_height;
@@ -35,6 +34,11 @@ namespace Engine
 		SDLRect m_rect;
 
 	public:
+		float prevX;
+		float prevY;
+		float m_x;
+		float m_y;
+
 		GameObject(const BodyType bodyType, const float startingX, const float startingY, const float width, const float height,
 			const float density, const float friction,
 			const bool visible, const bool fixed, const bool collidable, Texture* texture);
