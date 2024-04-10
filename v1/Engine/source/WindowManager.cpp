@@ -15,17 +15,12 @@ namespace Engine
 		: window(nullptr)
 	{
 		window = SDL_CREATE_WINDOW(
-			windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0,0, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN
+			windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0,0, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP
 		);
 
 		if (window == nullptr)
 		{
 			ENGINE_CRITICAL("Window not created! SDL_Error: {}", SDL_GetError());
-		}
-
-		if (SDL_SET_WINDOW_FULLSCREEN(window, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0)
-		{
-			ENGINE_CRITICAL("Fullscreen mode not set! SDL Error: {}", SDL_GetError());
 		}
 
 		// Gotta be an easier way?
