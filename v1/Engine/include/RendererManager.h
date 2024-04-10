@@ -22,9 +22,9 @@ namespace Engine
 		const int VIRTUAL_WIDTH;
 		const int VIRTUAL_HEIGHT;
 
-		float SCALE_X;
-		float SCALE_Y;
-		float SCALE;
+		double SCALE_X;
+		double SCALE_Y;
+		double SCALE;
 
 		int viewportWidth;
 		int viewportHeight;

@@ -12,15 +12,16 @@ namespace Engine
 		// SDL_Window* pointer. This is the window that will be used to display the application.
 		SDLWindow* window;
 
-		// Holds useful information about the display.
-		SDLDisplayMode m_displayMode;
+		int m_fullscreenWidth;
+		int m_fullscreenHeight;
 
 	public:
 		WindowManager(const char* windowTitle);
 		~WindowManager();
 
 		SDLWindow* getWindow() const;
-		SDLDisplayMode& getDisplayMode();
+		const int GetFullscreenWidth() const;
+		const int GetFullscreenHeight() const;
 		void resize(const int newWindowWidth, const int newWindowHeight);
 		void toggleFullscreen();
 		void free();

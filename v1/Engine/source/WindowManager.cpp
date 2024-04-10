@@ -30,10 +30,14 @@ namespace Engine
 
 		// Gotta be an easier way?
 		// Is there a way to get the full screen size without toggling fullscreen by default?
-		if (SDL_GET_DESKTOP_DISPLAY_MODE(0, &m_displayMode) != 0)
+		SDL_DisplayMode displayMode;
+		if (SDL_GET_DESKTOP_DISPLAY_MODE(0, &displayMode) != 0)
 		{
 			ENGINE_CRITICAL("Get desktop display mode failed: {}", SDL_GetError());
 		}
+
+		m_fullscreenWidth = displayMode.w;
+		m_fullscreenHeight = displayMode.h;
 	}
 
 	SDL_Window* WindowManager::getWindow() const
@@ -41,18 +45,37 @@ namespace Engine
 		return window;
 	}
 
-	SDLDisplayMode& WindowManager::getDisplayMode()
+	const int WindowManager::GetFullscreenWidth() const
 	{
-		return m_displayMode;
+		return m_fullscreenWidth;
+	}
+
+	const int WindowManager::GetFullscreenHeight() const
+	{
+		return m_fullscreenHeight;
 	}
 
 	void WindowManager::resize(const int newWindowWidth, const int newWindowHeight)
 	{
 		ENGINE_TRACE("{}, {}", newWindowWidth, newWindowHeight);
 
-		// There is still a bug here. The window does not resize properly.
-		// Something else changes the window size thats not SDL2.
-		SDL_SET_WINDOW_SIZE(window, newWindowWidth, newWindowHeight);
+		if (newWindowWidth < m_fullscreenWidth / 2 && newWindowHeight < m_fullscreenHeight / 2)
+		{
+			SDL_SET_WINDOW_SIZE(window, m_fullscreenWidth / 2, m_fullscreenHeight / 2);
+		}
+		else if (newWindowWidth < m_fullscreenWidth / 2) 
+		{ 
+			SDL_SET_WINDOW_SIZE(window, m_fullscreenWidth / 2, newWindowHeight); 
+		}
+		else if (newWindowHeight < m_fullscreenHeight / 2) 
+		{ 
+			SDL_SET_WINDOW_SIZE(window, newWindowWidth, m_fullscreenHeight / 2); 
+		}
+		else
+		{
+			// Let OS handle resize.
+		}
+
 	}
 
 	void WindowManager::toggleFullscreen()
@@ -73,7 +96,7 @@ namespace Engine
 		{
 			// Default behavior for now will be to toggle fullscreen on for client.
 			// When the screen is toggled to windowed, the size will be half of the width and height.
-			SDL_SET_WINDOW_SIZE(window, m_displayMode.w / 2, m_displayMode.h / 2);
+			SDL_SET_WINDOW_SIZE(window, m_fullscreenWidth / 2, m_fullscreenHeight / 2);
 			SDL_SET_WINDOW_POSITION(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
 	}
