@@ -197,6 +197,7 @@ namespace Engine
 		ptrICallbackSystem->NewCallback(Type::ToggleFullscreen, [this](Data data)
 			{
 				m_windowManager.toggleFullscreen();
+				m_rendererManager.setViewport(m_windowManager.getWindow());
 			});
 
 		ptrICallbackSystem->NewCallback(Type::EndApplication, [this](Data data)
@@ -216,6 +217,14 @@ namespace Engine
 				GameObject* gameObject = std::get<GameObject*>(layerEventData);
 
 				m_world.removeBox(*gameObject);
+			});
+
+		ptrICallbackSystem->NewCallback(Type::ResizeWindow, [this](Data data)
+			{
+				const std::pair<int, int> windowSize = std::get<const std::pair<int, int>>(data);
+				
+				m_windowManager.resize(windowSize.first, windowSize.second);
+				m_rendererManager.setViewport(m_windowManager.getWindow());
 			});
 	}
 }

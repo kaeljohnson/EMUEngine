@@ -11,7 +11,7 @@ int main(int argc, char* args[])
 
 	Engine::Application* ptrAppInstance = Engine::Application::GetInstance();
 
-	ptrAppInstance->SetSimulation(0.0f, 9.8f, 1.0f / 60.0f, 20);
+	ptrAppInstance->SetSimulation(0.0f, 9.8f, 1.0f / 60.0f, 10);
 
 	AppManagementLayer appLayer("App management layer");
 	Engine::Layer testLayer("Test Layer 1");
