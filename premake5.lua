@@ -38,7 +38,9 @@ project "v1"
 	libdirs
 	{
 		"%{prj.name}/external/vcpkg/installed/x64-windows/lib",
-		"%{prj.name}/external/box2d/build/bin/Debug"
+		"%{prj.name}/external/box2d/build/bin/Debug",
+		"%{prj.name}/external/box2d/build/bin/Release",
+		"%{prj.name}/external/box2d/build/bin/Dist"
 	}
 
 	links
