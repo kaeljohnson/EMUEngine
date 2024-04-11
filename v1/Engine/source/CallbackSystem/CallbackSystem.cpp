@@ -19,7 +19,7 @@ namespace Engine
     {
         if (instance == nullptr)
         {
-            ENGINE_CRITICAL("Callback system not initialized!");
+            ENGINE_CRITICAL_D("Callback system not initialized!");
             return;
         }
 
@@ -30,7 +30,7 @@ namespace Engine
     {
         if (instance == nullptr)
         {
-			ENGINE_CRITICAL("Callback system not initialized!");
+			ENGINE_CRITICAL_D("Callback system not initialized!");
 			return;
 		}
 

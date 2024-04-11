@@ -26,7 +26,7 @@ namespace Engine
 		*/
 
 		Logger::Init();
-		ENGINE_TRACE("Logger initialized!");
+		ENGINE_TRACE_D("Logger initialized!");
 
 		if (!IMG_INIT(IMG_INIT_PNG))
 			ENGINE_CRITICAL("IMG Init failed! SDL_Error: {}", SDL_GetError());

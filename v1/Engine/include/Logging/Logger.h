@@ -16,6 +16,32 @@ namespace Engine
 		inline static std::shared_ptr<spdlog::logger>& getClientLogger() { return s_ClientLogger; }
 	};
 
+#if defined(DEBUG)
+	#define ENGINE_TRACE_D(...)	   ::Engine::Logger::getEngineLogger()->trace(__VA_ARGS__)
+	#define ENGINE_INFO_D(...)	   ::Engine::Logger::getEngineLogger()->info(__VA_ARGS__)
+	#define ENGINE_WARN_D(...)	   ::Engine::Logger::getEngineLogger()->warn(__VA_ARGS__)
+	#define ENGINE_ERROR_D(...)	   ::Engine::Logger::getEngineLogger()->error(__VA_ARGS__)
+	#define ENGINE_CRITICAL_D(...) ::Engine::Logger::getEngineLogger()->critical(__VA_ARGS__)
+
+	#define CLIENT_TRACE_D(...)	   ::Engine::Logger::getClientLogger()->trace(__VA_ARGS__)
+	#define CLIENT_INFO_D(...)	   ::Engine::Logger::getClientLogger()->info(__VA_ARGS__)
+	#define CLIENT_WARN_D(...)	   ::Engine::Logger::getClientLogger()->warn(__VA_ARGS__)
+	#define CLIENT_ERROR_D(...)	   ::Engine::Logger::getClientLogger()->error(__VA_ARGS__)
+	#define CLIENT_CRITICAL_D(...) ::Engine::Logger::getClientLogger()->critical(__VA_ARGS__)
+#elif defined(NDEBUG)
+	#define ENGINE_TRACE_D(...)	 ((void)0)
+	#define ENGINE_INFO_D(...)	 ((void)0)
+	#define ENGINE_WARN_D(...)	 ((void)0)
+	#define ENGINE_ERROR_D(...)	 ((void)0)
+	#define ENGINE_CRITICAL_D(...) ((void)0)
+
+	#define CLIENT_TRACE_D(...)	 ((void)0)
+	#define CLIENT_INFO_D(...)	 ((void)0)
+	#define CLIENT_WARN_D(...)	 ((void)0)
+	#define CLIENT_ERROR_D(...)	 ((void)0)
+	#define CLIENT_CRITICAL_D(...) ((void)0)
+#endif
+
 	#define ENGINE_TRACE(...)    ::Engine::Logger::getEngineLogger()->trace(__VA_ARGS__)
 	#define ENGINE_INFO(...)     ::Engine::Logger::getEngineLogger()->info(__VA_ARGS__)
 	#define ENGINE_WARN(...)     ::Engine::Logger::getEngineLogger()->warn(__VA_ARGS__)

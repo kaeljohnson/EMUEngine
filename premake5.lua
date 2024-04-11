@@ -57,9 +57,12 @@ project "v1"
 
 	filter "configurations:Debug"
 		symbols "On"
+		defines { "DEBUG"}
 
 	filter "configurations:Release"
 		optimize "On"
+		defines { "NDEBUG"}
 
 	filter "configurations:Dist"
 		optimize "On"
+		defines { "NDEBUG" }

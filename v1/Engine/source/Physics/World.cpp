@@ -23,7 +23,7 @@ namespace Engine
 		box.setBody( m_world.CreateBody(&box.getBodyDef()) );
 		box.createFixture();
 
-		ENGINE_INFO("Box added to world at position: {0}, {1}. With width: {2}, height: {3}",
+		ENGINE_INFO_D("Box added to world at position: {0}, {1}. With width: {2}, height: {3}",
 			box.getCenterXInMeters(), box.getCenterYInMeters(), box.getWidthInMeters(), box.getHeightInMeters());
 	}
 
