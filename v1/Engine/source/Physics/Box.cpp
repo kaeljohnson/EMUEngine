@@ -22,21 +22,21 @@ namespace Engine
 			m_fixtureDef.density = 0;
 			m_fixtureDef.friction = 0;
 			m_bodyDef.fixedRotation = true;
-			ENGINE_TRACE("Creating static body.");
+			ENGINE_TRACE_D("Creating static body.");
 			break;
 		case DYNAMIC:
 			m_bodyDef.type = b2_dynamicBody;
 			m_fixtureDef.density = density;
 			m_fixtureDef.friction = friction;
 			m_bodyDef.fixedRotation = false;
-			ENGINE_TRACE("Creating dynamic body.");
+			ENGINE_TRACE_D("Creating dynamic body.");
 			break;
 		default:
 			m_bodyDef.type = b2_staticBody;
 			m_fixtureDef.density = 0;
 			m_fixtureDef.friction = 0;
 			m_bodyDef.fixedRotation = true;
-			ENGINE_WARN("Invalid body type. Creating static body.");
+			ENGINE_WARN_D("Invalid body type. Creating static body.");
 			break;
 		}
 
@@ -44,7 +44,7 @@ namespace Engine
 		m_shape.SetAsBox(m_halfWidthInMeters, m_halfHeightInMeters);
 		m_fixtureDef.shape = &m_shape;
 
-		ENGINE_INFO("Box created at position: {0}, {1}. With width: {2}, height: {3}", 
+		ENGINE_INFO_D("Box created at position: {0}, {1}. With width: {2}, height: {3}", 
 			startingXInMeters, startingYInMeters, m_widthInMeters, m_heightInMeters);
 	}
 

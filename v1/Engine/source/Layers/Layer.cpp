@@ -16,7 +16,7 @@ namespace Engine
 	 
 	void Layer::AddToWorld()
 	{
-		ENGINE_TRACE("Adding layer {} to the world.", m_name);
+		ENGINE_TRACE_D("Adding layer {} to the world.", m_name);
 
 		for (GameObject* gameObject : m_gameObjects)
 		{
@@ -26,7 +26,7 @@ namespace Engine
 
 	void Layer::RemoveFromWorld()
 	{
-		ENGINE_TRACE("Removing layer {} from the world.", m_name);
+		ENGINE_TRACE_D("Removing layer {} from the world.", m_name);
 
 		// Need to remove all game objects inside the layer from the world. May need to be careful with how
 		// objects are removed due to box2d actively using the object during the world step.
@@ -38,11 +38,11 @@ namespace Engine
 		}
 	};
 
-	void Layer::OnAttach() { ENGINE_TRACE("Inside layer {} attach function.", m_name); };
-	void Layer::OnDetach() { ENGINE_TRACE("Inside layer {} detach function.", m_name); };
-	void Layer::Free() { ENGINE_TRACE("Freeing layer {}.", m_name); /*Depending on clients use case they may need "delete layer" here.*/ };
-	void Layer::OnUpdate() { ENGINE_TRACE("Update layer {}", m_name); };
-	void Layer::ProcessEvent(Event& e) { ENGINE_TRACE("Process event for layer {}", m_name); };
+	void Layer::OnAttach() { ENGINE_TRACE_D("Inside layer {} attach function.", m_name); };
+	void Layer::OnDetach() { ENGINE_TRACE_D("Inside layer {} detach function.", m_name); };
+	void Layer::Free() { ENGINE_TRACE_D("Freeing layer {}.", m_name); /*Depending on clients use case they may need "delete layer" here.*/ };
+	void Layer::OnUpdate() { ENGINE_TRACE_D("Update layer {}", m_name); };
+	void Layer::ProcessEvent(Event& e) { ENGINE_TRACE_D("Process event for layer {}", m_name); };
 
 	const std::string& Layer::GetName() const { return m_name; }
 

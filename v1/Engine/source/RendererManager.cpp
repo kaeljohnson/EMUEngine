@@ -63,20 +63,6 @@ namespace Engine
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
 
-		// The x and y coordinates correspond to the coordinates on the screen in pixels. 
-		// The width and height are the width and height of the rect we want to render.
-
-		if (gameObject->GetTexture() == nullptr)
-		{
-			ENGINE_CRITICAL("Texture is nullptr. Cannot render GameObject.");
-			ptrICallbackSystem->TriggerCallback(Type::EndApplication, std::monostate{});
-		}
-		if (gameObject->getBody() == nullptr)
-		{
-			ENGINE_CRITICAL("Body is nullptr. Cannot render GameObject.");
-			ptrICallbackSystem->TriggerCallback(Type::EndApplication, std::monostate{});
-		}
-
 		SDLRect dst
 		{
 			// This rect will eventually be the outline of the texture we want to render,

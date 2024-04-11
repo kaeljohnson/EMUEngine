@@ -28,7 +28,7 @@ namespace Engine
 		SDL_DisplayMode displayMode;
 		if (SDL_GET_DESKTOP_DISPLAY_MODE(0, &displayMode) != 0)
 		{
-			ENGINE_CRITICAL("Get desktop display mode failed: {}", SDL_GetError());
+			ENGINE_CRITICAL_D("Get desktop display mode failed: {}", SDL_GetError());
 		}
 
 		m_fullscreenWidth = displayMode.w;
@@ -52,7 +52,7 @@ namespace Engine
 
 	void WindowManager::resize(const int newWindowWidth, const int newWindowHeight)
 	{
-		ENGINE_TRACE("{}, {}", newWindowWidth, newWindowHeight);
+		ENGINE_TRACE_D("{}, {}", newWindowWidth, newWindowHeight);
 
 		if (newWindowWidth < m_fullscreenWidth / 2 && newWindowHeight < m_fullscreenHeight / 2)
 		{

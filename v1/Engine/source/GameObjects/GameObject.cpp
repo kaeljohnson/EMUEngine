@@ -17,7 +17,7 @@ namespace Engine
 		m_visible(visible), m_fixed(fixed), m_collidable(collidable),
 		m_texture(texture)
 	{
-		ENGINE_INFO("GameObject created at: ({0}, {1})", startingX, startingY);
+		ENGINE_INFO_D("GameObject created at: ({0}, {1})", startingX, startingY);
 	}
 
 	Texture* GameObject::GetTexture()

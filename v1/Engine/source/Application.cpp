@@ -35,7 +35,7 @@ namespace Engine
 		m_world.SetVelocityIterations(6);
 		m_world.SetPositionIterations(2);
 
-		ENGINE_INFO("Client creating simulation with gravity: ({}, {}) and time step: {}", gravityX, gravityY, timeStep);
+		ENGINE_INFO_D("Client creating simulation with gravity: ({}, {}) and time step: {}", gravityX, gravityY, timeStep);
 	}
 
 	Application* Application::GetInstance()
@@ -48,7 +48,7 @@ namespace Engine
 		
 		// Don't want client to reference 
 		// multiple instances of the application.
-		ENGINE_CRITICAL("Warning! Instance of application already exists. Multiple usage only recommended for testing.");
+		ENGINE_CRITICAL_D("Warning! Instance of application already exists. Multiple usage only recommended for testing.");
 		return instance;
 	}
 
@@ -57,18 +57,18 @@ namespace Engine
 
 		for (auto& layer : m_layerStack)
 		{
-			ENGINE_TRACE("Layer: {}", layer->GetName());
+			ENGINE_TRACE_D("Layer: {}", layer->GetName());
 		}
 
 		ENGINE_INFO("Application running!");
 
-		if (m_layerStack.size() > 1)
+		if (m_layerStack.size() > 0)
 		{
-			ENGINE_TRACE("Layer stack size: {}", m_layerStack.size());
+			ENGINE_TRACE_D("Layer stack size: {}", m_layerStack.size());
 		}
 		else
 		{
-			ENGINE_CRITICAL("Layer stack is empty! Application must have at least two layers to be valid!");
+			ENGINE_CRITICAL_D("Layer stack is empty! Application must have at least one layers to be valid!");
 			End();
 		}
 
@@ -171,7 +171,7 @@ namespace Engine
 
 			if (!currentEvent.Handled)
 			{
-				ENGINE_TRACE("Unhandled Event: {}", static_cast<int>(currentEvent.Type));
+				ENGINE_TRACE_D("Unhandled Event: {}", static_cast<int>(currentEvent.Type));
 			}
 
 			m_eventQ.pop();
