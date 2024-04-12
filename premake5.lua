@@ -30,6 +30,7 @@ project "v1"
 
 	includedirs
 	{
+		"%{prj.name}/Engine",
 		"%{prj.name}/external/vcpkg/installed/x64-windows/include",
 		"%{prj.name}/external/spdlog/include",
 		"%{prj.name}/external/box2d/include"

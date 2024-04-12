@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../include/EngineIncludes.h"
+#include <Engine.h>
 #include "../include/Layers/AppManagementLayer.h"
 
 int main(int argc, char* args[])

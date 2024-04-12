@@ -1,6 +1,8 @@
 #pragma once
 
-#include "../EngineIncludes.h"
+#include <string>
+
+#include <Engine.h>
 
 // Example of client defined layer. Controls the application 
 // lifecycle along with some window events.
