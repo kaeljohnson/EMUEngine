@@ -1,4 +1,5 @@
 #pragma once
+#include "../Core.h"
 
 #include "../Logging/Logger.h"
 #include "box2d/box2d.h"

@@ -1,0 +1,755 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Dist|x64">
+      <Configuration>Dist</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{ECE6870B-58F0-877C-E16B-9E7C4D74937C}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Emu</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\bin\Debug-x86_64\Emu\</OutDir>
+    <IntDir>..\bin-int\Debug-x86_64\Emu\</IntDir>
+    <TargetName>Emu</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\bin\Release-x86_64\Emu\</OutDir>
+    <IntDir>..\bin-int\Release-x86_64\Emu\</IntDir>
+    <TargetName>Emu</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\bin\Dist-x86_64\Emu\</OutDir>
+    <IntDir>..\bin-int\Dist-x86_64\Emu\</IntDir>
+    <TargetName>Emu</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>EMU_BUILD_DLL;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>external\vcpkg\installed\x64-windows\include;external\spdlog\include;external\box2d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;\manual-link\SDL2main.lib;SDL2_image.lib;box2d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>..\bin\Debug-x86_64\Emu\Emu.lib</ImportLibrary>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST ..\bin\Debug-x86_64\Emu\Emu.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-x86_64\Emu\Emu.dll ..\bin\Debug-x86_64\GameV1 || echo Copy operation failed! &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-x86_64\Emu\Emu.dll ..\bin\Debug-x86_64\GameV1 || echo Copy operation failed! &gt; nul)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>EMU_BUILD_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>external\vcpkg\installed\x64-windows\include;external\spdlog\include;external\box2d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>SDL2.lib;\manual-link\SDL2main.lib;SDL2_image.lib;box2d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>..\bin\Release-x86_64\Emu\Emu.lib</ImportLibrary>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST ..\bin\Release-x86_64\Emu\Emu.dll\ (xcopy /Q /E /Y /I ..\bin\Release-x86_64\Emu\Emu.dll ..\bin\Release-x86_64\GameV1 || echo Copy operation failed! &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-x86_64\Emu\Emu.dll ..\bin\Release-x86_64\GameV1 || echo Copy operation failed! &gt; nul)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>EMU_BUILD_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>external\vcpkg\installed\x64-windows\include;external\spdlog\include;external\box2d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>SDL2.lib;\manual-link\SDL2main.lib;SDL2_image.lib;box2d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>..\bin\Dist-x86_64\Emu\Emu.lib</ImportLibrary>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST ..\bin\Dist-x86_64\Emu\Emu.dll\ (xcopy /Q /E /Y /I ..\bin\Dist-x86_64\Emu\Emu.dll ..\bin\Dist-x86_64\GameV1 || echo Copy operation failed! &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Dist-x86_64\Emu\Emu.dll ..\bin\Dist-x86_64\GameV1 || echo Copy operation failed! &gt; nul)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Engine.h" />
+    <ClInclude Include="external\box2d\extern\glad\include\KHR\khrplatform.h" />
+    <ClInclude Include="external\box2d\extern\glad\include\glad\gl.h" />
+    <ClInclude Include="external\box2d\extern\glfw\include\GLFW\glfw3.h" />
+    <ClInclude Include="external\box2d\extern\glfw\include\GLFW\glfw3native.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\cocoa_joystick.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\cocoa_platform.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\egl_context.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\glfw_config.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\glx_context.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\internal.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\linux_joystick.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\mappings.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\nsgl_context.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\null_joystick.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\null_platform.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\osmesa_context.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\posix_thread.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\posix_time.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\wgl_context.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\win32_joystick.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\win32_platform.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\wl_platform.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\x11_platform.h" />
+    <ClInclude Include="external\box2d\extern\glfw\src\xkb_unicode.h" />
+    <ClInclude Include="external\box2d\extern\imgui\imconfig.h" />
+    <ClInclude Include="external\box2d\extern\imgui\imgui.h" />
+    <ClInclude Include="external\box2d\extern\imgui\imgui_internal.h" />
+    <ClInclude Include="external\box2d\extern\imgui\imstb_rectpack.h" />
+    <ClInclude Include="external\box2d\extern\imgui\imstb_textedit.h" />
+    <ClInclude Include="external\box2d\extern\imgui\imstb_truetype.h" />
+    <ClInclude Include="external\box2d\extern\sajson\sajson.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_api.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_block_allocator.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_body.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_broad_phase.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_chain_shape.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_circle_shape.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_collision.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_common.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_contact.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_contact_manager.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_distance.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_distance_joint.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_draw.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_dynamic_tree.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_edge_shape.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_fixture.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_friction_joint.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_gear_joint.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_growable_stack.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_joint.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_math.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_motor_joint.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_mouse_joint.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_polygon_shape.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_prismatic_joint.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_pulley_joint.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_revolute_joint.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_rope.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_settings.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_shape.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_stack_allocator.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_time_of_impact.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_time_step.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_timer.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_types.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_weld_joint.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_wheel_joint.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_world.h" />
+    <ClInclude Include="external\box2d\include\box2d\b2_world_callbacks.h" />
+    <ClInclude Include="external\box2d\include\box2d\box2d.h" />
+    <ClInclude Include="external\box2d\src\dynamics\b2_chain_circle_contact.h" />
+    <ClInclude Include="external\box2d\src\dynamics\b2_chain_polygon_contact.h" />
+    <ClInclude Include="external\box2d\src\dynamics\b2_circle_contact.h" />
+    <ClInclude Include="external\box2d\src\dynamics\b2_contact_solver.h" />
+    <ClInclude Include="external\box2d\src\dynamics\b2_edge_circle_contact.h" />
+    <ClInclude Include="external\box2d\src\dynamics\b2_edge_polygon_contact.h" />
+    <ClInclude Include="external\box2d\src\dynamics\b2_island.h" />
+    <ClInclude Include="external\box2d\src\dynamics\b2_polygon_circle_contact.h" />
+    <ClInclude Include="external\box2d\src\dynamics\b2_polygon_contact.h" />
+    <ClInclude Include="external\box2d\testbed\draw.h" />
+    <ClInclude Include="external\box2d\testbed\imgui_impl_glfw.h" />
+    <ClInclude Include="external\box2d\testbed\imgui_impl_opengl3.h" />
+    <ClInclude Include="external\box2d\testbed\settings.h" />
+    <ClInclude Include="external\box2d\testbed\test.h" />
+    <ClInclude Include="external\box2d\unit-test\doctest.h" />
+    <ClInclude Include="external\spdlog\bench\utils.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\async.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\async_logger-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\async_logger.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\cfg\argv.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\cfg\env.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\cfg\helpers-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\cfg\helpers.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\common-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\common.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\backtracer-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\backtracer.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\circular_q.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\console_globals.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\file_helper-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\file_helper.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\fmt_helper.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\log_msg-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\log_msg.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\log_msg_buffer-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\log_msg_buffer.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\mpmc_blocking_q.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\null_mutex.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\os-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\os.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\periodic_worker-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\periodic_worker.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\registry-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\registry.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\synchronous_factory.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\tcp_client-windows.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\tcp_client.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\thread_pool-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\thread_pool.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\udp_client-windows.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\udp_client.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\details\windows_include.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bin_to_hex.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bundled\args.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bundled\chrono.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bundled\color.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bundled\compile.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bundled\core.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bundled\format-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bundled\format.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bundled\locale.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bundled\os.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bundled\ostream.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bundled\printf.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bundled\ranges.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bundled\std.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\bundled\xchar.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\chrono.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\compile.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\fmt.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\ostr.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\ranges.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\std.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fmt\xchar.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\formatter.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\fwd.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\logger-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\logger.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\pattern_formatter-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\pattern_formatter.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\android_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\ansicolor_sink-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\ansicolor_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\base_sink-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\base_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\basic_file_sink-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\basic_file_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\callback_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\daily_file_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\dist_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\dup_filter_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\hourly_file_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\kafka_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\mongo_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\msvc_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\null_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\ostream_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\qt_sinks.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\ringbuffer_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\rotating_file_sink-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\rotating_file_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\sink-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\stdout_color_sinks-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\stdout_color_sinks.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\stdout_sinks-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\stdout_sinks.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\syslog_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\systemd_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\tcp_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\udp_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\win_eventlog_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\wincolor_sink-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\sinks\wincolor_sink.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\spdlog-inl.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\spdlog.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\stopwatch.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\tweakme.h" />
+    <ClInclude Include="external\spdlog\include\spdlog\version.h" />
+    <ClInclude Include="external\spdlog\tests\includes.h" />
+    <ClInclude Include="external\spdlog\tests\test_sink.h" />
+    <ClInclude Include="external\spdlog\tests\utils.h" />
+    <ClInclude Include="external\vcpkg\buildtrees\detect_compiler\x64-windows-rel\CMakeFiles\ShowIncludes\foo.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_assert.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_atomic.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_audio.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_bits.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_blendmode.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_clipboard.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_config.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_copying.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_cpuinfo.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_egl.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_endian.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_error.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_events.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_filesystem.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_gamecontroller.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_gesture.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_guid.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_haptic.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_hidapi.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_hints.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_image.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_joystick.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_keyboard.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_keycode.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_loadso.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_locale.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_log.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_main.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_messagebox.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_metal.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_misc.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_mouse.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_mutex.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_name.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_opengl.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_opengl_glext.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_opengles.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_opengles2.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_opengles2_gl2.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_opengles2_gl2ext.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_opengles2_gl2platform.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_opengles2_khrplatform.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_pixels.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_platform.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_power.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_quit.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_rect.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_render.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_revision.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_rwops.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_scancode.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_sensor.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_shape.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_stdinc.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_surface.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_system.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_syswm.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_test.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_test_assert.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_test_common.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_test_compare.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_test_crc32.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_test_font.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_test_fuzzer.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_test_harness.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_test_images.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_test_log.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_test_md5.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_test_memory.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_test_random.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_thread.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_timer.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_touch.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_types.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_version.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_video.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\SDL_vulkan.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\begin_code.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\SDL2\close_code.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\libpng16\png.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\libpng16\pngconf.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\libpng16\pnglibconf.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\png.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\pngconf.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\pnglibconf.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\zconf.h" />
+    <ClInclude Include="external\vcpkg\installed\x64-windows\include\zlib.h" />
+    <ClInclude Include="external\vcpkg\packages\libpng_x64-windows\include\libpng16\png.h" />
+    <ClInclude Include="external\vcpkg\packages\libpng_x64-windows\include\libpng16\pngconf.h" />
+    <ClInclude Include="external\vcpkg\packages\libpng_x64-windows\include\libpng16\pnglibconf.h" />
+    <ClInclude Include="external\vcpkg\packages\libpng_x64-windows\include\png.h" />
+    <ClInclude Include="external\vcpkg\packages\libpng_x64-windows\include\pngconf.h" />
+    <ClInclude Include="external\vcpkg\packages\libpng_x64-windows\include\pnglibconf.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2-image_x64-windows\include\SDL2\SDL_image.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_assert.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_atomic.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_audio.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_bits.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_blendmode.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_clipboard.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_config.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_copying.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_cpuinfo.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_egl.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_endian.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_error.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_events.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_filesystem.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_gamecontroller.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_gesture.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_guid.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_haptic.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_hidapi.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_hints.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_joystick.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_keyboard.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_keycode.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_loadso.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_locale.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_log.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_main.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_messagebox.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_metal.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_misc.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_mouse.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_mutex.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_name.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_opengl.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_opengl_glext.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_opengles.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_opengles2.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_opengles2_gl2.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_opengles2_gl2ext.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_opengles2_gl2platform.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_opengles2_khrplatform.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_pixels.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_platform.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_power.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_quit.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_rect.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_render.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_revision.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_rwops.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_scancode.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_sensor.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_shape.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_stdinc.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_surface.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_system.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_syswm.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_test.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_test_assert.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_test_common.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_test_compare.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_test_crc32.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_test_font.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_test_fuzzer.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_test_harness.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_test_images.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_test_log.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_test_md5.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_test_memory.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_test_random.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_thread.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_timer.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_touch.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_types.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_version.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_video.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\SDL_vulkan.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\begin_code.h" />
+    <ClInclude Include="external\vcpkg\packages\sdl2_x64-windows\include\SDL2\close_code.h" />
+    <ClInclude Include="external\vcpkg\packages\zlib_x64-windows\include\zconf.h" />
+    <ClInclude Include="external\vcpkg\packages\zlib_x64-windows\include\zlib.h" />
+    <ClInclude Include="external\vcpkg\ports\b64\b64_dynamic_config.h" />
+    <ClInclude Include="external\vcpkg\ports\b64\b64_static_config.h" />
+    <ClInclude Include="external\vcpkg\ports\cgns\cgnsconfig.h" />
+    <ClInclude Include="external\vcpkg\ports\chartdir\chartdir.h" />
+    <ClInclude Include="external\vcpkg\ports\cityhash\config.h" />
+    <ClInclude Include="external\vcpkg\ports\clapack\arith_linux64.h" />
+    <ClInclude Include="external\vcpkg\ports\clapack\arith_osx.h" />
+    <ClInclude Include="external\vcpkg\ports\clapack\arith_win32.h" />
+    <ClInclude Include="external\vcpkg\ports\clapack\arith_win64.h" />
+    <ClInclude Include="external\vcpkg\ports\freeimage\FreeImageConfig-dynamic.h" />
+    <ClInclude Include="external\vcpkg\ports\freeimage\FreeImageConfig-static.h" />
+    <ClInclude Include="external\vcpkg\ports\gettimeofday\gettimeofday.h" />
+    <ClInclude Include="external\vcpkg\ports\graphicsmagick\magick_types.h" />
+    <ClInclude Include="external\vcpkg\ports\gts\predicates_init.h" />
+    <ClInclude Include="external\vcpkg\ports\igraph\arith_osx.h" />
+    <ClInclude Include="external\vcpkg\ports\igraph\arith_win32.h" />
+    <ClInclude Include="external\vcpkg\ports\igraph\arith_win64.h" />
+    <ClInclude Include="external\vcpkg\ports\libaiff\config.h" />
+    <ClInclude Include="external\vcpkg\ports\libmspack\config.h" />
+    <ClInclude Include="external\vcpkg\ports\libu2f-server\u2f-server-version.h" />
+    <ClInclude Include="external\vcpkg\ports\libuuid\config.linux.h" />
+    <ClInclude Include="external\vcpkg\ports\modp-base64\modp_b64_data.h" />
+    <ClInclude Include="external\vcpkg\ports\openblas\openblas_common.h" />
+    <ClInclude Include="external\vcpkg\ports\ragel\config.h" />
+    <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\CallbackSystem\CallbackSystem.h" />
+    <ClInclude Include="include\CallbackSystem\CallbackType.h" />
+    <ClInclude Include="include\Core.h" />
+    <ClInclude Include="include\Events\Event.h" />
+    <ClInclude Include="include\Events\EventManager.h" />
+    <ClInclude Include="include\GameObjects\GameObject.h" />
+    <ClInclude Include="include\Init.h" />
+    <ClInclude Include="include\Layers\Layer.h" />
+    <ClInclude Include="include\Layers\LayerStack.h" />
+    <ClInclude Include="include\Logging\Logger.h" />
+    <ClInclude Include="include\Physics\BodyTypes.h" />
+    <ClInclude Include="include\Physics\Box.h" />
+    <ClInclude Include="include\Physics\ConversionFunctions.h" />
+    <ClInclude Include="include\Physics\World.h" />
+    <ClInclude Include="include\RendererManager.h" />
+    <ClInclude Include="include\SDLWrapper\SDLWrapper.h" />
+    <ClInclude Include="include\Textures\Texture.h" />
+    <ClInclude Include="include\WindowManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="external\box2d\build\CMakeFiles\3.29.1\CompilerIdCXX\CMakeCXXCompilerId.cpp" />
+    <ClCompile Include="external\box2d\extern\imgui\imgui.cpp" />
+    <ClCompile Include="external\box2d\extern\imgui\imgui_demo.cpp" />
+    <ClCompile Include="external\box2d\extern\imgui\imgui_draw.cpp" />
+    <ClCompile Include="external\box2d\extern\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="external\box2d\extern\sajson\sajson.cpp" />
+    <ClCompile Include="external\box2d\src\collision\b2_broad_phase.cpp" />
+    <ClCompile Include="external\box2d\src\collision\b2_chain_shape.cpp" />
+    <ClCompile Include="external\box2d\src\collision\b2_circle_shape.cpp" />
+    <ClCompile Include="external\box2d\src\collision\b2_collide_circle.cpp" />
+    <ClCompile Include="external\box2d\src\collision\b2_collide_edge.cpp" />
+    <ClCompile Include="external\box2d\src\collision\b2_collide_polygon.cpp" />
+    <ClCompile Include="external\box2d\src\collision\b2_collision.cpp" />
+    <ClCompile Include="external\box2d\src\collision\b2_distance.cpp" />
+    <ClCompile Include="external\box2d\src\collision\b2_dynamic_tree.cpp" />
+    <ClCompile Include="external\box2d\src\collision\b2_edge_shape.cpp" />
+    <ClCompile Include="external\box2d\src\collision\b2_polygon_shape.cpp" />
+    <ClCompile Include="external\box2d\src\collision\b2_time_of_impact.cpp" />
+    <ClCompile Include="external\box2d\src\common\b2_block_allocator.cpp" />
+    <ClCompile Include="external\box2d\src\common\b2_draw.cpp" />
+    <ClCompile Include="external\box2d\src\common\b2_math.cpp" />
+    <ClCompile Include="external\box2d\src\common\b2_settings.cpp" />
+    <ClCompile Include="external\box2d\src\common\b2_stack_allocator.cpp" />
+    <ClCompile Include="external\box2d\src\common\b2_timer.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_body.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_chain_circle_contact.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_chain_polygon_contact.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_circle_contact.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_contact.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_contact_manager.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_contact_solver.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_distance_joint.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_edge_circle_contact.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_edge_polygon_contact.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_fixture.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_friction_joint.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_gear_joint.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_island.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_joint.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_motor_joint.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_mouse_joint.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_polygon_circle_contact.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_polygon_contact.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_prismatic_joint.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_pulley_joint.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_revolute_joint.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_weld_joint.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_wheel_joint.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_world.cpp" />
+    <ClCompile Include="external\box2d\src\dynamics\b2_world_callbacks.cpp" />
+    <ClCompile Include="external\box2d\src\rope\b2_rope.cpp" />
+    <ClCompile Include="external\box2d\testbed\draw.cpp" />
+    <ClCompile Include="external\box2d\testbed\imgui_impl_glfw.cpp" />
+    <ClCompile Include="external\box2d\testbed\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="external\box2d\testbed\main.cpp" />
+    <ClCompile Include="external\box2d\testbed\settings.cpp" />
+    <ClCompile Include="external\box2d\testbed\test.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\add_pair.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\apply_force.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\benchmark_boxes.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\body_types.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\box_stack.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\breakable.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\bridge.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\bullet_test.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\cantilever.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\car.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\chain.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\chain_problem.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\character_collision.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\circle_stack.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\collision_filtering.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\collision_processing.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\compound_shapes.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\confined.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\continuous_test.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\convex_hull.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\conveyor_belt.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\distance_joint.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\distance_test.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\dominos.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\dump_loader.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\dynamic_tree.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\edge_shapes.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\edge_test.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\friction.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\gear_joint.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\heavy1.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\heavy2.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\mobile_balanced.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\mobile_unbalanced.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\motor_joint.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\pinball.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\platformer.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\polygon_collision.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\polygon_shapes.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\prismatic_joint.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\pulley_joint.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\pyramid.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\ray_cast.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\restitution.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\revolute_joint.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\rope.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\sensor.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\shape_cast.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\shape_editing.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\skier.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\slider_crank_1.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\slider_crank_2.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\theo_jansen.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\tiles.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\time_of_impact.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\tumbler.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\web.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\wheel_joint.cpp" />
+    <ClCompile Include="external\box2d\testbed\tests\wrecking_ball.cpp" />
+    <ClCompile Include="external\box2d\unit-test\collision_test.cpp" />
+    <ClCompile Include="external\box2d\unit-test\hello_world.cpp" />
+    <ClCompile Include="external\box2d\unit-test\joint_test.cpp" />
+    <ClCompile Include="external\box2d\unit-test\math_test.cpp" />
+    <ClCompile Include="external\box2d\unit-test\world_test.cpp" />
+    <ClCompile Include="external\spdlog\bench\async_bench.cpp" />
+    <ClCompile Include="external\spdlog\bench\bench.cpp" />
+    <ClCompile Include="external\spdlog\bench\formatter-bench.cpp" />
+    <ClCompile Include="external\spdlog\bench\latency.cpp" />
+    <ClCompile Include="external\spdlog\example\example.cpp" />
+    <ClCompile Include="external\spdlog\src\async.cpp" />
+    <ClCompile Include="external\spdlog\src\bundled_fmtlib_format.cpp" />
+    <ClCompile Include="external\spdlog\src\cfg.cpp" />
+    <ClCompile Include="external\spdlog\src\color_sinks.cpp" />
+    <ClCompile Include="external\spdlog\src\file_sinks.cpp" />
+    <ClCompile Include="external\spdlog\src\spdlog.cpp" />
+    <ClCompile Include="external\spdlog\src\stdout_sinks.cpp" />
+    <ClCompile Include="external\spdlog\tests\main.cpp">
+      <ObjectFileName>$(IntDir)\main1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="external\spdlog\tests\test_async.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_backtrace.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_bin_to_hex.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_cfg.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_circular_q.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_create_dir.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_custom_callbacks.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_daily_logger.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_dup_filter.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_errors.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_eventlog.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_file_helper.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_file_logging.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_fmt_helper.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_macros.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_misc.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_mpmc_q.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_pattern_formatter.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_registry.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_stdout_api.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_stopwatch.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_systemd.cpp" />
+    <ClCompile Include="external\spdlog\tests\test_time_point.cpp" />
+    <ClCompile Include="external\spdlog\tests\utils.cpp" />
+    <ClCompile Include="external\vcpkg\buildtrees\detect_compiler\x64-windows-rel\CMakeFiles\3.29.1\CompilerIdCXX\CMakeCXXCompilerId.cpp">
+      <ObjectFileName>$(IntDir)\CMakeCXXCompilerId1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="external\vcpkg\scripts\test_ports\vcpkg-ci-ankurvdev-embedresource\project\main.cpp">
+      <ObjectFileName>$(IntDir)\main2.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="external\vcpkg\scripts\test_ports\vcpkg-ci-soci\project\main.cpp">
+      <ObjectFileName>$(IntDir)\main3.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="source\Application.cpp" />
+    <ClCompile Include="source\CallbackSystem\CallbackSystem.cpp" />
+    <ClCompile Include="source\Events\Event.cpp" />
+    <ClCompile Include="source\Events\EventManager.cpp" />
+    <ClCompile Include="source\GameObjects\GameObject.cpp" />
+    <ClCompile Include="source\Init.cpp" />
+    <ClCompile Include="source\Layers\Layer.cpp" />
+    <ClCompile Include="source\Layers\LayerStack.cpp" />
+    <ClCompile Include="source\Logging\Logger.cpp" />
+    <ClCompile Include="source\Physics\Box.cpp" />
+    <ClCompile Include="source\Physics\World.cpp" />
+    <ClCompile Include="source\RendererManager.cpp" />
+    <ClCompile Include="source\Textures\Texture.cpp" />
+    <ClCompile Include="source\WindowManager.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

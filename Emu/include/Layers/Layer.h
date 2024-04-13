@@ -2,13 +2,14 @@
 
 #include <string>
 
+#include "../Core.h"
 #include "../Events/Event.h"
 #include "../GameObjects/GameObject.h"
 #include "../CallbackSystem/CallbackSystem.h"
 
 namespace Engine
 {
-	class Layer
+	class EMU_API Layer
 	{
 	protected:
 		std::string m_name;

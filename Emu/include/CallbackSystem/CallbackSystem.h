@@ -13,7 +13,7 @@ namespace Engine
     using Data = std::variant<std::monostate, const int, const float, const std::string, const std::pair<int, int>, GameObject*>;
     using Callback = std::function<void(Data)>;
 
-    class ICallbackSystem
+    class EMU_API ICallbackSystem
     {
     private:
 		static ICallbackSystem* instance;

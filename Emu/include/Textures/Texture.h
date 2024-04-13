@@ -1,8 +1,9 @@
 #pragma once
+#include "../Core.h"
 
 namespace Engine
 {
-	class Texture
+	class EMU_API Texture
 	{
 	public:
 		SDL_Texture* m_texture;

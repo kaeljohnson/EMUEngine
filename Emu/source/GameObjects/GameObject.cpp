@@ -13,7 +13,8 @@ namespace Engine
 		const float density, const float friction,
 		const bool visible, const bool fixed, const bool collidable, Texture* texture)
 		: Box(bodyType, startingX, startingY, width / 2.0f, height / 2.0f,  density, friction),
-		prevX(startingX), prevY(startingY), X(startingX), Y(startingY), m_width(width), m_height(height), m_density(density), m_friction(friction),
+		prevX(startingX), prevY(startingY), X(startingX), Y(startingY), 
+		m_width(width), m_height(height), m_density(density), m_friction(friction),
 		m_visible(visible), m_fixed(fixed), m_collidable(collidable),
 		m_texture(texture)
 	{

@@ -2,6 +2,7 @@
 
 #include <queue>
 
+#include "../Core.h"
 #include "WindowManager.h"
 #include "RendererManager.h"
 #include "Events/EventManager.h" 
@@ -14,7 +15,7 @@
 
 namespace Engine
 {
-	class Application
+	class EMU_API Application
 	{
 	private:
 		static Application* instance;

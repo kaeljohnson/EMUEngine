@@ -1,10 +1,11 @@
 #pragma once
 
+#include "../Core.h"
 #include "spdlog/spdlog.h"
 
 namespace Engine
 {
-	class Logger
+	class EMU_API Logger
 	{
 	private:
 		static std::shared_ptr<spdlog::logger> s_EngineLogger;

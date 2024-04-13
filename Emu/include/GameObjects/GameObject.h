@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Core.h"
+
 #include "../SDLWrapper/SDLWrapper.h"
 
 #include "../Events/Event.h"
@@ -9,7 +11,7 @@
 
 namespace Engine
 {
-	class GameObject : public Box
+	class EMU_API GameObject : public Box
 	{
 	private:
 		// SpriteSheet m_spriteSheet;
