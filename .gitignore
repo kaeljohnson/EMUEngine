@@ -6,7 +6,6 @@
 #folders
 vcpkg/
 bin-int/
-Emu/external/box2d/
 
 # User-specific files
 *.rsuser

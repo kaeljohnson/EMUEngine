@@ -10,6 +10,7 @@
 #include "../include/Layers/Layer.h"
 #include "../include/GameObjects/GameObject.h"
 #include "../include/Physics/Box.h"
+#include "../include/Physics/PhysicsFactory.h"
 
 namespace Engine
 {
@@ -20,9 +21,10 @@ namespace Engine
 		m_layerStack(),
 		running(false),
 		m_pixelsPerMeter(20),
-		m_timeStep(1.0f / 60.0f),
-		m_world(0.0f * m_pixelsPerMeter, 9.8f * m_pixelsPerMeter, m_timeStep, 6, 2)
+		m_timeStep(1.0f / 60.0f)
 	{
+
+		m_world = CreateWorld(0.0f * m_pixelsPerMeter, 9.8f * m_pixelsPerMeter, m_timeStep, 8, 3);
 		defineDefaultApplicationCallbacks();
 	}
 
@@ -30,10 +32,10 @@ namespace Engine
 	{
 		m_timeStep = timeStep;
 		m_pixelsPerMeter = pixelsPerMeter;
-		m_world.SetGravity(gravityX * pixelsPerMeter, gravityY * pixelsPerMeter);
-		m_world.SetTimeStep(timeStep);
-		m_world.SetVelocityIterations(6);
-		m_world.SetPositionIterations(2);
+		m_world->SetGravity(gravityX * pixelsPerMeter, gravityY * pixelsPerMeter);
+		m_world->SetTimeStep(timeStep);
+		m_world->SetVelocityIterations(6);
+		m_world->SetPositionIterations(2);
 
 		ENGINE_INFO_D("Client creating simulation with gravity: ({}, {}) and time step: {}", gravityX, gravityY, timeStep);
 	}
@@ -107,12 +109,12 @@ namespace Engine
 				{
 					for (GameObject* gameObject : *layer)
 					{
-						gameObject->prevX = gameObject->getTopLeftXInMeters();
-						gameObject->prevY = gameObject->getTopLeftYInMeters();
+						gameObject->GetPhysicsBody()->updatePrevX();
+						gameObject->GetPhysicsBody()->updatePrevY();
 					}
 				}
 
-				m_world.update();
+				m_world->update();
 
 				accumulator -= m_timeStep;
 			}
@@ -220,15 +222,17 @@ namespace Engine
 		ptrICallbackSystem->NewCallback(Type::AddToWorld, [this](Data layerEventData)
 			{
 				GameObject* gameObject = std::get<GameObject*>(layerEventData);
+				Box* ptrBox = static_cast<Box*>(gameObject->GetPhysicsBody());
 
-				m_world.addBox(*gameObject);
+				m_world->addBox(ptrBox);
 			});
 
 		ptrICallbackSystem->NewCallback(Type::RemoveFromWorld, [this](Data layerEventData)
 			{
 				GameObject* gameObject = std::get<GameObject*>(layerEventData);
+				Box* ptrBox = static_cast<Box*>(gameObject->GetPhysicsBody());
 
-				m_world.removeBox(*gameObject);
+				m_world->removeBox(ptrBox);
 			});
 
 		ptrICallbackSystem->NewCallback(Type::ResizeWindow, [this](Data data)

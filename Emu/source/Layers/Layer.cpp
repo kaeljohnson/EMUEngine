@@ -52,11 +52,11 @@ namespace Engine
 		// Collisions are more accurate when static objects are simulated first.
 		// Thus, we need to add static objects to the beginning of the list.
 
-		if (gameObject->getBodyType() == BodyType::STATIC) 
+		if (gameObject->GetPhysicsBody()->getBodyType() == BodyType::STATIC)
 		{
-			auto it = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [](const GameObject* gameObject) 
+			auto it = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [](GameObject* gameObject) 
 				{
-					return !gameObject->getBodyType();
+					return !gameObject->GetPhysicsBody()->getBodyType();
 				});
 
 			// Insert the static object before the first dynamic object.

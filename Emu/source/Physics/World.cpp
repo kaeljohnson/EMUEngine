@@ -1,5 +1,7 @@
 #pragma once
 
+#include "box2d/box2d.h"
+
 #include "../../include/Physics/World.h"
 #include "../../include/Physics/Box.h"
 #include "../../include/Logging/Logger.h"
@@ -18,18 +20,20 @@ namespace Engine
 		m_world.Step(m_deltaTime, m_velocityIterations, m_positionIterations);
 	}
 
-	void World::addBox(Box& box)
+	void World::addBox(Box* box)
 	{
-		box.setBody( m_world.CreateBody(&box.getBodyDef()) );
-		box.createFixture();
+		
+
+		box->m_body = m_world.CreateBody(&box->m_bodyDef);
+		box->createFixture();
 
 		ENGINE_INFO_D("Box added to world at position: {0}, {1}. With width: {2}, height: {3}",
-			box.getCenterXInMeters(), box.getCenterYInMeters(), box.getWidthInMeters(), box.getHeightInMeters());
+			box->getCenterXInMeters(), box->getCenterYInMeters(), box->getWidthInMeters(), box->getHeightInMeters());
 	}
 
-	void World::removeBox(Box& body)
+	void World::removeBox(Box* body)
 	{
-		m_world.DestroyBody(body.getBody());
+		m_world.DestroyBody(body->m_body);
 	}
 
 	void World::SetGravity(const float gravityX, const float gravityY)

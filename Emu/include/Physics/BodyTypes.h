@@ -2,7 +2,7 @@
 
 namespace Engine
 {
-	enum BodyType
+	enum EMU_API BodyType
 	{
 		STATIC,
 		DYNAMIC

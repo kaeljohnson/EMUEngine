@@ -15,8 +15,9 @@ project "Emu"
 
     files
     {
-        "%{prj.name}/**.h",
-        "%{prj.name}/**.cpp",
+        "{%prj.name}/public/**.h",
+        "%{prj.name}/include/**.h",
+        "%{prj.name}/source/**.cpp",
     }
 
     includedirs
@@ -25,6 +26,14 @@ project "Emu"
         "%{prj.name}/external/spdlog/include",
         "%{prj.name}/external/box2d/include"
     }
+
+    libdirs
+	{
+		"%{prj.name}/external/vcpkg/installed/x64-windows/lib",
+		"%{prj.name}/external/box2d/build/bin/Debug",
+		"%{prj.name}/external/box2d/build/bin/Release",
+		"%{prj.name}/external/box2d/build/bin/Dist"
+	}
 
     links
 	{
@@ -36,7 +45,7 @@ project "Emu"
 
     filter "system:windows"
         cppdialect "C++20"
-        staticruntime "On"
+        staticruntime "off"
         systemversion "latest"
 
         defines
@@ -46,7 +55,8 @@ project "Emu"
 
         postbuildcommands
         {
-            "{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputDirectory .. "/GameV1 || echo Copy operation failed!"
+            "if not exist ../bin/" .. outputDirectory .. "/GameV1 mkdir ../bin/" .. outputDirectory .. "/GameV1",
+            "{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputDirectory .. "/GameV1"
         }
 
 
@@ -66,6 +76,7 @@ project "GameV1"
     location "GameV1"
     kind "ConsoleApp"
     language "C++"
+    staticruntime "off"
 
     targetdir ("bin/" .. outputDirectory .. "/%{prj.name}")
     objdir ("bin-int/" .. outputDirectory .. "/%{prj.name}")
@@ -78,15 +89,22 @@ project "GameV1"
 
     includedirs
     {
-        "Emu",
+        "Emu/public",
         "Emu/external/vcpkg/installed/x64-windows/include",
         "Emu/external/spdlog/include",
-        "Emu/external/box2d/include"
     }
+
+    libdirs
+	{
+		"Emu/external/vcpkg/installed/x64-windows/lib",
+	}
 
     links
     {
-        "Emu"
+        "Emu",
+        "SDL2",
+		"/manual-link/SDL2main",
+		"SDL2_image",
     }
 
     filter "system:windows"

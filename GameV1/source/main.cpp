@@ -13,15 +13,21 @@ int main(int argc, char* args[])
 
 	ptrAppInstance->SetSimulation(0.0f, 9.8f, 1.0f / 60.0f, 10);
 
-	AppManagementLayer appLayer("App management layer");
-	Engine::Layer testLayer("Test Layer 1");
-
 	// Temp
 	Engine::Texture tempTextureRed(255, 0, 0);
 	Engine::Texture tempTextureBlue(0, 0, 265);
 
-	Engine::GameObject testGO(Engine::DYNAMIC, 63.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, true, false, true, &tempTextureRed);
-	Engine::GameObject testGround(Engine::STATIC, 63.5f, 70.0f, 120.0f, 2.0f, 0.0f, 0.0f, true, true, true, &tempTextureBlue);
+	// Maybe The physics body interface just automatically attaches the body to the world?
+	Engine::IPhysicsBody* testBody = Engine::CreatePhysicsBody(Engine::DYNAMIC, 63.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0, 0.5, true, false, true);
+	Engine::IPhysicsBody* groundBody = Engine::CreatePhysicsBody(Engine::STATIC, 63.5f, 70.0f, 120.0f, 2.0f, 0.0f, 0.0f, 0.0, 0.0, true, true, true);
+
+	// GameObject to be renamed and have a constructor that only takes
+	// a texture. Making the object exist outside the physics world.
+	Engine::GameObject testGO(testBody, &tempTextureRed);
+	Engine::GameObject testGround(groundBody, &tempTextureBlue);
+
+	AppManagementLayer appLayer("App management layer");
+	Engine::Layer testLayer("Test Layer 1");
 
 	testLayer.AddGameObject(&testGround);
 	testLayer.AddGameObject(&testGO);

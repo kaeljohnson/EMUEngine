@@ -7,6 +7,7 @@
 #include "../include/Logging/Logger.h"
 #include "../include/GameObjects/GameObject.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
+#include "../include/Physics/IPhysicsBody.h"
 
 namespace Engine
 {
@@ -63,19 +64,21 @@ namespace Engine
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
 
+		IPhysicsBody* ptrBody = gameObject->GetPhysicsBody();
+
 		SDLRect dst
 		{
 			// This rect will eventually be the outline of the texture we want to render,
 			// not the collidable object tracked by the underlying box2d body.
 
-			static_cast<int>(round((gameObject->prevX * (1.0 - interpolation) + gameObject->getTopLeftXInMeters() * interpolation) * pixelsPerMeter * SCALE)),
-			static_cast<int>(round((gameObject->prevY * (1.0 - interpolation) + gameObject->getTopLeftYInMeters() * interpolation) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((ptrBody->getPrevX() * (1.0 - interpolation) + ptrBody->getTopLeftXInMeters() * interpolation) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((ptrBody->getPrevY() * (1.0 - interpolation) + ptrBody->getTopLeftYInMeters() * interpolation) * pixelsPerMeter * SCALE)),
 			
-			static_cast<int>(round(gameObject->getWidthInMeters() * pixelsPerMeter * SCALE)),
-			static_cast<int>(round(gameObject->getHeightInMeters() * pixelsPerMeter * SCALE))
+			static_cast<int>(round(ptrBody->getWidthInMeters() * pixelsPerMeter * SCALE)),
+			static_cast<int>(round(ptrBody->getHeightInMeters() * pixelsPerMeter * SCALE))
 		};
 
-		SDL_RENDER_COPY_EX(renderer, gameObject->GetTexture()->m_texture, nullptr, &dst, gameObject->getAngleInDegrees(), nullptr, SDL_FLIP_NONE);
+		SDL_RENDER_COPY_EX(renderer, gameObject->GetTexture()->m_texture, nullptr, &dst, ptrBody->getAngleInDegrees(), nullptr, SDL_FLIP_NONE);
 	}
 
 	void RendererManager::setViewport(SDLWindow* ptrWindow)

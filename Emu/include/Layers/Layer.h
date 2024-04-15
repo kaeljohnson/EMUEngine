@@ -9,7 +9,7 @@
 
 namespace Engine
 {
-	class EMU_API Layer
+	class Layer
 	{
 	protected:
 		std::string m_name;
@@ -21,26 +21,26 @@ namespace Engine
 
 		ICallbackSystem* ptrICallbackSystem;
 	public:
-		Layer(std::string name);
-		virtual	~Layer();
+		EMU_API Layer(std::string name);
+		EMU_API virtual	~Layer();
 
 		bool isAttached;
 
 		const std::vector<GameObject*>::iterator begin() { return m_gameObjects.begin(); }
 		const std::vector<GameObject*>::iterator end() { return m_gameObjects.end(); }
 
-		void AddToWorld();
-		void RemoveFromWorld();
+		EMU_API void AddToWorld();
+		EMU_API void RemoveFromWorld();
 
-		virtual void OnAttach();
-		virtual void OnDetach();
-		virtual void Free();
-		virtual void OnUpdate();
-		virtual void ProcessEvent(Event& e);
+		EMU_API virtual void OnAttach();
+		EMU_API virtual void OnDetach();
+		EMU_API virtual void Free();
+		EMU_API virtual void OnUpdate();
+		EMU_API virtual void ProcessEvent(Event& e);
 
 		const std::string& GetName() const;
 
-		void AddGameObject(GameObject* gameObject);
-		void RemoveGameObject(GameObject* gameObject);
+		EMU_API void AddGameObject(GameObject* gameObject);
+		EMU_API void RemoveGameObject(GameObject* gameObject);
 	};
 }

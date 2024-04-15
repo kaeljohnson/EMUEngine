@@ -38,7 +38,7 @@ if not exist build\bin\%CONFIG%\ (
     echo Building %CONFIG%...
     if not exist build\ (mkdir build)
     cd build
-    cmake ..
+    cmake .. 
     cmake --build . --config %CONFIG%
     cd ..
 )

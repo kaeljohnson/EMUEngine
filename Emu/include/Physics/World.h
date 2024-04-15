@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IWorld.h"
+
 #include "box2d/box2d.h"
 #include "Box.h"
 #include "ConversionFunctions.h"
@@ -12,7 +14,7 @@ namespace Engine
 	// box2d body, to the application, they are by definition adding it to the world object. Essentially, the "game layer"
 	// will be the layer which the world lies in. Foreground layers, background layers and UI layers will adhere to separate systems.
 
-	class World
+	class World : public IWorld
 	{
 	private:
 		b2World m_world;
@@ -25,8 +27,8 @@ namespace Engine
 		World();
 		World(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations);
 		void update();
-		void addBox(Box& body);
-		void removeBox(Box& body);
+		void addBox(Box* body);
+		void removeBox(Box* body);
 
 		void SetGravity(const float gravityX, const float gravityY);
 		void SetTimeStep(const float timeStep);

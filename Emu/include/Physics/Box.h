@@ -1,10 +1,12 @@
 #pragma once
 #include "../Core.h"
 
-#include "../Logging/Logger.h"
 #include "box2d/box2d.h"
+
+#include "../Logging/Logger.h"
 #include "ConversionFunctions.h"
 #include "BodyTypes.h"
+#include "IPhysicsBody.h"
 
 namespace Engine
 {
@@ -13,9 +15,9 @@ namespace Engine
 	// is not meant to be used by the client. It is not the "entity" or "game object" class. It will not handle
 	// textures or animation. Those classes will inherit from this class.
 
-	class Box
+	class Box : public IPhysicsBody
 	{
-	private:
+	public:
 		b2Body* m_body;
 		b2BodyDef m_bodyDef;
 		b2FixtureDef m_fixtureDef;
@@ -28,29 +30,43 @@ namespace Engine
 		const float m_widthInMeters;
 		const float m_heightInMeters;
 
+		float m_prevX;
+		float m_prevY;
+		// float X;
+		// float Y;
+
+		float m_restitution;
+		float m_restitutionThreshold;
+
+		bool m_visible;
+		bool m_collidable;
+		bool m_fixed;
+
 	public:
 		Box() = default;
-		Box(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters, 
-			const float halfWidthInMeters, const float halfHeightInMeters, const float density, const float friction);
+		Box(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters,
+			const float widthInMeters, const float heightInMeters, const float density, const float friction,
+			const float restitution, const float restitutionThreshold, bool visible, bool collidable, bool fixed);
 
-		b2Body* getBody() const;
-		void setBody(b2Body* body);
-		const b2BodyDef& getBodyDef() const;
+		void createFixture() override;
 
-		void createFixture();
+		const float getPrevX() const override;
+		const float getPrevY() const override;
+		void updatePrevX() override;	
+		void updatePrevY() override;
 
-		const double getCenterXInMeters() const;
-		const double getCenterYInMeters() const;
-		const double getTopLeftXInMeters() const;
-		const double getTopLeftYInMeters() const;
+		const float getCenterXInMeters() const override;
+		const float getCenterYInMeters() const override;
+		const float getTopLeftXInMeters() const override;
+		const float getTopLeftYInMeters() const override;
 
-		const int getWidthInMeters() const; 
-		const int getHeightInMeters() const;
+		const float getWidthInMeters() const override; 
+		const float getHeightInMeters() const override;
 
-		const float getAngleInRadians() const;
-		const double getAngleInDegrees() const;
+		const float getAngleInRadians() const override;
+		const float getAngleInDegrees() const override;
 
-		const BodyType getBodyType() const;
+		const BodyType getBodyType() const override;
 		void bodyNotInWorldAlert() const;
 	};
 }

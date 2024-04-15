@@ -2,7 +2,7 @@
 
 #include <queue>
 
-#include "../Core.h"
+#include "Core.h"
 #include "WindowManager.h"
 #include "RendererManager.h"
 #include "Events/EventManager.h" 
@@ -10,12 +10,12 @@
 #include "Layers/LayerStack.h"
 #include "Layers/Layer.h"
 #include "CallbackSystem/CallbackSystem.h"
-#include "Physics/Box.h"
-#include "Physics/World.h"
+#include "Physics/IWorld.h"
+#include "Physics/PhysicsFactory.h"
 
 namespace Engine
 {
-	class EMU_API Application
+	class Application
 	{
 	private:
 		static Application* instance;
@@ -39,30 +39,32 @@ namespace Engine
 		// Hold applications layers.
 		LayerStack m_layerStack;
 
-		// World the app exists in.
-		World m_world;
+		// Interface for world where the application simulation exists within.
+		IWorld* m_world;
 
 		void processEventQueue();
 		void renderLayers(const double interpolation);
 		void defineDefaultApplicationCallbacks();
 
 	public:
-		static Application* GetInstance();
-		~Application() = default;
+		EMU_API static Application* GetInstance();
 
-		void SetSimulation(const float gravityX, const float gravityY, const float timeStep, const int pixelsPerMeter);
+		// Probably should not expose to client.
+		EMU_API ~Application() = default;
+
+		EMU_API void SetSimulation(const float gravityX, const float gravityY, const float timeStep, const int pixelsPerMeter);
 
 		// TEMP
-		SDLRenderer* GetRenderer() { return m_rendererManager.getRenderer(); }
+		EMU_API SDLRenderer* GetRenderer() { return m_rendererManager.getRenderer(); }
 
 		// Layer stack functions.
-		void PushToLayerStack(Layer* layer);
-		void PopLayerFromStack(Layer* layer);
-		void PopLayerFromStack();
+		EMU_API void PushToLayerStack(Layer* layer);
+		EMU_API void PopLayerFromStack(Layer* layer);
+		EMU_API void PopLayerFromStack();
 
 		// Application functions.
-		void Run();
-		void End();
+		EMU_API void Run();
+		EMU_API void End();
 
 		// Deleted functions to ensure our app instance cannot be copied or moved.
 		Application(const Application&) = delete;

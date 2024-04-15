@@ -1,18 +1,18 @@
 #pragma once
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
+#ifndef M_PIf
+#define M_PIf 3.14159265358979323846f
 #endif
 
 namespace Engine
 {
     inline double degreesToRadians(double degrees)
     {
-		return degrees * M_PI / 180.0f;
+		return degrees * M_PIf / 180.0f;
 	}
 
-    inline double radiansToDegrees(double radians)
+    inline float radiansToDegrees(float radians)
     {
-        return radians * 180.0 / M_PI;
+        return radians * 180.0f / M_PIf;
     }
 } 

@@ -3,48 +3,32 @@
 #include "../Core.h"
 
 #include "../SDLWrapper/SDLWrapper.h"
-
+#include "../Physics/IPhysicsBody.h"
 #include "../Events/Event.h"
-#include "../Physics/Box.h"
-#include "../Physics/BodyTypes.h"
 #include "../Textures/Texture.h"
 
 namespace Engine
 {
-	class EMU_API GameObject : public Box
+	class EMU_API GameObject
+	
 	{
 	private:
 		// SpriteSheet m_spriteSheet;
 		// State m_state;
 
-		const float m_width;
-		const float m_height;
-
-		const float m_density;
-		const float m_friction;
-
-		bool m_visible;
-		bool m_collidable;
-		bool m_fixed;
-
 		Texture* m_texture;
+		IPhysicsBody* m_physicsBody;
 
 	public:
-		double prevX;
-		double prevY;
-		double X;
-		double Y;
+		GameObject(IPhysicsBody* ptrPhysicsBody, Texture* ptrTexture);
+		virtual ~GameObject() = default;
 
-		GameObject(const BodyType bodyType, const float startingX, const float startingY, const float width, const float height,
-			const float density, const float friction,
-			const bool visible, const bool fixed, const bool collidable, Texture* texture);
-		~GameObject() = default;
+		IPhysicsBody* GetPhysicsBody();
 
-		void ProcessEvent(Event& e);
-		void Update();
-		void Render();
-		void Display();
-		const SDLRect& GetRect() const;
+		/*virtual void ProcessEvent(Event& e);
+		virtual void Update();
+		virtual void Render();
+		virtual void Display();*/
 
 		Texture* GetTexture();
 	};

@@ -9,11 +9,13 @@ namespace Engine
 {
 	void Box::bodyNotInWorldAlert() const { ENGINE_CRITICAL("Body not in world. Cannot get position."); }
 
-	Box::Box(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters, 
-		const float halfWidthInMeters, const float halfHeightInMeters, const float density, const float friction)
-		: m_halfWidthInMeters(halfWidthInMeters), m_halfHeightInMeters(halfHeightInMeters), 
-		m_widthInMeters(m_halfWidthInMeters * 2.0f), m_heightInMeters(m_halfHeightInMeters * 2.0f),
-		m_bodyType(bodyType), m_body(nullptr)
+	Box::Box(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters,
+		const float widthInMeters, const float heightInMeters, const float density, const float friction,
+		const float restitution, const float restitutionThreshold, bool visible, bool collidable, bool fixed)
+		: m_halfWidthInMeters(widthInMeters / 2.0f), m_halfHeightInMeters(heightInMeters / 2.0f), 
+		m_widthInMeters(widthInMeters), m_heightInMeters(heightInMeters),
+		m_restitution(restitution), m_restitutionThreshold(restitutionThreshold),
+		m_bodyType(bodyType), m_visible(visible), m_collidable(collidable), m_fixed(fixed), m_body(nullptr)
 	{
 		switch (bodyType)
 		{
@@ -40,29 +42,36 @@ namespace Engine
 			break;
 		}
 
+		m_prevX = startingXInMeters;
+		m_prevY = startingYInMeters;
 		m_bodyDef.position.Set(startingXInMeters, startingYInMeters);
 		m_shape.SetAsBox(m_halfWidthInMeters, m_halfHeightInMeters);
 		m_fixtureDef.shape = &m_shape;
+
+		m_fixtureDef.restitution = restitution;
+		m_fixtureDef.restitutionThreshold = restitutionThreshold;
 
 		ENGINE_INFO_D("Box created at position: {0}, {1}. With width: {2}, height: {3}", 
 			startingXInMeters, startingYInMeters, m_widthInMeters, m_heightInMeters);
 	}
 
-	b2Body* Box::getBody() const { return m_body; }
-	const b2BodyDef& Box::getBodyDef() const { return m_bodyDef; }
 	const BodyType Box::getBodyType() const { return m_bodyType; }
 
-	const int Box::getWidthInMeters() const { return static_cast<int>(m_widthInMeters); }
-	const int Box::getHeightInMeters() const { return static_cast<int>(m_heightInMeters); }
+	const float Box::getWidthInMeters() const { return m_widthInMeters; }
+	const float Box::getHeightInMeters() const { return m_heightInMeters; }
 
-	void Box::setBody(b2Body* body) { m_body = body; }
 	void Box::createFixture() { m_body->CreateFixture(&m_fixtureDef); }
 
-	const double Box::getCenterXInMeters() const { return (m_body->GetPosition().x); }
-	const double Box::getCenterYInMeters() const { return (m_body->GetPosition().y); }
-	const double Box::getTopLeftXInMeters() const { return (m_body->GetPosition().x - m_widthInMeters / 2.0); }
-	const double Box::getTopLeftYInMeters() const { return (m_body->GetPosition().y - m_heightInMeters / 2.0); }
+	const float Box::getPrevX() const { return m_prevX; }
+	const float Box::getPrevY() const { return m_prevY; };
+	void Box::updatePrevX(){ m_prevX = getTopLeftXInMeters(); };
+	void Box::updatePrevY() { m_prevY = getTopLeftYInMeters(); };
+
+	const float Box::getCenterXInMeters() const { return (m_body->GetPosition().x); }
+	const float Box::getCenterYInMeters() const { return (m_body->GetPosition().y); }
+	const float Box::getTopLeftXInMeters() const { return (m_body->GetPosition().x - m_widthInMeters / 2.0f); }
+	const float Box::getTopLeftYInMeters() const { return (m_body->GetPosition().y - m_heightInMeters / 2.0f); }
 
 	const float Box::getAngleInRadians() const { return m_body->GetAngle(); }
-	const double Box::getAngleInDegrees() const { return radiansToDegrees(m_body->GetAngle()); }
+	const float Box::getAngleInDegrees() const { return radiansToDegrees(m_body->GetAngle()); }
 }
