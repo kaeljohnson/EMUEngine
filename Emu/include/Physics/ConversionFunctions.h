@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-    inline double degreesToRadians(double degrees)
+    inline float degreesToRadians(float degrees)
     {
 		return degrees * M_PIf / 180.0f;
 	}

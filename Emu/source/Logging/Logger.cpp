@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../include/Logging/Logger.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
+#include "../../include/Logging/Logger.h"
 
 namespace Engine
 {

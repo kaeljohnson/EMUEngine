@@ -18,8 +18,8 @@ int main(int argc, char* args[])
 	Engine::Texture tempTextureBlue(0, 0, 265);
 
 	// Maybe The physics body interface just automatically attaches the body to the world?
-	Engine::IPhysicsBody* testBody = Engine::CreatePhysicsBody(Engine::DYNAMIC, 63.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0, 0.5, true, false, true);
-	Engine::IPhysicsBody* groundBody = Engine::CreatePhysicsBody(Engine::STATIC, 63.5f, 70.0f, 120.0f, 2.0f, 0.0f, 0.0f, 0.0, 0.0, true, true, true);
+	Engine::IPhysicsBody* testBody = Engine::CreatePhysicsBody(Engine::DYNAMIC, 63.5f, 1.0f, 1.0f, 1.0f, 1.0f, 60.0f, 0, 1.0, 0.5, true, false, true);
+	Engine::IPhysicsBody* groundBody = Engine::CreatePhysicsBody(Engine::STATIC, 63.5f, 70.0f, 120.0f, 2.0f, 0.0f, 0.0f, 0.0, 0.0, 0.0, true, true, true);
 
 	// GameObject to be renamed and have a constructor that only takes
 	// a texture. Making the object exist outside the physics world.

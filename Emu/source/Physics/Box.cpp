@@ -10,7 +10,7 @@ namespace Engine
 	void Box::bodyNotInWorldAlert() const { ENGINE_CRITICAL("Body not in world. Cannot get position."); }
 
 	Box::Box(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters,
-		const float widthInMeters, const float heightInMeters, const float density, const float friction,
+		const float widthInMeters, const float heightInMeters, const float density, const float friction, const float angle,
 		const float restitution, const float restitutionThreshold, bool visible, bool collidable, bool fixed)
 		: m_halfWidthInMeters(widthInMeters / 2.0f), m_halfHeightInMeters(heightInMeters / 2.0f), 
 		m_widthInMeters(widthInMeters), m_heightInMeters(heightInMeters),
@@ -45,9 +45,9 @@ namespace Engine
 		m_prevX = startingXInMeters;
 		m_prevY = startingYInMeters;
 		m_bodyDef.position.Set(startingXInMeters, startingYInMeters);
+		m_bodyDef.angle = degreesToRadians(angle);
 		m_shape.SetAsBox(m_halfWidthInMeters, m_halfHeightInMeters);
 		m_fixtureDef.shape = &m_shape;
-
 		m_fixtureDef.restitution = restitution;
 		m_fixtureDef.restitutionThreshold = restitutionThreshold;
 

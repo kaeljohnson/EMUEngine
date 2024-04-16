@@ -55,7 +55,6 @@ project "Emu"
 
         postbuildcommands
         {
-            "if not exist ../bin/" .. outputDirectory .. "/GameV1 mkdir ../bin/" .. outputDirectory .. "/GameV1",
             "{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputDirectory .. "/GameV1"
         }
 

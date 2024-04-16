@@ -34,8 +34,8 @@ namespace Engine
 		m_pixelsPerMeter = pixelsPerMeter;
 		m_world->SetGravity(gravityX * pixelsPerMeter, gravityY * pixelsPerMeter);
 		m_world->SetTimeStep(timeStep);
-		m_world->SetVelocityIterations(6);
-		m_world->SetPositionIterations(2);
+		m_world->SetVelocityIterations(8);
+		m_world->SetPositionIterations(3);
 
 		ENGINE_INFO_D("Client creating simulation with gravity: ({}, {}) and time step: {}", gravityX, gravityY, timeStep);
 	}

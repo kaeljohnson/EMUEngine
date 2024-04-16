@@ -13,7 +13,7 @@ namespace Engine
 	// This class primarily serves as a wrapper for the Box2D b2Body class. It will be used by the 
 	// engine as the object that adheres to physics and collission detection. This class
 	// is not meant to be used by the client. It is not the "entity" or "game object" class. It will not handle
-	// textures or animation. Those classes will inherit from this class.
+	// textures or animation.
 
 	class Box : public IPhysicsBody
 	{
@@ -32,8 +32,6 @@ namespace Engine
 
 		float m_prevX;
 		float m_prevY;
-		// float X;
-		// float Y;
 
 		float m_restitution;
 		float m_restitutionThreshold;
@@ -45,7 +43,7 @@ namespace Engine
 	public:
 		Box() = default;
 		Box(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters,
-			const float widthInMeters, const float heightInMeters, const float density, const float friction,
+			const float widthInMeters, const float heightInMeters, const float density, const float friction, const float angle,
 			const float restitution, const float restitutionThreshold, bool visible, bool collidable, bool fixed);
 
 		void createFixture() override;

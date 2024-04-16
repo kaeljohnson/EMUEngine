@@ -24,12 +24,11 @@ namespace Engine
 		virtual ~GameObject() = default;
 
 		IPhysicsBody* GetPhysicsBody();
+		Texture* GetTexture();
 
 		/*virtual void ProcessEvent(Event& e);
 		virtual void Update();
 		virtual void Render();
 		virtual void Display();*/
-
-		Texture* GetTexture();
 	};
 }
