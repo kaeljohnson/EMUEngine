@@ -35,17 +35,17 @@ int main(int argc, char* args[])
 	
 
 	AppManagementLayer appLayer("App management layer");
-	Engine::Layer testLayer("Test Layer 1");
+	Engine::Layer simulationLayer("Test Layer 1");
 
-	testLayer.AddGameObject(&testWall);
-	testLayer.AddGameObject(&testGround);
-	testLayer.AddGameObject(&testGO);
-	testLayer.AddGameObject(&testWallRight);
-	testLayer.AddGameObject(&testGO2);
+	simulationLayer.AddGameObject(&testWall);
+	simulationLayer.AddGameObject(&testGround);
+	simulationLayer.AddGameObject(&testGO);
+	simulationLayer.AddGameObject(&testWallRight);
+	simulationLayer.AddGameObject(&testGO2);
 	
 
 	ptrAppInstance->PushToLayerStack(&appLayer);
-	ptrAppInstance->PushToLayerStack(&testLayer);
+	ptrAppInstance->PushToLayerStack(&simulationLayer);
 
 	// Note in documentation that the client must keep in mind
 	// which order they want layers processed and rendered in.
