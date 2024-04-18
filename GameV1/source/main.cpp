@@ -18,19 +18,31 @@ int main(int argc, char* args[])
 	Engine::Texture tempTextureBlue(0, 0, 265);
 
 	// Maybe The physics body interface just automatically attaches the body to the world?
-	Engine::IPhysicsBody* testBody = Engine::CreatePhysicsBody(Engine::DYNAMIC, 63.5f, 1.0f, 1.0f, 1.0f, 1.0f, 60.0f, 0, 1.0, 0.5, true, false, true);
-	Engine::IPhysicsBody* groundBody = Engine::CreatePhysicsBody(Engine::STATIC, 63.5f, 70.0f, 120.0f, 2.0f, 0.0f, 0.0f, 0.0, 0.0, 0.0, true, true, true);
+	Engine::IPhysicsBody* testBody =      Engine::CreatePhysicsBody(Engine::DYNAMIC, 63.5f, 3.0f, 2.0f, 2.0f, 1.0f, 10.0f, 30.0, 1.0, 1.0, true, false, true);
+	Engine::IPhysicsBody* testBody2 =     Engine::CreatePhysicsBody(Engine::DYNAMIC, 68.5f, 3.0f, 6.0f, 6.0f, 1.0f, 10.0f, 30.0, 1.0, 1.0, true, false, true);
+	Engine::IPhysicsBody* wallBody =      Engine::CreatePhysicsBody(Engine::STATIC, 15.0f, 35.0f, 2.0f, 80.0f, 0.0f, 50.0f, 0.0, 0.0, 0.0, true, true, true);
+	Engine::IPhysicsBody* wallRightBody = Engine::CreatePhysicsBody(Engine::STATIC, 100.0f, 35.0f, 2.0f, 80.0f, 0.0f, 50.0f, 0.0, 0.0, 0.0, true, true, true);
+	Engine::IPhysicsBody* groundBody =    Engine::CreatePhysicsBody(Engine::STATIC, 63.5f, 70.0f, 120.0f, 2.0f, 0.0f, 50.0f, 0.0, 1.0, 1.0, true, true, true);
+	
 
 	// GameObject to be renamed and have a constructor that only takes
 	// a texture. Making the object exist outside the physics world.
 	Engine::GameObject testGO(testBody, &tempTextureRed);
+	Engine::GameObject testGO2(testBody2, &tempTextureRed);
+	Engine::GameObject testWall(wallBody, &tempTextureBlue);
+	Engine::GameObject testWallRight(wallRightBody, &tempTextureBlue);
 	Engine::GameObject testGround(groundBody, &tempTextureBlue);
+	
 
 	AppManagementLayer appLayer("App management layer");
 	Engine::Layer testLayer("Test Layer 1");
 
+	testLayer.AddGameObject(&testWall);
 	testLayer.AddGameObject(&testGround);
 	testLayer.AddGameObject(&testGO);
+	testLayer.AddGameObject(&testWallRight);
+	testLayer.AddGameObject(&testGO2);
+	
 
 	ptrAppInstance->PushToLayerStack(&appLayer);
 	ptrAppInstance->PushToLayerStack(&testLayer);
