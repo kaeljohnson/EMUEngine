@@ -20,7 +20,7 @@ if "%CONFIG%"=="distribution" (
 if exist vcpkg\ (
     echo vcpkg exists
 ) else (
-    cd v1/external
+    cd Emu/external
     call git clone https://github.com/microsoft/vcpkg.git
     cd vcpkg
     call bootstrap-vcpkg.bat
@@ -30,7 +30,7 @@ if exist vcpkg\ (
 )
 
 :: Build Box2D with the specified configuration
-cd v1\external\box2d\
+cd Emu\external\box2d\
 echo Deleting wrong builds...
 if "%CONFIG%"=="debug" if exist build\bin\release\ (rmdir /s /q build\bin\release)
 if "%CONFIG%"=="release" if exist build\bin\debug\ (rmdir /s /q build\bin\debug)
@@ -38,7 +38,7 @@ if not exist build\bin\%CONFIG%\ (
     echo Building %CONFIG%...
     if not exist build\ (mkdir build)
     cd build
-    cmake ..
+    cmake .. 
     cmake --build . --config %CONFIG%
     cd ..
 )
@@ -46,6 +46,6 @@ if not exist build\bin\%CONFIG%\ (
 cd ../../../
 
 :: Run premake
-call v1\external\premake\premake5.exe vs2022
+call Emu\external\premake\premake5.exe vs2022
 
 PAUSE

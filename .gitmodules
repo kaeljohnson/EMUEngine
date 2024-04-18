@@ -1,6 +1,6 @@
-[submodule "v1/external/spdlog"]
-	path = v1/external/spdlog
+[submodule "Emu/external/spdlog"]
+	path = Emu/external/spdlog
 	url = https://github.com/gabime/spdlog
-[submodule "v1/external/box2d"]
-	path = v1/external/box2d
+[submodule "Emu/external/box2d"]
+	path = Emu/external/box2d
 	url = https://github.com/erincatto/box2d.git

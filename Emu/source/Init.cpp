@@ -1,0 +1,36 @@
+#pragma once
+
+#include <stdio.h>
+
+#include "../include/Init.h"
+#include "../include/Application.h"
+#include "../include/Logging/Logger.h"
+
+namespace Engine
+{
+
+	// Callback system singleton.
+	Engine::ICallbackSystem* Engine::ICallbackSystem::instance = nullptr;
+
+	// Application singleton.
+	Engine::Application* Engine::Application::instance = nullptr;
+
+
+	Init::Init()
+	{
+		/*
+			Call to SDL "IMG_Init" and "SDL_Init" functions.
+			If these function fail, print the last 
+			SDL error to the console. We will need more robust error logging later.
+		*/
+
+		Logger::Init();
+		ENGINE_TRACE_D("Logger initialized!");
+
+		if (!IMG_INIT(IMG_INIT_PNG))
+			ENGINE_CRITICAL("IMG Init failed! SDL_Error: {}", SDL_GetError());
+
+		if (SDL_INIT() < 0)
+			ENGINE_CRITICAL("SDL Init failed! SDL_Error: {}", SDL_GetError());
+	}
+}
