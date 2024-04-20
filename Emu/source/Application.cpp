@@ -23,7 +23,6 @@ namespace Engine
 		m_pixelsPerMeter(20),
 		m_timeStep(1.0f / 60.0f)
 	{
-
 		m_world = CreateWorld(0.0f * m_pixelsPerMeter, 9.8f * m_pixelsPerMeter, m_timeStep, 8, 3);
 		defineDefaultApplicationCallbacks();
 	}
@@ -34,8 +33,6 @@ namespace Engine
 		m_pixelsPerMeter = pixelsPerMeter;
 		m_world->SetGravity(gravityX * pixelsPerMeter, gravityY * pixelsPerMeter);
 		m_world->SetTimeStep(timeStep);
-		m_world->SetVelocityIterations(8);
-		m_world->SetPositionIterations(3);
 
 		ENGINE_INFO_D("Client creating simulation with gravity: ({}, {}) and time step: {}", gravityX, gravityY, timeStep);
 	}
@@ -187,16 +184,25 @@ namespace Engine
 		running = false;
 	}
 
+	Application::~Application()
+	{
+		delete m_world;
+		m_world = nullptr;
+
+		delete instance;
+		instance = nullptr;
+	}
+
 	void Application::PushToLayerStack(Layer* layer)
 	{
 		m_layerStack.pushLayer(layer);
-		layer->isAttached = true;
+		layer->IsAttachedToScene = true;
 	}
 
 	void Application::PopLayerFromStack(Layer* layer)
 	{
 		m_layerStack.popLayer(layer);
-		layer->isAttached = false;
+		layer->IsAttachedToScene = false;
 	}
 
 	void Application::PopLayerFromStack()
@@ -225,14 +231,6 @@ namespace Engine
 				Box* ptrBox = static_cast<Box*>(gameObject->GetPhysicsBody());
 
 				m_world->addBox(ptrBox);
-			});
-
-		ptrICallbackSystem->NewCallback(Type::RemoveFromWorld, [this](Data layerEventData)
-			{
-				GameObject* gameObject = std::get<GameObject*>(layerEventData);
-				Box* ptrBox = static_cast<Box*>(gameObject->GetPhysicsBody());
-
-				m_world->removeBox(ptrBox);
 			});
 
 		ptrICallbackSystem->NewCallback(Type::ResizeWindow, [this](Data data)

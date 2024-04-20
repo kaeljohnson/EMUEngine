@@ -21,7 +21,7 @@ namespace Engine
 
 	public:
 		GameObject(IPhysicsBody* ptrPhysicsBody, Texture* ptrTexture);
-		virtual ~GameObject() = default;
+		virtual ~GameObject();
 
 		IPhysicsBody* GetPhysicsBody();
 		Texture* GetTexture();

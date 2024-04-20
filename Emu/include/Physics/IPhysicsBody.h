@@ -38,5 +38,6 @@ namespace Engine
 		virtual const float getPrevY() const = 0;
 
 		virtual void bodyNotInWorldAlert() const = 0;
+		virtual void removeBodyFromWorld() = 0;
 	};
 }

@@ -49,8 +49,7 @@ namespace Engine
 	public:
 		EMU_API static Application* GetInstance();
 
-		// Probably should not expose to client.
-		EMU_API ~Application() = default;
+		~Application();
 
 		EMU_API void SetSimulation(const float gravityX, const float gravityY, const float timeStep, const int pixelsPerMeter);
 
