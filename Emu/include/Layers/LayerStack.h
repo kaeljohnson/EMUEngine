@@ -7,6 +7,11 @@
 
 namespace Engine
 {
+
+	// LayerStack class. A stack of layers that can be 
+	// pushed and popped. The layer stack belongs to 
+	// the current scene being updated and rendered.
+
 	class LayerStack
 	{
 	private:
@@ -19,11 +24,16 @@ namespace Engine
 		LayerStack(std::vector<Layer*> layers);
 		~LayerStack();
 
-		void pushLayer(Layer* layer);
-		void popLayer(Layer* layer);
-		void popLayer();
-
 		std::vector<Layer*>::iterator begin() { return m_layers.begin(); }
 		std::vector<Layer*>::iterator end() { return m_layers.end(); }
+
+		// Pushes a layer to the stack.
+		void pushLayer(Layer* layer);
+
+		// Pops a layer from the stack.
+		void popLayer(Layer* layer);
+
+		// Pops the top layer from the stack.
+		void popLayer();
 	};
 }

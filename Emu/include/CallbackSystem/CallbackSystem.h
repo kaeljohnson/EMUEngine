@@ -8,6 +8,9 @@
 #include <functional>
 #include <string>
 
+// This is the callback system interface. It is a singleton that allows anyone to create callbacks and trigger them.
+// There are built in types for registering and triggering callbacks. The types are defined in CallbackType.h.
+
 namespace Engine
 {
     using Data = std::variant<std::monostate, const int, const float, const std::string, const std::pair<int, int>, GameObject*>;
