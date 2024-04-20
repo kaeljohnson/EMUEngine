@@ -5,6 +5,8 @@
 
 namespace Engine
 {
+	// Basic logging from spdlog.
+
 	class Logger
 	{
 	private:

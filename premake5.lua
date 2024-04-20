@@ -53,12 +53,6 @@ project "Emu"
             "EMU_BUILD_DLL"
         }
 
-        postbuildcommands
-        {
-            "{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputDirectory .. "/GameV1"
-        }
-
-
     filter "configurations:Debug"
         symbols "On"
         defines { "DEBUG"}

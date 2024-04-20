@@ -58,14 +58,4 @@ namespace Engine
 	{
 		m_deltaTime = timeStep;
 	}
-
-	void World::SetVelocityIterations(const int velocityIterations)
-	{
-		m_velocityIterations = velocityIterations;
-	}
-
-	void World::SetPositionIterations(const int positionIterations)
-	{
-		m_positionIterations = positionIterations;
-	}
 }
