@@ -46,6 +46,8 @@ namespace Engine
 			const float widthInMeters, const float heightInMeters, const float density, const float friction, const float angle,
 			const float restitution, const float restitutionThreshold, bool visible, bool collidable, bool fixed);
 
+		~Box();
+
 		void createFixture() override;
 
 		const float getPrevX() const override;
@@ -66,5 +68,6 @@ namespace Engine
 
 		const BodyType getBodyType() const override;
 		void bodyNotInWorldAlert() const;
+		void removeBodyFromWorld() override;
 	};
 }

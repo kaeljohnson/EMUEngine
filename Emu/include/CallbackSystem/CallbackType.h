@@ -6,7 +6,6 @@ namespace Engine
 	{
 		// World interaction
 		AddToWorld = 0,
-		RemoveFromWorld,
 
 		// Application interaction
 		EndApplication,

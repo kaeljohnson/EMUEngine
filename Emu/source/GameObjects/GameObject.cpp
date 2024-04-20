@@ -12,6 +12,16 @@ namespace Engine
 		ENGINE_INFO_D("GameObject created");
 	}
 
+	GameObject::~GameObject()
+	{
+		ENGINE_INFO_D("Freeing GameObject!");
+		if (m_physicsBody != nullptr)
+			delete m_physicsBody;
+
+		//delete m_texture;
+	}
+
+
 	Texture* GameObject::GetTexture()
 	{
 		return m_texture;

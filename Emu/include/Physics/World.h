@@ -26,6 +26,8 @@ namespace Engine
 	public:
 		World();
 		World(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations);
+		~World();
+
 		void update();
 		void addBox(Box* body);
 		void removeBox(Box* body);

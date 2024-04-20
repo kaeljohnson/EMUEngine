@@ -36,7 +36,6 @@ namespace Engine
 			break;
 		}
 
-		
 		m_prevX = startingXInMeters;
 		m_prevY = startingYInMeters;
 		m_bodyDef.position.Set(startingXInMeters, startingYInMeters);
@@ -48,8 +47,18 @@ namespace Engine
 		m_fixtureDef.restitution = restitution;
 		m_fixtureDef.restitutionThreshold = restitutionThreshold;
 
-		ENGINE_INFO_D("Box created at position: {0}, {1}. With width: {2}, height: {3}", 
+		ENGINE_INFO_D("Box created at position: {0}, {1}. With width: {2}, height: {3}",
 			startingXInMeters, startingYInMeters, m_widthInMeters, m_heightInMeters);
+	}
+
+	Box::~Box()
+	{
+		ENGINE_INFO_D("Freeing Box!");
+		if (m_body != nullptr)
+		{
+			m_body->GetWorld()->DestroyBody(m_body);
+			m_body = nullptr;
+		}
 	}
 
 	const BodyType Box::getBodyType() const { return m_bodyType; }
@@ -71,4 +80,13 @@ namespace Engine
 
 	const float Box::getAngleInRadians() const { return m_body->GetAngle(); }
 	const float Box::getAngleInDegrees() const { return radiansToDegrees(m_body->GetAngle()); }
+
+	void Box::removeBodyFromWorld()
+	{
+		if (m_body != nullptr)
+		{
+			m_body->GetWorld()->DestroyBody(m_body);
+			m_body = nullptr;
+		}
+	}
 }

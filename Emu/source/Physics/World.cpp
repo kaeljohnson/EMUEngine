@@ -15,6 +15,19 @@ namespace Engine
 		m_velocityIterations(velocityIterations), m_positionIterations(positionIterations)
 	{}
 
+	World::~World()
+	{
+		ENGINE_INFO_D("Freeing World!");
+		// Destroy all bodies in the world
+		b2Body* body = m_world.GetBodyList();
+		while (body != nullptr)
+		{
+			b2Body* nextBody = body->GetNext();
+			m_world.DestroyBody(body);
+			body = nextBody;
+		}
+	}
+
 	void World::update()
 	{
 		m_world.Step(m_deltaTime, m_velocityIterations, m_positionIterations);
@@ -22,8 +35,6 @@ namespace Engine
 
 	void World::addBox(Box* box)
 	{
-		
-
 		box->m_body = m_world.CreateBody(&box->m_bodyDef);
 		box->createFixture();
 
@@ -34,6 +45,7 @@ namespace Engine
 	void World::removeBox(Box* body)
 	{
 		m_world.DestroyBody(body->m_body);
+		body = nullptr;
 	}
 
 	void World::SetGravity(const float gravityX, const float gravityY)

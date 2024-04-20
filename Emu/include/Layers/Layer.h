@@ -11,6 +11,10 @@ namespace Engine
 {
 	class Layer
 	{
+
+	public:
+		bool IsAttachedToScene;
+
 	protected:
 		std::string m_name;
 		bool m_enabled;
@@ -23,8 +27,6 @@ namespace Engine
 	public:
 		EMU_API Layer(std::string name);
 		EMU_API virtual	~Layer();
-
-		bool isAttached;
 
 		const std::vector<GameObject*>::iterator begin() { return m_gameObjects.begin(); }
 		const std::vector<GameObject*>::iterator end() { return m_gameObjects.end(); }

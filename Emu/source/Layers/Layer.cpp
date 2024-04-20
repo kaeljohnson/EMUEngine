@@ -10,7 +10,7 @@
 namespace Engine
 {
 	Layer::Layer(std::string name) : ptrICallbackSystem(ICallbackSystem::GetInstance()), 
-		m_name(name), m_enabled(true), isAttached(false) {}
+		m_name(name), m_enabled(true), IsAttachedToScene(false) {}
 	
 	Layer::~Layer() {}
 	 
@@ -34,7 +34,7 @@ namespace Engine
 
 		for (GameObject* gameObject : m_gameObjects)
 		{
-			ptrICallbackSystem->TriggerCallback(Type::RemoveFromWorld, gameObject);
+			gameObject->GetPhysicsBody()->removeBodyFromWorld();
 		}
 	};
 
@@ -48,13 +48,19 @@ namespace Engine
 
 	void Layer::AddGameObject(GameObject* gameObject)
 	{
+		if (std::find(m_gameObjects.begin(), m_gameObjects.end(), gameObject) != m_gameObjects.end())
+		{
+			ENGINE_WARN_D("GameObject already exists in layer {}.", m_name);
+			return;
+		}
+
 		// Box2d performs better when it simulates static objects before dynamic objects.
 		// Collisions are more accurate when static objects are simulated first.
 		// Thus, we need to add static objects to the beginning of the list.
 
 		if (gameObject->GetPhysicsBody()->getBodyType() == BodyType::STATIC)
 		{
-			auto it = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [](GameObject* gameObject) 
+			auto it = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [&](GameObject* gameObject) 
 				{
 					return !gameObject->GetPhysicsBody()->getBodyType();
 				});
@@ -69,7 +75,7 @@ namespace Engine
 		}
 
 		// If the layer is already attached to the applications layer stack, add the object to the world as well.
-		if (isAttached)
+		if (IsAttachedToScene)
 		{
 			ptrICallbackSystem->TriggerCallback(Type::AddToWorld, gameObject);
 		}
@@ -77,15 +83,19 @@ namespace Engine
 
 	void Layer::RemoveGameObject(GameObject* gameObject)
 	{
-		auto it = std::find(m_gameObjects.begin(), m_gameObjects.end(), gameObject);
-		if (it != m_gameObjects.end())
+		auto ptrGameObjectIt = std::find(m_gameObjects.begin(), m_gameObjects.end(), gameObject);
+		if (ptrGameObjectIt != m_gameObjects.end())
 		{
-			if (isAttached)
+			if (IsAttachedToScene)
 			{
-				ptrICallbackSystem->TriggerCallback(Type::RemoveFromWorld, gameObject);
+				gameObject->GetPhysicsBody()->removeBodyFromWorld();
 			}
 
-			m_gameObjects.erase(it);
+			m_gameObjects.erase(ptrGameObjectIt);
+		}
+		else
+		{
+			ENGINE_WARN_D("GameObject not found in layer {}.", m_name);
 		}
 	}
 }
