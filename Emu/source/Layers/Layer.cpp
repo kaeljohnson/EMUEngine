@@ -9,10 +9,15 @@
 
 namespace Engine
 {
-	Layer::Layer(std::string name) : ptrICallbackSystem(ICallbackSystem::GetInstance()), 
+	Layer::Layer(std::string name) : ptrICallbackSystem(ICallbackSystem::GetInstance()),
 		m_name(name), m_enabled(true), IsAttachedToScene(false) {}
 	
-	Layer::~Layer() {}
+	Layer::~Layer() 
+	{
+		ENGINE_TRACE_D("Destroying layer {}.", m_name);
+		// Even if the layer is destroyed, the scene objects will still exist.
+		// Layer just organizes the scene objects.
+	}
 	 
 	void Layer::AddToWorld()
 	{
@@ -28,7 +33,7 @@ namespace Engine
 	{
 		ENGINE_TRACE_D("Removing layer {} from the world.", m_name);
 
-		// Need to remove all game objects inside the layer from the world. May need to be careful with how
+		// Need to remove all scene objects inside the layer from the world. May need to be careful with how
 		// objects are removed due to box2d actively using the object during the world step.
 		// Box2d simulating an object that no longer exists will be problematic.
 
@@ -40,7 +45,11 @@ namespace Engine
 
 	void Layer::OnAttach() { ENGINE_TRACE_D("Inside layer {} attach function.", m_name); };
 	void Layer::OnDetach() { ENGINE_TRACE_D("Inside layer {} detach function.", m_name); };
-	void Layer::Free() { ENGINE_TRACE_D("Freeing layer {}.", m_name); /*Depending on clients use case they may need "delete layer" here.*/ };
+	void Layer::Free() 
+	{ 
+		ENGINE_TRACE_D("Freeing layer {}.", m_name); 
+		// May need to free some resources? 
+	};
 	void Layer::OnUpdate() { ENGINE_TRACE_D("Update layer {}", m_name); };
 	void Layer::ProcessEvent(Event& e) { ENGINE_TRACE_D("Process event for layer {}", m_name); };
 
@@ -68,13 +77,13 @@ namespace Engine
 			// Insert the static object before the first dynamic object.
 			m_gameObjects.insert(it, gameObject);
 		}
-		else 
+		else
 		{
 			// Add rest of objects to the end of the list.
 			m_gameObjects.push_back(gameObject);
 		}
 
-		// If the layer is already attached to the applications layer stack, add the object to the world as well.
+		// If the layer is already attached to the scenes layer stack, add the object to the world as well.
 		if (IsAttachedToScene)
 		{
 			ptrICallbackSystem->TriggerCallback(Type::AddToWorld, gameObject);
@@ -83,6 +92,8 @@ namespace Engine
 
 	void Layer::RemoveGameObject(GameObject* gameObject)
 	{
+		(gameObject == nullptr) ? ENGINE_WARN_D("GameObject is nullptr.") : ENGINE_TRACE_D("Removing scene object from layer {}.", m_name);
+
 		auto ptrGameObjectIt = std::find(m_gameObjects.begin(), m_gameObjects.end(), gameObject);
 		if (ptrGameObjectIt != m_gameObjects.end())
 		{
@@ -95,7 +106,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_WARN_D("GameObject not found in layer {}.", m_name);
+			ENGINE_WARN_D("SceneObject not found in layer {}.", m_name);
 		}
 	}
 }

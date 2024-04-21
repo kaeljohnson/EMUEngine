@@ -35,6 +35,12 @@ namespace Engine
 
 	void World::addBox(Box* box)
 	{
+		if (box == nullptr)
+		{
+			ENGINE_ERROR_D("Box is null!");
+			return;
+		}
+
 		box->m_body = m_world.CreateBody(&box->m_bodyDef);
 		box->createFixture();
 
@@ -44,6 +50,12 @@ namespace Engine
 
 	void World::removeBox(Box* body)
 	{
+		if (body == nullptr)
+		{
+			ENGINE_ERROR_D("Box is null!");
+			return;
+		}
+
 		m_world.DestroyBody(body->m_body);
 		body = nullptr;
 	}

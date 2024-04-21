@@ -40,7 +40,7 @@ namespace Engine
 	Application* Application::GetInstance()
 	{
 		if (instance == nullptr)
-		{
+		{	
 			instance = new Application();
 			return instance;
 		}
@@ -53,13 +53,12 @@ namespace Engine
 
 	void Application::Run()
 	{
-
 		for (auto& layer : m_layerStack)
 		{
 			ENGINE_TRACE_D("Layer: {}", layer->GetName());
 		}
 
-		ENGINE_INFO("Application running!");
+		ENGINE_INFO_D("Application running!");
 
 		if (m_layerStack.size() > 0)
 		{
@@ -116,12 +115,9 @@ namespace Engine
 				accumulator -= m_timeStep;
 			}
 
-			// Calculate interpolation factor. This will be used in the future.
 			const double interpolation = accumulator / m_timeStep;
 
 			m_rendererManager.clearScreen();
-
-			// Need interpolation for smooth rendering.
 			renderLayers(interpolation);
 			m_rendererManager.display();      
 		}
@@ -179,7 +175,7 @@ namespace Engine
 
 	void Application::End()
 	{
-		ENGINE_INFO("Application ending!");
+		ENGINE_INFO_D("Application ending!");
 
 		running = false;
 	}
@@ -195,18 +191,36 @@ namespace Engine
 
 	void Application::PushToLayerStack(Layer* layer)
 	{
+		if (layer == nullptr)
+		{
+			ENGINE_CRITICAL_D("Layer is nullptr! Cannot push to layer stack.");
+			return;
+		}
+
 		m_layerStack.pushLayer(layer);
 		layer->IsAttachedToScene = true;
 	}
 
 	void Application::PopLayerFromStack(Layer* layer)
 	{
+		if (layer == nullptr)
+		{
+			ENGINE_CRITICAL_D("Layer is nullptr! Cannot pop from layer stack.");
+			return;
+		}
+
 		m_layerStack.popLayer(layer);
 		layer->IsAttachedToScene = false;
 	}
 
 	void Application::PopLayerFromStack()
 	{
+		if (m_layerStack.size() == 0)
+		{
+			ENGINE_CRITICAL_D("Layer stack is empty! Cannot pop from layer stack.");
+			return;
+		}
+
 		m_layerStack.popLayer();
 	}
 
