@@ -17,6 +17,7 @@ namespace Engine
 	class World : public IWorld
 	{
 	private:
+		// Box2D members
 		b2World m_world;
 		b2Vec2 m_gravity;
 
@@ -28,13 +29,16 @@ namespace Engine
 		World(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations);
 		~World();
 
+		// Step the simulation forward.
 		void update();
+
+		// Add physics body to world.
 		void addBox(Box* body);
+		
+		// Remove physics body from world. 
 		void removeBox(Box* body);
 
 		void SetGravity(const float gravityX, const float gravityY);
 		void SetTimeStep(const float timeStep);
-		void SetVelocityIterations(const int velocityIterations);
-		void SetPositionIterations(const int positionIterations);
 	};
 }

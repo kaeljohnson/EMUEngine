@@ -22,6 +22,8 @@ namespace Engine
 		Application();
 
 		bool running;
+
+		// Time step for physics simulation. Can be set by user.
 		float m_timeStep;
 
 		int m_pixelsPerMeter;
@@ -56,7 +58,8 @@ namespace Engine
 		// TEMP
 		EMU_API SDLRenderer* GetRenderer() { return m_rendererManager.getRenderer(); }
 
-		// Layer stack functions.
+		// Push layer to layer stack. Pop layer from layer stack. This will change to being a scene member function.
+		// The scene will own the layer stack.
 		EMU_API void PushToLayerStack(Layer* layer);
 		EMU_API void PopLayerFromStack(Layer* layer);
 		EMU_API void PopLayerFromStack();

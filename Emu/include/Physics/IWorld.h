@@ -4,6 +4,7 @@
 
 #include "BodyTypes.h"
 
+// World Interface for Box2D World.
 
 namespace Engine
 {
@@ -20,7 +21,5 @@ namespace Engine
 
 		virtual void SetGravity(const float gravityX, const float gravityY) = 0;
 		virtual void SetTimeStep(const float timeStep) = 0;
-		virtual void SetVelocityIterations(const int velocityIterations) = 0;
-		virtual void SetPositionIterations(const int positionIterations) = 0;
 	};
 }

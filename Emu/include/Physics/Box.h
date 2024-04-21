@@ -18,6 +18,8 @@ namespace Engine
 	class Box : public IPhysicsBody
 	{
 	public:
+
+		// Box2D specific members.
 		b2Body* m_body;
 		b2BodyDef m_bodyDef;
 		b2FixtureDef m_fixtureDef;
@@ -25,6 +27,7 @@ namespace Engine
 		
 		const BodyType m_bodyType;
 
+		// State members
 		const float m_halfWidthInMeters;
 		const float m_halfHeightInMeters;
 		const float m_widthInMeters;
@@ -48,13 +51,13 @@ namespace Engine
 
 		~Box();
 
+		// Calls Box2D CreateFixture.
 		void createFixture() override;
 
+		// Getters
 		const float getPrevX() const override;
 		const float getPrevY() const override;
-		void updatePrevX() override;	
-		void updatePrevY() override;
-
+		
 		const float getCenterXInMeters() const override;
 		const float getCenterYInMeters() const override;
 		const float getTopLeftXInMeters() const override;
@@ -67,6 +70,12 @@ namespace Engine
 		const float getAngleInDegrees() const override;
 
 		const BodyType getBodyType() const override;
+
+		// Box2D does not track previous values. 
+		// Need to update them here.
+		void updatePrevX() override;
+		void updatePrevY() override;
+
 		void bodyNotInWorldAlert() const;
 		void removeBodyFromWorld() override;
 	};

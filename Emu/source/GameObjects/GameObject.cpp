@@ -21,7 +21,6 @@ namespace Engine
 		//delete m_texture;
 	}
 
-
 	Texture* GameObject::GetTexture()
 	{
 		return m_texture;

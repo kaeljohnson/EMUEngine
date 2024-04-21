@@ -20,7 +20,7 @@ namespace Engine
 
 		if (window == nullptr)
 		{
-			ENGINE_CRITICAL("Window not created! SDL_Error: {}", SDL_GetError());
+			ENGINE_CRITICAL("Window not created! SDL_Error: {}", SDL_GET_ERROR());
 		}
 
 		// Gotta be an easier way?
@@ -28,7 +28,7 @@ namespace Engine
 		SDL_DisplayMode displayMode;
 		if (SDL_GET_DESKTOP_DISPLAY_MODE(0, &displayMode) != 0)
 		{
-			ENGINE_CRITICAL_D("Get desktop display mode failed: {}", SDL_GetError());
+			ENGINE_CRITICAL_D("Get desktop display mode failed: {}", SDL_GET_ERROR());
 		}
 
 		m_fullscreenWidth = displayMode.w;
@@ -85,7 +85,7 @@ namespace Engine
 
 		if (SDL_SET_WINDOW_FULLSCREEN(window, isFullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)
 		{
-			ENGINE_ERROR("Fullscreen failed! SDL_Error: {}", SDL_GetError());
+			ENGINE_ERROR("Fullscreen failed! SDL_Error: {}", SDL_GET_ERROR());
 		}
 		else
 		{

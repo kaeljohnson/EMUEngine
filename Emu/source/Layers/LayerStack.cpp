@@ -17,7 +17,7 @@ namespace Engine
 		// If the client pops the layer from the stack, the client is responsible for 
 		// deleting the layer.
 
-		ENGINE_INFO("Freeing LayerStack.");
+		ENGINE_INFO_D("Freeing LayerStack.");
 		for (Layer* layer : m_layers)
 		{
 			layer->Free();
@@ -28,12 +28,17 @@ namespace Engine
 
 	void LayerStack::pushLayer(Layer* layer) 
 	{
-		if (layer == nullptr) return;
+		if (layer == nullptr)
+		{
+			ENGINE_CRITICAL_D("Layer is nullptr. Cannot push nullptr to the layer stack.");
+			return;
+		}
+
 		for (auto it = m_layers.begin(); it != m_layers.end(); ++it)
 		{
 			if ((*it)->GetName() == layer->GetName())
 			{
-				ENGINE_CRITICAL("Layer with name: {} already exists in the layer stack!", layer->GetName());
+				ENGINE_CRITICAL_D("Layer with name: {} already exists in the layer stack!", layer->GetName());
 				return;
 			}
 		}
@@ -51,6 +56,12 @@ namespace Engine
 
 	void LayerStack::popLayer(Layer* layer) 
 	{
+		if (layer == nullptr)
+		{
+			ENGINE_CRITICAL_D("Layer is nullptr. Cannot pop nullptr from the layer stack.");
+			return;
+		}
+
 		for (auto it = m_layers.begin(); it != m_layers.end(); it++)
 		{
 			if ((*it)->GetName() == layer->GetName())
@@ -71,6 +82,12 @@ namespace Engine
 
 	void LayerStack::popLayer() 
 	{
+		if (m_layers.empty())
+		{
+			ENGINE_CRITICAL_D("Layer stack is empty. Cannot pop layer from an empty layer stack.");
+			return;
+		}
+
 		// Stuff engine needs to do when a layer is popped.
 		m_layers.back()->RemoveFromWorld();
 

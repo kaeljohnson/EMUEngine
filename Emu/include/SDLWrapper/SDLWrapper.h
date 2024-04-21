@@ -3,6 +3,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+// Wraps all SDL functions and types in case they change.
+
 namespace Engine
 {
 	using SDLWindow = SDL_Window;

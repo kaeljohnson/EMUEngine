@@ -3,6 +3,9 @@
 
 namespace Engine
 {
+
+	// Temporary class for creating textures.
+
 	class EMU_API Texture
 	{
 	public:

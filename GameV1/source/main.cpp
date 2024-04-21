@@ -34,7 +34,6 @@ int main(int argc, char* args[])
 	Engine::GameObject testWallRight(wallRightBody, &tempTextureBlue);
 	Engine::GameObject testGround(groundBody, &tempTextureBlue);
 	
-
 	AppManagementLayer appLayer("App management layer");
 	Engine::Layer simulationLayer("Test Layer 1");
 
@@ -48,17 +47,12 @@ int main(int argc, char* args[])
 	simulationLayer.AddGameObject(&testWall);
 	simulationLayer.AddGameObject(&testGround);
 	simulationLayer.AddGameObject(&testGO);
+	simulationLayer.AddGameObject(&testGO2);
 	simulationLayer.AddGameObject(&testGO3);
 	simulationLayer.AddGameObject(&testWallRight);
 	simulationLayer.AddGameObject(&testGO2);
-
-	// Removing a game object from a layer does not delete the object.
-	simulationLayer.RemoveGameObject(&testGO2);
-	simulationLayer.AddGameObject(&testGO2);
 	
 	ptrAppInstance->Run();
-
-
 
 	return 0;
 }

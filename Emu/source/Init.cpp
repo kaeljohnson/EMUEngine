@@ -18,19 +18,13 @@ namespace Engine
 
 	Init::Init()
 	{
-		/*
-			Call to SDL "IMG_Init" and "SDL_Init" functions.
-			If these function fail, print the last 
-			SDL error to the console. We will need more robust error logging later.
-		*/
-
 		Logger::Init();
 		ENGINE_TRACE_D("Logger initialized!");
 
 		if (!IMG_INIT(IMG_INIT_PNG))
-			ENGINE_CRITICAL("IMG Init failed! SDL_Error: {}", SDL_GetError());
+			ENGINE_CRITICAL("IMG Init failed! SDL_Error: {}", SDL_GET_ERROR());
 
 		if (SDL_INIT() < 0)
-			ENGINE_CRITICAL("SDL Init failed! SDL_Error: {}", SDL_GetError());
+			ENGINE_CRITICAL("SDL Init failed! SDL_Error: {}", SDL_GET_ERROR());
 	}
 }

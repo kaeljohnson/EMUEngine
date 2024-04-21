@@ -51,16 +51,6 @@ namespace Engine
 			startingXInMeters, startingYInMeters, m_widthInMeters, m_heightInMeters);
 	}
 
-	Box::~Box()
-	{
-		ENGINE_INFO_D("Freeing Box!");
-		if (m_body != nullptr)
-		{
-			m_body->GetWorld()->DestroyBody(m_body);
-			m_body = nullptr;
-		}
-	}
-
 	const BodyType Box::getBodyType() const { return m_bodyType; }
 
 	const float Box::getWidthInMeters() const { return m_widthInMeters; }
@@ -83,6 +73,16 @@ namespace Engine
 
 	void Box::removeBodyFromWorld()
 	{
+		if (m_body != nullptr)
+		{
+			m_body->GetWorld()->DestroyBody(m_body);
+			m_body = nullptr;
+		}
+	}
+
+	Box::~Box()
+	{
+		ENGINE_INFO_D("Freeing Box!");
 		if (m_body != nullptr)
 		{
 			m_body->GetWorld()->DestroyBody(m_body);
