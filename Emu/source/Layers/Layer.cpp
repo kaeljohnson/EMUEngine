@@ -4,7 +4,7 @@
 
 #include "../../include/Layers/Layer.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/GameObjects/GameObject.h"
+#include "../../include/SceneObjects/SceneObject.h"
 #include "../../include/CallbackSystem/CallbackSystem.h"
 
 namespace Engine
@@ -23,9 +23,9 @@ namespace Engine
 	{
 		ENGINE_TRACE_D("Adding layer {} to the world.", m_name);
 
-		for (GameObject* gameObject : m_gameObjects)
+		for (SceneObject* sceneObject : m_sceneObjects)
 		{
-			ptrICallbackSystem->TriggerCallback(Type::AddToWorld, gameObject);
+			ptrICallbackSystem->TriggerCallback(Type::AddToWorld, sceneObject);
 		}
 	};
 
@@ -37,9 +37,9 @@ namespace Engine
 		// objects are removed due to box2d actively using the object during the world step.
 		// Box2d simulating an object that no longer exists will be problematic.
 
-		for (GameObject* gameObject : m_gameObjects)
+		for (SceneObject* sceneObject : m_sceneObjects)
 		{
-			gameObject->GetPhysicsBody()->removeBodyFromWorld();
+			sceneObject->GetPhysicsBody()->removeBodyFromWorld();
 		}
 	};
 
@@ -55,11 +55,13 @@ namespace Engine
 
 	const std::string& Layer::GetName() const { return m_name; }
 
-	void Layer::AddGameObject(GameObject* gameObject)
+	void Layer::AddSceneObject(SceneObject* sceneObject)
 	{
-		if (std::find(m_gameObjects.begin(), m_gameObjects.end(), gameObject) != m_gameObjects.end())
+		(sceneObject == nullptr) ? ENGINE_WARN_D("SceneObject is nullptr.") : ENGINE_TRACE_D("Adding scene object to layer {}.", m_name);
+
+		if (std::find(m_sceneObjects.begin(), m_sceneObjects.end(), sceneObject) != m_sceneObjects.end())
 		{
-			ENGINE_WARN_D("GameObject already exists in layer {}.", m_name);
+			ENGINE_WARN_D("SceneObject already exists in layer {}.", m_name);
 			return;
 		}
 
@@ -67,42 +69,42 @@ namespace Engine
 		// Collisions are more accurate when static objects are simulated first.
 		// Thus, we need to add static objects to the beginning of the list.
 
-		if (gameObject->GetPhysicsBody()->getBodyType() == BodyType::STATIC)
+		if (sceneObject->GetPhysicsBody()->getBodyType() == BodyType::STATIC)
 		{
-			auto it = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [&](GameObject* gameObject) 
+			auto it = std::find_if(m_sceneObjects.begin(), m_sceneObjects.end(), [&](SceneObject* sceneObject) 
 				{
-					return !gameObject->GetPhysicsBody()->getBodyType();
+					return !sceneObject->GetPhysicsBody()->getBodyType();
 				});
 
 			// Insert the static object before the first dynamic object.
-			m_gameObjects.insert(it, gameObject);
+			m_sceneObjects.insert(it, sceneObject);
 		}
 		else
 		{
 			// Add rest of objects to the end of the list.
-			m_gameObjects.push_back(gameObject);
+			m_sceneObjects.push_back(sceneObject);
 		}
 
 		// If the layer is already attached to the scenes layer stack, add the object to the world as well.
 		if (IsAttachedToScene)
 		{
-			ptrICallbackSystem->TriggerCallback(Type::AddToWorld, gameObject);
+			ptrICallbackSystem->TriggerCallback(Type::AddToWorld, sceneObject);
 		}
 	}
 
-	void Layer::RemoveGameObject(GameObject* gameObject)
+	void Layer::RemoveSceneObject(SceneObject* sceneObject)
 	{
-		(gameObject == nullptr) ? ENGINE_WARN_D("GameObject is nullptr.") : ENGINE_TRACE_D("Removing scene object from layer {}.", m_name);
+		(sceneObject == nullptr) ? ENGINE_WARN_D("SceneObject is nullptr.") : ENGINE_TRACE_D("Removing scene object from layer {}.", m_name);
 
-		auto ptrGameObjectIt = std::find(m_gameObjects.begin(), m_gameObjects.end(), gameObject);
-		if (ptrGameObjectIt != m_gameObjects.end())
+		auto ptrSceneObjectIt = std::find(m_sceneObjects.begin(), m_sceneObjects.end(), sceneObject);
+		if (ptrSceneObjectIt != m_sceneObjects.end())
 		{
 			if (IsAttachedToScene)
 			{
-				gameObject->GetPhysicsBody()->removeBodyFromWorld();
+				sceneObject->GetPhysicsBody()->removeBodyFromWorld();
 			}
 
-			m_gameObjects.erase(ptrGameObjectIt);
+			m_sceneObjects.erase(ptrSceneObjectIt);
 		}
 		else
 		{

@@ -5,7 +5,7 @@
 
 #include "../include/RendererManager.h"
 #include "../include/Logging/Logger.h"
-#include "../include/GameObjects/GameObject.h"
+#include "../include/SceneObjects/SceneObject.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Physics/IPhysicsBody.h"
 
@@ -59,12 +59,12 @@ namespace Engine
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void RendererManager::render(GameObject* gameObject, const int pixelsPerMeter, const double interpolation)
+	void RendererManager::render(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation)
 	{
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
 
-		IPhysicsBody* ptrBody = gameObject->GetPhysicsBody();
+		IPhysicsBody* ptrBody = sceneObject->GetPhysicsBody();
 
 		SDLRect dst
 		{
@@ -78,7 +78,7 @@ namespace Engine
 			static_cast<int>(round(ptrBody->getHeightInMeters() * pixelsPerMeter * SCALE))
 		};
 
-		SDL_RENDER_COPY_EX(renderer, gameObject->GetTexture()->m_texture, nullptr, &dst, ptrBody->getAngleInDegrees(), nullptr, SDL_FLIP_NONE);
+		SDL_RENDER_COPY_EX(renderer, sceneObject->GetTexture()->m_texture, nullptr, &dst, ptrBody->getAngleInDegrees(), nullptr, SDL_FLIP_NONE);
 	}
 
 	void RendererManager::setViewport(SDLWindow* ptrWindow)

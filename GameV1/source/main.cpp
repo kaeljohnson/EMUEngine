@@ -25,32 +25,30 @@ int main(int argc, char* args[])
 	Engine::IPhysicsBody* wallRightBody = Engine::CreatePhysicsBody(Engine::STATIC, 100.0f, 35.0f, 2.0f, 80.0f, 0.0f, 50.0f, 0.0, 0.0, 0.0, true, true, true);
 	Engine::IPhysicsBody* groundBody =    Engine::CreatePhysicsBody(Engine::STATIC, 63.5f, 70.0f, 120.0f, 2.0f, 0.0f, 50.0f, 0.0, 1.0, 1.0, true, true, true);
 	
-	// GameObject to be renamed and have a constructor that only takes
+	// SceneObject to be renamed and have a constructor that only takes
 	// a texture. Making the object exist outside the physics world.
-	Engine::GameObject testGO(testBody, &tempTextureRed);
-	Engine::GameObject testGO2(testBody2, &tempTextureRed);
-	Engine::GameObject testGO3(testBody3, &tempTextureRed);
-	Engine::GameObject testWall(wallBody, &tempTextureBlue);
-	Engine::GameObject testWallRight(wallRightBody, &tempTextureBlue);
-	Engine::GameObject testGround(groundBody, &tempTextureBlue);
+	Engine::SceneObject testGO(testBody, &tempTextureRed);
+	Engine::SceneObject testGO2(testBody2, &tempTextureRed);
+	Engine::SceneObject testGO3(testBody3, &tempTextureRed);
+	Engine::SceneObject testWall(wallBody, &tempTextureBlue);
+	Engine::SceneObject testWallRight(wallRightBody, &tempTextureBlue);
+	Engine::SceneObject testGround(groundBody, &tempTextureBlue);
 	
 	AppManagementLayer appLayer("App management layer");
 	Engine::Layer simulationLayer("Test Layer 1");
-
-	//simulationLayer.AddGameObject(&testGO3);
 
 	// Note in documentation that the client must keep in mind
 	// which order they want layers processed and rendered in.
 	ptrAppInstance->PushToLayerStack(&appLayer);
 	ptrAppInstance->PushToLayerStack(&simulationLayer);
 
-	simulationLayer.AddGameObject(&testWall);
-	simulationLayer.AddGameObject(&testGround);
-	simulationLayer.AddGameObject(&testGO);
-	simulationLayer.AddGameObject(&testGO2);
-	simulationLayer.AddGameObject(&testGO3);
-	simulationLayer.AddGameObject(&testWallRight);
-	simulationLayer.AddGameObject(&testGO2);
+	simulationLayer.AddSceneObject(&testWall);
+	simulationLayer.AddSceneObject(&testGround);
+	simulationLayer.AddSceneObject(&testGO);
+	simulationLayer.AddSceneObject(&testGO2);
+	simulationLayer.AddSceneObject(&testGO3);
+	simulationLayer.AddSceneObject(&testWallRight);
+	simulationLayer.AddSceneObject(&testGO2);
 	
 	ptrAppInstance->Run();
 

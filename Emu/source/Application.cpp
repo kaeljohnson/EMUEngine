@@ -8,7 +8,7 @@
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
 #include "../include/Layers/Layer.h"
-#include "../include/GameObjects/GameObject.h"
+#include "../include/SceneObjects/SceneObject.h"
 #include "../include/Physics/Box.h"
 #include "../include/Physics/PhysicsFactory.h"
 
@@ -103,10 +103,10 @@ namespace Engine
 				// objects that have changed in general
 				for (Layer* layer : m_layerStack)
 				{
-					for (GameObject* gameObject : *layer)
+					for (SceneObject* sceneObject : *layer)
 					{
-						gameObject->GetPhysicsBody()->updatePrevX();
-						gameObject->GetPhysicsBody()->updatePrevY();
+						sceneObject->GetPhysicsBody()->updatePrevX();
+						sceneObject->GetPhysicsBody()->updatePrevY();
 					}
 				}
 
@@ -130,9 +130,9 @@ namespace Engine
 
 		for (Layer* layer : m_layerStack)
 		{
-			for (GameObject* gameObject : *layer)
+			for (SceneObject* sceneObject : *layer)
 			{
-				m_rendererManager.render(gameObject, m_pixelsPerMeter, interpolation);
+				m_rendererManager.render(sceneObject, m_pixelsPerMeter, interpolation);
 			}
 		}
 	}
@@ -146,7 +146,7 @@ namespace Engine
 		// Render order for layers
 		// EX:
 		// Background Layer -> Filled with Background textures.
-		// Game Layer -> Filled with Engine supported GameObjects type.
+		// Game Layer -> Filled with Engine supported SceneObjects type.
 		// Foreground Layer -> Filled with Foreground textures.
 		// Debug Layer -> Wrapper for Game Layer. Shows important info like hit boxes, etc.
 		// UI Layer -> Filled with Engine supported UI type.
@@ -241,8 +241,8 @@ namespace Engine
 
 		ptrICallbackSystem->NewCallback(Type::AddToWorld, [this](Data layerEventData)
 			{
-				GameObject* gameObject = std::get<GameObject*>(layerEventData);
-				Box* ptrBox = static_cast<Box*>(gameObject->GetPhysicsBody());
+				SceneObject* sceneObject = std::get<SceneObject*>(layerEventData);
+				Box* ptrBox = static_cast<Box*>(sceneObject->GetPhysicsBody());
 
 				m_world->addBox(ptrBox);
 			});

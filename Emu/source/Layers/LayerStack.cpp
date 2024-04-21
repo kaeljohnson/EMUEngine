@@ -44,7 +44,7 @@ namespace Engine
 		}
 
 		// Stuff engine needs to do when a layer is pushed.
-		// Game objects added to the application world when layer is pushed to application layer stack.
+		// Scene objects added to the application world when layer is pushed to application layer stack.
 		layer->AddToWorld();
 
 		// Stuff the client needs to do when a layer is pushed.

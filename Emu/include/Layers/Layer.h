@@ -4,7 +4,7 @@
 
 #include "../Core.h"
 #include "../Events/Event.h"
-#include "../GameObjects/GameObject.h"
+#include "../SceneObjects/SceneObject.h"
 #include "../CallbackSystem/CallbackSystem.h"
 
 namespace Engine
@@ -25,15 +25,15 @@ namespace Engine
 
 		// Note: common box2d bug where collisions won't work if dynamic objects are
 		// created and simulated before static objects.
-		std::vector<GameObject*> m_gameObjects;
+		std::vector<SceneObject*> m_sceneObjects;
 
 		ICallbackSystem* ptrICallbackSystem;
 	public:
 		EMU_API Layer(std::string name);
 		EMU_API virtual	~Layer();
 
-		const std::vector<GameObject*>::iterator begin() { return m_gameObjects.begin(); }
-		const std::vector<GameObject*>::iterator end() { return m_gameObjects.end(); }
+		const std::vector<SceneObject*>::iterator begin() { return m_sceneObjects.begin(); }
+		const std::vector<SceneObject*>::iterator end() { return m_sceneObjects.end(); }
 
 
 		// Adds the layer to the world. This probably should 
@@ -63,10 +63,10 @@ namespace Engine
 		// Returns the name of the layer.
 		const std::string& GetName() const;
 
-		// Add a game object to the layer.
-		EMU_API void AddGameObject(GameObject* gameObject);
+		// Add a scene object to the layer.
+		EMU_API void AddSceneObject(SceneObject* sceneObject);
 
-		// Remove a game object from the layer.
-		EMU_API void RemoveGameObject(GameObject* gameObject);
+		// Remove a scene object from the layer.
+		EMU_API void RemoveSceneObject(SceneObject* sceneObject);
 	};
 }

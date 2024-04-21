@@ -10,9 +10,9 @@
 namespace Engine
 {
 
-	// GameObject class. Currently behaves as a wrapper for a physics body and a texture.
+	// SceneObject class. Currently behaves as a wrapper for a physics body and a texture.
 
-	class EMU_API GameObject
+	class EMU_API SceneObject
 	{
 	private:
 		// SpriteSheet m_spriteSheet;
@@ -22,8 +22,8 @@ namespace Engine
 		IPhysicsBody* m_physicsBody;
 
 	public:
-		GameObject(IPhysicsBody* ptrPhysicsBody, Texture* ptrTexture);
-		virtual ~GameObject();
+		SceneObject(IPhysicsBody* ptrPhysicsBody, Texture* ptrTexture);
+		virtual ~SceneObject();
 
 		IPhysicsBody* GetPhysicsBody();
 		Texture* GetTexture();

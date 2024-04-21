@@ -2,7 +2,7 @@
 
 #include "../include/SDLWrapper/SDLWrapper.h"
 
-#include "GameObjects/GameObject.h"
+#include "SceneObjects/SceneObject.h"
 #include "CallbackSystem/CallbackSystem.h"
 
 namespace Engine
@@ -11,7 +11,7 @@ namespace Engine
 	class RendererManager
 	{
 	private:
-		// SDL2 renderer pointer. This is the renderer that will be used to render all of the game objects.
+		// SDL2 renderer pointer. This is the renderer that will be used to render all of the scene objects.
 		SDLRenderer* renderer;
 
 		// Pointer to the ICallbackSystem instance. Having a member variable that points
@@ -38,7 +38,7 @@ namespace Engine
 		SDLRenderer* getRenderer() const;
 		const SDLTexture* loadTexture(const char* filePath);
 		void clearScreen();
-		void render(GameObject* gameObject, const int pixelsPerMeter, const double interpolation);
+		void render(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation);
 		void setViewport(SDLWindow* ptrWindow);
 		void display();
 		void free();

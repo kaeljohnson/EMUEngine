@@ -2,7 +2,6 @@
 
 namespace Engine
 {
-	
 	// All the possible engine supported body types.
 
 	enum EMU_API BodyType

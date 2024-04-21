@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../GameObjects/GameObject.h"
+#include "../SceneObjects/SceneObject.h"
 #include "CallbackType.h"
 
 #include <variant>
@@ -13,7 +13,7 @@
 
 namespace Engine
 {
-    using Data = std::variant<std::monostate, const int, const float, const std::string, const std::pair<int, int>, GameObject*>;
+    using Data = std::variant<std::monostate, const int, const float, const std::string, const std::pair<int, int>, SceneObject*>;
     using Callback = std::function<void(Data)>;
 
     class ICallbackSystem
