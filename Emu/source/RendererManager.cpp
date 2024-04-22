@@ -5,7 +5,7 @@
 
 #include "../include/RendererManager.h"
 #include "../include/Logging/Logger.h"
-#include "../include/SceneObjects/SceneObject.h"
+#include "../include/Scenes/SceneObject.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Physics/IPhysicsBody.h"
 

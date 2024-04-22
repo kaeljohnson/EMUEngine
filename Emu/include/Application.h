@@ -45,6 +45,7 @@ namespace Engine
 		IWorld* m_world;
 
 		void processEventQueue();
+		// void renderScene();
 		void renderLayers(const double interpolation);
 		void defineDefaultApplicationCallbacks();
 
@@ -65,6 +66,7 @@ namespace Engine
 		EMU_API void PopLayerFromStack();
 
 		// Application functions.
+		// EMU_API PlayScene();
 		EMU_API void Run();
 		EMU_API void End();
 

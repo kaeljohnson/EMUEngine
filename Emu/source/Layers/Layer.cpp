@@ -4,7 +4,7 @@
 
 #include "../../include/Layers/Layer.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/SceneObjects/SceneObject.h"
+#include "../../include/Scenes/SceneObject.h"
 #include "../../include/CallbackSystem/CallbackSystem.h"
 
 namespace Engine

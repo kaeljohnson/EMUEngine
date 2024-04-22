@@ -8,7 +8,7 @@
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
 #include "../include/Layers/Layer.h"
-#include "../include/SceneObjects/SceneObject.h"
+#include "../include/Scenes/SceneObject.h"
 #include "../include/Physics/Box.h"
 #include "../include/Physics/PhysicsFactory.h"
 

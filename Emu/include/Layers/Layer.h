@@ -4,7 +4,7 @@
 
 #include "../Core.h"
 #include "../Events/Event.h"
-#include "../SceneObjects/SceneObject.h"
+#include "../Scenes/SceneObject.h"
 #include "../CallbackSystem/CallbackSystem.h"
 
 namespace Engine

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../SceneObjects/SceneObject.h"
+#include "../Scenes/SceneObject.h"
 #include "CallbackType.h"
 
 #include <variant>
