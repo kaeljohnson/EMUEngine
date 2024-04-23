@@ -1,6 +1,7 @@
 #pragma once
 
 #include <queue>
+#include <memory>
 
 #include "Core.h"
 #include "WindowManager.h"
@@ -12,6 +13,7 @@
 #include "CallbackSystem/CallbackSystem.h"
 #include "Physics/IWorld.h"
 #include "Physics/PhysicsFactory.h"
+#include "Scenes/Scene.h"
 
 namespace Engine
 {
@@ -38,11 +40,10 @@ namespace Engine
 		// Manages events.
 		EventManager m_eventManager;
 
-		// Hold applications layers.
-		LayerStack m_layerStack;
-
-		// Interface for world where the application simulation exists within.
-		IWorld* m_world;
+		// This will be replaced with a scene map. Where the client can load up the scene
+		// they want to run. Scenes will hold the current level, and textures. They will
+		// be big so they should not be hot at all times.
+		std::shared_ptr<Scene> currentScene;
 
 		void processEventQueue();
 		// void renderScene();
@@ -54,7 +55,10 @@ namespace Engine
 
 		~Application();
 
-		EMU_API void SetSimulation(const float gravityX, const float gravityY, const float timeStep, const int pixelsPerMeter);
+		EMU_API std::shared_ptr<Scene> CreateScene(const std::string& sceneName);
+		//EMU_API void SetSimulation(const float gravityX, const float gravityY, const float timeStep, const int pixelsPerMeter);
+		EMU_API void SetTimeStep(const float timeStep);
+		EMU_API void SetPixelsPerMeter(const int pixelsPerMeter);
 
 		// TEMP
 		EMU_API SDLRenderer* GetRenderer() { return m_rendererManager.getRenderer(); }

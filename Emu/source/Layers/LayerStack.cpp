@@ -54,7 +54,7 @@ namespace Engine
 		m_layers.push_back(layer);
 	}
 
-	void LayerStack::popLayer(Layer* layer) 
+	void LayerStack::pop(Layer* layer) 
 	{
 		if (layer == nullptr)
 		{
@@ -73,6 +73,8 @@ namespace Engine
 				// Stuff the client needs to do when a layer is popped.
 				(*it)->OnDetach();
 
+				(*it)->IsAttachedToScene = false;
+
 				// Remove the layer from the layer stack.
 				m_layers.erase(it);
 				break;
@@ -80,7 +82,7 @@ namespace Engine
 		}
 	}
 
-	void LayerStack::popLayer() 
+	void LayerStack::pop() 
 	{
 		if (m_layers.empty())
 		{
@@ -93,6 +95,8 @@ namespace Engine
 
 		// Stuff the client needs to do when a layer is popped.
 		m_layers.back()->OnDetach();
+
+		m_layers.back()->IsAttachedToScene = false;
 
 		// Remove the layer from the layer stack.
 		m_layers.pop_back();

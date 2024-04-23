@@ -7,6 +7,7 @@
 #include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Logging/Logger.h"
 #include "../include/Scenes/SceneObject.h"
+#include "../include/Scenes/Scene.h"
 #include "../include/Layers/Layer.h"
 #include "../include/Physics/BodyTypes.h"
 #include "../include/Textures/Texture.h"

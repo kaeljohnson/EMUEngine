@@ -9,60 +9,71 @@
 #include "../include/Events/Event.h"
 #include "../include/Layers/Layer.h"
 #include "../include/Scenes/SceneObject.h"
+#include "../include/Scenes/Scene.h"
 #include "../include/Physics/Box.h"
 #include "../include/Physics/PhysicsFactory.h"
 
 namespace Engine
 {
-	Application::Application()
-		: m_windowManager("Default App Name"),
-		m_rendererManager(m_windowManager.getWindow()),
-		m_eventManager(m_eventQ),
-		m_layerStack(),
-		running(false),
-		m_pixelsPerMeter(20),
-		m_timeStep(1.0f / 60.0f)
-	{
-		m_world = CreateWorld(0.0f * m_pixelsPerMeter, 9.8f * m_pixelsPerMeter, m_timeStep, 8, 3);
-		defineDefaultApplicationCallbacks();
-	}
-
-	void Application::SetSimulation(const float gravityX, const float gravityY, const float timeStep, const int pixelsPerMeter)
-	{
-		m_timeStep = timeStep;
-		m_pixelsPerMeter = pixelsPerMeter;
-		m_world->SetGravity(gravityX * pixelsPerMeter, gravityY * pixelsPerMeter);
-		m_world->SetTimeStep(timeStep);
-
-		ENGINE_INFO_D("Client creating simulation with gravity: ({}, {}) and time step: {}", gravityX, gravityY, timeStep);
-	}
-
 	Application* Application::GetInstance()
 	{
 		if (instance == nullptr)
-		{	
+		{
 			instance = new Application();
 			return instance;
 		}
-		
+
 		// Don't want client to reference 
 		// multiple instances of the application.
 		ENGINE_CRITICAL_D("Warning! Instance of application already exists. Multiple usage only recommended for testing.");
 		return instance;
 	}
 
+	Application::Application()
+		: m_windowManager("Default App Name"),
+		m_rendererManager(m_windowManager.getWindow()),
+		m_eventManager(m_eventQ),
+		running(false),
+		m_pixelsPerMeter(20),
+		m_timeStep(1.0f / 60.0f)
+	{
+		defineDefaultApplicationCallbacks();
+	}
+
+	std::shared_ptr<Scene> Application::CreateScene(const std::string& sceneName)
+{
+    ENGINE_INFO_D("Creating scene: {}", sceneName);
+    currentScene = std::make_shared<Scene>(sceneName, m_timeStep, m_pixelsPerMeter);
+    return currentScene;
+}
+
+	void Application::SetTimeStep(const float timeStep)
+	{
+		m_timeStep = timeStep;
+	}
+	void Application::SetPixelsPerMeter(const int pixelsPerMeter)
+	{
+		m_pixelsPerMeter = pixelsPerMeter;
+	}
+
 	void Application::Run()
 	{
-		for (auto& layer : m_layerStack)
+		if (currentScene == nullptr)
+		{
+			ENGINE_CRITICAL_D("No scene loaded! Application must have a scene to run!");
+			End();
+		}
+
+		for (auto& layer : currentScene->m_layerStack)
 		{
 			ENGINE_TRACE_D("Layer: {}", layer->GetName());
 		}
 
 		ENGINE_INFO_D("Application running!");
 
-		if (m_layerStack.size() > 0)
+		if (currentScene->m_layerStack.size() > 0)
 		{
-			ENGINE_TRACE_D("Layer stack size: {}", m_layerStack.size());
+			ENGINE_TRACE_D("Layer stack size: {}", currentScene->m_layerStack.size());
 		}
 		else
 		{
@@ -98,19 +109,10 @@ namespace Engine
 				m_eventManager.handleEvents();
 				processEventQueue();
 
-				// Faster way to do this? Should only have to update objects
-				// prev values if they have changed. In fact, should only update
-				// objects that have changed in general
-				for (Layer* layer : m_layerStack)
-				{
-					for (SceneObject* sceneObject : *layer)
-					{
-						sceneObject->GetPhysicsBody()->updatePrevX();
-						sceneObject->GetPhysicsBody()->updatePrevY();
-					}
-				}
+				
+				
 
-				m_world->update();
+				currentScene->update();
 
 				accumulator -= m_timeStep;
 			}
@@ -128,7 +130,7 @@ namespace Engine
 		// Should not be renderering every layer every frame.
 	    // Should only render layers that are visible and have changed.
 
-		for (Layer* layer : m_layerStack)
+		for (Layer* layer : currentScene->m_layerStack)
 		{
 			for (SceneObject* sceneObject : *layer)
 			{
@@ -154,7 +156,7 @@ namespace Engine
 		while (!m_eventQ.empty())
 		{
 			Event& currentEvent = m_eventQ.front();
-			for (auto it_layer = m_layerStack.end(); it_layer != m_layerStack.begin();)
+			for (auto it_layer = currentScene->m_layerStack.end(); it_layer != currentScene->m_layerStack.begin();)
 			{
 				
 				(*--it_layer)->ProcessEvent(currentEvent);
@@ -182,46 +184,8 @@ namespace Engine
 
 	Application::~Application()
 	{
-		delete m_world;
-		m_world = nullptr;
-
 		delete instance;
 		instance = nullptr;
-	}
-
-	void Application::PushToLayerStack(Layer* layer)
-	{
-		if (layer == nullptr)
-		{
-			ENGINE_CRITICAL_D("Layer is nullptr! Cannot push to layer stack.");
-			return;
-		}
-
-		m_layerStack.pushLayer(layer);
-		layer->IsAttachedToScene = true;
-	}
-
-	void Application::PopLayerFromStack(Layer* layer)
-	{
-		if (layer == nullptr)
-		{
-			ENGINE_CRITICAL_D("Layer is nullptr! Cannot pop from layer stack.");
-			return;
-		}
-
-		m_layerStack.popLayer(layer);
-		layer->IsAttachedToScene = false;
-	}
-
-	void Application::PopLayerFromStack()
-	{
-		if (m_layerStack.size() == 0)
-		{
-			ENGINE_CRITICAL_D("Layer stack is empty! Cannot pop from layer stack.");
-			return;
-		}
-
-		m_layerStack.popLayer();
 	}
 
 	void Application::defineDefaultApplicationCallbacks()
@@ -237,14 +201,6 @@ namespace Engine
 		ptrICallbackSystem->NewCallback(Type::EndApplication, [this](Data data)
 			{
 				End();
-			});
-
-		ptrICallbackSystem->NewCallback(Type::AddToWorld, [this](Data layerEventData)
-			{
-				SceneObject* sceneObject = std::get<SceneObject*>(layerEventData);
-				Box* ptrBox = static_cast<Box*>(sceneObject->GetPhysicsBody());
-
-				m_world->addBox(ptrBox);
 			});
 
 		ptrICallbackSystem->NewCallback(Type::ResizeWindow, [this](Data data)

@@ -31,9 +31,9 @@ namespace Engine
 		void pushLayer(Layer* layer);
 
 		// Pops a layer from the stack.
-		void popLayer(Layer* layer);
+		void pop(Layer* layer);
 
 		// Pops the top layer from the stack.
-		void popLayer();
+		void pop();
 	};
 }
