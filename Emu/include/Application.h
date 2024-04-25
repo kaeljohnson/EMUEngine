@@ -2,6 +2,7 @@
 
 #include <queue>
 #include <memory>
+#include <unordered_map>
 
 #include "Core.h"
 #include "WindowManager.h"
@@ -34,20 +35,21 @@ namespace Engine
 		std::queue<Event> m_eventQ;
 
 		// Managers for major engine components.
+		// Maybe decouple from application class?
 		WindowManager m_windowManager;
 		RendererManager m_rendererManager;
 		
 		// Manages events.
+		//Maybe decouple from application class?
 		EventManager m_eventManager;
 
-		// This will be replaced with a scene map. Where the client can load up the scene
-		// they want to run. Scenes will hold the current level, and textures. They will
-		// be big so they should not be hot at all times.
-		std::shared_ptr<Scene> currentScene;
+		// Scenes probably don't need to be managed by the application.
+		// Maybe create a separate scene manager class.
+		// Application really only needs to see the active scene.
+		std::unordered_map<std::string, std::shared_ptr<Scene>> m_sceneMap;
 
-		void processEventQueue();
-		// void renderScene();
-		void renderLayers(const double interpolation);
+		void processEventQueue(std::shared_ptr<Scene> currentScene);
+		void renderScene(std::shared_ptr<Scene> scene, const double interpolation);
 		void defineDefaultApplicationCallbacks();
 
 	public:
@@ -71,7 +73,10 @@ namespace Engine
 
 		// Application functions.
 		// EMU_API PlayScene();
-		EMU_API void Run();
+		//EMU_API void Run();
+		EMU_API void PlayScene(std::string sceneName);
+		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
+		EMU_API void PauseScene();
 		EMU_API void End();
 
 		// Deleted functions to ensure our app instance cannot be copied or moved.

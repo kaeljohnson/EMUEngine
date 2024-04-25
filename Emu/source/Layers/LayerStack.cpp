@@ -26,7 +26,7 @@ namespace Engine
 
 	const size_t LayerStack::size() const { return m_layers.size(); }
 
-	void LayerStack::pushLayer(Layer* layer) 
+	void LayerStack::push(Layer* layer) 
 	{
 		if (layer == nullptr)
 		{
@@ -44,8 +44,7 @@ namespace Engine
 		}
 
 		// Stuff engine needs to do when a layer is pushed.
-		// Scene objects added to the application world when layer is pushed to application layer stack.
-		layer->AddToWorld();
+		
 
 		// Stuff the client needs to do when a layer is pushed.
 		layer->OnAttach();

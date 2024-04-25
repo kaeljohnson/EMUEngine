@@ -39,7 +39,7 @@ namespace Engine
 		// Adds the layer to the world. This probably should 
 		// not be a layer member function. Once scenes exist, 
 		// it can be something like "scene->AddLayer(layer)".
-		EMU_API void AddToWorld();
+		//EMU_API void AddToWorld();
 
 		// Removes the layer from the world.
 		// Should be a scene member function.
@@ -64,7 +64,7 @@ namespace Engine
 		const std::string& GetName() const;
 
 		// Add a scene object to the layer.
-		EMU_API void AddSceneObject(SceneObject* sceneObject);
+		void AddSceneObject(SceneObject* sceneObject);
 
 		// Remove a scene object from the layer.
 		EMU_API void RemoveSceneObject(SceneObject* sceneObject);

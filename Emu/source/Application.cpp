@@ -43,8 +43,8 @@ namespace Engine
 	std::shared_ptr<Scene> Application::CreateScene(const std::string& sceneName)
 {
     ENGINE_INFO_D("Creating scene: {}", sceneName);
-    currentScene = std::make_shared<Scene>(sceneName, m_timeStep, m_pixelsPerMeter);
-    return currentScene;
+	m_sceneMap[sceneName] = std::make_shared<Scene>(sceneName, m_timeStep, m_pixelsPerMeter);
+    return m_sceneMap[sceneName];
 }
 
 	void Application::SetTimeStep(const float timeStep)
@@ -54,9 +54,20 @@ namespace Engine
 	void Application::SetPixelsPerMeter(const int pixelsPerMeter)
 	{
 		m_pixelsPerMeter = pixelsPerMeter;
+		for (auto& scene : m_sceneMap)
+		{
+			scene.second->m_pixelsPerMeter = pixelsPerMeter;
+		}
 	}
 
-	void Application::Run()
+	void Application::PlayScene(std::string sceneName)
+	{
+		ENGINE_INFO_D("Playing scene: {}", sceneName);
+		PlayScene(m_sceneMap[sceneName]);
+	
+	}
+
+	void Application::PlayScene(std::shared_ptr<Scene> currentScene)
 	{
 		if (currentScene == nullptr)
 		{
@@ -64,22 +75,7 @@ namespace Engine
 			End();
 		}
 
-		for (auto& layer : currentScene->m_layerStack)
-		{
-			ENGINE_TRACE_D("Layer: {}", layer->GetName());
-		}
-
-		ENGINE_INFO_D("Application running!");
-
-		if (currentScene->m_layerStack.size() > 0)
-		{
-			ENGINE_TRACE_D("Layer stack size: {}", currentScene->m_layerStack.size());
-		}
-		else
-		{
-			ENGINE_CRITICAL_D("Layer stack is empty! Application must have at least one layers to be valid!");
-			End();
-		}
+		currentScene->checkValid();
 
 		running = true;
 
@@ -107,10 +103,7 @@ namespace Engine
 			while (accumulator >= m_timeStep)
 			{
 				m_eventManager.handleEvents();
-				processEventQueue();
-
-				
-				
+				processEventQueue(currentScene);
 
 				currentScene->update();
 
@@ -120,17 +113,17 @@ namespace Engine
 			const double interpolation = accumulator / m_timeStep;
 
 			m_rendererManager.clearScreen();
-			renderLayers(interpolation);
+			renderScene(currentScene, interpolation);
 			m_rendererManager.display();      
 		}
 	}
 
-	void Application::renderLayers(const double interpolation)
+	void Application::renderScene(std::shared_ptr<Scene> scene, const double interpolation)
 	{
 		// Should not be renderering every layer every frame.
 	    // Should only render layers that are visible and have changed.
 
-		for (Layer* layer : currentScene->m_layerStack)
+		for (Layer* layer : *scene)
 		{
 			for (SceneObject* sceneObject : *layer)
 			{
@@ -139,7 +132,7 @@ namespace Engine
 		}
 	}
 
-	void Application::processEventQueue()
+	void Application::processEventQueue(std::shared_ptr<Scene> currentScene)
 	{
 		// Process order for layers is opporsite of render order.
 
@@ -156,7 +149,7 @@ namespace Engine
 		while (!m_eventQ.empty())
 		{
 			Event& currentEvent = m_eventQ.front();
-			for (auto it_layer = currentScene->m_layerStack.end(); it_layer != currentScene->m_layerStack.begin();)
+			for (auto it_layer = currentScene->end(); it_layer != currentScene->begin();)
 			{
 				
 				(*--it_layer)->ProcessEvent(currentEvent);

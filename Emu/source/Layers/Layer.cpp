@@ -18,16 +18,6 @@ namespace Engine
 		// Even if the layer is destroyed, the scene objects will still exist.
 		// Layer just organizes the scene objects.
 	}
-	 
-	void Layer::AddToWorld()
-	{
-		ENGINE_TRACE_D("Adding layer {} to the world.", m_name);
-
-		for (SceneObject* sceneObject : m_sceneObjects)
-		{
-			ptrICallbackSystem->TriggerCallback(Type::AddToWorld, sceneObject);
-		}
-	};
 
 	void Layer::RemoveFromWorld()
 	{
@@ -83,12 +73,6 @@ namespace Engine
 		{
 			// Add rest of objects to the end of the list.
 			m_sceneObjects.push_back(sceneObject);
-		}
-
-		// If the layer is already attached to the scenes layer stack, add the object to the world as well.
-		if (IsAttachedToScene)
-		{
-			ptrICallbackSystem->TriggerCallback(Type::AddToWorld, sceneObject);
 		}
 	}
 

@@ -28,7 +28,7 @@ namespace Engine
 		std::vector<Layer*>::iterator end() { return m_layers.end(); }
 
 		// Pushes a layer to the stack.
-		void pushLayer(Layer* layer);
+		void push(Layer* layer);
 
 		// Pops a layer from the stack.
 		void pop(Layer* layer);
