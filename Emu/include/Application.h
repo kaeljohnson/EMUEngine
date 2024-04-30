@@ -9,8 +9,8 @@
 #include "RendererManager.h"
 #include "Events/EventManager.h" 
 #include "Events/Event.h"
-#include "Layers/LayerStack.h"
-#include "Layers/Layer.h"
+#include "Events/EventListenerStack.h"
+#include "Events/EventListener.h"
 #include "CallbackSystem/CallbackSystem.h"
 #include "Physics/IWorld.h"
 #include "Physics/PhysicsFactory.h"
@@ -31,16 +31,15 @@ namespace Engine
 
 		int m_pixelsPerMeter;
 
-		// Event queue to hold all events.
-		std::queue<Event> m_eventQ;
-
 		// Managers for major engine components.
 		// Maybe decouple from application class?
 		WindowManager m_windowManager;
 		RendererManager m_rendererManager;
 		
+		// Event queue to hold all events.
+		std::queue<Event> m_eventQ;
 		// Manages events.
-		//Maybe decouple from application class?
+		// Maybe decouple from application class?
 		EventManager m_eventManager;
 
 		// Scenes probably don't need to be managed by the application.
@@ -65,18 +64,9 @@ namespace Engine
 		// TEMP
 		EMU_API SDLRenderer* GetRenderer() { return m_rendererManager.getRenderer(); }
 
-		// Push layer to layer stack. Pop layer from layer stack. This will change to being a scene member function.
-		// The scene will own the layer stack.
-		EMU_API void PushToLayerStack(Layer* layer);
-		EMU_API void PopLayerFromStack(Layer* layer);
-		EMU_API void PopLayerFromStack();
-
 		// Application functions.
-		// EMU_API PlayScene();
-		//EMU_API void Run();
 		EMU_API void PlayScene(std::string sceneName);
 		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
-		EMU_API void PauseScene();
 		EMU_API void End();
 
 		// Deleted functions to ensure our app instance cannot be copied or moved.

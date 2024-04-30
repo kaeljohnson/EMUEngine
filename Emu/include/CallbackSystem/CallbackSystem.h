@@ -26,6 +26,6 @@ namespace Engine
     public:
         EMU_API static ICallbackSystem* GetInstance();
         EMU_API void NewCallback(Type callbackType, Callback callback);
-        EMU_API void TriggerCallback(Type layerEventType, Data eventData);
+        EMU_API void TriggerCallback(Type eventType, Data eventData);
     };
 }

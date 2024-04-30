@@ -2,7 +2,7 @@
 
 #include <Engine.h>
 #include <memory>
-#include "../include/Layers/AppManagementLayer.h"
+#include "../include/EventListeners/AppManagementListener.h"
 
 int main(int argc, char* args[])
 {
@@ -31,8 +31,6 @@ int main(int argc, char* args[])
 	Engine::IPhysicsBody* wallRightBody = Engine::CreatePhysicsBody(Engine::STATIC, 100.0f, 35.0f, 2.0f, 80.0f, 0.0f, 50.0f, 0.0, 0.0, 0.0, true, true, true);
 	Engine::IPhysicsBody* groundBody =    Engine::CreatePhysicsBody(Engine::STATIC, 63.5f, 70.0f, 120.0f, 2.0f, 0.0f, 50.0f, 0.0, 1.0, 1.0, true, true, true);
 	
-	// SceneObject to be renamed and have a constructor that only takes
-	// a texture. Making the object exist outside the physics world.
 	Engine::SceneObject testGO(testBody, &tempTextureRed);
 	Engine::SceneObject testGO2(testBody2, &tempTextureRed);
 	Engine::SceneObject testGO3(testBody3, &tempTextureRed);
@@ -40,24 +38,16 @@ int main(int argc, char* args[])
 	Engine::SceneObject testWallRight(wallRightBody, &tempTextureBlue);
 	Engine::SceneObject testGround(groundBody, &tempTextureBlue);
 	
-	AppManagementLayer appLayer("App management layer");
-	Engine::Layer simulationLayer("Test Layer 1");
+	AppManagementListener appListener("App management listener");
 
-	// Note in documentation that the client must keep in mind
-	// which order they want layers processed and rendered in.
-	scene->PushLayer(&appLayer);
-	scene->PushLayer(&simulationLayer);
+	scene->AddEventListener(&appListener);
 
-	// Maybe the objects should be added to the scene and then associated with a layer.
-	// This might simplify understanding. The scene will own the objects and the layers
-	// will just be a way to organize them.
-
-	scene->Add(&testWall, &simulationLayer);
-	scene->Add(&testGround, &simulationLayer);
-	scene->Add(&testGO, &simulationLayer);
-	scene->Add(&testGO2, &simulationLayer);
-	scene->Add(&testGO3, &simulationLayer);
-	scene->Add(&testWallRight, &simulationLayer);
+	scene->Add(&testWall);
+	scene->Add(&testGround);
+	scene->Add(&testGO);
+	scene->Add(&testGO2);
+	scene->Add(&testGO3);
+	scene->Add(&testWallRight);
 	
 	ptrAppInstance->PlayScene("Test Scene");
 	// Need to figure out how to change scenes, stop scenes, etc.

@@ -9,7 +9,6 @@
 
 namespace Engine
 {
-
 	// SceneObject class. Currently behaves as a wrapper for a physics body and a texture.
 
 	class EMU_API SceneObject

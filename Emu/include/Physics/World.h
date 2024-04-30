@@ -11,8 +11,7 @@ namespace Engine
 	// This class is a wrapper for the box2d b2World class. It will be used by the engine as the object where
 	// all physics objects are created and updated. Scene objects which needs to adhere to physics will be added to 
 	// the world object. Every scene will have one world object. So, when the client adds an object, which is a
-	// box2d body, to the scene, they are by definition adding it to the world object. Essentially, the "game layer"
-	// will be the layer which the world lies in. Foreground layers, background layers and UI layers will adhere to separate systems.
+	// box2d body, to the scene, they are by definition adding it to the world object.
 
 	class World : public IWorld
 	{

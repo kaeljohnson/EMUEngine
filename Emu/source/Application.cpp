@@ -7,7 +7,8 @@
 #include "../include/Logging/Logger.h"
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
-#include "../include/Layers/Layer.h"
+#include "../include/Events/EventListenerStack.h"
+#include "../include/Events/EventListener.h"
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
 #include "../include/Physics/Box.h"
@@ -41,11 +42,11 @@ namespace Engine
 	}
 
 	std::shared_ptr<Scene> Application::CreateScene(const std::string& sceneName)
-{
-    ENGINE_INFO_D("Creating scene: {}", sceneName);
-	m_sceneMap[sceneName] = std::make_shared<Scene>(sceneName, m_timeStep, m_pixelsPerMeter);
-    return m_sceneMap[sceneName];
-}
+	{
+		ENGINE_INFO_D("Creating scene: {}", sceneName);
+		m_sceneMap[sceneName] = std::make_shared<Scene>(sceneName, m_timeStep, m_pixelsPerMeter);
+		return m_sceneMap[sceneName];
+	}
 
 	void Application::SetTimeStep(const float timeStep)
 	{
@@ -90,8 +91,8 @@ namespace Engine
 				1. Handle events.
 				2. Process actions.
 				3. Clear the screen.
-				4. Render layer.
-				5. Display the rendered layers.
+				4. Render scene.
+				5. Display the rendered scene.
 			*/
 
 			double newTime = SDL_GetTicks() / 1000.0;
@@ -120,21 +121,20 @@ namespace Engine
 
 	void Application::renderScene(std::shared_ptr<Scene> scene, const double interpolation)
 	{
-		// Should not be renderering every layer every frame.
-	    // Should only render layers that are visible and have changed.
+		// Should not be renderering every object in the scene every frame.
 
-		for (Layer* layer : *scene)
+		size_t idx = 0;
+		while (idx < scene->m_sceneObjectCount)
 		{
-			for (SceneObject* sceneObject : *layer)
-			{
-				m_rendererManager.render(sceneObject, m_pixelsPerMeter, interpolation);
-			}
+			m_rendererManager.render(scene->m_sceneObjects[idx], m_pixelsPerMeter, interpolation);
+			idx++;
 		}
+
 	}
 
 	void Application::processEventQueue(std::shared_ptr<Scene> currentScene)
 	{
-		// Process order for layers is opporsite of render order.
+		// Process order for scene is opposite of render order.
 
 		// Potential for multithreading if there are a lot of events.
 		
@@ -149,10 +149,10 @@ namespace Engine
 		while (!m_eventQ.empty())
 		{
 			Event& currentEvent = m_eventQ.front();
-			for (auto it_layer = currentScene->end(); it_layer != currentScene->begin();)
+
+			for (auto& eventHandler : currentScene->m_eventListeners)
 			{
-				
-				(*--it_layer)->ProcessEvent(currentEvent);
+				eventHandler->ProcessEvent(currentEvent);
 				if (currentEvent.Handled)
 				{
 					break;

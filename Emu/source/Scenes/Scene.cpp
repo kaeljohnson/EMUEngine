@@ -11,7 +11,7 @@
 
 namespace Engine
 {
-	Scene::Scene(std::string name, const float timestep, const int pixelsPerMeter) : m_name(name), m_layerStack(), m_pixelsPerMeter(pixelsPerMeter), m_timeStep(timestep)
+	Scene::Scene(std::string name, const float timestep, const int pixelsPerMeter) : m_name(name), m_eventListeners(), m_pixelsPerMeter(pixelsPerMeter), m_timeStep(timestep)
 	{
 		m_world = CreateWorld(0.0f * m_pixelsPerMeter, 9.8f * m_pixelsPerMeter, m_timeStep, 8, 3);
 
@@ -26,20 +26,20 @@ namespace Engine
 	void Scene::checkValid()
 	{
 		// Check if the scene is valid. If not, throw an error.
-		for (auto& layer : m_layerStack)
+		for (auto& listener : m_eventListeners)
 		{
-			ENGINE_TRACE_D("Layer: {}", layer->GetName());
+			ENGINE_TRACE_D("eventListener: {}", listener->m_name);
 		}
 
 		ENGINE_INFO_D("Application running!");
 
-		if (m_layerStack.size() > 0)
+		if (m_eventListeners.size() > 0)
 		{
-			ENGINE_TRACE_D("Layer stack size: {}", m_layerStack.size());
+			ENGINE_TRACE_D("eventListener stack size: {}", m_eventListeners.size());
 		}
 		else
 		{
-			ENGINE_CRITICAL_D("Layer stack is empty! Application must have at least one layers to be valid!");
+			ENGINE_CRITICAL_D("eventListener stack is empty! Application must have at least one eventListeners to be valid!");
 			ICallbackSystem::GetInstance()->TriggerCallback(Type::EndApplication, nullptr);
 		}
 	}
@@ -50,14 +50,14 @@ namespace Engine
 		// prev values if they have changed. In fact, should only update
 		// objects that have changed in general
 
-		for (Layer* layer : m_layerStack)
+		size_t idx = 0;
+		while (idx < m_sceneObjectCount)
 		{
-			for (SceneObject* sceneObject : *layer)
-			{
-				sceneObject->GetPhysicsBody()->updatePrevX();
-				sceneObject->GetPhysicsBody()->updatePrevY();
-			}
+			m_sceneObjects[idx]->GetPhysicsBody()->updatePrevX();
+			m_sceneObjects[idx]->GetPhysicsBody()->updatePrevY();
+			idx++;
 		}
+
 		m_world->update();
 	};
 
@@ -69,30 +69,53 @@ namespace Engine
 		ENGINE_INFO_D("Client creating simulation with gravity: ({}, {})", gravityX, gravityY);
 	}
 
-	// Push layer to layer stack. Pop layer from layer stack. This will change to being a scene member function.
-	// The scene will own the layer stack.
-	void Scene::PushLayer(Layer* layer)
+	void Scene::AddEventListener(EventListener* eventListener)
 	{
-		if (layer == nullptr)
+		if (eventListener == nullptr)
 		{
-			ENGINE_CRITICAL_D("Layer is nullptr! Cannot push to layer stack.");
+			ENGINE_WARN_D("EventListener is nullptr.");
 			return;
 		}
 
-		m_layerStack.push(layer);
-		// Scene objects added to the application world when layer is pushed to application layer stack.
-		//AddToWorld(layer);
-		layer->IsAttachedToScene = true;
+		ENGINE_INFO_D("Adding event listener to scene {}.", m_name);
+
+		for (auto& ptrEventListener : m_eventListeners)
+		{
+			if (ptrEventListener == eventListener)
+			{
+				ENGINE_WARN_D("Event listener already exists in scene {}.", m_name);
+				return;
+			}
+		}
+
+		m_eventListeners.push(eventListener);
+		eventListener->IsAttachedToScene = true;
+
+		// Add all scene objects in the event listener to the world
+		for (SceneObject* sceneObject : *eventListener)
+		{
+			Add(sceneObject);
+		}
 	}
 
-	void Scene::Add(SceneObject* sceneObject, Layer* layer)
+	void Scene::Add(SceneObject* sceneObject)
 	{
-		(sceneObject == nullptr) ? ENGINE_WARN_D("SceneObject is nullptr.") : ENGINE_TRACE_D("Adding scene object to scene {}.", m_name);
-		(layer == nullptr) ? ENGINE_WARN_D("Layer is nullptr. Scene object will be rendered last.") : ENGINE_TRACE_D("Scene object tied to {}.", layer->GetName());
+		(sceneObject == nullptr) ? ENGINE_WARN_D("SceneObject is nullptr.") : ENGINE_WARN_D("Adding scene object to scene {}.", m_name);
 
-		if (std::find(m_sceneObjects.begin(), m_sceneObjects.end(), sceneObject) != m_sceneObjects.end())
+		// Check if the scene object already exists in the array
+		for (size_t i = 0; i < m_sceneObjectCount; i++)
 		{
-			ENGINE_WARN_D("SceneObject already exists in scene {}.", m_name);
+			if (m_sceneObjects[i] == sceneObject)
+			{
+				ENGINE_WARN_D("SceneObject already exists in scene {}.", m_name);
+				return;
+			}
+		}
+
+		// Check if there's room in the array
+		if (m_sceneObjectCount >= m_maxSceneObjects)
+		{
+			ENGINE_WARN_D("Scene is full. Cannot add more scene objects.");
 			return;
 		}
 
@@ -102,76 +125,66 @@ namespace Engine
 
 		if (sceneObject->GetPhysicsBody()->getBodyType() == BodyType::STATIC)
 		{
-			auto it = std::find_if(m_sceneObjects.begin(), m_sceneObjects.end(), [&](SceneObject* sceneObject)
+			// Find the first dynamic object
+			size_t firstDynamicIndex = 0;
+			for (; firstDynamicIndex < m_sceneObjectCount; firstDynamicIndex++)
+			{
+				if (m_sceneObjects[firstDynamicIndex]->GetPhysicsBody()->getBodyType() != BodyType::STATIC)
 				{
-					return !sceneObject->GetPhysicsBody()->getBodyType();
-				});
+					break;
+				}
+			}
 
-			// Insert the static object before the first dynamic object.
-			m_sceneObjects.insert(it, sceneObject);
-			layer->AddSceneObject(sceneObject);
+			// Shift all dynamic objects to the right
+			for (size_t i = m_sceneObjectCount; i > firstDynamicIndex; i--)
+			{
+				m_sceneObjects[i] = m_sceneObjects[i - 1];
+			}
+
+			// Insert the static object before the first dynamic object
+			m_sceneObjects[firstDynamicIndex] = sceneObject;
 		}
 		else
 		{
-			// Add rest of objects to the end of the list.
-			m_sceneObjects.push_back(sceneObject);
-			layer->AddSceneObject(sceneObject);
+			// Add rest of objects to the end of the list
+			m_sceneObjects[m_sceneObjectCount] = sceneObject;
 		}
 
-		// If the layer is already attached to the scenes layer stack, add the object to the world as well.
-		// Could be other reasons the client may or may not want to add the object to the world.
-		// More conditions may be added later. Like, visible, collidable, etc.
-		if (layer->IsAttachedToScene)
-		{
-			// ptrICallbackSystem->TriggerCallback(Type::AddToWorld, sceneObject);
-			m_world->addBox(static_cast<Box*>(sceneObject->GetPhysicsBody()));
-		}
+		m_sceneObjectCount++;
+
+		
+		m_world->addBox(static_cast<Box*>(sceneObject->GetPhysicsBody()));
 	}
 
-	/*void Scene::AddToWorld(Layer* layer)
+	void Scene::Remove(SceneObject* sceneObject)
 	{
-		ENGINE_TRACE_D("Adding layer {} to the world.", m_name);
+		(sceneObject == nullptr) ? ENGINE_WARN_D("SceneObject is nullptr.") : ENGINE_WARN_D("Removing scene object from scene {}.", m_name);
 
-		for (SceneObject* sceneObject : *layer)
+		// Find the scene object in the array
+		size_t index = 0;
+		for (; index < m_sceneObjectCount; index++)
 		{
-			m_world->addBox(static_cast<Box*>(sceneObject->GetPhysicsBody()));
+			if (m_sceneObjects[index] == sceneObject)
+			{
+				break;
+			}
 		}
-	};*/
 
-	void Scene::PopLayer(Layer* layer)
-	{
-		if (layer == nullptr)
+		// If the scene object was not found, return
+		if (index == m_sceneObjectCount)
 		{
-			ENGINE_CRITICAL_D("Layer is nullptr! Cannot pop from layer stack.");
+			ENGINE_WARN_D("Scene object not found in scene {}.", m_name);
 			return;
 		}
 
-		m_layerStack.pop(layer);
-	}
-
-	void Scene::PopLayer()
-	{
-		if (m_layerStack.size() == 0)
+		// Remove the scene object from the array
+		for (size_t i = index; i < m_sceneObjectCount - 1; i++)
 		{
-			ENGINE_CRITICAL_D("Layer stack is empty! Cannot pop from layer stack.");
-			return;
+			m_sceneObjects[i] = m_sceneObjects[i + 1];
 		}
 
-		m_layerStack.pop();
-	}
+		m_sceneObjectCount--;
 
-	// Removes the layer from the world.
-	void Scene::RemoveFromWorld(Layer* layer)
-	{
-		ENGINE_TRACE_D("Removing layer {} from the scenes world.", m_name);
-
-		// Need to remove all scene objects inside the layer from the world. May need to be careful with how
-		// objects are removed due to box2d actively using the object during the world step.
-		// Box2d simulating an object that no longer exists will be problematic.
-
-		for (SceneObject* sceneObject : *layer)
-		{
-			m_world->removeBox(static_cast<Box*>(sceneObject->GetPhysicsBody()));
-		}
+		m_world->removeBox(static_cast<Box*>(sceneObject->GetPhysicsBody()));
 	}
 }
