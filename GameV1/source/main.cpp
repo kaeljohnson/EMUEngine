@@ -17,6 +17,7 @@ int main(int argc, char* args[])
 
 	ptrAppInstance->SetTimeStep(1.0f / 60.0f);
 	ptrAppInstance->SetPixelsPerMeter(10);
+
 	scene->SetSimulation(0.0f, 9.8f);
 
 	// Temp
@@ -40,7 +41,7 @@ int main(int argc, char* args[])
 	
 	AppManagementListener appListener("App management listener");
 
-	scene->AddEventListener(&appListener);
+	ptrAppInstance->AddEventListener(&appListener);
 
 	scene->Add(&testWall);
 	scene->Add(&testGround);

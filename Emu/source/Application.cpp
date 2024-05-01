@@ -34,6 +34,7 @@ namespace Engine
 		: m_windowManager("Default App Name"),
 		m_rendererManager(m_windowManager.getWindow()),
 		m_eventManager(m_eventQ),
+		m_eventListeners(),
 		running(false),
 		m_pixelsPerMeter(20),
 		m_timeStep(1.0f / 60.0f)
@@ -150,9 +151,9 @@ namespace Engine
 		{
 			Event& currentEvent = m_eventQ.front();
 
-			for (auto& eventHandler : currentScene->m_eventListeners)
+			for (auto& eventListener : m_eventListeners)
 			{
-				eventHandler->ProcessEvent(currentEvent);
+				eventListener->ProcessEvent(currentEvent);
 				if (currentEvent.Handled)
 				{
 					break;
@@ -166,6 +167,29 @@ namespace Engine
 
 			m_eventQ.pop();
 		}
+	}
+
+	void Application::AddEventListener(EventListener* eventListener)
+	{
+		if (eventListener == nullptr)
+		{
+			ENGINE_WARN_D("EventListener is nullptr.");
+			return;
+		}
+
+		ENGINE_INFO_D("Adding event listener to app.");
+
+		for (auto& ptrEventListener : m_eventListeners)
+		{
+			if (ptrEventListener == eventListener)
+			{
+				ENGINE_WARN_D("Event listener already exists in scene.");
+				return;
+			}
+		}
+
+		m_eventListeners.push(eventListener);
+		eventListener->IsAttachedToApp = true;
 	}
 
 	void Application::End()

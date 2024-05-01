@@ -11,10 +11,15 @@
 
 namespace Engine
 {
-	Scene::Scene(std::string name, const float timestep, const int pixelsPerMeter) : m_name(name), m_eventListeners(), m_pixelsPerMeter(pixelsPerMeter), m_timeStep(timestep)
+	Scene::Scene(std::string name, const float timestep, const int pixelsPerMeter) : m_name(name), m_pixelsPerMeter(pixelsPerMeter), m_timeStep(timestep)
 	{
 		m_world = CreateWorld(0.0f * m_pixelsPerMeter, 9.8f * m_pixelsPerMeter, m_timeStep, 8, 3);
-
+		
+		for (size_t i = 0; i < m_maxSceneObjects; i++)
+		{
+			m_sceneObjects[i] = nullptr;
+		
+		}
 	}
 
 	Scene::~Scene()
@@ -25,23 +30,11 @@ namespace Engine
 
 	void Scene::checkValid()
 	{
-		// Check if the scene is valid. If not, throw an error.
-		for (auto& listener : m_eventListeners)
-		{
-			ENGINE_TRACE_D("eventListener: {}", listener->m_name);
-		}
-
-		ENGINE_INFO_D("Application running!");
-
-		if (m_eventListeners.size() > 0)
-		{
-			ENGINE_TRACE_D("eventListener stack size: {}", m_eventListeners.size());
-		}
-		else
-		{
-			ENGINE_CRITICAL_D("eventListener stack is empty! Application must have at least one eventListeners to be valid!");
-			ICallbackSystem::GetInstance()->TriggerCallback(Type::EndApplication, nullptr);
-		}
+		(m_world == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
+		(m_sceneObjectCount > m_maxSceneObjects) ? ENGINE_CRITICAL_D("Scene object count exceeds max scene objects.") : ENGINE_INFO_D("Scene object count is valid.");
+		(m_pixelsPerMeter <= 0) ? ENGINE_CRITICAL_D("Pixels per meter is invalid.") : ENGINE_INFO_D("Pixels per meter is valid.");
+		(m_timeStep <= 0) ? ENGINE_CRITICAL_D("Time step is invalid.") : ENGINE_INFO_D("Time step is valid.");
+		(m_name.empty()) ? ENGINE_CRITICAL_D("Scene name is empty.") : ENGINE_INFO_D("Scene name is valid.");
 	}
 
 	void Scene::update()
@@ -67,35 +60,6 @@ namespace Engine
 		m_world->SetTimeStep(m_timeStep);
 
 		ENGINE_INFO_D("Client creating simulation with gravity: ({}, {})", gravityX, gravityY);
-	}
-
-	void Scene::AddEventListener(EventListener* eventListener)
-	{
-		if (eventListener == nullptr)
-		{
-			ENGINE_WARN_D("EventListener is nullptr.");
-			return;
-		}
-
-		ENGINE_INFO_D("Adding event listener to scene {}.", m_name);
-
-		for (auto& ptrEventListener : m_eventListeners)
-		{
-			if (ptrEventListener == eventListener)
-			{
-				ENGINE_WARN_D("Event listener already exists in scene {}.", m_name);
-				return;
-			}
-		}
-
-		m_eventListeners.push(eventListener);
-		eventListener->IsAttachedToScene = true;
-
-		// Add all scene objects in the event listener to the world
-		for (SceneObject* sceneObject : *eventListener)
-		{
-			Add(sceneObject);
-		}
 	}
 
 	void Scene::Add(SceneObject* sceneObject)

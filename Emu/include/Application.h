@@ -2,7 +2,6 @@
 
 #include <queue>
 #include <memory>
-#include <unordered_map>
 
 #include "Core.h"
 #include "WindowManager.h"
@@ -42,6 +41,9 @@ namespace Engine
 		// Maybe decouple from application class?
 		EventManager m_eventManager;
 
+		// Hold all event listeners.
+		EventListenerStack m_eventListeners;
+
 		// Scenes probably don't need to be managed by the application.
 		// Maybe create a separate scene manager class.
 		// Application really only needs to see the active scene.
@@ -60,6 +62,8 @@ namespace Engine
 		//EMU_API void SetSimulation(const float gravityX, const float gravityY, const float timeStep, const int pixelsPerMeter);
 		EMU_API void SetTimeStep(const float timeStep);
 		EMU_API void SetPixelsPerMeter(const int pixelsPerMeter);
+
+		EMU_API void AddEventListener(EventListener* eventListener);
 
 		// TEMP
 		EMU_API SDLRenderer* GetRenderer() { return m_rendererManager.getRenderer(); }
