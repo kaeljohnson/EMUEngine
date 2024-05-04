@@ -13,7 +13,7 @@ int main(int argc, char* args[])
 
 	Engine::Application* ptrAppInstance = Engine::Application::GetInstance();
 
-	std::shared_ptr<Engine::Scene> scene = ptrAppInstance->CreateScene("Test Scene");
+	std::shared_ptr<Engine::Scene> scene = std::make_shared<Engine::Scene>("Test Scene", 1.0f / 60.0f, 10);
 
 	ptrAppInstance->SetTimeStep(1.0f / 60.0f);
 	ptrAppInstance->SetPixelsPerMeter(10);
@@ -49,7 +49,7 @@ int main(int argc, char* args[])
 	scene->Add(&testGO3);
 	scene->Add(&testWallRight);
 	
-	ptrAppInstance->PlayScene("Test Scene");
+	ptrAppInstance->PlayScene(scene);
 	// Need to figure out how to change scenes, stop scenes, etc.
 
 	return 0;

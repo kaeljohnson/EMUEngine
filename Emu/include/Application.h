@@ -44,8 +44,6 @@ namespace Engine
 		// Hold all event listeners.
 		EventListenerStack m_eventListeners;
 
-		std::unordered_map<std::string, std::shared_ptr<Scene>> m_sceneMap;
-
 		void processEventQueue(std::shared_ptr<Scene> currentScene);
 		void renderScene(std::shared_ptr<Scene> scene, const double interpolation);
 		void defineDefaultApplicationCallbacks();
@@ -55,8 +53,6 @@ namespace Engine
 
 		~Application();
 
-		EMU_API std::shared_ptr<Scene> CreateScene(const std::string& sceneName);
-		//EMU_API void SetSimulation(const float gravityX, const float gravityY, const float timeStep, const int pixelsPerMeter);
 		EMU_API void SetTimeStep(const float timeStep);
 		EMU_API void SetPixelsPerMeter(const int pixelsPerMeter);
 
@@ -66,7 +62,7 @@ namespace Engine
 		EMU_API SDLRenderer* GetRenderer() { return m_rendererManager.getRenderer(); }
 
 		// Application functions.
-		EMU_API void PlayScene(std::string sceneName);
+		// EMU_API void PlayScene(std::string sceneName);
 		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
 		EMU_API void End();
 

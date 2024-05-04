@@ -24,8 +24,8 @@ namespace Engine
 		IWorld* m_world;
 
 	public:
-		Scene(std::string name, const float timestep, const int pixelsPerMeter);
-		~Scene();
+		EMU_API Scene(std::string name, const float timestep, const int pixelsPerMeter);
+		EMU_API ~Scene();
 
 		SceneObject** const begin() { return m_sceneObjects.begin(); }
 		SceneObject** const end() { return m_sceneObjects.end(); }

@@ -42,13 +42,6 @@ namespace Engine
 		defineDefaultApplicationCallbacks();
 	}
 
-	std::shared_ptr<Scene> Application::CreateScene(const std::string& sceneName)
-	{
-		ENGINE_INFO_D("Creating scene: {}", sceneName);
-		m_sceneMap[sceneName] = std::make_shared<Scene>(sceneName, m_timeStep, m_pixelsPerMeter);
-		return m_sceneMap[sceneName];
-	}
-
 	void Application::SetTimeStep(const float timeStep)
 	{
 		m_timeStep = timeStep;
@@ -56,17 +49,6 @@ namespace Engine
 	void Application::SetPixelsPerMeter(const int pixelsPerMeter)
 	{
 		m_pixelsPerMeter = pixelsPerMeter;
-		for (auto& scene : m_sceneMap)
-		{
-			scene.second->m_pixelsPerMeter = pixelsPerMeter;
-		}
-	}
-
-	void Application::PlayScene(std::string sceneName)
-	{
-		ENGINE_INFO_D("Playing scene: {}", sceneName);
-		PlayScene(m_sceneMap[sceneName]);
-	
 	}
 
 	void Application::PlayScene(std::shared_ptr<Scene> currentScene)
