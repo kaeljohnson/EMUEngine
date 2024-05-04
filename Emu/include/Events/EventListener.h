@@ -9,15 +9,15 @@
 namespace Engine
 {
 	// Event listener class. Listeners are used to listen for events and process them.
-	// Listeners can subscribe to scenes.
+	// Listeners use the apps callback system to trigger events.
 
 	class EventListener
 	{
-	public:
+	private:
 		std::string m_name;
 		bool m_enabled;
 
-		bool IsAttachedToApp;
+		bool m_attachedToApp;
 
 	protected:
 		ICallbackSystem* ptrICallbackSystem;
@@ -25,8 +25,11 @@ namespace Engine
 	public:
 		EMU_API EventListener(std::string name);
 		EMU_API virtual	~EventListener() = default;
-
-		// Does anything the client might need to do when an event is processed.
 		EMU_API virtual void ProcessEvent(Event& e);
+
+		EMU_API const std::string GetName() const;
+		EMU_API const bool IsEnabled() const;
+		EMU_API const bool IsAttached() const;
+		EMU_API void SetAttached(bool attached);
 	};
 }

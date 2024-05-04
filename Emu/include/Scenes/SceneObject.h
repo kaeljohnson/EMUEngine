@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "../Core.h"
 
 #include "../SDLWrapper/SDLWrapper.h"
@@ -11,25 +13,28 @@ namespace Engine
 {
 	// SceneObject class. Currently behaves as a wrapper for a physics body and a texture.
 
-	class EMU_API SceneObject
+	// Will eventually be virtual
+	class SceneObject
 	{
 	private:
-		// SpriteSheet m_spriteSheet;
-		// State m_state;
+		std::string m_name;
+		bool m_enabled;
+		bool m_attachedToScene;
 
+	protected:
 		Texture* m_texture;
 		IPhysicsBody* m_physicsBody;
 
 	public:
-		SceneObject(IPhysicsBody* ptrPhysicsBody, Texture* ptrTexture);
-		virtual ~SceneObject();
+		EMU_API SceneObject(IPhysicsBody* ptrPhysicsBody, Texture* ptrTexture);
+		EMU_API virtual ~SceneObject();
 
-		IPhysicsBody* GetPhysicsBody();
-		Texture* GetTexture();
+		EMU_API IPhysicsBody* GetPhysicsBody();
+		EMU_API Texture* GetTexture();
 
-		/*virtual void ProcessEvent(Event& e);
-		virtual void Update();
-		virtual void Render();
-		virtual void Display();*/
+		EMU_API const std::string GetName() const ;
+		EMU_API const bool IsEnabled() const;
+		EMU_API const bool IsAttached() const;
+		EMU_API void SetAttached(bool attached);
 	};
 }

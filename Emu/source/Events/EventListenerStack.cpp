@@ -27,9 +27,9 @@ namespace Engine
 		// Check if the event listener already exists in the array
 		for (int i = 0; i < m_eventListenerCount; i++)
 		{
-			if (m_eventListeners[i]->m_name == eventListener->m_name)
+			if (m_eventListeners[i]->GetName() == eventListener->GetName())
 			{
-				ENGINE_CRITICAL_D("EventListener with name: {} already exists in the EventListener stack!", eventListener->m_name);
+				ENGINE_CRITICAL_D("EventListener with name: {} already exists in the EventListener stack!", eventListener->GetName());
 				return;
 			}
 		}
@@ -42,6 +42,7 @@ namespace Engine
 		}
 
 		// Add the event listener to the end of the array
+		eventListener->SetAttached(true);
 		m_eventListeners[m_eventListenerCount] = eventListener;
 		m_eventListenerCount++;
 	}
@@ -57,9 +58,9 @@ namespace Engine
 		// Find the event listener in the array
 		for (int i = 0; i < m_eventListenerCount; i++)
 		{
-			if (m_eventListeners[i]->m_name == eventListener->m_name)
+			if (m_eventListeners[i]->GetName() == eventListener->GetName())
 			{
-				m_eventListeners[i]->IsAttachedToApp = false;
+				m_eventListeners[i]->SetAttached(false);
 
 				// Remove the event listener from the array by moving all elements after it one step to the left
 				for (int j = i; j < m_eventListenerCount - 1; j++)
@@ -83,7 +84,7 @@ namespace Engine
 			return;
 		}
 
-		m_eventListeners[m_eventListenerCount - 1]->IsAttachedToApp = false;
+		m_eventListeners[m_eventListenerCount - 1]->SetAttached(false);
 
 		// Decrease the count of event listeners
 		m_eventListenerCount--;

@@ -5,6 +5,7 @@
 #include "../Events/EventListenerStack.h"
 #include "../Events/EventListener.h"
 #include "../Scenes/SceneObject.h"
+#include "../Scenes/SceneObjectStack.h"
 #include "../Physics/IWorld.h"
 
 namespace Engine
@@ -12,14 +13,12 @@ namespace Engine
 	class Scene
 	{
 	public:
+		int m_pixelsPerMeter;
+	private:
 		std::string m_name;
 		float m_timeStep;
-		int m_pixelsPerMeter;
 		
-		// Client should be able to set this.
-		static const int m_maxSceneObjects = 100;
-		size_t m_sceneObjectCount = 0;
-		SceneObject* m_sceneObjects[m_maxSceneObjects];
+		SceneObjectStack m_sceneObjects;
 
 	private:
 		IWorld* m_world;
@@ -27,6 +26,9 @@ namespace Engine
 	public:
 		Scene(std::string name, const float timestep, const int pixelsPerMeter);
 		~Scene();
+
+		SceneObject** const begin() { return m_sceneObjects.begin(); }
+		SceneObject** const end() { return m_sceneObjects.end(); }
 
 		void checkValid();
 

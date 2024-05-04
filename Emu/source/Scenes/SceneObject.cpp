@@ -30,4 +30,9 @@ namespace Engine
 	{
 		return m_physicsBody;
 	}
+
+	const std::string SceneObject::GetName() const { return m_name; }
+	const bool SceneObject::IsEnabled() const { return m_enabled;  }
+	const bool SceneObject::IsAttached() const { return m_attachedToScene; }
+	void SceneObject::SetAttached(bool attached) { m_attachedToScene = attached; }
 }

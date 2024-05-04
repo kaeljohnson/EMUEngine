@@ -44,9 +44,6 @@ namespace Engine
 		// Hold all event listeners.
 		EventListenerStack m_eventListeners;
 
-		// Scenes probably don't need to be managed by the application.
-		// Maybe create a separate scene manager class.
-		// Application really only needs to see the active scene.
 		std::unordered_map<std::string, std::shared_ptr<Scene>> m_sceneMap;
 
 		void processEventQueue(std::shared_ptr<Scene> currentScene);

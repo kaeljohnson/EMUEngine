@@ -124,11 +124,9 @@ namespace Engine
 	{
 		// Should not be renderering every object in the scene every frame.
 
-		size_t idx = 0;
-		while (idx < scene->m_sceneObjectCount)
+		for (auto& sceneObject : *scene)
 		{
-			m_rendererManager.render(scene->m_sceneObjects[idx], m_pixelsPerMeter, interpolation);
-			idx++;
+			m_rendererManager.render(sceneObject, m_pixelsPerMeter, interpolation);
 		}
 
 	}
@@ -179,17 +177,7 @@ namespace Engine
 
 		ENGINE_INFO_D("Adding event listener to app.");
 
-		for (auto& ptrEventListener : m_eventListeners)
-		{
-			if (ptrEventListener == eventListener)
-			{
-				ENGINE_WARN_D("Event listener already exists in scene.");
-				return;
-			}
-		}
-
 		m_eventListeners.push(eventListener);
-		eventListener->IsAttachedToApp = true;
 	}
 
 	void Application::End()

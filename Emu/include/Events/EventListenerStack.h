@@ -12,6 +12,7 @@ namespace Engine
 	{
 	public:
 		static const size_t MAX_LISTENERS = 10;
+	private:	
 		size_t m_eventListenerCount = 0;
 		EventListener* m_eventListeners[MAX_LISTENERS];
 
@@ -19,8 +20,8 @@ namespace Engine
 		EventListenerStack();
 		~EventListenerStack() = default;
 
-		EventListener** begin() { return m_eventListeners; }
-		EventListener** end() { return m_eventListeners + m_eventListenerCount; }
+		EventListener** const begin() { return m_eventListeners; }
+		EventListener** const end() { return m_eventListeners + m_eventListenerCount; }
 
 		const size_t size() const;
 
