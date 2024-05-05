@@ -6,15 +6,13 @@
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/Box.h"
 #include "../../include/Physics/PhysicsFactory.h"
-#include "../../include/Logging/Logger.h"
-#include "../../include/CallbackSystem/CallbackSystem.h"
 
 namespace Engine
 {
-	Scene::Scene(std::string name, const float timestep, const int pixelsPerMeter) : m_name(name), m_pixelsPerMeter(pixelsPerMeter), m_timeStep(timestep)
-	{
-		m_world = CreateWorld(0.0f * m_pixelsPerMeter, 9.8f * m_pixelsPerMeter, m_timeStep, 8, 3);
-	}
+	Scene::Scene(std::string name, const float timestep, const int pixelsPerMeter) 
+		: m_name(name), m_pixelsPerMeter(pixelsPerMeter), m_timeStep(timestep),
+		m_world(CreateWorld(0.0f * m_pixelsPerMeter, 9.8f * m_pixelsPerMeter, m_timeStep, 8, 3))
+	{}
 
 	Scene::~Scene()
 	{
@@ -25,7 +23,8 @@ namespace Engine
 	void Scene::checkValid()
 	{
 		(m_world == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
-		// (m_sceneObjectCount > m_maxSceneObjects) ? ENGINE_CRITICAL_D("Scene object count exceeds max scene objects.") : ENGINE_INFO_D("Scene object count is valid.");
+		(m_sceneObjects.size() > m_sceneObjects.MAX_OBJECTS) 
+			? ENGINE_CRITICAL_D("Scene object count exceeds max scene objects.") : ENGINE_INFO_D("Scene object count is valid.");
 		(m_pixelsPerMeter <= 0) ? ENGINE_CRITICAL_D("Pixels per meter is invalid.") : ENGINE_INFO_D("Pixels per meter is valid.");
 		(m_timeStep <= 0) ? ENGINE_CRITICAL_D("Time step is invalid.") : ENGINE_INFO_D("Time step is valid.");
 		(m_name.empty()) ? ENGINE_CRITICAL_D("Scene name is empty.") : ENGINE_INFO_D("Scene name is valid.");

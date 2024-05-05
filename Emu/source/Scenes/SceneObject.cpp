@@ -7,7 +7,8 @@
 
 namespace Engine
 {
-	SceneObject::SceneObject(IPhysicsBody* ptrPhysicsBody, Texture* ptrTexture) : m_physicsBody(ptrPhysicsBody), m_texture(ptrTexture)
+	SceneObject::SceneObject(IPhysicsBody* ptrPhysicsBody, Texture* ptrTexture) 
+		: m_physicsBody(ptrPhysicsBody), m_texture(ptrTexture), m_enabled(true)
 	{
 		ENGINE_INFO_D("SceneObject created");
 	}
@@ -17,8 +18,7 @@ namespace Engine
 		ENGINE_INFO_D("Freeing SceneObject!");
 		if (m_physicsBody != nullptr)
 			delete m_physicsBody;
-
-		//delete m_texture;
+		m_physicsBody = nullptr;
 	}
 
 	Texture* SceneObject::GetTexture()
@@ -31,8 +31,5 @@ namespace Engine
 		return m_physicsBody;
 	}
 
-	const std::string SceneObject::GetName() const { return m_name; }
 	const bool SceneObject::IsEnabled() const { return m_enabled;  }
-	const bool SceneObject::IsAttached() const { return m_attachedToScene; }
-	void SceneObject::SetAttached(bool attached) { m_attachedToScene = attached; }
 }

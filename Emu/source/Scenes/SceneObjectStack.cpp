@@ -117,8 +117,6 @@ namespace Engine
 			return;
 		}
 
-		m_sceneObjects[m_sceneObjectCount - 1]->SetAttached(false);
-
 		// Decrease the count of event listeners
 		m_sceneObjectCount--;
 	}

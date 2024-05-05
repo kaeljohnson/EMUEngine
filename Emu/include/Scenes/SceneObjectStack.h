@@ -1,13 +1,9 @@
 #pragma once
 
-#include <string>
-
 #include "SceneObject.h"
 
 namespace Engine
 {
-	// Event Listener Stack.
-
 	class SceneObjectStack
 	{
 	public:
