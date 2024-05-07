@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	EMU_API IPhysicsBody* CreatePhysicsBody(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters,
+	EMU_API std::shared_ptr<IPhysicsBody> CreatePhysicsBody(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters,
 		const float widthInMeters, const float heightInMeters, const float density, const float friction, const float angle,
 		const float restitution, const float restitutionThreshold, const bool collidable, const bool fixed, const bool visible);
 

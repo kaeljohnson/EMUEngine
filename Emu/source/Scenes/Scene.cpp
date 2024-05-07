@@ -53,7 +53,9 @@ namespace Engine
 
 		m_sceneObjects.push(sceneObject);
 
-		m_world->addBox(static_cast<Box*>(sceneObject->GetPhysicsBody()));
+		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject->GetPhysicsBody());
+
+		m_world->addBox(ptrBox);
 	}
 
 	void Scene::Remove(SceneObject* sceneObject)
@@ -63,6 +65,6 @@ namespace Engine
 		// Find the scene object in the array
 		m_sceneObjects.pop(sceneObject);
 
-		m_world->removeBox(static_cast<Box*>(sceneObject->GetPhysicsBody()));
+		m_world->removeBox(static_cast<Box*>(sceneObject->GetPhysicsBody().get()));
 	}
 }

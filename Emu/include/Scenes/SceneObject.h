@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <memory>
 
 #include "../Core.h"
 
@@ -18,13 +18,13 @@ namespace Engine
 
 	protected:
 		Texture* m_texture;
-		IPhysicsBody* m_physicsBody;
+		std::shared_ptr<IPhysicsBody> m_physicsBody;
 
 	public:
-		EMU_API SceneObject(IPhysicsBody* ptrPhysicsBody, Texture* ptrTexture);
-		EMU_API virtual ~SceneObject();
+		EMU_API SceneObject(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture* ptrTexture);
+		EMU_API virtual ~SceneObject() = default;
 
-		EMU_API IPhysicsBody* GetPhysicsBody();
+		EMU_API std::shared_ptr<IPhysicsBody> GetPhysicsBody();
 		EMU_API Texture* GetTexture();
 		EMU_API const bool IsEnabled() const;
 	};
