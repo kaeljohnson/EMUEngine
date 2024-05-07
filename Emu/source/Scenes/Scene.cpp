@@ -14,12 +14,6 @@ namespace Engine
 		m_world(CreateWorld(0.0f * m_pixelsPerMeter, 9.8f * m_pixelsPerMeter, m_timeStep, 8, 3))
 	{}
 
-	Scene::~Scene()
-	{
-		delete m_world;
-		m_world = nullptr;
-	}
-
 	void Scene::checkValid()
 	{
 		(m_world == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");

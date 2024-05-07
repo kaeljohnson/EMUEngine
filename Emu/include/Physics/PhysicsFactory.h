@@ -10,5 +10,5 @@ namespace Engine
 		const float widthInMeters, const float heightInMeters, const float density, const float friction, const float angle,
 		const float restitution, const float restitutionThreshold, const bool collidable, const bool fixed, const bool visible);
 
-	EMU_API IWorld* CreateWorld(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations);
+	EMU_API std::unique_ptr<IWorld> CreateWorld(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations);
 }
