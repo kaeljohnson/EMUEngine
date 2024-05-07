@@ -74,7 +74,7 @@ namespace Engine
 		bool Handled;
 
 		Event(const EventType);
-		Event(const EventType actionType, const int xPos, const int yPos);	
+		Event(const EventType actionType, const int xPos, const int yPos);
 	};
 }
  

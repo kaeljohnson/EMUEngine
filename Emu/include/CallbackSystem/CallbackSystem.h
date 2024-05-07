@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../GameObjects/GameObject.h"
+#include "../Scenes/SceneObject.h"
 #include "CallbackType.h"
 
 #include <variant>
@@ -13,7 +13,7 @@
 
 namespace Engine
 {
-    using Data = std::variant<std::monostate, const int, const float, const std::string, const std::pair<int, int>, GameObject*>;
+    using Data = std::variant<std::monostate, const int, const float, const std::string, const std::pair<int, int>, SceneObject*>;
     using Callback = std::function<void(Data)>;
 
     class ICallbackSystem
@@ -26,6 +26,6 @@ namespace Engine
     public:
         EMU_API static ICallbackSystem* GetInstance();
         EMU_API void NewCallback(Type callbackType, Callback callback);
-        EMU_API void TriggerCallback(Type layerEventType, Data eventData);
+        EMU_API void TriggerCallback(Type eventType, Data eventData);
     };
 }

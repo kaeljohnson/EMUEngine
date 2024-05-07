@@ -7,7 +7,6 @@
 #include "../include/Events/Event.h"
 #include "../include/WindowManager.h"
 #include "../include/Logging/Logger.h"
-#include "../include/Layers/Layer.h"
 
 namespace Engine
 {

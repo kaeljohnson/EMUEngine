@@ -7,68 +7,59 @@
 #include "../include/Logging/Logger.h"
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
-#include "../include/Layers/Layer.h"
-#include "../include/GameObjects/GameObject.h"
+#include "../include/Events/EventListenerStack.h"
+#include "../include/Events/EventListener.h"
+#include "../include/Scenes/SceneObject.h"
+#include "../include/Scenes/Scene.h"
 #include "../include/Physics/Box.h"
 #include "../include/Physics/PhysicsFactory.h"
 
 namespace Engine
 {
-	Application::Application()
-		: m_windowManager("Default App Name"),
-		m_rendererManager(m_windowManager.getWindow()),
-		m_eventManager(m_eventQ),
-		m_layerStack(),
-		running(false),
-		m_pixelsPerMeter(20),
-		m_timeStep(1.0f / 60.0f)
-	{
-		m_world = CreateWorld(0.0f * m_pixelsPerMeter, 9.8f * m_pixelsPerMeter, m_timeStep, 8, 3);
-		defineDefaultApplicationCallbacks();
-	}
-
-	void Application::SetSimulation(const float gravityX, const float gravityY, const float timeStep, const int pixelsPerMeter)
-	{
-		m_timeStep = timeStep;
-		m_pixelsPerMeter = pixelsPerMeter;
-		m_world->SetGravity(gravityX * pixelsPerMeter, gravityY * pixelsPerMeter);
-		m_world->SetTimeStep(timeStep);
-
-		ENGINE_INFO_D("Client creating simulation with gravity: ({}, {}) and time step: {}", gravityX, gravityY, timeStep);
-	}
-
 	Application* Application::GetInstance()
 	{
 		if (instance == nullptr)
-		{	
+		{
 			instance = new Application();
 			return instance;
 		}
-		
+
 		// Don't want client to reference 
 		// multiple instances of the application.
 		ENGINE_CRITICAL_D("Warning! Instance of application already exists. Multiple usage only recommended for testing.");
 		return instance;
 	}
 
-	void Application::Run()
+	Application::Application()
+		: m_windowManager("Default App Name"),
+		m_rendererManager(m_windowManager.getWindow()),
+		m_eventManager(m_eventQ),
+		m_eventListeners(),
+		running(false),
+		m_pixelsPerMeter(20),
+		m_timeStep(1.0f / 60.0f)
 	{
-		for (auto& layer : m_layerStack)
-		{
-			ENGINE_TRACE_D("Layer: {}", layer->GetName());
-		}
+		defineDefaultApplicationCallbacks();
+	}
 
-		ENGINE_INFO_D("Application running!");
+	void Application::SetTimeStep(const float timeStep)
+	{
+		m_timeStep = timeStep;
+	}
+	void Application::SetPixelsPerMeter(const int pixelsPerMeter)
+	{
+		m_pixelsPerMeter = pixelsPerMeter;
+	}
 
-		if (m_layerStack.size() > 0)
+	void Application::PlayScene(std::shared_ptr<Scene> currentScene)
+	{
+		if (currentScene == nullptr)
 		{
-			ENGINE_TRACE_D("Layer stack size: {}", m_layerStack.size());
-		}
-		else
-		{
-			ENGINE_CRITICAL_D("Layer stack is empty! Application must have at least one layers to be valid!");
+			ENGINE_CRITICAL_D("No scene loaded! Application must have a scene to run!");
 			End();
 		}
+
+		currentScene->checkValid();
 
 		running = true;
 
@@ -83,8 +74,8 @@ namespace Engine
 				1. Handle events.
 				2. Process actions.
 				3. Clear the screen.
-				4. Render layer.
-				5. Display the rendered layers.
+				4. Render scene.
+				5. Display the rendered scene.
 			*/
 
 			double newTime = SDL_GetTicks() / 1000.0;
@@ -96,21 +87,9 @@ namespace Engine
 			while (accumulator >= m_timeStep)
 			{
 				m_eventManager.handleEvents();
-				processEventQueue();
+				processEventQueue(currentScene);
 
-				// Faster way to do this? Should only have to update objects
-				// prev values if they have changed. In fact, should only update
-				// objects that have changed in general
-				for (Layer* layer : m_layerStack)
-				{
-					for (GameObject* gameObject : *layer)
-					{
-						gameObject->GetPhysicsBody()->updatePrevX();
-						gameObject->GetPhysicsBody()->updatePrevY();
-					}
-				}
-
-				m_world->update();
+				currentScene->update();
 
 				accumulator -= m_timeStep;
 			}
@@ -118,35 +97,32 @@ namespace Engine
 			const double interpolation = accumulator / m_timeStep;
 
 			m_rendererManager.clearScreen();
-			renderLayers(interpolation);
+			renderScene(currentScene, interpolation);
 			m_rendererManager.display();      
 		}
 	}
 
-	void Application::renderLayers(const double interpolation)
+	void Application::renderScene(std::shared_ptr<Scene> scene, const double interpolation)
 	{
-		// Should not be renderering every layer every frame.
-	    // Should only render layers that are visible and have changed.
+		// Should not be renderering every object in the scene every frame.
 
-		for (Layer* layer : m_layerStack)
+		for (auto& sceneObject : *scene)
 		{
-			for (GameObject* gameObject : *layer)
-			{
-				m_rendererManager.render(gameObject, m_pixelsPerMeter, interpolation);
-			}
+			m_rendererManager.render(sceneObject, m_pixelsPerMeter, interpolation);
 		}
+
 	}
 
-	void Application::processEventQueue()
+	void Application::processEventQueue(std::shared_ptr<Scene> currentScene)
 	{
-		// Process order for layers is opporsite of render order.
+		// Process order for scene is opposite of render order.
 
 		// Potential for multithreading if there are a lot of events.
 		
 		// Render order for layers
 		// EX:
 		// Background Layer -> Filled with Background textures.
-		// Game Layer -> Filled with Engine supported GameObjects type.
+		// Game Layer -> Filled with Engine supported SceneObjects type.
 		// Foreground Layer -> Filled with Foreground textures.
 		// Debug Layer -> Wrapper for Game Layer. Shows important info like hit boxes, etc.
 		// UI Layer -> Filled with Engine supported UI type.
@@ -154,10 +130,10 @@ namespace Engine
 		while (!m_eventQ.empty())
 		{
 			Event& currentEvent = m_eventQ.front();
-			for (auto it_layer = m_layerStack.end(); it_layer != m_layerStack.begin();)
+
+			for (auto& eventListener : m_eventListeners)
 			{
-				
-				(*--it_layer)->ProcessEvent(currentEvent);
+				eventListener->ProcessEvent(currentEvent);
 				if (currentEvent.Handled)
 				{
 					break;
@@ -173,6 +149,19 @@ namespace Engine
 		}
 	}
 
+	void Application::AddEventListener(EventListener* eventListener)
+	{
+		if (eventListener == nullptr)
+		{
+			ENGINE_WARN_D("EventListener is nullptr.");
+			return;
+		}
+
+		ENGINE_INFO_D("Adding event listener to app.");
+
+		m_eventListeners.push(eventListener);
+	}
+
 	void Application::End()
 	{
 		ENGINE_INFO_D("Application ending!");
@@ -182,46 +171,8 @@ namespace Engine
 
 	Application::~Application()
 	{
-		delete m_world;
-		m_world = nullptr;
-
 		delete instance;
 		instance = nullptr;
-	}
-
-	void Application::PushToLayerStack(Layer* layer)
-	{
-		if (layer == nullptr)
-		{
-			ENGINE_CRITICAL_D("Layer is nullptr! Cannot push to layer stack.");
-			return;
-		}
-
-		m_layerStack.pushLayer(layer);
-		layer->IsAttachedToScene = true;
-	}
-
-	void Application::PopLayerFromStack(Layer* layer)
-	{
-		if (layer == nullptr)
-		{
-			ENGINE_CRITICAL_D("Layer is nullptr! Cannot pop from layer stack.");
-			return;
-		}
-
-		m_layerStack.popLayer(layer);
-		layer->IsAttachedToScene = false;
-	}
-
-	void Application::PopLayerFromStack()
-	{
-		if (m_layerStack.size() == 0)
-		{
-			ENGINE_CRITICAL_D("Layer stack is empty! Cannot pop from layer stack.");
-			return;
-		}
-
-		m_layerStack.popLayer();
 	}
 
 	void Application::defineDefaultApplicationCallbacks()
@@ -237,14 +188,6 @@ namespace Engine
 		ptrICallbackSystem->NewCallback(Type::EndApplication, [this](Data data)
 			{
 				End();
-			});
-
-		ptrICallbackSystem->NewCallback(Type::AddToWorld, [this](Data layerEventData)
-			{
-				GameObject* gameObject = std::get<GameObject*>(layerEventData);
-				Box* ptrBox = static_cast<Box*>(gameObject->GetPhysicsBody());
-
-				m_world->addBox(ptrBox);
 			});
 
 		ptrICallbackSystem->NewCallback(Type::ResizeWindow, [this](Data data)

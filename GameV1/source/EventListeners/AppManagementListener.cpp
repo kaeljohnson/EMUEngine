@@ -2,30 +2,18 @@
 
 #include <string>
 
-#include "../../include/Layers/AppManagementLayer.h"
+#include "../../include/EventListeners/AppManagementListener.h"
 
 
-AppManagementLayer::AppManagementLayer(std::string name) : Engine::Layer(name)
+AppManagementListener::AppManagementListener(std::string name) : Engine::EventListener(name)
 {
 }
 
-AppManagementLayer::~AppManagementLayer()
+AppManagementListener::~AppManagementListener()
 {
 }
 
-void AppManagementLayer::OnAttach()
-{
-}
-
-void AppManagementLayer::OnDetach()
-{
-}
-
-void AppManagementLayer::OnUpdate()
-{
-}
-
-void AppManagementLayer::ProcessEvent(Engine::Event& e)
+void AppManagementListener::ProcessEvent(Engine::Event& e)
 {
 	switch (e.Type)
 	{

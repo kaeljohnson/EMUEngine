@@ -1,5 +1,6 @@
 #pragma once
 #include "../Core.h"
+#include "../SDLWrapper/SDLWrapper.h"
 
 namespace Engine
 {
