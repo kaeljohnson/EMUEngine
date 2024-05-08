@@ -6,6 +6,7 @@
 #include "../include/Events/Event.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Logging/Logger.h"
+#include "../include/Scenes/SceneFactory.h"
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
 #include "../include/Events/EventListener.h"
@@ -13,3 +14,10 @@
 #include "../include/Textures/Texture.h"
 #include "../include/Physics/IPhysicsBody.h"
 #include "../include/Physics/PhysicsFactory.h"
+
+namespace Engine
+{
+	using ScenePtr = std::shared_ptr<Engine::Scene>;
+	using SceneObjectPtr = std::shared_ptr<Engine::SceneObject>;
+	using PhysicsBodyPtr = std::shared_ptr<Engine::IPhysicsBody>;
+}

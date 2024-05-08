@@ -8,5 +8,5 @@
 class ClientObject : public Engine::SceneObject
 {
 public:
-	ClientObject( std::shared_ptr<Engine::IPhysicsBody> ptrPhysicsBody, Engine::Texture* ptrTexture);
+	ClientObject(std::shared_ptr<Engine::IPhysicsBody> ptrPhysicsBody, Engine::Texture* ptrTexture);
 };
