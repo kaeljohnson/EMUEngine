@@ -33,7 +33,7 @@ namespace Engine
 		m_world.Step(m_deltaTime, m_velocityIterations, m_positionIterations);
 	}
 
-	void World::addBox(Box* box)
+	void World::addBox(std::shared_ptr<Box> box)
 	{
 		if (box == nullptr)
 		{

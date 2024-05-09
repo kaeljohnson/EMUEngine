@@ -14,12 +14,6 @@ namespace Engine
 		m_world(CreateWorld(0.0f * m_pixelsPerMeter, 9.8f * m_pixelsPerMeter, m_timeStep, 8, 3))
 	{}
 
-	Scene::~Scene()
-	{
-		delete m_world;
-		m_world = nullptr;
-	}
-
 	void Scene::checkValid()
 	{
 		(m_world == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
@@ -59,7 +53,9 @@ namespace Engine
 
 		m_sceneObjects.push(sceneObject);
 
-		m_world->addBox(static_cast<Box*>(sceneObject->GetPhysicsBody()));
+		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject->GetPhysicsBody());
+
+		m_world->addBox(ptrBox);
 	}
 
 	void Scene::Remove(SceneObject* sceneObject)
@@ -69,6 +65,6 @@ namespace Engine
 		// Find the scene object in the array
 		m_sceneObjects.pop(sceneObject);
 
-		m_world->removeBox(static_cast<Box*>(sceneObject->GetPhysicsBody()));
+		m_world->removeBox(static_cast<Box*>(sceneObject->GetPhysicsBody().get()));
 	}
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "../Core.h"
 
 #include "BodyTypes.h"
@@ -16,7 +18,7 @@ namespace Engine
 	public:
 		virtual ~IWorld() = default;
 		virtual void update() = 0;
-		virtual void addBox(Box* body) = 0;
+		virtual void addBox(std::shared_ptr<Box> body) = 0;
 		virtual void removeBox(Box* body) = 0;
 
 		virtual void SetGravity(const float gravityX, const float gravityY) = 0;

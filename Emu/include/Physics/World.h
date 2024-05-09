@@ -32,7 +32,7 @@ namespace Engine
 		void update();
 
 		// Add physics body to world.
-		void addBox(Box* body);
+		void addBox(std::shared_ptr<Box> body);
 		
 		// Remove physics body from world. 
 		void removeBox(Box* body);

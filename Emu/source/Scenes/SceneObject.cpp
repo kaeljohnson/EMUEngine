@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "../../include/Scenes/SceneObject.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/BodyTypes.h"
@@ -7,18 +9,10 @@
 
 namespace Engine
 {
-	SceneObject::SceneObject(IPhysicsBody* ptrPhysicsBody, Texture* ptrTexture) 
+	SceneObject::SceneObject(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture* ptrTexture) 
 		: m_physicsBody(ptrPhysicsBody), m_texture(ptrTexture), m_enabled(true)
 	{
 		ENGINE_INFO_D("SceneObject created");
-	}
-
-	SceneObject::~SceneObject()
-	{
-		ENGINE_INFO_D("Freeing SceneObject!");
-		if (m_physicsBody != nullptr)
-			delete m_physicsBody;
-		m_physicsBody = nullptr;
 	}
 
 	Texture* SceneObject::GetTexture()
@@ -26,7 +20,7 @@ namespace Engine
 		return m_texture;
 	}
 
-	IPhysicsBody* SceneObject::GetPhysicsBody()
+	std::shared_ptr<IPhysicsBody> SceneObject::GetPhysicsBody()
 	{
 		return m_physicsBody;
 	}

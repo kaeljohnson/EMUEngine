@@ -16,6 +16,9 @@
 
 namespace Engine
 {
+	// Application singleton.
+	Application* Application::instance = nullptr;
+
 	Application* Application::GetInstance()
 	{
 		if (instance == nullptr)
@@ -87,7 +90,7 @@ namespace Engine
 			while (accumulator >= m_timeStep)
 			{
 				m_eventManager.handleEvents();
-				processEventQueue(currentScene);
+				processEventQueue();
 
 				currentScene->update();
 
@@ -113,7 +116,7 @@ namespace Engine
 
 	}
 
-	void Application::processEventQueue(std::shared_ptr<Scene> currentScene)
+	void Application::processEventQueue()
 	{
 		// Process order for scene is opposite of render order.
 
@@ -171,8 +174,8 @@ namespace Engine
 
 	Application::~Application()
 	{
-		delete instance;
-		instance = nullptr;
+		//delete instance;
+		//instance = nullptr;
 	}
 
 	void Application::defineDefaultApplicationCallbacks()

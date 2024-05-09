@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Engine.h>
-#include <memory>
 #include "../include/EventListeners/AppManagementListener.h"
 #include "../include/ClientObjects/ClientObject.h"
 
@@ -11,9 +10,9 @@ int main(int argc, char* args[])
 
 	CLIENT_INFO_D("Client Running!");
 
-	Engine::Application* ptrAppInstance = Engine::Application::GetInstance();
+	Engine::ApplicationPtr ptrAppInstance = Engine::Application::GetInstance();
 
-	std::shared_ptr<Engine::Scene> scene = std::make_shared<Engine::Scene>("Test Scene", 1.0f / 60.0f, 10);
+	Engine::ScenePtr scene = Engine::CreateScene("Test Scene", 1.0f / 60.0f, 10);
 
 	ptrAppInstance->SetTimeStep(1.0f / 60.0f);
 	ptrAppInstance->SetPixelsPerMeter(10);
@@ -24,12 +23,12 @@ int main(int argc, char* args[])
 	Engine::Texture tempTextureRed(255, 0, 0);
 	Engine::Texture tempTextureBlue(0, 0, 265);
 
-	Engine::IPhysicsBody* testBody =      Engine::CreatePhysicsBody(Engine::DYNAMIC, 63.5f, 3.0f, 1.0f, 1.0f, 1.0f, 10.0f, 30.0, 1.0, 1.0, true, false, true);
-	Engine::IPhysicsBody* testBody2 =     Engine::CreatePhysicsBody(Engine::DYNAMIC, 68.5f, 3.0f, 1.0f, 1.0f, 1.0f, 10.0f, 30.0, 1.0, 1.0, true, false, true);
-	Engine::IPhysicsBody* testBody3 =	  Engine::CreatePhysicsBody(Engine::DYNAMIC, 76.5f, 3.0f, 2.0f, 2.0f, 1.0f, 10.0f, 30.0, 1.0, 1.0, true, false, true);
-	Engine::IPhysicsBody* wallBody =      Engine::CreatePhysicsBody(Engine::STATIC, 15.0f, 35.0f, 2.0f, 80.0f, 0.0f, 50.0f, 0.0, 0.0, 0.0, true, true, true);
-	Engine::IPhysicsBody* wallRightBody = Engine::CreatePhysicsBody(Engine::STATIC, 100.0f, 35.0f, 2.0f, 80.0f, 0.0f, 50.0f, 0.0, 0.0, 0.0, true, true, true);
-	Engine::IPhysicsBody* groundBody =    Engine::CreatePhysicsBody(Engine::STATIC, 63.5f, 70.0f, 120.0f, 2.0f, 0.0f, 50.0f, 0.0, 1.0, 1.0, true, true, true);
+	Engine::PhysicsBodyPtr testBody =      Engine::CreatePhysicsBody(Engine::DYNAMIC, 63.5f, 3.0f, 1.0f, 1.0f, 1.0f, 10.0f, 3.0, 1.0, 1.0, true, false, true);
+	Engine::PhysicsBodyPtr testBody2 =     Engine::CreatePhysicsBody(Engine::DYNAMIC, 68.5f, 3.0f, 1.0f, 1.0f, 1.0f, 10.0f, 0.0, 1.0, 1.0, true, false, true);
+	Engine::PhysicsBodyPtr testBody3 =	   Engine::CreatePhysicsBody(Engine::DYNAMIC, 76.5f, 3.0f, 2.0f, 2.0f, 1.0f, 10.0f, 0.0, 1.0, 1.0, true, false, true);
+	Engine::PhysicsBodyPtr wallBody =      Engine::CreatePhysicsBody(Engine::STATIC, 15.0f, 35.0f, 2.0f, 80.0f, 0.0f, 50.0f, 0.0, 0.0, 0.0, true, true, true);
+	Engine::PhysicsBodyPtr wallRightBody = Engine::CreatePhysicsBody(Engine::STATIC, 100.0f, 35.0f, 2.0f, 80.0f, 0.0f, 50.0f, 0.0, 0.0, 0.0, true, true, true);
+	Engine::PhysicsBodyPtr groundBody =    Engine::CreatePhysicsBody(Engine::STATIC, 63.5f, 70.0f, 120.0f, 2.0f, 0.0f, 50.0f, 0.0, 1.0, 1.0, true, true, true);
 	
 	ClientObject testGO(testBody, &tempTextureRed);
 	ClientObject testGO2(testBody2, &tempTextureRed);

@@ -7,16 +7,16 @@
 
 namespace Engine
 {
-    IPhysicsBody* CreatePhysicsBody(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters,
+   std::shared_ptr<IPhysicsBody> CreatePhysicsBody(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters,
         const float widthInMeters, const float heightInMeters, const float density, const float friction, const float angle,
         const float restitution, const float restitutionThreshold, const bool collidable, const bool fixed, const bool visible)
     {
-        return new Box(bodyType, startingXInMeters, startingYInMeters, widthInMeters,
+        return std::make_shared<Box>(bodyType, startingXInMeters, startingYInMeters, widthInMeters,
             heightInMeters, density, friction, angle, restitution, restitutionThreshold, collidable, fixed, visible);
     }
 
-    IWorld* CreateWorld(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations)
+    std::unique_ptr<IWorld> CreateWorld(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations)
     {
-        return new World(gravityX, gravityY, deltaTime, velocityIterations, positionIterations);
+        return std::make_unique<World>(gravityX, gravityY, deltaTime, velocityIterations, positionIterations);
     }
 }
