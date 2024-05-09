@@ -44,7 +44,7 @@ namespace Engine
 		// Hold all event listeners.
 		EventListenerStack m_eventListeners;
 
-		void processEventQueue(std::shared_ptr<Scene> currentScene);
+		void processEventQueue();
 		void renderScene(std::shared_ptr<Scene> scene, const double interpolation);
 		void defineDefaultApplicationCallbacks();
 

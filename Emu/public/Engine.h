@@ -17,8 +17,9 @@
 
 namespace Engine
 {
-	using ScenePtr = std::shared_ptr<Engine::Scene>;
-	using SceneObjectPtr = std::shared_ptr<Engine::SceneObject>;
-	using PhysicsBodyPtr = std::shared_ptr<Engine::IPhysicsBody>;
+	using ScenePtr = std::shared_ptr<Scene>;
+	using SceneObjectPtr = std::shared_ptr<SceneObject>;
+	using PhysicsBodyPtr = std::shared_ptr<IPhysicsBody>;
 	using ApplicationPtr = Application*;
+	using ICallbackSystemPtr = ICallbackSystem*;
 }

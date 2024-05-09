@@ -23,7 +23,7 @@ int main(int argc, char* args[])
 	Engine::Texture tempTextureRed(255, 0, 0);
 	Engine::Texture tempTextureBlue(0, 0, 265);
 
-	Engine::PhysicsBodyPtr testBody =      Engine::CreatePhysicsBody(Engine::DYNAMIC, 63.5f, 3.0f, 1.0f, 1.0f, 1.0f, 10.0f, 0.0, 1.0, 1.0, true, false, true);
+	Engine::PhysicsBodyPtr testBody =      Engine::CreatePhysicsBody(Engine::DYNAMIC, 63.5f, 3.0f, 1.0f, 1.0f, 1.0f, 10.0f, 3.0, 1.0, 1.0, true, false, true);
 	Engine::PhysicsBodyPtr testBody2 =     Engine::CreatePhysicsBody(Engine::DYNAMIC, 68.5f, 3.0f, 1.0f, 1.0f, 1.0f, 10.0f, 0.0, 1.0, 1.0, true, false, true);
 	Engine::PhysicsBodyPtr testBody3 =	   Engine::CreatePhysicsBody(Engine::DYNAMIC, 76.5f, 3.0f, 2.0f, 2.0f, 1.0f, 10.0f, 0.0, 1.0, 1.0, true, false, true);
 	Engine::PhysicsBodyPtr wallBody =      Engine::CreatePhysicsBody(Engine::STATIC, 15.0f, 35.0f, 2.0f, 80.0f, 0.0f, 50.0f, 0.0, 0.0, 0.0, true, true, true);

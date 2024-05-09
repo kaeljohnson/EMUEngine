@@ -5,6 +5,9 @@
 
 namespace Engine
 {
+    // Callback system singleton.
+    Engine::ICallbackSystem* Engine::ICallbackSystem::instance = nullptr;
+
     ICallbackSystem* ICallbackSystem::GetInstance()
     {
         if (instance == nullptr)
