@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/Box.h"
@@ -9,10 +7,13 @@
 
 namespace Engine
 {
-	Scene::Scene(std::string name, const float timestep, const int pixelsPerMeter) 
-		: m_name(name), m_pixelsPerMeter(pixelsPerMeter), m_timeStep(timestep),
-		m_world(CreateWorld(0.0f * m_pixelsPerMeter, 9.8f * m_pixelsPerMeter, m_timeStep, 8, 3))
-	{}
+	Scene::Scene() : m_timeStep(0), m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_sceneObjects(), m_world(nullptr)
+	{
+		ICallbackSystem::GetInstance()->NewCallback(Type::CreateSimulation, [this](Data data)
+			{
+				SetSimulation(m_gravityX, m_gravityY, m_timeStep, m_pixelsPerMeter);
+			});
+	}
 
 	void Scene::checkValid()
 	{
@@ -21,7 +22,6 @@ namespace Engine
 			? ENGINE_CRITICAL_D("Scene object count exceeds max scene objects.") : ENGINE_INFO_D("Scene object count is valid.");
 		(m_pixelsPerMeter <= 0) ? ENGINE_CRITICAL_D("Pixels per meter is invalid.") : ENGINE_INFO_D("Pixels per meter is valid.");
 		(m_timeStep <= 0) ? ENGINE_CRITICAL_D("Time step is invalid.") : ENGINE_INFO_D("Time step is valid.");
-		(m_name.empty()) ? ENGINE_CRITICAL_D("Scene name is empty.") : ENGINE_INFO_D("Scene name is valid.");
 	}
 
 	void Scene::update()
@@ -39,17 +39,35 @@ namespace Engine
 		m_world->update();
 	};
 
-	void Scene::SetSimulation(const float gravityX, const float gravityY)
+	void Scene::SetSimulation(const float gravityX, const float gravityY, const float timestep, const int pixelsPerMeter)
 	{
-		m_world->SetGravity(gravityX * m_pixelsPerMeter, gravityY * m_pixelsPerMeter);
-		m_world->SetTimeStep(m_timeStep);
+		// What happens if this is called multiple times for one scene? Make sure nothing bad.
+
+		m_pixelsPerMeter = pixelsPerMeter;
+		m_timeStep = timestep;
+
+		m_gravityX = gravityX;
+		m_gravityY = gravityY;
+
+		ENGINE_INFO_D("Setting pixels per meter, time step, gravityX and gravityY at positions: {}, {}, {}, {}", m_pixelsPerMeter, m_timeStep, m_gravityX, m_gravityY);
+
+		if (m_world)
+		{
+			ENGINE_INFO_D("World already set!");
+			return;
+		}
+		
+		// Need a reset function for the world which resets all objects in the world.
+
+		m_world = CreateWorld(m_gravityX * m_pixelsPerMeter, m_gravityY * m_pixelsPerMeter, m_timeStep, 8, 3);
+		
 
 		ENGINE_INFO_D("Client creating simulation with gravity: ({}, {})", gravityX, gravityY);
 	}
 
 	void Scene::Add(SceneObject* sceneObject)
 	{
-		(sceneObject == nullptr) ? ENGINE_WARN_D("SceneObject is nullptr.") : ENGINE_WARN_D("Adding scene object to scene {}.", m_name);
+		(sceneObject == nullptr) ? ENGINE_WARN_D("SceneObject is nullptr.") : ENGINE_WARN_D("Adding scene object to scene.");
 
 		m_sceneObjects.push(sceneObject);
 
@@ -60,7 +78,7 @@ namespace Engine
 
 	void Scene::Remove(SceneObject* sceneObject)
 	{
-		(sceneObject == nullptr) ? ENGINE_WARN_D("SceneObject is nullptr.") : ENGINE_WARN_D("Removing scene object from scene {}.", m_name);
+		(sceneObject == nullptr) ? ENGINE_WARN_D("SceneObject is nullptr.") : ENGINE_WARN_D("Removing scene object from scene.");
 
 		// Find the scene object in the array
 		m_sceneObjects.pop(sceneObject);

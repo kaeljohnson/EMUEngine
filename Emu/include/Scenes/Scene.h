@@ -14,9 +14,11 @@ namespace Engine
 	class Scene
 	{
 	private:
-		std::string m_name;
 		float m_timeStep;
 		int m_pixelsPerMeter;
+
+		float m_gravityX;
+		float m_gravityY;
 		
 		SceneObjectStack m_sceneObjects;
 
@@ -24,10 +26,10 @@ namespace Engine
 		std::unique_ptr<IWorld> m_world;
 
 	public:
-		EMU_API Scene(std::string name, const float timestep, const int pixelsPerMeter);
+		EMU_API Scene();
 		EMU_API ~Scene() = default;
 
-		EMU_API void SetSimulation(const float gravityX, const float gravityY);
+		EMU_API void SetSimulation(const float gravityX, const float gravityY, const float timestep, const int pixelsPerMeter);
 
 		// Adds scene object to the scene. Need to add a "order" parameter to determine the order of rendering.
 		EMU_API void Add(SceneObject* sceneObject);
@@ -35,6 +37,9 @@ namespace Engine
 
 		SceneObject** const begin() { return m_sceneObjects.begin(); }
 		SceneObject** const end() { return m_sceneObjects.end(); }
+
+		inline const float GetTimeStep() const { return m_timeStep; }
+		inline const int GetPixelsPerMeter() const { return m_pixelsPerMeter; }
 
 		void checkValid();
 		void update();

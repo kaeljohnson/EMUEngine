@@ -25,11 +25,6 @@ namespace Engine
 
 		bool running;
 
-		// Time step for physics simulation. Can be set by user.
-		float m_timeStep;
-
-		int m_pixelsPerMeter;
-
 		// Managers for major engine components.
 		// Maybe decouple from application class?
 		WindowManager m_windowManager;
@@ -52,9 +47,6 @@ namespace Engine
 		EMU_API static Application* GetInstance();
 
 		~Application();
-
-		EMU_API void SetTimeStep(const float timeStep);
-		EMU_API void SetPixelsPerMeter(const int pixelsPerMeter);
 
 		EMU_API void AddEventListener(EventListener* eventListener);
 

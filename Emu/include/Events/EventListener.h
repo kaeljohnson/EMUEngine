@@ -14,22 +14,16 @@ namespace Engine
 	class EventListener
 	{
 	private:
-		std::string m_name;
 		bool m_enabled;
-
-		bool m_attachedToApp;
 
 	protected:
 		ICallbackSystem* ptrICallbackSystem;
 
 	public:
-		EMU_API EventListener(std::string name);
+		EMU_API EventListener();
 		EMU_API virtual	~EventListener() = default;
 		EMU_API virtual void ProcessEvent(Event& e);
 
-		EMU_API const std::string GetName() const;
 		EMU_API const bool IsEnabled() const;
-		EMU_API const bool IsAttached() const;
-		EMU_API void SetAttached(bool attached);
 	};
 }

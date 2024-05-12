@@ -8,10 +8,10 @@
 
 namespace Engine
 {
-	World::World() : m_world({ 0.0f, 0.0f }), m_gravity({ 0.0f, 0.0f }), m_deltaTime(0), m_velocityIterations(0), m_positionIterations(0) {}
+	World::World() : m_world({ 0.0f, 0.0f }), m_gravity({ 0.0f, 0.0f }), m_timeStep(0), m_velocityIterations(0), m_positionIterations(0) {}
 
-	World::World(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations)
-		: m_gravity({ gravityX, gravityY }), m_world({ gravityX, gravityY}), m_deltaTime(deltaTime),
+	World::World(const float gravityX, const float gravityY, const float timeStep, const int velocityIterations, const int positionIterations)
+		: m_gravity({ gravityX, gravityY }), m_world({ gravityX, gravityY}), m_timeStep(timeStep),
 		m_velocityIterations(velocityIterations), m_positionIterations(positionIterations)
 	{}
 
@@ -30,7 +30,7 @@ namespace Engine
 
 	void World::update()
 	{
-		m_world.Step(m_deltaTime, m_velocityIterations, m_positionIterations);
+		m_world.Step(m_timeStep, m_velocityIterations, m_positionIterations);
 	}
 
 	void World::addBox(std::shared_ptr<Box> box)
@@ -68,6 +68,6 @@ namespace Engine
 
 	void World::SetTimeStep(const float timeStep)
 	{
-		m_deltaTime = timeStep;
+		m_timeStep = timeStep;
 	}
 }

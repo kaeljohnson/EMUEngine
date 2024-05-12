@@ -20,7 +20,7 @@ namespace Engine
 		b2World m_world;
 		b2Vec2 m_gravity;
 
-		float m_deltaTime;
+		float m_timeStep;
 		int m_velocityIterations;
 		int m_positionIterations;
 	public:

@@ -38,20 +38,9 @@ namespace Engine
 		m_rendererManager(m_windowManager.getWindow()),
 		m_eventManager(m_eventQ),
 		m_eventListeners(),
-		running(false),
-		m_pixelsPerMeter(20),
-		m_timeStep(1.0f / 60.0f)
+		running(false)
 	{
 		defineDefaultApplicationCallbacks();
-	}
-
-	void Application::SetTimeStep(const float timeStep)
-	{
-		m_timeStep = timeStep;
-	}
-	void Application::SetPixelsPerMeter(const int pixelsPerMeter)
-	{
-		m_pixelsPerMeter = pixelsPerMeter;
 	}
 
 	void Application::PlayScene(std::shared_ptr<Scene> currentScene)
@@ -63,6 +52,9 @@ namespace Engine
 		}
 
 		currentScene->checkValid();
+
+		const int pixelsPerMeter = currentScene->GetPixelsPerMeter();
+		const float timeStep = currentScene->GetTimeStep();
 
 		running = true;
 
@@ -87,21 +79,21 @@ namespace Engine
 
 			accumulator += frameTime;
 
-			while (accumulator >= m_timeStep)
+			while (accumulator >= timeStep)
 			{
 				m_eventManager.handleEvents();
 				processEventQueue();
 
 				currentScene->update();
 
-				accumulator -= m_timeStep;
+				accumulator -= timeStep;
 			}
 
-			const double interpolation = accumulator / m_timeStep;
+			const double interpolation = accumulator / timeStep;
 
 			m_rendererManager.clearScreen();
 			renderScene(currentScene, interpolation);
-			m_rendererManager.display();      
+			m_rendererManager.display();
 		}
 	}
 
@@ -111,7 +103,7 @@ namespace Engine
 
 		for (auto& sceneObject : *scene)
 		{
-			m_rendererManager.render(sceneObject, m_pixelsPerMeter, interpolation);
+			m_rendererManager.render(sceneObject, scene->GetPixelsPerMeter(), interpolation);
 		}
 
 	}
