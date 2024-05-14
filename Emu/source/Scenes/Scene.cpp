@@ -9,7 +9,7 @@ namespace Engine
 {
 	Scene::Scene() : m_timeStep(0), m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_sceneObjects(), m_world(nullptr)
 	{
-		ICallbackSystem::GetInstance()->NewCallback(Type::CreateSimulation, [this](Data data)
+		ICallbackSystem::GetInstance()->NewCallback(Type::SetSimulation, [this](Data data)
 			{
 				SetSimulation(m_gravityX, m_gravityY, m_timeStep, m_pixelsPerMeter);
 			});

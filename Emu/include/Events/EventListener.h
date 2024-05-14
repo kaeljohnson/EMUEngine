@@ -22,6 +22,11 @@ namespace Engine
 	public:
 		EMU_API EventListener();
 		EMU_API virtual	~EventListener() = default;
+
+		// Must design function carefully when manipulating objects tied to a scene as the 
+		// event listeners are not tied to a scene directly. 
+		// Maybe change this in the future where an event listener can be tied to a scene 
+		// or directly to the app.
 		EMU_API virtual void ProcessEvent(Event& e);
 
 		EMU_API const bool IsEnabled() const;

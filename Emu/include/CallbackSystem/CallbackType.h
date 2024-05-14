@@ -19,6 +19,6 @@ namespace Engine
 		LoadDefaultTexture,
 
 		// Scene interaction
-		CreateSimulation,
+		SetSimulation,
 	};
 }

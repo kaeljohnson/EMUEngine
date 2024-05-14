@@ -6,14 +6,12 @@
 #include "../include/RendererManager.h"
 #include "../include/Logging/Logger.h"
 #include "../include/Scenes/SceneObject.h"
-#include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Physics/IPhysicsBody.h"
 
 namespace Engine
 {
 	RendererManager::RendererManager(SDLWindow* window)
-		: renderer(nullptr), ptrICallbackSystem(ICallbackSystem::GetInstance()),
-		VIRTUAL_WIDTH(1280), VIRTUAL_HEIGHT(720), SCALE_X(0), SCALE_Y(0), SCALE(0)
+		: renderer(nullptr), VIRTUAL_WIDTH(1280), VIRTUAL_HEIGHT(720), SCALE_X(0), SCALE_Y(0), SCALE(0)
 	{
 		// Assign SDL renderer pointer to the return value of the SDL_CreateRenderer function. 
 		// Note: Hover over function to understand the arguments it takes.

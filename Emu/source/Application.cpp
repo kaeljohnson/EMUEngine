@@ -164,11 +164,7 @@ namespace Engine
 		running = false;
 	}
 
-	Application::~Application()
-	{
-		//delete instance;
-		//instance = nullptr;
-	}
+	Application::~Application() {}
 
 	void Application::defineDefaultApplicationCallbacks()
 	{

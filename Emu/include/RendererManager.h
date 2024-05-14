@@ -14,11 +14,6 @@ namespace Engine
 		// SDL2 renderer pointer. This is the renderer that will be used to render all of the scene objects.
 		SDLRenderer* renderer;
 
-		// Pointer to the ICallbackSystem instance. Having a member variable that points
-		// to a singleton is typically not a good practice,
-		// but since the CallbackSystem is a basic messaging system, it is ok.
-		ICallbackSystem* ptrICallbackSystem;
-
 		const int VIRTUAL_WIDTH;
 		const int VIRTUAL_HEIGHT;
 

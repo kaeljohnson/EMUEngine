@@ -51,7 +51,7 @@ namespace Engine
 		EMU_API void AddEventListener(EventListener* eventListener);
 
 		// TEMP
-		EMU_API SDLRenderer* GetRenderer() { return m_rendererManager.getRenderer(); }
+	    SDLRenderer* GetRenderer() { return m_rendererManager.getRenderer(); }
 
 		// Application functions.
 		// EMU_API void PlayScene(std::string sceneName);
