@@ -7,35 +7,46 @@
 
 namespace Engine
 {
-	// RendererManager class. Manages the rendering of the application.
-	class RendererManager
-	{
-	private:
-		// SDL2 renderer pointer. This is the renderer that will be used to render all of the scene objects.
-		SDLRenderer* renderer;
+    class RendererManager
+    {
+    private:
+        static RendererManager* instance;
+        SDLRenderer* renderer;
 
-		const int VIRTUAL_WIDTH;
-		const int VIRTUAL_HEIGHT;
+        const int VIRTUAL_WIDTH;
+        const int VIRTUAL_HEIGHT;
 
-		float SCALE_X;
-		float SCALE_Y;
-		float SCALE;
+        float SCALE_X;
+        float SCALE_Y;
+        float SCALE;
 
-		int viewportWidth;
-		int viewportHeight;
-		int viewportX;
-		int viewportY;
-	
-	public:
-		RendererManager(SDLWindow* window);
-		~RendererManager();
+        int viewportWidth;
+        int viewportHeight;
+        int viewportX;
+        int viewportY;
 
-		SDLRenderer* getRenderer() const;
-		const SDLTexture* loadTexture(const char* filePath);
-		void clearScreen();
-		void render(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation);
-		void setViewport(SDLWindow* ptrWindow);
-		void display();
-		void free();
-	};
+        bool rendererCreated;
+
+        RendererManager();
+
+    public:
+        static RendererManager* GetInstance();
+        void CreateRenderer(SDLWindow* window);
+        SDLRenderer* GetRenderer() const;
+
+        ~RendererManager();
+
+        const SDLTexture* loadTexture(const char* filePath);
+        void clearScreen();
+        void render(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation);
+        void setViewport(SDLWindow* ptrWindow);
+        void display();
+        void free();
+
+        // Deleted functions to ensure our singleton instance cannot be copied or moved.
+        RendererManager(const RendererManager&) = delete;
+        RendererManager& operator=(const RendererManager&) = delete;
+        RendererManager(RendererManager&&) = delete;
+        RendererManager& operator=(RendererManager&&) = delete;
+    };
 }

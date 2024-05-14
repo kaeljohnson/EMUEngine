@@ -12,7 +12,7 @@
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
 #include "../include/Physics/Box.h"
-#include "../include/Physics/PhysicsFactory.h"
+// #include "../include/Physics/PhysicsFactory.h"
 
 namespace Engine
 {
@@ -35,11 +35,13 @@ namespace Engine
 
 	Application::Application()
 		: m_windowManager("Default App Name"),
-		m_rendererManager(m_windowManager.getWindow()),
+		ptrRendererManager(RendererManager::GetInstance()),
 		m_eventManager(m_eventQ),
 		m_eventListeners(),
 		running(false)
 	{
+		ptrRendererManager->CreateRenderer(m_windowManager.getWindow());
+
 		defineDefaultApplicationCallbacks();
 	}
 
@@ -91,9 +93,9 @@ namespace Engine
 
 			const double interpolation = accumulator / timeStep;
 
-			m_rendererManager.clearScreen();
+			ptrRendererManager->clearScreen();
 			renderScene(currentScene, interpolation);
-			m_rendererManager.display();
+			ptrRendererManager->display();
 		}
 	}
 
@@ -103,7 +105,7 @@ namespace Engine
 
 		for (auto& sceneObject : *scene)
 		{
-			m_rendererManager.render(sceneObject, scene->GetPixelsPerMeter(), interpolation);
+			ptrRendererManager->render(sceneObject, scene->GetPixelsPerMeter(), interpolation);
 		}
 
 	}
@@ -173,7 +175,7 @@ namespace Engine
 		ptrICallbackSystem->NewCallback(Type::ToggleFullscreen, [this](Data data)
 			{
 				m_windowManager.toggleFullscreen();
-				m_rendererManager.setViewport(m_windowManager.getWindow());
+				ptrRendererManager->setViewport(m_windowManager.getWindow());
 			});
 
 		ptrICallbackSystem->NewCallback(Type::EndApplication, [this](Data data)
@@ -186,7 +188,7 @@ namespace Engine
 				const std::pair<int, int> windowSize = std::get<const std::pair<int, int>>(data);
 				
 				m_windowManager.resize(windowSize.first, windowSize.second);
-				m_rendererManager.setViewport(m_windowManager.getWindow());
+				ptrRendererManager->setViewport(m_windowManager.getWindow());
 			});
 	}
 }

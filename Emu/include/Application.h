@@ -28,7 +28,7 @@ namespace Engine
 		// Managers for major engine components.
 		// Maybe decouple from application class?
 		WindowManager m_windowManager;
-		RendererManager m_rendererManager;
+		RendererManager* ptrRendererManager;
 		
 		// Event queue to hold all events.
 		std::queue<Event> m_eventQ;
@@ -50,11 +50,6 @@ namespace Engine
 
 		EMU_API void AddEventListener(EventListener* eventListener);
 
-		// TEMP
-	    SDLRenderer* GetRenderer() { return m_rendererManager.getRenderer(); }
-
-		// Application functions.
-		// EMU_API void PlayScene(std::string sceneName);
 		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
 		EMU_API void End();
 

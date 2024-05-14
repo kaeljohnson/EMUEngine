@@ -10,12 +10,25 @@
 
 namespace Engine
 {
-	RendererManager::RendererManager(SDLWindow* window)
-		: renderer(nullptr), VIRTUAL_WIDTH(1280), VIRTUAL_HEIGHT(720), SCALE_X(0), SCALE_Y(0), SCALE(0)
+	// Initialize static member
+	RendererManager* RendererManager::instance = nullptr;
+
+	RendererManager::RendererManager() 
+		: VIRTUAL_WIDTH(1280), VIRTUAL_HEIGHT(720), SCALE_X(0), SCALE_Y(0), SCALE(0), 
+		viewportX(0), viewportY(0), viewportWidth(0), viewportHeight(0),
+		rendererCreated(false), renderer(nullptr)
+	{}
+
+	void RendererManager::CreateRenderer(SDLWindow* window)
 	{
-		// Assign SDL renderer pointer to the return value of the SDL_CreateRenderer function. 
-		// Note: Hover over function to understand the arguments it takes.
-		renderer = SDL_CREATE_RENDERER(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // rendering driver?
+		if (rendererCreated)
+		{
+			ENGINE_INFO_D("Renderer already created. Returning.");
+			return;
+		}
+
+		// renderer = SDL_CREATE_RENDERER(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // rendering driver?
+		renderer = SDL_CREATE_RENDERER(window, -1, SDL_RENDERER_ACCELERATED);
 		if (renderer == nullptr)
 		{
 			ENGINE_CRITICAL("Renderer could not be created! SDL Error: {}", SDL_GET_ERROR());
@@ -24,10 +37,25 @@ namespace Engine
 		SDL_SetRenderDrawColor(renderer, 'd3', 'd3', 'd3', SDL_ALPHA_OPAQUE);
 
 		setViewport(window);
+
+		// Renderer only supports one window.
+		rendererCreated = true;
 	}
 
-	SDLRenderer* RendererManager::getRenderer() const
+	RendererManager* RendererManager::GetInstance()
 	{
+		if (instance == nullptr)
+		{
+			instance = new RendererManager();
+		}
+		return instance;
+	}
+
+	SDLRenderer* RendererManager::GetRenderer() const
+	{
+		rendererCreated ? ENGINE_INFO_D("Renderer is created.") : 
+						  ENGINE_INFO_D("Renderer is not created. Returning nullptr.");
+
 		return renderer;
 	}
 
@@ -107,7 +135,7 @@ namespace Engine
 
 		// Now that we freed the renderer, the pointer is still attached to that memory.
 		// This is bad because we don't control what is there anymore, so it needs to be set back to nullptr.
-		renderer = nullptr;																											
+		renderer = nullptr;
 	}
 
 	// Definition for the RendererManager destructor. Calls the free function.
