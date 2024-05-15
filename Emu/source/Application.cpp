@@ -2,17 +2,14 @@
 
 #include <stdio.h>
 #include <queue>
-#include <string>
 
+#include "../include/EngineConstants.h"
 #include "../include/Logging/Logger.h"
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
-#include "../include/Events/EventListenerStack.h"
 #include "../include/Events/EventListener.h"
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
-#include "../include/Physics/Box.h"
-// #include "../include/Physics/PhysicsFactory.h"
 
 namespace Engine
 {
@@ -56,7 +53,7 @@ namespace Engine
 		currentScene->checkValid();
 
 		const int pixelsPerMeter = currentScene->GetPixelsPerMeter();
-		const float timeStep = currentScene->GetTimeStep();
+		const float timeStep = TIME_STEP;
 
 		running = true;
 

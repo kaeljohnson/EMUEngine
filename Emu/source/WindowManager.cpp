@@ -4,7 +4,6 @@
 #include <queue>
 
 #include "../include/SDLWrapper/SDLWrapper.h"
-#include "../include/Events/Event.h"
 #include "../include/WindowManager.h"
 #include "../include/Logging/Logger.h"
 

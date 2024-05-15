@@ -1,9 +1,7 @@
 #pragma once
 
-#include <stdio.h>
-
+#include "../include/SDLWrapper/SDLWrapper.h"
 #include "../include/Init.h"
-#include "../include/Application.h"
 #include "../include/Logging/Logger.h"
 
 namespace Engine

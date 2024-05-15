@@ -5,7 +5,6 @@
 #include "../../include/SDLWrapper/SDLWrapper.h"
 #include "../../include/Events/EventManager.h"
 #include "../../include/Events/Event.h"
-#include "../../include/Logging/Logger.h"
 
 namespace Engine
 {

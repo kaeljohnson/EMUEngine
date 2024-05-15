@@ -1,13 +1,13 @@
 #pragma once
 
+#include "../EngineConstants.h"
+
 #include "SceneObject.h"
 
 namespace Engine
 {
 	class SceneObjectStack
 	{
-	public:
-		static const size_t MAX_OBJECTS = 100;
 	private:
 		size_t m_sceneObjectCount = 0;
 		SceneObject* m_sceneObjects[MAX_OBJECTS];

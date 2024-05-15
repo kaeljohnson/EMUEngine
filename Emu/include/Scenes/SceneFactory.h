@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <string>
+#include "Scene.h"
 
 namespace Engine
 {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "IWorld.h"
 
 #include "box2d/box2d.h"
@@ -20,12 +22,11 @@ namespace Engine
 		b2World m_world;
 		b2Vec2 m_gravity;
 
-		float m_timeStep;
 		int m_velocityIterations;
 		int m_positionIterations;
 	public:
 		World();
-		World(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations);
+		World(const float gravityX, const float gravityY, const int velocityIterations, const int positionIterations);
 		~World();
 
 		// Step the simulation forward.
@@ -35,9 +36,8 @@ namespace Engine
 		void addBox(std::shared_ptr<Box> body);
 		
 		// Remove physics body from world. 
-		void removeBox(Box* body);
+		void removeBox(std::shared_ptr<Box> body);
 
 		void SetGravity(const float gravityX, const float gravityY);
-		void SetTimeStep(const float timeStep);
 	};
 }

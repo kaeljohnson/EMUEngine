@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+
 #include "../../include/Physics/PhysicsFactory.h"
 #include "../../include/Physics/Box.h"
 #include "../../include/Physics/World.h"
@@ -15,8 +16,8 @@ namespace Engine
             heightInMeters, density, friction, angle, restitution, restitutionThreshold, collidable, fixed, visible);
     }
 
-    std::unique_ptr<IWorld> CreateWorld(const float gravityX, const float gravityY, const float deltaTime, const int velocityIterations, const int positionIterations)
+    std::unique_ptr<IWorld> CreateWorld(const float gravityX, const float gravityY, const int velocityIterations, const int positionIterations)
     {
-        return std::make_unique<World>(gravityX, gravityY, deltaTime, velocityIterations, positionIterations);
+        return std::make_unique<World>(gravityX, gravityY, velocityIterations, positionIterations);
     }
 }

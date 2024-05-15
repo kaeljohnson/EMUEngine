@@ -4,7 +4,6 @@
 
 #include "../../include/Scenes/SceneObject.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/Physics/BodyTypes.h"
 #include "../../include/Textures/Texture.h"
 
 namespace Engine

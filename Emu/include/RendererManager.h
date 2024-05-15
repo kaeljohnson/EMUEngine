@@ -3,7 +3,6 @@
 #include "../include/SDLWrapper/SDLWrapper.h"
 
 #include "Scenes/SceneObject.h"
-#include "CallbackSystem/CallbackSystem.h"
 
 namespace Engine
 {

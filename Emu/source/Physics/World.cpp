@@ -2,16 +2,17 @@
 
 #include "box2d/box2d.h"
 
+#include "../../include/EngineConstants.h"
 #include "../../include/Physics/World.h"
 #include "../../include/Physics/Box.h"
 #include "../../include/Logging/Logger.h"
 
 namespace Engine
 {
-	World::World() : m_world({ 0.0f, 0.0f }), m_gravity({ 0.0f, 0.0f }), m_timeStep(0), m_velocityIterations(0), m_positionIterations(0) {}
+	World::World() : m_world({ 0.0f, 0.0f }), m_gravity({ 0.0f, 0.0f }), m_velocityIterations(0), m_positionIterations(0) {}
 
-	World::World(const float gravityX, const float gravityY, const float timeStep, const int velocityIterations, const int positionIterations)
-		: m_gravity({ gravityX, gravityY }), m_world({ gravityX, gravityY}), m_timeStep(timeStep),
+	World::World(const float gravityX, const float gravityY, const int velocityIterations, const int positionIterations)
+		: m_gravity({ gravityX, gravityY }), m_world({ gravityX, gravityY}),
 		m_velocityIterations(velocityIterations), m_positionIterations(positionIterations)
 	{}
 
@@ -30,7 +31,7 @@ namespace Engine
 
 	void World::update()
 	{
-		m_world.Step(m_timeStep, m_velocityIterations, m_positionIterations);
+		m_world.Step(TIME_STEP, m_velocityIterations, m_positionIterations);
 	}
 
 	void World::addBox(std::shared_ptr<Box> box)
@@ -48,7 +49,7 @@ namespace Engine
 			box->getCenterXInMeters(), box->getCenterYInMeters(), box->getWidthInMeters(), box->getHeightInMeters());
 	}
 
-	void World::removeBox(Box* body)
+	void World::removeBox(std::shared_ptr<Box> body)
 	{
 		if (body == nullptr)
 		{
@@ -64,10 +65,5 @@ namespace Engine
 	{
 		m_gravity = { gravityX, gravityY };
 		m_world.SetGravity({ gravityX, gravityY });
-	}
-
-	void World::SetTimeStep(const float timeStep)
-	{
-		m_timeStep = timeStep;
 	}
 }

@@ -14,7 +14,7 @@ int main(int argc, char* args[])
 
 	Engine::ScenePtr scene = Engine::CreateScene();
 
-	scene->SetSimulation(0.0f, 9.8f, 1.0f / 60.0f, 10);
+	scene->SetSimulation(0.0f, 9.8f, 10);
 
 	// Temp
 	Engine::Texture tempTextureRed(255, 0, 0);
