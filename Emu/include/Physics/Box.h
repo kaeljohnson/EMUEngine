@@ -3,8 +3,6 @@
 
 #include "box2d/box2d.h"
 
-#include "../Logging/Logger.h"
-#include "ConversionFunctions.h"
 #include "BodyTypes.h"
 #include "IPhysicsBody.h"
 

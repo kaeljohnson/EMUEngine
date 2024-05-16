@@ -10,9 +10,7 @@
 #include "Events/Event.h"
 #include "Events/EventListenerStack.h"
 #include "Events/EventListener.h"
-#include "CallbackSystem/CallbackSystem.h"
 #include "Physics/IWorld.h"
-#include "Physics/PhysicsFactory.h"
 #include "Scenes/Scene.h"
 
 namespace Engine
@@ -25,15 +23,10 @@ namespace Engine
 
 		bool running;
 
-		// Time step for physics simulation. Can be set by user.
-		float m_timeStep;
-
-		int m_pixelsPerMeter;
-
 		// Managers for major engine components.
 		// Maybe decouple from application class?
 		WindowManager m_windowManager;
-		RendererManager m_rendererManager;
+		RendererManager* ptrRendererManager;
 		
 		// Event queue to hold all events.
 		std::queue<Event> m_eventQ;
@@ -53,16 +46,8 @@ namespace Engine
 
 		~Application();
 
-		EMU_API void SetTimeStep(const float timeStep);
-		EMU_API void SetPixelsPerMeter(const int pixelsPerMeter);
-
 		EMU_API void AddEventListener(EventListener* eventListener);
 
-		// TEMP
-		EMU_API SDLRenderer* GetRenderer() { return m_rendererManager.getRenderer(); }
-
-		// Application functions.
-		// EMU_API void PlayScene(std::string sceneName);
 		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
 		EMU_API void End();
 

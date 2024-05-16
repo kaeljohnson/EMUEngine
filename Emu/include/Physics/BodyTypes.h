@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Core.h"
+
 namespace Engine
 {
 	// All the possible engine supported body types.

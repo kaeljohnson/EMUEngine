@@ -17,5 +17,8 @@ namespace Engine
 
 		// Texture interaction
 		LoadDefaultTexture,
+
+		// Scene interaction
+		SetSimulation,
 	};
 }

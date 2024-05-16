@@ -2,12 +2,12 @@
 
 #include <memory>
 
-#include <string>
+#include "Scene.h"
 
 namespace Engine
 {
-	inline std::shared_ptr<Scene> CreateScene(const std::string& name, float timeStep, int pixelsPerMeter)
+	inline std::shared_ptr<Scene> CreateScene()
 	{
-		return std::make_shared<Scene>(name, timeStep, pixelsPerMeter);
+		return std::make_shared<Scene>();
 	}
 }

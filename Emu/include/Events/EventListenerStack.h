@@ -1,7 +1,6 @@
 #pragma once
 
-#include <string>
-
+#include "../EngineConstants.h"
 #include "EventListener.h"
 
 namespace Engine
@@ -10,8 +9,6 @@ namespace Engine
 
 	class EventListenerStack
 	{
-	public:
-		static const size_t MAX_LISTENERS = 10;
 	private:	
 		size_t m_eventListenerCount = 0;
 		EventListener* m_eventListeners[MAX_LISTENERS];

@@ -2,17 +2,14 @@
 
 #include <stdio.h>
 #include <queue>
-#include <string>
 
+#include "../include/EngineConstants.h"
 #include "../include/Logging/Logger.h"
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
-#include "../include/Events/EventListenerStack.h"
 #include "../include/Events/EventListener.h"
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
-#include "../include/Physics/Box.h"
-#include "../include/Physics/PhysicsFactory.h"
 
 namespace Engine
 {
@@ -35,23 +32,14 @@ namespace Engine
 
 	Application::Application()
 		: m_windowManager("Default App Name"),
-		m_rendererManager(m_windowManager.getWindow()),
+		ptrRendererManager(RendererManager::GetInstance()),
 		m_eventManager(m_eventQ),
 		m_eventListeners(),
-		running(false),
-		m_pixelsPerMeter(20),
-		m_timeStep(1.0f / 60.0f)
+		running(false)
 	{
-		defineDefaultApplicationCallbacks();
-	}
+		ptrRendererManager->CreateRenderer(m_windowManager.getWindow());
 
-	void Application::SetTimeStep(const float timeStep)
-	{
-		m_timeStep = timeStep;
-	}
-	void Application::SetPixelsPerMeter(const int pixelsPerMeter)
-	{
-		m_pixelsPerMeter = pixelsPerMeter;
+		defineDefaultApplicationCallbacks();
 	}
 
 	void Application::PlayScene(std::shared_ptr<Scene> currentScene)
@@ -63,6 +51,9 @@ namespace Engine
 		}
 
 		currentScene->checkValid();
+
+		const int pixelsPerMeter = currentScene->GetPixelsPerMeter();
+		const float timeStep = TIME_STEP;
 
 		running = true;
 
@@ -87,21 +78,21 @@ namespace Engine
 
 			accumulator += frameTime;
 
-			while (accumulator >= m_timeStep)
+			while (accumulator >= timeStep)
 			{
 				m_eventManager.handleEvents();
 				processEventQueue();
 
 				currentScene->update();
 
-				accumulator -= m_timeStep;
+				accumulator -= timeStep;
 			}
 
-			const double interpolation = accumulator / m_timeStep;
+			const double interpolation = accumulator / timeStep;
 
-			m_rendererManager.clearScreen();
+			ptrRendererManager->clearScreen();
 			renderScene(currentScene, interpolation);
-			m_rendererManager.display();      
+			ptrRendererManager->display();
 		}
 	}
 
@@ -111,7 +102,7 @@ namespace Engine
 
 		for (auto& sceneObject : *scene)
 		{
-			m_rendererManager.render(sceneObject, m_pixelsPerMeter, interpolation);
+			ptrRendererManager->render(sceneObject, scene->GetPixelsPerMeter(), interpolation);
 		}
 
 	}
@@ -172,11 +163,7 @@ namespace Engine
 		running = false;
 	}
 
-	Application::~Application()
-	{
-		//delete instance;
-		//instance = nullptr;
-	}
+	Application::~Application() {}
 
 	void Application::defineDefaultApplicationCallbacks()
 	{
@@ -185,7 +172,7 @@ namespace Engine
 		ptrICallbackSystem->NewCallback(Type::ToggleFullscreen, [this](Data data)
 			{
 				m_windowManager.toggleFullscreen();
-				m_rendererManager.setViewport(m_windowManager.getWindow());
+				ptrRendererManager->setViewport(m_windowManager.getWindow());
 			});
 
 		ptrICallbackSystem->NewCallback(Type::EndApplication, [this](Data data)
@@ -198,7 +185,7 @@ namespace Engine
 				const std::pair<int, int> windowSize = std::get<const std::pair<int, int>>(data);
 				
 				m_windowManager.resize(windowSize.first, windowSize.second);
-				m_rendererManager.setViewport(m_windowManager.getWindow());
+				ptrRendererManager->setViewport(m_windowManager.getWindow());
 			});
 	}
 }

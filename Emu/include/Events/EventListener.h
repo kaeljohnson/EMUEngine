@@ -14,22 +14,21 @@ namespace Engine
 	class EventListener
 	{
 	private:
-		std::string m_name;
 		bool m_enabled;
-
-		bool m_attachedToApp;
 
 	protected:
 		ICallbackSystem* ptrICallbackSystem;
 
 	public:
-		EMU_API EventListener(std::string name);
+		EMU_API EventListener();
 		EMU_API virtual	~EventListener() = default;
+
+		// Must design function carefully when manipulating objects tied to a scene as the 
+		// event listeners are not tied to a scene directly. 
+		// Maybe change this in the future where an event listener can be tied to a scene 
+		// or directly to the app.
 		EMU_API virtual void ProcessEvent(Event& e);
 
-		EMU_API const std::string GetName() const;
 		EMU_API const bool IsEnabled() const;
-		EMU_API const bool IsAttached() const;
-		EMU_API void SetAttached(bool attached);
 	};
 }

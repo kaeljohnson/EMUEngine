@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../include/Events/EventListenerStack.h"
-#include "../../include/Events/EventListenerStack.h"
+#include "../../include/Events/EventListener.h"
 #include "../../include/Logging/Logger.h"
 
 namespace Engine
@@ -27,9 +27,9 @@ namespace Engine
 		// Check if the event listener already exists in the array
 		for (int i = 0; i < m_eventListenerCount; i++)
 		{
-			if (m_eventListeners[i]->GetName() == eventListener->GetName())
+			if (m_eventListeners[i] == eventListener)
 			{
-				ENGINE_CRITICAL_D("EventListener with name: {} already exists in the EventListener stack!", eventListener->GetName());
+				ENGINE_CRITICAL_D("EventListener already exists in the EventListener stack!");
 				return;
 			}
 		}
@@ -42,7 +42,6 @@ namespace Engine
 		}
 
 		// Add the event listener to the end of the array
-		eventListener->SetAttached(true);
 		m_eventListeners[m_eventListenerCount] = eventListener;
 		m_eventListenerCount++;
 	}
@@ -58,10 +57,8 @@ namespace Engine
 		// Find the event listener in the array
 		for (int i = 0; i < m_eventListenerCount; i++)
 		{
-			if (m_eventListeners[i]->GetName() == eventListener->GetName())
+			if (m_eventListeners[i] == eventListener)
 			{
-				m_eventListeners[i]->SetAttached(false);
-
 				// Remove the event listener from the array by moving all elements after it one step to the left
 				for (int j = i; j < m_eventListenerCount - 1; j++)
 				{
@@ -83,8 +80,6 @@ namespace Engine
 			ENGINE_CRITICAL_D("EventListener stack is empty. Cannot pop EventListener from an empty EventListener stack.");
 			return;
 		}
-
-		m_eventListeners[m_eventListenerCount - 1]->SetAttached(false);
 
 		// Decrease the count of event listeners
 		m_eventListenerCount--;
