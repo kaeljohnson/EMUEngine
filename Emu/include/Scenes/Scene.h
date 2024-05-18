@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
 
 #include "../Core.h"
 
@@ -18,6 +19,7 @@ namespace Engine
 		float m_gravityX;
 		float m_gravityY;
 		
+		std::unordered_map<std::string, SceneObject*> m_sceneObjectsMap;
 		SceneObjectStack m_sceneObjects;
 
 	private:
