@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "../Core.h"
 
@@ -14,6 +15,7 @@ namespace Engine
 	class SceneObject
 	{
 	private:
+		std::string uuid;
 		bool m_enabled;
 
 	protected:
@@ -25,6 +27,7 @@ namespace Engine
 		EMU_API virtual ~SceneObject() = default;
 
 		EMU_API std::shared_ptr<IPhysicsBody> GetPhysicsBody();
+		EMU_API std::string GetUUID();
 		EMU_API Texture* GetTexture();
 		EMU_API const bool IsEnabled() const;
 	};

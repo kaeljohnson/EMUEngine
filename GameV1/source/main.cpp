@@ -34,6 +34,8 @@ int main(int argc, char* args[])
 	ClientObject testWallRight(wallRightBody, &tempTextureBlue);
 	ClientObject testGround(groundBody, &tempTextureBlue);
 	
+	CLIENT_INFO_D(testGO.GetUUID());
+
 	AppManagementListener appManagementListener("App management listener");
 
 	ptrAppInstance->AddEventListener(&appManagementListener);

@@ -70,6 +70,7 @@ namespace Engine
 		(sceneObject == nullptr) ? ENGINE_WARN_D("SceneObject is nullptr.") : ENGINE_WARN_D("Adding scene object to scene.");
 
 		m_sceneObjects.push(sceneObject);
+		m_sceneObjectsMap[sceneObject->GetUUID()] = sceneObject;
 
 		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject->GetPhysicsBody());
 
