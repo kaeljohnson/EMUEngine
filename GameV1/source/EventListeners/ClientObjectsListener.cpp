@@ -13,6 +13,7 @@ ClientObjectsListener::~ClientObjectsListener()
 
 void ClientObjectsListener::ProcessEvent(Engine::Event& e)
 {
+	e.Handled = true;
 	if (e.Type == Engine::D_KEY_DOWN)
 	{
 		ptrClientObject->SetXVelocity(50.0f);
@@ -39,6 +40,6 @@ void ClientObjectsListener::ProcessEvent(Engine::Event& e)
 	}
 	else
 	{
-		// Do nothing
+		e.Handled = false;
 	}
 }
