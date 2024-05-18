@@ -31,4 +31,14 @@ namespace Engine
 	}
 
 	const bool SceneObject::IsEnabled() const { return m_enabled;  }
+
+	void SceneObject::SetXVelocity(const float xVel)
+	{
+		m_physicsBody->SetXVelocity(xVel);
+	}
+
+	void SceneObject::SetYVelocity(const float yVel)
+	{
+		m_physicsBody->SetYVelocity(yVel);
+	}
 }

@@ -30,5 +30,8 @@ namespace Engine
 		EMU_API std::string GetUUID();
 		EMU_API Texture* GetTexture();
 		EMU_API const bool IsEnabled() const;
+
+		EMU_API void SetXVelocity(const float xVel);
+		EMU_API void SetYVelocity(const float yVel);
 	};
 }
