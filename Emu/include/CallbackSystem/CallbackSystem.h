@@ -3,7 +3,6 @@
 #include "../Core.h"
 
 #include "CallbackType.h"
-#include "../Events/Event.h"
 
 #include <variant>
 #include <unordered_map>
