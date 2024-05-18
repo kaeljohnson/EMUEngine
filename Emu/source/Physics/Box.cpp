@@ -80,6 +80,9 @@ namespace Engine
 		}
 	}
 
+	void Box::SetXVelocity(const float xVel) { m_body->SetLinearVelocity(b2Vec2(xVel, m_body->GetLinearVelocity().y)); }
+	void Box::SetYVelocity(const float yVel) { m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, yVel)); }
+
 	Box::~Box()
 	{
 		ENGINE_INFO_D("Freeing Box!");

@@ -76,5 +76,8 @@ namespace Engine
 
 		void bodyNotInWorldAlert() const;
 		void removeBodyFromWorld() override;
+
+		void SetXVelocity(const float xVel);
+		void SetYVelocity(const float yVel);
 	};
 }

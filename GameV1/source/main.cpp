@@ -2,6 +2,7 @@
 
 #include <Engine.h>
 #include "../include/EventListeners/AppManagementListener.h"
+#include "../include/EventListeners/ClientObjectsListener.h"
 #include "../include/ClientObjects/ClientObject.h"
 
 int main(int argc, char* args[])
@@ -36,8 +37,10 @@ int main(int argc, char* args[])
 	
 	CLIENT_INFO_D(testGO.GetUUID());
 
+	ClientObjectsListener testBodyListener("Test body listener", &testGO);
 	AppManagementListener appManagementListener("App management listener");
 
+	ptrAppInstance->AddEventListener(&testBodyListener);
 	ptrAppInstance->AddEventListener(&appManagementListener);
 
 	scene->Add(&testWall);
