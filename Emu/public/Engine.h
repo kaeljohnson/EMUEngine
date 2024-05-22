@@ -14,6 +14,7 @@
 #include "../include/Textures/Texture.h"
 #include "../include/Physics/IPhysicsBody.h"
 #include "../include/Physics/PhysicsFactory.h"
+#include "../include/Controllable/Controllable.h"
 
 namespace Engine
 {

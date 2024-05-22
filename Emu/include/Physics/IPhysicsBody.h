@@ -39,5 +39,7 @@ namespace Engine
 
 		virtual void SetXVelocity(const float xVel) = 0;
 		virtual void SetYVelocity(const float yVel) = 0;
+
+		virtual void SetGravity(bool enabled) = 0;
 	};
 }

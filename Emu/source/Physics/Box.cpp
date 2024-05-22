@@ -26,7 +26,8 @@ namespace Engine
 			break;
 		case DYNAMIC:
 			m_bodyDef.type = b2_dynamicBody;
-			m_bodyDef.fixedRotation = false;
+			// m_bodyDef.fixedRotation = false;
+			m_bodyDef.fixedRotation = true;
 			ENGINE_TRACE_D("Creating dynamic body.");
 			break;
 		default:
@@ -82,6 +83,8 @@ namespace Engine
 
 	void Box::SetXVelocity(const float xVel) { m_body->SetLinearVelocity(b2Vec2(xVel, m_body->GetLinearVelocity().y)); }
 	void Box::SetYVelocity(const float yVel) { m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, yVel)); }
+
+	void Box::SetGravity(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
 
 	Box::~Box()
 	{
