@@ -5,12 +5,13 @@
 #include "../../include/Controllable/Controllable.h"
 #include "../../include/Textures/Texture.h"
 #include "../../include/Physics/IPhysicsBody.h"
+#include "../../include/Logging/Logger.h"
 
 namespace Engine
 {
 	Controllable::Controllable(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture* ptrTexture) 
-		: m_ptrPhysicsBody(ptrPhysicsBody), SceneObject(ptrPhysicsBody, ptrTexture)
-	{}
+		: m_xVelocity(0.0f), m_yVelocity(0.0f), m_xAcceleration(0.0f), m_yAcceleration(0.0f), m_jumpForce(30.0f), m_keyStates(),
+        SceneObject(ptrPhysicsBody, ptrTexture) {}
 
 	void Controllable::SetXVelocity(const float xVel)
 	{
@@ -27,90 +28,104 @@ namespace Engine
 		m_physicsBody->SetGravity(enabled);
 	}
 
+    const float Controllable::GetXVelocity() const
+    {
+		return m_physicsBody->GetXVelocity();
+	}
+
+    const float Controllable::GetYVelocity() const
+    {
+		return m_physicsBody->GetYVelocity();
+	}
+
 	void Controllable::ProcessEvent(Event& e)
 	{
+        if (e.Type == D_KEY_DOWN || e.Type == A_KEY_DOWN)
+        {
+            m_keyStates[e.Type] = true;
+            e.Handled = true;
+        }
+        
+        if (e.Type == D_KEY_UP)
+        {
+            m_keyStates[D_KEY_DOWN] = false;
+            e.Handled = true;
+        }
 
-		// Need interface for client to do this.
-        e.Handled = true;
-        if (e.Type == Engine::D_KEY_DOWN)
+        if (e.Type == A_KEY_UP)
         {
-            dKeyDown = true;
-            SetXVelocity(50.0f);
+			m_keyStates[A_KEY_DOWN] = false;
+			e.Handled = true;
         }
-        else if (e.Type == Engine::A_KEY_DOWN)
+
+        if (e.Type == SPACE_KEY_DOWN)
         {
-            aKeyDown = true;
-            SetXVelocity(-50.0f);
-        }
-        else if (e.Type == Engine::W_KEY_DOWN)
-        {
-            wKeyDown = true;
-            SetYVelocity(-50.0f);
-        }
-        else if (e.Type == Engine::S_KEY_DOWN)
-        {
-            sKeyDown = true;
-            SetYVelocity(50.0f);
-        }
-        else if (e.Type == Engine::D_KEY_UP)
-        {
-            dKeyDown = false;
-            if (aKeyDown)
-            {
-                SetXVelocity(-50.0f);
-            }
-            else
-            {
-                SetXVelocity(0.0f);
-            }
-        }
-        else if (e.Type == Engine::A_KEY_UP)
-        {
-            aKeyDown = false;
-            if (dKeyDown)
-            {
-                SetXVelocity(50.0f);
-            }
-            else
-            {
-                SetXVelocity(0.0f);
-            }
-        }
-        else if (e.Type == Engine::W_KEY_UP)
-        {
-            wKeyDown = false;
-            if (sKeyDown)
-            {
-                SetYVelocity(50.0f);
-            }
-            else
-            {
-                SetYVelocity(0.0f);
-            }
-        }
-        else if (e.Type == Engine::S_KEY_UP)
-        {
-            sKeyDown = false;
-            if (wKeyDown)
-            {
-                SetYVelocity(-50.0f);
-            }
-            else
-            {
-                SetYVelocity(0.0f);
-            }
-        }
-		else if (e.Type == Engine::SPACE_KEY_DOWN)
-		{
-			SetGravity(true);
+			m_keyStates[SPACE_KEY_DOWN] = true;
+			e.Handled = true;
 		}
-		else if (e.Type == Engine::SPACE_KEY_UP)
-		{
-			SetGravity(false);
+	}
+
+    void Controllable::update()
+    {
+        std::pair<float, float> force = { 0.0f, 0.0f };
+        float currentVelocityX = m_physicsBody->GetXVelocity();
+
+        if (m_keyStates[D_KEY_DOWN] && !m_keyStates[A_KEY_DOWN])
+        {
+            if (currentVelocityX < 0) // If previously moving left
+            {
+                force = { XSWITCHDECELERATION, 0.0f }; // Apply larger force to the right
+            }
+            else // If already moving right or not moving at all
+            {
+                force = { XACCELERATION, 0.0f }; // Apply normal force to the right
+            }
+        }
+        else if (m_keyStates[A_KEY_DOWN] && !m_keyStates[D_KEY_DOWN])
+        {
+            if (currentVelocityX > 0) // If previously moving right
+            {
+                force = { -XSWITCHDECELERATION, 0.0f }; // Apply larger force to the left
+            }
+            else // If already moving left or not moving at all
+            {
+                force = { -XACCELERATION, 0.0f }; // Apply normal force to the left
+            }
+        }
+        else
+        {
+            // Apply deceleration when no keys are pressed
+            force = { -currentVelocityX * XDECELERATION, 0.0f };
+        }
+
+        // Jump
+        if (m_keyStates[SPACE_KEY_DOWN])
+        {
+			Jump();
+			m_keyStates[SPACE_KEY_DOWN] = false;
 		}
-		else
-		{
-			e.Handled = false;
+
+        m_physicsBody->ApplyForceToBox(force);
+
+        // Limit the velocity
+        if (m_physicsBody->GetXVelocity() > MAX_XVELOCITY)
+        {
+			m_physicsBody->SetXVelocity(MAX_XVELOCITY);
+		}
+
+        if (m_physicsBody->GetXVelocity() < -MAX_XVELOCITY)
+        {
+            m_physicsBody->SetXVelocity(-MAX_XVELOCITY);
+        }
+    }
+
+    void Controllable::Jump()
+    {
+        if (!m_isJumping)
+        {
+            if (m_physicsBody->GetYVelocity() > 0) m_physicsBody->SetYVelocity(0.0f);
+			m_physicsBody->ApplyImpulseToBox({ 0.0f, -m_jumpForce });
+			// m_isJumping = true;
 		}
 	}
 }

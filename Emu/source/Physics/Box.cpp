@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "../../include/Physics/Box.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/ConversionFunctions.h"
@@ -81,10 +83,27 @@ namespace Engine
 		}
 	}
 
+	void Box::SetXDeceleration(const float xDecel)
+	{
+		m_body->SetLinearDamping(xDecel);
+	}
+
 	void Box::SetXVelocity(const float xVel) { m_body->SetLinearVelocity(b2Vec2(xVel, m_body->GetLinearVelocity().y)); }
 	void Box::SetYVelocity(const float yVel) { m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, yVel)); }
+	const float Box::GetXVelocity() const { return m_body->GetLinearVelocity().x; }
+	const float Box::GetYVelocity() const { return m_body->GetLinearVelocity().y; }
 
 	void Box::SetGravity(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
+
+	void Box::ApplyForceToBox(std::pair<float, float> force)
+	{
+		m_body->ApplyForceToCenter(b2Vec2(force.first, force.second), true);
+	}
+
+	void Box::ApplyImpulseToBox(std::pair<float, float> impulse)
+	{
+		m_body->ApplyLinearImpulseToCenter(b2Vec2(impulse.first, impulse.second), true);
+	}
 
 	Box::~Box()
 	{

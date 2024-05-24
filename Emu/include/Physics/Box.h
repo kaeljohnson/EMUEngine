@@ -1,4 +1,7 @@
 #pragma once
+
+#include <utility>
+
 #include "../Core.h"
 
 #include "box2d/box2d.h"
@@ -77,9 +80,16 @@ namespace Engine
 		void bodyNotInWorldAlert() const;
 		void removeBodyFromWorld() override;
 
+		void SetXDeceleration(const float xDecel) override;
+
 		void SetXVelocity(const float xVel) override;
 		void SetYVelocity(const float yVel) override;
+		const float GetXVelocity() const override;
+		const float GetYVelocity() const override;
 
 		void SetGravity(bool enabled) override;
+
+		void ApplyForceToBox(std::pair<float, float> force) override;
+		void ApplyImpulseToBox(std::pair<float, float> impulse) override;
 	};
 }

@@ -41,4 +41,9 @@ namespace Engine
 	{
 		m_physicsBody->SetYVelocity(yVel);
 	}
+
+	void SceneObject::update()
+	{
+		// World updates physics bodies.
+	}
 }

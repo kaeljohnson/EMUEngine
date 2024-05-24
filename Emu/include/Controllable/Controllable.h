@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
 
 #include "../Core.h"
 
@@ -17,15 +18,24 @@ namespace Engine
 	private:
 		float m_xVelocity;
 		float m_yVelocity;
-		std::shared_ptr<IPhysicsBody> m_ptrPhysicsBody;
 
-		// Temporary key down variables
-		// Should be replaced with a key mapping system
-		// that can be defined by the client.
-		bool dKeyDown = false;
-		bool aKeyDown = false;
-		bool wKeyDown = false;
-		bool sKeyDown = false;
+		const float XSWITCHDECELERATION = 70.0f;
+		const float XDECELERATION = 5.0f;
+		const float XACCELERATION = 30.0f;
+		const float MAX_XVELOCITY = 30.0f;
+		float m_xAcceleration;
+
+		const float YACCELERATION = 30.0f;
+		const float MAX_YVELOCITY = 60.0f;
+		float m_yAcceleration;
+
+		float m_jumpForce;
+
+		// Jumping state will need to be handled 
+		// using the box2d callback system.
+		bool m_isJumping = false;
+
+		std::unordered_map<EventType, bool> m_keyStates;
 
 	public:
 		EMU_API Controllable(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture* ptrTexture);
@@ -37,5 +47,11 @@ namespace Engine
 
 		EMU_API void SetXVelocity(const float xVel);
 		EMU_API void SetYVelocity(const float yVel);
+		EMU_API const float GetXVelocity() const;
+		EMU_API const float GetYVelocity() const;
+
+		EMU_API virtual void update() override;
+
+		EMU_API virtual void Jump();
 	};
 }

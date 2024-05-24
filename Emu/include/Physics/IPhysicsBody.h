@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "../Core.h"
 
 #include "BodyTypes.h"
@@ -37,9 +39,16 @@ namespace Engine
 		virtual void bodyNotInWorldAlert() const = 0;
 		virtual void removeBodyFromWorld() = 0;
 
+		virtual void SetXDeceleration(const float xDecel) = 0;
+
 		virtual void SetXVelocity(const float xVel) = 0;
 		virtual void SetYVelocity(const float yVel) = 0;
+		virtual const float GetXVelocity() const = 0;
+		virtual const float GetYVelocity() const = 0;
 
 		virtual void SetGravity(bool enabled) = 0;
+
+		virtual void ApplyForceToBox(std::pair<float, float> force) = 0;
+		virtual void ApplyImpulseToBox(std::pair<float, float> impulse) = 0;
 	};
 }
