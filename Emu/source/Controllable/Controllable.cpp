@@ -10,7 +10,8 @@
 namespace Engine
 {
 	Controllable::Controllable(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture* ptrTexture) 
-		: m_xVelocity(0.0f), m_yVelocity(0.0f), m_xAcceleration(0.0f), m_yAcceleration(0.0f), m_jumpForce(30.0f), m_keyStates(),
+		: XSWITCHDECELERATION(70.0f), XDECELERATION(5.0f), XACCELERATION(30.0f), MAX_XVELOCITY(30.0f), 
+        YACCELERATION(30.0f), MAX_YVELOCITY(60.0f), JUMPFORCE(30.0f), m_keyStates(),
         SceneObject(ptrPhysicsBody, ptrTexture) {}
 
 	void Controllable::SetXVelocity(const float xVel)
@@ -123,8 +124,8 @@ namespace Engine
     {
         if (!m_isJumping)
         {
-            if (m_physicsBody->GetYVelocity() > 0) m_physicsBody->SetYVelocity(0.0f);
-			m_physicsBody->ApplyImpulseToBox({ 0.0f, -m_jumpForce });
+            m_physicsBody->SetYVelocity(0.0f);
+			m_physicsBody->ApplyImpulseToBox({ 0.0f, -JUMPFORCE });
 			// m_isJumping = true;
 		}
 	}

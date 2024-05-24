@@ -16,20 +16,13 @@ namespace Engine
 	class Controllable : public EventListener, public SceneObject
 	{
 	private:
-		float m_xVelocity;
-		float m_yVelocity;
-
-		const float XSWITCHDECELERATION = 70.0f;
+		const float XSWITCHDECELERATION;
 		const float XDECELERATION = 5.0f;
 		const float XACCELERATION = 30.0f;
 		const float MAX_XVELOCITY = 30.0f;
-		float m_xAcceleration;
-
 		const float YACCELERATION = 30.0f;
 		const float MAX_YVELOCITY = 60.0f;
-		float m_yAcceleration;
-
-		float m_jumpForce;
+		const float JUMPFORCE;
 
 		// Jumping state will need to be handled 
 		// using the box2d callback system.
