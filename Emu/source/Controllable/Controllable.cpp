@@ -9,9 +9,10 @@
 
 namespace Engine
 {
-	Controllable::Controllable(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture* ptrTexture) 
-		: XSWITCHDECELERATION(70.0f), XDECELERATION(5.0f), XACCELERATION(30.0f), MAX_XVELOCITY(30.0f), 
-        YACCELERATION(30.0f), MAX_YVELOCITY(60.0f), JUMPFORCE(30.0f), m_keyStates(),
+    Controllable::Controllable(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture* ptrTexture)
+        : XSWITCHDECELERATION(70.0f), XDECELERATION(5.0f), XACCELERATION(30.0f), MAX_XVELOCITY(30.0f),
+        YACCELERATION(30.0f), MAX_YVELOCITY(60.0f), JUMPFORCE(15.0f), m_jumpCharge(0.0), 
+        JUMPCHARGEINCREMENT(0.05f), MINJUMPFORCE(20.0f), MAXJUMPCHARGE(1.0f), m_keyStates(),
         SceneObject(ptrPhysicsBody, ptrTexture) {}
 
 	void Controllable::SetXVelocity(const float xVel)
@@ -24,9 +25,9 @@ namespace Engine
 		m_physicsBody->SetYVelocity(yVel);
 	}
 
-	void Controllable::SetGravity(bool enabled)
+	void Controllable::GravityOn(bool enabled)
 	{
-		m_physicsBody->SetGravity(enabled);
+		m_physicsBody->GravityOn(enabled);
 	}
 
     const float Controllable::GetXVelocity() const
@@ -41,6 +42,9 @@ namespace Engine
 
 	void Controllable::ProcessEvent(Event& e)
 	{
+        // Should key states just be a member of the application
+        // or maybe a static class? This would be a big refactor.
+
         if (e.Type == D_KEY_DOWN || e.Type == A_KEY_DOWN)
         {
             m_keyStates[e.Type] = true;
@@ -62,6 +66,13 @@ namespace Engine
         if (e.Type == SPACE_KEY_DOWN)
         {
 			m_keyStates[SPACE_KEY_DOWN] = true;
+			e.Handled = true;
+		}
+        
+        if (e.Type == SPACE_KEY_UP)
+        {
+            m_keyStates[SPACE_KEY_DOWN] = false;
+			m_keyStates[SPACE_KEY_UP] = true;
 			e.Handled = true;
 		}
 	}
@@ -102,8 +113,15 @@ namespace Engine
         // Jump
         if (m_keyStates[SPACE_KEY_DOWN])
         {
+            if (m_jumpCharge < MAXJUMPCHARGE)
+                m_jumpCharge += JUMPCHARGEINCREMENT;
+		}
+        
+        if (m_keyStates[SPACE_KEY_UP])
+        {
 			Jump();
-			m_keyStates[SPACE_KEY_DOWN] = false;
+            m_jumpCharge = 0.0f;
+            m_keyStates[SPACE_KEY_UP] = false;
 		}
 
         m_physicsBody->ApplyForceToBox(force);
@@ -122,11 +140,10 @@ namespace Engine
 
     void Controllable::Jump()
     {
-        if (!m_isJumping)
+        if (m_physicsBody->OnGround())
         {
             m_physicsBody->SetYVelocity(0.0f);
-			m_physicsBody->ApplyImpulseToBox({ 0.0f, -JUMPFORCE });
-			// m_isJumping = true;
+			m_physicsBody->ApplyImpulseToBox({ 0.0f, -MINJUMPFORCE + (- JUMPFORCE * m_jumpCharge) });
 		}
 	}
 }

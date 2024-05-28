@@ -93,7 +93,7 @@ namespace Engine
 	const float Box::GetXVelocity() const { return m_body->GetLinearVelocity().x; }
 	const float Box::GetYVelocity() const { return m_body->GetLinearVelocity().y; }
 
-	void Box::SetGravity(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
+	void Box::GravityOn(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
 
 	void Box::ApplyForceToBox(std::pair<float, float> force)
 	{
@@ -103,6 +103,30 @@ namespace Engine
 	void Box::ApplyImpulseToBox(std::pair<float, float> impulse)
 	{
 		m_body->ApplyLinearImpulseToCenter(b2Vec2(impulse.first, impulse.second), true);
+	}
+
+	bool Box::OnGround() const
+	{
+		b2ContactEdge* edge = m_body->GetContactList();
+		while (edge)
+		{
+			if (edge->contact->IsTouching())
+			{
+				b2WorldManifold worldManifold;
+				edge->contact->GetWorldManifold(&worldManifold);
+
+				// Check which body is the player body
+				bool bodyAIsPlayer = edge->contact->GetFixtureA()->GetBody() == m_body;
+				float normalY = bodyAIsPlayer ? worldManifold.normal.y : -worldManifold.normal.y;
+
+				if (normalY > 0.5f)
+				{
+					return true;
+				}
+			}
+			edge = edge->next;
+		}
+		return false;
 	}
 
 	Box::~Box()

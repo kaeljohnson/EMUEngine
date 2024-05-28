@@ -47,28 +47,28 @@ namespace Engine
 		// Collisions are more accurate when static objects are simulated first.
 		// Thus, we need to add static objects to the beginning of the list.
 
-		if (sceneObject->GetPhysicsBody()->getBodyType() == BodyType::STATIC)
-		{
-			// Find the first dynamic object
-			size_t firstDynamicIndex = 0;
-			for (; firstDynamicIndex < m_sceneObjectCount; firstDynamicIndex++)
-			{
-				if (m_sceneObjects[firstDynamicIndex]->GetPhysicsBody()->getBodyType() != BodyType::STATIC)
-				{
-					break;
-				}
-			}
+		//if (sceneObject->GetPhysicsBody()->getBodyType() == BodyType::STATIC)
+		//{
+		//	// Find the first dynamic object
+		//	size_t firstDynamicIndex = 0;
+		//	for (; firstDynamicIndex < m_sceneObjectCount; firstDynamicIndex++)
+		//	{
+		//		if (m_sceneObjects[firstDynamicIndex]->GetPhysicsBody()->getBodyType() != BodyType::STATIC)
+		//		{
+		//			break;
+		//		}
+		//	}
 
-			// Shift all dynamic objects to the right
-			for (size_t i = m_sceneObjectCount; i > firstDynamicIndex; i--)
-			{
-				m_sceneObjects[i] = m_sceneObjects[i - 1];
-			}
+		//	// Shift all dynamic objects to the right
+		//	for (size_t i = m_sceneObjectCount; i > firstDynamicIndex; i--)
+		//	{
+		//		m_sceneObjects[i] = m_sceneObjects[i - 1];
+		//	}
 
-			// Insert the static object before the first dynamic object
-			m_sceneObjects[firstDynamicIndex] = sceneObject;
-		}
-		else
+		//	// Insert the static object before the first dynamic object
+		//	m_sceneObjects[firstDynamicIndex] = sceneObject;
+		//}
+		//else
 		{
 			// Add rest of objects to the end of the list
 			m_sceneObjects[m_sceneObjectCount] = sceneObject;

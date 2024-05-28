@@ -46,9 +46,11 @@ namespace Engine
 		virtual const float GetXVelocity() const = 0;
 		virtual const float GetYVelocity() const = 0;
 
-		virtual void SetGravity(bool enabled) = 0;
+		virtual void GravityOn(bool enabled) = 0;
 
 		virtual void ApplyForceToBox(std::pair<float, float> force) = 0;
 		virtual void ApplyImpulseToBox(std::pair<float, float> impulse) = 0;
+
+		virtual bool OnGround() const = 0;
 	};
 }

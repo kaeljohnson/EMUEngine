@@ -44,6 +44,14 @@ namespace Engine
 		bool m_collidable;
 		bool m_fixed;
 
+		// Need to interact with contact listener
+		// wrapper to deterime.
+		bool m_onGround;
+		bool m_onRightWall;
+		bool m_onLeftwall;
+
+		bool m_gavityOn;
+
 	public:
 		Box() = default;
 		Box(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters,
@@ -87,9 +95,11 @@ namespace Engine
 		const float GetXVelocity() const override;
 		const float GetYVelocity() const override;
 
-		void SetGravity(bool enabled) override;
+		void GravityOn(bool enabled) override;
 
 		void ApplyForceToBox(std::pair<float, float> force) override;
 		void ApplyImpulseToBox(std::pair<float, float> impulse) override;
+
+		bool OnGround() const override;
 	};
 }
