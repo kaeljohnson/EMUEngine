@@ -1,4 +1,5 @@
 #pragma once
+
 #include "../Core.h"
 
 #include "box2d/box2d.h"
@@ -41,6 +42,14 @@ namespace Engine
 		bool m_collidable;
 		bool m_fixed;
 
+		// Need to interact with contact listener
+		// wrapper to deterime.
+		bool m_onGround;
+		bool m_onRightWall;
+		bool m_onLeftwall;
+
+		bool m_gavityOn;
+
 	public:
 		Box() = default;
 		Box(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters,
@@ -77,7 +86,18 @@ namespace Engine
 		void bodyNotInWorldAlert() const;
 		void removeBodyFromWorld() override;
 
-		void SetXVelocity(const float xVel);
-		void SetYVelocity(const float yVel);
+		void SetXDeceleration(const float xDecel) override;
+
+		void SetXVelocity(const float xVel) override;
+		void SetYVelocity(const float yVel) override;
+		const float GetXVelocity() const override;
+		const float GetYVelocity() const override;
+
+		void GravityOn(bool enabled) override;
+
+		void ApplyForceToBox(std::pair<float, float> force) override;
+		void ApplyImpulseToBox(std::pair<float, float> impulse) override;
+
+		bool OnGround() const override;
 	};
 }

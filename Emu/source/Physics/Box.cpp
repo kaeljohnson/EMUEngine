@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "../../include/Physics/Box.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/ConversionFunctions.h"
@@ -15,26 +17,26 @@ namespace Engine
 		: m_halfWidthInMeters(widthInMeters / 2.0f), m_halfHeightInMeters(heightInMeters / 2.0f), 
 		m_widthInMeters(widthInMeters), m_heightInMeters(heightInMeters),
 		m_restitution(restitution), m_restitutionThreshold(restitutionThreshold),
-		m_bodyType(bodyType), m_visible(visible), m_collidable(collidable), m_fixed(fixed), m_body(nullptr)
+		m_bodyType(bodyType), m_visible(visible), m_collidable(collidable), m_fixed(fixed), m_body(nullptr),
+		m_onGround(false), m_onRightWall(false), m_onLeftwall(false), m_gavityOn(true)
 	{
 		switch (bodyType)
 		{
 		case STATIC:
-			m_bodyDef.type = b2_staticBody;
-			m_bodyDef.fixedRotation = true;
 			ENGINE_TRACE_D("Creating static body.");
 			break;
 		case DYNAMIC:
 			m_bodyDef.type = b2_dynamicBody;
-			m_bodyDef.fixedRotation = false;
 			ENGINE_TRACE_D("Creating dynamic body.");
 			break;
 		default:
 			m_bodyDef.type = b2_staticBody;
-			m_bodyDef.fixedRotation = true;
 			ENGINE_WARN_D("Invalid body type. Creating static body.");
 			break;
 		}
+
+		// User should set this value at some point.
+		m_bodyDef.fixedRotation = true;
 
 		m_prevX = startingXInMeters;
 		m_prevY = startingYInMeters;
@@ -80,8 +82,51 @@ namespace Engine
 		}
 	}
 
+	void Box::SetXDeceleration(const float xDecel)
+	{
+		m_body->SetLinearDamping(xDecel);
+	}
+
 	void Box::SetXVelocity(const float xVel) { m_body->SetLinearVelocity(b2Vec2(xVel, m_body->GetLinearVelocity().y)); }
 	void Box::SetYVelocity(const float yVel) { m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, yVel)); }
+	const float Box::GetXVelocity() const { return m_body->GetLinearVelocity().x; }
+	const float Box::GetYVelocity() const { return m_body->GetLinearVelocity().y; }
+
+	void Box::GravityOn(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
+
+	void Box::ApplyForceToBox(std::pair<float, float> force)
+	{
+		m_body->ApplyForceToCenter(b2Vec2(force.first, force.second), true);
+	}
+
+	void Box::ApplyImpulseToBox(std::pair<float, float> impulse)
+	{
+		m_body->ApplyLinearImpulseToCenter(b2Vec2(impulse.first, impulse.second), true);
+	}
+
+	bool Box::OnGround() const
+	{
+		b2ContactEdge* edge = m_body->GetContactList();
+		while (edge)
+		{
+			if (edge->contact->IsTouching())
+			{
+				b2WorldManifold worldManifold;
+				edge->contact->GetWorldManifold(&worldManifold);
+
+				// Check which body is the player body
+				bool bodyAIsPlayer = edge->contact->GetFixtureA()->GetBody() == m_body;
+				float normalY = bodyAIsPlayer ? worldManifold.normal.y : -worldManifold.normal.y;
+
+				if (normalY > 0.5f)
+				{
+					return true;
+				}
+			}
+			edge = edge->next;
+		}
+		return false;
+	}
 
 	Box::~Box()
 	{

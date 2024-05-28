@@ -35,6 +35,8 @@ namespace Engine
 		{
 			sceneObject->GetPhysicsBody()->updatePrevX();
 			sceneObject->GetPhysicsBody()->updatePrevY();
+
+			sceneObject->update();
 		}
 
 		m_world->update();

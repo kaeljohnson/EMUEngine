@@ -33,5 +33,7 @@ namespace Engine
 
 		EMU_API void SetXVelocity(const float xVel);
 		EMU_API void SetYVelocity(const float yVel);
+
+		EMU_API virtual void update();
 	};
 }
