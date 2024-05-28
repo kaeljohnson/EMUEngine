@@ -8,6 +8,7 @@
 
 namespace Engine
 {
+    // Need to have less stuff in the constructor. User can set the rest of the values later.
    std::shared_ptr<IPhysicsBody> CreatePhysicsBody(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters,
         const float widthInMeters, const float heightInMeters, const float density, const float friction, const float angle,
         const float restitution, const float restitutionThreshold, const bool collidable, const bool fixed, const bool visible)

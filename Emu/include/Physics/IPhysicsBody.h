@@ -1,7 +1,5 @@
 #pragma once
 
-#include <utility>
-
 #include "../Core.h"
 
 #include "BodyTypes.h"

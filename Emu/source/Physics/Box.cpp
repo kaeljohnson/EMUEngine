@@ -17,27 +17,26 @@ namespace Engine
 		: m_halfWidthInMeters(widthInMeters / 2.0f), m_halfHeightInMeters(heightInMeters / 2.0f), 
 		m_widthInMeters(widthInMeters), m_heightInMeters(heightInMeters),
 		m_restitution(restitution), m_restitutionThreshold(restitutionThreshold),
-		m_bodyType(bodyType), m_visible(visible), m_collidable(collidable), m_fixed(fixed), m_body(nullptr)
+		m_bodyType(bodyType), m_visible(visible), m_collidable(collidable), m_fixed(fixed), m_body(nullptr),
+		m_onGround(false), m_onRightWall(false), m_onLeftwall(false), m_gavityOn(true)
 	{
 		switch (bodyType)
 		{
 		case STATIC:
-			m_bodyDef.type = b2_staticBody;
-			m_bodyDef.fixedRotation = true;
 			ENGINE_TRACE_D("Creating static body.");
 			break;
 		case DYNAMIC:
 			m_bodyDef.type = b2_dynamicBody;
-			// m_bodyDef.fixedRotation = false;
-			m_bodyDef.fixedRotation = true;
 			ENGINE_TRACE_D("Creating dynamic body.");
 			break;
 		default:
 			m_bodyDef.type = b2_staticBody;
-			m_bodyDef.fixedRotation = true;
 			ENGINE_WARN_D("Invalid body type. Creating static body.");
 			break;
 		}
+
+		// User should set this value at some point.
+		m_bodyDef.fixedRotation = true;
 
 		m_prevX = startingXInMeters;
 		m_prevY = startingYInMeters;

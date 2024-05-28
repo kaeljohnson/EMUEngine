@@ -44,10 +44,10 @@ int main(int argc, char* args[])
 	ptrAppInstance->AddEventListener(&appManagementListener);
 
 	scene->Add(&player);
-	scene->Add(&testWall);
-	scene->Add(&testGround);
 	scene->Add(&testGO2);
 	scene->Add(&testGO3);
+	scene->Add(&testWall);
+	scene->Add(&testGround);
 	scene->Add(&testWallRight);
 	
 	
