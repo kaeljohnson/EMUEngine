@@ -2,7 +2,6 @@
 
 #include <Engine.h>
 #include "../include/EventListeners/AppManagementListener.h"
-#include "../include/EventListeners/ClientObjectsListener.h"
 #include "../include/ClientObjects/ClientObject.h"
 
 int main(int argc, char* args[])
@@ -28,27 +27,26 @@ int main(int argc, char* args[])
 	Engine::PhysicsBodyPtr wallRightBody = Engine::CreatePhysicsBody(Engine::STATIC, 100.0f, 35.0f, 2.0f, 80.0f, 0.0f, 50.0f, 0.0, 0.0, 0.0, true, true, true);
 	Engine::PhysicsBodyPtr groundBody =    Engine::CreatePhysicsBody(Engine::STATIC, 63.5f, 70.0f, 120.0f, 2.0f, 0.0f, 50.0f, 0.0, 0.0, 0.0, true, true, true);
 	
-	Engine::Controllable player(testBody, &tempTextureRed);
+	Engine::Controllable player(testBody, tempTextureRed);
 
-	ClientObject testGO2(testBody2, &tempTextureRed);
-	ClientObject testGO3(testBody3, &tempTextureRed);
-	ClientObject testWall(wallBody, &tempTextureBlue);
-	ClientObject testWallRight(wallRightBody, &tempTextureBlue);
-	ClientObject testGround(groundBody, &tempTextureBlue);
+	ClientObject testGO2(testBody2, tempTextureRed);
+	ClientObject testGO3(testBody3, tempTextureRed);
+	ClientObject testWall(wallBody, tempTextureBlue);
+	ClientObject testWallRight(wallRightBody, tempTextureBlue);
+	ClientObject testGround(groundBody, tempTextureBlue);
 	
 	CLIENT_INFO_D(player.GetUUID());
 
 	AppManagementListener appManagementListener("App management listener");
 
-	ptrAppInstance->AddEventListener(&appManagementListener);
+	ptrAppInstance->AddEventListener(appManagementListener);
 
-	scene->Add(&player);
-	scene->Add(&testGO2);
-	scene->Add(&testGO3);
-	scene->Add(&testWall);
-	scene->Add(&testGround);
-	scene->Add(&testWallRight);
-	
+	scene->Add(player);
+	scene->Add(testGO2);
+	scene->Add(testGO3);
+	scene->Add(testWall);
+	scene->Add(testGround);
+	scene->Add(testWallRight);
 	
 	ptrAppInstance->PlayScene(scene);
 	// Need to figure out how to change scenes, stop scenes, etc.

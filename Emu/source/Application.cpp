@@ -10,6 +10,7 @@
 #include "../include/Events/EventListener.h"
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
+#include "../include/CallbackSystem/CallbackSystem.h"
 
 namespace Engine
 {
@@ -142,17 +143,18 @@ namespace Engine
 		}
 	}
 
-	void Application::AddEventListener(EventListener* eventListener)
+	void Application::AddEventListener(EventListener& eventListener)
 	{
-		if (eventListener == nullptr)
-		{
-			ENGINE_WARN_D("EventListener is nullptr.");
-			return;
-		}
-
 		ENGINE_INFO_D("Adding event listener to app.");
 
-		m_eventListeners.push(eventListener);
+		m_eventListeners.push(&eventListener);
+	}
+
+	void Application::RemoveEventListener(EventListener& eventListener)
+	{
+		ENGINE_INFO_D("Removing event listener from app.");
+
+		m_eventListeners.pop(&eventListener);
 	}
 
 	void Application::End()

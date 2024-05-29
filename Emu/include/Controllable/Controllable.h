@@ -5,14 +5,15 @@
 
 #include "../Core.h"
 
+#include "../Events/EventListener.h"
+#include "../Events/Event.h"
 #include "../Physics/IPhysicsBody.h"
 #include "../Textures/Texture.h"
-#include "../Events/Event.h"
 #include "../Scenes/SceneObject.h"
 
 namespace Engine
 {
-	class Controllable : public SceneObject
+	class Controllable : public SceneObject, public EventListener
 	{
 	private:
 		const float XSWITCHDECELERATION;
@@ -32,7 +33,7 @@ namespace Engine
 		const std::unordered_map<EventType, bool>& refKeyStates;
 
 	public:
-		EMU_API Controllable(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture* ptrTexture);
+		EMU_API Controllable(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture& ptrTexture);
 		~Controllable() = default;
 
 		EMU_API void GravityOn(bool enabled);
