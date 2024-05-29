@@ -1,35 +1,48 @@
 #pragma once
 
 #include <queue>
+#include <unordered_map>
 
+#include "../Core.h"
+#include "../SDLWrapper/SDLWrapper.h"
 #include "../Events/Event.h"
 
 namespace Engine
 {
 	// EventManager class. Polls for events and dispatches them to the event queue.
-	class EventManager
-	{
-	private:
-		std::queue<Event>& refEventQ;
+    class EventManager
+    {
+    private:
+        static EventManager* instance;
 
-		void dispatchQuitEvent();
-		void dispatchWindowEvent(SDL_WindowEvent& windowEvent);
-		void dispatchKeydownEvent(SDL_Keycode& keyCode);
-		void dispatchKeyupEvent(SDL_Keycode& keyCode);
-		void dispatchMouseMoveEvent(SDL_MouseMotionEvent& mouseMotion);
-		void dispatchMouseButtonDownEvent(SDL_MouseButtonEvent& mouseButtonEvent);
-		void dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent);
-		void dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent);
-	public:
-		EventManager(std::queue<Event>& eventQ);
-		~EventManager() = default;
+        std::unordered_map<EventType, bool> keyStates;
 
-		// event handling and dispatching functions.
-		void handleEvents();
+        EventManager();
 
-		EventManager(const EventManager&) = delete;											
-		EventManager& operator=(const EventManager&) = delete;
-		EventManager(EventManager&&) = delete;
-		EventManager& operator=(EventManager&&) = delete;
-	};
+        void dispatchQuitEvent();
+        void dispatchWindowEvent(SDL_WindowEvent& windowEvent);
+        void dispatchKeydownEvent(SDL_Keycode& keyCode);
+        void dispatchKeyupEvent(SDL_Keycode& keyCode);
+        void dispatchMouseMoveEvent(SDL_MouseMotionEvent& mouseMotion);
+        void dispatchMouseButtonDownEvent(SDL_MouseButtonEvent& mouseButtonEvent);
+        void dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent);
+        void dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent);
+
+    public:
+        EMU_API static EventManager* GetInstance();
+
+        std::queue<Event> eventQ;
+
+        EMU_API const std::unordered_map<EventType, bool>& GetKeyStates() const;
+
+        ~EventManager() = default;
+
+        // event handling and dispatching functions.
+        void handleEvents();
+
+        EventManager(const EventManager&) = delete;
+        EventManager& operator=(const EventManager&) = delete;
+        EventManager(EventManager&&) = delete;
+        EventManager& operator=(EventManager&&) = delete;
+    };
 }

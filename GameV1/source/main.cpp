@@ -40,7 +40,6 @@ int main(int argc, char* args[])
 
 	AppManagementListener appManagementListener("App management listener");
 
-	ptrAppInstance->AddEventListener(&player);
 	ptrAppInstance->AddEventListener(&appManagementListener);
 
 	scene->Add(&player);

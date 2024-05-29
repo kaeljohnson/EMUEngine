@@ -5,7 +5,6 @@
 
 #include "../Core.h"
 
-#include "../Events/EventListener.h"
 #include "../Physics/IPhysicsBody.h"
 #include "../Textures/Texture.h"
 #include "../Events/Event.h"
@@ -13,7 +12,7 @@
 
 namespace Engine
 {
-	class Controllable : public EventListener, public SceneObject
+	class Controllable : public SceneObject
 	{
 	private:
 		const float XSWITCHDECELERATION;
@@ -23,14 +22,14 @@ namespace Engine
 		const float YACCELERATION;
 		const float MAX_YVELOCITY;
 		
-		
+		bool m_readyToJump;
 		float m_jumpCharge;
 		const float MAXJUMPCHARGE;
 		const float JUMPFORCE;
 		const float MINJUMPFORCE;
 		const float JUMPCHARGEINCREMENT;
 
-		std::unordered_map<EventType, bool> m_keyStates;
+		const std::unordered_map<EventType, bool>& refKeyStates;
 
 	public:
 		EMU_API Controllable(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture* ptrTexture);
@@ -43,7 +42,6 @@ namespace Engine
 		EMU_API const float GetXVelocity() const;
 		EMU_API const float GetYVelocity() const;
 
-		EMU_API virtual void ProcessEvent(Event& e) override;
 		EMU_API virtual void update() override;
 		EMU_API virtual void Jump();
 	};

@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "../../include/Events/EventManager.h"
 #include "../../include/Controllable/Controllable.h"
 #include "../../include/Textures/Texture.h"
 #include "../../include/Physics/IPhysicsBody.h"
@@ -11,8 +12,9 @@ namespace Engine
 {
     Controllable::Controllable(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture* ptrTexture)
         : XSWITCHDECELERATION(70.0f), XDECELERATION(5.0f), XACCELERATION(30.0f), MAX_XVELOCITY(30.0f),
-        YACCELERATION(30.0f), MAX_YVELOCITY(60.0f), JUMPFORCE(15.0f), m_jumpCharge(0.0), 
-        JUMPCHARGEINCREMENT(0.05f), MINJUMPFORCE(20.0f), MAXJUMPCHARGE(1.0f), m_keyStates(),
+        YACCELERATION(30.0f), MAX_YVELOCITY(60.0f), JUMPFORCE(15.0f), m_readyToJump(false), m_jumpCharge(0.0),
+        JUMPCHARGEINCREMENT(0.05f), MINJUMPFORCE(20.0f), MAXJUMPCHARGE(1.0f), 
+        refKeyStates(EventManager::GetInstance()->GetKeyStates()),
         SceneObject(ptrPhysicsBody, ptrTexture) {}
 
 	void Controllable::SetXVelocity(const float xVel)
@@ -40,49 +42,12 @@ namespace Engine
 		return m_physicsBody->GetYVelocity();
 	}
 
-	void Controllable::ProcessEvent(Event& e)
-	{
-        // Should key states just be a member of the application
-        // or maybe a static class? This would be a big refactor.
-
-        if (e.Type == D_KEY_DOWN || e.Type == A_KEY_DOWN)
-        {
-            m_keyStates[e.Type] = true;
-            e.Handled = true;
-        }
-        
-        if (e.Type == D_KEY_UP)
-        {
-            m_keyStates[D_KEY_DOWN] = false;
-            e.Handled = true;
-        }
-
-        if (e.Type == A_KEY_UP)
-        {
-			m_keyStates[A_KEY_DOWN] = false;
-			e.Handled = true;
-        }
-
-        if (e.Type == SPACE_KEY_DOWN)
-        {
-			m_keyStates[SPACE_KEY_DOWN] = true;
-			e.Handled = true;
-		}
-        
-        if (e.Type == SPACE_KEY_UP)
-        {
-            m_keyStates[SPACE_KEY_DOWN] = false;
-			m_keyStates[SPACE_KEY_UP] = true;
-			e.Handled = true;
-		}
-	}
-
     void Controllable::update()
     {
         std::pair<float, float> force = { 0.0f, 0.0f };
         float currentVelocityX = m_physicsBody->GetXVelocity();
 
-        if (m_keyStates[D_KEY_DOWN] && !m_keyStates[A_KEY_DOWN])
+        if (refKeyStates.at(D_KEY_DOWN) && refKeyStates.at(A_KEY_UP))
         {
             if (currentVelocityX < 0) // If previously moving left
             {
@@ -93,7 +58,7 @@ namespace Engine
                 force = { XACCELERATION, 0.0f }; // Apply normal force to the right
             }
         }
-        else if (m_keyStates[A_KEY_DOWN] && !m_keyStates[D_KEY_DOWN])
+        else if (refKeyStates.at(A_KEY_DOWN) && refKeyStates.at(D_KEY_UP))
         {
             if (currentVelocityX > 0) // If previously moving right
             {
@@ -111,17 +76,18 @@ namespace Engine
         }
 
         // Jump
-        if (m_keyStates[SPACE_KEY_DOWN])
+        if (refKeyStates.at(SPACE_KEY_DOWN))
         {
+            m_readyToJump = true;
             if (m_jumpCharge < MAXJUMPCHARGE)
                 m_jumpCharge += JUMPCHARGEINCREMENT;
 		}
         
-        if (m_keyStates[SPACE_KEY_UP])
+        if (m_readyToJump && refKeyStates.at(SPACE_KEY_UP))
         {
 			Jump();
             m_jumpCharge = 0.0f;
-            m_keyStates[SPACE_KEY_UP] = false;
+            m_readyToJump = false;
 		}
 
         m_physicsBody->ApplyForceToBox(force);

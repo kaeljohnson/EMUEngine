@@ -29,10 +29,12 @@ namespace Engine
 		RendererManager* ptrRendererManager;
 		
 		// Event queue to hold all events.
-		std::queue<Event> m_eventQ;
+		// std::queue<Event> m_eventQ;
+		// std::unordered_map<EventType, bool> m_keyStates;
+
 		// Manages events.
 		// Maybe decouple from application class?
-		EventManager m_eventManager;
+		EventManager* ptrEventManager;
 
 		// Hold all event listeners.
 		EventListenerStack m_eventListeners;
