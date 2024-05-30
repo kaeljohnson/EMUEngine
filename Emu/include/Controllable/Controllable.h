@@ -8,8 +8,8 @@
 #include "../Events/EventListener.h"
 #include "../Events/Event.h"
 #include "../Physics/IPhysicsBody.h"
-#include "../Textures/Texture.h"
 #include "../Scenes/SceneObject.h"
+#include "../Textures/Texture.h"
 
 namespace Engine
 {

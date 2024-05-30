@@ -20,8 +20,5 @@ namespace Engine
 
 		// Scene interaction
 		SetSimulation,
-
-		// Misc
-		AddEventListener,
 	};
 }

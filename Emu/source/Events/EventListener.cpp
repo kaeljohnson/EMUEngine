@@ -8,12 +8,7 @@
 
 namespace Engine
 {
-	EventListener::EventListener() : m_enabled(true) {}
+	EventListener::EventListener() : Enabled(true) {}
 
 	void EventListener::ProcessEvent(Event& e) { ENGINE_TRACE_D("Process event for EventListener"); };
-
-	const bool EventListener::IsEnabled() const
-	{
-		return m_enabled;
-	}
 }

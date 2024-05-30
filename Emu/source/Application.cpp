@@ -127,7 +127,7 @@ namespace Engine
 
 			for (auto& eventListener : m_eventListeners)
 			{
-				eventListener->ProcessEvent(currentEvent);
+				eventListener->Enabled ? eventListener->ProcessEvent(currentEvent) : ENGINE_INFO_D("Event listener disabled");
 				if (currentEvent.Handled)
 				{
 					break;

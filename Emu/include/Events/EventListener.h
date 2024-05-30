@@ -11,15 +11,13 @@ namespace Engine
 
 	class EventListener
 	{
-	private:
-		bool m_enabled;
-
+	public:
+		bool Enabled;
 	public:
 		EMU_API EventListener();
 		EMU_API virtual	~EventListener() = default;
 
 		EMU_API virtual void ProcessEvent(Event& e);
 
-		EMU_API const bool IsEnabled() const;
 	};
 }
