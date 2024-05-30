@@ -29,15 +29,10 @@ namespace Engine
 		World(const float gravityX, const float gravityY, const int velocityIterations, const int positionIterations);
 		~World();
 
-		// Step the simulation forward.
-		void update();
+		void SetGravity(const float gravityX, const float gravityY) override;
 
-		// Add physics body to world.
-		void addBox(std::shared_ptr<Box> body);
-		
-		// Remove physics body from world. 
-		void removeBox(std::shared_ptr<Box> body);
-
-		void SetGravity(const float gravityX, const float gravityY);
+		void Update() override;
+		void AddBox(std::shared_ptr<Box> body) override;
+		void RemoveBox(std::shared_ptr<Box> body) override;
 	};
 }

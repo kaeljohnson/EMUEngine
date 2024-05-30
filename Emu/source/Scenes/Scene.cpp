@@ -9,23 +9,17 @@
 
 namespace Engine
 {
-	Scene::Scene() : m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_sceneObjects(), m_world(nullptr)
-	{
-		ICallbackSystem::GetInstance()->NewCallback(Type::SetSimulation, [this](Data data)
-			{
-				SetSimulation(m_gravityX, m_gravityY, m_pixelsPerMeter);
-			});
-	}
+	Scene::Scene() : m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_sceneObjects(), m_world(nullptr) {}
 
-	void Scene::checkValid()
+	void Scene::CheckValid()
 	{
 		(m_world == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
-		(m_sceneObjects.size() > MAX_OBJECTS) 
+		(m_sceneObjects.Size() > MAX_OBJECTS) 
 			? ENGINE_CRITICAL_D("Scene object count exceeds max scene objects.") : ENGINE_INFO_D("Scene object count is valid.");
 		(m_pixelsPerMeter <= 0) ? ENGINE_CRITICAL_D("Pixels per meter is invalid.") : ENGINE_INFO_D("Pixels per meter is valid.");
 	}
 
-	void Scene::update()
+	void Scene::Update()
 	{
 		// Faster way to do this? Should only have to update objects
 		// prev values if they have changed. In fact, should only update
@@ -33,13 +27,12 @@ namespace Engine
 
 		for (auto& sceneObject : m_sceneObjects)
 		{
-			sceneObject->GetPhysicsBody()->updatePrevX();
-			sceneObject->GetPhysicsBody()->updatePrevY();
+			sceneObject->UpdatePrevPosition();
 
-			sceneObject->update();
+			sceneObject->Update();
 		}
 
-		m_world->update();
+		m_world->Update();
 	};
 
 	void Scene::SetSimulation(const float gravityX, const float gravityY, const int pixelsPerMeter)
@@ -69,20 +62,20 @@ namespace Engine
 
 	void Scene::Add(SceneObject& sceneObject)
 	{
-		m_sceneObjects.push(&sceneObject);
+		m_sceneObjects.Push(&sceneObject);
 
 		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject.GetPhysicsBody());
 
-		m_world->addBox(ptrBox);
+		m_world->AddBox(ptrBox);
 	}
 
 	void Scene::Remove(SceneObject& sceneObject)
 	{
 		// Find the scene object in the array
-		m_sceneObjects.pop(&sceneObject);
+		m_sceneObjects.Pop(&sceneObject);
 
 		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject.GetPhysicsBody());
 
-		m_world->removeBox(ptrBox);
+		m_world->RemoveBox(ptrBox);
 	}
 }

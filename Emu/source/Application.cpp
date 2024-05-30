@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 #include <queue>
+#include <thread>
+#include <chrono>
 
 #include "../include/EngineConstants.h"
 #include "../include/Logging/Logger.h"
@@ -45,13 +47,14 @@ namespace Engine
 
 	void Application::PlayScene(std::shared_ptr<Scene> currentScene)
 	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 		if (currentScene == nullptr)
 		{
 			ENGINE_CRITICAL_D("No scene loaded! Application must have a scene to run!");
 			End();
 		}
 
-		currentScene->checkValid();
+		currentScene->CheckValid();
 
 		const int pixelsPerMeter = currentScene->GetPixelsPerMeter();
 		const float timeStep = TIME_STEP;
@@ -81,10 +84,10 @@ namespace Engine
 
 			while (accumulator >= timeStep)
 			{
-				ptrEventManager->handleEvents();
+				ptrEventManager->HandleEvents();
 				processEventQueue();
 
-				currentScene->update();
+				currentScene->Update();
 
 				accumulator -= timeStep;
 			}
@@ -147,14 +150,14 @@ namespace Engine
 	{
 		ENGINE_INFO_D("Adding event listener to app.");
 
-		m_eventListeners.push(&eventListener);
+		m_eventListeners.Push(&eventListener);
 	}
 
 	void Application::RemoveEventListener(EventListener& eventListener)
 	{
 		ENGINE_INFO_D("Removing event listener from app.");
 
-		m_eventListeners.pop(&eventListener);
+		m_eventListeners.Pop(&eventListener);
 	}
 
 	void Application::End()

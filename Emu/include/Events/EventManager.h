@@ -14,10 +14,9 @@ namespace Engine
     {
     private:
         static EventManager* instance;
+        EventManager();
 
         std::unordered_map<EventType, bool> keyStates;
-
-        EventManager();
 
         void dispatchQuitEvent();
         void dispatchWindowEvent(SDL_WindowEvent& windowEvent);
@@ -29,16 +28,14 @@ namespace Engine
         void dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent);
 
     public:
-        EMU_API static EventManager* GetInstance();
-
         std::queue<Event> eventQ;
+    public:
+        EMU_API static EventManager* GetInstance();
+        ~EventManager() = default;
 
         EMU_API const std::unordered_map<EventType, bool>& GetKeyStates() const;
 
-        ~EventManager() = default;
-
-        // event handling and dispatching functions.
-        void handleEvents();
+        void HandleEvents();
 
         EventManager(const EventManager&) = delete;
         EventManager& operator=(const EventManager&) = delete;

@@ -36,14 +36,14 @@ namespace Engine
 		EMU_API Controllable(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture& ptrTexture);
 		~Controllable() = default;
 
-		EMU_API void GravityOn(bool enabled);
 
 		EMU_API void SetXVelocity(const float xVel);
 		EMU_API void SetYVelocity(const float yVel);
 		EMU_API const float GetXVelocity() const;
 		EMU_API const float GetYVelocity() const;
 
-		EMU_API virtual void update() override;
+		EMU_API virtual void Update() override;
 		EMU_API virtual void Jump();
+		EMU_API void SetGravity(bool enabled);
 	};
 }

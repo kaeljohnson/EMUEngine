@@ -17,6 +17,7 @@ namespace Engine
 	private:
 		std::string uuid;
 		bool m_enabled;
+		bool m_visible;
 
 	protected:
 		Texture* m_texture;
@@ -26,14 +27,16 @@ namespace Engine
 		EMU_API SceneObject(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture& ptrTexture);
 		EMU_API virtual ~SceneObject() = default;
 
+		EMU_API void SetXVelocity(const float xVel);
+		EMU_API void SetYVelocity(const float yVel);
+		EMU_API void SetVisibility(const bool visible);
 		EMU_API std::shared_ptr<IPhysicsBody> GetPhysicsBody();
 		EMU_API std::string GetUUID();
 		EMU_API Texture* GetTexture();
 		EMU_API const bool IsEnabled() const;
 
-		EMU_API void SetXVelocity(const float xVel);
-		EMU_API void SetYVelocity(const float yVel);
+		void UpdatePrevPosition();
 
-		EMU_API virtual void update();
+		EMU_API virtual void Update();
 	};
 }

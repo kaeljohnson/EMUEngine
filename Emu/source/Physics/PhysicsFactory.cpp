@@ -9,12 +9,10 @@
 namespace Engine
 {
     // Need to have less stuff in the constructor. User can set the rest of the values later.
-   std::shared_ptr<IPhysicsBody> CreatePhysicsBody(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters,
-        const float widthInMeters, const float heightInMeters, const float density, const float friction, const float angle,
-        const float restitution, const float restitutionThreshold, const bool collidable, const bool fixed, const bool visible)
+    std::shared_ptr<IPhysicsBody> CreatePhysicsBody(const BodyType bodyType, const bool fixed, const float startingXInMeters, const float startingYInMeters,
+        const float widthInMeters, const float heightInMeters)
     {
-        return std::make_shared<Box>(bodyType, startingXInMeters, startingYInMeters, widthInMeters,
-            heightInMeters, density, friction, angle, restitution, restitutionThreshold, collidable, fixed, visible);
+        return std::make_shared<Box>(bodyType, fixed, startingXInMeters, startingYInMeters, widthInMeters, heightInMeters);
     }
 
     std::unique_ptr<IWorld> CreateWorld(const float gravityX, const float gravityY, const int velocityIterations, const int positionIterations)

@@ -97,14 +97,14 @@ namespace Engine
 			// This rect will eventually be the outline of the texture we want to render,
 			// not the collidable object tracked by the underlying box2d body.
 
-			static_cast<int>(round((ptrBody->getPrevX() * (1.0 - interpolation) + ptrBody->getTopLeftXInMeters() * interpolation) * pixelsPerMeter * SCALE)),
-			static_cast<int>(round((ptrBody->getPrevY() * (1.0 - interpolation) + ptrBody->getTopLeftYInMeters() * interpolation) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((ptrBody->GetTopLeftPrevX() * (1.0 - interpolation) + ptrBody->GetTopLeftXInMeters() * interpolation) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((ptrBody->GetTopLeftPrevY() * (1.0 - interpolation) + ptrBody->GetTopLeftYInMeters() * interpolation) * pixelsPerMeter * SCALE)),
 			
-			static_cast<int>(round(ptrBody->getWidthInMeters() * pixelsPerMeter * SCALE)),
-			static_cast<int>(round(ptrBody->getHeightInMeters() * pixelsPerMeter * SCALE))
+			static_cast<int>(round(ptrBody->GetWidthInMeters() * pixelsPerMeter * SCALE)),
+			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))
 		};
 
-		SDL_RENDER_COPY_EX(renderer, sceneObject->GetTexture()->m_texture, nullptr, &dst, ptrBody->getAngleInDegrees(), nullptr, SDL_FLIP_NONE);
+		SDL_RENDER_COPY_EX(renderer, sceneObject->GetTexture()->m_texture, nullptr, &dst, ptrBody->GetAngleInDegrees(), nullptr, SDL_FLIP_NONE);
 	}
 
 	void RendererManager::setViewport(SDLWindow* ptrWindow)

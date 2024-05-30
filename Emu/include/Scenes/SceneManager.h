@@ -9,7 +9,6 @@ namespace Engine
 		SceneManager();
 	public:
 		static SceneManager* GetInstance();
-			
 
 		~SceneManager() = default;
 

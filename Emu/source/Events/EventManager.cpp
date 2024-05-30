@@ -130,7 +130,7 @@ namespace Engine
 		return keyStates;
 	}
 
-	void EventManager::handleEvents()
+	void EventManager::HandleEvents()
 	{
 		/*
 			Poll for SDLevents and dispatch them to their respective event types.

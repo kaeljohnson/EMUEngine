@@ -1,9 +1,10 @@
 #pragma once
 
 #include <string>
-#include "Event.h"
 
 #include "../Core.h"
+
+#include "Event.h"
 
 namespace Engine
 {
@@ -18,6 +19,5 @@ namespace Engine
 		EMU_API virtual	~EventListener() = default;
 
 		EMU_API virtual void ProcessEvent(Event& e);
-
 	};
 }

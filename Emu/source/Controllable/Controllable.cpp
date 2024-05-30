@@ -15,7 +15,10 @@ namespace Engine
         YACCELERATION(30.0f), MAX_YVELOCITY(60.0f), JUMPFORCE(15.0f), m_readyToJump(false), m_jumpCharge(0.0),
         JUMPCHARGEINCREMENT(0.05f), MINJUMPFORCE(20.0f), MAXJUMPCHARGE(1.0f), 
         refKeyStates(EventManager::GetInstance()->GetKeyStates()),
-        SceneObject(ptrPhysicsBody, refTexture) {}
+        SceneObject(ptrPhysicsBody, refTexture) 
+    {
+    	m_physicsBody->SetFriction(0.0f);
+    }
 
 	void Controllable::SetXVelocity(const float xVel)
 	{
@@ -27,9 +30,9 @@ namespace Engine
 		m_physicsBody->SetYVelocity(yVel);
 	}
 
-	void Controllable::GravityOn(bool enabled)
+	void Controllable::SetGravity(bool enabled)
 	{
-		m_physicsBody->GravityOn(enabled);
+		m_physicsBody->SetGravity(enabled);
 	}
 
     const float Controllable::GetXVelocity() const
@@ -42,8 +45,11 @@ namespace Engine
 		return m_physicsBody->GetYVelocity();
 	}
 
-    void Controllable::update()
+    void Controllable::Update()
     {
+        // If the controllable is jumping, they should
+        // have less control over their movement.
+
         std::pair<float, float> force = { 0.0f, 0.0f };
         float currentVelocityX = m_physicsBody->GetXVelocity();
 

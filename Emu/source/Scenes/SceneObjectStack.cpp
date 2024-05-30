@@ -16,9 +16,9 @@ namespace Engine
 		}
 	}
 
-	const size_t SceneObjectStack::size() const { return m_sceneObjectCount; }
+	const size_t SceneObjectStack::Size() const { return m_sceneObjectCount; }
 
-	void SceneObjectStack::push(SceneObject* sceneObject)
+	void SceneObjectStack::Push(SceneObject* sceneObject)
 	{
 		if (sceneObject == nullptr)
 		{
@@ -49,7 +49,7 @@ namespace Engine
 		m_sceneObjectCount++;
 	}
 
-	void SceneObjectStack::pop(SceneObject* sceneObject)
+	void SceneObjectStack::Pop(SceneObject* sceneObject)
 	{
 		if (sceneObject == nullptr)
 		{
@@ -83,7 +83,7 @@ namespace Engine
 		m_sceneObjectCount--;
 	}
 
-	void SceneObjectStack::pop()
+	void SceneObjectStack::Pop()
 	{
 		if (m_sceneObjectCount == 0)
 		{
