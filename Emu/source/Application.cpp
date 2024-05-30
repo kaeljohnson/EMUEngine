@@ -10,6 +10,7 @@
 #include "../include/Events/EventListener.h"
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
+#include "../include/CallbackSystem/CallbackSystem.h"
 
 namespace Engine
 {
@@ -33,7 +34,7 @@ namespace Engine
 	Application::Application()
 		: m_windowManager("Default App Name"),
 		ptrRendererManager(RendererManager::GetInstance()),
-		m_eventManager(m_eventQ),
+		ptrEventManager(EventManager::GetInstance()),
 		m_eventListeners(),
 		running(false)
 	{
@@ -80,7 +81,7 @@ namespace Engine
 
 			while (accumulator >= timeStep)
 			{
-				m_eventManager.handleEvents();
+				ptrEventManager->handleEvents();
 				processEventQueue();
 
 				currentScene->update();
@@ -98,13 +99,12 @@ namespace Engine
 
 	void Application::renderScene(std::shared_ptr<Scene> scene, const double interpolation)
 	{
-		// Should not be renderering every object in the scene every frame.
+		// Should not be rendering every object in the scene every frame.
 
 		for (auto& sceneObject : *scene)
 		{
 			ptrRendererManager->render(sceneObject, scene->GetPixelsPerMeter(), interpolation);
 		}
-
 	}
 
 	void Application::processEventQueue()
@@ -121,13 +121,13 @@ namespace Engine
 		// Debug Layer -> Wrapper for Game Layer. Shows important info like hit boxes, etc.
 		// UI Layer -> Filled with Engine supported UI type.
 
-		while (!m_eventQ.empty())
+		while (!ptrEventManager->eventQ.empty())
 		{
-			Event& currentEvent = m_eventQ.front();
+			Event& currentEvent = ptrEventManager->eventQ.front();
 
 			for (auto& eventListener : m_eventListeners)
 			{
-				eventListener->ProcessEvent(currentEvent);
+				eventListener->Enabled ? eventListener->ProcessEvent(currentEvent) : ENGINE_INFO_D("Event listener disabled");
 				if (currentEvent.Handled)
 				{
 					break;
@@ -139,21 +139,22 @@ namespace Engine
 				ENGINE_TRACE_D("Unhandled Event: {}", static_cast<int>(currentEvent.Type));
 			}
 
-			m_eventQ.pop();
+			ptrEventManager->eventQ.pop();
 		}
 	}
 
-	void Application::AddEventListener(EventListener* eventListener)
+	void Application::AddEventListener(EventListener& eventListener)
 	{
-		if (eventListener == nullptr)
-		{
-			ENGINE_WARN_D("EventListener is nullptr.");
-			return;
-		}
-
 		ENGINE_INFO_D("Adding event listener to app.");
 
-		m_eventListeners.push(eventListener);
+		m_eventListeners.push(&eventListener);
+	}
+
+	void Application::RemoveEventListener(EventListener& eventListener)
+	{
+		ENGINE_INFO_D("Removing event listener from app.");
+
+		m_eventListeners.pop(&eventListener);
 	}
 
 	void Application::End()

@@ -27,12 +27,9 @@ namespace Engine
 		// Maybe decouple from application class?
 		WindowManager m_windowManager;
 		RendererManager* ptrRendererManager;
-		
-		// Event queue to hold all events.
-		std::queue<Event> m_eventQ;
+
 		// Manages events.
-		// Maybe decouple from application class?
-		EventManager m_eventManager;
+		EventManager* ptrEventManager;
 
 		// Hold all event listeners.
 		EventListenerStack m_eventListeners;
@@ -46,8 +43,8 @@ namespace Engine
 
 		~Application();
 
-		EMU_API void AddEventListener(EventListener* eventListener);
-
+		EMU_API void AddEventListener(EventListener& eventListener);
+		EMU_API void RemoveEventListener(EventListener& eventListener);
 		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
 		EMU_API void End();
 

@@ -7,6 +7,9 @@
 
 class AppManagementListener : public Engine::EventListener
 {
+private:
+	Engine::ICallbackSystemPtr ptrICallbackSystem;
+
 public:
 	AppManagementListener(std::string name);
 	~AppManagementListener();

@@ -67,25 +67,21 @@ namespace Engine
 		ENGINE_INFO_D("Client creating simulation with gravity: ({}, {})", gravityX, gravityY);
 	}
 
-	void Scene::Add(SceneObject* sceneObject)
+	void Scene::Add(SceneObject& sceneObject)
 	{
-		(sceneObject == nullptr) ? ENGINE_WARN_D("SceneObject is nullptr.") : ENGINE_WARN_D("Adding scene object to scene.");
+		m_sceneObjects.push(&sceneObject);
 
-		m_sceneObjects.push(sceneObject);
-
-		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject->GetPhysicsBody());
+		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject.GetPhysicsBody());
 
 		m_world->addBox(ptrBox);
 	}
 
-	void Scene::Remove(SceneObject* sceneObject)
+	void Scene::Remove(SceneObject& sceneObject)
 	{
-		(sceneObject == nullptr) ? ENGINE_WARN_D("SceneObject is nullptr.") : ENGINE_WARN_D("Removing scene object from scene.");
-
 		// Find the scene object in the array
-		m_sceneObjects.pop(sceneObject);
+		m_sceneObjects.pop(&sceneObject);
 
-		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject->GetPhysicsBody());
+		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject.GetPhysicsBody());
 
 		m_world->removeBox(ptrBox);
 	}

@@ -9,8 +9,8 @@
 
 namespace Engine
 {
-	SceneObject::SceneObject(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture* ptrTexture)
-		: uuid(CreateUUID()), m_physicsBody(ptrPhysicsBody), m_texture(ptrTexture), m_enabled(true)
+	SceneObject::SceneObject(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture& ptrTexture)
+		: uuid(CreateUUID()), m_physicsBody(ptrPhysicsBody), m_texture(&ptrTexture), m_enabled(true)
 	{
 		ENGINE_INFO_D("SceneObject created");
 	}

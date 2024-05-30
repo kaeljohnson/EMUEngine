@@ -5,7 +5,7 @@
 #include "../../include/EventListeners/AppManagementListener.h"
 
 
-AppManagementListener::AppManagementListener(std::string name) : Engine::EventListener()
+AppManagementListener::AppManagementListener(std::string name) : ptrICallbackSystem(Engine::ICallbackSystem::GetInstance()), Engine::EventListener()
 {
 }
 
@@ -45,4 +45,6 @@ void AppManagementListener::ProcessEvent(Engine::Event& e)
 		default:
 			break;
 	}
+
+
 }

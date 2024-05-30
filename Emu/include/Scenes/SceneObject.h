@@ -23,7 +23,7 @@ namespace Engine
 		std::shared_ptr<IPhysicsBody> m_physicsBody;
 
 	public:
-		EMU_API SceneObject(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture* ptrTexture);
+		EMU_API SceneObject(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture& ptrTexture);
 		EMU_API virtual ~SceneObject() = default;
 
 		EMU_API std::shared_ptr<IPhysicsBody> GetPhysicsBody();

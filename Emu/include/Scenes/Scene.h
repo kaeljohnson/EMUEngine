@@ -31,8 +31,8 @@ namespace Engine
 		EMU_API void SetSimulation(const float gravityX, const float gravityY, const int pixelsPerMeter);
 
 		// Adds scene object to the scene. Need to add a "order" parameter to determine the order of rendering.
-		EMU_API void Add(SceneObject* sceneObject);
-		EMU_API void Remove(SceneObject* sceneObject);
+		EMU_API void Add(SceneObject& sceneObject);
+		EMU_API void Remove(SceneObject& sceneObject);
 
 		SceneObject** const begin() { return m_sceneObjects.begin(); }
 		SceneObject** const end() { return m_sceneObjects.end(); }
