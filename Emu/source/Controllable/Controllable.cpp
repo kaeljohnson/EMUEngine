@@ -11,11 +11,12 @@
 namespace Engine
 {
     Controllable::Controllable(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture& refTexture)
-        : XSWITCHDECELERATION(70.0f), XDECELERATION(5.0f), XACCELERATION(30.0f), MAX_XVELOCITY(30.0f),
-        YACCELERATION(30.0f), MAX_YVELOCITY(60.0f), JUMPFORCE(15.0f), m_readyToJump(false), m_jumpCharge(0.0),
-        JUMPCHARGEINCREMENT(0.05f), MINJUMPFORCE(20.0f), MAXJUMPCHARGE(1.0f), 
+        : XSWITCHDECELERATION(85.0f), XDECELERATION(10.0f), XACCELERATION(30.0f), MAX_XVELOCITY(30.0f),
+        YACCELERATION(30.0f), MAX_YVELOCITY(60.0f), JUMPFORCE(20.0f), m_jumpCharge(0.0),
+        JUMPCHARGEINCREMENT(1.0f), MINJUMPFORCE(20.0f), MAXJUMPCHARGE(10.0f), m_isJumping(false),
+        SIZE(m_physicsBody->GetWidthInMeters()* m_physicsBody->GetHeightInMeters()),
         refKeyStates(EventManager::GetInstance()->GetKeyStates()),
-        SceneObject(ptrPhysicsBody, refTexture) 
+        SceneObject(ptrPhysicsBody, refTexture)
     {
     	m_physicsBody->SetFriction(0.0f);
     }
@@ -47,53 +48,51 @@ namespace Engine
 
     void Controllable::Update()
     {
-        // If the controllable is jumping, they should
-        // have less control over their movement.
-
         std::pair<float, float> force = { 0.0f, 0.0f };
         float currentVelocityX = m_physicsBody->GetXVelocity();
+
+        // If the controllable is jumping, they should
+        // have less control over their movement.        
+        const float ACCELERATIONDAMPENING = m_physicsBody->OnGround() ? 1.0f : 0.75f;
 
         if (refKeyStates.at(D_KEY_DOWN) && refKeyStates.at(A_KEY_UP))
         {
             if (currentVelocityX < 0) // If previously moving left
             {
-                force = { XSWITCHDECELERATION, 0.0f }; // Apply larger force to the right
+                force = { XSWITCHDECELERATION * ACCELERATIONDAMPENING * SIZE, 0.0f }; // Apply larger force to the right
             }
             else // If already moving right or not moving at all
             {
-                force = { XACCELERATION, 0.0f }; // Apply normal force to the right
+                force = { XACCELERATION * ACCELERATIONDAMPENING * SIZE, 0.0f }; // Apply normal force to the right
             }
         }
         else if (refKeyStates.at(A_KEY_DOWN) && refKeyStates.at(D_KEY_UP))
         {
             if (currentVelocityX > 0) // If previously moving right
             {
-                force = { -XSWITCHDECELERATION, 0.0f }; // Apply larger force to the left
+                force = { -XSWITCHDECELERATION * ACCELERATIONDAMPENING * SIZE, 0.0f }; // Apply larger force to the left
             }
             else // If already moving left or not moving at all
             {
-                force = { -XACCELERATION, 0.0f }; // Apply normal force to the left
+                force = { -XACCELERATION * ACCELERATIONDAMPENING * SIZE, 0.0f }; // Apply normal force to the left
             }
         }
         else
         {
             // Apply deceleration when no keys are pressed
-            force = { -currentVelocityX * XDECELERATION, 0.0f };
+            force = { -currentVelocityX * XDECELERATION * ACCELERATIONDAMPENING * SIZE, 0.0f };
         }
 
         // Jump
         if (refKeyStates.at(SPACE_KEY_DOWN))
         {
-            m_readyToJump = true;
-            if (m_jumpCharge < MAXJUMPCHARGE)
-                m_jumpCharge += JUMPCHARGEINCREMENT;
+            Jump();
 		}
-        
-        if (m_readyToJump && refKeyStates.at(SPACE_KEY_UP))
+
+        if (refKeyStates.at(SPACE_KEY_UP))
         {
-			Jump();
-            m_jumpCharge = 0.0f;
-            m_readyToJump = false;
+			m_jumpCharge = 0.0f;
+			m_isJumping = false;
 		}
 
         m_physicsBody->ApplyForceToBox(force);
@@ -112,10 +111,18 @@ namespace Engine
 
     void Controllable::Jump()
     {
-        if (m_physicsBody->OnGround())
+        if (m_isJumping)
         {
+            if (m_jumpCharge < MAXJUMPCHARGE)
+                m_jumpCharge += JUMPCHARGEINCREMENT;
+
+            m_physicsBody->ApplyForceToBox({ 0.0f, -JUMPFORCE * (MAXJUMPCHARGE - m_jumpCharge) * SIZE });
+        }
+        else if (m_physicsBody->OnGround())
+        {
+            m_isJumping = true;
             m_physicsBody->SetYVelocity(0.0f);
-			m_physicsBody->ApplyImpulseToBox({ 0.0f, -MINJUMPFORCE + (- JUMPFORCE * m_jumpCharge) });
+			m_physicsBody->ApplyImpulseToBox({ 0.0f, -MINJUMPFORCE * SIZE });
 		}
 	}
 }

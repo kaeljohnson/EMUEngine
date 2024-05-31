@@ -23,12 +23,15 @@ namespace Engine
 		const float YACCELERATION;
 		const float MAX_YVELOCITY;
 		
-		bool m_readyToJump;
+		bool m_isJumping;
 		float m_jumpCharge;
+
 		const float MAXJUMPCHARGE;
 		const float JUMPFORCE;
 		const float MINJUMPFORCE;
 		const float JUMPCHARGEINCREMENT;
+
+		float SIZE;
 
 		const std::unordered_map<EventType, bool>& refKeyStates;
 
