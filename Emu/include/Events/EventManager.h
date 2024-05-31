@@ -2,6 +2,7 @@
 
 #include <queue>
 #include <unordered_map>
+#include <utility>
 
 #include "../Core.h"
 #include "../SDLWrapper/SDLWrapper.h"
@@ -17,6 +18,9 @@ namespace Engine
         EventManager();
 
         std::unordered_map<EventType, bool> keyStates;
+        std::unordered_map<EventType, bool> mouseButtonStates;
+        std::pair<int, int> mousePosition;
+        std::pair<int, int> scrollDirection;
 
         void dispatchQuitEvent();
         void dispatchWindowEvent(SDL_WindowEvent& windowEvent);
@@ -34,6 +38,9 @@ namespace Engine
         ~EventManager() = default;
 
         EMU_API const std::unordered_map<EventType, bool>& GetKeyStates() const;
+        EMU_API const std::unordered_map<EventType, bool>& GetMouseButtonStates() const;
+        EMU_API const std::pair<int, int>& GetMousePosition() const;
+        EMU_API const std::pair<int, int>& GetScrollDirection() const;
 
         void HandleEvents();
 

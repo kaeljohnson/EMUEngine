@@ -5,6 +5,7 @@
 #include "../../include/SDLWrapper/SDLWrapper.h"
 #include "../../include/Events/EventManager.h"
 #include "../../include/Events/Event.h"
+#include "../../include/Logging/Logger.h"
 
 namespace Engine
 {
@@ -125,10 +126,10 @@ namespace Engine
 		return instance;
 	}
 
-    const std::unordered_map<EventType, bool>& EventManager::GetKeyStates() const
-	{
-		return keyStates;
-	}
+    const std::unordered_map<EventType, bool>& EventManager::GetKeyStates() const { return keyStates; }
+    const std::pair<int, int>& EventManager::GetMousePosition() const { return mousePosition; }
+    const std::pair<int, int>& EventManager::GetScrollDirection() const { return scrollDirection; }
+	const std::unordered_map<EventType, bool>& EventManager::GetMouseButtonStates() const { return mouseButtonStates; }
 
 	void EventManager::HandleEvents()
 	{
@@ -293,17 +294,21 @@ namespace Engine
         default: break;
         }
     }
+
     void EventManager::dispatchMouseMoveEvent(SDL_MouseMotionEvent& mouseMotion)
     {
+        mousePosition.first = mouseMotion.x;
+        mousePosition.second = mouseMotion.y;
         eventQ.push({ MOUSE_MOVE, mouseMotion.x, mouseMotion.y });
     }
+
     void EventManager::dispatchMouseButtonDownEvent(SDL_MouseButtonEvent& mouseButtonEvent)
     {
         switch (mouseButtonEvent.button)
         {
-        case (SDL_BUTTON_LEFT): eventQ.push({ LEFT_MOUSE_BUTTON_DOWN }); break;
-        case (SDL_BUTTON_MIDDLE): eventQ.push({ MIDDLE_MOUSE_BUTTON_DOWN }); break;
-        case (SDL_BUTTON_RIGHT): eventQ.push({ RIGHT_MOUSE_BUTTON_DOWN }); break;
+        case (SDL_BUTTON_LEFT): mouseButtonStates[LEFT_MOUSE_BUTTON_DOWN] = true; mouseButtonStates[LEFT_MOUSE_BUTTON_UP] = false; eventQ.push({ LEFT_MOUSE_BUTTON_DOWN }); break;
+        case (SDL_BUTTON_MIDDLE): mouseButtonStates[MIDDLE_MOUSE_BUTTON_DOWN] = true; mouseButtonStates[MIDDLE_MOUSE_BUTTON_UP] = false; eventQ.push({ MIDDLE_MOUSE_BUTTON_DOWN }); break;
+        case (SDL_BUTTON_RIGHT): mouseButtonStates[RIGHT_MOUSE_BUTTON_DOWN] = true; mouseButtonStates[RIGHT_MOUSE_BUTTON_UP] = false; eventQ.push({ RIGHT_MOUSE_BUTTON_DOWN }); break;
         default: break;
         }
     }
@@ -311,14 +316,16 @@ namespace Engine
     {
         switch (mouseButtonEvent.button)
         {
-        case (SDL_BUTTON_LEFT): eventQ.push({ LEFT_MOUSE_BUTTON_UP }); break;
-        case (SDL_BUTTON_MIDDLE): eventQ.push({ MIDDLE_MOUSE_BUTTON_UP }); break;
-        case (SDL_BUTTON_RIGHT): eventQ.push({ RIGHT_MOUSE_BUTTON_UP }); break;
+        case (SDL_BUTTON_LEFT): mouseButtonStates[LEFT_MOUSE_BUTTON_UP] = true; mouseButtonStates[LEFT_MOUSE_BUTTON_DOWN] = false; eventQ.push({ LEFT_MOUSE_BUTTON_UP }); break;
+        case (SDL_BUTTON_MIDDLE): mouseButtonStates[MIDDLE_MOUSE_BUTTON_UP] = true; mouseButtonStates[MIDDLE_MOUSE_BUTTON_DOWN] = false; eventQ.push({ MIDDLE_MOUSE_BUTTON_UP }); break;
+        case (SDL_BUTTON_RIGHT): mouseButtonStates[RIGHT_MOUSE_BUTTON_UP] = true; mouseButtonStates[RIGHT_MOUSE_BUTTON_DOWN] = false; eventQ.push({ RIGHT_MOUSE_BUTTON_UP }); break;
         default: break;
         }
     }
     void EventManager::dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent)
     {
+        scrollDirection.first = mouseWheelEvent.x;
+        scrollDirection.second = mouseWheelEvent.y;
         switch (mouseWheelEvent.direction)
         {
         case (SDL_MOUSEWHEEL_NORMAL): eventQ.push({ MOUSE_WHEEL_MOVED, mouseWheelEvent.x, mouseWheelEvent.y }); break;
