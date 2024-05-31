@@ -33,7 +33,7 @@ namespace Engine
 		m_fullscreenHeight = displayMode.h;
 	}
 
-	SDL_Window* WindowManager::getWindow() const
+	SDL_Window* WindowManager::GetWindow() const
 	{
 		return window;
 	}
@@ -48,7 +48,7 @@ namespace Engine
 		return m_fullscreenHeight;
 	}
 
-	void WindowManager::resize(const int newWindowWidth, const int newWindowHeight)
+	void WindowManager::Resize(const int newWindowWidth, const int newWindowHeight)
 	{
 		ENGINE_TRACE_D("{}, {}", newWindowWidth, newWindowHeight);
 
@@ -71,7 +71,7 @@ namespace Engine
 
 	}
 
-	void WindowManager::toggleFullscreen()
+	void WindowManager::ToggleFullscreen()
 	{
 		// Bug here: Figure out why "SDL_WINDOW_FULLSCREEN" does not work.
 		// Incompatibility with native video mode?

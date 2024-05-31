@@ -26,9 +26,8 @@ namespace Engine
 		// Managers for major engine components.
 		// Maybe decouple from application class?
 		WindowManager m_windowManager;
-		RendererManager* ptrRendererManager;
 
-		// Manages events.
+		RendererManager* ptrRendererManager;
 		EventManager* ptrEventManager;
 
 		// Hold all event listeners.
@@ -37,16 +36,15 @@ namespace Engine
 		void processEventQueue();
 		void renderScene(std::shared_ptr<Scene> scene, const double interpolation);
 		void defineDefaultApplicationCallbacks();
+		void end();
 
 	public:
 		EMU_API static Application* GetInstance();
-
 		~Application();
 
 		EMU_API void AddEventListener(EventListener& eventListener);
 		EMU_API void RemoveEventListener(EventListener& eventListener);
 		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
-		EMU_API void End();
 
 		// Deleted functions to ensure our app instance cannot be copied or moved.
 		Application(const Application&) = delete;

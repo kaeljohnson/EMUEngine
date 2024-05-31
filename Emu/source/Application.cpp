@@ -40,7 +40,7 @@ namespace Engine
 		m_eventListeners(),
 		running(false)
 	{
-		ptrRendererManager->CreateRenderer(m_windowManager.getWindow());
+		ptrRendererManager->CreateRenderer(m_windowManager.GetWindow());
 
 		defineDefaultApplicationCallbacks();
 	}
@@ -51,7 +51,7 @@ namespace Engine
 		if (currentScene == nullptr)
 		{
 			ENGINE_CRITICAL_D("No scene loaded! Application must have a scene to run!");
-			End();
+			end();
 		}
 
 		currentScene->CheckValid();
@@ -94,9 +94,9 @@ namespace Engine
 
 			const double interpolation = accumulator / timeStep;
 
-			ptrRendererManager->clearScreen();
+			ptrRendererManager->ClearScreen();
 			renderScene(currentScene, interpolation);
-			ptrRendererManager->display();
+			ptrRendererManager->Display();
 		}
 	}
 
@@ -106,7 +106,7 @@ namespace Engine
 
 		for (auto& sceneObject : *scene)
 		{
-			ptrRendererManager->render(sceneObject, scene->GetPixelsPerMeter(), interpolation);
+			ptrRendererManager->Render(sceneObject, scene->GetPixelsPerMeter(), interpolation);
 		}
 	}
 
@@ -160,7 +160,7 @@ namespace Engine
 		m_eventListeners.Pop(&eventListener);
 	}
 
-	void Application::End()
+	void Application::end()
 	{
 		ENGINE_INFO_D("Application ending!");
 
@@ -175,21 +175,21 @@ namespace Engine
 
 		ptrICallbackSystem->NewCallback(Type::ToggleFullscreen, [this](Data data)
 			{
-				m_windowManager.toggleFullscreen();
-				ptrRendererManager->setViewport(m_windowManager.getWindow());
+				m_windowManager.ToggleFullscreen();
+				ptrRendererManager->SetViewport(m_windowManager.GetWindow());
 			});
 
 		ptrICallbackSystem->NewCallback(Type::EndApplication, [this](Data data)
 			{
-				End();
+				end();
 			});
 
 		ptrICallbackSystem->NewCallback(Type::ResizeWindow, [this](Data data)
 			{
 				const std::pair<int, int> windowSize = std::get<const std::pair<int, int>>(data);
 				
-				m_windowManager.resize(windowSize.first, windowSize.second);
-				ptrRendererManager->setViewport(m_windowManager.getWindow());
+				m_windowManager.Resize(windowSize.first, windowSize.second);
+				ptrRendererManager->SetViewport(m_windowManager.GetWindow());
 			});
 	}
 }
