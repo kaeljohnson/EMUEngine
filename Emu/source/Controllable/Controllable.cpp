@@ -52,7 +52,7 @@ namespace Engine
 
         // If the controllable is jumping, they should
         // have less control over their movement.        
-        const float ACCELERATIONDAMPENING = m_physicsBody->OnGround() ? 1.0f : 0.75f;
+        const float ACCELERATIONDAMPENING = m_physicsBody->OnGround() ? 1.0f : 0.90f;
 
         if (refKeyStates.at(D_KEY_DOWN) && refKeyStates.at(A_KEY_UP))
         {

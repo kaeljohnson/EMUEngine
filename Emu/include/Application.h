@@ -8,7 +8,6 @@
 #include "RendererManager.h"
 #include "Events/EventManager.h" 
 #include "Events/Event.h"
-#include "Events/EventListenerStack.h"
 #include "Events/EventListener.h"
 #include "Physics/IWorld.h"
 #include "Scenes/Scene.h"
@@ -30,10 +29,10 @@ namespace Engine
 		RendererManager* ptrRendererManager;
 		EventManager* ptrEventManager;
 
-		// Hold all event listeners.
-		EventListenerStack m_eventListeners;
+		// Application needs one listener for app management events.
+		EventListener* m_ptrAppManagerListener;
 
-		void processEventQueue();
+		void processEventQueue(std::shared_ptr<Scene> scene);
 		void renderScene(std::shared_ptr<Scene> scene, const double interpolation);
 		void defineDefaultApplicationCallbacks();
 		void end();
@@ -42,8 +41,7 @@ namespace Engine
 		EMU_API static Application* GetInstance();
 		~Application();
 
-		EMU_API void AddEventListener(EventListener& eventListener);
-		EMU_API void RemoveEventListener(EventListener& eventListener);
+		EMU_API void CreateEventListener(EventListener& eventListener);
 		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
 
 		// Deleted functions to ensure our app instance cannot be copied or moved.

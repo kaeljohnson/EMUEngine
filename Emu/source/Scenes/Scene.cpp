@@ -9,7 +9,8 @@
 
 namespace Engine
 {
-	Scene::Scene() : m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_sceneObjects(), m_world(nullptr) {}
+	Scene::Scene() : m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_sceneObjects(), m_world(nullptr),
+		m_eventListeners() {}
 
 	void Scene::CheckValid()
 	{
@@ -69,6 +70,11 @@ namespace Engine
 		m_world->AddBox(ptrBox);
 	}
 
+	EMU_API void Scene::AddEventListener(EventListener& eventListener)
+	{
+		m_eventListeners.Push(&eventListener);
+	}
+
 	void Scene::Remove(SceneObject& sceneObject)
 	{
 		// Find the scene object in the array
@@ -77,5 +83,10 @@ namespace Engine
 		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject.GetPhysicsBody());
 
 		m_world->RemoveBox(ptrBox);
+	}
+
+	void Scene::RemoveEventListener(EventListener& eventListener)
+	{
+		m_eventListeners.Pop(&eventListener);
 	}
 }

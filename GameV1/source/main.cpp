@@ -47,7 +47,9 @@ int main(int argc, char* args[])
 
 	AppManagementListener appManagementListener("App management listener");
 
-	ptrAppInstance->AddEventListener(appManagementListener);
+	ptrAppInstance->CreateEventListener(appManagementListener);
+
+	scene->AddEventListener(player);
 
 	scene->Add(player);
 	scene->Add(testGO2);

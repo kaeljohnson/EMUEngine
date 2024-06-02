@@ -37,8 +37,7 @@ namespace Engine
 		: m_windowManager("Default App Name"),
 		ptrRendererManager(RendererManager::GetInstance()),
 		ptrEventManager(EventManager::GetInstance()),
-		m_eventListeners(),
-		running(false)
+		running(false), m_ptrAppManagerListener(nullptr)
 	{
 		ptrRendererManager->CreateRenderer(m_windowManager.GetWindow());
 
@@ -47,6 +46,8 @@ namespace Engine
 
 	void Application::PlayScene(std::shared_ptr<Scene> currentScene)
 	{
+		running = true;
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 		if (currentScene == nullptr)
 		{
@@ -54,12 +55,16 @@ namespace Engine
 			end();
 		}
 
+		if (m_ptrAppManagerListener == nullptr)
+		{
+			ENGINE_CRITICAL_D("No event listener loaded! Application must have an event listener to run!");
+			end();
+		}
+
 		currentScene->CheckValid();
 
 		const int pixelsPerMeter = currentScene->GetPixelsPerMeter();
 		const float timeStep = TIME_STEP;
-
-		running = true;
 
 		double currentTime = SDL_GetTicks() / 1000.0;
 		double accumulator = 0.0;
@@ -85,7 +90,7 @@ namespace Engine
 			while (accumulator >= timeStep)
 			{
 				ptrEventManager->HandleEvents();
-				processEventQueue();
+				processEventQueue(currentScene);
 
 				currentScene->Update();
 
@@ -110,7 +115,7 @@ namespace Engine
 		}
 	}
 
-	void Application::processEventQueue()
+	void Application::processEventQueue(std::shared_ptr<Scene> scene)
 	{
 		// Process order for scene is opposite of render order.
 
@@ -128,7 +133,10 @@ namespace Engine
 		{
 			Event& currentEvent = ptrEventManager->eventQ.front();
 
-			for (auto& eventListener : m_eventListeners)
+			// Application events processed first.
+			m_ptrAppManagerListener->ProcessEvent(currentEvent);
+
+			for (auto& eventListener : scene->GetEventListeners())
 			{
 				eventListener->Enabled ? eventListener->ProcessEvent(currentEvent) : ENGINE_INFO_D("Event listener disabled");
 				if (currentEvent.Handled)
@@ -146,18 +154,11 @@ namespace Engine
 		}
 	}
 
-	void Application::AddEventListener(EventListener& eventListener)
+	void Application::CreateEventListener(EventListener& eventListener)
 	{
 		ENGINE_INFO_D("Adding event listener to app.");
 
-		m_eventListeners.Push(&eventListener);
-	}
-
-	void Application::RemoveEventListener(EventListener& eventListener)
-	{
-		ENGINE_INFO_D("Removing event listener from app.");
-
-		m_eventListeners.Pop(&eventListener);
+		m_ptrAppManagerListener = &eventListener;
 	}
 
 	void Application::end()
