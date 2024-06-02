@@ -113,10 +113,13 @@ namespace Engine
 	void Box::SetRestitution(const float restitution) { m_fixtureDef.restitution = restitution; }
 	void Box::SetRestitutionThreshold(const float threshold) { m_fixtureDef.restitutionThreshold = threshold; }
 	void Box::SetCollidable(const bool collidable) { m_collidable = collidable; }
+	void Box::SetWidthInMeters(const float widthInMeters) { m_shape.SetAsBox(widthInMeters / 2.0f, m_halfHeightInMeters); }
+	void Box::SetHeightInMeters(const float heightInMeters) { m_shape.SetAsBox(m_halfWidthInMeters, heightInMeters / 2.0f); }
 
 	const BodyType Box::GetBodyType() const { return m_bodyType; }
 	const float Box::GetWidthInMeters() const { return m_widthInMeters; }
 	const float Box::GetHeightInMeters() const { return m_heightInMeters; }
+	const float Box::GetSizeInMeters() const { return m_widthInMeters * m_heightInMeters; }
 	const float Box::GetXVelocity() const { return m_body->GetLinearVelocity().x; }
 	const float Box::GetYVelocity() const { return m_body->GetLinearVelocity().y; }
 	

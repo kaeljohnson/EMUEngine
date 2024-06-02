@@ -60,11 +60,13 @@ namespace Engine
 		void SetXVelocity(const float xVel) override;
 		void SetYVelocity(const float yVel) override;
 		void SetFixedRotation(bool fixed) override;
-		void SetDensity(const float density);
-		void SetFriction(const float friction);
-		void SetRestitution(const float restitution);
-		void SetRestitutionThreshold(const float threshold);
-		void SetCollidable(const bool collidable);
+		void SetDensity(const float density) override;
+		void SetFriction(const float friction) override;
+		void SetRestitution(const float restitution) override;
+		void SetRestitutionThreshold(const float threshold) override;
+		void SetCollidable(const bool collidable) override;
+		void SetWidthInMeters(const float widthInMeters) override;
+		void SetHeightInMeters(const float heightInMeters) override;
 		const float GetXVelocity() const override;
 		const float GetYVelocity() const override;
 		const float GetCenterXInMeters() const override;
@@ -84,6 +86,7 @@ namespace Engine
 		const float GetTopLeftPrevY() const override;
 		const float GetWidthInMeters() const override; 
 		const float GetHeightInMeters() const override;
+		const float GetSizeInMeters() const override;
 
 	};
 }

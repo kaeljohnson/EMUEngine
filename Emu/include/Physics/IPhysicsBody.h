@@ -28,6 +28,8 @@ namespace Engine
 		virtual void SetXDeceleration(const float xDecel) = 0;
 		virtual void SetXVelocity(const float xVel) = 0;
 		virtual void SetYVelocity(const float yVel) = 0;
+		virtual void SetWidthInMeters(const float width) = 0;
+		virtual void SetHeightInMeters(const float height) = 0;
 
 		virtual const float GetXVelocity() const = 0;
 		virtual const float GetYVelocity() const = 0;
@@ -40,6 +42,7 @@ namespace Engine
 
 		virtual const float GetWidthInMeters() const = 0;
 		virtual const float GetHeightInMeters() const = 0;
+		virtual const float GetSizeInMeters() const = 0;
 
 		virtual const float GetAngleInRadians() const = 0;
 		virtual const float GetAngleInDegrees() const = 0;

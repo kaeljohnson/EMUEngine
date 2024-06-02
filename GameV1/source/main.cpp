@@ -27,7 +27,9 @@ int main(int argc, char* args[])
 	Engine::PhysicsBodyPtr wallRightBody = Engine::CreatePhysicsBody(Engine::STATIC, true, 100.0f, 35.0f, 2.0f, 80.0f);
 	Engine::PhysicsBodyPtr groundBody =    Engine::CreatePhysicsBody(Engine::STATIC, true, 63.5f, 70.0f, 120.0f, 2.0f);
 	
-	Engine::PhysicsBodyPtr blockBody = Engine::CreatePhysicsBody(Engine::STATIC, false, 63.5f, 63.0f, 9.0f, 1.0f);
+	Engine::PhysicsBodyPtr blockBody = Engine::CreatePhysicsBody(Engine::STATIC, false, 63.5f, 65.0f, 9.0f, 1.0f);
+	Engine::PhysicsBodyPtr blockBody2 = Engine::CreatePhysicsBody(Engine::STATIC, false, 63.5f, 60.0f, 9.0f, 1.0f);
+	Engine::PhysicsBodyPtr blockBody3 = Engine::CreatePhysicsBody(Engine::STATIC, false, 50.0f, 55.0f, 9.0f, 1.0f);
 	
 	Engine::Controllable player(testBody, tempTextureRed);
 
@@ -38,6 +40,8 @@ int main(int argc, char* args[])
 	ClientObject testGround(groundBody, tempTextureBlue);
 
 	ClientObject testBlock(blockBody, tempTextureBlue);
+	ClientObject testBlock2(blockBody2, tempTextureBlue);
+	ClientObject testBlock3(blockBody3, tempTextureBlue);
 	
 	CLIENT_INFO_D(player.GetUUID());
 
@@ -52,6 +56,8 @@ int main(int argc, char* args[])
 	scene->Add(testGround);
 	scene->Add(testWallRight);
 	scene->Add(testBlock);
+	scene->Add(testBlock2);
+	scene->Add(testBlock3);
 	
 	ptrAppInstance->PlayScene(scene);
 	// Need to figure out how to change scenes, stop scenes, etc.
