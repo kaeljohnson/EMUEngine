@@ -109,6 +109,9 @@ namespace Engine
 	{
 		// Should not be rendering every object in the scene every frame.
 
+		// Maybe render all objects once at the start of the sceen
+		// and then only render dynamic objects that have moved on every frame.
+
 		for (auto& sceneObject : *scene)
 		{
 			ptrRendererManager->Render(sceneObject, scene->GetPixelsPerMeter(), interpolation);

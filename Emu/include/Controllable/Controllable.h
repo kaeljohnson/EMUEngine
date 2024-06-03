@@ -18,10 +18,12 @@ namespace Engine
 	protected:
 		const float XSWITCHDECELERATION;
 		const float XDECELERATION;
+		const float YDECELERATION;
 		const float XACCELERATION;
 		const float YACCELERATION;
 		const float MAX_XVELOCITY;
 		const float MAX_YVELOCITY;
+
 		const float MAXJUMPCHARGE;
 		const float JUMPCHARGEINCREMENT;
 		const float JUMPFORCE;
