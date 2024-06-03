@@ -19,29 +19,18 @@ int main(int argc, char* args[])
 	// Temp
 	Engine::Texture tempTextureRed(255, 0, 0);
 	Engine::Texture tempTextureBlue(0, 0, 265);
-
-	Engine::PhysicsBodyPtr testBody =      Engine::CreatePhysicsBody(Engine::DYNAMIC, false, 63.5f, 3.0f, 1.0f, 2.0f);
-	Engine::PhysicsBodyPtr testBody2 =     Engine::CreatePhysicsBody(Engine::DYNAMIC, false, 68.5f, 3.0f, 1.0f, 1.0f);
-	Engine::PhysicsBodyPtr testBody3 =	   Engine::CreatePhysicsBody(Engine::DYNAMIC, false, 76.5f, 3.0f, 2.0f, 2.0f);
-	Engine::PhysicsBodyPtr wallBody =      Engine::CreatePhysicsBody(Engine::STATIC, true, 15.0f, 35.0f, 2.0f, 80.0f);
-	Engine::PhysicsBodyPtr wallRightBody = Engine::CreatePhysicsBody(Engine::STATIC, true, 100.0f, 35.0f, 2.0f, 80.0f);
-	Engine::PhysicsBodyPtr groundBody =    Engine::CreatePhysicsBody(Engine::STATIC, true, 63.5f, 70.0f, 120.0f, 2.0f);
 	
-	Engine::PhysicsBodyPtr blockBody = Engine::CreatePhysicsBody(Engine::STATIC, false, 63.5f, 65.0f, 9.0f, 1.0f);
-	Engine::PhysicsBodyPtr blockBody2 = Engine::CreatePhysicsBody(Engine::STATIC, false, 63.5f, 60.0f, 9.0f, 1.0f);
-	Engine::PhysicsBodyPtr blockBody3 = Engine::CreatePhysicsBody(Engine::STATIC, false, 50.0f, 55.0f, 9.0f, 1.0f);
-	
-	Engine::Controllable player(testBody, tempTextureRed);
+	Engine::Controllable player(Engine::DYNAMIC, false, 63.5f, 3.0f, 1.0f, 2.0f, tempTextureRed);
 
-	ClientObject testGO2(testBody2, tempTextureRed);
-	ClientObject testGO3(testBody3, tempTextureRed);
-	ClientObject testWall(wallBody, tempTextureBlue);
-	ClientObject testWallRight(wallRightBody, tempTextureBlue);
-	ClientObject testGround(groundBody, tempTextureBlue);
+	ClientObject testGO2(Engine::DYNAMIC, false, 68.5f, 3.0f, 1.0f, 1.0f, tempTextureRed);
+	ClientObject testGO3(Engine::DYNAMIC, false, 76.5f, 3.0f, 2.0f, 2.0f, tempTextureRed);
+	ClientObject testWall(Engine::STATIC, true, 15.0f, 35.0f, 2.0f, 80.0f, tempTextureBlue);
+	ClientObject testWallRight(Engine::STATIC, true, 100.0f, 35.0f, 2.0f, 80.0f, tempTextureBlue);
+	ClientObject testGround(Engine::STATIC, true, 63.5f, 70.0f, 120.0f, 2.0f, tempTextureBlue);
 
-	ClientObject testBlock(blockBody, tempTextureBlue);
-	ClientObject testBlock2(blockBody2, tempTextureBlue);
-	ClientObject testBlock3(blockBody3, tempTextureBlue);
+	ClientObject testBlock(Engine::STATIC, false, 63.5f, 65.0f, 9.0f, 1.0f, tempTextureBlue);
+	ClientObject testBlock2(Engine::STATIC, false, 63.5f, 60.0f, 9.0f, 1.0f, tempTextureBlue);
+	ClientObject testBlock3(Engine::STATIC, false, 50.0f, 55.0f, 9.0f, 1.0f, tempTextureBlue);
 	
 	CLIENT_INFO_D(player.GetUUID());
 

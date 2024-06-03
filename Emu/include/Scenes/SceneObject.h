@@ -24,15 +24,17 @@ namespace Engine
 		std::shared_ptr<IPhysicsBody> m_physicsBody;
 
 	public:
-		EMU_API SceneObject(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture& ptrTexture);
+		EMU_API SceneObject(const BodyType bodyType, const bool fixed, const float startingXInMeters, 
+			const float startingYInMeters, const float widthInMeters, const float heightInMeters, Texture& refTexture);
+	    
 		EMU_API virtual ~SceneObject() = default;
 
 		EMU_API void SetXVelocity(const float xVel);
 		EMU_API void SetYVelocity(const float yVel);
 		EMU_API void SetVisibility(const bool visible);
 		EMU_API std::shared_ptr<IPhysicsBody> GetPhysicsBody();
+		EMU_API inline Texture* GetTexture() { return m_texture; }
 		EMU_API std::string GetUUID();
-		EMU_API Texture* GetTexture();
 		EMU_API const bool IsEnabled() const;
 
 		void UpdatePrevPosition();

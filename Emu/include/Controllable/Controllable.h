@@ -33,7 +33,8 @@ namespace Engine
 		const std::unordered_map<EventType, bool>& refKeyStates;
 
 	public:
-		EMU_API Controllable(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture& ptrTexture);
+		EMU_API Controllable(const BodyType bodyType, const bool fixed, const float startingXInMeters, 
+			const float startingYInMeters, const float widthInMeters, const float heightInMeters, Texture& ptrTexture);
 		~Controllable() = default;
 
 		EMU_API void SetXVelocity(const float xVel);

@@ -10,12 +10,13 @@
 
 namespace Engine
 {
-    Controllable::Controllable(std::shared_ptr<IPhysicsBody> ptrPhysicsBody, Texture& refTexture)
+    Controllable::Controllable(const BodyType bodyType, const bool fixed, const float startingXInMeters, const float startingYInMeters,
+        const float widthInMeters, const float heightInMeters, Texture& refTexture)
         : XSWITCHDECELERATION(85.0f), XDECELERATION(10.0f), XACCELERATION(30.0f), MAX_XVELOCITY(30.0f),
         YACCELERATION(30.0f), MAX_YVELOCITY(60.0f), JUMPFORCE(20.0f), m_jumpCharge(0.0),
         JUMPCHARGEINCREMENT(1.0f), MINJUMPFORCE(20.0f), MAXJUMPCHARGE(10.0f), m_isJumping(false),
         refKeyStates(EventManager::GetInstance()->GetKeyStates()),
-        SceneObject(ptrPhysicsBody, refTexture)
+        SceneObject(bodyType, fixed, startingXInMeters, startingYInMeters, widthInMeters, heightInMeters, refTexture)
     {
     	m_physicsBody->SetFriction(0.0f);
     }
