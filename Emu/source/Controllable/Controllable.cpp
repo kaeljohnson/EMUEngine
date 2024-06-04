@@ -12,7 +12,7 @@ namespace Engine
 {
     Controllable::Controllable(const BodyType bodyType, const bool fixed, const float startingXInMeters, const float startingYInMeters,
         const float widthInMeters, const float heightInMeters, Texture& refTexture)
-        : XSWITCHDECELERATION(85.0f), XDECELERATION(10.0f), XACCELERATION(30.0f), MAX_XVELOCITY(30.0f),
+        : XSWITCHDECELERATION(85.0f), XDECELERATION(10.0f), YDECELERATION(0.0f), XACCELERATION(30.0f), MAX_XVELOCITY(30.0f),
         YACCELERATION(30.0f), MAX_YVELOCITY(60.0f), JUMPFORCE(20.0f), m_jumpCharge(0.0),
         JUMPCHARGEINCREMENT(1.0f), MINJUMPFORCE(20.0f), MAXJUMPCHARGE(10.0f), m_isJumping(false),
         refKeyStates(EventManager::GetInstance()->GetKeyStates()),
@@ -20,31 +20,6 @@ namespace Engine
     {
     	m_physicsBody->SetFriction(0.0f);
     }
-
-	void Controllable::SetXVelocity(const float xVel)
-	{
-		m_physicsBody->SetXVelocity(xVel);
-	}
-
-	void Controllable::SetYVelocity(const float yVel)
-	{
-		m_physicsBody->SetYVelocity(yVel);
-	}
-
-	void Controllable::SetGravity(bool enabled)
-	{
-		m_physicsBody->SetGravity(enabled);
-	}
-
-    const float Controllable::GetXVelocity() const
-    {
-		return m_physicsBody->GetXVelocity();
-	}
-
-    const float Controllable::GetYVelocity() const
-    {
-		return m_physicsBody->GetYVelocity();
-	}
 
     void Controllable::Update()
     {

@@ -39,12 +39,6 @@ namespace Engine
 			const float startingYInMeters, const float widthInMeters, const float heightInMeters, Texture& ptrTexture);
 		~Controllable() = default;
 
-		EMU_API void SetXVelocity(const float xVel);
-		EMU_API void SetYVelocity(const float yVel);
-		EMU_API const float GetXVelocity() const;
-		EMU_API const float GetYVelocity() const;
-		EMU_API void SetGravity(bool enabled);
-
 		EMU_API virtual void Update() override;
 		EMU_API virtual void Jump();
 	};

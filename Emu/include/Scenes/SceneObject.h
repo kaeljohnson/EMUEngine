@@ -31,8 +31,13 @@ namespace Engine
 
 		EMU_API void SetXVelocity(const float xVel);
 		EMU_API void SetYVelocity(const float yVel);
+		EMU_API void SetGravity(const bool gravityEnabled);
 		EMU_API void SetVisibility(const bool visible);
+
+		// Should clients be able to get the physics body?
 		EMU_API std::shared_ptr<IPhysicsBody> GetPhysicsBody();
+		EMU_API const float GetXVelocity() const;
+		EMU_API const float GetYVelocity() const;
 		EMU_API inline Texture* GetTexture() { return m_texture; }
 		EMU_API std::string GetUUID();
 		EMU_API const bool IsEnabled() const;

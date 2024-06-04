@@ -70,11 +70,6 @@ namespace Engine
 		m_world->AddBox(ptrBox);
 	}
 
-	EMU_API void Scene::AddEventListener(EventListener& eventListener)
-	{
-		m_eventListeners.Push(&eventListener);
-	}
-
 	void Scene::Remove(SceneObject& sceneObject)
 	{
 		// Find the scene object in the array
@@ -83,6 +78,11 @@ namespace Engine
 		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject.GetPhysicsBody());
 
 		m_world->RemoveBox(ptrBox);
+	}
+
+	void Scene::AddEventListener(EventListener& eventListener)
+	{
+		m_eventListeners.Push(&eventListener);
 	}
 
 	void Scene::RemoveEventListener(EventListener& eventListener)

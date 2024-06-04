@@ -9,7 +9,7 @@
 namespace Engine
 {
 	// Client will not be able to create an instance of this class in the future.
-	class EMU_API IPhysicsBody
+	class IPhysicsBody
 	{
 	public:
 		virtual ~IPhysicsBody() = default;

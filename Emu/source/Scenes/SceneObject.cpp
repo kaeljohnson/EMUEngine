@@ -25,8 +25,11 @@ namespace Engine
 
 	void SceneObject::SetXVelocity(const float xVel) { m_physicsBody->SetXVelocity(xVel); }
 	void SceneObject::SetYVelocity(const float yVel) { m_physicsBody->SetYVelocity(yVel); }
+	void SceneObject::SetGravity(bool enabled) { m_physicsBody->SetGravity(enabled); }
 	void SceneObject::SetVisibility(const bool visible) { m_visible = visible; }
 	std::shared_ptr<IPhysicsBody> SceneObject::GetPhysicsBody() { return m_physicsBody; }
+	const float SceneObject::GetXVelocity() const { return m_physicsBody->GetXVelocity(); }
+	const float SceneObject::GetYVelocity() const { return m_physicsBody->GetYVelocity(); }
 
 	void SceneObject::UpdatePrevPosition() 
 	{ 
