@@ -2,7 +2,6 @@
 
 #include "../include/SDLWrapper/SDLWrapper.h"
 
-
 namespace Engine
 {
 	// WindowManager class. Manages the window of the application.

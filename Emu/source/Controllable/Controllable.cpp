@@ -5,13 +5,13 @@
 #include "../../include/Events/EventManager.h"
 #include "../../include/Controllable/Controllable.h"
 #include "../../include/Textures/Texture.h"
-#include "../../include/Physics/IPhysicsBody.h"
 #include "../../include/Logging/Logger.h"
 
 namespace Engine
 {
     Controllable::Controllable(const BodyType bodyType, const bool fixed, const float startingXInMeters, const float startingYInMeters,
         const float widthInMeters, const float heightInMeters, Texture& refTexture)
+        // These need to be set by client.
         : m_xSwitchDeceleration(85.0f), m_xDeceleration(10.0f), m_yDeceleration(0.0f), m_xAcceleration(30.0f), m_xMaxVelocity(30.0f),
         m_yAcceleration(30.0f), m_yMaxVelocity(60.0f), m_jumpForce(20.0f), m_jumpCharge(0.0),
         m_jumpChargeIncrement(1.0f), m_minJumpForce(20.0f), m_maxJumpCharge(10.0f), m_isJumping(false),

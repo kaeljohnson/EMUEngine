@@ -6,7 +6,6 @@
 #include "../../include/Scenes/SceneObject.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Textures/Texture.h"
-#include "../../include/Physics/IPhysicsBody.h"
 #include "../../include/Physics/PhysicsFactory.h"
 
 namespace Engine
@@ -19,15 +18,9 @@ namespace Engine
 		ENGINE_INFO_D("SceneObject created");
 	}
 
-	// std::string SceneObject::GetUUID() { return uuid; }
-
 	void SceneObject::SetXVelocity(const float xVel) { m_physicsBody->SetXVelocity(xVel); }
 	void SceneObject::SetYVelocity(const float yVel) { m_physicsBody->SetYVelocity(yVel); }
 	void SceneObject::SetGravity(bool enabled) { m_physicsBody->SetGravity(enabled); }
-
-	// std::shared_ptr<IPhysicsBody> SceneObject::GetPhysicsBody() { return m_physicsBody; }
-	// const float SceneObject::GetXVelocity() const { return m_physicsBody->GetXVelocity(); }
-	// const float SceneObject::GetYVelocity() const { return m_physicsBody->GetYVelocity(); }
 
 	void SceneObject::UpdatePrevPosition() 
 	{ 
