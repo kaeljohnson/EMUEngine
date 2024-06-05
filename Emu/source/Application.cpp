@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 #include <queue>
+#include <thread>
+#include <chrono>
 
 #include "../include/EngineConstants.h"
 #include "../include/Logging/Logger.h"
@@ -35,28 +37,34 @@ namespace Engine
 		: m_windowManager("Default App Name"),
 		ptrRendererManager(RendererManager::GetInstance()),
 		ptrEventManager(EventManager::GetInstance()),
-		m_eventListeners(),
-		running(false)
+		running(false), m_ptrAppManagerListener(nullptr)
 	{
-		ptrRendererManager->CreateRenderer(m_windowManager.getWindow());
+		ptrRendererManager->CreateRenderer(m_windowManager.GetWindow());
 
 		defineDefaultApplicationCallbacks();
 	}
 
 	void Application::PlayScene(std::shared_ptr<Scene> currentScene)
 	{
+		running = true;
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 		if (currentScene == nullptr)
 		{
 			ENGINE_CRITICAL_D("No scene loaded! Application must have a scene to run!");
-			End();
+			end();
 		}
 
-		currentScene->checkValid();
+		if (m_ptrAppManagerListener == nullptr)
+		{
+			ENGINE_CRITICAL_D("No event listener loaded! Application must have an event listener to run!");
+			end();
+		}
+
+		currentScene->CheckValid();
 
 		const int pixelsPerMeter = currentScene->GetPixelsPerMeter();
 		const float timeStep = TIME_STEP;
-
-		running = true;
 
 		double currentTime = SDL_GetTicks() / 1000.0;
 		double accumulator = 0.0;
@@ -81,19 +89,19 @@ namespace Engine
 
 			while (accumulator >= timeStep)
 			{
-				ptrEventManager->handleEvents();
-				processEventQueue();
+				ptrEventManager->HandleEvents();
+				processEventQueue(currentScene);
 
-				currentScene->update();
+				currentScene->Update();
 
 				accumulator -= timeStep;
 			}
 
 			const double interpolation = accumulator / timeStep;
 
-			ptrRendererManager->clearScreen();
+			ptrRendererManager->ClearScreen();
 			renderScene(currentScene, interpolation);
-			ptrRendererManager->display();
+			ptrRendererManager->Display();
 		}
 	}
 
@@ -101,13 +109,16 @@ namespace Engine
 	{
 		// Should not be rendering every object in the scene every frame.
 
+		// Maybe render all objects once at the start of the sceen
+		// and then only render dynamic objects that have moved on every frame.
+
 		for (auto& sceneObject : *scene)
 		{
-			ptrRendererManager->render(sceneObject, scene->GetPixelsPerMeter(), interpolation);
+			ptrRendererManager->Render(sceneObject, scene->GetPixelsPerMeter(), interpolation);
 		}
 	}
 
-	void Application::processEventQueue()
+	void Application::processEventQueue(std::shared_ptr<Scene> scene)
 	{
 		// Process order for scene is opposite of render order.
 
@@ -125,7 +136,10 @@ namespace Engine
 		{
 			Event& currentEvent = ptrEventManager->eventQ.front();
 
-			for (auto& eventListener : m_eventListeners)
+			// Application events processed first.
+			m_ptrAppManagerListener->ProcessEvent(currentEvent);
+
+			for (auto& eventListener : scene->GetEventListeners())
 			{
 				eventListener->Enabled ? eventListener->ProcessEvent(currentEvent) : ENGINE_INFO_D("Event listener disabled");
 				if (currentEvent.Handled)
@@ -143,21 +157,14 @@ namespace Engine
 		}
 	}
 
-	void Application::AddEventListener(EventListener& eventListener)
+	void Application::CreateEventListener(EventListener& eventListener)
 	{
 		ENGINE_INFO_D("Adding event listener to app.");
 
-		m_eventListeners.push(&eventListener);
+		m_ptrAppManagerListener = &eventListener;
 	}
 
-	void Application::RemoveEventListener(EventListener& eventListener)
-	{
-		ENGINE_INFO_D("Removing event listener from app.");
-
-		m_eventListeners.pop(&eventListener);
-	}
-
-	void Application::End()
+	void Application::end()
 	{
 		ENGINE_INFO_D("Application ending!");
 
@@ -172,21 +179,21 @@ namespace Engine
 
 		ptrICallbackSystem->NewCallback(Type::ToggleFullscreen, [this](Data data)
 			{
-				m_windowManager.toggleFullscreen();
-				ptrRendererManager->setViewport(m_windowManager.getWindow());
+				m_windowManager.ToggleFullscreen();
+				ptrRendererManager->SetViewport(m_windowManager.GetWindow());
 			});
 
 		ptrICallbackSystem->NewCallback(Type::EndApplication, [this](Data data)
 			{
-				End();
+				end();
 			});
 
 		ptrICallbackSystem->NewCallback(Type::ResizeWindow, [this](Data data)
 			{
 				const std::pair<int, int> windowSize = std::get<const std::pair<int, int>>(data);
 				
-				m_windowManager.resize(windowSize.first, windowSize.second);
-				ptrRendererManager->setViewport(m_windowManager.getWindow());
+				m_windowManager.Resize(windowSize.first, windowSize.second);
+				ptrRendererManager->SetViewport(m_windowManager.GetWindow());
 			});
 	}
 }

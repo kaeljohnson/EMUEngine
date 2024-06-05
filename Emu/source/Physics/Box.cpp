@@ -4,21 +4,16 @@
 
 #include "../../include/Physics/Box.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/Physics/ConversionFunctions.h"
 #include "../../include/Physics/BodyTypes.h"
 
 namespace Engine
 {
-	void Box::bodyNotInWorldAlert() const { ENGINE_CRITICAL("Body not in world. Cannot get position."); }
-
-	Box::Box(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters,
-		const float widthInMeters, const float heightInMeters, const float density, const float friction, const float angle,
-		const float restitution, const float restitutionThreshold, bool visible, bool collidable, bool fixed)
+	Box::Box(const BodyType bodyType, const bool fixed, const float startingXInMeters, const float startingYInMeters,
+		const float widthInMeters, const float heightInMeters)
 		: m_halfWidthInMeters(widthInMeters / 2.0f), m_halfHeightInMeters(heightInMeters / 2.0f), 
 		m_widthInMeters(widthInMeters), m_heightInMeters(heightInMeters),
-		m_restitution(restitution), m_restitutionThreshold(restitutionThreshold),
-		m_bodyType(bodyType), m_visible(visible), m_collidable(collidable), m_fixed(fixed), m_body(nullptr),
-		m_onGround(false), m_onRightWall(false), m_onLeftwall(false), m_gavityOn(true)
+		m_bodyType(bodyType), m_collidable(true), m_fixed(fixed), m_body(nullptr),
+		m_gravityOn(true)
 	{
 		switch (bodyType)
 		{
@@ -35,46 +30,24 @@ namespace Engine
 			break;
 		}
 
-		// User should set this value at some point.
 		m_bodyDef.fixedRotation = true;
-
 		m_prevX = startingXInMeters;
 		m_prevY = startingYInMeters;
 		m_bodyDef.position.Set(startingXInMeters, startingYInMeters);
-		m_bodyDef.angle = degreesToRadians(angle);
 		m_shape.SetAsBox(m_halfWidthInMeters, m_halfHeightInMeters);
-		m_fixtureDef.density = density;
-		m_fixtureDef.friction = friction;
 		m_fixtureDef.shape = &m_shape;
-		m_fixtureDef.restitution = restitution;
-		m_fixtureDef.restitutionThreshold = restitutionThreshold;
+		m_fixtureDef.restitution = 0.0f;
+		m_fixtureDef.restitutionThreshold = 0.0f;
+		m_fixtureDef.density = 1.0f;
+		m_fixtureDef.friction = 1.0f;
 
 		ENGINE_INFO_D("Box created at position: {0}, {1}. With width: {2}, height: {3}",
 			startingXInMeters, startingYInMeters, m_widthInMeters, m_heightInMeters);
 	}
 
-	const BodyType Box::getBodyType() const { return m_bodyType; }
-
-	const float Box::getWidthInMeters() const { return m_widthInMeters; }
-	const float Box::getHeightInMeters() const { return m_heightInMeters; }
-
-	void Box::createFixture() { m_body->CreateFixture(&m_fixtureDef); }
-
-	const float Box::getPrevX() const { return m_prevX; }
-	const float Box::getPrevY() const { return m_prevY; };
-	void Box::updatePrevX(){ m_prevX = getTopLeftXInMeters(); };
-	void Box::updatePrevY() { m_prevY = getTopLeftYInMeters(); };
-
-	const float Box::getCenterXInMeters() const { return (m_body->GetPosition().x); }
-	const float Box::getCenterYInMeters() const { return (m_body->GetPosition().y); }
-	const float Box::getTopLeftXInMeters() const { return (m_body->GetPosition().x - m_widthInMeters / 2.0f); }
-	const float Box::getTopLeftYInMeters() const { return (m_body->GetPosition().y - m_heightInMeters / 2.0f); }
-
-	const float Box::getAngleInRadians() const { return m_body->GetAngle(); }
-	const float Box::getAngleInDegrees() const { return radiansToDegrees(m_body->GetAngle()); }
-
-	void Box::removeBodyFromWorld()
+	Box::~Box()
 	{
+		ENGINE_INFO_D("Freeing Box!");
 		if (m_body != nullptr)
 		{
 			m_body->GetWorld()->DestroyBody(m_body);
@@ -82,17 +55,14 @@ namespace Engine
 		}
 	}
 
-	void Box::SetXDeceleration(const float xDecel)
+	void Box::RemoveBodyFromWorld()
 	{
-		m_body->SetLinearDamping(xDecel);
+		if (m_body != nullptr)
+		{
+			m_body->GetWorld()->DestroyBody(m_body);
+			m_body = nullptr;
+		}
 	}
-
-	void Box::SetXVelocity(const float xVel) { m_body->SetLinearVelocity(b2Vec2(xVel, m_body->GetLinearVelocity().y)); }
-	void Box::SetYVelocity(const float yVel) { m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, yVel)); }
-	const float Box::GetXVelocity() const { return m_body->GetLinearVelocity().x; }
-	const float Box::GetYVelocity() const { return m_body->GetLinearVelocity().y; }
-
-	void Box::GravityOn(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
 
 	void Box::ApplyForceToBox(std::pair<float, float> force)
 	{
@@ -128,13 +98,20 @@ namespace Engine
 		return false;
 	}
 
-	Box::~Box()
-	{
-		ENGINE_INFO_D("Freeing Box!");
-		if (m_body != nullptr)
-		{
-			m_body->GetWorld()->DestroyBody(m_body);
-			m_body = nullptr;
-		}
-	}
+	void Box::UpdatePrevPosition() { m_prevX = GetTopLeftXInMeters(); m_prevY = GetTopLeftYInMeters(); }
+
+	void Box::CreateFixture() { m_body->CreateFixture(&m_fixtureDef); }
+	void Box::SetGravity(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
+
+	void Box::SetXVelocity(const float xVel) { m_body->SetLinearVelocity(b2Vec2(xVel, m_body->GetLinearVelocity().y)); }
+	void Box::SetYVelocity(const float yVel) { m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, yVel)); }
+	void Box::SetXDeceleration(const float xDecel) { m_body->SetLinearDamping(xDecel); }
+	void Box::SetFixedRotation(bool fixed) { m_body->SetFixedRotation(fixed); }
+	void Box::SetDensity(const float density) { m_fixtureDef.density = density; }
+	void Box::SetFriction(const float friction) { m_fixtureDef.friction = friction; }
+	void Box::SetRestitution(const float restitution) { m_fixtureDef.restitution = restitution; }
+	void Box::SetRestitutionThreshold(const float threshold) { m_fixtureDef.restitutionThreshold = threshold; }
+	void Box::SetCollidable(const bool collidable) { m_collidable = collidable; }
+	void Box::SetWidthInMeters(const float widthInMeters) { m_shape.SetAsBox(widthInMeters / 2.0f, m_halfHeightInMeters); }
+	void Box::SetHeightInMeters(const float heightInMeters) { m_shape.SetAsBox(m_halfWidthInMeters, heightInMeters / 2.0f); }
 }

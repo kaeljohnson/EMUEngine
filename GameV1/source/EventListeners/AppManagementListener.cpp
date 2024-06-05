@@ -37,11 +37,6 @@ void AppManagementListener::ProcessEvent(Engine::Event& e)
 			ptrICallbackSystem->TriggerCallback(Engine::Type::EndApplication, std::monostate{});
 			e.Handled = true;
 			break;
-		case (Engine::R_KEY_DOWN):
-			CLIENT_TRACE_D("Handled event: {}", static_cast<int>(Engine::R_KEY_DOWN));
-			ptrICallbackSystem->TriggerCallback(Engine::Type::SetSimulation, std::monostate{});
-			e.Handled = true;
-			break;
 		default:
 			break;
 	}

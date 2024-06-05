@@ -14,9 +14,9 @@ namespace Engine
 		}
 	}
 
-	const size_t EventListenerStack::size() const { return m_eventListenerCount; }
+	const size_t EventListenerStack::Size() const { return m_eventListenerCount; }
 
-	void EventListenerStack::push(EventListener* eventListener)
+	void EventListenerStack::Push(EventListener* eventListener)
 	{
 		if (eventListener == nullptr)
 		{
@@ -46,7 +46,7 @@ namespace Engine
 		m_eventListenerCount++;
 	}
 
-	void EventListenerStack::pop(EventListener* eventListener)
+	void EventListenerStack::Pop(EventListener* eventListener)
 	{
 		if (eventListener == nullptr)
 		{
@@ -73,7 +73,7 @@ namespace Engine
 		}
 	}
 
-	void EventListenerStack::pop()
+	void EventListenerStack::Pop()
 	{
 		if (m_eventListenerCount == 0)
 		{

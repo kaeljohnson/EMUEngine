@@ -29,12 +29,12 @@ namespace Engine
 		}
 	}
 
-	void World::update()
+	void World::Update()
 	{
 		m_world.Step(TIME_STEP, m_velocityIterations, m_positionIterations);
 	}
 
-	void World::addBox(std::shared_ptr<Box> box)
+	void World::AddBox(std::shared_ptr<Box> box)
 	{
 		if (box == nullptr)
 		{
@@ -43,13 +43,13 @@ namespace Engine
 		}
 
 		box->m_body = m_world.CreateBody(&box->m_bodyDef);
-		box->createFixture();
+		box->CreateFixture();
 
 		ENGINE_INFO_D("Box added to world at position: {0}, {1}. With width: {2}, height: {3}",
-			box->getCenterXInMeters(), box->getCenterYInMeters(), box->getWidthInMeters(), box->getHeightInMeters());
+			box->GetCenterXInMeters(), box->GetCenterYInMeters(), box->GetWidthInMeters(), box->GetHeightInMeters());
 	}
 
-	void World::removeBox(std::shared_ptr<Box> body)
+	void World::RemoveBox(std::shared_ptr<Box> body)
 	{
 		if (body == nullptr)
 		{

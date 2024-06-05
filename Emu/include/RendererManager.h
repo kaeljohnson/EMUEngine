@@ -9,6 +9,7 @@ namespace Engine
     class RendererManager
     {
     private:
+        RendererManager();
         static RendererManager* instance;
         SDLRenderer* renderer;
 
@@ -26,7 +27,7 @@ namespace Engine
 
         bool rendererCreated;
 
-        RendererManager();
+        void free();
 
     public:
         static RendererManager* GetInstance();
@@ -35,12 +36,11 @@ namespace Engine
 
         ~RendererManager();
 
-        const SDLTexture* loadTexture(const char* filePath);
-        void clearScreen();
-        void render(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation);
-        void setViewport(SDLWindow* ptrWindow);
-        void display();
-        void free();
+        const SDLTexture* LoadTexture(const char* filePath);
+        void SetViewport(SDLWindow* ptrWindow);
+        void ClearScreen();
+        void Render(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation);
+        void Display();
 
         // Deleted functions to ensure our singleton instance cannot be copied or moved.
         RendererManager(const RendererManager&) = delete;

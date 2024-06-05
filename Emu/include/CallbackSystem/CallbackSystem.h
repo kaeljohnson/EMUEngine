@@ -18,14 +18,15 @@ namespace Engine
 
     class ICallbackSystem
     {
-    private:
-		static ICallbackSystem* instance;
-		ICallbackSystem() = default;
-
-        std::unordered_map<Type, Callback> m_callbacks;
     public:
         EMU_API static ICallbackSystem* GetInstance();
         EMU_API void NewCallback(Type callbackType, Callback callback);
         EMU_API void TriggerCallback(Type eventType, Data eventData);
+    
+    private:
+        static ICallbackSystem* instance;
+        ICallbackSystem() = default;
+
+        std::unordered_map<Type, Callback> m_callbacks;
     };
 }

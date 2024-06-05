@@ -17,18 +17,12 @@ namespace Engine
 		EventListenerStack();
 		~EventListenerStack() = default;
 
+		const size_t Size() const;
+		void Push(EventListener* listener);
+		void Pop(EventListener* listener);
+		void Pop();
+
 		EventListener** const begin() { return m_eventListeners; }
 		EventListener** const end() { return m_eventListeners + m_eventListenerCount; }
-
-		const size_t size() const;
-
-		// Pushes a listener to the stack.
-		void push(EventListener* listener);
-
-		// Pops a listener from the stack.
-		void pop(EventListener* listener);
-
-		// Pops the top listener from the stack.
-		void pop();
 	};
 }

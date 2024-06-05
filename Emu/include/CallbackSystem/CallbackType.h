@@ -2,7 +2,6 @@
 
 namespace Engine
 {
-
 	// Callback types which are used to create and trigger callbacks.
 
 	enum Type

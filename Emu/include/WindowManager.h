@@ -2,7 +2,6 @@
 
 #include "../include/SDLWrapper/SDLWrapper.h"
 
-
 namespace Engine
 {
 	// WindowManager class. Manages the window of the application.
@@ -15,16 +14,18 @@ namespace Engine
 		int m_fullscreenWidth;
 		int m_fullscreenHeight;
 
+		void free();
+
 	public:
 		WindowManager(const char* windowTitle);
 		~WindowManager();
 
-		SDLWindow* getWindow() const;
+		SDLWindow* GetWindow() const;
 		const int GetFullscreenWidth() const;
 		const int GetFullscreenHeight() const;
-		void resize(const int newWindowWidth, const int newWindowHeight);
-		void toggleFullscreen();
-		void free();
+
+		void Resize(const int newWindowWidth, const int newWindowHeight);
+		void ToggleFullscreen();
 
 		// Deleted functions to ensure our window manager instance cannot be copied or moved.
 		WindowManager(const WindowManager&) = delete;

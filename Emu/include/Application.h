@@ -6,9 +6,7 @@
 #include "Core.h"
 #include "WindowManager.h"
 #include "RendererManager.h"
-#include "Events/EventManager.h" 
-#include "Events/Event.h"
-#include "Events/EventListenerStack.h"
+#include "Events/EventManager.h"
 #include "Events/EventListener.h"
 #include "Physics/IWorld.h"
 #include "Scenes/Scene.h"
@@ -17,6 +15,19 @@ namespace Engine
 {
 	class Application
 	{
+	public:
+		EMU_API static Application* GetInstance();
+		EMU_API void CreateEventListener(EventListener& eventListener);
+		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
+
+		~Application();
+
+		// Deleted functions to ensure our app instance cannot be copied or moved.
+		Application(const Application&) = delete;
+		Application& operator=(const Application&) = delete;
+		Application(Application&&) = delete;
+		Application& operator=(Application&&) = delete;
+
 	private:
 		static Application* instance;
 		Application();
@@ -26,32 +37,18 @@ namespace Engine
 		// Managers for major engine components.
 		// Maybe decouple from application class?
 		WindowManager m_windowManager;
-		RendererManager* ptrRendererManager;
 
-		// Manages events.
+		RendererManager* ptrRendererManager;
 		EventManager* ptrEventManager;
 
-		// Hold all event listeners.
-		EventListenerStack m_eventListeners;
+		// Application needs one listener for app management events.
+		EventListener* m_ptrAppManagerListener;
 
-		void processEventQueue();
+		void processEventQueue(std::shared_ptr<Scene> scene);
 		void renderScene(std::shared_ptr<Scene> scene, const double interpolation);
 		void defineDefaultApplicationCallbacks();
+		void end();
 
-	public:
-		EMU_API static Application* GetInstance();
-
-		~Application();
-
-		EMU_API void AddEventListener(EventListener& eventListener);
-		EMU_API void RemoveEventListener(EventListener& eventListener);
-		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
-		EMU_API void End();
-
-		// Deleted functions to ensure our app instance cannot be copied or moved.
-		Application(const Application&) = delete;
-		Application& operator=(const Application&) = delete;
-		Application(Application&&) = delete;
-		Application& operator=(Application&&) = delete;
+	
 	};
 }

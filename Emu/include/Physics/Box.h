@@ -2,6 +2,8 @@
 
 #include "../Core.h"
 
+#include "ConversionFunctions.h"
+
 #include "box2d/box2d.h"
 
 #include "BodyTypes.h"
@@ -17,7 +19,6 @@ namespace Engine
 	class Box : public IPhysicsBody
 	{
 	public:
-
 		// Box2D specific members.
 		b2Body* m_body;
 		b2BodyDef m_bodyDef;
@@ -34,70 +35,61 @@ namespace Engine
 
 		float m_prevX;
 		float m_prevY;
-
-		float m_restitution;
-		float m_restitutionThreshold;
-
-		bool m_visible;
+		
 		bool m_collidable;
 		bool m_fixed;
-
-		// Need to interact with contact listener
-		// wrapper to deterime.
-		bool m_onGround;
-		bool m_onRightWall;
-		bool m_onLeftwall;
-
-		bool m_gavityOn;
+		bool m_gravityOn;
 
 	public:
 		Box() = default;
-		Box(const BodyType bodyType, const float startingXInMeters, const float startingYInMeters,
-			const float widthInMeters, const float heightInMeters, const float density, const float friction, const float angle,
-			const float restitution, const float restitutionThreshold, bool visible, bool collidable, bool fixed);
+		Box(const BodyType bodyType, const bool fixed, const float startingXInMeters,
+			const float startingYInMeters, const float widthInMeters, const float heightInMeters);
 
 		~Box();
 
-		// Calls Box2D CreateFixture.
-		void createFixture() override;
-
-		// Getters
-		const float getPrevX() const override;
-		const float getPrevY() const override;
-		
-		const float getCenterXInMeters() const override;
-		const float getCenterYInMeters() const override;
-		const float getTopLeftXInMeters() const override;
-		const float getTopLeftYInMeters() const override;
-
-		const float getWidthInMeters() const override; 
-		const float getHeightInMeters() const override;
-
-		const float getAngleInRadians() const override;
-		const float getAngleInDegrees() const override;
-
-		const BodyType getBodyType() const override;
-
-		// Box2D does not track previous values. 
-		// Need to update them here.
-		void updatePrevX() override;
-		void updatePrevY() override;
-
-		void bodyNotInWorldAlert() const;
-		void removeBodyFromWorld() override;
-
-		void SetXDeceleration(const float xDecel) override;
-
-		void SetXVelocity(const float xVel) override;
-		void SetYVelocity(const float yVel) override;
-		const float GetXVelocity() const override;
-		const float GetYVelocity() const override;
-
-		void GravityOn(bool enabled) override;
+		// Box2D specific functions
+		void RemoveBodyFromWorld() override;
 
 		void ApplyForceToBox(std::pair<float, float> force) override;
 		void ApplyImpulseToBox(std::pair<float, float> impulse) override;
 
 		bool OnGround() const override;
+
+		// Box2d getter and setter wrappers
+		void CreateFixture() override;
+		void SetGravity(bool enabled) override;
+		void SetXDeceleration(const float xDecel) override;
+		void SetXVelocity(const float xVel) override;
+		void SetYVelocity(const float yVel) override;
+		void SetFixedRotation(bool fixed) override;
+		void SetDensity(const float density) override;
+		void SetFriction(const float friction) override;
+		void SetRestitution(const float restitution) override;
+		void SetRestitutionThreshold(const float threshold) override;
+		void SetCollidable(const bool collidable) override;
+		void SetWidthInMeters(const float widthInMeters) override;
+		void SetHeightInMeters(const float heightInMeters) override;
+
+		inline const float GetXVelocity() const override { return m_body->GetLinearVelocity().x; }
+		inline const float GetYVelocity() const override { return m_body->GetLinearVelocity().y; }
+		inline const float GetCenterXInMeters() const override { return m_body->GetPosition().x; }
+		inline const float GetCenterYInMeters() const override { return m_body->GetPosition().y; }
+		inline const float GetTopLeftXInMeters() const override { return (m_body->GetPosition().x - m_widthInMeters / 2.0f); }
+		inline const float GetTopLeftYInMeters() const override { return (m_body->GetPosition().y - m_heightInMeters / 2.0f); }
+		inline const BodyType GetBodyType() const override { return m_bodyType; }
+		inline const float GetAngleInRadians() const override { return m_body->GetAngle(); }
+		inline const float GetAngleInDegrees() const override { return radiansToDegrees(m_body->GetAngle()); }
+		
+		// Box2D does not track previous values.
+		// Need to update them here.
+		void UpdatePrevPosition() override;
+
+		// Non-box2d getters
+		inline const float GetTopLeftPrevX() const override { return m_prevX; }
+		inline const float GetTopLeftPrevY() const override { return m_prevY; }
+		inline const float GetWidthInMeters() const override { return m_widthInMeters; }
+		inline const float GetHeightInMeters() const override { return m_heightInMeters; }
+		inline const float GetSizeInMeters() const override { return m_widthInMeters * m_heightInMeters; }
+
 	};
 }

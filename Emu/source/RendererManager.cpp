@@ -36,7 +36,7 @@ namespace Engine
 
 		SDL_SetRenderDrawColor(renderer, 'd3', 'd3', 'd3', SDL_ALPHA_OPAQUE);
 
-		setViewport(window);
+		SetViewport(window);
 
 		// Renderer only supports one window.
 		rendererCreated = true;
@@ -62,7 +62,7 @@ namespace Engine
 	// Definition for loadTexture function in RendererManager. 
 	// Returns a const SDL_Texture*. Takes a file (probably a sprite sheet) 
 	// full of the textures we want to load.
-	const SDLTexture* RendererManager::loadTexture(const char* filePath)
+	const SDLTexture* RendererManager::LoadTexture(const char* filePath)
 	{
 		SDLTexture* texture =  IMG_LoadTexture(renderer, filePath);
 		if (texture == nullptr)
@@ -73,19 +73,19 @@ namespace Engine
 	}
 
 	// Wrapper for SDL_RenderClear. Clears the screen.
-	void RendererManager::clearScreen()
+	void RendererManager::ClearScreen()
 	{
 		SDL_RENDER_CLEAR(renderer);
 	}
 
 	// Wrapper for SDL_RenderPresent. Talks to the actual hardwares renderer to display the renderer.
-	void RendererManager::display()
+	void RendererManager::Display()
 	{
 		SDL_RENDER_PRESENT(renderer);
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void RendererManager::render(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation)
+	void RendererManager::Render(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation)
 	{
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
@@ -97,17 +97,17 @@ namespace Engine
 			// This rect will eventually be the outline of the texture we want to render,
 			// not the collidable object tracked by the underlying box2d body.
 
-			static_cast<int>(round((ptrBody->getPrevX() * (1.0 - interpolation) + ptrBody->getTopLeftXInMeters() * interpolation) * pixelsPerMeter * SCALE)),
-			static_cast<int>(round((ptrBody->getPrevY() * (1.0 - interpolation) + ptrBody->getTopLeftYInMeters() * interpolation) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((ptrBody->GetTopLeftPrevX() * (1.0 - interpolation) + ptrBody->GetTopLeftXInMeters() * interpolation) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((ptrBody->GetTopLeftPrevY() * (1.0 - interpolation) + ptrBody->GetTopLeftYInMeters() * interpolation) * pixelsPerMeter * SCALE)),
 			
-			static_cast<int>(round(ptrBody->getWidthInMeters() * pixelsPerMeter * SCALE)),
-			static_cast<int>(round(ptrBody->getHeightInMeters() * pixelsPerMeter * SCALE))
+			static_cast<int>(round(ptrBody->GetWidthInMeters() * pixelsPerMeter * SCALE)),
+			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))
 		};
 
-		SDL_RENDER_COPY_EX(renderer, sceneObject->GetTexture()->m_texture, nullptr, &dst, ptrBody->getAngleInDegrees(), nullptr, SDL_FLIP_NONE);
+		SDL_RENDER_COPY_EX(renderer, sceneObject->GetTexture()->m_texture, nullptr, &dst, ptrBody->GetAngleInDegrees(), nullptr, SDL_FLIP_NONE);
 	}
 
-	void RendererManager::setViewport(SDLWindow* ptrWindow)
+	void RendererManager::SetViewport(SDLWindow* ptrWindow)
 	{
 		int windowWidth, windowHeight;
 		SDL_GET_WINDOW_SIZE(ptrWindow, &windowWidth, &windowHeight);
