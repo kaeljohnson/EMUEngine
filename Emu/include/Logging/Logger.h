@@ -9,6 +9,9 @@ namespace Engine
 
 	class Logger
 	{
+	public:
+		EMU_API inline static spdlog::logger& getClientLogger() { return *s_ClientLogger; }
+
 	private:
 		static std::shared_ptr<spdlog::logger> s_EngineLogger;
 		static std::shared_ptr<spdlog::logger> s_ClientLogger;
@@ -16,7 +19,6 @@ namespace Engine
 		static void Init();
 
 		inline static spdlog::logger& getEngineLogger() { return *s_EngineLogger; }
-		EMU_API inline static spdlog::logger& getClientLogger() { return *s_ClientLogger; }
 	};
 
 #if defined(DEBUG)

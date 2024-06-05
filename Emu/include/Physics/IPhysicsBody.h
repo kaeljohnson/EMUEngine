@@ -55,7 +55,5 @@ namespace Engine
 		virtual void ApplyImpulseToBox(std::pair<float, float> impulse) = 0;
 
 		virtual bool OnGround() const = 0;
-
-		
 	};
 }

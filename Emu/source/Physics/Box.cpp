@@ -4,7 +4,6 @@
 
 #include "../../include/Physics/Box.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/Physics/ConversionFunctions.h"
 #include "../../include/Physics/BodyTypes.h"
 
 namespace Engine
@@ -115,22 +114,4 @@ namespace Engine
 	void Box::SetCollidable(const bool collidable) { m_collidable = collidable; }
 	void Box::SetWidthInMeters(const float widthInMeters) { m_shape.SetAsBox(widthInMeters / 2.0f, m_halfHeightInMeters); }
 	void Box::SetHeightInMeters(const float heightInMeters) { m_shape.SetAsBox(m_halfWidthInMeters, heightInMeters / 2.0f); }
-
-	const BodyType Box::GetBodyType() const { return m_bodyType; }
-	const float Box::GetWidthInMeters() const { return m_widthInMeters; }
-	const float Box::GetHeightInMeters() const { return m_heightInMeters; }
-	const float Box::GetSizeInMeters() const { return m_widthInMeters * m_heightInMeters; }
-	const float Box::GetXVelocity() const { return m_body->GetLinearVelocity().x; }
-	const float Box::GetYVelocity() const { return m_body->GetLinearVelocity().y; }
-	
-	const float Box::GetTopLeftPrevX() const { return m_prevX; }
-	const float Box::GetTopLeftPrevY() const { return m_prevY; }
-
-	const float Box::GetCenterXInMeters() const { return (m_body->GetPosition().x); }
-	const float Box::GetCenterYInMeters() const { return (m_body->GetPosition().y); }
-	const float Box::GetTopLeftXInMeters() const { return (m_body->GetPosition().x - m_widthInMeters / 2.0f); }
-	const float Box::GetTopLeftYInMeters() const { return (m_body->GetPosition().y - m_heightInMeters / 2.0f); }
-
-	const float Box::GetAngleInRadians() const { return m_body->GetAngle(); }
-	const float Box::GetAngleInDegrees() const { return radiansToDegrees(m_body->GetAngle()); }
 }

@@ -63,8 +63,6 @@ namespace Engine
 		// Engine processig events
 		ENGINE_NOT_INITIALIZED, ENGINE_INITIALIZED, ENGINE_SHUTDOWN, ENGINE_ERROR
 	};
-
-
 	
 	// Custom event class to hide the SDL2 event from the user.
 	class Event

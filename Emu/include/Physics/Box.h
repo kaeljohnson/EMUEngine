@@ -2,6 +2,8 @@
 
 #include "../Core.h"
 
+#include "ConversionFunctions.h"
+
 #include "box2d/box2d.h"
 
 #include "BodyTypes.h"
@@ -67,26 +69,27 @@ namespace Engine
 		void SetCollidable(const bool collidable) override;
 		void SetWidthInMeters(const float widthInMeters) override;
 		void SetHeightInMeters(const float heightInMeters) override;
-		const float GetXVelocity() const override;
-		const float GetYVelocity() const override;
-		const float GetCenterXInMeters() const override;
-		const float GetCenterYInMeters() const override;
-		const float GetTopLeftXInMeters() const override;
-		const float GetTopLeftYInMeters() const override;
-		const BodyType GetBodyType() const override;
-		const float GetAngleInRadians() const override;
-		const float GetAngleInDegrees() const override;
+
+		inline const float GetXVelocity() const override { return m_body->GetLinearVelocity().x; }
+		inline const float GetYVelocity() const override { return m_body->GetLinearVelocity().y; }
+		inline const float GetCenterXInMeters() const override { return m_body->GetPosition().x; }
+		inline const float GetCenterYInMeters() const override { return m_body->GetPosition().y; }
+		inline const float GetTopLeftXInMeters() const override { return (m_body->GetPosition().x - m_widthInMeters / 2.0f); }
+		inline const float GetTopLeftYInMeters() const override { return (m_body->GetPosition().y - m_heightInMeters / 2.0f); }
+		inline const BodyType GetBodyType() const override { return m_bodyType; }
+		inline const float GetAngleInRadians() const override { return m_body->GetAngle(); }
+		inline const float GetAngleInDegrees() const override { return radiansToDegrees(m_body->GetAngle()); }
 		
 		// Box2D does not track previous values.
 		// Need to update them here.
 		void UpdatePrevPosition() override;
 
 		// Non-box2d getters
-		const float GetTopLeftPrevX() const override;
-		const float GetTopLeftPrevY() const override;
-		const float GetWidthInMeters() const override; 
-		const float GetHeightInMeters() const override;
-		const float GetSizeInMeters() const override;
+		inline const float GetTopLeftPrevX() const override { return m_prevX; }
+		inline const float GetTopLeftPrevY() const override { return m_prevY; }
+		inline const float GetWidthInMeters() const override { return m_widthInMeters; }
+		inline const float GetHeightInMeters() const override { return m_heightInMeters; }
+		inline const float GetSizeInMeters() const override { return m_widthInMeters * m_heightInMeters; }
 
 	};
 }

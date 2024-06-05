@@ -16,6 +16,19 @@ namespace Engine
 {
 	class Application
 	{
+	public:
+		EMU_API static Application* GetInstance();
+		EMU_API void CreateEventListener(EventListener& eventListener);
+		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
+
+		~Application();
+
+		// Deleted functions to ensure our app instance cannot be copied or moved.
+		Application(const Application&) = delete;
+		Application& operator=(const Application&) = delete;
+		Application(Application&&) = delete;
+		Application& operator=(Application&&) = delete;
+
 	private:
 		static Application* instance;
 		Application();
@@ -37,17 +50,6 @@ namespace Engine
 		void defineDefaultApplicationCallbacks();
 		void end();
 
-	public:
-		EMU_API static Application* GetInstance();
-		~Application();
-
-		EMU_API void CreateEventListener(EventListener& eventListener);
-		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
-
-		// Deleted functions to ensure our app instance cannot be copied or moved.
-		Application(const Application&) = delete;
-		Application& operator=(const Application&) = delete;
-		Application(Application&&) = delete;
-		Application& operator=(Application&&) = delete;
+	
 	};
 }
