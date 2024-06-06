@@ -8,6 +8,7 @@
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Physics/IPhysicsBody.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
+#include "../include/Textures/ITexture.h"
 #include "../include/Textures/Texture.h"
 
 namespace Engine
@@ -206,7 +207,8 @@ namespace Engine
 			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))
 		};
 
-		SDL_Texture* texture = static_cast<Texture*>(sceneObject->GetTexture())->m_texture;
+		// SDL_Texture* texture = static_cast<Texture*>(sceneObject->GetTexture())->m_texture;
+		SDLTexture* texture = static_cast<Texture*>(sceneObject->GetTexture().get())->m_texture;
 
 		SDL_RENDER_COPY_EX(m_ptrRenderer, sceneObject->GetTexture()->m_texture, nullptr, &dst, ptrBody->GetAngleInDegrees(), nullptr, SDL_FLIP_NONE);
 	}
