@@ -23,7 +23,7 @@ namespace Engine
 
 		// Gotta be an easier way?
 		// Is there a way to get the full screen size without toggling fullscreen by default?
-		SDL_DisplayMode displayMode;
+		SDLDisplayMode displayMode;
 		if (SDL_GET_DESKTOP_DISPLAY_MODE(0, &displayMode) != 0)
 		{
 			ENGINE_CRITICAL_D("Get desktop display mode failed: {}", SDL_GET_ERROR());
@@ -33,7 +33,7 @@ namespace Engine
 		m_fullscreenHeight = displayMode.h;
 	}
 
-	SDL_Window* WindowManager::GetWindow() const
+	SDLWindow* WindowManager::GetWindow() const
 	{
 		return window;
 	}

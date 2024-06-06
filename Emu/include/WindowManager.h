@@ -8,7 +8,6 @@ namespace Engine
 	class WindowManager
 	{
 	private:
-		// SDL_Window* pointer. This is the window that will be used to display the application.
 		SDLWindow* window;
 
 		int m_fullscreenWidth;

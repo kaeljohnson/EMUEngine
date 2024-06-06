@@ -17,8 +17,8 @@ int main(int argc, char* args[])
 	scene->SetSimulation(0.0f, 9.8f, 10);
 
 	// Temp
-	Engine::Texture tempTextureRed(255, 0, 0);
-	Engine::Texture tempTextureBlue(0, 0, 265);
+	Engine::TexturePtr tempTextureRed = Engine::CreateTexture(255, 0, 0);
+	Engine::TexturePtr tempTextureBlue = Engine::CreateTexture(0, 0, 265);
 	
 	Engine::Controllable player(Engine::DYNAMIC, false, 63.5f, 3.0f, 1.0f, 2.0f, tempTextureRed);
 

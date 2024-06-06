@@ -66,7 +66,7 @@ namespace Engine
 		const int pixelsPerMeter = currentScene->GetPixelsPerMeter();
 		const float timeStep = TIME_STEP;
 
-		double currentTime = SDL_GetTicks() / 1000.0;
+		double currentTime = SDL_GET_TICKS() / 1000.0;
 		double accumulator = 0.0;
 
 		// Application loop.
@@ -81,7 +81,7 @@ namespace Engine
 				5. Display the rendered scene.
 			*/
 
-			double newTime = SDL_GetTicks() / 1000.0;
+			double newTime = SDL_GET_TICKS() / 1000.0;
 			double frameTime = newTime - currentTime;
 			currentTime = newTime;
 

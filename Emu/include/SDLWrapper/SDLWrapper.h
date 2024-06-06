@@ -14,6 +14,11 @@ namespace Engine
 	using SDLSurface = SDL_Surface;
 	using SDLDisplayMode = SDL_DisplayMode;
 	using SDLEvent = SDL_Event;
+	using SDLWindowEvent = SDL_WindowEvent;
+	using SDLKeycode = SDL_Keycode;
+	using SDLMouseMotionEvent = SDL_MouseMotionEvent;
+	using SDLMouseButtonEvent = SDL_MouseButtonEvent;
+	using SDLMouseWheelEvent = SDL_MouseWheelEvent;
 
 	#define SDL_INIT() SDL_Init(SDL_INIT_VIDEO)
 	#define IMG_INIT(flags) IMG_Init(flags)
@@ -41,5 +46,10 @@ namespace Engine
 	#define SDL_FREE_SURFACE(surface) SDL_FreeSurface(surface)
 	#define SDL_DESTROY_TEXTURE(texture) SDL_DestroyTexture(texture)
 	#define SDL_GET_ERROR() SDL_GetError()
+	#define SDL_GET_TICKS() SDL_GetTicks()
+}
+
+namespace Engine
+{
 
 }

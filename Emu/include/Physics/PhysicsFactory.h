@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../Core.h"
-
 #include "IPhysicsBody.h"
 #include "IWorld.h"
 

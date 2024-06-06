@@ -5,7 +5,7 @@
 
 #include "Core.h"
 #include "WindowManager.h"
-#include "RendererManager.h"
+#include "Rendering/RendererManager.h"
 #include "Events/EventManager.h"
 #include "Events/EventListener.h"
 #include "Physics/IWorld.h"

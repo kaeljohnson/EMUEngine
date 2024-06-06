@@ -42,12 +42,12 @@ namespace Engine
         std::pair<int, int> m_scrollDirection;
 
         void dispatchQuitEvent();
-        void dispatchWindowEvent(SDL_WindowEvent& windowEvent);
-        void dispatchKeydownEvent(SDL_Keycode& keyCode);
-        void dispatchKeyupEvent(SDL_Keycode& keyCode);
-        void dispatchMouseMoveEvent(SDL_MouseMotionEvent& mouseMotion);
-        void dispatchMouseButtonDownEvent(SDL_MouseButtonEvent& mouseButtonEvent);
-        void dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent);
-        void dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent);
+        void dispatchWindowEvent(SDLWindowEvent& windowEvent);
+        void dispatchKeydownEvent(SDLKeycode& keyCode);
+        void dispatchKeyupEvent(SDLKeycode& keyCode);
+        void dispatchMouseMoveEvent(SDLMouseMotionEvent& mouseMotion);
+        void dispatchMouseButtonDownEvent(SDLMouseButtonEvent& mouseButtonEvent);
+        void dispatchMouseButtonUpEvent(SDLMouseButtonEvent& mouseButtonEvent);
+        void dispatchMouseScrollEvent(SDLMouseWheelEvent& mouseWheelEvent);
     };
 }

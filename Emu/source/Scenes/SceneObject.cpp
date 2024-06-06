@@ -5,15 +5,15 @@
 #include "../../include/CommonFunctions.h"
 #include "../../include/Scenes/SceneObject.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/Textures/Texture.h"
+#include "../../include/Textures/ITexture.h"
 #include "../../include/Physics/PhysicsFactory.h"
 
 namespace Engine
 {
 	SceneObject::SceneObject(const BodyType bodyType, const bool fixed, const float startingXInMeters, const float startingYInMeters,
-		const float widthInMeters, const float heightInMeters, Texture& refTexture)
+		const float widthInMeters, const float heightInMeters, std::shared_ptr<ITexture> ptrTexture)
 		: m_physicsBody(CreatePhysicsBody(bodyType, fixed, startingXInMeters, startingYInMeters, widthInMeters, heightInMeters)), 
-		m_texture(&refTexture), Enabled(true), Visible(true), uuid(CreateUUID())
+		m_texture(ptrTexture), Enabled(true), Visible(true), uuid(CreateUUID())
 	{
 		ENGINE_INFO_D("SceneObject created");
 	}

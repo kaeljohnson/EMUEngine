@@ -170,7 +170,7 @@ namespace Engine
         eventQ.push({ QUIT });
     }
 
-    void EventManager::dispatchWindowEvent(SDL_WindowEvent& windowEvent)
+    void EventManager::dispatchWindowEvent(SDLWindowEvent& windowEvent)
     {
         switch (windowEvent.event)
         {
@@ -179,7 +179,7 @@ namespace Engine
         }
     }
 
-    void EventManager::dispatchKeydownEvent(SDL_Keycode& keyCode)
+    void EventManager::dispatchKeydownEvent(SDLKeycode& keyCode)
     {
         switch (keyCode)
         {
@@ -237,7 +237,7 @@ namespace Engine
         }
     }
 
-    void EventManager::dispatchKeyupEvent(SDL_Keycode& keyCode)
+    void EventManager::dispatchKeyupEvent(SDLKeycode& keyCode)
     {
         switch (keyCode)
         {
@@ -295,14 +295,14 @@ namespace Engine
         }
     }
 
-    void EventManager::dispatchMouseMoveEvent(SDL_MouseMotionEvent& mouseMotion)
+    void EventManager::dispatchMouseMoveEvent(SDLMouseMotionEvent& mouseMotion)
     {
         m_mousePosition.first = mouseMotion.x;
         m_mousePosition.second = mouseMotion.y;
         eventQ.push({ MOUSE_MOVE, mouseMotion.x, mouseMotion.y });
     }
 
-    void EventManager::dispatchMouseButtonDownEvent(SDL_MouseButtonEvent& mouseButtonEvent)
+    void EventManager::dispatchMouseButtonDownEvent(SDLMouseButtonEvent& mouseButtonEvent)
     {
         switch (mouseButtonEvent.button)
         {
@@ -312,7 +312,7 @@ namespace Engine
         default: break;
         }
     }
-    void EventManager::dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent)
+    void EventManager::dispatchMouseButtonUpEvent(SDLMouseButtonEvent& mouseButtonEvent)
     {
         switch (mouseButtonEvent.button)
         {
@@ -322,7 +322,7 @@ namespace Engine
         default: break;
         }
     }
-    void EventManager::dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent)
+    void EventManager::dispatchMouseScrollEvent(SDLMouseWheelEvent& mouseWheelEvent)
     {
         m_scrollDirection.first = mouseWheelEvent.x;
         m_scrollDirection.second = mouseWheelEvent.y;

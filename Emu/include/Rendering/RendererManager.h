@@ -1,8 +1,11 @@
 #pragma once
 
-#include "../include/SDLWrapper/SDLWrapper.h"
+#include <memory>
 
-#include "Scenes/SceneObject.h"
+#include "../SDLWrapper/SDLWrapper.h"
+
+#include "IRenderer.h"
+#include "../Scenes/SceneObject.h"
 
 namespace Engine
 {
@@ -11,32 +14,17 @@ namespace Engine
     private:
         RendererManager();
         static RendererManager* instance;
-        SDLRenderer* renderer;
-
-        const int VIRTUAL_WIDTH;
-        const int VIRTUAL_HEIGHT;
-
-        float SCALE_X;
-        float SCALE_Y;
-        float SCALE;
-
-        int viewportWidth;
-        int viewportHeight;
-        int viewportX;
-        int viewportY;
-
-        bool rendererCreated;
+        std::shared_ptr<IRenderer> m_renderer;
 
         void free();
 
     public:
         static RendererManager* GetInstance();
         void CreateRenderer(SDLWindow* window);
-        SDLRenderer* GetRenderer() const;
+        std::shared_ptr<IRenderer> GetRenderer() const;
 
         ~RendererManager();
 
-        const SDLTexture* LoadTexture(const char* filePath);
         void SetViewport(SDLWindow* ptrWindow);
         void ClearScreen();
         void Render(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation);
