@@ -95,9 +95,6 @@ project "GameV1"
     links
     {
         "Emu",
-        "SDL2",
-		"/manual-link/SDL2main",
-		"SDL2_image",
     }
 
     filter "system:windows"

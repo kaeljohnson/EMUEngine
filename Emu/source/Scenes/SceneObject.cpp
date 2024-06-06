@@ -11,9 +11,9 @@
 namespace Engine
 {
 	SceneObject::SceneObject(const BodyType bodyType, const bool fixed, const float startingXInMeters, const float startingYInMeters,
-		const float widthInMeters, const float heightInMeters, ITexture& refTexture)
+		const float widthInMeters, const float heightInMeters, std::shared_ptr<ITexture> ptrTexture)
 		: m_physicsBody(CreatePhysicsBody(bodyType, fixed, startingXInMeters, startingYInMeters, widthInMeters, heightInMeters)),
-		m_texture(&refTexture), Enabled(true), Visible(true), uuid(CreateUUID())
+		m_texture(ptrTexture), Enabled(true), Visible(true), uuid(CreateUUID())
 	{
 		ENGINE_INFO_D("SceneObject created");
 	}
