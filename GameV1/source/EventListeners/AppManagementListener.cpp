@@ -40,6 +40,4 @@ void AppManagementListener::ProcessEvent(Engine::Event& e)
 		default:
 			break;
 	}
-
-
 }

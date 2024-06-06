@@ -6,7 +6,7 @@
 #include "../Core.h"
 
 #include "../Physics/IPhysicsBody.h"
-#include "../Textures/Texture.h"
+#include "../Textures/ITexture.h"
 
 namespace Engine
 {
@@ -20,7 +20,7 @@ namespace Engine
 
 	public:
 		EMU_API SceneObject(const BodyType bodyType, const bool fixed, const float startingXInMeters,
-			const float startingYInMeters, const float widthInMeters, const float heightInMeters, Texture& refTexture);
+			const float startingYInMeters, const float widthInMeters, const float heightInMeters, ITexture& refTexture);
 
 		EMU_API virtual ~SceneObject() = default;
 
@@ -30,9 +30,9 @@ namespace Engine
 
 		// Should clients be able to get the physics body?
 		EMU_API inline std::shared_ptr<IPhysicsBody> GetPhysicsBody() { return m_physicsBody; }
+		EMU_API inline const ITexture* GetTexture() const { return m_texture; }
 		EMU_API inline const float GetXVelocity() const { return m_physicsBody->GetXVelocity(); }
 		EMU_API inline const float GetYVelocity() const { return m_physicsBody->GetYVelocity(); }
-		EMU_API inline Texture* GetTexture() { return m_texture; }
 		EMU_API inline std::string GetUUID() const { return uuid; }
 
 		EMU_API virtual void Update();
@@ -44,7 +44,7 @@ namespace Engine
 		std::string uuid;
 
 	protected:
-		Texture* m_texture;
+		ITexture* m_texture;
 		std::shared_ptr<IPhysicsBody> m_physicsBody;
 
 	};
