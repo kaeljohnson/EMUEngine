@@ -5,7 +5,7 @@
 #include "../../include/Events/EventManager.h"
 #include "../../include/Controllable/Controllable.h"
 #include "../../include/Textures/ITexture.h"
-#include "../../include/Logging/Logger.h"
+#include "../../include/Logging/ILogger.h"
 
 namespace Engine
 {

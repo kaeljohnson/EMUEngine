@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "../../include/Physics/Box.h"
-#include "../../include/Logging/Logger.h"
+#include "../../include/Logging/ILogger.h"
 #include "../../include/Physics/BodyTypes.h"
 
 namespace Engine
@@ -41,8 +41,8 @@ namespace Engine
 		m_fixtureDef.density = 1.0f;
 		m_fixtureDef.friction = 1.0f;
 
-		ENGINE_INFO_D("Box created at position: {0}, {1}. With width: {2}, height: {3}",
-			startingXInMeters, startingYInMeters, m_widthInMeters, m_heightInMeters);
+		ENGINE_INFO_D("Box created at position: " + std::to_string(startingXInMeters) + "," + 
+			std::to_string(startingYInMeters) + " With width: " + std::to_string(m_widthInMeters) + ", height: " + std::to_string(m_heightInMeters));
 	}
 
 	Box::~Box()

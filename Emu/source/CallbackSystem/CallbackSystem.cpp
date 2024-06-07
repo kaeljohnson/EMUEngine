@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../include/CallbackSystem/CallbackSystem.h"
-#include "../../include/Logging/Logger.h"
+#include "../../include/Logging/ILogger.h"
 
 namespace Engine
 {

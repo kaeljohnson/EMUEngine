@@ -6,6 +6,7 @@
 #include <chrono>
 
 #include "../include/EngineConstants.h"
+#include "../include/Logging/ILogger.h"
 #include "../include/Logging/Logger.h"
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
@@ -183,7 +184,7 @@ namespace Engine
 
 			if (!currentEvent.Handled)
 			{
-				ENGINE_TRACE_D("Unhandled Event: {}", static_cast<int>(currentEvent.Type));
+				ENGINE_TRACE_D("Unhandled Event: " + static_cast<int>(currentEvent.Type));
 			}
 
 			ptrEventManager->eventQ.pop();

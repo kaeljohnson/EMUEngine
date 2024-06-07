@@ -8,7 +8,7 @@ int main(int argc, char* args[])
 {
 	Engine::Init();
 
-	CLIENT_INFO_D("Client Running!");
+	ENGINE_INFO_D("Client Running!");
 
 	Engine::ApplicationPtr ptrAppInstance = Engine::Application::GetInstance();
 
@@ -52,7 +52,7 @@ int main(int argc, char* args[])
 	ClientObject testBlock21(Engine::STATIC, false, 35.0f, 15.0f, 1.0f, 1.0f, tempTextureBlue);
 	ClientObject testBlock22(Engine::STATIC, false, 40.0f, 10.0f, 1.0f, 1.0f, tempTextureBlue);
 	
-	CLIENT_INFO_D(player.GetUUID());
+	ENGINE_INFO_D(player.GetUUID());
 
 	AppManagementListener appManagementListener("App management listener");
 

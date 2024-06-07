@@ -2,7 +2,7 @@
 
 #include "../../include/Events/EventListenerStack.h"
 #include "../../include/Events/EventListener.h"
-#include "../../include/Logging/Logger.h"
+#include "../../include/Logging/ILogger.h"
 
 namespace Engine
 {

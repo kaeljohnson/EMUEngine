@@ -5,7 +5,7 @@
 #include "../../include/EngineConstants.h"
 #include "../../include/Physics/World.h"
 #include "../../include/Physics/Box.h"
-#include "../../include/Logging/Logger.h"
+#include "../../include/Logging/ILogger.h"
 
 namespace Engine
 {
@@ -45,8 +45,9 @@ namespace Engine
 		box->m_body = m_world.CreateBody(&box->m_bodyDef);
 		box->CreateFixture();
 
-		ENGINE_INFO_D("Box added to world at position: {0}, {1}. With width: {2}, height: {3}",
-			box->GetCenterXInMeters(), box->GetCenterYInMeters(), box->GetWidthInMeters(), box->GetHeightInMeters());
+		ENGINE_INFO_D("Box added to world at position: " + std::to_string(box->GetCenterXInMeters()) + ", " 
+			+ std::to_string(box->GetCenterYInMeters()) +". With width : " 
+			+ std::to_string(box->GetWidthInMeters()) +", height : " + std::to_string(box->GetHeightInMeters()));
 	}
 
 	void World::RemoveBox(std::shared_ptr<Box> body)
