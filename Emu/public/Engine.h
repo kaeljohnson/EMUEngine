@@ -10,9 +10,9 @@
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
 #include "../include/Events/EventListener.h"
-#include "../include/Events/EventManager.h"
 #include "../include/Physics/BodyTypes.h"
-#include "../include/Textures/Texture.h"
+#include "../include/Textures/ITexture.h"
+#include "../include/Textures/TextureFactory.h"
 #include "../include/Physics/IPhysicsBody.h"
 #include "../include/Physics/PhysicsFactory.h"
 #include "../include/Controllable/Controllable.h"
@@ -24,4 +24,5 @@ namespace Engine
 	using PhysicsBodyPtr = std::shared_ptr<IPhysicsBody>;
 	using ApplicationPtr = Application*;
 	using ICallbackSystemPtr = ICallbackSystem*;
+	using TexturePtr = std::shared_ptr<ITexture>;
 }

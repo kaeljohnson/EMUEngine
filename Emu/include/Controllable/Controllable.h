@@ -8,7 +8,7 @@
 #include "../Events/EventListener.h"
 #include "../Events/Event.h"
 #include "../Scenes/SceneObject.h"
-#include "../Textures/Texture.h"
+#include "../Textures/ITexture.h"
 
 namespace Engine
 {
@@ -16,7 +16,7 @@ namespace Engine
 	{
 	public:
 		EMU_API Controllable(const BodyType bodyType, const bool fixed, const float startingXInMeters,
-			const float startingYInMeters, const float widthInMeters, const float heightInMeters, Texture& ptrTexture);
+			const float startingYInMeters, const float widthInMeters, const float heightInMeters, std::shared_ptr<ITexture> ptrTexture);
 		EMU_API virtual ~Controllable() = default;
 		EMU_API virtual void Update() override;
 		EMU_API virtual void Jump();

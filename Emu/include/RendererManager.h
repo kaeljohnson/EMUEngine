@@ -8,10 +8,46 @@ namespace Engine
 {
     class RendererManager
     {
+    public:
+        static RendererManager* GetInstance();
+        void CreateRenderer();
+        SDLRenderer* GetRenderer() const;
+
+        ~RendererManager();
+
+        const SDLTexture* LoadTexture(const char* filePath);
+        void SetViewport();
+        void ClearScreen();
+        void Render(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation);
+        void Display();
+
+        // Window related functions.
+        SDLWindow* GetWindow() const;
+        const int GetFullscreenWidth() const;
+        const int GetFullscreenHeight() const;
+
+        void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
+        void ToggleFullscreen();
+
+
+        // Deleted functions to ensure our singleton instance cannot be copied or moved.
+        RendererManager(const RendererManager&) = delete;
+        RendererManager& operator=(const RendererManager&) = delete;
+        RendererManager(RendererManager&&) = delete;
+        RendererManager& operator=(RendererManager&&) = delete;
+
     private:
         RendererManager();
         static RendererManager* instance;
-        SDLRenderer* renderer;
+
+        // May need to decouple if there is ever a need for 
+        // the application to have multiple windows.
+        SDLWindow* m_ptrWindow;
+
+        int m_fullscreenWidth;
+        int m_fullscreenHeight;
+
+        SDLRenderer* m_ptrRenderer;
 
         const int VIRTUAL_WIDTH;
         const int VIRTUAL_HEIGHT;
@@ -20,32 +56,13 @@ namespace Engine
         float SCALE_Y;
         float SCALE;
 
-        int viewportWidth;
-        int viewportHeight;
-        int viewportX;
-        int viewportY;
+        int m_viewportWidth;
+        int m_viewportHeight;
+        int m_viewportX;
+        int m_viewportY;
 
-        bool rendererCreated;
+        bool m_rendererCreated;
 
         void free();
-
-    public:
-        static RendererManager* GetInstance();
-        void CreateRenderer(SDLWindow* window);
-        SDLRenderer* GetRenderer() const;
-
-        ~RendererManager();
-
-        const SDLTexture* LoadTexture(const char* filePath);
-        void SetViewport(SDLWindow* ptrWindow);
-        void ClearScreen();
-        void Render(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation);
-        void Display();
-
-        // Deleted functions to ensure our singleton instance cannot be copied or moved.
-        RendererManager(const RendererManager&) = delete;
-        RendererManager& operator=(const RendererManager&) = delete;
-        RendererManager(RendererManager&&) = delete;
-        RendererManager& operator=(RendererManager&&) = delete;
     };
 }

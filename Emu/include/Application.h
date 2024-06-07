@@ -4,9 +4,6 @@
 #include <memory>
 
 #include "Core.h"
-#include "WindowManager.h"
-#include "RendererManager.h"
-#include "Events/EventManager.h"
 #include "Events/EventListener.h"
 #include "Physics/IWorld.h"
 #include "Scenes/Scene.h"
@@ -34,21 +31,10 @@ namespace Engine
 
 		bool running;
 
-		// Managers for major engine components.
-		// Maybe decouple from application class?
-		WindowManager m_windowManager;
-
-		RendererManager* ptrRendererManager;
-		EventManager* ptrEventManager;
-
 		// Application needs one listener for app management events.
 		EventListener* m_ptrAppManagerListener;
 
-		void processEventQueue(std::shared_ptr<Scene> scene);
-		void renderScene(std::shared_ptr<Scene> scene, const double interpolation);
 		void defineDefaultApplicationCallbacks();
 		void end();
-
-	
 	};
 }
