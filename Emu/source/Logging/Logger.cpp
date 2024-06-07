@@ -6,9 +6,6 @@
 
 namespace Engine
 {
-	// std::shared_ptr<spdlog::logger> Logger::s_EngineLogger;
-	// std::shared_ptr<spdlog::logger> Logger::s_ClientLogger;
-	
 	std::shared_ptr<ILogger> GlobalLogger = CreateLogger();
 
 	Logger::Logger()
@@ -21,28 +18,53 @@ namespace Engine
 		s_ClientLogger->set_level(spdlog::level::trace);
 	}
 
-	void Logger::Trace(const std::string& message)
+	void Logger::EngineTrace(const std::string& message)
 	{
 		s_EngineLogger->trace(message);
 	}
 	
-	void Logger::Info(const std::string& message)
+	void Logger::EngineInfo(const std::string& message)
 	{
 		s_EngineLogger->info(message);
 	}
 	
-	void Logger::Warn(const std::string& message)
+	void Logger::EngineWarn(const std::string& message)
 	{
 		s_EngineLogger->warn(message);
 	}
 	
-	void Logger::Error(const std::string& message)
+	void Logger::EngineError(const std::string& message)
 	{
 		s_EngineLogger->error(message);
 	}
 	
-	void Logger::Critical(const std::string& message)
+	void Logger::EngineCritical(const std::string& message)
 	{
 		s_EngineLogger->critical(message);
+	}
+
+	void Logger::ClientTrace(const std::string& message)
+	{
+		s_ClientLogger->trace(message);
+	}
+
+	void Logger::ClientInfo(const std::string& message)
+	{
+		s_ClientLogger->info(message);
+	}
+
+	void Logger::ClientWarn(const std::string& message)
+	{
+		s_ClientLogger->warn(message);
+	}
+
+	void Logger::ClientError(const std::string& message)
+	{
+		s_ClientLogger->error(message);
+	}
+
+	void Logger::ClientCritical(const std::string& message)
+	{
+		s_ClientLogger->critical(message);
 	}
 }

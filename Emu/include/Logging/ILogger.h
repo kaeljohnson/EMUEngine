@@ -12,11 +12,17 @@ namespace Engine
     public:
         virtual ~ILogger() = default;
 
-        virtual void Trace(const std::string& message) = 0;
-        virtual void Info(const std::string& message) = 0;
-        virtual void Warn(const std::string& message) = 0;
-        virtual void Error(const std::string& message) = 0;
-        virtual void Critical(const std::string& message) = 0;
+        virtual void EngineTrace(const std::string& message) = 0;
+        virtual void EngineInfo(const std::string& message) = 0;
+        virtual void EngineWarn(const std::string& message) = 0;
+        virtual void EngineError(const std::string& message) = 0;
+        virtual void EngineCritical(const std::string& message) = 0;
+
+        virtual void ClientTrace(const std::string& message) = 0;
+        virtual void ClientInfo(const std::string& message) = 0;
+        virtual void ClientWarn(const std::string& message) = 0;
+        virtual void ClientError(const std::string& message) = 0;
+        virtual void ClientCritical(const std::string& message) = 0;
     };
 
     EMU_API extern std::shared_ptr<ILogger> GlobalLogger;
@@ -25,17 +31,17 @@ namespace Engine
 }
 
 #if defined(DEBUG)
-#define ENGINE_TRACE_D(msg)    ::Engine::GlobalLogger->Trace(msg)
-#define ENGINE_INFO_D(msg)     ::Engine::GlobalLogger->Info(msg)
-#define ENGINE_WARN_D(msg)     ::Engine::GlobalLogger->Warn(msg)
-#define ENGINE_ERROR_D(msg)    ::Engine::GlobalLogger->Error(msg)
-#define ENGINE_CRITICAL_D(msg) ::Engine::GlobalLogger->Critical(msg)
+#define ENGINE_TRACE_D(msg)    ::Engine::GlobalLogger->EngineTrace(msg)
+#define ENGINE_INFO_D(msg)     ::Engine::GlobalLogger->EngineInfo(msg)
+#define ENGINE_WARN_D(msg)     ::Engine::GlobalLogger->EngineWarn(msg)
+#define ENGINE_ERROR_D(msg)    ::Engine::GlobalLogger->EngineError(msg)
+#define ENGINE_CRITICAL_D(msg) ::Engine::GlobalLogger->EngineCritical(msg)
 
-//#define CLIENT_TRACE_D(msg)    ::Engine::GlobalLogger->Trace(msg)
-//#define CLIENT_INFO_D(msg)     ::Engine::GlobalLogger->Info(msg)
-//#define CLIENT_WARN_D(msg)     ::Engine::GlobalLogger->Warn(msg)
-//#define CLIENT_ERROR_D(msg)    ::Engine::GlobalLogger->Error(msg)
-//#define CLIENT_CRITICAL_D(msg) ::Engine::GlobalLogger->Critical(msg)
+#define CLIENT_TRACE_D(msg)    ::Engine::GlobalLogger->ClientTrace(msg)
+#define CLIENT_INFO_D(msg)     ::Engine::GlobalLogger->ClientInfo(msg)
+#define CLIENT_WARN_D(msg)     ::Engine::GlobalLogger->ClientWarn(msg)
+#define CLIENT_ERROR_D(msg)    ::Engine::GlobalLogger->ClientError(msg)
+#define CLIENT_CRITICAL_D(msg) ::Engine::GlobalLogger->ClientCritical(msg)
 #elif defined(NDEBUG)
 #define ENGINE_TRACE_D(...)	 ((void)0)
 #define ENGINE_INFO_D(...)	 ((void)0)
@@ -50,14 +56,14 @@ namespace Engine
 #define CLIENT_CRITICAL_D(...) ((void)0)
 #endif
 
-#define ENGINE_TRACE(msg)    ::Engine::GlobalLogger->Trace(msg)
-#define ENGINE_INFO(msg)     ::Engine::GlobalLogger->Info(msg)
-#define ENGINE_WARN(msg)     ::Engine::GlobalLogger->Warn(msg)
-#define ENGINE_ERROR(msg)    ::Engine::GlobalLogger->Error(msg)
-#define ENGINE_CRITICAL(msg) ::Engine::GlobalLogger->Critical(msg)
+#define ENGINE_TRACE(msg)    ::Engine::GlobalLogger->EngineTrace(msg)
+#define ENGINE_INFO(msg)     ::Engine::GlobalLogger->EngineInfo(msg)
+#define ENGINE_WARN(msg)     ::Engine::GlobalLogger->EngineWarn(msg)
+#define ENGINE_ERROR(msg)    ::Engine::GlobalLogger->EngineError(msg)
+#define ENGINE_CRITICAL(msg) ::Engine::GlobalLogger->EngineCritical(msg)
 
-//#define CLIENT_TRACE(msg)    ::Engine::GlobalClientLogger->Trace(msg)
-//#define CLIENT_INFO(msg)     ::Engine::GlobalClientLogger->Info(msg)
-//#define CLIENT_WARN(msg)     ::Engine::GlobalClientLogger->Warn(msg)
-//#define CLIENT_ERROR(msg)    ::Engine::GlobalClientLogger->Error(msg)
-//#define CLIENT_CRITICAL(msg) ::Engine::GlobalClientLogger->Critical(msg)
+#define CLIENT_TRACE(msg)    ::Engine::GlobalClientLogger->ClientTrace(msg)
+#define CLIENT_INFO(msg)     ::Engine::GlobalClientLogger->ClientInfo(msg)
+#define CLIENT_WARN(msg)     ::Engine::GlobalClientLogger->ClientWarn(msg)
+#define CLIENT_ERROR(msg)    ::Engine::GlobalClientLogger->ClientError(msg)
+#define CLIENT_CRITICAL(msg) ::Engine::GlobalClientLogger->ClientCritical(msg)

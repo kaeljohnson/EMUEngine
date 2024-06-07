@@ -5,13 +5,10 @@
 #include "../../include/EventListeners/AppManagementListener.h"
 
 
-AppManagementListener::AppManagementListener(std::string name) : ptrICallbackSystem(Engine::ICallbackSystem::GetInstance()), Engine::EventListener()
-{
-}
+AppManagementListener::AppManagementListener(std::string name) 
+	: ptrICallbackSystem(Engine::ICallbackSystem::GetInstance()), Engine::EventListener() {}
 
-AppManagementListener::~AppManagementListener()
-{
-}
+AppManagementListener::~AppManagementListener() {}
 
 void AppManagementListener::ProcessEvent(Engine::Event& e)
 {
@@ -19,21 +16,21 @@ void AppManagementListener::ProcessEvent(Engine::Event& e)
 	{
 		case (Engine::F_KEY_DOWN):
 			ptrICallbackSystem->TriggerCallback(Engine::Type::ToggleFullscreen, std::monostate{});
-			ENGINE_TRACE_D("Handled event:" + static_cast<int>(Engine::F_KEY_DOWN));
+			CLIENT_TRACE_D("Handled event:" + static_cast<int>(Engine::F_KEY_DOWN));
 			e.Handled = true;
 			break;
 		case (Engine::RESIZE_WINDOW):
 			ptrICallbackSystem->TriggerCallback(Engine::Type::ResizeWindow, std::make_pair(e.X_POS, e.Y_POS));
-			ENGINE_TRACE_D("Handled event: " + static_cast<int>(Engine::RESIZE_WINDOW));
+			CLIENT_TRACE_D("Handled event: " + static_cast<int>(Engine::RESIZE_WINDOW));
 			e.Handled = true;
 			break;
 		case (Engine::ESCAPE_KEY_DOWN):
-			ENGINE_TRACE_D("Handled event: " + static_cast<int>(Engine::ESCAPE_KEY_DOWN));
+			CLIENT_TRACE_D("Handled event: " + static_cast<int>(Engine::ESCAPE_KEY_DOWN));
 			ptrICallbackSystem->TriggerCallback(Engine::Type::EndApplication, std::monostate{});
 			e.Handled = true;
 			break;
 		case (Engine::QUIT):
-			ENGINE_TRACE_D("Handled event: " + static_cast<int>(Engine::QUIT));
+			CLIENT_TRACE_D("Handled event: " + static_cast<int>(Engine::QUIT));
 			ptrICallbackSystem->TriggerCallback(Engine::Type::EndApplication, std::monostate{});
 			e.Handled = true;
 			break;
