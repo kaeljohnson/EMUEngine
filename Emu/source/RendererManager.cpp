@@ -38,7 +38,7 @@ namespace Engine
 
 		if (m_ptrWindow == nullptr)
 		{
-			ENGINE_CRITICAL("Window not created! SDL_Error: {}", SDL_GET_ERROR());
+			ENGINE_CRITICAL("Window not created! SDL_Error: " + std::string(SDL_GET_ERROR()));
 		}
 
 		// Gotta be an easier way?
@@ -46,7 +46,7 @@ namespace Engine
 		SDLDisplayMode displayMode;
 		if (SDL_GET_DESKTOP_DISPLAY_MODE(0, &displayMode) != 0)
 		{
-			ENGINE_CRITICAL_D("Get desktop display mode failed: {}", SDL_GET_ERROR());
+			ENGINE_CRITICAL_D("Get desktop display mode failed: " + std::string(SDL_GET_ERROR()));
 		}
 
 		m_fullscreenWidth = displayMode.w;
@@ -59,7 +59,7 @@ namespace Engine
 		m_ptrRenderer = SDL_CREATE_RENDERER(m_ptrWindow, -1, SDL_RENDERER_ACCELERATED);
 		if (m_ptrRenderer == nullptr)
 		{
-			ENGINE_CRITICAL("Renderer could not be created! SDL Error: {}", SDL_GET_ERROR());
+			ENGINE_CRITICAL("Renderer could not be created! SDL Error: " + std::string(SDL_GET_ERROR()));
 		}
 
 		SDL_SetRenderDrawColor(m_ptrRenderer, 'd3', 'd3', 'd3', SDL_ALPHA_OPAQUE);
@@ -128,7 +128,8 @@ namespace Engine
 
 		if (SDL_SET_WINDOW_FULLSCREEN(m_ptrWindow, isFullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)
 		{
-			ENGINE_ERROR("Fullscreen failed! SDL_Error: {}", SDL_GET_ERROR());
+			ENGINE_ERROR("Fullscreen failed! SDL_Error: " + std::string(SDL_GET_ERROR()));
+
 		}
 		else
 		{
@@ -141,7 +142,7 @@ namespace Engine
 
 	void RendererManager::ResizeWindow(const int newWindowWidth, const int newWindowHeight)
 	{
-		ENGINE_TRACE_D("{}, {}", newWindowWidth, newWindowHeight);
+		ENGINE_TRACE_D(std::to_string(newWindowWidth) + ", " + std::to_string(newWindowHeight));
 
 		if (newWindowWidth < m_fullscreenWidth / 2 && newWindowHeight < m_fullscreenHeight / 2)
 		{
@@ -170,7 +171,7 @@ namespace Engine
 		SDLTexture* texture =  IMG_LoadTexture(m_ptrRenderer, filePath);
 		if (texture == nullptr)
 		{
-			ENGINE_CRITICAL("Failed to load texture. SDL Error: {}", SDL_GET_ERROR());
+			ENGINE_CRITICAL("Failed to load texture. SDL Error: " + std::string(SDL_GET_ERROR()));
 		}
 		return texture;
 	}

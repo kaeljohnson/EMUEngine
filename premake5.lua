@@ -84,7 +84,6 @@ project "GameV1"
     {
         "Emu/public",
         "Emu/external/vcpkg/installed/x64-windows/include",
-        "Emu/external/spdlog/include",
     }
 
     libdirs

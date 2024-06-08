@@ -1,61 +1,66 @@
 #pragma once
 
 #include "../Core.h"
-#include "spdlog/spdlog.h"
+
+#include <string>
+#include <memory>
 
 namespace Engine
 {
-	// Basic logging from spdlog.
-
 	class Logger
 	{
 	public:
-		EMU_API inline static spdlog::logger& getClientLogger() { return *s_ClientLogger; }
+		Logger();
 
-	private:
-		static std::shared_ptr<spdlog::logger> s_EngineLogger;
-		static std::shared_ptr<spdlog::logger> s_ClientLogger;
-	public:
-		static void Init();
-
-		inline static spdlog::logger& getEngineLogger() { return *s_EngineLogger; }
+		EMU_API void EngineTrace(const std::string& str);
+		EMU_API void EngineInfo(const std::string& str);
+		EMU_API void EngineWarn(const std::string& str);
+		EMU_API void EngineError(const std::string& str);
+		EMU_API void EngineCritical(const std::string& str);
+		EMU_API void ClientTrace(const std::string& str);
+		EMU_API void ClientInfo(const std::string& str);
+		EMU_API void ClientWarn(const std::string& str);
+		EMU_API void ClientError(const std::string& str);
+		EMU_API void ClientCritical(const std::string& str);
 	};
 
+	EMU_API extern std::shared_ptr<Logger> GlobalLogger;
+}
+
 #if defined(DEBUG)
-	#define ENGINE_TRACE_D(...)	   ::Engine::Logger::getEngineLogger().trace(__VA_ARGS__)
-	#define ENGINE_INFO_D(...)	   ::Engine::Logger::getEngineLogger().info(__VA_ARGS__)
-	#define ENGINE_WARN_D(...)	   ::Engine::Logger::getEngineLogger().warn(__VA_ARGS__)
-	#define ENGINE_ERROR_D(...)	   ::Engine::Logger::getEngineLogger().error(__VA_ARGS__)
-	#define ENGINE_CRITICAL_D(...) ::Engine::Logger::getEngineLogger().critical(__VA_ARGS__)
+#define ENGINE_TRACE_D(msg)    ::Engine::GlobalLogger->EngineTrace(std::string(msg))
+#define ENGINE_INFO_D(msg)     ::Engine::GlobalLogger->EngineInfo(std::string(msg))
+#define ENGINE_WARN_D(msg)     ::Engine::GlobalLogger->EngineWarn(std::string(msg))
+#define ENGINE_ERROR_D(msg)    ::Engine::GlobalLogger->EngineError(std::string(msg))
+#define ENGINE_CRITICAL_D(msg) ::Engine::GlobalLogger->EngineCritical(std::string(msg))
 
-	#define CLIENT_TRACE_D(...)	   ::Engine::Logger::getClientLogger().trace(__VA_ARGS__)
-	#define CLIENT_INFO_D(...)	   ::Engine::Logger::getClientLogger().info(__VA_ARGS__)
-	#define CLIENT_WARN_D(...)	   ::Engine::Logger::getClientLogger().warn(__VA_ARGS__)
-	#define CLIENT_ERROR_D(...)	   ::Engine::Logger::getClientLogger().error(__VA_ARGS__)
-	#define CLIENT_CRITICAL_D(...) ::Engine::Logger::getClientLogger().critical(__VA_ARGS__)
+#define CLIENT_TRACE_D(msg)    ::Engine::GlobalLogger->ClientTrace(std::string(msg))
+#define CLIENT_INFO_D(msg)     ::Engine::GlobalLogger->ClientInfo(std::string(msg))
+#define CLIENT_WARN_D(msg)     ::Engine::GlobalLogger->ClientWarn(std::string(msg))
+#define CLIENT_ERROR_D(msg)    ::Engine::GlobalLogger->ClientError(std::string(msg))
+#define CLIENT_CRITICAL_D(msg) ::Engine::GlobalLogger->ClientCritical(std::string(msg))
 #elif defined(NDEBUG)
-	#define ENGINE_TRACE_D(...)	 ((void)0)
-	#define ENGINE_INFO_D(...)	 ((void)0)
-	#define ENGINE_WARN_D(...)	 ((void)0)
-	#define ENGINE_ERROR_D(...)	 ((void)0)
-	#define ENGINE_CRITICAL_D(...) ((void)0)
+#define ENGINE_TRACE_D(...)	 ((void)0)
+#define ENGINE_INFO_D(...)	 ((void)0)
+#define ENGINE_WARN_D(...)	 ((void)0)
+#define ENGINE_ERROR_D(...)	 ((void)0)
+#define ENGINE_CRITICAL_D(...) ((void)0)
 
-	#define CLIENT_TRACE_D(...)	 ((void)0)
-	#define CLIENT_INFO_D(...)	 ((void)0)
-	#define CLIENT_WARN_D(...)	 ((void)0)
-	#define CLIENT_ERROR_D(...)	 ((void)0)
-	#define CLIENT_CRITICAL_D(...) ((void)0)
+#define CLIENT_TRACE_D(...)	 ((void)0)
+#define CLIENT_INFO_D(...)	 ((void)0)
+#define CLIENT_WARN_D(...)	 ((void)0)
+#define CLIENT_ERROR_D(...)	 ((void)0)
+#define CLIENT_CRITICAL_D(...) ((void)0)
 #endif
 
-	#define ENGINE_TRACE(...)    ::Engine::Logger::getEngineLogger().trace(__VA_ARGS__)
-	#define ENGINE_INFO(...)     ::Engine::Logger::getEngineLogger().info(__VA_ARGS__)
-	#define ENGINE_WARN(...)     ::Engine::Logger::getEngineLogger().warn(__VA_ARGS__)
-	#define ENGINE_ERROR(...)    ::Engine::Logger::getEngineLogger().error(__VA_ARGS__)
-	#define ENGINE_CRITICAL(...) ::Engine::Logger::getEngineLogger().critical(__VA_ARGS__)
+#define ENGINE_TRACE(msg)    ::Engine::GlobalLogger->EngineTrace(std::string(msg))
+#define ENGINE_INFO(msg)     ::Engine::GlobalLogger->EngineInfo(std::string(msg))
+#define ENGINE_WARN(msg)     ::Engine::GlobalLogger->EngineWarn(std::string(msg))
+#define ENGINE_ERROR(msg)    ::Engine::GlobalLogger->EngineError(std::string(msg))
+#define ENGINE_CRITICAL(msg) ::Engine::GlobalLogger->EngineCritical(std::string(msg))
 
-	#define CLIENT_TRACE(...)    ::Engine::Logger::getClientLogger().trace(__VA_ARGS__)
-	#define CLIENT_INFO(...)     ::Engine::Logger::getClientLogger().info(__VA_ARGS__)
-	#define CLIENT_WARN(...)     ::Engine::Logger::getClientLogger().warn(__VA_ARGS__)
-	#define CLIENT_ERROR(...)    ::Engine::Logger::getClientLogger().error(__VA_ARGS__)
-	#define CLIENT_CRITICAL(...) ::Engine::Logger::getClientLogger().critical(__VA_ARGS__)
-}
+#define CLIENT_TRACE(msg)    ::Engine::GlobalLogger->ClientTrace(std::string(msg))
+#define CLIENT_INFO(msg)     ::Engine::GlobalLogger->ClientInfo(std::string(msg))
+#define CLIENT_WARN(msg)     ::Engine::GlobalLogger->ClientWarn(std::string(msg))
+#define CLIENT_ERROR(msg)    ::Engine::GlobalLogger->ClientError(std::string(msg))
+#define CLIENT_CRITICAL(msg) ::Engine::GlobalLogger->ClientCritical(std::string(msg))

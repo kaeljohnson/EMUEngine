@@ -183,7 +183,7 @@ namespace Engine
 
 			if (!currentEvent.Handled)
 			{
-				ENGINE_TRACE_D("Unhandled Event: {}", static_cast<int>(currentEvent.Type));
+				ENGINE_TRACE_D("Unhandled Event: " + std::to_string(static_cast<int>(currentEvent.Type)));
 			}
 
 			ptrEventManager->eventQ.pop();
