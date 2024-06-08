@@ -26,7 +26,6 @@ if exist vcpkg\ (
     call bootstrap-vcpkg.bat
     call vcpkg integrate install
     call vcpkg install sdl2 sdl2-image
-    call vcpkg install fmt
     cd ../../..
 )
 
