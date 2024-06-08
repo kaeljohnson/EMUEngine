@@ -6,11 +6,10 @@
 
 namespace Engine
 {
+	std::shared_ptr<Logger> GlobalLogger = std::make_shared<Logger>();
 
 	std::shared_ptr<spdlog::logger> s_EngineLogger;
 	std::shared_ptr<spdlog::logger> s_ClientLogger;
-
-	std::shared_ptr<Logger> GlobalLogger = CreateLogger();
 
 	Logger::Logger()
 	{
@@ -22,62 +21,52 @@ namespace Engine
 		s_ClientLogger->set_level(spdlog::level::trace);
 	}
 
-	template <typename... Args>
-	void Logger::EngineTrace(Args... message)
+	void Logger::EngineTrace(const std::string& message)
 	{
 		s_EngineLogger->trace(message);
 	}
 	
-	template <typename... Args>
-	void Logger::EngineInfo(Args... message)
+	void Logger::EngineInfo(const std::string& message)
 	{
 		s_EngineLogger->info(message);
 	}
 	
-	template <typename... Args>
-	void Logger::EngineWarn(Args... message)
+	void Logger::EngineWarn(const std::string& message)
 	{
 		s_EngineLogger->warn(message);
 	}
 	
-	template <typename... Args>
-	void Logger::EngineError(Args... message)
+	void Logger::EngineError(const std::string& message)
 	{
 		s_EngineLogger->error(message);
 	}
 	
-	template <typename... Args>
-	void Logger::EngineCritical(Args... message)
+	void Logger::EngineCritical(const std::string& message)
 	{
 		s_EngineLogger->critical(message);
 	}
 
-	template <typename... Args>
-	void Logger::ClientTrace(Args... message)
+	void Logger::ClientTrace(const std::string& message)
 	{
 		s_ClientLogger->trace(message);
 	}
 
-	template <typename... Args>
-	void Logger::ClientInfo(Args... message)
+	void Logger::ClientInfo(const std::string& message)
 	{
 		s_ClientLogger->info(message);
 	}
 
-	template <typename... Args>
-	void Logger::ClientWarn(Args... message)
+	void Logger::ClientWarn(const std::string& message)
 	{
 		s_ClientLogger->warn(message);
 	}
 
-	template <typename... Args>
-	void Logger::ClientError(Args... message)
+	void Logger::ClientError(const std::string& message)
 	{
 		s_ClientLogger->error(message);
 	}
 
-	template <typename... Args>
-	void Logger::ClientCritical(Args... message)
+	void Logger::ClientCritical(const std::string& message)
 	{
 		s_ClientLogger->critical(message);
 	}

@@ -2,6 +2,7 @@
 
 #include "../Core.h"
 
+#include <string>
 #include <memory>
 
 namespace Engine
@@ -11,43 +12,22 @@ namespace Engine
 	public:
 		Logger();
 
-		template <typename... Args>
-		void EngineTrace(Args... message);
-
-		template <typename... Args>
-		void EngineInfo(Args... message);
-
-		template <typename... Args>
-		void EngineWarn(Args... message);
-
-		template <typename... Args>
-		void EngineError(Args... message);
-
-		template <typename... Args>
-		void EngineCritical(Args... message);
-
-		template <typename... Args>
-		void ClientTrace(Args... message);
-		
-		template <typename... Args>
-		void ClientInfo(Args... message);
-		
-		template <typename... Args>
-		void ClientWarn(Args... message);
-		
-		template <typename... Args>
-		void ClientError(Args... message);
-		
-		template <typename... Args>
-		void ClientCritical(Args... message);
+		EMU_API void EngineTrace(const std::string& message);
+		EMU_API void EngineInfo(const std::string& message);
+		EMU_API void EngineWarn(const std::string& message);
+		EMU_API void EngineError(const std::string& message);
+		EMU_API void EngineCritical(const std::string& message);
+		EMU_API void ClientTrace(const std::string& message);
+		EMU_API void ClientInfo(const std::string& message);
+		EMU_API void ClientWarn(const std::string& message);
+		EMU_API void ClientError(const std::string& message);
+		EMU_API void ClientCritical(const std::string& message);
 
 	private:
 		
 	};
 
 	EMU_API extern std::shared_ptr<Logger> GlobalLogger;
-
-	std::shared_ptr<Logger> CreateLogger();
 }
 
 #if defined(DEBUG)
