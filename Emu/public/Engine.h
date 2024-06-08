@@ -5,7 +5,7 @@
 #include "../include/Init.h"
 #include "../include/Events/Event.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
-#include "../include/Logging/ILogger.h"
+#include "../include/Logging/Logger.h"
 #include "../include/Scenes/SceneFactory.h"
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"

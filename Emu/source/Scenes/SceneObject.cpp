@@ -4,7 +4,7 @@
 
 #include "../../include/CommonFunctions.h"
 #include "../../include/Scenes/SceneObject.h"
-#include "../../include/Logging/ILogger.h"
+#include "../../include/Logging/Logger.h"
 #include "../../include/Textures/ITexture.h"
 #include "../../include/Physics/PhysicsFactory.h"
 

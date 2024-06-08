@@ -3,7 +3,6 @@
 #include "../../include/EngineConstants.h"
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Scenes/SceneObject.h"
-#include "../../include/Logging/ILogger.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/Box.h"
 #include "../../include/Physics/PhysicsFactory.h"
@@ -47,8 +46,7 @@ namespace Engine
 		m_gravityX = gravityX;
 		m_gravityY = gravityY;
 
-		ENGINE_INFO_D("Setting pixels per meter, time step, gravityX and gravityY at positions: " 
-			+ std::to_string(m_pixelsPerMeter) + ", " + std::to_string(m_gravityX) + ", " + std::to_string(m_gravityY));
+		ENGINE_INFO_D("Setting pixels per meter, time step, gravityX and gravityY at positions: {}, {}, {}", m_pixelsPerMeter, m_gravityX, m_gravityY);
 
 		if (m_world)
 		{
@@ -61,7 +59,7 @@ namespace Engine
 		m_world = CreateWorld(m_gravityX * m_pixelsPerMeter, m_gravityY * m_pixelsPerMeter, 8, 3);
 		
 
-		ENGINE_INFO_D("Client creating simulation with gravity: (" + std::to_string(gravityX) + "," + std::to_string(gravityY) + ")");
+		ENGINE_INFO_D("Client creating simulation with gravity: ({}, {})", gravityX, gravityY);
 	}
 
 	void Scene::Add(SceneObject& sceneObject)
