@@ -16,6 +16,8 @@
 #include "../include/Physics/IPhysicsBody.h"
 #include "../include/Physics/PhysicsFactory.h"
 #include "../include/Controllable/Controllable.h"
+#include "../include/Tiles/Tile.h"
+#include "../include/Entities/Entity.h"
 
 namespace Engine
 {
