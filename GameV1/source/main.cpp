@@ -2,7 +2,6 @@
 
 #include <Engine.h>
 #include "../include/EventListeners/AppManagementListener.h"
-#include "../include/ClientObjects/ClientObject.h"
 
 int main(int argc, char* args[])
 {
@@ -25,6 +24,15 @@ int main(int argc, char* args[])
 	Engine::Entity testGO2(68.5f, 3.0f, 1.0f, 1.0f, tempTextureRed);
 	testGO2.GetPhysicsBody()->SetRestitution(1.0f);
 	Engine::Entity testGO3(76.5f, 3.0f, 2.0f, 2.0f, tempTextureRed);
+
+	Engine::TileMap testMap("TestMap1.txt");
+
+	CLIENT_INFO_D("Map size: width: " + std::to_string(testMap.m_width) + " height: " + std::to_string(testMap.m_height));
+	for (auto& c : testMap.m_map)
+	{
+		CLIENT_INFO_D(std::string(1, c));
+	}
+
 	Engine::Tile testWall(15.0f, 35.0f, 2.0f, 80.0f, tempTextureBlue);
 	Engine::Tile testWallRight(100.0f, 35.0f, 2.0f, 80.0f, tempTextureBlue);
 	Engine::Tile testGround(63.5f, 70.0f, 120.0f, 2.0f, tempTextureBlue);
