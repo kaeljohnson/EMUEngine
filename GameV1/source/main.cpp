@@ -20,37 +20,37 @@ int main(int argc, char* args[])
 	Engine::TexturePtr tempTextureRed = Engine::CreateTexture(255, 0, 0);
 	Engine::TexturePtr tempTextureBlue = Engine::CreateTexture(0, 0, 265);
 	
-	Engine::Controllable player(Engine::DYNAMIC, false, 63.5f, 3.0f, 1.0f, 2.0f, tempTextureRed);
+	Engine::Controllable player(63.5f, 3.0f, 1.0f, 2.0f, tempTextureRed);
 
-	ClientObject testGO2(Engine::DYNAMIC, false, 68.5f, 3.0f, 1.0f, 1.0f, tempTextureRed);
+	Engine::Entity testGO2(68.5f, 3.0f, 1.0f, 1.0f, tempTextureRed);
 	testGO2.GetPhysicsBody()->SetRestitution(1.0f);
-	ClientObject testGO3(Engine::DYNAMIC, false, 76.5f, 3.0f, 2.0f, 2.0f, tempTextureRed);
-	ClientObject testWall(Engine::STATIC, true, 15.0f, 35.0f, 2.0f, 80.0f, tempTextureBlue);
-	ClientObject testWallRight(Engine::STATIC, true, 100.0f, 35.0f, 2.0f, 80.0f, tempTextureBlue);
-	ClientObject testGround(Engine::STATIC, true, 63.5f, 70.0f, 120.0f, 2.0f, tempTextureBlue);
+	Engine::Entity testGO3(76.5f, 3.0f, 2.0f, 2.0f, tempTextureRed);
+	Engine::Tile testWall(15.0f, 35.0f, 2.0f, 80.0f, tempTextureBlue);
+	Engine::Tile testWallRight(100.0f, 35.0f, 2.0f, 80.0f, tempTextureBlue);
+	Engine::Tile testGround(63.5f, 70.0f, 120.0f, 2.0f, tempTextureBlue);
 
-	ClientObject testBlock(Engine::STATIC, false, 63.5f, 65.0f, 9.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock2(Engine::STATIC, false, 63.5f, 60.0f, 9.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock3(Engine::STATIC, false, 43.0f, 55.0f, 9.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock4(Engine::STATIC, false, 50.0f, 50.0f, 9.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock5(Engine::STATIC, false, 50.0f, 45.0f, 9.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock6(Engine::STATIC, false, 50.0f, 40.0f, 9.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock7(Engine::STATIC, false, 50.0f, 35.0f, 9.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock8(Engine::STATIC, false, 70.0f, 35.0f, 1.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock9(Engine::STATIC, false, 74.0f, 30.0f, 1.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock10(Engine::STATIC, false, 78.0f, 25.0f, 1.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock11(Engine::STATIC, false, 35.0f, 65.0f, 1.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock12(Engine::STATIC, false, 40.0f, 60.0f, 1.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock13(Engine::STATIC, false, 35.0f, 55.0f, 1.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock14(Engine::STATIC, false, 40.0f, 50.0f, 1.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock15(Engine::STATIC, false, 35.0f, 45.0f, 1.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock16(Engine::STATIC, false, 40.0f, 40.0f, 1.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock17(Engine::STATIC, false, 35.0f, 35.0f, 1.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock18(Engine::STATIC, false, 40.0f, 30.0f, 1.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock19(Engine::STATIC, false, 35.0f, 25.0f, 1.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock20(Engine::STATIC, false, 40.0f, 20.0f, 1.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock21(Engine::STATIC, false, 35.0f, 15.0f, 1.0f, 1.0f, tempTextureBlue);
-	ClientObject testBlock22(Engine::STATIC, false, 40.0f, 10.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock(63.5f, 65.0f, 9.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock2(63.5f, 60.0f, 9.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock3(43.0f, 55.0f, 9.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock4(50.0f, 50.0f, 9.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock5(50.0f, 45.0f, 9.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock6(50.0f, 40.0f, 9.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock7(50.0f, 35.0f, 9.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock8(70.0f, 35.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock9(74.0f, 30.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock10(78.0f, 25.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock11(35.0f, 65.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock12(40.0f, 60.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock13(35.0f, 55.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock14(40.0f, 50.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock15(35.0f, 45.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock16(40.0f, 40.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock17(35.0f, 35.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock18(40.0f, 30.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock19(35.0f, 25.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock20(40.0f, 20.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock21(35.0f, 15.0f, 1.0f, 1.0f, tempTextureBlue);
+	Engine::Tile testBlock22(40.0f, 10.0f, 1.0f, 1.0f, tempTextureBlue);
 	
 	CLIENT_INFO_D(player.GetUUID());
 
