@@ -7,10 +7,13 @@
 #include "../../include/Physics/Box.h"
 #include "../../include/Physics/PhysicsFactory.h"
 #include "../../include/CallbackSystem/CallbackSystem.h"
+#include "../../include/Tiles/TileMap.h"
+#include "../../include/Tiles/Tile.h"
 
 namespace Engine
 {
-	Scene::Scene() : m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_sceneObjects(), m_world(nullptr),
+	Scene::Scene() : m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_sceneObjects(),
+		HasMap(false), ptrTileMap(nullptr), m_world(nullptr),
 		m_eventListeners() {}
 
 	void Scene::CheckValid()
@@ -21,17 +24,46 @@ namespace Engine
 		(m_pixelsPerMeter <= 0) ? ENGINE_CRITICAL_D("Pixels per meter is invalid.") : ENGINE_INFO_D("Pixels per meter is valid.");
 	}
 
+	void Scene::AddMap(TileMap& tileMap)
+	{
+		tileMap.LoadMap();
+
+		ptrTileMap = &tileMap;
+
+		// Add all tiles to the world
+		for (Tile& tile : tileMap.m_tiles)
+		{
+			std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(tile.GetPhysicsBody());
+
+			m_world->AddBox(ptrBox);
+		}
+
+		HasMap = true;
+	}
+
 	void Scene::Update()
 	{
 		// Faster way to do this? Should only have to update objects
 		// prev values if they have changed. In fact, should only update
 		// objects that have changed in general
 
+		// Integrate tile map into scen objects array?
+
 		for (auto& sceneObject : m_sceneObjects)
 		{
 			sceneObject->UpdatePrevPosition();
 
 			sceneObject->Update();
+		}
+
+		if (HasMap)
+		{
+			for (Tile& tile : ptrTileMap->m_tiles)
+			{
+				tile.UpdatePrevPosition();
+
+				tile.Update();
+			}
 		}
 
 		m_world->Update();

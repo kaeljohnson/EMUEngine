@@ -9,6 +9,8 @@
 #include "../Events/EventListenerStack.h"
 #include "../Events/EventListener.h"
 #include "../Physics/IWorld.h"
+#include "../Tiles/TileMap.h"
+#include "../Tiles/Tile.h"
 
 namespace Engine
 {
@@ -25,6 +27,7 @@ namespace Engine
 		EMU_API void AddEventListener(EventListener& eventListener);
 		EMU_API void Remove(SceneObject& sceneObject);
 		EMU_API void RemoveEventListener(EventListener& eventListener);
+		EMU_API void AddMap(TileMap& tileMap);
 
 	private:
 		int m_pixelsPerMeter;
@@ -33,6 +36,7 @@ namespace Engine
 		float m_gravityY;
 		
 		SceneObjectStack m_sceneObjects;
+		
 		EventListenerStack m_eventListeners;
 
 		std::unique_ptr<IWorld> m_world;
@@ -40,6 +44,9 @@ namespace Engine
 	public:
 		inline const int GetPixelsPerMeter() const { return m_pixelsPerMeter; }
 		inline EventListenerStack& GetEventListeners() { return m_eventListeners; }
+
+		bool HasMap;
+		TileMap* ptrTileMap;
 
 		void CheckValid();
 		void Update();

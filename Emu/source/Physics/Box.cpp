@@ -33,7 +33,7 @@ namespace Engine
 		m_bodyDef.fixedRotation = true;
 		m_prevX = startingXInMeters;
 		m_prevY = startingYInMeters;
-		m_bodyDef.position.Set(startingXInMeters, startingYInMeters);
+		m_bodyDef.position.Set(startingXInMeters + m_halfWidthInMeters, startingYInMeters + m_halfHeightInMeters);
 		m_shape.SetAsBox(m_halfWidthInMeters, m_halfHeightInMeters);
 		m_fixtureDef.shape = &m_shape;
 		m_fixtureDef.restitution = 0.0f;

@@ -149,6 +149,19 @@ namespace Engine
 		{
 			ptrRendererManager->Render(sceneObject, scene->GetPixelsPerMeter(), interpolation);
 		}
+
+		if (scene->HasMap)
+		{
+			for (auto& tile : scene->ptrTileMap->m_tiles)
+			{
+				ptrRendererManager->Render(&tile, scene->GetPixelsPerMeter(), interpolation);
+			}
+		}
+
+		/*for (auto& uiObject : scene->GetUIObjects())
+		{
+			ptrRendererManager->Render(uiObject, scene->GetPixelsPerMeter(), interpolation);
+		}*/
 	}
 
 	void processEventQueue(std::shared_ptr<Scene> scene, EventManager* ptrEventManager, EventListener* ptrAppManagerListener)
