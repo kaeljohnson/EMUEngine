@@ -145,61 +145,6 @@ namespace Engine
         }
     }
 
-
-
-    /*void TileMap::LoadMap()
-    {
-        std::shared_ptr<ITexture> tempTextureBlue = CreateTexture(0, 0, 265);
-
-        // Need to combine vertical tiles into one as well...
-        for (int y = 0; y < GetHeight(); ++y)
-        {
-            int startX = 0;
-            bool inBlock = false;
-
-            for (int x = 0; x < GetWidth() + 1; ++x)
-            {
-                if (GetTile(x, y) != '-' && !inBlock)
-                {
-                    startX = x;
-                    inBlock = true;
-
-                    if (x == GetWidth() - 1)
-                    {
-                        m_tiles.emplace_back(static_cast<float>(startX) * m_numMetersPerTile, 
-                            static_cast<float>(y) * m_numMetersPerTile, 
-                            1.0f * m_numMetersPerTile, 1.0f * m_numMetersPerTile, 
-                            CreateRandomTexture());
-                    }
-                }
-                else if (inBlock && GetTile(x, y) != '-' && x == GetWidth() - 1)
-                {
-                    ENGINE_INFO_D("TileMap::LoadMap: Loading tile from x: "
-                        + std::to_string(startX) + " to x: " + std::to_string(GetWidth() - 1) + " at y: " + std::to_string(y));
-
-                    m_tiles.emplace_back(static_cast<float>(startX) * m_numMetersPerTile, 
-                        static_cast<float>(y) * m_numMetersPerTile, 
-                        static_cast<float>(x + 1 - startX) * m_numMetersPerTile, 
-                        1.0f * m_numMetersPerTile, 
-                        CreateRandomTexture());
-                }
-                else if ((GetTile(x, y) == '-' || x == GetWidth() - 1) && inBlock)
-                {
-                    ENGINE_INFO_D("TileMap::LoadMap: Loading tile from x: "
-                        + std::to_string(startX) + " to x: " + std::to_string(x - 1) + " at y: " + std::to_string(y));
-
-                    m_tiles.emplace_back(static_cast<float>(startX) * m_numMetersPerTile, 
-                        static_cast<float>(y) * m_numMetersPerTile, 
-                        static_cast<float>(x - startX) * m_numMetersPerTile, 
-                        1.0f * m_numMetersPerTile, 
-                        CreateRandomTexture());
-
-                    inBlock = false;
-                }
-            }
-        }
-    }*/
-
     // Call this sparingly.
     void TileMap::UnloadMap()
 	{
