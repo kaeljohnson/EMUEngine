@@ -12,5 +12,11 @@ namespace Engine
 	public:
 		EMU_API Tile(const float x, const float y, const float width, const float height, const std::shared_ptr<ITexture> ptrTexture);
 		~Tile() = default;
+
+		float x;
+		float y;
+
+		float width;
+		float height;
 	};
 }

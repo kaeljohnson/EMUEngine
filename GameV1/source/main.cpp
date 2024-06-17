@@ -14,7 +14,7 @@ int main(int argc, char* args[])
 	Engine::ScenePtr scene = Engine::CreateScene();
 
 	// Need physcis to scale with pixels per meter.
-	scene->SetSimulation(0.0f, 6.2f, 16.0f);
+	scene->SetSimulation(0.0f, 3.1f, 32.0f);
 
 	// Temp
 	Engine::TexturePtr tempTextureRed = Engine::CreateTexture(255, 0, 0);

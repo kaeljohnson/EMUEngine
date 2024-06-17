@@ -7,7 +7,7 @@
 namespace Engine
 {
 	Tile::Tile(const float x, const float y, const float width, const float height, const std::shared_ptr<ITexture> ptrTexture)
-		: SceneObject(STATIC, true, x, y, width, height, ptrTexture)
+		: x(x), y(y), width(width), height(height), SceneObject(STATIC, true, x, y, width, height, ptrTexture)
 	{
 	}
 }
