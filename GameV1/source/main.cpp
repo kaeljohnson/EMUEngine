@@ -20,7 +20,7 @@ int main(int argc, char* args[])
 	Engine::TexturePtr tempTextureRed = Engine::CreateTexture(255, 0, 0);
 	Engine::TexturePtr tempTextureBlue = Engine::CreateTexture(0, 0, 265);
 	
-	Engine::Controllable player(4.0f, 20.0f, 1.0f, 1.0f, tempTextureRed);
+	Engine::Controllable player(4.0f, 20.0f, 0.9f, 0.9f, tempTextureRed);
 
 	Engine::TileMap testMap("TestMap1.txt", 1);
 

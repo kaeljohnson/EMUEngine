@@ -1,7 +1,10 @@
 #pragma once
 
+#include <memory>
+
 #include "../include/SDLWrapper/SDLWrapper.h"
 
+#include "../include/Scenes/Scene.h"
 #include "Scenes/SceneObject.h"
 
 namespace Engine
@@ -18,7 +21,8 @@ namespace Engine
         const SDLTexture* LoadTexture(const char* filePath);
         void SetViewport();
         void ClearScreen();
-        void Render(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation);
+        void RenderScene(std::shared_ptr<Scene> scene, const double interpolation);
+        void Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation);
         void Display();
 
         // Window related functions.

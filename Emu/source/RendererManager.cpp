@@ -1,10 +1,12 @@
 #pragma once
 
-#include <stdio.h>
+#include <memory>
+
 #include "../include/SDLWrapper/SDLWrapper.h"
 
 #include "../include/RendererManager.h"
 #include "../include/Logging/Logger.h"
+#include "../include/Scenes/Scene.h"
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Physics/IPhysicsBody.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
@@ -188,8 +190,29 @@ namespace Engine
 		SDL_RENDER_PRESENT(m_ptrRenderer);
 	}
 
+	void RendererManager::RenderScene(std::shared_ptr<Scene> scene, const double interpolation)
+	{
+		ClearScreen();
+
+		// Render the scene.
+		for (auto& sceneObject : *scene)
+		{
+			Draw(sceneObject, scene->GetPixelsPerMeter(), interpolation);
+		}
+
+		if (scene->HasMap)
+		{
+			for (auto& tile : *scene->ptrTileMap)
+			{
+				Draw(&tile, scene->GetPixelsPerMeter(), interpolation);
+			}
+		}
+
+		Display();
+	}
+
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void RendererManager::Render(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation)
+	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation)
 	{
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };

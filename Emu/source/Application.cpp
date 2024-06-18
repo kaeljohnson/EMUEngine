@@ -104,9 +104,7 @@ namespace Engine
 
 			const double interpolation = accumulator / timeStep;
 
-			ptrRendererManager->ClearScreen();
-			renderScene(currentScene, ptrRendererManager, interpolation);
-			ptrRendererManager->Display();
+			ptrRendererManager->RenderScene(currentScene, interpolation);
 		}
 	}
 
@@ -134,34 +132,6 @@ namespace Engine
 			{
 				end();
 			});
-	}
-
-
-	// Helper functions for application loop.
-	void renderScene(std::shared_ptr<Scene> scene, RendererManager* ptrRendererManager, const double interpolation)
-	{
-		// Should not be rendering every object in the scene every frame.
-
-		// Maybe render all objects once at the start of the sceen
-		// and then only render dynamic objects that have moved on every frame.
-
-		for (auto& sceneObject : *scene)
-		{
-			ptrRendererManager->Render(sceneObject, scene->GetPixelsPerMeter(), interpolation);
-		}
-
-		if (scene->HasMap)
-		{
-			for (auto& tile : scene->ptrTileMap->m_tiles)
-			{
-				ptrRendererManager->Render(&tile, scene->GetPixelsPerMeter(), interpolation);
-			}
-		}
-
-		/*for (auto& uiObject : scene->GetUIObjects())
-		{
-			ptrRendererManager->Render(uiObject, scene->GetPixelsPerMeter(), interpolation);
-		}*/
 	}
 
 	void processEventQueue(std::shared_ptr<Scene> scene, EventManager* ptrEventManager, EventListener* ptrAppManagerListener)
