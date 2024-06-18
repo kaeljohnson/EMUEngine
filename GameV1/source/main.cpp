@@ -24,12 +24,6 @@ int main(int argc, char* args[])
 
 	Engine::TileMap testMap("TestMap1.txt", 1);
 
-	CLIENT_INFO_D("Map size: width: " + std::to_string(testMap.m_width) + " height: " + std::to_string(testMap.m_height));
-	for (auto& c : testMap.m_map)
-	{
-		CLIENT_INFO_D(std::string(1, c));
-	}
-
 	scene->AddMap(testMap);
 	
 	CLIENT_INFO_D(player.GetUUID());

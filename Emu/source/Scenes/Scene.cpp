@@ -31,7 +31,7 @@ namespace Engine
 		ptrTileMap = &tileMap;
 
 		// Add all tiles to the world
-		for (Tile& tile : tileMap.m_tiles)
+		for (Tile& tile : tileMap)
 		{
 			std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(tile.GetPhysicsBody());
 
@@ -58,7 +58,7 @@ namespace Engine
 
 		if (HasMap)
 		{
-			for (Tile& tile : ptrTileMap->m_tiles)
+			for (Tile& tile : *ptrTileMap)
 			{
 				tile.UpdatePrevPosition();
 

@@ -30,7 +30,7 @@ namespace Engine
 		std::vector<Tile>::const_iterator begin() const { return m_tiles.begin(); }
 		std::vector<Tile>::const_iterator end() const { return m_tiles.end(); }
 
-	public:
+	private:
 		std::vector<char> m_map;
 		std::vector<Tile> m_tiles;
 		size_t m_width;
