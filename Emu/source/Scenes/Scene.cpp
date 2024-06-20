@@ -24,7 +24,7 @@ namespace Engine
 		(m_pixelsPerMeter <= 0) ? ENGINE_CRITICAL_D("Pixels per meter is invalid.") : ENGINE_INFO_D("Pixels per meter is valid.");
 	}
 
-	void Scene::AddMap(TileMap& tileMap)
+	void Scene::AddTileMap(TileMap& tileMap)
 	{
 		tileMap.LoadMap();
 		tileMap.CreateCollisionBodies();

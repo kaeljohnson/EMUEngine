@@ -23,7 +23,7 @@ int main(int argc, char* args[])
 
 	Engine::TileMap testMap("TestMap1.txt", 1);
 
-	scene->AddMap(testMap);
+	scene->AddTileMap(testMap);
 	
 	CLIENT_INFO_D(player.GetUUID());
 

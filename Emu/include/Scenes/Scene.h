@@ -10,7 +10,6 @@
 #include "../Events/EventListener.h"
 #include "../Physics/IWorld.h"
 #include "../Tiles/TileMap.h"
-#include "../Tiles/Tile.h"
 
 namespace Engine
 {
@@ -27,7 +26,7 @@ namespace Engine
 		EMU_API void AddEventListener(EventListener& eventListener);
 		EMU_API void Remove(SceneObject& sceneObject);
 		EMU_API void RemoveEventListener(EventListener& eventListener);
-		EMU_API void AddMap(TileMap& tileMap);
+		EMU_API void AddTileMap(TileMap& tileMap);
 
 	private:
 		int m_pixelsPerMeter;

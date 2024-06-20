@@ -1,7 +1,6 @@
 #pragma once
 
 #include <fstream>
-#include <string>
 #include <vector>
 
 #include "../../include/Tiles/TileMap.h"
@@ -30,7 +29,7 @@ namespace Engine
                 // Set the width to the length of the first line
                 m_width = line.length();
             }
-            else if (line.length() != m_width) 
+            else if (line.length() != m_width)
             {
                 // Handle error: line does not have the same length as the first line
                 ENGINE_CRITICAL("Map is not a rectangle: line " + std::to_string(m_height + 1) + " has a different length");
