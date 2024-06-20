@@ -21,7 +21,11 @@ namespace Engine
 		EMU_API inline size_t GetWidth() const { return m_width; }
 		EMU_API inline size_t GetHeight() const { return m_height; }
 
+	public:
+		inline std::vector<Tile>& GetCollisionBodies() { return m_collisionBodies; }
+
 		void LoadMap();
+		void CreateCollisionBodies();
 		void UnloadMap();
 
 		std::vector<Tile>::iterator begin() { return m_tiles.begin(); }
@@ -32,6 +36,7 @@ namespace Engine
 
 	private:
 		std::vector<char> m_map;
+		std::vector<Tile> m_collisionBodies;
 		std::vector<Tile> m_tiles;
 		size_t m_width;
 		size_t m_height;

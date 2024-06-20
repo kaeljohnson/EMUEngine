@@ -27,11 +27,19 @@ namespace Engine
 	void Scene::AddMap(TileMap& tileMap)
 	{
 		tileMap.LoadMap();
+		tileMap.CreateCollisionBodies();
 
 		ptrTileMap = &tileMap;
 
 		// Add all tiles to the world
-		for (Tile& tile : tileMap)
+		for (auto& tile : tileMap.GetCollisionBodies())
+		{
+			std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(tile.GetPhysicsBody());
+
+			m_world->AddBox(ptrBox);
+		}
+
+		for (auto& tile : tileMap)
 		{
 			std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(tile.GetPhysicsBody());
 
@@ -58,7 +66,7 @@ namespace Engine
 
 		if (HasMap)
 		{
-			for (Tile& tile : *ptrTileMap)
+			for (auto& tile : *ptrTileMap)
 			{
 				tile.UpdatePrevPosition();
 

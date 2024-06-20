@@ -18,7 +18,6 @@
 
 namespace Engine
 {
-	void renderScene(std::shared_ptr<Scene> scene, RendererManager* ptrRendererManager, const double interpolation); // Helper function for rendering the scene.
 	void processEventQueue(std::shared_ptr<Scene> scene, EventManager* ptrEventManager, EventListener* ptrAppManagerListener); // Helper function for processing the event queue.
 
 	// Application singleton.

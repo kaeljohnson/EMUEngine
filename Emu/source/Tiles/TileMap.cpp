@@ -7,9 +7,6 @@
 #include "../../include/Tiles/TileMap.h"
 #include "../../include/Logging/Logger.h"
 
-#include "../../include/Textures/Texture.h"
-#include "../../include/Textures/TextureFactory.h"
-
 namespace Engine
 {
 	TileMap::TileMap(const std::string mapFile, const int numMetersPerTile)
@@ -23,7 +20,6 @@ namespace Engine
             ENGINE_CRITICAL("Failed to open map file: " + mapFile);
             return;
         }
-
 
         std::string line;
         while (std::getline(file, line)) 
@@ -54,34 +50,33 @@ namespace Engine
         }
 	}
 
-    std::shared_ptr<ITexture> CreateRandomTexture()
-    {
-        // Generate random RGB values
-        int r = rand() % 256;
-        int g = rand() % 256;
-        int b = rand() % 256;
-
-        // Assuming CreateTexture takes RGB values and creates a texture
-        return CreateTexture(r, g, b);
-    }
-
     void TileMap::LoadMap()
     {
-        // Need to still be able to do things like animations on a tile per tile basis.
+        for (int y = 0; y < GetHeight(); ++y)
+        {
+            for (int x = 0; x < GetWidth(); ++x)
+            {
+                if (GetTile(x, y) != '-')
+                {
+                    m_tiles.emplace_back(
+                        KINEMATIC,
+						static_cast<float>(x) * m_numMetersPerTile,
+						static_cast<float>(y) * m_numMetersPerTile,
+						m_numMetersPerTile,
+						m_numMetersPerTile,
+						nullptr);
+				}
+			}
+		}
+	}
+
+    void TileMap::CreateCollisionBodies()
+    {
+        // Creates collision bodies for the map. This is a very simple implementation that creates a collision body for each block of tiles.
         // 
-        // Might need to move this function to somewhere like the world class right before tiles are
-        // turned into physics objects. Then, there would have to be another object type other than tiles
-        // that would hold all the aspects of the tile not related to collision. This would require two separate places
-        // for coordinates. The underlying box2d body would be created by the code below, but the "tile" would still
-        // be singular tiles so that the client can have flexibility with what happens on a per tile basis.
-        // 
-        // Or, have the animation system accomodate the fact that tiles might be bigger than just 1x1
-        // and automatically accomodate the texture based on that. For example, 
-        // if a tile is 1x3 based on a grassy tileset, the animation would automatically have the new tile 
-        // consist of a left top corner grass tile, a middle grass tile, and a right grass tile.
+        // When a tile is moved or removed, the corresponding collision body needs to be updated.
         // 
 
-        std::shared_ptr<ITexture> tempTextureBlue = CreateTexture(0, 0, 265);
         std::vector<std::vector<bool>> processed(GetHeight(), std::vector<bool>(GetWidth(), false));
 
         for (int y = 0; y < GetHeight(); ++y)
@@ -100,7 +95,7 @@ namespace Engine
                     while (startX + width < GetWidth() && GetTile(startX + width, y) != '-' && !processed[y][startX + width])
                     {
                         ++width;
-                    }   
+                    }
 
                     // Expand vertically to form a block
                     while (startY + height < GetHeight())
@@ -134,12 +129,13 @@ namespace Engine
                     }
 
                     // Create the tile object with calculated dimensions
-                    m_tiles.emplace_back(
+                    m_collisionBodies.emplace_back(
+                        STATIC,
                         static_cast<float>(startX) * m_numMetersPerTile,
                         static_cast<float>(startY) * m_numMetersPerTile,
                         static_cast<float>(width) * m_numMetersPerTile,
                         static_cast<float>(height) * m_numMetersPerTile,
-                        CreateRandomTexture());
+                        nullptr);
                 }
             }
         }
