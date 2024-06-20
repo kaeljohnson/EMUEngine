@@ -24,6 +24,11 @@ namespace Engine
 			m_bodyDef.type = b2_dynamicBody;
 			ENGINE_TRACE_D("Creating dynamic body.");
 			break;
+		case KINEMATIC:
+			m_bodyDef.type = b2_kinematicBody;
+			ENGINE_TRACE_D("Creating kinematic body.");
+			m_fixtureDef.isSensor = true;
+			break;
 		default:
 			m_bodyDef.type = b2_staticBody;
 			ENGINE_WARN_D("Invalid body type. Creating static body.");
@@ -33,7 +38,7 @@ namespace Engine
 		m_bodyDef.fixedRotation = true;
 		m_prevX = startingXInMeters;
 		m_prevY = startingYInMeters;
-		m_bodyDef.position.Set(startingXInMeters, startingYInMeters);
+		m_bodyDef.position.Set(startingXInMeters + m_halfWidthInMeters, startingYInMeters + m_halfHeightInMeters);
 		m_shape.SetAsBox(m_halfWidthInMeters, m_halfHeightInMeters);
 		m_fixtureDef.shape = &m_shape;
 		m_fixtureDef.restitution = 0.0f;
@@ -81,6 +86,19 @@ namespace Engine
 		{
 			if (edge->contact->IsTouching())
 			{
+				b2Body* otherBody = edge->contact->GetFixtureA()->GetBody() == m_body ?
+					edge->contact->GetFixtureB()->GetBody() :
+					edge->contact->GetFixtureA()->GetBody();
+
+				// Ignore contacts with kinematic bodies for now.
+				// Might need a custom body type for bodies that
+				// are meant to be the ground.
+				if (otherBody->GetType() == b2_kinematicBody)
+				{
+					edge = edge->next;
+					continue;
+				}
+
 				b2WorldManifold worldManifold;
 				edge->contact->GetWorldManifold(&worldManifold);
 

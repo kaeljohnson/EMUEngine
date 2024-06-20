@@ -9,6 +9,7 @@ namespace Engine
 	enum EMU_API BodyType
 	{
 		STATIC,
-		DYNAMIC
+		DYNAMIC,
+		KINEMATIC
 	}; 
 }

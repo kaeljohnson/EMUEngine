@@ -1,10 +1,12 @@
 #pragma once
 
-#include <stdio.h>
+#include <memory>
+
 #include "../include/SDLWrapper/SDLWrapper.h"
 
 #include "../include/RendererManager.h"
 #include "../include/Logging/Logger.h"
+#include "../include/Scenes/Scene.h"
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Physics/IPhysicsBody.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
@@ -188,9 +190,37 @@ namespace Engine
 		SDL_RENDER_PRESENT(m_ptrRenderer);
 	}
 
-	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void RendererManager::Render(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation)
+	void RendererManager::RenderScene(std::shared_ptr<Scene> scene, const double interpolation)
 	{
+		ClearScreen();
+
+		// Render the scene.
+		for (auto& sceneObject : *scene)
+		{
+			Draw(sceneObject, scene->GetPixelsPerMeter(), interpolation);
+		}
+
+		if (scene->HasMap)
+		{
+			for (auto& tile : *scene->ptrTileMap)
+			{
+				Draw(&tile, scene->GetPixelsPerMeter(), interpolation);
+			}
+		}
+
+		Display();
+	}
+
+	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
+	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation)
+	{
+		bool isTextureNull = sceneObject->GetTexture() == nullptr;
+
+		/*if (isTextureNull)
+		{
+			ENGINE_CRITICAL_D("Scene object does not have a texture. Rendering physics border.");
+		}*/
+
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
 
@@ -209,9 +239,23 @@ namespace Engine
 		};
 
 		// SDL_Texture* texture = static_cast<Texture*>(sceneObject->GetTexture())->m_texture;
-		SDLTexture* ptrTexture = static_cast<Texture*>(sceneObject->GetTexture().get())->m_texture;
+		SDLTexture* ptrTexture = nullptr;
+
+		if (!isTextureNull)
+			ptrTexture = static_cast<Texture*>(sceneObject->GetTexture().get())->m_texture;
 
 		SDL_RENDER_COPY_EX(m_ptrRenderer, ptrTexture, nullptr, &dst, ptrBody->GetAngleInDegrees(), nullptr, SDL_FLIP_NONE);
+
+		// This should show the boundary of the physics body, not the texture.
+#if defined(DEBUG)
+		SDL_SetRenderDrawColor(m_ptrRenderer, 255, 0, 0, 255);
+
+		// Draw the rectangle
+		SDL_RenderDrawRect(m_ptrRenderer, &dst);
+
+		// Reset the drawing color to white (or any other color you want)
+		SDL_SetRenderDrawColor(m_ptrRenderer, 'd3', 'd3', 'd3', SDL_ALPHA_OPAQUE);
+#endif
 	}
 
 	void RendererManager::SetViewport()
