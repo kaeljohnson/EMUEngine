@@ -21,6 +21,7 @@ namespace Engine
             return;
         }
 
+
         std::string line;
         while (std::getline(file, line)) 
         {
@@ -60,10 +61,10 @@ namespace Engine
                 {
                     m_tiles.emplace_back(
                         KINEMATIC,
-						static_cast<float>(x) * m_numMetersPerTile,
-						static_cast<float>(y) * m_numMetersPerTile,
-						m_numMetersPerTile,
-						m_numMetersPerTile,
+						static_cast<float>(x) * static_cast<float>(m_numMetersPerTile),
+						static_cast<float>(y) * static_cast<float>(m_numMetersPerTile),
+						static_cast<float>(m_numMetersPerTile),
+						static_cast<float>(m_numMetersPerTile),
 						nullptr);
 				}
 			}
@@ -95,7 +96,7 @@ namespace Engine
                     while (startX + width < GetWidth() && GetTile(startX + width, y) != '-' && !processed[y][startX + width])
                     {
                         ++width;
-                    }
+                    }   
 
                     // Expand vertically to form a block
                     while (startY + height < GetHeight())
@@ -131,10 +132,10 @@ namespace Engine
                     // Create the tile object with calculated dimensions
                     m_collisionBodies.emplace_back(
                         STATIC,
-                        static_cast<float>(startX) * m_numMetersPerTile,
-                        static_cast<float>(startY) * m_numMetersPerTile,
-                        static_cast<float>(width) * m_numMetersPerTile,
-                        static_cast<float>(height) * m_numMetersPerTile,
+                        static_cast<float>(startX) * static_cast<float>(m_numMetersPerTile),
+                        static_cast<float>(startY) * static_cast<float>(m_numMetersPerTile),
+                        static_cast<float>(width) * static_cast<float>(m_numMetersPerTile),
+                        static_cast<float>(height) * static_cast<float>(m_numMetersPerTile),
                         nullptr);
                 }
             }
