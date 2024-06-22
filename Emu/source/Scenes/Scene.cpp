@@ -57,21 +57,23 @@ namespace Engine
 
 		// Integrate tile map into scen objects array?
 
-		for (auto& sceneObject : m_sceneObjects)
-		{
-			sceneObject->UpdatePrevPosition();
-
-			sceneObject->Update();
-		}
-
 		if (HasMap)
 		{
 			for (auto& tile : *ptrTileMap)
 			{
-				tile.UpdatePrevPosition();
+				tile.CheckAllCollisions();
 
 				tile.Update();
 			}
+		}
+
+		for (auto& sceneObject : m_sceneObjects)
+		{
+			sceneObject->UpdatePrevPosition();
+
+			sceneObject->CheckAllCollisions();
+
+			sceneObject->Update();
 		}
 
 		m_world->Update();

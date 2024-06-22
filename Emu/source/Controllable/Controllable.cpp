@@ -29,7 +29,7 @@ namespace Engine
 
         // If the controllable is jumping, they should
         // have less control over their movement.        
-        const float ACCELERATIONDAMPENING = m_physicsBody->OnGround() ? 1.0f : 0.90f;
+        const float ACCELERATIONDAMPENING = m_physicsBody->GetHasBottomCollision() ? 1.0f : 0.90f;
 
         if (refKeyStates.at(D_KEY_DOWN) && refKeyStates.at(A_KEY_UP))
         {
@@ -94,7 +94,7 @@ namespace Engine
 
             m_physicsBody->ApplyForceToBox({ 0.0f, -m_jumpForce * (m_maxJumpCharge - m_jumpCharge) * m_physicsBody->GetSizeInMeters()});
         }
-        else if (m_physicsBody->OnGround())
+        else if (m_physicsBody->GetHasBottomCollision())
         {
             m_isJumping = true;
             m_physicsBody->SetYVelocity(0.0f);

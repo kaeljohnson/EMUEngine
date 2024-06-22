@@ -17,7 +17,6 @@ namespace Engine
 	public:
 		bool Enabled;
 		bool Visible;
-
 	public:
 		EMU_API SceneObject(const BodyType bodyType, const bool fixed, const float startingXInMeters,
 			const float startingYInMeters, const float widthInMeters, const float heightInMeters, std::shared_ptr<ITexture> refTexture);
@@ -39,6 +38,8 @@ namespace Engine
 
 	public:
 		void UpdatePrevPosition();
+		virtual void CheckAllCollisions();
+
 
 	private:
 		std::string uuid;

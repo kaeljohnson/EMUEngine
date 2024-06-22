@@ -131,10 +131,10 @@ namespace Engine
                     // Create the tile object with calculated dimensions
                     m_collisionBodies.emplace_back(
                         STATIC,
-                        static_cast<float>(startX) * static_cast<float>(m_numMetersPerTile),
-                        static_cast<float>(startY) * static_cast<float>(m_numMetersPerTile),
-                        static_cast<float>(width) * static_cast<float>(m_numMetersPerTile),
-                        static_cast<float>(height) * static_cast<float>(m_numMetersPerTile),
+                        static_cast<float>(startX) * static_cast<float>(m_numMetersPerTile), // +0.025f,
+                        static_cast<float>(startY) * static_cast<float>(m_numMetersPerTile), // + 0.025f,
+                        static_cast<float>(width) * static_cast<float>(m_numMetersPerTile), // - 0.05f,
+                        static_cast<float>(height) * static_cast<float>(m_numMetersPerTile), // - 0.05f,
                         nullptr);
                 }
             }

@@ -233,7 +233,7 @@ namespace Engine
 
 			static_cast<int>(round((ptrBody->GetTopLeftPrevX() * (1.0 - interpolation) + ptrBody->GetTopLeftXInMeters() * interpolation) * pixelsPerMeter * SCALE)),
 			static_cast<int>(round((ptrBody->GetTopLeftPrevY() * (1.0 - interpolation) + ptrBody->GetTopLeftYInMeters() * interpolation) * pixelsPerMeter * SCALE)),
-			
+
 			static_cast<int>(round(ptrBody->GetWidthInMeters() * pixelsPerMeter * SCALE)),
 			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))
 		};
@@ -248,12 +248,22 @@ namespace Engine
 
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)
-		SDL_SetRenderDrawColor(m_ptrRenderer, 255, 0, 0, 255);
-
-		// Draw the rectangle
+		// if (ptrBody->GetIsBeingCollidedWith())
+		if (ptrBody->GetHasBottomCollision() || ptrBody->GetHasTopCollision() || 
+			ptrBody->GetHasLeftCollision() || ptrBody->GetHasRightCollision())
+		{
+			SDL_SetRenderDrawColor(m_ptrRenderer, 0, 0, 255, 255);
+		}
+		else if (ptrBody->GetHasBottomSensor() || ptrBody->GetHasTopSensor() || 
+				 ptrBody->GetHasLeftSensor() || ptrBody->GetHasRightSensor())
+		{
+			SDL_SetRenderDrawColor(m_ptrRenderer, 0, 255, 0, 255);
+		}
+		else
+		{
+			SDL_SetRenderDrawColor(m_ptrRenderer, 255, 0, 0, 255);
+		}
 		SDL_RenderDrawRect(m_ptrRenderer, &dst);
-
-		// Reset the drawing color to white (or any other color you want)
 		SDL_SetRenderDrawColor(m_ptrRenderer, 'd3', 'd3', 'd3', SDL_ALPHA_OPAQUE);
 #endif
 	}
