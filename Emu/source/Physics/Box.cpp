@@ -30,7 +30,7 @@ namespace Engine
 			break;
 		case SENSOR:
 			m_bodyDef.type = b2_kinematicBody;
-			ENGINE_TRACE_D("Creating sensor body.");
+			ENGINE_TRACE_D("Creating sensor.");
 			m_fixtureDef.isSensor = true;
 			break;
 		default:
