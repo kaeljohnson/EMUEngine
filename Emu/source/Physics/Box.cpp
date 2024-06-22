@@ -13,7 +13,7 @@ namespace Engine
 		: m_halfWidthInMeters(widthInMeters / 2.0f), m_halfHeightInMeters(heightInMeters / 2.0f), 
 		m_widthInMeters(widthInMeters), m_heightInMeters(heightInMeters),
 		m_bodyType(bodyType), m_collidable(true), m_fixed(fixed), m_body(nullptr),
-		m_gravityOn(true), OnGroundFlag(false), IsCollidingWith(false), IsBeingCollidedWith(false)
+		m_gravityOn(true)
 	{
 		switch (bodyType)
 		{
@@ -27,6 +27,10 @@ namespace Engine
 		case KINEMATIC:
 			m_bodyDef.type = b2_kinematicBody;
 			ENGINE_TRACE_D("Creating kinematic body.");
+			break;
+		case SENSOR:
+			m_bodyDef.type = b2_kinematicBody;
+			ENGINE_TRACE_D("Creating sensor body.");
 			m_fixtureDef.isSensor = true;
 			break;
 		default:
@@ -82,15 +86,15 @@ namespace Engine
 
 	void Box::SetCollisionFlags()
 	{
-		SetBottomCollision(false);
-		SetTopCollision(false);
-		SetLeftCollision(false);
-		SetRightCollision(false);
+		m_bottomCollision = false;
+		m_topCollision = false;
+		m_leftCollision = false;
+		m_rightCollision = false;
 
-		SetBottomSensor(false);
-		SetTopSensor(false);
-		SetLeftSensor(false);
-		SetRightSensor(false);
+		m_bottomSensor = false;
+		m_topSensor = false;
+		m_leftSensor = false;
+		m_rightSensor = false;
 
 		b2ContactEdge* edge = m_body->GetContactList();
 		while (edge)
@@ -109,7 +113,7 @@ namespace Engine
 				// Different trigger for contacts for kinematic bodies for now.
 				// Might need a custom body type for bodies that
 				// are meant to be the ground.
-				if (otherBody->GetType() == b2_kinematicBody)
+				if (otherBox->GetBodyType() == SENSOR)
 				{
 					if (normal.y < -0.5) // Collision from above `this`
 					{
@@ -181,13 +185,13 @@ namespace Engine
 	void Box::SetWidthInMeters(const float widthInMeters) { m_shape.SetAsBox(widthInMeters / 2.0f, m_halfHeightInMeters); }
 	void Box::SetHeightInMeters(const float heightInMeters) { m_shape.SetAsBox(m_halfWidthInMeters, heightInMeters / 2.0f); }
 
-	void Box::SetBottomCollision(const bool bottomCollision) { BottomCollision = bottomCollision; }
-	void Box::SetTopCollision(const bool topCollision) { TopCollision = topCollision; }
-	void Box::SetLeftCollision(const bool leftCollision) { LeftCollision = leftCollision; }
-	void Box::SetRightCollision(const bool rightCollision) { RightCollision = rightCollision; }
+	void Box::SetBottomCollision(const bool bottomCollision) { m_bottomCollision = bottomCollision; }
+	void Box::SetTopCollision(const bool topCollision) { m_topCollision = topCollision; }
+	void Box::SetLeftCollision(const bool leftCollision) { m_leftCollision = leftCollision; }
+	void Box::SetRightCollision(const bool rightCollision) { m_rightCollision = rightCollision; }
 
-	void Box::SetBottomSensor(const bool bottomSensor) { BottomSensor = bottomSensor; }
-	void Box::SetTopSensor(const bool topSensor) { TopSensor = topSensor; }
-	void Box::SetLeftSensor(const bool leftSensor) { LeftSensor = leftSensor; }
-	void Box::SetRightSensor(const bool rightSensor) { RightSensor = rightSensor; }
+	void Box::SetBottomSensor(const bool bottomSensor) { m_bottomSensor = bottomSensor; }
+	void Box::SetTopSensor(const bool topSensor) { m_topSensor = topSensor; }
+	void Box::SetLeftSensor(const bool leftSensor) { m_leftSensor = leftSensor; }
+	void Box::SetRightSensor(const bool rightSensor) { m_rightSensor = rightSensor; }
 }

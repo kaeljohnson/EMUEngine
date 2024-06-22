@@ -57,22 +57,20 @@ namespace Engine
 
 		// Integrate tile map into scen objects array?
 
+		// Dyanmic bodies must be updated after static.
+
 		if (HasMap)
 		{
 			for (auto& tile : *ptrTileMap)
 			{
-				tile.CheckAllCollisions();
-
+				tile.EngineSideUpdate();
 				tile.Update();
 			}
 		}
 
 		for (auto& sceneObject : m_sceneObjects)
 		{
-			sceneObject->UpdatePrevPosition();
-
-			sceneObject->CheckAllCollisions();
-
+			sceneObject->EngineSideUpdate();
 			sceneObject->Update();
 		}
 

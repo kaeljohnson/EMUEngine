@@ -16,12 +16,6 @@ namespace Engine
 		~Entity() = default;
 
 	public:
-		void CheckAllCollisions() override;
-
-	public:
-		/*bool OnGroundFlag;
-		bool OnCelingFlag;
-		bool OnLeftWallFlag;
-		bool OnRightWallFlag;*/
+		void EngineSideUpdate() override;
 	};
 }

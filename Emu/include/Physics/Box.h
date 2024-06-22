@@ -19,14 +19,14 @@ namespace Engine
 	class Box : public IPhysicsBody
 	{
 	public:
+		const BodyType m_bodyType;
+
 		// Box2D specific members.
 		b2Body* m_body;
 		b2BodyDef m_bodyDef;
 		b2FixtureDef m_fixtureDef;
 		b2PolygonShape m_shape;
 		b2Fixture* m_fixture;
-		
-		const BodyType m_bodyType;
 
 		// State members
 		const float m_halfWidthInMeters;
@@ -41,20 +41,16 @@ namespace Engine
 		bool m_fixed;
 		bool m_gravityOn;
 
-		bool OnGroundFlag;
 
-		bool IsCollidingWith;
-		bool IsBeingCollidedWith;
+		bool m_bottomCollision;
+		bool m_topCollision;
+		bool m_leftCollision;
+		bool m_rightCollision;
 
-		bool BottomCollision;
-		bool TopCollision;
-		bool LeftCollision;
-		bool RightCollision;
-
-		bool BottomSensor;
-		bool TopSensor;
-		bool LeftSensor;
-		bool RightSensor;
+		bool m_bottomSensor;
+		bool m_topSensor;
+		bool m_leftSensor;
+		bool m_rightSensor;
 
 	public:
 		Box() = default;
@@ -96,15 +92,15 @@ namespace Engine
 		void SetLeftSensor(const bool leftSensor) override;
 		void SetRightSensor(const bool rightSensor) override;
 
-		inline const bool GetHasBottomCollision() const { return BottomCollision; }
-		inline const bool GetHasTopCollision() const { return TopCollision; }
-		inline const bool GetHasLeftCollision() const { return LeftCollision; }
-		inline const bool GetHasRightCollision() const { return RightCollision; }
+		inline const bool GetHasBottomCollision() const { return m_bottomCollision; }
+		inline const bool GetHasTopCollision() const { return m_topCollision; }
+		inline const bool GetHasLeftCollision() const { return m_leftCollision; }
+		inline const bool GetHasRightCollision() const { return m_rightCollision; }
 
-		inline const bool GetHasBottomSensor() const { return BottomSensor; }
-		inline const bool GetHasTopSensor() const { return TopSensor; }
-		inline const bool GetHasLeftSensor() const { return LeftSensor; }
-		inline const bool GetHasRightSensor() const { return RightSensor; }
+		inline const bool GetHasBottomSensor() const { return m_bottomSensor; }
+		inline const bool GetHasTopSensor() const { return m_topSensor; }
+		inline const bool GetHasLeftSensor() const { return m_leftSensor; }
+		inline const bool GetHasRightSensor() const { return m_rightSensor; }
 
 		inline const float GetXVelocity() const override { return m_body->GetLinearVelocity().x; }
 		inline const float GetYVelocity() const override { return m_body->GetLinearVelocity().y; }

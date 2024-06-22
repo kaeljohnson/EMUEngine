@@ -29,27 +29,18 @@ namespace Engine
 		m_physicsBody->UpdatePrevPosition();
 	}
 
-	void SceneObject::Update()
+	void SceneObject::EngineSideUpdate()
 	{
 		// World updates physics bodies.
 	}
 
 	void SceneObject::CheckAllCollisions()
 	{
-		// Engine uses this for checking if 
-		// Entities are on the ground, ceiling, left wall, or right wall
-		// each frame.
+		// By default, scene objects do not check for collisions each frame.
+	}
 
-		// m_physicsBody->SetIsBeingCollidedWith(false);
-		// m_physicsBody->SetIsCollidingWith(false);
-		m_physicsBody->SetBottomCollision(false);
-		m_physicsBody->SetTopCollision(false);
-		m_physicsBody->SetLeftCollision(false);
-		m_physicsBody->SetRightCollision(false);
-
-		m_physicsBody->SetBottomSensor(false);
-		m_physicsBody->SetTopSensor(false);
-		m_physicsBody->SetLeftSensor(false);
-		m_physicsBody->SetRightSensor(false);
+	void SceneObject::Update()
+	{
+		// Purely virtual function meant to be implemented by client of engine.
 	}
 }

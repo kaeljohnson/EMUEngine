@@ -59,7 +59,7 @@ namespace Engine
                 if (GetTile(x, y) != '-')
                 {
                     m_tiles.emplace_back(
-                        KINEMATIC,
+                        SENSOR,
 						static_cast<float>(x) * static_cast<float>(m_numMetersPerTile),
 						static_cast<float>(y) * static_cast<float>(m_numMetersPerTile),
 						static_cast<float>(m_numMetersPerTile),
@@ -72,7 +72,7 @@ namespace Engine
 
     void TileMap::CreateCollisionBodies()
     {
-        // Creates collision bodies for the map. This is a very simple implementation that creates a collision body for each block of tiles.
+        // Creates collision bodies for the map. This creates a collision body for each block of tiles.
         // 
         // When a tile is moved or removed, the corresponding collision body needs to be updated.
         // 
@@ -131,10 +131,10 @@ namespace Engine
                     // Create the tile object with calculated dimensions
                     m_collisionBodies.emplace_back(
                         STATIC,
-                        static_cast<float>(startX) * static_cast<float>(m_numMetersPerTile), // +0.025f,
-                        static_cast<float>(startY) * static_cast<float>(m_numMetersPerTile), // + 0.025f,
-                        static_cast<float>(width) * static_cast<float>(m_numMetersPerTile), // - 0.05f,
-                        static_cast<float>(height) * static_cast<float>(m_numMetersPerTile), // - 0.05f,
+                        static_cast<float>(startX) * static_cast<float>(m_numMetersPerTile),
+                        static_cast<float>(startY) * static_cast<float>(m_numMetersPerTile),
+                        static_cast<float>(width) * static_cast<float>(m_numMetersPerTile),
+                        static_cast<float>(height) * static_cast<float>(m_numMetersPerTile),
                         nullptr);
                 }
             }

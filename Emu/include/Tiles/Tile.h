@@ -14,10 +14,15 @@ namespace Engine
 		EMU_API Tile(const BodyType bodyType, const float x, const float y, const float width, const float height, const std::shared_ptr<ITexture> ptrTexture);
 		~Tile() = default;
 
+	public:
 		float x;
 		float y;
 
 		float width;
 		float height;
+
+	public:
+		void EngineSideUpdate() override;
+		void CheckAllCollisions() override;
 	};
 }

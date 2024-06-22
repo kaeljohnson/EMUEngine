@@ -34,7 +34,8 @@ namespace Engine
 		EMU_API inline const float GetYVelocity() const { return m_physicsBody->GetYVelocity(); }
 		EMU_API inline std::string GetUUID() const { return uuid; }
 
-		EMU_API virtual void Update();
+		virtual void EngineSideUpdate();
+		virtual void Update();
 
 	public:
 		void UpdatePrevPosition();
