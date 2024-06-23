@@ -12,7 +12,7 @@ public:
 		const float widthInMeters, const float heightInMeters, std::shared_ptr<Engine::ITexture> ptrTexture);
 	~Controllable() = default;
 	void Update() override;
-	void Jump();
+	void Jump(bool canJump);
 
 protected:
 	const float m_xSwitchDeceleration;
@@ -28,6 +28,22 @@ protected:
 	const float m_jumpForce;
 	const float m_minJumpForce;
 
+	bool m_jumpKeyHeld;
+	bool m_canJump;
 	bool m_isJumping;
-	float m_jumpCharge;		
+	float m_jumpCharge;
+
+	float m_coyoteTime;
+	const float m_coyoteTimeDuration;
+
+	Engine::EventType m_jumpKeyDown;
+	Engine::EventType m_jumpKeyUp;
+
+	Engine::EventType m_moveLeftKeyDown;
+	Engine::EventType m_moveLeftKeyUp;
+	Engine::EventType m_moveRightKeyDown;
+	Engine::EventType m_moveRightKeyUp;
+
+private:
+	void checkForJump(bool onGround);
 };
