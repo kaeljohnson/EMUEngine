@@ -168,6 +168,19 @@ namespace Engine
 		}
 	}
 
+	void Box::SetCollisionFlagsToFalse()
+	{
+		m_bottomCollision = false;
+		m_topCollision = false;
+		m_leftCollision = false;
+		m_rightCollision = false;
+
+		m_bottomSensor = false;
+		m_topSensor = false;
+		m_leftSensor = false;
+		m_rightSensor = false;
+	}
+
 	void Box::UpdatePrevPosition() { m_prevX = GetTopLeftXInMeters(); m_prevY = GetTopLeftYInMeters(); }
 
 	void Box::CreateFixture() { m_fixture = m_body->CreateFixture(&m_fixtureDef); }

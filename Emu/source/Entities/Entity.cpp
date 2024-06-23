@@ -10,12 +10,4 @@ namespace Engine
 	Entity::Entity(const float x, const float y, const float width, const float height, const std::shared_ptr<ITexture> ptrTexture)
 		: SceneObject(DYNAMIC, false, x, y, width, height, ptrTexture)
 	{}
-
-	void Entity::EngineSideUpdate()
-	{
-		m_physicsBody->UpdatePrevPosition();
-
-		// World updates physics bodies.
-		m_physicsBody->SetCollisionFlags();
-	}
-}
+} 

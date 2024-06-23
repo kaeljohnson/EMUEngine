@@ -7,13 +7,15 @@
 #include "../../include/Logging/Logger.h"
 #include "../../include/Textures/ITexture.h"
 #include "../../include/Physics/PhysicsFactory.h"
+#include "../../include/Events/EventManager.h"
 
 namespace Engine
 {
 	SceneObject::SceneObject(const BodyType bodyType, const bool fixed, const float startingXInMeters, const float startingYInMeters,
 		const float widthInMeters, const float heightInMeters, std::shared_ptr<ITexture> ptrTexture)
 		: m_physicsBody(CreatePhysicsBody(bodyType, fixed, startingXInMeters, startingYInMeters, widthInMeters, heightInMeters)),
-		m_texture(ptrTexture), Enabled(true), Visible(true), uuid(CreateUUID())
+		m_texture(ptrTexture), Enabled(true), Visible(true), uuid(CreateUUID()),
+		refKeyStates(EventManager::GetInstance()->GetKeyStates())
 	{
 		ENGINE_INFO_D("SceneObject created");
 	}
@@ -32,11 +34,22 @@ namespace Engine
 	void SceneObject::EngineSideUpdate()
 	{
 		// World updates physics bodies.
-	}
-
-	void SceneObject::CheckAllCollisions()
-	{
-		// By default, scene objects do not check for collisions each frame.
+		switch (m_physicsBody->GetBodyType())
+		{
+			case DYNAMIC:
+				m_physicsBody->UpdatePrevPosition();
+				m_physicsBody->SetCollisionFlags();
+				break;
+			case STATIC:
+				m_physicsBody->SetCollisionFlagsToFalse();
+				break;
+			case SENSOR:
+				m_physicsBody->SetCollisionFlagsToFalse();
+				break;
+			default:
+				ENGINE_WARN_D("Body type has no engine side updating.");
+				break;
+		}
 	}
 
 	void SceneObject::Update()

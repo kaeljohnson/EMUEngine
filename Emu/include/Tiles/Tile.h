@@ -20,9 +20,5 @@ namespace Engine
 
 		float width;
 		float height;
-
-	public:
-		void EngineSideUpdate() override;
-		void CheckAllCollisions() override;
 	};
 }

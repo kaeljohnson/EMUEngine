@@ -15,7 +15,6 @@
 #include "../include/Textures/TextureFactory.h"
 #include "../include/Physics/IPhysicsBody.h"
 #include "../include/Physics/PhysicsFactory.h"
-#include "../include/Controllable/Controllable.h"
 #include "../include/Tiles/Tile.h"
 #include "../include/Tiles/TileMap.h"
 #include "../include/Entities/Entity.h"

@@ -2,21 +2,16 @@
 
 #include <memory>
 
-#include "../../include/Events/EventManager.h"
-#include "../../include/Entities/Entity.h"
-#include "../../include/Controllable/Controllable.h"
-#include "../../include/Textures/ITexture.h"
-#include "../../include/Logging/Logger.h"
+#include <Engine.h>
 
-namespace Engine
-{
+#include "../../include/Controllable/Controllable.h"
+
     Controllable::Controllable(const float startingXInMeters, const float startingYInMeters,
-        const float widthInMeters, const float heightInMeters, std::shared_ptr<ITexture> refTexture)
+        const float widthInMeters, const float heightInMeters, std::shared_ptr<Engine::ITexture> refTexture)
         // These need to be set by client.
         : m_xSwitchDeceleration(85.0f), m_xDeceleration(10.0f), m_yDeceleration(0.0f), m_xAcceleration(30.0f), m_xMaxVelocity(30.0f),
         m_yAcceleration(30.0f), m_yMaxVelocity(60.0f), m_jumpForce(10.0f), m_jumpCharge(0.0),
         m_jumpChargeIncrement(1.0f), m_minJumpForce(15.0f), m_maxJumpCharge(10.5f), m_isJumping(false),
-        refKeyStates(EventManager::GetInstance()->GetKeyStates()),
         Entity(startingXInMeters, startingYInMeters, widthInMeters, heightInMeters, refTexture)
     {
     	m_physicsBody->SetFriction(0.0f);
@@ -31,7 +26,7 @@ namespace Engine
         // have less control over their movement.        
         const float ACCELERATIONDAMPENING = m_physicsBody->GetHasBottomCollision() ? 1.0f : 0.90f;
 
-        if (refKeyStates.at(D_KEY_DOWN) && refKeyStates.at(A_KEY_UP))
+        if (refKeyStates.at(Engine::D_KEY_DOWN) && refKeyStates.at(Engine::A_KEY_UP))
         {
             if (currentVelocityX < 0) // If previously moving left
             {
@@ -42,7 +37,7 @@ namespace Engine
                 force = { m_xAcceleration * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters(), 0.0f }; // Apply normal force to the right
             }
         }
-        else if (refKeyStates.at(A_KEY_DOWN) && refKeyStates.at(D_KEY_UP))
+        else if (refKeyStates.at(Engine::A_KEY_DOWN) && refKeyStates.at(Engine::D_KEY_UP))
         {
             if (currentVelocityX > 0) // If previously moving right
             {
@@ -60,12 +55,12 @@ namespace Engine
         }
 
         // Jump
-        if (refKeyStates.at(SPACE_KEY_DOWN))
+        if (refKeyStates.at(Engine::SPACE_KEY_DOWN))
         {
             Jump();
 		}
 
-        if (refKeyStates.at(SPACE_KEY_UP))
+        if (refKeyStates.at(Engine::SPACE_KEY_UP))
         {
 			m_jumpCharge = 0.0f;
 			m_isJumping = false;
@@ -101,4 +96,3 @@ namespace Engine
 			m_physicsBody->ApplyImpulseToBox({ 0.0f, -m_minJumpForce * m_physicsBody->GetSizeInMeters() });
 		}
 	}
-}

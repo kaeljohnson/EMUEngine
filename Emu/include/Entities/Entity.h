@@ -14,8 +14,5 @@ namespace Engine
 	public:
 		EMU_API Entity(const float x, const float y, const float width, const float height, const std::shared_ptr<ITexture> ptrTexture);
 		~Entity() = default;
-
-	public:
-		void EngineSideUpdate() override;
 	};
 }

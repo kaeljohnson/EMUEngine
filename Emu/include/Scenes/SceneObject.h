@@ -2,11 +2,13 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "../Core.h"
 
 #include "../Physics/IPhysicsBody.h"
 #include "../Textures/ITexture.h"
+#include "../Events/Event.h"
 
 namespace Engine
 {
@@ -34,12 +36,11 @@ namespace Engine
 		EMU_API inline const float GetYVelocity() const { return m_physicsBody->GetYVelocity(); }
 		EMU_API inline std::string GetUUID() const { return uuid; }
 
-		virtual void EngineSideUpdate();
-		virtual void Update();
+		EMU_API virtual void Update();
 
 	public:
+		void EngineSideUpdate();
 		void UpdatePrevPosition();
-		virtual void CheckAllCollisions();
 
 
 	private:
@@ -49,5 +50,8 @@ namespace Engine
 		std::shared_ptr<ITexture> m_texture;
 		std::shared_ptr<IPhysicsBody> m_physicsBody;
 
+		// Reference to the key states in the event manager. Not
+		// sure if this should be here.
+		const std::unordered_map<EventType, bool>& refKeyStates;
 	};
 }

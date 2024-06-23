@@ -81,6 +81,7 @@ namespace Engine
 		void SetHeightInMeters(const float heightInMeters) override;
 
 		void SetCollisionFlags() override;
+		void SetCollisionFlagsToFalse() override;
 
 		void SetBottomCollision(const bool bottomCollision) override;
 		void SetTopCollision(const bool topCollision) override;
