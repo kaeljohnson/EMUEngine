@@ -55,8 +55,9 @@ namespace Engine
 		// prev values if they have changed. In fact, should only update
 		// objects that have changed in general
 
-		// Integrate tile map into scen objects array?
+		// Integrate tile map into scene objects array?
 
+		// Need correct order for updating objects.
 		// Dyanmic bodies must be updated after static.
 
 		if (HasMap)
