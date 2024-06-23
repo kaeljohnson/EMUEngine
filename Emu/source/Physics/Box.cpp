@@ -84,7 +84,7 @@ namespace Engine
 		m_body->ApplyLinearImpulseToCenter(b2Vec2(impulse.first, impulse.second), true);
 	}
 
-	void Box::SetCollisionFlags()
+	void Box::SetContactFlags()
 	{
 		m_bottomCollision = false;
 		m_topCollision = false;
@@ -168,7 +168,7 @@ namespace Engine
 		}
 	}
 
-	void Box::SetCollisionFlagsToFalse()
+	void Box::SetContactFlagsToFalse()
 	{
 		m_bottomCollision = false;
 		m_topCollision = false;

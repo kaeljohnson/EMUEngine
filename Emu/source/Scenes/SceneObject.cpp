@@ -20,9 +20,9 @@ namespace Engine
 		ENGINE_INFO_D("SceneObject created");
 	}
 
-	void SceneObject::SetXVelocity(const float xVel) { m_physicsBody->SetXVelocity(xVel); }
-	void SceneObject::SetYVelocity(const float yVel) { m_physicsBody->SetYVelocity(yVel); }
-	void SceneObject::SetGravity(bool enabled) { m_physicsBody->SetGravity(enabled); }
+	// void SceneObject::SetXVelocity(const float xVel) { m_physicsBody->SetXVelocity(xVel); }
+	// void SceneObject::SetYVelocity(const float yVel) { m_physicsBody->SetYVelocity(yVel); }
+	// void SceneObject::SetGravity(bool enabled) { m_physicsBody->SetGravity(enabled); }
 
 	void SceneObject::UpdatePrevPosition()
 	{ 
@@ -38,13 +38,13 @@ namespace Engine
 		{
 			case DYNAMIC:
 				m_physicsBody->UpdatePrevPosition();
-				m_physicsBody->SetCollisionFlags();
+				m_physicsBody->SetContactFlags();
 				break;
 			case STATIC:
-				m_physicsBody->SetCollisionFlagsToFalse();
+				m_physicsBody->SetContactFlagsToFalse();
 				break;
 			case SENSOR:
-				m_physicsBody->SetCollisionFlagsToFalse();
+				m_physicsBody->SetContactFlagsToFalse();
 				break;
 			default:
 				ENGINE_WARN_D("Body type has no engine side updating.");

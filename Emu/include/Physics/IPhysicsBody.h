@@ -54,8 +54,8 @@ namespace Engine
 		virtual void ApplyForceToBox(std::pair<float, float> force) = 0;
 		virtual void ApplyImpulseToBox(std::pair<float, float> impulse) = 0;
 
-		virtual void SetCollisionFlags() = 0;
-		virtual void SetCollisionFlagsToFalse() = 0;
+		virtual void SetContactFlags() = 0;
+		virtual void SetContactFlagsToFalse() = 0;
 
 		virtual void SetBottomCollision(const bool bottomCollision) = 0;
 		virtual void SetTopCollision(const bool topCollision) = 0;

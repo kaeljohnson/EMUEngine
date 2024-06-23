@@ -22,11 +22,12 @@ int main(int argc, char* args[])
 	
 	Controllable player(4.0f, 20.0f, 0.9f, 0.9f, tempTextureRed);
 
+	CLIENT_INFO_D("Player UUID: " + player.GetUUID());
+
 	Engine::TileMap testMap("TestMap1.txt", 1);
 
 	scene->AddTileMap(testMap);
 	
-	CLIENT_INFO_D(player.GetUUID());
 
 	AppManagementListener appManagementListener("App management listener");
 
