@@ -12,7 +12,7 @@
         : m_xSwitchDeceleration(85.0f), m_xDeceleration(10.0f), m_yDeceleration(0.0f), m_xAcceleration(30.0f), m_xMaxVelocity(30.0f),
         m_yAcceleration(30.0f), m_yMaxVelocity(60.0f), m_jumpForce(10.0f), m_jumpCharge(0.0),
         m_jumpChargeIncrement(1.0f), m_minJumpForce(15.0f), m_maxJumpCharge(10.5f), m_isJumping(false),
-        m_coyoteTime(0.0f), m_coyoteTimeDuration(0.035f), m_jumpKeyHeld(false), m_canJump(false),
+        m_coyoteTime(0.0f), m_coyoteTimeDuration(TIME_STEP * 2.0f), m_jumpKeyHeld(false), m_canJump(false),
         m_jumpKeyDown(Engine::SPACE_KEY_DOWN), m_jumpKeyUp(Engine::SPACE_KEY_UP),
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
