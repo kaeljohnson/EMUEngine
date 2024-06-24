@@ -216,11 +216,6 @@ namespace Engine
 	{
 		bool isTextureNull = sceneObject->GetTexture() == nullptr;
 
-		/*if (isTextureNull)
-		{
-			ENGINE_CRITICAL_D("Scene object does not have a texture. Rendering physics border.");
-		}*/
-
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
 
@@ -238,7 +233,6 @@ namespace Engine
 			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))
 		};
 
-		// SDL_Texture* texture = static_cast<Texture*>(sceneObject->GetTexture())->m_texture;
 		SDLTexture* ptrTexture = nullptr;
 
 		if (!isTextureNull)
@@ -248,7 +242,6 @@ namespace Engine
 
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)
-		// if (ptrBody->GetIsBeingCollidedWith())
 		if (ptrBody->GetHasBottomCollision() || ptrBody->GetHasTopCollision() || 
 			ptrBody->GetHasLeftCollision() || ptrBody->GetHasRightCollision())
 		{
