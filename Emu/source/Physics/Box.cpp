@@ -27,6 +27,10 @@ namespace Engine
 		case KINEMATIC:
 			m_bodyDef.type = b2_kinematicBody;
 			ENGINE_TRACE_D("Creating kinematic body.");
+			break;
+		case SENSOR:
+			m_bodyDef.type = b2_kinematicBody;
+			ENGINE_TRACE_D("Creating sensor.");
 			m_fixtureDef.isSensor = true;
 			break;
 		default:
@@ -36,6 +40,7 @@ namespace Engine
 		}
 
 		m_bodyDef.fixedRotation = true;
+		m_bodyDef.userData.pointer = reinterpret_cast<intptr_t>(this);
 		m_prevX = startingXInMeters;
 		m_prevY = startingYInMeters;
 		m_bodyDef.position.Set(startingXInMeters + m_halfWidthInMeters, startingYInMeters + m_halfHeightInMeters);
@@ -79,46 +84,106 @@ namespace Engine
 		m_body->ApplyLinearImpulseToCenter(b2Vec2(impulse.first, impulse.second), true);
 	}
 
-	bool Box::OnGround() const
+	void Box::SetContactFlags()
 	{
+		m_bottomCollision = false;
+		m_topCollision = false;
+		m_leftCollision = false;
+		m_rightCollision = false;
+
+		m_bottomSensor = false;
+		m_topSensor = false;
+		m_leftSensor = false;
+		m_rightSensor = false;
+
 		b2ContactEdge* edge = m_body->GetContactList();
 		while (edge)
 		{
 			if (edge->contact->IsTouching())
 			{
-				b2Body* otherBody = edge->contact->GetFixtureA()->GetBody() == m_body ?
-					edge->contact->GetFixtureB()->GetBody() :
-					edge->contact->GetFixtureA()->GetBody();
-
-				// Ignore contacts with kinematic bodies for now.
-				// Might need a custom body type for bodies that
-				// are meant to be the ground.
-				if (otherBody->GetType() == b2_kinematicBody)
-				{
-					edge = edge->next;
-					continue;
-				}
-
 				b2WorldManifold worldManifold;
 				edge->contact->GetWorldManifold(&worldManifold);
 
-				// Check which body is the player body
-				bool bodyAIsPlayer = edge->contact->GetFixtureA()->GetBody() == m_body;
-				float normalY = bodyAIsPlayer ? worldManifold.normal.y : -worldManifold.normal.y;
+				b2Body* otherBody = edge->contact->GetFixtureA()->GetBody() == m_body ? edge->contact->GetFixtureB()->GetBody() : edge->contact->GetFixtureA()->GetBody();
+				Box* otherBox = reinterpret_cast<Box*>(otherBody->GetUserData().pointer);
 
-				if (normalY > 0.5f)
+				// Assuming the first point's normal is representative for the whole contact
+				b2Vec2 normal = worldManifold.normal;
+
+				// Different trigger for contacts for kinematic bodies for now.
+				// Might need a custom body type for bodies that
+				// are meant to be the ground.
+				if (otherBox->GetBodyType() == SENSOR)
 				{
-					return true;
+					if (normal.y < -0.5) // Collision from above `this`
+					{
+						this->SetBottomSensor(true);
+						otherBox->SetTopSensor(true);
+					}
+					else if (normal.y > 0.5) // Collision from below `this`
+					{
+						this->SetTopSensor(true);
+						otherBox->SetBottomSensor(true);
+					}
+
+					if (normal.x > 0.5) // Collision from the left of `this`
+					{
+						this->SetLeftSensor(true);
+						otherBox->SetRightSensor(true);
+					}
+					else if (normal.x < -0.5) // Collision from the right of `this`
+					{
+						this->SetRightSensor(true);
+						otherBox->SetLeftSensor(true);
+					}
+				}
+				else
+				{
+					// Determine the direction of the collision for `this`
+
+					if (normal.y < -0.5) // Collision from above `this`
+					{
+						this->SetBottomCollision(true);
+						otherBox->SetTopCollision(true);
+					}
+					else if (normal.y > 0.5) // Collision from below `this`
+					{
+						this->SetTopCollision(true);
+						otherBox->SetBottomCollision(true);
+					}
+
+					if (normal.x > 0.5) // Collision from the left of `this`
+					{
+						this->SetLeftCollision(true);
+						otherBox->SetRightCollision(true);
+					}
+					else if (normal.x < -0.5) // Collision from the right of `this`
+					{
+						this->SetRightCollision(true);
+						otherBox->SetLeftCollision(true);
+					}
 				}
 			}
 			edge = edge->next;
 		}
-		return false;
+	}
+
+	void Box::SetContactFlagsToFalse()
+	{
+		m_bottomCollision = false;
+		m_topCollision = false;
+		m_leftCollision = false;
+		m_rightCollision = false;
+
+		m_bottomSensor = false;
+		m_topSensor = false;
+		m_leftSensor = false;
+		m_rightSensor = false;
 	}
 
 	void Box::UpdatePrevPosition() { m_prevX = GetTopLeftXInMeters(); m_prevY = GetTopLeftYInMeters(); }
 
-	void Box::CreateFixture() { m_body->CreateFixture(&m_fixtureDef); }
+	void Box::CreateFixture() { m_fixture = m_body->CreateFixture(&m_fixtureDef); }
 	void Box::SetGravity(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
 
 	void Box::SetXVelocity(const float xVel) { m_body->SetLinearVelocity(b2Vec2(xVel, m_body->GetLinearVelocity().y)); }
@@ -132,4 +197,14 @@ namespace Engine
 	void Box::SetCollidable(const bool collidable) { m_collidable = collidable; }
 	void Box::SetWidthInMeters(const float widthInMeters) { m_shape.SetAsBox(widthInMeters / 2.0f, m_halfHeightInMeters); }
 	void Box::SetHeightInMeters(const float heightInMeters) { m_shape.SetAsBox(m_halfWidthInMeters, heightInMeters / 2.0f); }
+
+	void Box::SetBottomCollision(const bool bottomCollision) { m_bottomCollision = bottomCollision; }
+	void Box::SetTopCollision(const bool topCollision) { m_topCollision = topCollision; }
+	void Box::SetLeftCollision(const bool leftCollision) { m_leftCollision = leftCollision; }
+	void Box::SetRightCollision(const bool rightCollision) { m_rightCollision = rightCollision; }
+
+	void Box::SetBottomSensor(const bool bottomSensor) { m_bottomSensor = bottomSensor; }
+	void Box::SetTopSensor(const bool topSensor) { m_topSensor = topSensor; }
+	void Box::SetLeftSensor(const bool leftSensor) { m_leftSensor = leftSensor; }
+	void Box::SetRightSensor(const bool rightSensor) { m_rightSensor = rightSensor; }
 }

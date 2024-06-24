@@ -2,6 +2,7 @@
 
 #include <Engine.h>
 #include "../include/EventListeners/AppManagementListener.h"
+#include "../include/Controllable/Controllable.h"
 
 int main(int argc, char* args[])
 {
@@ -19,13 +20,14 @@ int main(int argc, char* args[])
 	// Temp
 	Engine::TexturePtr tempTextureRed = Engine::CreateTexture(0, 0, 0);
 	
-	Engine::Controllable player(4.0f, 20.0f, 0.9f, 0.9f, tempTextureRed);
+	Controllable player(4.0f, 20.0f, 0.9f, 0.9f, tempTextureRed);
+
+	CLIENT_INFO_D("Player UUID: " + player.GetUUID());
 
 	Engine::TileMap testMap("TestMap1.txt", 1);
 
 	scene->AddTileMap(testMap);
 	
-	CLIENT_INFO_D(player.GetUUID());
 
 	AppManagementListener appManagementListener("App management listener");
 

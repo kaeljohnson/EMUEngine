@@ -216,11 +216,6 @@ namespace Engine
 	{
 		bool isTextureNull = sceneObject->GetTexture() == nullptr;
 
-		/*if (isTextureNull)
-		{
-			ENGINE_CRITICAL_D("Scene object does not have a texture. Rendering physics border.");
-		}*/
-
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
 
@@ -233,12 +228,11 @@ namespace Engine
 
 			static_cast<int>(round((ptrBody->GetTopLeftPrevX() * (1.0 - interpolation) + ptrBody->GetTopLeftXInMeters() * interpolation) * pixelsPerMeter * SCALE)),
 			static_cast<int>(round((ptrBody->GetTopLeftPrevY() * (1.0 - interpolation) + ptrBody->GetTopLeftYInMeters() * interpolation) * pixelsPerMeter * SCALE)),
-			
+
 			static_cast<int>(round(ptrBody->GetWidthInMeters() * pixelsPerMeter * SCALE)),
 			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))
 		};
 
-		// SDL_Texture* texture = static_cast<Texture*>(sceneObject->GetTexture())->m_texture;
 		SDLTexture* ptrTexture = nullptr;
 
 		if (!isTextureNull)
@@ -248,12 +242,21 @@ namespace Engine
 
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)
-		SDL_SetRenderDrawColor(m_ptrRenderer, 255, 0, 0, 255);
-
-		// Draw the rectangle
+		if (ptrBody->GetHasBottomCollision() || ptrBody->GetHasTopCollision() || 
+			ptrBody->GetHasLeftCollision() || ptrBody->GetHasRightCollision())
+		{
+			SDL_SetRenderDrawColor(m_ptrRenderer, 0, 0, 255, 255);
+		}
+		else if (ptrBody->GetHasBottomSensor() || ptrBody->GetHasTopSensor() || 
+				 ptrBody->GetHasLeftSensor() || ptrBody->GetHasRightSensor())
+		{
+			SDL_SetRenderDrawColor(m_ptrRenderer, 0, 255, 0, 255);
+		}
+		else
+		{
+			SDL_SetRenderDrawColor(m_ptrRenderer, 255, 0, 0, 255);
+		}
 		SDL_RenderDrawRect(m_ptrRenderer, &dst);
-
-		// Reset the drawing color to white (or any other color you want)
 		SDL_SetRenderDrawColor(m_ptrRenderer, 'd3', 'd3', 'd3', SDL_ALPHA_OPAQUE);
 #endif
 	}

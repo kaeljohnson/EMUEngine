@@ -54,6 +54,27 @@ namespace Engine
 		virtual void ApplyForceToBox(std::pair<float, float> force) = 0;
 		virtual void ApplyImpulseToBox(std::pair<float, float> impulse) = 0;
 
-		virtual bool OnGround() const = 0;
+		virtual void SetContactFlags() = 0;
+		virtual void SetContactFlagsToFalse() = 0;
+
+		virtual void SetBottomCollision(const bool bottomCollision) = 0;
+		virtual void SetTopCollision(const bool topCollision) = 0;
+		virtual void SetLeftCollision(const bool leftCollision) = 0;
+		virtual void SetRightCollision(const bool rightCollision) = 0;
+
+		virtual const bool GetHasBottomCollision() const = 0;
+		virtual const bool GetHasTopCollision() const = 0;
+		virtual const bool GetHasLeftCollision() const = 0;
+		virtual const bool GetHasRightCollision() const = 0;
+
+		virtual void SetBottomSensor(const bool bottomSensor) = 0;
+		virtual void SetTopSensor(const bool topSensor) = 0;
+		virtual void SetLeftSensor(const bool leftSensor) = 0;
+		virtual void SetRightSensor(const bool rightSensor) = 0;
+
+		virtual const bool GetHasBottomSensor() const = 0;
+		virtual const bool GetHasTopSensor() const = 0;
+		virtual const bool GetHasLeftSensor() const = 0;
+		virtual const bool GetHasRightSensor() const = 0;
 	};
 }

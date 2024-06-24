@@ -19,13 +19,14 @@ namespace Engine
 	class Box : public IPhysicsBody
 	{
 	public:
+		const BodyType m_bodyType;
+
 		// Box2D specific members.
 		b2Body* m_body;
 		b2BodyDef m_bodyDef;
 		b2FixtureDef m_fixtureDef;
 		b2PolygonShape m_shape;
-		
-		const BodyType m_bodyType;
+		b2Fixture* m_fixture;
 
 		// State members
 		const float m_halfWidthInMeters;
@@ -40,6 +41,17 @@ namespace Engine
 		bool m_fixed;
 		bool m_gravityOn;
 
+
+		bool m_bottomCollision;
+		bool m_topCollision;
+		bool m_leftCollision;
+		bool m_rightCollision;
+
+		bool m_bottomSensor;
+		bool m_topSensor;
+		bool m_leftSensor;
+		bool m_rightSensor;
+
 	public:
 		Box() = default;
 		Box(const BodyType bodyType, const bool fixed, const float startingXInMeters,
@@ -52,8 +64,6 @@ namespace Engine
 
 		void ApplyForceToBox(std::pair<float, float> force) override;
 		void ApplyImpulseToBox(std::pair<float, float> impulse) override;
-
-		bool OnGround() const override;
 
 		// Box2d getter and setter wrappers
 		void CreateFixture() override;
@@ -69,6 +79,29 @@ namespace Engine
 		void SetCollidable(const bool collidable) override;
 		void SetWidthInMeters(const float widthInMeters) override;
 		void SetHeightInMeters(const float heightInMeters) override;
+
+		void SetContactFlags() override;
+		void SetContactFlagsToFalse() override;
+
+		void SetBottomCollision(const bool bottomCollision) override;
+		void SetTopCollision(const bool topCollision) override;
+		void SetLeftCollision(const bool leftCollision) override;
+		void SetRightCollision(const bool rightCollision) override;
+
+		void SetBottomSensor(const bool bottomSensor) override;
+		void SetTopSensor(const bool topSensor) override;
+		void SetLeftSensor(const bool leftSensor) override;
+		void SetRightSensor(const bool rightSensor) override;
+
+		inline const bool GetHasBottomCollision() const { return m_bottomCollision; }
+		inline const bool GetHasTopCollision() const { return m_topCollision; }
+		inline const bool GetHasLeftCollision() const { return m_leftCollision; }
+		inline const bool GetHasRightCollision() const { return m_rightCollision; }
+
+		inline const bool GetHasBottomSensor() const { return m_bottomSensor; }
+		inline const bool GetHasTopSensor() const { return m_topSensor; }
+		inline const bool GetHasLeftSensor() const { return m_leftSensor; }
+		inline const bool GetHasRightSensor() const { return m_rightSensor; }
 
 		inline const float GetXVelocity() const override { return m_body->GetLinearVelocity().x; }
 		inline const float GetYVelocity() const override { return m_body->GetLinearVelocity().y; }
@@ -90,6 +123,5 @@ namespace Engine
 		inline const float GetWidthInMeters() const override { return m_widthInMeters; }
 		inline const float GetHeightInMeters() const override { return m_heightInMeters; }
 		inline const float GetSizeInMeters() const override { return m_widthInMeters * m_heightInMeters; }
-
 	};
 }

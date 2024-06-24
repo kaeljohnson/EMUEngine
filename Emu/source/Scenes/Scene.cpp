@@ -55,23 +55,24 @@ namespace Engine
 		// prev values if they have changed. In fact, should only update
 		// objects that have changed in general
 
-		// Integrate tile map into scen objects array?
+		// Integrate tile map into scene objects array?
 
-		for (auto& sceneObject : m_sceneObjects)
-		{
-			sceneObject->UpdatePrevPosition();
-
-			sceneObject->Update();
-		}
+		// Need correct order for updating objects.
+		// Dyanmic bodies must be updated after static.
 
 		if (HasMap)
 		{
 			for (auto& tile : *ptrTileMap)
 			{
-				tile.UpdatePrevPosition();
-
+				tile.EngineSideUpdate();
 				tile.Update();
 			}
+		}
+
+		for (auto& sceneObject : m_sceneObjects)
+		{
+			sceneObject->EngineSideUpdate();
+			sceneObject->Update();
 		}
 
 		m_world->Update();
