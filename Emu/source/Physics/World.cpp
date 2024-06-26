@@ -50,16 +50,14 @@ namespace Engine
 			+ std::to_string(box->GetWidthInMeters()) + ", height: " + std::to_string(box->GetHeightInMeters()));
 	}
 
-	void World::RemoveBox(std::shared_ptr<Box> body)
+	void World::RemoveBox(std::shared_ptr<Box> box)
 	{
-		if (body == nullptr)
+		if (box == nullptr)
 		{
 			ENGINE_ERROR_D("Box is null!");
 			return;
 		}
-
-		m_world.DestroyBody(body->m_body);
-		body = nullptr;
+		box->RemoveBodyFromWorld();
 	}
 
 	void World::SetGravity(const float gravityX, const float gravityY)

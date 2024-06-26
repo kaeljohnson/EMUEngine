@@ -26,16 +26,22 @@ int main(int argc, char* args[])
 
 	Engine::TileMap testMap("TestMap1.txt", 1);
 
-	scene->AddTileMap(testMap);
+	const int MAP_LAYER = 0;
+	const int PLAYER_LAYER = 1;
+
+	// Make sure to document that the order of adding layers is important.
+	scene->AddLayer(MAP_LAYER);
+	scene->AddLayer(PLAYER_LAYER);
 	
+	scene->AddTileMap(testMap, MAP_LAYER);
+
+	scene->Add(player, PLAYER_LAYER);
 
 	AppManagementListener appManagementListener("App management listener");
 
 	ptrAppInstance->CreateEventListener(appManagementListener);
 
 	scene->AddEventListener(player);
-
-	scene->Add(player);
 	
 	ptrAppInstance->PlayScene(scene);
 	// Need to figure out how to change scenes, stop scenes, etc.

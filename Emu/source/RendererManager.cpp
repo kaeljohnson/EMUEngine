@@ -195,16 +195,14 @@ namespace Engine
 		ClearScreen();
 
 		// Render the scene.
-		for (auto& sceneObject : *scene)
+		// For now, iterate through each layer and render each object in the layer.
+		// Later, we can optimize this by only rendering objects that are visible or changed.
+		
+		for (auto& layer : scene->GetLayers())
 		{
-			Draw(sceneObject, scene->GetPixelsPerMeter(), interpolation);
-		}
-
-		if (scene->HasMap)
-		{
-			for (auto& tile : *scene->ptrTileMap)
+			for (auto& sceneObject : layer)
 			{
-				Draw(&tile, scene->GetPixelsPerMeter(), interpolation);
+				Draw(sceneObject, scene->GetPixelsPerMeter(), interpolation);
 			}
 		}
 

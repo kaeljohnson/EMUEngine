@@ -14,15 +14,11 @@ namespace Engine
 	SceneObject::SceneObject(const BodyType bodyType, const bool fixed, const float startingXInMeters, const float startingYInMeters,
 		const float widthInMeters, const float heightInMeters, std::shared_ptr<ITexture> ptrTexture)
 		: m_physicsBody(CreatePhysicsBody(bodyType, fixed, startingXInMeters, startingYInMeters, widthInMeters, heightInMeters)),
-		m_texture(ptrTexture), Enabled(true), Visible(true), uuid(CreateUUID()),
+		m_texture(ptrTexture), Enabled(true), Visible(true), LayerIdx(-1), uuid(CreateUUID()),
 		refKeyStates(EventManager::GetInstance()->GetKeyStates())
 	{
 		ENGINE_INFO_D("SceneObject created");
 	}
-
-	// void SceneObject::SetXVelocity(const float xVel) { m_physicsBody->SetXVelocity(xVel); }
-	// void SceneObject::SetYVelocity(const float yVel) { m_physicsBody->SetYVelocity(yVel); }
-	// void SceneObject::SetGravity(bool enabled) { m_physicsBody->SetGravity(enabled); }
 
 	void SceneObject::UpdatePrevPosition()
 	{ 

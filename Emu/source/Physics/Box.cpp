@@ -12,7 +12,9 @@ namespace Engine
 		const float widthInMeters, const float heightInMeters)
 		: m_halfWidthInMeters(widthInMeters / 2.0f), m_halfHeightInMeters(heightInMeters / 2.0f), 
 		m_widthInMeters(widthInMeters), m_heightInMeters(heightInMeters),
-		m_bodyType(bodyType), m_collidable(true), m_fixed(fixed), m_body(nullptr),
+		m_bodyType(bodyType), m_collidable(true), m_fixed(fixed), m_body(nullptr), m_fixture(nullptr),
+		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
+		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
 		m_gravityOn(true)
 	{
 		switch (bodyType)
@@ -58,11 +60,7 @@ namespace Engine
 	Box::~Box()
 	{
 		ENGINE_INFO_D("Freeing Box!");
-		if (m_body != nullptr)
-		{
-			m_body->GetWorld()->DestroyBody(m_body);
-			m_body = nullptr;
-		}
+		RemoveBodyFromWorld();
 	}
 
 	void Box::RemoveBodyFromWorld()
