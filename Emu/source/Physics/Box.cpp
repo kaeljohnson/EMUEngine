@@ -58,11 +58,7 @@ namespace Engine
 	Box::~Box()
 	{
 		ENGINE_INFO_D("Freeing Box!");
-		if (m_body != nullptr)
-		{
-			m_body->GetWorld()->DestroyBody(m_body);
-			m_body = nullptr;
-		}
+		RemoveBodyFromWorld();
 	}
 
 	void Box::RemoveBodyFromWorld()

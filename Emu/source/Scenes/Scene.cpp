@@ -12,41 +12,57 @@
 
 namespace Engine
 {
-	Scene::Scene() : m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_sceneObjects(),
-		HasMap(false), ptrTileMap(nullptr), m_world(nullptr),
-		m_eventListeners() {}
+	Scene::Scene() : m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_layers(),
+		 m_world(nullptr), m_eventListeners() {}
 
 	void Scene::CheckValid()
 	{
 		(m_world == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
-		(m_sceneObjects.Size() > MAX_OBJECTS) 
-			? ENGINE_CRITICAL_D("Scene object count exceeds max scene objects.") : ENGINE_INFO_D("Scene object count is valid.");
+		m_layers.size() > 0 ? ENGINE_INFO_D("Scene has at least one layer.") : ENGINE_CRITICAL_D("No layers exist in scene.");
 		(m_pixelsPerMeter <= 0) ? ENGINE_CRITICAL_D("Pixels per meter is invalid.") : ENGINE_INFO_D("Pixels per meter is valid.");
 	}
 
-	void Scene::AddTileMap(TileMap& tileMap)
+	void Scene::AddLayer(size_t layerIdx)
+	{
+		// Ensure the layer is appended to the end of the vector if the index is out of bounds.
+		if (layerIdx > m_layers.size()) 
+		{
+			ENGINE_CRITICAL_D("Layer index is out of bounds. Layer index must be no more than one higher than the last layer created. Start layer indexes at 0. Cannot add layer.");
+			return;
+		}
+
+		// Create an iterator pointing to the position where the new layer should be inserted
+		auto it = m_layers.begin() + layerIdx;
+
+		// Insert a new SceneObjectStack at the specified index
+		m_layers.insert(it, SceneObjectStack());
+	}
+
+	void Scene::AddTileMap(TileMap& tileMap, size_t layerIdx)
 	{
 		tileMap.LoadMap();
 		tileMap.CreateCollisionBodies();
 
-		ptrTileMap = &tileMap;
+		bool layerExists = false;
+		for (auto& tile : tileMap)
+		{
+			Add(tile, layerIdx);
+			layerExists = true;
+		}
 
-		// Add all tiles to the world
+		if (!layerExists)
+		{
+			ENGINE_WARN_D("Invalid layer. Cannot add map to scene!");
+		}
+
+		// Tile Maps underlying collision bodies exist in the physics world as continuous bodies,
+		// separate from the tile map itself.
 		for (auto& tile : tileMap.GetCollisionBodies())
 		{
 			std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(tile.GetPhysicsBody());
 
 			m_world->AddBox(ptrBox);
 		}
-
-		for (auto& tile : tileMap)
-		{
-			std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(tile.GetPhysicsBody());
-
-			m_world->AddBox(ptrBox);
-		}
-
-		HasMap = true;
 	}
 
 	void Scene::Update()
@@ -55,24 +71,20 @@ namespace Engine
 		// prev values if they have changed. In fact, should only update
 		// objects that have changed in general
 
-		// Integrate tile map into scene objects array?
-
 		// Need correct order for updating objects.
 		// Dyanmic bodies must be updated after static.
 
-		if (HasMap)
+		// Iterate through every layer for now and update.
+		// In the future we can filter which layers need to be updated each frame.
+		// For instance, if the camera has not moved, we don't need to update the background layer,
+		// or the collision bodies layer, and likely not the entire map layer.
+		for (auto& layer : m_layers)
 		{
-			for (auto& tile : *ptrTileMap)
+			for (auto& sceneObject : layer)
 			{
-				tile.EngineSideUpdate();
-				tile.Update();
+				sceneObject->EngineSideUpdate();
+				sceneObject->Update();
 			}
-		}
-
-		for (auto& sceneObject : m_sceneObjects)
-		{
-			sceneObject->EngineSideUpdate();
-			sceneObject->Update();
 		}
 
 		m_world->Update();
@@ -104,9 +116,17 @@ namespace Engine
 		ENGINE_INFO_D("Client creating simulation with gravity: " + std::to_string(gravityX) + ", " + std::to_string(gravityY));
 	}
 
-	void Scene::Add(SceneObject& sceneObject)
+	void Scene::Add(SceneObject& sceneObject, size_t layerIdx)
 	{
-		m_sceneObjects.Push(&sceneObject);
+		// Check if layerIdx is valid
+		if (layerIdx >= m_layers.size()) 
+		{
+			ENGINE_CRITICAL_D("Invalid layer index: " + std::to_string(layerIdx) + ". Cannot add SceneObject.");
+			return;
+		}
+
+		sceneObject.LayerIdx = layerIdx;
+		m_layers[layerIdx].Push(&sceneObject);
 
 		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject.GetPhysicsBody());
 
@@ -115,12 +135,17 @@ namespace Engine
 
 	void Scene::Remove(SceneObject& sceneObject)
 	{
-		// Find the scene object in the array
-		m_sceneObjects.Pop(&sceneObject);
+		if (sceneObject.LayerIdx >= m_layers.size() || sceneObject.LayerIdx == -1)
+		{
+			ENGINE_CRITICAL_D("Invalid layer index: " + std::to_string(sceneObject.LayerIdx) + ". Cannot remove SceneObject because it does not exist in a valid layer.");
+			return;
+		}
+
+		m_layers[sceneObject.LayerIdx].Pop(&sceneObject);
 
 		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject.GetPhysicsBody());
 
-		m_world->RemoveBox(ptrBox);
+		ptrBox->RemoveBodyFromWorld();
 	}
 
 	void Scene::AddEventListener(EventListener& eventListener)

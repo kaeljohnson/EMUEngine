@@ -19,6 +19,7 @@ namespace Engine
 	public:
 		bool Enabled;
 		bool Visible;
+		int LayerIdx;
 	public:
 		SceneObject(const BodyType bodyType, const bool fixed, const float startingXInMeters,
 			const float startingYInMeters, const float widthInMeters, const float heightInMeters, std::shared_ptr<ITexture> refTexture);

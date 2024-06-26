@@ -43,7 +43,6 @@ namespace Engine
 			return;
 		}
 
-		// Add rest of objects to the end of the list
 		m_sceneObjects[m_sceneObjectCount] = sceneObject;
 
 		m_sceneObjectCount++;
@@ -74,6 +73,15 @@ namespace Engine
 			return;
 		}
 
+		// If there is only one scene object in the array, set it to nullptr and decrement the count.
+		// The for loop below won't run if there is only one scene object in the array.
+		if (m_sceneObjectCount == 1)
+		{
+			m_sceneObjects[0] = nullptr;
+			m_sceneObjectCount--;
+			return;
+		}
+
 		// Remove the scene object from the array
 		for (size_t i = index; i < m_sceneObjectCount - 1; i++)
 		{
@@ -91,7 +99,6 @@ namespace Engine
 			return;
 		}
 
-		// Decrease the count of event listeners
 		m_sceneObjectCount--;
 	}
 }
