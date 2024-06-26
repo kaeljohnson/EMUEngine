@@ -36,8 +36,6 @@ int main(int argc, char* args[])
 	scene->AddTileMap(testMap, MAP_LAYER);
 
 	scene->Add(player, PLAYER_LAYER);
-	scene->Remove(player);
-	scene->Add(player, PLAYER_LAYER);
 
 	AppManagementListener appManagementListener("App management listener");
 

@@ -58,9 +58,6 @@ namespace Engine
 			return;
 		}
 		box->RemoveBodyFromWorld();
-
-		/*m_world.DestroyBody(box->m_body);
-		box->m_body = nullptr;*/
 	}
 
 	void World::SetGravity(const float gravityX, const float gravityY)

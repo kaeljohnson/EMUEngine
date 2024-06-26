@@ -22,22 +22,20 @@ namespace Engine
 		EMU_API void SetSimulation(const float gravityX, const float gravityY, const int pixelsPerMeter);
 
 		// Adds scene object to the scene. Need to add a "order" parameter to determine the order of rendering.
-		EMU_API void Add(SceneObject& sceneObject, size_t layerNum);
+		EMU_API void Add(SceneObject& sceneObject, int layerNum);
 		EMU_API void AddEventListener(EventListener& eventListener);
 	
 		// Layer number is the index for now.
-		EMU_API void AddLayer(size_t layerNum);
+		EMU_API void AddLayer(size_t layerIdx);
 		EMU_API void Remove(SceneObject& sceneObject);
 		EMU_API void RemoveEventListener(EventListener& eventListener);
-		EMU_API void AddTileMap(TileMap& tileMap, size_t layerNum);
+		EMU_API void AddTileMap(TileMap& tileMap, int layerIdx);
 
 	private:
 		int m_pixelsPerMeter;
 
 		float m_gravityX;
 		float m_gravityY;
-		
-		// SceneObjectStack m_sceneObjects;
 		
 		EventListenerStack m_eventListeners;
 
@@ -52,8 +50,5 @@ namespace Engine
 
 		void CheckValid();
 		void Update();
-
-		// SceneObject** const begin() { return m_sceneObjects.begin(); }
-		// SceneObject** const end() { return m_sceneObjects.end(); }
 	}; 
 }

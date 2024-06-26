@@ -206,11 +206,6 @@ namespace Engine
 			}
 		}
 
-		/*for (auto& tile : *scene->ptrTileMap)
-		{
-				Draw(&tile, scene->GetPixelsPerMeter(), interpolation);
-		}*/
-
 		Display();
 	}
 

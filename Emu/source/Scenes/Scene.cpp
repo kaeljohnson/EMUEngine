@@ -27,18 +27,14 @@ namespace Engine
 		// Ensure the layer is appended to the end of the vector if the index is out of bounds.
 		if (layerIdx > m_layers.size()) 
 		{
-			ENGINE_CRITICAL_D("Layer index is out of bounds. Layer index must be no more than one higher than the last layer created. Start layer indexes at 0. Cannot add layer.");
+			ENGINE_CRITICAL_D("Layer index is out of bounds. Add layers sequentially.");
 			return;
 		}
 
-		// Create an iterator pointing to the position where the new layer should be inserted
-		auto it = m_layers.begin() + layerIdx;
-
-		// Insert a new SceneObjectStack at the specified index
-		m_layers.insert(it, SceneObjectStack());
+		m_layers.emplace_back(SceneObjectStack());
 	}
 
-	void Scene::AddTileMap(TileMap& tileMap, size_t layerIdx)
+	void Scene::AddTileMap(TileMap& tileMap, int layerIdx)
 	{
 		tileMap.LoadMap();
 		tileMap.CreateCollisionBodies();
@@ -53,6 +49,7 @@ namespace Engine
 		if (!layerExists)
 		{
 			ENGINE_WARN_D("Invalid layer. Cannot add map to scene!");
+			return;
 		}
 
 		// Tile Maps underlying collision bodies exist in the physics world as continuous bodies,
@@ -116,7 +113,7 @@ namespace Engine
 		ENGINE_INFO_D("Client creating simulation with gravity: " + std::to_string(gravityX) + ", " + std::to_string(gravityY));
 	}
 
-	void Scene::Add(SceneObject& sceneObject, size_t layerIdx)
+	void Scene::Add(SceneObject& sceneObject, int layerIdx)
 	{
 		// Check if layerIdx is valid
 		if (layerIdx >= m_layers.size()) 
