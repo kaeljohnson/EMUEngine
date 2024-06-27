@@ -27,7 +27,7 @@ namespace Engine
             if (m_height == 0) 
             {
                 // Set the width to the length of the first line
-                m_width = line.length();
+                m_width = (int)line.length();
             }
             else if (line.length() != m_width)
             {

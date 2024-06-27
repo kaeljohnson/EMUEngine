@@ -64,7 +64,7 @@ namespace Engine
 			ENGINE_CRITICAL("Renderer could not be created! SDL Error: " + std::string(SDL_GET_ERROR()));
 		}
 
-		SDL_SetRenderDrawColor(m_ptrRenderer, 'd3', 'd3', 'd3', SDL_ALPHA_OPAQUE);
+		SDL_SetRenderDrawColor(m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 
 		SetViewport();
 
@@ -256,7 +256,7 @@ namespace Engine
 			SDL_SetRenderDrawColor(m_ptrRenderer, 255, 0, 0, 255);
 		}
 		SDL_RenderDrawRect(m_ptrRenderer, &dst);
-		SDL_SetRenderDrawColor(m_ptrRenderer, 'd3', 'd3', 'd3', SDL_ALPHA_OPAQUE);
+		SDL_SetRenderDrawColor(m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 #endif
 	}
 

@@ -17,6 +17,8 @@ int main(int argc, char* args[])
 	// Need physcis to scale with pixels per meter.
 	scene->SetSimulation(0.0f, 3.1f, 32);
 
+	scene->m_camera.SetClampingOn(true);
+
 	// Temp
 	Engine::TexturePtr tempTextureRed = Engine::CreateTexture(0, 0, 0);
 	

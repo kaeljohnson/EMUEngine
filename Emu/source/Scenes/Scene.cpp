@@ -15,8 +15,8 @@
 
 namespace Engine
 {
-	Scene::Scene() : m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_layers(), m_mapWidthInMeters(0), m_mapHeightInMeters(0),
-		 m_world(nullptr), m_eventListeners(), m_camera(0, 0, RendererManager::GetInstance()->GetFullscreenWidth(), RendererManager::GetInstance()->GetFullscreenHeight(), 48, 37) {}
+	Scene::Scene() : m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_layers(), m_mapWidthInMeters(0), m_mapHeightInMeters(0), HasTileMap(false),
+		 m_world(nullptr), m_eventListeners(), m_camera(0.0f, 0.0f, RendererManager::GetInstance()->GetFullscreenWidth(), RendererManager::GetInstance()->GetFullscreenHeight(), 0, 0) {}
 
 	void Scene::CheckValid()
 	{
@@ -71,6 +71,27 @@ namespace Engine
 
 			m_world->AddBox(ptrBox);
 		}
+
+		HasTileMap = true;
+	}
+
+	void Scene::SetLevelWidthInMeters(const int levelWidthInMeters)
+	{
+		if (HasTileMap)
+		{
+			ENGINE_INFO_D("Scene already has a map. Overriding map width!");
+		}
+
+		m_mapWidthInMeters = levelWidthInMeters;
+		m_camera.SetLevelWidthInMeters(m_mapWidthInMeters);
+	}
+
+	void Scene::SetLevelHeightInMeters(const int levelHeightInMeters)
+	{
+		ENGINE_INFO_D("Scene already has a map. Overriding map height!");
+
+		m_mapHeightInMeters = levelHeightInMeters;
+		m_camera.SetLevelHeightInMeters(m_mapHeightInMeters);
 	}
 
 	void Scene::Update()
@@ -123,6 +144,15 @@ namespace Engine
 		m_camera.SetPixelsPerMeter(m_pixelsPerMeter);
 
 		ENGINE_INFO_D("Client creating simulation with gravity: " + std::to_string(gravityX) + ", " + std::to_string(gravityY));
+
+		if (!HasTileMap)
+		{
+			ENGINE_INFO_D("No map in the level. Add map or set level dimensions manually.");
+		}
+		else
+		{
+			ENGINE_INFO_D("Map exists in the level. Setting level width and height to map width and height.");
+		}
 	}
 
 	void Scene::Add(SceneObject& sceneObject, int layerIdx)

@@ -32,6 +32,10 @@ namespace Engine
 		EMU_API void RemoveEventListener(EventListener& eventListener);
 		EMU_API void AddTileMap(TileMap& tileMap, int layerIdx);
 
+		// IF theres no map in the level, client will decided the dimensions manually.
+		EMU_API void SetLevelWidthInMeters(const int levelWidthInMeters);
+		EMU_API void SetLevelHeightInMeters(const int levelHeightInMeters);
+
 	private:
 		int m_pixelsPerMeter;
 
@@ -54,6 +58,8 @@ namespace Engine
 
 		void CheckValid();
 		void Update();
+
+		bool HasTileMap;
 
 		Camera m_camera;
 	}; 

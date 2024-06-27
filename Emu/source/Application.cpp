@@ -106,10 +106,7 @@ namespace Engine
 
 			const double interpolation = accumulator / timeStep;
 
-			
-			// currentScene->m_camera.Move();
 			currentScene->m_camera.Update(interpolation);
-			// currentScene->m_camera.Clamp();
 
 			ptrRendererManager->RenderScene(currentScene, interpolation, currentScene->m_camera.m_offsetX, currentScene->m_camera.m_offsetY);
 		}

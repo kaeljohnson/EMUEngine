@@ -12,9 +12,10 @@ namespace Engine
 	{
 	public:
 		Camera();
-		Camera(float x, float y, float w, float h, const int levelWidth, const int levelHeight);
+		Camera(float x, float y, int w, int h, const int levelWidth, const int levelHeight);
 
 		EMU_API void SetCameraTarget(SceneObject* ptrTarget);
+		EMU_API void SetClampingOn(const bool clampingOn);
 		
 		void SetPixelsPerMeter(const int pixelsPerMeter);
 		void SetLevelWidthInMeters(const int levelWidthInMeters);
@@ -25,8 +26,8 @@ namespace Engine
 
 		inline const float GetXValue() const { return m_x; };
 		inline const float GetYValue() const { return m_y; };
-		inline const float GetWidth() const { return m_width; };
-		inline const float GetHeight() const { return m_height; };
+		inline const int GetWidth() const { return m_width; };
+		inline const int GetHeight() const { return m_height; };
 
 		Camera(const Camera& camera) = delete;
 		Camera& operator=(const Camera&) = delete;
@@ -39,17 +40,16 @@ namespace Engine
 		// If the camera is not following a target, it will be static.
 		// The client should be able to set other behaviors like: continuous scrolling, etc.
 		SceneObject* ptrCameraTarget;
-
-		int m_levelWidthInMeters;
-		int m_levelHeightInMeters;
 		
-		float m_width;
-		float m_height;
+		int m_width;
+		int m_height;
 
 		int m_levelWidth;
 		int m_levelHeight;
 
 		int m_pixelsPerMeter;
+
+		bool m_clampingOn;
 	public:
 		float m_offsetX;
 		float m_offsetY;
