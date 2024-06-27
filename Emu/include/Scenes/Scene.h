@@ -10,6 +10,7 @@
 #include "../Events/EventListener.h"
 #include "../Physics/IWorld.h"
 #include "../Tiles/TileMap.h"
+#include "../Camera/Camera.h"
 
 namespace Engine
 {
@@ -34,6 +35,9 @@ namespace Engine
 	private:
 		int m_pixelsPerMeter;
 
+		int m_mapWidthInMeters;
+		int m_mapHeightInMeters;
+
 		float m_gravityX;
 		float m_gravityY;
 		
@@ -50,5 +54,7 @@ namespace Engine
 
 		void CheckValid();
 		void Update();
+
+		Camera m_camera;
 	}; 
 }

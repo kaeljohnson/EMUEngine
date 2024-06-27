@@ -190,7 +190,7 @@ namespace Engine
 		SDL_RENDER_PRESENT(m_ptrRenderer);
 	}
 
-	void RendererManager::RenderScene(std::shared_ptr<Scene> scene, const double interpolation)
+	void RendererManager::RenderScene(std::shared_ptr<Scene> scene, const double interpolation, const float offsetX, const float offsetY)
 	{
 		ClearScreen();
 
@@ -202,7 +202,7 @@ namespace Engine
 		{
 			for (auto& sceneObject : layer)
 			{
-				Draw(sceneObject, scene->GetPixelsPerMeter(), interpolation);
+				Draw(sceneObject, scene->GetPixelsPerMeter(), interpolation, offsetX, offsetY);
 			}
 		}
 
@@ -210,7 +210,7 @@ namespace Engine
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation)
+	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation, const float offsetX, const float offsetY)
 	{
 		bool isTextureNull = sceneObject->GetTexture() == nullptr;
 
@@ -219,17 +219,18 @@ namespace Engine
 
 		std::shared_ptr<IPhysicsBody> ptrBody = sceneObject->GetPhysicsBody();
 
+		// ENGINE_CRITICAL_D(std::to_string(offsetX) + " " + std::to_string(offsetY));
+
 		SDLRect dst
 		{
-			// This rect will eventually be the outline of the texture we want to render,
-			// not the collidable object tracked by the underlying box2d body.
-
-			static_cast<int>(round((ptrBody->GetTopLeftPrevX() * (1.0 - interpolation) + ptrBody->GetTopLeftXInMeters() * interpolation) * pixelsPerMeter * SCALE)),
-			static_cast<int>(round((ptrBody->GetTopLeftPrevY() * (1.0 - interpolation) + ptrBody->GetTopLeftYInMeters() * interpolation) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round(((ptrBody->GetTopLeftPrevX()) * (1.0 - interpolation) + (ptrBody->GetTopLeftXInMeters()) * interpolation) * pixelsPerMeter * SCALE - offsetX * pixelsPerMeter * SCALE)),
+			static_cast<int>(round(((ptrBody->GetTopLeftPrevY()) * (1.0 - interpolation) + (ptrBody->GetTopLeftYInMeters()) * interpolation) * pixelsPerMeter * SCALE - offsetY * pixelsPerMeter * SCALE)),
 
 			static_cast<int>(round(ptrBody->GetWidthInMeters() * pixelsPerMeter * SCALE)),
 			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))
 		};
+
+		// if (sceneObject->LayerIdx == 1) ENGINE_CRITICAL_D("WHat is going on? " + std::to_string(dst.x) + ", " + std::to_string(dst.y));
 
 		SDLTexture* ptrTexture = nullptr;
 

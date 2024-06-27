@@ -95,15 +95,23 @@ namespace Engine
 			{
 				ptrEventManager->HandleEvents();
 				processEventQueue(currentScene, ptrEventManager, m_ptrAppManagerListener);
+				
+				
 
 				currentScene->Update();
-
+				
+				
 				accumulator -= timeStep;
 			}
 
 			const double interpolation = accumulator / timeStep;
 
-			ptrRendererManager->RenderScene(currentScene, interpolation);
+			
+			// currentScene->m_camera.Move();
+			currentScene->m_camera.Update(interpolation);
+			// currentScene->m_camera.Clamp();
+
+			ptrRendererManager->RenderScene(currentScene, interpolation, currentScene->m_camera.m_offsetX, currentScene->m_camera.m_offsetY);
 		}
 	}
 

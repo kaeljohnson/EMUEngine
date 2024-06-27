@@ -7,6 +7,7 @@
 #include "Events/EventListener.h"
 #include "Physics/IWorld.h"
 #include "Scenes/Scene.h"
+#include "Camera/Camera.h"
 
 namespace Engine
 {

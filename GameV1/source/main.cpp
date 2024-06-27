@@ -20,7 +20,9 @@ int main(int argc, char* args[])
 	// Temp
 	Engine::TexturePtr tempTextureRed = Engine::CreateTexture(0, 0, 0);
 	
-	Controllable player(4.0f, 20.0f, 0.9f, 0.9f, tempTextureRed);
+	Controllable player(4.0f, 30.0f, 0.75f, 0.75f, tempTextureRed);
+
+	scene->m_camera.SetCameraTarget(&player);
 
 	CLIENT_INFO_D("Player UUID: " + player.GetUUID());
 
