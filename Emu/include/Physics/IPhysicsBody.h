@@ -35,6 +35,8 @@ namespace Engine
 		virtual const float GetYVelocity() const = 0;
 		virtual const float GetTopLeftPrevX() const = 0;
 		virtual const float GetTopLeftPrevY() const = 0;
+		virtual const float GetCenterPrevX() const = 0;
+		virtual const float GetCenterPrevY() const = 0;
 		virtual const float GetCenterXInMeters() const = 0;
 		virtual const float GetCenterYInMeters() const = 0;
 		virtual const float GetTopLeftXInMeters() const = 0;

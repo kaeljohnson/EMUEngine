@@ -223,8 +223,8 @@ namespace Engine
 
 		SDLRect dst
 		{
-			static_cast<int>(round(((ptrBody->GetTopLeftPrevX()) * (1.0 - interpolation) + (ptrBody->GetTopLeftXInMeters()) * interpolation) * pixelsPerMeter * SCALE - offsetX * pixelsPerMeter * SCALE)),
-			static_cast<int>(round(((ptrBody->GetTopLeftPrevY()) * (1.0 - interpolation) + (ptrBody->GetTopLeftYInMeters()) * interpolation) * pixelsPerMeter * SCALE - offsetY * pixelsPerMeter * SCALE)),
+			static_cast<int>(round(((ptrBody->GetTopLeftPrevX()) * (1.0 - interpolation) + (ptrBody->GetTopLeftXInMeters()) * interpolation - offsetX) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round(((ptrBody->GetTopLeftPrevY()) * (1.0 - interpolation) + (ptrBody->GetTopLeftYInMeters()) * interpolation - offsetY) * pixelsPerMeter * SCALE)),
 
 			static_cast<int>(round(ptrBody->GetWidthInMeters() * pixelsPerMeter * SCALE)),
 			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))

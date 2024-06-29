@@ -120,6 +120,8 @@ namespace Engine
 		// Non-box2d getters
 		inline const float GetTopLeftPrevX() const override { return m_prevX; }
 		inline const float GetTopLeftPrevY() const override { return m_prevY; }
+		inline const float GetCenterPrevX() const override { return m_prevX + m_halfWidthInMeters; }
+		inline const float GetCenterPrevY() const override { return m_prevY + m_halfHeightInMeters; }
 		inline const float GetWidthInMeters() const override { return m_widthInMeters; }
 		inline const float GetHeightInMeters() const override { return m_heightInMeters; }
 		inline const float GetSizeInMeters() const override { return m_widthInMeters * m_heightInMeters; }
