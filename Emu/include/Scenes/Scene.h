@@ -10,7 +10,6 @@
 #include "../Events/EventListener.h"
 #include "../Physics/IWorld.h"
 #include "../Tiles/TileMap.h"
-#include "../Camera/Camera.h"
 
 namespace Engine
 {
@@ -55,12 +54,14 @@ namespace Engine
 		inline const int GetPixelsPerMeter() const { return m_pixelsPerMeter; }
 		inline EventListenerStack& GetEventListeners() { return m_eventListeners; }
 		inline std::vector<SceneObjectStack>& GetLayers() { return m_layers; }
+		inline const float GetLevelWidthInMeters() const { return m_mapWidthInMeters; }
+		inline const float GetLevelHeightInMeters() const { return m_mapHeightInMeters; }
 
 		void CheckValid();
 		void Update();
 
 		bool HasTileMap;
 
-		Camera m_camera;
+		// Camera m_camera;
 	}; 
 }

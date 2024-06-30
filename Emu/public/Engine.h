@@ -18,6 +18,7 @@
 #include "../include/Tiles/Tile.h"
 #include "../include/Tiles/TileMap.h"
 #include "../include/Entities/Entity.h"
+#include "../include/Camera/Camera.h"
 
 namespace Engine
 {

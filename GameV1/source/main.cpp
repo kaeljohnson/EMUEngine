@@ -21,8 +21,10 @@ int main(int argc, char* args[])
 	Engine::TexturePtr tempTextureRed = Engine::CreateTexture(0, 0, 0);
 	
 	Controllable player(1.0f, 1.0f, 0.75f, 0.75f, tempTextureRed);
+	Engine::Camera playerCamera;
 
-	scene->m_camera.SetCameraTarget(&player);
+	playerCamera.SetCameraTarget(&player);
+	// ptrAppInstance->AttachCamera(playerCamera);
 
 	CLIENT_INFO_D("Player UUID: " + player.GetUUID());
 

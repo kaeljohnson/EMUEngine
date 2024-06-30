@@ -16,9 +16,7 @@
 namespace Engine
 {
 	Scene::Scene() : m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_layers(), m_mapWidthInMeters(0), m_mapHeightInMeters(0), HasTileMap(false),
-		 m_world(nullptr), m_eventListeners(), 
-		m_camera(0.0f, 0.0f, RendererManager::GetInstance()->GetFullscreenWidth(),
-			RendererManager::GetInstance()->GetFullscreenHeight(), 0, 0, RendererManager::GetInstance()->GetScaleX(), RendererManager::GetInstance()->GetScaleY()) {}
+		m_world(nullptr), m_eventListeners() {}
 
 	void Scene::CheckValid()
 	{
@@ -46,9 +44,6 @@ namespace Engine
 
 		m_mapWidthInMeters = tileMap.GetWidth();
 		m_mapHeightInMeters = tileMap.GetHeight();
-
-		m_camera.SetLevelWidthInMeters(m_mapWidthInMeters);
-		m_camera.SetLevelHeightInMeters(m_mapHeightInMeters);
 
 		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_mapWidthInMeters) + ", Map height: " + std::to_string(m_mapHeightInMeters));
 
@@ -85,7 +80,6 @@ namespace Engine
 		}
 
 		m_mapWidthInMeters = levelWidthInMeters;
-		m_camera.SetLevelWidthInMeters(m_mapWidthInMeters);
 	}
 
 	void Scene::SetLevelHeightInMeters(const int levelHeightInMeters)
@@ -93,7 +87,6 @@ namespace Engine
 		ENGINE_INFO_D("Scene already has a map. Overriding map height!");
 
 		m_mapHeightInMeters = levelHeightInMeters;
-		m_camera.SetLevelHeightInMeters(m_mapHeightInMeters);
 	}
 
 	void Scene::Update()
@@ -142,8 +135,6 @@ namespace Engine
 		// Need a reset function for the world which resets all objects in the world.
 
 		m_world = CreateWorld(m_gravityX * m_pixelsPerMeter, m_gravityY * m_pixelsPerMeter, 8, 3);
-
-		m_camera.SetPixelsPerMeter(m_pixelsPerMeter);
 
 		ENGINE_INFO_D("Client creating simulation with gravity: " + std::to_string(gravityX) + ", " + std::to_string(gravityY));
 

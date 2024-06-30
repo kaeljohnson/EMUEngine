@@ -22,7 +22,8 @@ namespace Engine
 		: VIRTUAL_WIDTH(1280), VIRTUAL_HEIGHT(720), SCALE_X(0), SCALE_Y(0), SCALE(0), 
 		m_viewportX(0), m_viewportY(0), m_viewportWidth(0), m_viewportHeight(0),
 		m_fullscreenWidth(0), m_fullscreenHeight(0),
-		m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr)
+		m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), 
+		m_ptrCamera(nullptr), m_ptrCurrentScene(nullptr)
 	{}
 
 	void RendererManager::CreateRenderer()
@@ -190,17 +191,19 @@ namespace Engine
 		SDL_RENDER_PRESENT(m_ptrRenderer);
 	}
 
-	void RendererManager::RenderScene(std::shared_ptr<Scene> scene, const double interpolation, const float offsetX, const float offsetY)
+	void RendererManager::RenderScene(const double interpolation)
 	{
+		m_ptrCamera->Update(interpolation);
+
 		ClearScreen();
 
 		// Calculate camera bounds
-		float cameraLeft = offsetX;
-		float cameraRight = offsetX + (m_viewportWidth / scene->GetPixelsPerMeter());
-		float cameraTop = offsetY;
-		float cameraBottom = offsetY + (m_viewportHeight / scene->GetPixelsPerMeter());
+		float cameraLeft = m_ptrCamera->m_offsetX;
+		float cameraRight = m_ptrCamera->m_offsetX + (m_viewportWidth / m_ptrCurrentScene->GetPixelsPerMeter());
+		float cameraTop = m_ptrCamera->m_offsetY;
+		float cameraBottom = m_ptrCamera->m_offsetY + (m_viewportHeight / m_ptrCurrentScene->GetPixelsPerMeter());
 
-		for (auto& layer : scene->GetLayers())
+		for (auto& layer : m_ptrCurrentScene->GetLayers())
 		{
 			for (auto& sceneObject : layer)
 			{
@@ -214,7 +217,7 @@ namespace Engine
 
 				if (isVisible)
 				{
-					Draw(sceneObject, scene->GetPixelsPerMeter(), interpolation, offsetX, offsetY);
+					Draw(sceneObject, m_ptrCurrentScene->GetPixelsPerMeter(), interpolation, m_ptrCamera->m_offsetX, m_ptrCamera->m_offsetY);
 				}
 			}
 		}
@@ -267,6 +270,32 @@ namespace Engine
 		SDL_RenderDrawRect(m_ptrRenderer, &dst);
 		SDL_SetRenderDrawColor(m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 #endif
+	}
+
+	void RendererManager::SetCamera(Camera* ptrCamera)
+	{
+		if (m_ptrCamera != nullptr)
+		{
+			ENGINE_INFO_D("Camera already set. Returning.");
+			return;
+		}
+
+		ENGINE_INFO_D("Giving Camera to Renderer!");
+		m_ptrCamera = ptrCamera;
+	}
+
+	void RendererManager::SetScene(std::shared_ptr<Scene> ptrScene)
+	{
+		m_ptrCurrentScene = ptrScene;
+
+		if (m_ptrCamera == nullptr)
+		{
+			ENGINE_CRITICAL("Camera not set! Cannot render scene without camera.");
+		}
+
+		m_ptrCamera->Frame(ptrScene->GetPixelsPerMeter(),
+			ptrScene->GetLevelWidthInMeters(), ptrScene->GetLevelHeightInMeters(),
+			m_fullscreenWidth, m_fullscreenHeight, SCALE_X, SCALE_Y);
 	}
 
 	void RendererManager::SetViewport()

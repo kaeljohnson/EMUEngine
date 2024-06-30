@@ -50,6 +50,8 @@ namespace Engine
 		RendererManager* ptrRendererManager = RendererManager::GetInstance();
 		EventManager* ptrEventManager = EventManager::GetInstance();
 
+		ptrRendererManager->SetScene(currentScene);
+
 		running = true;
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -96,7 +98,6 @@ namespace Engine
 				ptrEventManager->HandleEvents();
 				processEventQueue(currentScene, ptrEventManager, m_ptrAppManagerListener);
 				
-				
 
 				currentScene->Update();
 				
@@ -106,9 +107,9 @@ namespace Engine
 
 			const double interpolation = accumulator / timeStep;
 
-			currentScene->m_camera.Update(interpolation);
+			// m_camera->Update(interpolation);
 
-			ptrRendererManager->RenderScene(currentScene, interpolation, currentScene->m_camera.m_offsetX, currentScene->m_camera.m_offsetY);
+			ptrRendererManager->RenderScene(interpolation);
 		}
 	}
 
@@ -168,10 +169,10 @@ namespace Engine
 				}
 			}
 
-			if (!currentEvent.Handled)
+			/*if (!currentEvent.Handled)
 			{
 				ENGINE_TRACE_D("Unhandled Event: " + std::to_string(static_cast<int>(currentEvent.Type)));
-			}
+			}*/
 
 			ptrEventManager->eventQ.pop();
 		}
