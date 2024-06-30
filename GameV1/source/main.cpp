@@ -20,7 +20,7 @@ int main(int argc, char* args[])
 	// Temp
 	Engine::TexturePtr tempTextureRed = Engine::CreateTexture(0, 0, 0);
 	
-	Controllable player(30.0f, 12.0f, 0.75f, 0.75f, tempTextureRed);
+	Controllable player(1.0f, 1.0f, 0.75f, 0.75f, tempTextureRed);
 
 	scene->m_camera.SetCameraTarget(&player);
 

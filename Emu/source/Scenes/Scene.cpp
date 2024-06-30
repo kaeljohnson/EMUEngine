@@ -16,7 +16,7 @@
 namespace Engine
 {
 	Scene::Scene() : m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_layers(), m_mapWidthInMeters(0), m_mapHeightInMeters(0), HasTileMap(false),
-		 m_world(nullptr), m_eventListeners(), m_camera(0.0f, 0.0f, RendererManager::GetInstance()->GetFullscreenWidth(), RendererManager::GetInstance()->GetFullscreenHeight(), 0, 0, RendererManager::GetInstance()->GetScale()) {}
+		 m_world(nullptr), m_eventListeners(), m_camera(0.0f, 0.0f, RendererManager::GetInstance()->GetFullscreenWidth(), RendererManager::GetInstance()->GetFullscreenHeight(), 0, 0, RendererManager::GetInstance()->GetScaleX(), RendererManager::GetInstance()->GetScaleY()) {}
 
 	void Scene::CheckValid()
 	{

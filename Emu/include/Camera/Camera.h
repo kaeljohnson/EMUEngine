@@ -12,7 +12,7 @@ namespace Engine
 	{
 	public:
 		Camera();
-		Camera(float x, float y, int w, int h, const int levelWidth, const int levelHeight, const float SCALE);
+		Camera(float x, float y, int w, int h, const int levelWidth, const int levelHeight, const float SCALEX, const float SCALEY);
 
 		EMU_API void SetCameraTarget(SceneObject* ptrTarget);
 		EMU_API void SetClampingOn(const bool clampingOn);
@@ -50,7 +50,8 @@ namespace Engine
 		int m_pixelsPerMeter;
 
 		// Rendering scale. The viewport is not necessarily the same as the window size.
-		float refSCALE;
+		float refSCALEX;
+		float refSCALEY;
 
 		bool m_clampingOn;
 	public:
