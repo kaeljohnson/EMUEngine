@@ -117,7 +117,7 @@ namespace Engine
 	{
 		return m_fullscreenHeight;
 	}
-
+	
 	void RendererManager::ToggleFullscreen()
 	{
 		// Bug here: Figure out why "SDL_WINDOW_FULLSCREEN" does not work.
@@ -194,15 +194,28 @@ namespace Engine
 	{
 		ClearScreen();
 
-		// Render the scene.
-		// For now, iterate through each layer and render each object in the layer.
-		// Later, we can optimize this by only rendering objects that are visible or changed.
-		
+		// Calculate camera bounds
+		float cameraLeft = offsetX;
+		float cameraRight = offsetX + (m_viewportWidth / scene->GetPixelsPerMeter());
+		float cameraTop = offsetY;
+		float cameraBottom = offsetY + (m_viewportHeight / scene->GetPixelsPerMeter());
+
 		for (auto& layer : scene->GetLayers())
 		{
 			for (auto& sceneObject : layer)
 			{
-				Draw(sceneObject, scene->GetPixelsPerMeter(), interpolation, offsetX, offsetY);
+				float objectLeft = sceneObject->GetPhysicsBody()->GetTopLeftXInMeters();
+				float objectRight = objectLeft + sceneObject->GetPhysicsBody()->GetWidthInMeters();
+				float objectTop = sceneObject->GetPhysicsBody()->GetTopLeftYInMeters();
+				float objectBottom = objectTop + sceneObject->GetPhysicsBody()->GetHeightInMeters();
+
+				bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
+					objectBottom >= cameraTop && objectTop <= cameraBottom;
+
+				if (isVisible)
+				{
+					Draw(sceneObject, scene->GetPixelsPerMeter(), interpolation, offsetX, offsetY);
+				}
 			}
 		}
 
@@ -219,8 +232,6 @@ namespace Engine
 
 		std::shared_ptr<IPhysicsBody> ptrBody = sceneObject->GetPhysicsBody();
 
-		// ENGINE_CRITICAL_D(std::to_string(offsetX) + " " + std::to_string(offsetY));
-
 		SDLRect dst
 		{
 			static_cast<int>(round(((ptrBody->GetTopLeftPrevX()) * (1.0 - interpolation) + (ptrBody->GetTopLeftXInMeters()) * interpolation - offsetX) * pixelsPerMeter * SCALE)),
@@ -229,8 +240,6 @@ namespace Engine
 			static_cast<int>(round(ptrBody->GetWidthInMeters() * pixelsPerMeter * SCALE)),
 			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))
 		};
-
-		// if (sceneObject->LayerIdx == 1) ENGINE_CRITICAL_D("WHat is going on? " + std::to_string(dst.x) + ", " + std::to_string(dst.y));
 
 		SDLTexture* ptrTexture = nullptr;
 

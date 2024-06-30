@@ -9,7 +9,8 @@ namespace Engine
 	Camera::Camera() : m_x(0), m_y(0), m_width(0), m_height(0), m_levelWidth(0), m_levelHeight(0), m_offsetX(0), m_offsetY(0), m_pixelsPerMeter(0), refSCALEX(0), refSCALEY(0), m_clampingOn(true), ptrCameraTarget(nullptr) {}
 
 	Camera::Camera(float x, float y, const int w, const int h, const int levelWidth, const int levelHeight, const float SCALEX, const float SCALEY)
-		: m_x(x), m_y(y), m_width(w), m_height(h), m_offsetX(0), m_offsetY(0), m_levelWidth(levelWidth), m_levelHeight(levelHeight), m_pixelsPerMeter(0), refSCALEX(SCALEX), refSCALEY(SCALEY), m_clampingOn(true), ptrCameraTarget(nullptr) {}
+		: m_x(x), m_y(y), m_width(w), m_height(h), m_widthInMeters(0), m_heightInMeters(0), m_offsetX(0), m_offsetY(0), m_levelWidth(levelWidth), m_levelHeight(levelHeight), 
+		m_pixelsPerMeter(0), refSCALEX(SCALEX), refSCALEY(SCALEY), m_clampingOn(true), ptrCameraTarget(nullptr) {}
 
 	void Camera::SetCameraTarget(SceneObject* ptrTarget)
 	{
@@ -24,6 +25,9 @@ namespace Engine
 	void Camera::SetPixelsPerMeter(const int pixelsPerMeter)
 	{
 		m_pixelsPerMeter = pixelsPerMeter;
+
+		m_widthInMeters = (float)m_width / (m_pixelsPerMeter * refSCALEX);
+		m_heightInMeters = (float)m_height / (m_pixelsPerMeter * refSCALEY);
 	}
 
 	void Camera::SetLevelWidthInMeters(const int levelWidthInMeters) { m_levelWidth = levelWidthInMeters; };
@@ -64,7 +68,7 @@ namespace Engine
 		float desiredCameraTopLeftY = (float)targetY - (heightInMeters / 2.0f);
 
 		// Smoothly update the camera's position towards the desired position
-		float smoothingFactor = 0.002f; // Adjust this value to control the camera's smoothing speed
+		float smoothingFactor = 0.0005f; // Adjust this value to control the camera's smoothing speed
 
 		if (targetX > m_offsetX + ((widthInMeters) * 0.7f))
 		{

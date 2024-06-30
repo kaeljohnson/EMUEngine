@@ -11,12 +11,19 @@ namespace Engine
 	class Camera
 	{
 	public:
+		EMU_API void SetCameraTarget(SceneObject* ptrTarget);
+		EMU_API void SetClampingOn(const bool clampingOn);
+
+	public:
+		float m_offsetX;
+		float m_offsetY;
+
+		float m_x;
+		float m_y;
+	public:
 		Camera();
 		Camera(float x, float y, int w, int h, const int levelWidth, const int levelHeight, const float SCALEX, const float SCALEY);
 
-		EMU_API void SetCameraTarget(SceneObject* ptrTarget);
-		EMU_API void SetClampingOn(const bool clampingOn);
-		
 		void SetPixelsPerMeter(const int pixelsPerMeter);
 		void SetLevelWidthInMeters(const int levelWidthInMeters);
 		void SetLevelHeightInMeters(const int levelHeightInMeters);
@@ -33,7 +40,6 @@ namespace Engine
 		Camera& operator=(const Camera&) = delete;
 		Camera(Camera&&) = delete;
 		Camera& operator=(Camera&&) = delete;
-
 	private:
 
 		// Default camera behavior is to follow a target.
@@ -44,21 +50,18 @@ namespace Engine
 		int m_width;
 		int m_height;
 
+		float m_widthInMeters;
+		float m_heightInMeters;
+
 		int m_levelWidth;
 		int m_levelHeight;
 
 		int m_pixelsPerMeter;
 
-		// Rendering scale. The viewport is not necessarily the same as the window size.
+		// Rendering viewport scale. The viewport is not necessarily the same as the window size.
 		float refSCALEX;
 		float refSCALEY;
 
 		bool m_clampingOn;
-	public:
-		float m_offsetX;
-		float m_offsetY;
-
-		float m_x;
-		float m_y;
 	};
 }
