@@ -44,7 +44,6 @@ namespace Engine
 
 	void Camera::Update(double interpolation)
 	{
-		ENGINE_INFO_D("SCALE: " + std::to_string(refSCALEX) + ", " + std::to_string(refSCALEY));
 		if (ptrCameraTarget == nullptr)
 		{
 			ENGINE_CRITICAL_D("Camera target is nullptr. Camera is static!");
@@ -70,33 +69,27 @@ namespace Engine
 		if (targetX > m_offsetX + ((widthInMeters) * 0.7f))
 		{
 			m_offsetX = (float)targetX - ((widthInMeters) * 0.7f);
-			ENGINE_INFO_D("1");
 		}
 		else if (targetX < m_offsetX + ((widthInMeters) * 0.3f))
 		{
 			m_offsetX = (float)targetX - ((widthInMeters) * 0.3f);
-			ENGINE_INFO_D("2");
 		}
 		else
 		{
-			m_offsetX += (desiredCameraTopLeftX - m_offsetX) * (smoothingFactor * refSCALEX);
-			ENGINE_INFO_D("3");
+			m_offsetX += (desiredCameraTopLeftX - m_offsetX) * (smoothingFactor / refSCALEX);
 		}
 
 		if (targetY > m_offsetY + ((heightInMeters) * 0.7f))
 		{
 			m_offsetY = (float)targetY - ((heightInMeters) * 0.7f);
-			ENGINE_INFO_D("4");
 		}
 		else if (targetY < m_offsetY + ((heightInMeters) * 0.3f))
 		{
 			m_offsetY = (float)targetY - ((heightInMeters) * 0.3f);
-			ENGINE_INFO_D("5");
 		}
 		else
 		{
-			m_offsetY += (desiredCameraTopLeftY - m_offsetY) * (smoothingFactor * refSCALEY) ;
-			ENGINE_INFO_D("6");
+			m_offsetY += (desiredCameraTopLeftY - m_offsetY) * (smoothingFactor / refSCALEY) ;
 		}
 
 		if (m_clampingOn) Clamp();
