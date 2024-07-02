@@ -21,10 +21,22 @@ int main(int argc, char* args[])
 	Engine::TexturePtr tempTextureRed = Engine::CreateTexture(0, 0, 0);
 	
 	Controllable player(1.0f, 1.0f, 0.75f, 0.75f, tempTextureRed);
-	Engine::Camera playerCamera;
 
+	Engine::Camera playerCamera(Engine::FOLLOW_TARGET);
 	playerCamera.SetCameraTarget(&player);
-	// ptrAppInstance->AttachCamera(playerCamera);
+
+	Engine::Camera scrollingCamera(Engine::SCROLLING);
+	scrollingCamera.SetScrollingSpeeds(0.0001f, 0.000000f);
+
+
+	Engine::Camera staticCamera(Engine::STATIC_CAMERA);
+
+	Engine::CameraManager& refCameraManager = ptrAppInstance->GetCameraManager();
+
+	// refCameraManager.SetCurrentCamera(&playerCamera);
+	// refCameraManager.SetCurrentCamera(&staticCamera);
+	refCameraManager.SetCurrentCamera(&scrollingCamera);
+
 
 	CLIENT_INFO_D("Player UUID: " + player.GetUUID());
 

@@ -31,14 +31,14 @@ namespace Engine
 			return instance;
 		}
 
-		// Don't want client to reference 
+		// Don't want client to reference
 		// multiple instances of the application.
 		ENGINE_CRITICAL_D("Warning! Instance of application already exists. Multiple usage only recommended for testing.");
 		return instance;
 	}
 
 	Application::Application()
-		: running(false), m_ptrAppManagerListener(nullptr)
+		: running(false), m_ptrAppManagerListener(nullptr), m_cameraManager()
 	{
 		RendererManager::GetInstance()->CreateRenderer();
 
@@ -50,7 +50,9 @@ namespace Engine
 		RendererManager* ptrRendererManager = RendererManager::GetInstance();
 		EventManager* ptrEventManager = EventManager::GetInstance();
 
+		ptrRendererManager->SetCamera(m_cameraManager.m_ptrCurrentCamera);
 		ptrRendererManager->SetScene(currentScene);
+		
 
 		running = true;
 

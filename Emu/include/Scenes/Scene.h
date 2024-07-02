@@ -61,7 +61,5 @@ namespace Engine
 		void Update();
 
 		bool HasTileMap;
-
-		// Camera m_camera;
 	}; 
 }

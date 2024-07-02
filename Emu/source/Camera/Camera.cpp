@@ -2,47 +2,42 @@
 
 #include "../../include/Camera/Camera.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/RendererManager.h"
 
 namespace Engine
 {
-	Camera::Camera() : m_x(0), m_y(0), m_width(0), m_height(0), m_offsetX(0), m_offsetY(0), 
-		currentScenesPixelsPerMeter(0), refSCALEX(0), refSCALEY(0), m_clampingOn(true), ptrCameraTarget(nullptr) {}
+	Camera::Camera() : m_cameraType(STATIC_CAMERA), m_widthInMeters(0), m_heightInMeters(0), 
+		m_offsetX(0), m_offsetY(0), m_mapBoundRight(0), m_mapBoundBottom(0), 
+		SCALEX(0), SCALEY(0), m_clampingOn(true), ptrCameraTarget(nullptr), 
+		m_horizontalScrollSpeed(0), m_verticalScrollSpeed(0) {}
 
-	Camera::Camera(float x, float y, const int w, const int h, const int levelWidth, const int levelHeight, const float SCALEX, const float SCALEY)
-		: m_x(x), m_y(y), m_width(w), m_height(h), m_widthInMeters(0), m_heightInMeters(0), m_offsetX(0), m_offsetY(0),
-		currentScenesPixelsPerMeter(0), refSCALEX(SCALEX), refSCALEY(SCALEY), m_clampingOn(true), ptrCameraTarget(nullptr) {}
+	Camera::Camera(const CameraType cameraType) : m_cameraType(cameraType), 
+		m_widthInMeters(0), m_heightInMeters(0), 
+		m_offsetX(0), m_offsetY(0), m_mapBoundRight(0), m_mapBoundBottom(0),
+		SCALEX(0), SCALEY(0), m_clampingOn(true), ptrCameraTarget(nullptr), 
+		m_horizontalScrollSpeed(0), m_verticalScrollSpeed(0) {}
 
 	void Camera::SetCameraTarget(SceneObject* ptrTarget)
 	{
-		RendererManager::GetInstance()->SetCamera(this); // Set the camera to the renderer manager (this is the camera that will be used to render the scene
 		ptrCameraTarget = ptrTarget;
 	}
 
-	void Camera::Frame(const int pixelsPerMeter, const float levelWidthInMeters, const float levelHeightInMeters, 
+	void Camera::SetScrollingSpeeds(const float xScrollingSpeed, const float yScrollingSpeed)
+	{
+		m_horizontalScrollSpeed = xScrollingSpeed;
+		m_verticalScrollSpeed = yScrollingSpeed;
+	}
+
+	void Camera::Frame(const int pixelsPerMeter, const float levelWidthInMeters, const float levelHeightInMeters,
 		const float screenWidth, const float screenHeight, const float scaleX, const float scaleY)
 	{
-		currentScenesPixelsPerMeter = pixelsPerMeter;
+		m_mapBoundRight = levelWidthInMeters;
+		m_mapBoundBottom = levelHeightInMeters;
 
-		currentScenesMapWidthPerMeter = levelWidthInMeters;
-		currentScenesMapHeightPerMeter = levelHeightInMeters;
+		SCALEX = scaleX;
+		SCALEY = scaleY;
 
-		refSCALEX = scaleX;
-		refSCALEY = scaleY;
-
-		m_width = screenWidth;
-		m_height = screenHeight;
-
-		m_widthInMeters = (float)m_width / (currentScenesPixelsPerMeter * refSCALEX);
-		m_heightInMeters = (float)m_height / (currentScenesPixelsPerMeter * refSCALEY);
-
-		ENGINE_INFO_D(std::to_string(currentScenesPixelsPerMeter));
-		ENGINE_INFO_D(std::to_string(currentScenesMapWidthPerMeter));
-		ENGINE_INFO_D(std::to_string(currentScenesMapHeightPerMeter));
-		ENGINE_INFO_D(std::to_string(refSCALEX));
-		ENGINE_INFO_D(std::to_string(refSCALEY));
-		ENGINE_INFO_D("Camera width in pixels: " + std::to_string(m_width) + ", Camera height in pixels: " + std::to_string(m_height));
-		ENGINE_INFO_D("Camera width in meters: " + std::to_string(m_widthInMeters) + ", Camera height in meters: " + std::to_string(m_heightInMeters));
+		m_widthInMeters = (float)screenWidth / (pixelsPerMeter * SCALEX);
+		m_heightInMeters = (float)screenHeight / (pixelsPerMeter * SCALEY);
 	}
 
 	void Camera::SetClampingOn(const bool clampingOn)
@@ -52,24 +47,24 @@ namespace Engine
 
 	void Camera::Clamp()
 	{
-		const float scalerX = currentScenesPixelsPerMeter * refSCALEX;
-		const float scalerY = currentScenesPixelsPerMeter * refSCALEY;
-
 		if (m_offsetX < 0) { m_offsetX = 0; }
-		if (m_offsetX + m_widthInMeters > currentScenesMapWidthPerMeter) { m_offsetX = currentScenesMapWidthPerMeter - m_widthInMeters; }
+		if (m_offsetX + m_widthInMeters > m_mapBoundRight) { m_offsetX = m_mapBoundRight - m_widthInMeters; }
 
 		if (m_offsetY < 0) { m_offsetY = 0; }
-		if (m_offsetY + m_heightInMeters > currentScenesMapHeightPerMeter) { m_offsetY = currentScenesMapHeightPerMeter - m_heightInMeters; }
+		if (m_offsetY + m_heightInMeters > m_mapBoundBottom) { m_offsetY = m_mapBoundBottom - m_heightInMeters; }
 	}
 
 
 	void Camera::Update(double interpolation)
 	{
-		/*if (ptrCameraTarget == nullptr)
+		if (m_cameraType == STATIC_CAMERA) return; // Static camera does not move.
+
+		if (m_cameraType == SCROLLING)
 		{
-			ENGINE_CRITICAL_D("Camera target is nullptr. Camera is static!");
+			m_offsetX += m_horizontalScrollSpeed;
+			m_offsetY += m_verticalScrollSpeed;
 			return;
-		}*/
+		}
 
 		// Calculate the interpolated position of the target
 		double targetX = (ptrCameraTarget->GetPhysicsBody()->GetCenterPrevX() * (1.0f - interpolation)) +
@@ -94,7 +89,7 @@ namespace Engine
 		}
 		else
 		{
-			m_offsetX += (desiredCameraTopLeftX - m_offsetX) * (smoothingFactor / refSCALEX);
+			m_offsetX += (desiredCameraTopLeftX - m_offsetX) * (smoothingFactor / SCALEX);
 		}
 
 		if (targetY > m_offsetY + ((m_heightInMeters) * 0.7f))
@@ -107,7 +102,7 @@ namespace Engine
 		}
 		else
 		{
-			m_offsetY += (desiredCameraTopLeftY - m_offsetY) * (smoothingFactor / refSCALEY) ;
+			m_offsetY += (desiredCameraTopLeftY - m_offsetY) * (smoothingFactor / SCALEY);
 		}
 
 		if (m_clampingOn) Clamp();

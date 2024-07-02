@@ -21,7 +21,7 @@ namespace Engine
 	RendererManager::RendererManager() 
 		: VIRTUAL_WIDTH(1280), VIRTUAL_HEIGHT(720), SCALE_X(0), SCALE_Y(0), SCALE(0), 
 		m_viewportX(0), m_viewportY(0), m_viewportWidth(0), m_viewportHeight(0),
-		m_fullscreenWidth(0), m_fullscreenHeight(0),
+		m_screenWidth(0), m_screenHeight(0),
 		m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), 
 		m_ptrCamera(nullptr), m_ptrCurrentScene(nullptr)
 	{}
@@ -52,8 +52,8 @@ namespace Engine
 			ENGINE_CRITICAL_D("Get desktop display mode failed: " + std::string(SDL_GET_ERROR()));
 		}
 
-		m_fullscreenWidth = displayMode.w;
-		m_fullscreenHeight = displayMode.h;
+		m_screenWidth = displayMode.w;
+		m_screenHeight = displayMode.h;
 
 
 		// Create renderer
@@ -111,12 +111,12 @@ namespace Engine
 
 	const int RendererManager::GetFullscreenWidth() const
 	{
-		return m_fullscreenWidth;
+		return m_screenWidth;
 	}
 
 	const int RendererManager::GetFullscreenHeight() const
 	{
-		return m_fullscreenHeight;
+		return m_screenHeight;
 	}
 	
 	void RendererManager::ToggleFullscreen()
@@ -138,7 +138,7 @@ namespace Engine
 		{
 			// Default behavior for now will be to toggle fullscreen on for client.
 			// When the screen is toggled to windowed, the size will be half of the width and height.
-			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_fullscreenWidth / 2, m_fullscreenHeight / 2);
+			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_screenWidth / 2, m_screenHeight / 2);
 			SDL_SET_WINDOW_POSITION(m_ptrWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
 	}
@@ -147,17 +147,17 @@ namespace Engine
 	{
 		ENGINE_TRACE_D(std::to_string(newWindowWidth) + ", " + std::to_string(newWindowHeight));
 
-		if (newWindowWidth < m_fullscreenWidth / 2 && newWindowHeight < m_fullscreenHeight / 2)
+		if (newWindowWidth < m_screenWidth / 2 && newWindowHeight < m_screenHeight / 2)
 		{
-			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_fullscreenWidth / 2, m_fullscreenHeight / 2);
+			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_screenWidth / 2, m_screenHeight / 2);
 		}
-		else if (newWindowWidth < m_fullscreenWidth / 2)
+		else if (newWindowWidth < m_screenWidth / 2)
 		{
-			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_fullscreenWidth / 2, newWindowHeight);
+			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_screenWidth / 2, newWindowHeight);
 		}
-		else if (newWindowHeight < m_fullscreenHeight / 2)
+		else if (newWindowHeight < m_screenHeight / 2)
 		{
-			SDL_SET_WINDOW_SIZE(m_ptrWindow, newWindowWidth, m_fullscreenHeight / 2);
+			SDL_SET_WINDOW_SIZE(m_ptrWindow, newWindowWidth, m_screenHeight / 2);
 		}
 		else
 		{
@@ -272,16 +272,22 @@ namespace Engine
 #endif
 	}
 
-	void RendererManager::SetCamera(Camera* ptrCamera)
+	void RendererManager::SetCamera(Camera* camera)
 	{
 		if (m_ptrCamera != nullptr)
 		{
-			ENGINE_INFO_D("Camera already set. Returning.");
+			ENGINE_CRITICAL("Camera already set! Returning.");
+			return;
+		}
+
+		if (camera == nullptr)
+		{
+			ENGINE_CRITICAL("Camera is nullptr! Returning.");
 			return;
 		}
 
 		ENGINE_INFO_D("Giving Camera to Renderer!");
-		m_ptrCamera = ptrCamera;
+		m_ptrCamera = camera;
 	}
 
 	void RendererManager::SetScene(std::shared_ptr<Scene> ptrScene)
@@ -290,12 +296,13 @@ namespace Engine
 
 		if (m_ptrCamera == nullptr)
 		{
-			ENGINE_CRITICAL("Camera not set! Cannot render scene without camera.");
+			ENGINE_CRITICAL("Camera not set! Rendering scene with default camera.");
+			return;
 		}
 
 		m_ptrCamera->Frame(ptrScene->GetPixelsPerMeter(),
 			ptrScene->GetLevelWidthInMeters(), ptrScene->GetLevelHeightInMeters(),
-			m_fullscreenWidth, m_fullscreenHeight, SCALE_X, SCALE_Y);
+			m_screenWidth, m_screenHeight, SCALE_X, SCALE_Y);
 	}
 
 	void RendererManager::SetViewport()

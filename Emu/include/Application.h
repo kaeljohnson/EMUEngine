@@ -7,6 +7,7 @@
 #include "Events/EventListener.h"
 #include "Physics/IWorld.h"
 #include "Scenes/Scene.h"
+#include "Camera/CameraManager.h"
 
 namespace Engine
 {
@@ -16,6 +17,7 @@ namespace Engine
 		EMU_API static Application* GetInstance();
 		EMU_API void CreateEventListener(EventListener& eventListener);
 		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
+		EMU_API inline CameraManager& GetCameraManager() { return m_cameraManager; }
 
 		~Application();
 
@@ -33,6 +35,9 @@ namespace Engine
 
 		// Application needs one listener for app management events.
 		EventListener* m_ptrAppManagerListener;
+
+		// This will exist here for now.
+		CameraManager m_cameraManager;
 
 		void defineDefaultApplicationCallbacks();
 		void end();

@@ -61,8 +61,8 @@ namespace Engine
         Camera* m_ptrCamera;
 
 	private:
-        int m_fullscreenWidth;
-        int m_fullscreenHeight;
+        int m_screenWidth;
+        int m_screenHeight;
 
         const int VIRTUAL_WIDTH;
         const int VIRTUAL_HEIGHT;
