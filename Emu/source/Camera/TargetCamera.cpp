@@ -1,11 +1,13 @@
 #pragma once
 
+#include "../../include/EngineConstants.h"
+
 #include "../../include/Camera/TargetCamera.h"
 
 namespace Engine
 {
 	TargetCamera::TargetCamera() :  ptrCameraTarget(nullptr), m_smoothingFactor(0.001f), 
-		m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), 
+		m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(false),
 		m_topTargetScreenBound(0.0f), m_bottomTargetScreenBound(1.0f), Camera()
 	{}
 
@@ -21,31 +23,38 @@ namespace Engine
 		float desiredCameraTopLeftX = (float)targetX - (m_widthInMeters / 2.0f);
 		float desiredCameraTopLeftY = (float)targetY - (m_heightInMeters / 2.0f);
 
-
-		if (targetX > m_offsetX + ((m_widthInMeters)*m_rightTargetScreenBound))
+		if (targetX > m_offsetX + ((m_widthInMeters) * m_rightTargetScreenBound))
 		{
-			m_offsetX = (float)targetX - ((m_widthInMeters)*m_rightTargetScreenBound);
+			m_offsetX = (float)targetX - ((m_widthInMeters) * m_rightTargetScreenBound);
 		}
-		else if (targetX < m_offsetX + ((m_widthInMeters)*m_leftTargetScreenBound))
+		else if (targetX < m_offsetX + ((m_widthInMeters) * m_leftTargetScreenBound))
 		{
-			m_offsetX = (float)targetX - ((m_widthInMeters)*m_leftTargetScreenBound);
+			m_offsetX = (float)targetX - ((m_widthInMeters) * m_leftTargetScreenBound);
+		}
+		else if (m_smoothingOn)
+		{
+			m_offsetX += (desiredCameraTopLeftX - m_offsetX) *  (m_smoothingFactor / SCALEX);
 		}
 		else
 		{
-			m_offsetX += (desiredCameraTopLeftX - m_offsetX) * (m_smoothingFactor / SCALEX);
+			m_offsetX = desiredCameraTopLeftX;
 		}
 
 		if (targetY > m_offsetY + ((m_heightInMeters)*m_bottomTargetScreenBound))
 		{
-			m_offsetY = (float)targetY - ((m_heightInMeters)*m_bottomTargetScreenBound);
+			m_offsetY = (float)targetY - ((m_heightInMeters) * m_bottomTargetScreenBound);
 		}
-		else if (targetY < m_offsetY + ((m_heightInMeters)*m_topTargetScreenBound))
+		else if (targetY < m_offsetY + ((m_heightInMeters) * m_topTargetScreenBound))
 		{
-			m_offsetY = (float)targetY - ((m_heightInMeters)*m_topTargetScreenBound);
+			m_offsetY = (float)targetY - ((m_heightInMeters) * m_topTargetScreenBound);
+		}
+		else if (m_smoothingOn)
+		{
+			m_offsetY += (desiredCameraTopLeftY - m_offsetY) *  (m_smoothingFactor / SCALEY);
 		}
 		else
 		{
-			m_offsetY += (desiredCameraTopLeftY - m_offsetY) * (m_smoothingFactor / SCALEY);
+			m_offsetY = desiredCameraTopLeftY;
 		}
 
 		if (m_clampingOn) Clamp();
@@ -59,6 +68,7 @@ namespace Engine
 	void TargetCamera::SetTargetSmoothingFactor(const float smoothingFactor)
 	{
 		m_smoothingFactor = smoothingFactor;
+		m_smoothingOn = true;
 	}
 
 	void TargetCamera::SetRightTargetScreenBound(const float screenBound)

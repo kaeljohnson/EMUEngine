@@ -33,6 +33,6 @@ namespace Engine
 		float m_topTargetScreenBound;
 		float m_bottomTargetScreenBound;
 
-		
+		bool m_smoothingOn;
 	};
 }
