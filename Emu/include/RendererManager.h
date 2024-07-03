@@ -6,7 +6,6 @@
 
 #include "../include/Scenes/Scene.h"
 #include "Scenes/SceneObject.h"
-#include "../include/Camera/Camera.h"
 
 namespace Engine
 {
@@ -24,10 +23,9 @@ namespace Engine
         const SDLTexture* LoadTexture(const char* filePath);
         void SetViewport();
         void ClearScreen();
-        void RenderScene(const double interpolation);
+        void RenderScene(const double interpolation, const float cameraOffsetX, const float cameraOffsetY);
         void Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation, const float offsetX, const float offsetY);
         void Display();
-        void SetCamera(Camera* camera);
 
         // Window related functions.
         SDLWindow* GetWindow() const;
@@ -57,8 +55,6 @@ namespace Engine
         SDLRenderer* m_ptrRenderer;
 
         std::shared_ptr<Scene> m_ptrCurrentScene;
-    public:
-        Camera* m_ptrCamera;
 
 	private:
         int m_screenWidth;

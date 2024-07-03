@@ -1,12 +1,9 @@
 #pragma once
 
-#include <memory>
-
 #include "../Core.h"
 
 namespace Engine
 {
-
 	class Camera
 	{
 	public:

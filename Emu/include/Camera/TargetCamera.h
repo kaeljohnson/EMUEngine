@@ -27,12 +27,12 @@ namespace Engine
 	private:
 		SceneObject* ptrCameraTarget;
 
+		bool m_smoothingOn;
+
 		float m_smoothingFactor;
 		float m_rightTargetScreenBound;
 		float m_leftTargetScreenBound;
 		float m_topTargetScreenBound;
 		float m_bottomTargetScreenBound;
-
-		bool m_smoothingOn;
 	};
 }

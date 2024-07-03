@@ -24,7 +24,7 @@ int main(int argc, char* args[])
 
 	Engine::TargetCamera playerCamera;
 	playerCamera.SetCameraTarget(&player);
-	playerCamera.SetTargetSmoothingFactor(0.001f);
+	playerCamera.SetTargetSmoothingFactor(0.0005f);
 	playerCamera.SetRightTargetScreenBound(0.75f);
 	playerCamera.SetLeftTargetScreenBound(0.25f);
 

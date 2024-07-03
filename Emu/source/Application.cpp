@@ -47,10 +47,18 @@ namespace Engine
 
 	void Application::PlayScene(std::shared_ptr<Scene> currentScene)
 	{
+		// Once sceme manager exists, this function will be a generic run funcion that queries the scene manager for the current scene.
+		// Will need to add more functionality in here to handle scene switching.
+		
+		// renderer manager and event manager are singletons in order to hide dependencies from client.
 		RendererManager* ptrRendererManager = RendererManager::GetInstance();
 		EventManager* ptrEventManager = EventManager::GetInstance();
 
-		ptrRendererManager->SetCamera(m_cameraManager.m_ptrCurrentCamera);
+		// Camera frames current scene.
+		m_cameraManager.m_ptrCurrentCamera->Frame(currentScene->GetPixelsPerMeter(), currentScene->GetLevelWidthInMeters(), currentScene->GetLevelHeightInMeters(), 
+			ptrRendererManager->GetFullscreenWidth(), ptrRendererManager->GetFullscreenHeight(), ptrRendererManager->GetScaleX(), ptrRendererManager->GetScaleY());
+
+
 		ptrRendererManager->SetScene(currentScene);
 		
 
@@ -109,9 +117,9 @@ namespace Engine
 
 			const double interpolation = accumulator / timeStep;
 
-			// m_camera->Update(interpolation);
+			m_cameraManager.m_ptrCurrentCamera->Update(interpolation);
 
-			ptrRendererManager->RenderScene(interpolation);
+			ptrRendererManager->RenderScene(interpolation, m_cameraManager.m_ptrCurrentCamera->m_offsetX, m_cameraManager.m_ptrCurrentCamera->m_offsetY);
 		}
 	}
 
