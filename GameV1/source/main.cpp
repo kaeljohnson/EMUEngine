@@ -22,20 +22,19 @@ int main(int argc, char* args[])
 	
 	Controllable player(1.0f, 1.0f, 0.75f, 0.75f, tempTextureRed);
 
-	Engine::Camera playerCamera(Engine::FOLLOW_TARGET);
+	Engine::TargetCamera playerCamera;
 	playerCamera.SetCameraTarget(&player);
+	playerCamera.SetTargetSmoothingFactor(0.0005f);
+	playerCamera.SetRightTargetScreenBound(0.75f);
+	playerCamera.SetLeftTargetScreenBound(0.25f);
 
-	Engine::Camera scrollingCamera(Engine::SCROLLING);
-	scrollingCamera.SetScrollingSpeeds(0.0001f, 0.000000f);
-
-
-	Engine::Camera staticCamera(Engine::STATIC_CAMERA);
+	// Document: Top should be the lower number.
+	playerCamera.SetTopTargetScreenBound(0.25f);
+	playerCamera.SetBottomTargetScreenBound(0.75f);
 
 	Engine::CameraManager& refCameraManager = ptrAppInstance->GetCameraManager();
 
-	// refCameraManager.SetCurrentCamera(&playerCamera);
-	// refCameraManager.SetCurrentCamera(&staticCamera);
-	refCameraManager.SetCurrentCamera(&scrollingCamera);
+	refCameraManager.SetCurrentCamera(&playerCamera);
 
 
 	CLIENT_INFO_D("Player UUID: " + player.GetUUID());
