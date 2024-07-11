@@ -23,8 +23,8 @@ namespace Engine
         const SDLTexture* LoadTexture(const char* filePath);
         void SetViewport();
         void ClearScreen();
-        void RenderScene(const double interpolation, const float cameraOffsetX, const float cameraOffsetY);
-        void Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation, const float offsetX, const float offsetY);
+        void RenderScene(const double interpolation, const double cameraOffsetX, const double cameraOffsetY);
+        void Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation, const double offsetX, const double offsetY);
         void Display();
 
         // Window related functions.

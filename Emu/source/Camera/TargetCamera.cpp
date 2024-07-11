@@ -1,93 +1,34 @@
 #pragma once
 
 #include "../../include/EngineConstants.h"
+#include "../../include/CommonFunctions.h"
 
 #include "../../include/Camera/TargetCamera.h"
 
 namespace Engine
 {
-	TargetCamera::TargetCamera() :  ptrCameraTarget(nullptr), m_smoothingFactor(0.001f), 
-		m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(false),
-		m_topTargetScreenBound(0.0f), m_bottomTargetScreenBound(1.0f), Camera()
+	TargetCamera::TargetCamera() : ptrCameraTarget(nullptr), Camera()
 	{}
 
 	// Bug: Camera is stuttery for certain values of m_smoothingFactor and bounds.
 	void TargetCamera::Update(const double interpolation)
 	{
-		double targetX = (ptrCameraTarget->GetPhysicsBody()->GetCenterPrevX() * (1.0f - interpolation)) +
-			(ptrCameraTarget->GetPhysicsBody()->GetCenterXInMeters() * interpolation);
-		double targetY = (ptrCameraTarget->GetPhysicsBody()->GetCenterPrevY() * (1.0f - interpolation)) +
-			(ptrCameraTarget->GetPhysicsBody()->GetCenterYInMeters() * interpolation);
+		double targetX = Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevX(), ptrCameraTarget->GetPhysicsBody()->GetCenterXInMeters(), interpolation);
+		double targetY = Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevY(), ptrCameraTarget->GetPhysicsBody()->GetCenterYInMeters(), interpolation);
 
 		// Desired camera position based on the target's position
-		float desiredCameraTopLeftX = (float)targetX - (m_widthInMeters / 2.0f);
-		float desiredCameraTopLeftY = (float)targetY - (m_heightInMeters / 2.0f);
+		double desiredCameraTopLeftX = targetX - (m_widthInMeters / 2.0);
+		double desiredCameraTopLeftY = targetY - (m_heightInMeters / 2.0);
 
-		if (targetX > m_offsetX + ((m_widthInMeters) * m_rightTargetScreenBound))
-		{
-			m_offsetX = (float)targetX - ((m_widthInMeters) * m_rightTargetScreenBound);
-		}
-		else if (targetX < m_offsetX + ((m_widthInMeters) * m_leftTargetScreenBound))
-		{
-			m_offsetX = (float)targetX - ((m_widthInMeters) * m_leftTargetScreenBound);
-		}
-		else if (m_smoothingOn)
-		{
-			m_offsetX += (desiredCameraTopLeftX - m_offsetX) *  (m_smoothingFactor / SCALEX);
-		}
-		else
-		{
-			m_offsetX = desiredCameraTopLeftX;
-		}
+		m_offsetX = desiredCameraTopLeftX;
+		m_offsetY = desiredCameraTopLeftY;
 
-		if (targetY > m_offsetY + ((m_heightInMeters)*m_bottomTargetScreenBound))
-		{
-			m_offsetY = (float)targetY - ((m_heightInMeters) * m_bottomTargetScreenBound);
-		}
-		else if (targetY < m_offsetY + ((m_heightInMeters) * m_topTargetScreenBound))
-		{
-			m_offsetY = (float)targetY - ((m_heightInMeters) * m_topTargetScreenBound);
-		}
-		else if (m_smoothingOn)
-		{
-			m_offsetY += (desiredCameraTopLeftY - m_offsetY) *  (m_smoothingFactor / SCALEY);
-		}
-		else
-		{
-			m_offsetY = desiredCameraTopLeftY;
-		}
-
+		// Clamp after adjustments if clamping is enabled
 		if (m_clampingOn) Clamp();
-	}
+	}	
 
-	void TargetCamera::SetCameraTarget(SceneObject* ptrTarget)
+	void TargetCamera::SetCameraTarget(SceneObject* target)
 	{
-		ptrCameraTarget = ptrTarget;
-	}
-
-	void TargetCamera::SetTargetSmoothingFactor(const float smoothingFactor)
-	{
-		m_smoothingFactor = smoothingFactor;
-		m_smoothingOn = true;
-	}
-
-	void TargetCamera::SetRightTargetScreenBound(const float screenBound)
-	{
-		m_rightTargetScreenBound = screenBound;
-	}
-
-	void TargetCamera::SetLeftTargetScreenBound(const float screenBound)
-	{
-		m_leftTargetScreenBound = screenBound;
-	}
-
-	void TargetCamera::SetTopTargetScreenBound(const float screenBound)
-	{
-		m_topTargetScreenBound = screenBound;
-	}
-
-	void TargetCamera::SetBottomTargetScreenBound(const float screenBound)
-	{
-		m_bottomTargetScreenBound = screenBound;
+		ptrCameraTarget = target;
 	}
 }

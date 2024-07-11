@@ -12,19 +12,19 @@ namespace Engine
 		EMU_API void SetCameraPosition(const float x, const float y);
 		EMU_API void SetClampingOn(const bool clampingOn);
 
+		EMU_API void Clamp();
+
 		virtual ~Camera() = default;
 
 	public:
-		float m_offsetX;
-		float m_offsetY;
+		double m_offsetX;
+		double m_offsetY;
 
 	public:
 		virtual void Update(const double interpolation);
 
-		void Frame(const int pixelsPerMeter, const float levelWidthInMeters, const float levelHeightInMeters,
-			const float scaleX, const float scaleY, const float screenWidth, const float screenHeight);
-		
-		void Clamp();
+		void Frame(const int pixelsPerMeter, const int levelWidthInMeters, const int levelHeightInMeters,
+			const int screenWidth, const int screenHeight, const float scaleX, const float scaleY);
 
 		Camera(const Camera& camera) = delete;
 		Camera& operator=(const Camera&) = delete;
@@ -34,8 +34,8 @@ namespace Engine
 		float m_widthInMeters;
 		float m_heightInMeters;
 
-		float m_mapBoundRight;
-		float m_mapBoundBottom;
+		int m_mapBoundRight;
+		int m_mapBoundBottom;
 		
 		bool m_clampingOn;
 

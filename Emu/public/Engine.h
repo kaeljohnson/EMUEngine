@@ -23,6 +23,8 @@
 #include "../include/Camera/ScrollingCamera.h"
 #include "../include/Camera/TargetCamera.h"
 
+#include "../include/CommonFunctions.h"
+
 namespace Engine
 {
 	using ScenePtr = std::shared_ptr<Scene>;

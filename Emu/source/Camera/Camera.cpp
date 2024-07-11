@@ -13,8 +13,8 @@ namespace Engine
 		m_offsetY = y;
 	}
 
-	void Camera::Frame(const int pixelsPerMeter, const float levelWidthInMeters, const float levelHeightInMeters,
-		const float screenWidth, const float screenHeight, const float scaleX, const float scaleY)
+	void Camera::Frame(const int pixelsPerMeter, const int levelWidthInMeters, const int levelHeightInMeters,
+		const int screenWidth, const int screenHeight, const float scaleX, const float scaleY)
 	{
 		m_mapBoundRight = levelWidthInMeters;
 		m_mapBoundBottom = levelHeightInMeters;

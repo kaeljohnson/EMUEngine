@@ -13,26 +13,11 @@ namespace Engine
 	public:
 		EMU_API TargetCamera();
 		EMU_API void SetCameraTarget(SceneObject* ptrTarget);
-
-		EMU_API void SetTargetSmoothingFactor(const float smoothingFactor);
-		EMU_API void SetRightTargetScreenBound(const float screenBound);
-		EMU_API void SetLeftTargetScreenBound(const float screenBound);
-		EMU_API void SetTopTargetScreenBound(const float screenBound);
-		EMU_API void SetBottomTargetScreenBound(const float screenBound);
+		EMU_API virtual void Update(const double interpolation);
 
 		~TargetCamera() = default;
-
-	public:
-		void Update(const double interpolation) override;
-	private:
+	
+	protected:
 		SceneObject* ptrCameraTarget;
-
-		bool m_smoothingOn;
-
-		float m_smoothingFactor;
-		float m_rightTargetScreenBound;
-		float m_leftTargetScreenBound;
-		float m_topTargetScreenBound;
-		float m_bottomTargetScreenBound;
 	};
 }

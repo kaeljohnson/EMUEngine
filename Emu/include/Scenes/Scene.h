@@ -54,8 +54,8 @@ namespace Engine
 		inline const int GetPixelsPerMeter() const { return m_pixelsPerMeter; }
 		inline EventListenerStack& GetEventListeners() { return m_eventListeners; }
 		inline std::vector<SceneObjectStack>& GetLayers() { return m_layers; }
-		inline const float GetLevelWidthInMeters() const { return m_mapWidthInMeters; }
-		inline const float GetLevelHeightInMeters() const { return m_mapHeightInMeters; }
+		inline const int GetLevelWidthInMeters() const { return m_mapWidthInMeters; }
+		inline const int GetLevelHeightInMeters() const { return m_mapHeightInMeters; }
 
 		void CheckValid();
 		void Update();

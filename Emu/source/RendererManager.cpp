@@ -13,6 +13,8 @@
 #include "../include/Textures/ITexture.h"
 #include "../include/Textures/Texture.h"
 
+#include "../include/CommonFunctions.h"
+
 namespace Engine
 {
 	// Initialize static member
@@ -191,15 +193,15 @@ namespace Engine
 		SDL_RENDER_PRESENT(m_ptrRenderer);
 	}
 
-	void RendererManager::RenderScene(const double interpolation, const float cameraOffsetX, const float cameraOffsetY)
+	void RendererManager::RenderScene(const double interpolation, const double cameraOffsetX, const double cameraOffsetY)
 	{
 		ClearScreen();
 
 		// Calculate camera bounds
-		float cameraLeft = cameraOffsetX;
-		float cameraRight = cameraOffsetX + (m_viewportWidth / m_ptrCurrentScene->GetPixelsPerMeter());
-		float cameraTop = cameraOffsetY;
-		float cameraBottom = cameraOffsetY + (m_viewportHeight / m_ptrCurrentScene->GetPixelsPerMeter());
+		double cameraLeft = cameraOffsetX;
+		double cameraRight = cameraOffsetX + (m_viewportWidth / m_ptrCurrentScene->GetPixelsPerMeter());
+		double cameraTop = cameraOffsetY;
+		double cameraBottom = cameraOffsetY + (m_viewportHeight / m_ptrCurrentScene->GetPixelsPerMeter());
 
 		for (auto& layer : m_ptrCurrentScene->GetLayers())
 		{
@@ -224,7 +226,7 @@ namespace Engine
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation, const float offsetX, const float offsetY)
+	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation, const double offsetX, const double offsetY)
 	{
 		bool isTextureNull = sceneObject->GetTexture() == nullptr;
 
@@ -235,8 +237,8 @@ namespace Engine
 
 		SDLRect dst
 		{
-			static_cast<int>(round(((ptrBody->GetTopLeftPrevX()) * (1.0 - interpolation) + (ptrBody->GetTopLeftXInMeters()) * interpolation - offsetX) * pixelsPerMeter * SCALE)),
-			static_cast<int>(round(((ptrBody->GetTopLeftPrevY()) * (1.0 - interpolation) + (ptrBody->GetTopLeftYInMeters()) * interpolation - offsetY) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevX(), ptrBody->GetTopLeftXInMeters(), interpolation) - offsetX) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevY(), ptrBody->GetTopLeftYInMeters(), interpolation) - offsetY) * pixelsPerMeter * SCALE)),
 
 			static_cast<int>(round(ptrBody->GetWidthInMeters() * pixelsPerMeter * SCALE)),
 			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))

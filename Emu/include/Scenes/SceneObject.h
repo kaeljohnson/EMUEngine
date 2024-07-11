@@ -20,9 +20,10 @@ namespace Engine
 		bool Enabled;
 		bool Visible;
 		int LayerIdx;
+		int DirectionFacing;
 	public:
 		SceneObject(const BodyType bodyType, const bool fixed, const float startingXInMeters,
-			const float startingYInMeters, const float widthInMeters, const float heightInMeters, std::shared_ptr<ITexture> refTexture);
+			const float startingYInMeters, const float widthInMeters, const float heightInMeters, std::shared_ptr<ITexture> refTexture, int directionFacing);
 
 		EMU_API virtual ~SceneObject() = default;
 
@@ -44,6 +45,7 @@ namespace Engine
 		std::shared_ptr<ITexture> m_texture;
 		std::shared_ptr<IPhysicsBody> m_physicsBody;
 
+	public:
 		// Reference to the key states in the event manager. Not
 		// sure if this should be here.
 		const std::unordered_map<EventType, bool>& refKeyStates;

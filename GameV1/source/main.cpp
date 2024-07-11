@@ -3,6 +3,7 @@
 #include <Engine.h>
 #include "../include/EventListeners/AppManagementListener.h"
 #include "../include/Controllable/Controllable.h"
+#include "../include/Camera/PlayerCamera.h"
 
 int main(int argc, char* args[])
 {
@@ -22,15 +23,16 @@ int main(int argc, char* args[])
 	
 	Controllable player(1.0f, 1.0f, 0.75f, 0.75f, tempTextureRed);
 
-	Engine::TargetCamera playerCamera;
+	PlayerCamera playerCamera;
 	playerCamera.SetCameraTarget(&player);
-	playerCamera.SetTargetSmoothingFactor(0.0005f);
-	playerCamera.SetRightTargetScreenBound(0.75f);
-	playerCamera.SetLeftTargetScreenBound(0.25f);
+	playerCamera.SetTargetSmoothingFactor(0.001f);
+	playerCamera.SetRightTargetScreenBound(0.60f);
+	playerCamera.SetLeftTargetScreenBound(0.40f);
 
 	// Document: Top should be the lower number.
 	playerCamera.SetTopTargetScreenBound(0.25f);
 	playerCamera.SetBottomTargetScreenBound(0.75f);
+	playerCamera.SetLookAheadFactor(1.0f);
 
 	Engine::CameraManager& refCameraManager = ptrAppInstance->GetCameraManager();
 
