@@ -22,7 +22,7 @@ private:
 	bool m_smoothingOn;
 	double m_lookAhead;
 	double m_lookAheadFactor;
-	const double m_minLookAheadDistance = 0.03;
+	const float m_lookAheadChangeSpeed = 0.005f;
 
 	float m_smoothingFactor;
 	float m_rightTargetScreenBound;
