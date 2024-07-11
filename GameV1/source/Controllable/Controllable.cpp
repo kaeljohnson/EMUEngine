@@ -28,6 +28,9 @@
         std::pair<float, float> force = { 0.0f, 0.0f };
         float currentVelocityX = m_physicsBody->GetXVelocity();
 
+        // Define a minimum velocity threshold
+        const float MIN_VELOCITY_THRESHOLD = 0.5f;
+
         // If the controllable is jumping, they should
         // have less control over their movement.        
         const float ACCELERATIONDAMPENING = onGround ? 1.0f : 0.90f;
@@ -36,7 +39,7 @@
         {
             if (currentVelocityX < 0) // If previously moving left
             {
-                force = { m_xSwitchDeceleration * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters(), 0.0f}; // Apply larger force to the right
+                force = { m_xSwitchDeceleration * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters(), 0.0f }; // Apply larger force to the right
                 DirectionFacing = 1;
             }
             else // If already moving right or not moving at all
@@ -68,15 +71,23 @@
 
         m_physicsBody->ApplyForceToBox(force);
 
-        // Limit the velocity
-        if (m_physicsBody->GetXVelocity() > m_xMaxVelocity)
+        // Check if the current velocity is below the threshold and set it to zero
+        if (std::abs(m_physicsBody->GetXVelocity()) < MIN_VELOCITY_THRESHOLD)
         {
-			m_physicsBody->SetXVelocity(m_xMaxVelocity);
-		}
+            m_physicsBody->SetXVelocity(0.0f);
+        }
+        else
+        {
+            // Limit the velocity
+            if (m_physicsBody->GetXVelocity() >= m_xMaxVelocity)
+            {
+                m_physicsBody->SetXVelocity(m_xMaxVelocity);
+            }
 
-        if (m_physicsBody->GetXVelocity() < -m_xMaxVelocity)
-        {
-            m_physicsBody->SetXVelocity(-m_xMaxVelocity);
+            if (m_physicsBody->GetXVelocity() <= -m_xMaxVelocity)
+            {
+                m_physicsBody->SetXVelocity(-m_xMaxVelocity);
+            }
         }
     }
 
