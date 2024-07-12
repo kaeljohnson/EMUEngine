@@ -42,5 +42,8 @@ namespace Engine
 		// Rendering viewport scale. The viewport is not necessarily the same as the window size.
 		float SCALEX;
 		float SCALEY;
+
+		int m_screenWidth;
+		int m_screenHeight;
 	};
 }

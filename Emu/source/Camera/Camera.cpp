@@ -26,6 +26,9 @@ namespace Engine
 		SCALEX = scaleX;
 		SCALEY = scaleY;
 
+		m_screenWidth = screenWidth;
+		m_screenHeight = screenHeight;
+
 		m_widthInMeters = (float)screenWidth / (pixelsPerMeter * SCALEX);
 		m_heightInMeters = (float)screenHeight / (pixelsPerMeter * SCALEY);
 	}
