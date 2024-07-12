@@ -3,9 +3,13 @@
 #include "../../include/Camera/Camera.h"
 #include "../../include/Logging/Logger.h"
 
+// TEMP
+#include "../../include/RendererManager.h"
+
 namespace Engine
 {
-	Camera::Camera() : m_offsetX(0), m_offsetY(0), SCALEX(0), SCALEY(0), m_widthInMeters(0), m_heightInMeters(0), m_clampingOn(true) {}
+	Camera::Camera() : SCALEX(RendererManager::GetInstance()->GetScaleX()), SCALEY(RendererManager::GetInstance()->GetScaleY()), 
+		m_offsetX(0), m_offsetY(0), m_widthInMeters(0), m_heightInMeters(0), m_clampingOn(true) {}
 
 	void Camera::SetCameraPosition(const float x, const float y)
 	{
