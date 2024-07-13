@@ -45,5 +45,7 @@ namespace Engine
 
 		int m_screenWidth;
 		int m_screenHeight;
+
+		int m_pixelsPerMeter;
 	};
 }

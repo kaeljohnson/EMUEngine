@@ -1,7 +1,5 @@
 #pragma once
 
-#include <algorithm>
-
 #include "../../include/Camera/PlayerCamera.h"
 
 PlayerCamera::PlayerCamera() : m_smoothingFactor(0.001f),
@@ -20,10 +18,9 @@ void PlayerCamera::Update(const double interpolation)
     // Calculate the difference between the current and desired look-ahead
     double lookAheadDifference = desiredLookAhead - m_lookAhead;
 
-    double actualMovement = std::min(std::abs(lookAheadDifference), 0.5) * (lookAheadDifference > 0 ? 1 : -1);
-
     // Calculate the step to move towards the desired look-ahead, ensuring we don't overshoot
-    m_lookAheadChangeSpeed = 0.005f * SCALEX / m_screenWidth;
+    m_lookAheadChangeSpeed = 0.2f / m_pixelsPerMeter; // What do I set this to? It must have the same affect across all resolutions and screen sizes.
+
     double lookAheadStep = std::min(std::abs(lookAheadDifference), m_lookAheadChangeSpeed * interpolation);
     lookAheadStep *= (lookAheadDifference > 0) ? 1 : -1; // Ensure the step has the correct direction
 

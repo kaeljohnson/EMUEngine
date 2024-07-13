@@ -29,6 +29,8 @@ namespace Engine
 		m_screenWidth = screenWidth;
 		m_screenHeight = screenHeight;
 
+		m_pixelsPerMeter = pixelsPerMeter;
+
 		m_widthInMeters = (float)screenWidth / (pixelsPerMeter * SCALEX);
 		m_heightInMeters = (float)screenHeight / (pixelsPerMeter * SCALEY);
 	}
