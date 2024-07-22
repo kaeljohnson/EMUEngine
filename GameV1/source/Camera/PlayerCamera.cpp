@@ -19,7 +19,7 @@ void PlayerCamera::Update(const double interpolation)
     double lookAheadDifference = desiredLookAhead - m_lookAhead;
 
     // Calculate the step to move towards the desired look-ahead, ensuring we don't overshoot
-    m_lookAheadChangeSpeed = 0.2f / m_pixelsPerMeter; // What do I set this to? It must have the same affect across all resolutions and screen sizes.
+    m_lookAheadChangeSpeed = 0.005f / SCALEX;
 
     double lookAheadStep = std::min(std::abs(lookAheadDifference), m_lookAheadChangeSpeed * interpolation);
     lookAheadStep *= (lookAheadDifference > 0) ? 1 : -1; // Ensure the step has the correct direction
