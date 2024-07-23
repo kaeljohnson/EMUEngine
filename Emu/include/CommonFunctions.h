@@ -25,4 +25,9 @@ namespace Engine
 
 		return ss.str();
 	}
+
+	inline static double Lerp(double a, double b, double f)
+	{
+		return (a * (1.0f - f)) + (b * f);
+	}
 }

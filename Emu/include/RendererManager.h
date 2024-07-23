@@ -18,11 +18,13 @@ namespace Engine
 
         ~RendererManager();
 
+        void SetScene(std::shared_ptr<Scene> scene);
+
         const SDLTexture* LoadTexture(const char* filePath);
         void SetViewport();
         void ClearScreen();
-        void RenderScene(std::shared_ptr<Scene> scene, const double interpolation);
-        void Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation);
+        void RenderScene(const double interpolation, const double cameraOffsetX, const double cameraOffsetY);
+        void Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation, const double offsetX, const double offsetY);
         void Display();
 
         // Window related functions.
@@ -33,6 +35,8 @@ namespace Engine
         void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
         void ToggleFullscreen();
 
+        inline const float GetScaleX() const { return SCALE_X; }
+        inline const float GetScaleY() const { return SCALE_Y; }
 
         // Deleted functions to ensure our singleton instance cannot be copied or moved.
         RendererManager(const RendererManager&) = delete;
@@ -48,10 +52,13 @@ namespace Engine
         // the application to have multiple windows.
         SDLWindow* m_ptrWindow;
 
-        int m_fullscreenWidth;
-        int m_fullscreenHeight;
-
         SDLRenderer* m_ptrRenderer;
+
+        std::shared_ptr<Scene> m_ptrCurrentScene;
+
+	private:
+        int m_screenWidth;
+        int m_screenHeight;
 
         const int VIRTUAL_WIDTH;
         const int VIRTUAL_HEIGHT;

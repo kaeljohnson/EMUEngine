@@ -27,7 +27,7 @@ namespace Engine
             if (m_height == 0) 
             {
                 // Set the width to the length of the first line
-                m_width = line.length();
+                m_width = (int)line.length();
             }
             else if (line.length() != m_width)
             {
@@ -64,7 +64,7 @@ namespace Engine
 						static_cast<float>(y) * static_cast<float>(m_numMetersPerTile),
 						static_cast<float>(m_numMetersPerTile),
 						static_cast<float>(m_numMetersPerTile),
-						nullptr);
+						nullptr, 0);
 				}
 			}
 		}
@@ -95,7 +95,7 @@ namespace Engine
                     while (startX + width < GetWidth() && GetTile(startX + width, y) != '-' && !processed[y][startX + width])
                     {
                         ++width;
-                    }   
+                    }
 
                     // Expand vertically to form a block
                     while (startY + height < GetHeight())
@@ -135,7 +135,7 @@ namespace Engine
                         static_cast<float>(startY) * static_cast<float>(m_numMetersPerTile),
                         static_cast<float>(width) * static_cast<float>(m_numMetersPerTile),
                         static_cast<float>(height) * static_cast<float>(m_numMetersPerTile),
-                        nullptr);
+                        nullptr, 0);
                 }
             }
         }

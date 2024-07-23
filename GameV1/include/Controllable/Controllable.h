@@ -13,6 +13,7 @@ public:
 	~Controllable() = default;
 	void Update() override;
 	void Jump(bool canJump);
+	void Dash(bool canDash);
 
 protected:
 	const float m_xSwitchDeceleration;
@@ -32,6 +33,8 @@ protected:
 	bool m_canJump;
 	bool m_isJumping;
 	float m_jumpCharge;
+
+	bool m_isDashing;
 
 	float m_coyoteTime;
 	const float m_coyoteTimeDuration;

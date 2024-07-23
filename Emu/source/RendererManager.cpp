@@ -13,6 +13,8 @@
 #include "../include/Textures/ITexture.h"
 #include "../include/Textures/Texture.h"
 
+#include "../include/CommonFunctions.h"
+
 namespace Engine
 {
 	// Initialize static member
@@ -21,8 +23,9 @@ namespace Engine
 	RendererManager::RendererManager() 
 		: VIRTUAL_WIDTH(1280), VIRTUAL_HEIGHT(720), SCALE_X(0), SCALE_Y(0), SCALE(0), 
 		m_viewportX(0), m_viewportY(0), m_viewportWidth(0), m_viewportHeight(0),
-		m_fullscreenWidth(0), m_fullscreenHeight(0),
-		m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr)
+		m_screenWidth(0), m_screenHeight(0),
+		m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), 
+		m_ptrCurrentScene(nullptr)
 	{}
 
 	void RendererManager::CreateRenderer()
@@ -51,8 +54,8 @@ namespace Engine
 			ENGINE_CRITICAL_D("Get desktop display mode failed: " + std::string(SDL_GET_ERROR()));
 		}
 
-		m_fullscreenWidth = displayMode.w;
-		m_fullscreenHeight = displayMode.h;
+		m_screenWidth = displayMode.w;
+		m_screenHeight = displayMode.h;
 
 
 		// Create renderer
@@ -64,7 +67,7 @@ namespace Engine
 			ENGINE_CRITICAL("Renderer could not be created! SDL Error: " + std::string(SDL_GET_ERROR()));
 		}
 
-		SDL_SetRenderDrawColor(m_ptrRenderer, 'd3', 'd3', 'd3', SDL_ALPHA_OPAQUE);
+		SDL_SetRenderDrawColor(m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 
 		SetViewport();
 
@@ -110,14 +113,14 @@ namespace Engine
 
 	const int RendererManager::GetFullscreenWidth() const
 	{
-		return m_fullscreenWidth;
+		return m_screenWidth;
 	}
 
 	const int RendererManager::GetFullscreenHeight() const
 	{
-		return m_fullscreenHeight;
+		return m_screenHeight;
 	}
-
+	
 	void RendererManager::ToggleFullscreen()
 	{
 		// Bug here: Figure out why "SDL_WINDOW_FULLSCREEN" does not work.
@@ -137,7 +140,7 @@ namespace Engine
 		{
 			// Default behavior for now will be to toggle fullscreen on for client.
 			// When the screen is toggled to windowed, the size will be half of the width and height.
-			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_fullscreenWidth / 2, m_fullscreenHeight / 2);
+			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_screenWidth / 2, m_screenHeight / 2);
 			SDL_SET_WINDOW_POSITION(m_ptrWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
 	}
@@ -146,17 +149,17 @@ namespace Engine
 	{
 		ENGINE_TRACE_D(std::to_string(newWindowWidth) + ", " + std::to_string(newWindowHeight));
 
-		if (newWindowWidth < m_fullscreenWidth / 2 && newWindowHeight < m_fullscreenHeight / 2)
+		if (newWindowWidth < m_screenWidth / 2 && newWindowHeight < m_screenHeight / 2)
 		{
-			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_fullscreenWidth / 2, m_fullscreenHeight / 2);
+			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_screenWidth / 2, m_screenHeight / 2);
 		}
-		else if (newWindowWidth < m_fullscreenWidth / 2)
+		else if (newWindowWidth < m_screenWidth / 2)
 		{
-			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_fullscreenWidth / 2, newWindowHeight);
+			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_screenWidth / 2, newWindowHeight);
 		}
-		else if (newWindowHeight < m_fullscreenHeight / 2)
+		else if (newWindowHeight < m_screenHeight / 2)
 		{
-			SDL_SET_WINDOW_SIZE(m_ptrWindow, newWindowWidth, m_fullscreenHeight / 2);
+			SDL_SET_WINDOW_SIZE(m_ptrWindow, newWindowWidth, m_screenHeight / 2);
 		}
 		else
 		{
@@ -190,19 +193,32 @@ namespace Engine
 		SDL_RENDER_PRESENT(m_ptrRenderer);
 	}
 
-	void RendererManager::RenderScene(std::shared_ptr<Scene> scene, const double interpolation)
+	void RendererManager::RenderScene(const double interpolation, const double cameraOffsetX, const double cameraOffsetY)
 	{
 		ClearScreen();
 
-		// Render the scene.
-		// For now, iterate through each layer and render each object in the layer.
-		// Later, we can optimize this by only rendering objects that are visible or changed.
-		
-		for (auto& layer : scene->GetLayers())
+		// Calculate camera bounds
+		double cameraLeft = cameraOffsetX;
+		double cameraRight = cameraOffsetX + (m_viewportWidth / m_ptrCurrentScene->GetPixelsPerMeter());
+		double cameraTop = cameraOffsetY;
+		double cameraBottom = cameraOffsetY + (m_viewportHeight / m_ptrCurrentScene->GetPixelsPerMeter());
+
+		for (auto& layer : m_ptrCurrentScene->GetLayers())
 		{
 			for (auto& sceneObject : layer)
 			{
-				Draw(sceneObject, scene->GetPixelsPerMeter(), interpolation);
+				float objectLeft = sceneObject->GetPhysicsBody()->GetTopLeftXInMeters();
+				float objectRight = objectLeft + sceneObject->GetPhysicsBody()->GetWidthInMeters();
+				float objectTop = sceneObject->GetPhysicsBody()->GetTopLeftYInMeters();
+				float objectBottom = objectTop + sceneObject->GetPhysicsBody()->GetHeightInMeters();
+
+				bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
+					objectBottom >= cameraTop && objectTop <= cameraBottom;
+
+				if (isVisible)
+				{
+					Draw(sceneObject, m_ptrCurrentScene->GetPixelsPerMeter(), interpolation, cameraLeft, cameraTop);
+				}
 			}
 		}
 
@@ -210,7 +226,7 @@ namespace Engine
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation)
+	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation, const double offsetX, const double offsetY)
 	{
 		bool isTextureNull = sceneObject->GetTexture() == nullptr;
 
@@ -221,11 +237,8 @@ namespace Engine
 
 		SDLRect dst
 		{
-			// This rect will eventually be the outline of the texture we want to render,
-			// not the collidable object tracked by the underlying box2d body.
-
-			static_cast<int>(round((ptrBody->GetTopLeftPrevX() * (1.0 - interpolation) + ptrBody->GetTopLeftXInMeters() * interpolation) * pixelsPerMeter * SCALE)),
-			static_cast<int>(round((ptrBody->GetTopLeftPrevY() * (1.0 - interpolation) + ptrBody->GetTopLeftYInMeters() * interpolation) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevX(), ptrBody->GetTopLeftXInMeters(), interpolation) - offsetX) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevY(), ptrBody->GetTopLeftYInMeters(), interpolation) - offsetY) * pixelsPerMeter * SCALE)),
 
 			static_cast<int>(round(ptrBody->GetWidthInMeters() * pixelsPerMeter * SCALE)),
 			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))
@@ -255,8 +268,13 @@ namespace Engine
 			SDL_SetRenderDrawColor(m_ptrRenderer, 255, 0, 0, 255);
 		}
 		SDL_RenderDrawRect(m_ptrRenderer, &dst);
-		SDL_SetRenderDrawColor(m_ptrRenderer, 'd3', 'd3', 'd3', SDL_ALPHA_OPAQUE);
+		SDL_SetRenderDrawColor(m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 #endif
+	}
+
+	void RendererManager::SetScene(std::shared_ptr<Scene> ptrScene)
+	{
+		m_ptrCurrentScene = ptrScene;
 	}
 
 	void RendererManager::SetViewport()

@@ -31,14 +31,14 @@ namespace Engine
 			return instance;
 		}
 
-		// Don't want client to reference 
+		// Don't want client to reference
 		// multiple instances of the application.
 		ENGINE_CRITICAL_D("Warning! Instance of application already exists. Multiple usage only recommended for testing.");
 		return instance;
 	}
 
 	Application::Application()
-		: running(false), m_ptrAppManagerListener(nullptr)
+		: running(false), m_ptrAppManagerListener(nullptr), m_cameraManager()
 	{
 		RendererManager::GetInstance()->CreateRenderer();
 
@@ -47,8 +47,20 @@ namespace Engine
 
 	void Application::PlayScene(std::shared_ptr<Scene> currentScene)
 	{
+		// Once sceme manager exists, this function will be a generic run funcion that queries the scene manager for the current scene.
+		// Will need to add more functionality in here to handle scene switching.
+		
+		// renderer manager and event manager are singletons in order to hide dependencies from client.
 		RendererManager* ptrRendererManager = RendererManager::GetInstance();
 		EventManager* ptrEventManager = EventManager::GetInstance();
+
+		// Camera frames current scene.
+		m_cameraManager.m_ptrCurrentCamera->Frame(currentScene->GetPixelsPerMeter(), currentScene->GetLevelWidthInMeters(), currentScene->GetLevelHeightInMeters(), 
+			ptrRendererManager->GetFullscreenWidth(), ptrRendererManager->GetFullscreenHeight(), ptrRendererManager->GetScaleX(), ptrRendererManager->GetScaleY());
+
+
+		ptrRendererManager->SetScene(currentScene);
+		
 
 		running = true;
 
@@ -95,15 +107,19 @@ namespace Engine
 			{
 				ptrEventManager->HandleEvents();
 				processEventQueue(currentScene, ptrEventManager, m_ptrAppManagerListener);
+				
 
 				currentScene->Update();
-
+				
+				
 				accumulator -= timeStep;
 			}
 
 			const double interpolation = accumulator / timeStep;
 
-			ptrRendererManager->RenderScene(currentScene, interpolation);
+			m_cameraManager.m_ptrCurrentCamera->Update(interpolation);
+
+			ptrRendererManager->RenderScene(interpolation, m_cameraManager.m_ptrCurrentCamera->m_offsetX, m_cameraManager.m_ptrCurrentCamera->m_offsetY);
 		}
 	}
 
@@ -163,10 +179,10 @@ namespace Engine
 				}
 			}
 
-			if (!currentEvent.Handled)
+			/*if (!currentEvent.Handled)
 			{
 				ENGINE_TRACE_D("Unhandled Event: " + std::to_string(static_cast<int>(currentEvent.Type)));
-			}
+			}*/
 
 			ptrEventManager->eventQ.pop();
 		}

@@ -3,6 +3,7 @@
 #include <Engine.h>
 #include "../include/EventListeners/AppManagementListener.h"
 #include "../include/Controllable/Controllable.h"
+#include "../include/Camera/PlayerCamera.h"
 
 int main(int argc, char* args[])
 {
@@ -20,7 +21,22 @@ int main(int argc, char* args[])
 	// Temp
 	Engine::TexturePtr tempTextureRed = Engine::CreateTexture(0, 0, 0);
 	
-	Controllable player(4.0f, 20.0f, 0.9f, 0.9f, tempTextureRed);
+	Controllable player(1.0f, 1.0f, 0.75f, 0.75f, tempTextureRed);
+
+	Engine::ScrollingCamera scrollCamera;
+	scrollCamera.SetScrollingSpeeds(0.0005f, 0.0f);
+	scrollCamera.SetCameraPosition(0.0f, 38.5f);
+
+
+	PlayerCamera playerCamera;
+	playerCamera.SetCameraTarget(&player);
+
+
+	Engine::CameraManager& refCameraManager = ptrAppInstance->GetCameraManager();
+
+	refCameraManager.SetCurrentCamera(&playerCamera);
+	// refCameraManager.SetCurrentCamera(&scrollCamera);
+
 
 	CLIENT_INFO_D("Player UUID: " + player.GetUUID());
 

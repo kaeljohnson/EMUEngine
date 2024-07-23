@@ -31,8 +31,15 @@ namespace Engine
 		EMU_API void RemoveEventListener(EventListener& eventListener);
 		EMU_API void AddTileMap(TileMap& tileMap, int layerIdx);
 
+		// IF theres no map in the level, client will decided the dimensions manually.
+		EMU_API void SetLevelWidthInMeters(const int levelWidthInMeters);
+		EMU_API void SetLevelHeightInMeters(const int levelHeightInMeters);
+
 	private:
 		int m_pixelsPerMeter;
+
+		int m_mapWidthInMeters;
+		int m_mapHeightInMeters;
 
 		float m_gravityX;
 		float m_gravityY;
@@ -47,8 +54,12 @@ namespace Engine
 		inline const int GetPixelsPerMeter() const { return m_pixelsPerMeter; }
 		inline EventListenerStack& GetEventListeners() { return m_eventListeners; }
 		inline std::vector<SceneObjectStack>& GetLayers() { return m_layers; }
+		inline const int GetLevelWidthInMeters() const { return m_mapWidthInMeters; }
+		inline const int GetLevelHeightInMeters() const { return m_mapHeightInMeters; }
 
 		void CheckValid();
 		void Update();
+
+		bool HasTileMap;
 	}; 
 }

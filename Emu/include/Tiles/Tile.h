@@ -11,7 +11,7 @@ namespace Engine
 	class Tile : public SceneObject
 	{
 	public:
-		EMU_API Tile(const BodyType bodyType, const float x, const float y, const float width, const float height, const std::shared_ptr<ITexture> ptrTexture);
+		EMU_API Tile(const BodyType bodyType, const float x, const float y, const float width, const float height, const std::shared_ptr<ITexture> ptrTexture, int directionFacing);
 		~Tile() = default;
 
 	public:
