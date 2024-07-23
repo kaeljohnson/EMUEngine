@@ -10,7 +10,7 @@
         const float widthInMeters, const float heightInMeters, std::shared_ptr<Engine::ITexture> refTexture)
         // These need to be set by client.
         : m_xSwitchDeceleration(85.0f), m_xDeceleration(15.0f), m_yDeceleration(0.0f), m_xAcceleration(50.0f), m_xMaxVelocity(10.0f),
-        m_yAcceleration(30.0f), m_yMaxVelocity(60.0f), m_jumpForce(10.0f), m_jumpCharge(0.0),
+        m_yAcceleration(60.0f), m_yMaxVelocity(60.0f), m_jumpForce(16.0f), m_jumpCharge(0.0),
         m_jumpChargeIncrement(1.0f), m_minJumpForce(15.0f), m_maxJumpCharge(11.0f), m_isJumping(false),
         m_coyoteTime(0.0f), m_coyoteTimeDuration(TIME_STEP * 2.0f), m_jumpKeyHeld(false), m_canJump(false),
         m_jumpKeyDown(Engine::SPACE_KEY_DOWN), m_jumpKeyUp(Engine::SPACE_KEY_UP),

@@ -10,9 +10,6 @@
 #include "../../include/Tiles/TileMap.h"
 #include "../../include/Tiles/Tile.h"
 
-// TEMP
-#include "../../include/RendererManager.h"
-
 namespace Engine
 {
 	Scene::Scene() : m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_layers(), m_mapWidthInMeters(0), m_mapHeightInMeters(0), HasTileMap(false),
