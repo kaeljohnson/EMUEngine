@@ -10,11 +10,10 @@
     Player::Player(const float startingXInMeters, const float startingYInMeters,
         const float widthInMeters, const float heightInMeters, std::shared_ptr<Engine::ITexture> refTexture)
         // These need to be set by client.
-        : m_isJumping(false), m_coyoteTime(0.0f), m_canJump(false),
+        : m_coyoteTime(0.0f), m_canJump(false), m_jumpCharge(0.0f), m_onGround(false),
         m_jumpKeyDown(Engine::SPACE_KEY_DOWN), m_jumpKeyUp(Engine::SPACE_KEY_UP),
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
-        m_jumpCharge(0.0f), m_isDashing(false), m_onGround(false), m_isFalling(false),
         m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right),
         Entity(startingXInMeters, startingYInMeters, widthInMeters, heightInMeters, refTexture, 1)
     {
@@ -25,12 +24,11 @@
     {
         m_onGround = m_physicsBody->GetHasBottomCollision();
 
-        std::pair<float, float> force = { 0.0f, 0.0f };
-        float currentVelocityX = m_physicsBody->GetXVelocity();
+        m_force = { 0.0f, 0.0f };
 
-        UpdateMovement(force, currentVelocityX);
+        UpdateMovement();
 
-        m_physicsBody->ApplyForceToBox(force);
+        m_physicsBody->ApplyForceToBox(m_force);
 
         // Check if the current velocity is below the threshold and set it to zero
         if (std::abs(m_physicsBody->GetXVelocity()) < MIN_VELOCITY_THRESHOLD)
@@ -52,9 +50,9 @@
         }
     }
 
-    void Player::UpdateMovement(std::pair<float, float>& force, const float currentVelocityX)
+    void Player::UpdateMovement()
     {
-        const float ACCELERATIONDAMPENING = m_onGround ? 1.0f : 0.90f;
+        float currentVelocityX = m_physicsBody->GetXVelocity();
 
         if (m_currentDirection == PlayerDirection::Right) DirectionFacing = 1;
 		else DirectionFacing = -1;
@@ -68,18 +66,18 @@
             {
                 m_currentDirection = PlayerDirection::Right;
                 TransitionToState(PlayerState::HorizontalMovement);
-                startHorizontalMove(force, ACCELERATIONDAMPENING);
+                startHorizontalMove();
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
             {
                 m_currentDirection = PlayerDirection::Left;
                 TransitionToState(PlayerState::HorizontalMovement);
-                startHorizontalMove(force, ACCELERATIONDAMPENING);
+                startHorizontalMove();
             }
             else
             {
 				// Apply deceleration when no movement keys are pressed
-				endHorizontalMove(force, currentVelocityX, ACCELERATIONDAMPENING);
+				endHorizontalMove();
 			}
             // Transition to Jumping if jump key is pressed
             if (refKeyStates.at(m_jumpKeyDown) && m_canJump)
@@ -95,18 +93,18 @@
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
             {
                 m_currentDirection = PlayerDirection::Right;
-                updateHorizontalMove(force, ACCELERATIONDAMPENING);
+                updateHorizontalMove();
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
             {
                 m_currentDirection = PlayerDirection::Left;
-                updateHorizontalMove(force, ACCELERATIONDAMPENING);
+                updateHorizontalMove();
             }
             else
             {
                 // Apply deceleration when no movement keys are pressed
-                endHorizontalMove(force, currentVelocityX, ACCELERATIONDAMPENING);
-                force.first = -currentVelocityX * X_DECELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
+                endHorizontalMove();
+                m_force.first = -currentVelocityX * X_DECELERATION * m_physicsBody->GetSizeInMeters();
                 if (m_onGround && std::abs(currentVelocityX) < MIN_VELOCITY_THRESHOLD)
                 {
                     TransitionToState(PlayerState::Idle);
@@ -130,17 +128,17 @@
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
             {
                 m_currentDirection = PlayerDirection::Right;
-                updateHorizontalMove(force, ACCELERATIONDAMPENING);
+                updateHorizontalMove();
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
             {
                 m_currentDirection = PlayerDirection::Left;
-                updateHorizontalMove(force, ACCELERATIONDAMPENING);
+                updateHorizontalMove();
             }
             else
             {
                 // Apply deceleration when no movement keys are pressed
-                endHorizontalMove(force, currentVelocityX, ACCELERATIONDAMPENING);
+                endHorizontalMove();
             }
 
             if (refKeyStates.at(m_jumpKeyUp) || m_physicsBody->GetYVelocity() > 0)
@@ -153,7 +151,7 @@
                 {
                     m_jumpCharge += JUMP_CHARGE_INCREMENT;
                 }
-                force.second = -JUMP_FORCE * (MAX_JUMP_CHARGE - m_jumpCharge) * m_physicsBody->GetSizeInMeters();
+                m_force.second = -JUMP_FORCE * (MAX_JUMP_CHARGE - m_jumpCharge) * m_physicsBody->GetSizeInMeters();
             }
             break;
 
@@ -165,20 +163,20 @@
             {
                 m_currentDirection = PlayerDirection::Right;
                 // TransitionToState(PlayerState::HorizontalMovement);
-                updateHorizontalMove(force, ACCELERATIONDAMPENING);
+                updateHorizontalMove();
                 continueMoving = true;
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
             {
                 m_currentDirection = PlayerDirection::Left;
                 // TransitionToState(PlayerState::HorizontalMovement);
-                startHorizontalMove(force, ACCELERATIONDAMPENING);
+                startHorizontalMove();
                 continueMoving = true;
             }
             else
             {
                 // Apply deceleration when no movement keys are pressed
-                endHorizontalMove(force, currentVelocityX, ACCELERATIONDAMPENING);
+                endHorizontalMove();
                 if (m_onGround && std::abs(currentVelocityX) < MIN_VELOCITY_THRESHOLD)
                 {
                     TransitionToState(PlayerState::Idle);
@@ -187,7 +185,7 @@
 
             if (m_onGround && continueMoving)
             {
-                updateHorizontalMove(force, ACCELERATIONDAMPENING);
+                updateHorizontalMove();
                 TransitionToState(PlayerState::HorizontalMovement);
             }
             else if (m_onGround)
@@ -248,25 +246,25 @@
     }
 
 
-    void Player::startHorizontalMove(std::pair<float, float>& force, const float ACCELERATIONDAMPENING)
+    void Player::startHorizontalMove()
     {
         // begin move right animation.
-        updateHorizontalMove(force, ACCELERATIONDAMPENING);
+        updateHorizontalMove();
     }
 
-    void Player::updateHorizontalMove(std::pair<float, float>& force, const float ACCELERATIONDAMPENING)
+    void Player::updateHorizontalMove()
     {
         if (m_currentDirection == PlayerDirection::Right)
         {
-			force.first = X_ACCELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
+			m_force.first = X_ACCELERATION * m_physicsBody->GetSizeInMeters();
 		}
         else
         {
-			force.first = -X_ACCELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
+			m_force.first = -X_ACCELERATION * m_physicsBody->GetSizeInMeters();
 		}
     }
 
-    void Player::endHorizontalMove(std::pair<float, float>& force, const float currentVelocityX, const float ACCELERATIONDAMPENING)
+    void Player::endHorizontalMove()
     {
-		force.first = -currentVelocityX * X_DECELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
+		m_force.first = -m_physicsBody->GetXVelocity() * X_DECELERATION * m_physicsBody->GetSizeInMeters();
 	}

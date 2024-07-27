@@ -26,29 +26,16 @@ public:
 		const float widthInMeters, const float heightInMeters, std::shared_ptr<Engine::ITexture> ptrTexture);
 	~Player() = default;
 	void Update() override;
-	void UpdateHorizontalMovement(std::pair<float, float>& force, const float currentVelocityX);
-	void UpdateVerticalMovement();
-	void Jump();
-	void ContinueJump();
-	void EndJump();
-	void Dash(bool canDash);
 
 	PlayerState m_currentState;
 	PlayerDirection m_currentDirection;
 
-protected:
-	bool m_jumpKeyHeld;
+private:
 	bool m_canJump;
-	bool m_isJumping;
-	bool m_isFalling;
 	float m_jumpCharge;
-
-	bool m_isDashing;
-
 	float m_coyoteTime;
-
-	bool m_endJump;
 	bool m_onGround;
+	std::pair<float, float> m_force;
 
 	Engine::EventType m_jumpKeyDown;
 	Engine::EventType m_jumpKeyUp;
@@ -59,18 +46,16 @@ protected:
 	Engine::EventType m_moveRightKeyUp;
 
 private:
-	// void checkForJump(bool onGround);
-
-	void UpdateMovement(std::pair<float, float>& force, const float currentVelocityX);
+	void UpdateMovement();
 	void TransitionToState(PlayerState newState);
 
 	void beginIdle();
 	void updateIdle();
 	void endIdle();
 
-	void startHorizontalMove(std::pair<float, float>& force, const float ACCELERATIONDAMPENING);
-	void updateHorizontalMove(std::pair<float, float>& force, const float ACCELERATIONDAMPENING);
-	void endHorizontalMove(std::pair<float, float>& force, const float currentVelocityX, const float ACCELERATIONDAMPENING);
+	void startHorizontalMove();
+	void updateHorizontalMove();
+	void endHorizontalMove();
 
 
 	void beginJump();
