@@ -13,6 +13,12 @@ enum PlayerState
 	Falling,
 };
 
+enum PlayerDirection
+{
+	Left,
+	Right,
+};
+
 class Player : public Engine::Entity, public Engine::EventListener
 {
 public:
@@ -26,6 +32,9 @@ public:
 	void ContinueJump();
 	void EndJump();
 	void Dash(bool canDash);
+
+	PlayerState m_currentState;
+	PlayerDirection m_currentDirection;
 
 protected:
 	bool m_jumpKeyHeld;
@@ -52,8 +61,6 @@ protected:
 private:
 	// void checkForJump(bool onGround);
 
-	PlayerState m_currentState;
-
 	void UpdateMovement(std::pair<float, float>& force, const float currentVelocityX);
 	void TransitionToState(PlayerState newState);
 
@@ -61,9 +68,10 @@ private:
 	void updateIdle();
 	void endIdle();
 
-	void beginWalk(std::pair<float, float>& force, const float currentVelocityX);
-	void updateWalk(std::pair<float, float>& force, const float currentVelocityX);
-	void endWalk(std::pair<float, float>& force, const float currentVelocityX);
+	void startHorizontalMove(std::pair<float, float>& force, const float ACCELERATIONDAMPENING);
+	void updateHorizontalMove(std::pair<float, float>& force, const float ACCELERATIONDAMPENING);
+	void endHorizontalMove(std::pair<float, float>& force, const float currentVelocityX, const float ACCELERATIONDAMPENING);
+
 
 	void beginJump();
 	void updateJump();

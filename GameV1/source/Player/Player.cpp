@@ -15,7 +15,7 @@
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
         m_jumpCharge(0.0f), m_isDashing(false), m_onGround(false), m_isFalling(false),
-        m_currentState(PlayerState::Idle),
+        m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right),
         Entity(startingXInMeters, startingYInMeters, widthInMeters, heightInMeters, refTexture, 1)
     {
     	m_physicsBody->SetFriction(0.0f);
@@ -56,23 +56,31 @@
     {
         const float ACCELERATIONDAMPENING = m_onGround ? 1.0f : 0.90f;
 
+        if (m_currentDirection == PlayerDirection::Right) DirectionFacing = 1;
+		else DirectionFacing = -1;
+
         switch (m_currentState)
         {
         case PlayerState::Idle:
-            CLIENT_INFO_D("Idle");
             // Transition to HorizontalMovement if movement keys are pressed
+            CLIENT_INFO_D("Idle");
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
             {
-                force.first = X_ACCELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
-                DirectionFacing = 1;
+                m_currentDirection = PlayerDirection::Right;
                 TransitionToState(PlayerState::HorizontalMovement);
+                startHorizontalMove(force, ACCELERATIONDAMPENING);
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
             {
-                force.first = -X_ACCELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
-                DirectionFacing = -1;
+                m_currentDirection = PlayerDirection::Left;
                 TransitionToState(PlayerState::HorizontalMovement);
+                startHorizontalMove(force, ACCELERATIONDAMPENING);
             }
+            else
+            {
+				// Apply deceleration when no movement keys are pressed
+				endHorizontalMove(force, currentVelocityX, ACCELERATIONDAMPENING);
+			}
             // Transition to Jumping if jump key is pressed
             if (refKeyStates.at(m_jumpKeyDown) && m_canJump)
             {
@@ -81,20 +89,23 @@
             break;
 
         case PlayerState::HorizontalMovement:
+            CLIENT_INFO_D("Horizontal Movement");
+
             // Horizontal Movement
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
             {
-                force.first = X_ACCELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
-                DirectionFacing = 1;
+                m_currentDirection = PlayerDirection::Right;
+                updateHorizontalMove(force, ACCELERATIONDAMPENING);
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
             {
-                force.first = -X_ACCELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
-                DirectionFacing = -1;
+                m_currentDirection = PlayerDirection::Left;
+                updateHorizontalMove(force, ACCELERATIONDAMPENING);
             }
             else
             {
                 // Apply deceleration when no movement keys are pressed
+                endHorizontalMove(force, currentVelocityX, ACCELERATIONDAMPENING);
                 force.first = -currentVelocityX * X_DECELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
                 if (m_onGround && std::abs(currentVelocityX) < MIN_VELOCITY_THRESHOLD)
                 {
@@ -114,16 +125,22 @@
             break;
 
         case PlayerState::Jumping:
+            CLIENT_INFO_D("Jumping");
             // Allow horizontal movement while jumping
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
             {
-                force.first = X_ACCELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
-                DirectionFacing = 1;
+                m_currentDirection = PlayerDirection::Right;
+                updateHorizontalMove(force, ACCELERATIONDAMPENING);
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
             {
-                force.first = -X_ACCELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
-                DirectionFacing = -1;
+                m_currentDirection = PlayerDirection::Left;
+                updateHorizontalMove(force, ACCELERATIONDAMPENING);
+            }
+            else
+            {
+                // Apply deceleration when no movement keys are pressed
+                endHorizontalMove(force, currentVelocityX, ACCELERATIONDAMPENING);
             }
 
             if (refKeyStates.at(m_jumpKeyUp) || m_physicsBody->GetYVelocity() > 0)
@@ -141,28 +158,45 @@
             break;
 
         case PlayerState::Falling:
+            CLIENT_INFO_D("Falling");
             // Allow horizontal movement while falling
             bool continueMoving = false;
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
             {
-                force.first = X_ACCELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
-                DirectionFacing = 1;
+                m_currentDirection = PlayerDirection::Right;
+                // TransitionToState(PlayerState::HorizontalMovement);
+                updateHorizontalMove(force, ACCELERATIONDAMPENING);
                 continueMoving = true;
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
             {
-                force.first = -X_ACCELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
-                DirectionFacing = -1;
+                m_currentDirection = PlayerDirection::Left;
+                // TransitionToState(PlayerState::HorizontalMovement);
+                startHorizontalMove(force, ACCELERATIONDAMPENING);
                 continueMoving = true;
+            }
+            else
+            {
+                // Apply deceleration when no movement keys are pressed
+                endHorizontalMove(force, currentVelocityX, ACCELERATIONDAMPENING);
+                if (m_onGround && std::abs(currentVelocityX) < MIN_VELOCITY_THRESHOLD)
+                {
+                    TransitionToState(PlayerState::Idle);
+                }
             }
 
             if (m_onGround && continueMoving)
             {
+                updateHorizontalMove(force, ACCELERATIONDAMPENING);
                 TransitionToState(PlayerState::HorizontalMovement);
             }
             else if (m_onGround)
             {
 				TransitionToState(PlayerState::Idle);
+			}
+            else if (refKeyStates.at(m_jumpKeyDown) && m_canJump && m_coyoteTime <= COYOTE_TIME_DURATION)
+            {
+				TransitionToState(PlayerState::Jumping);
 			}
 
             break;
@@ -213,74 +247,26 @@
         m_currentState = newState;
     }
 
-    void Player::UpdateHorizontalMovement(std::pair<float, float>& force, const float currentVelocityX)
-    {
-        // If the Player is jumping, they should
-        // have less control over their movement.        
-        const float ACCELERATIONDAMPENING = m_onGround ? 1.0f : 0.90f;
 
-        if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
-        {
-            force = { X_ACCELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters(), 0.0f }; // Apply normal force to the right
-            DirectionFacing = 1;
-        }
-        else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
-        {
-            force = { -X_ACCELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters(), 0.0f }; // Apply normal force to the left
-            DirectionFacing = -1;
-        }
-        else // Apply deceleration when no keys are pressed or both keys are pressed
-        {
-            force = { -currentVelocityX * X_DECELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters(), 0.0f };
-        }
+    void Player::startHorizontalMove(std::pair<float, float>& force, const float ACCELERATIONDAMPENING)
+    {
+        // begin move right animation.
+        updateHorizontalMove(force, ACCELERATIONDAMPENING);
     }
 
-    void Player::UpdateVerticalMovement()
-	{
-        // Update Coyote Time
-        if (!m_onGround)
-		{
-			m_coyoteTime += TIME_STEP;
+    void Player::updateHorizontalMove(std::pair<float, float>& force, const float ACCELERATIONDAMPENING)
+    {
+        if (m_currentDirection == PlayerDirection::Right)
+        {
+			force.first = X_ACCELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
 		}
-		else
-		{
-			m_coyoteTime = 0.0f; // Reset coyote time if on ground
-			// m_isJumping = false;
-            m_isFalling = false;
+        else
+        {
+			force.first = -X_ACCELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
 		}
+    }
 
-        // Set vertical states
-
-        if (refKeyStates.at(m_jumpKeyUp))
-        {
-            m_canJump = true;
-        }
-
-        if ((m_isJumping && refKeyStates.at(m_jumpKeyUp)) || m_physicsBody->GetYVelocity() > 0)
-        {
-            // Transition to falling state
-            m_isJumping = false;
-            m_isFalling = true;
-
-            m_jumpCharge = 0.0f;
-            if (m_physicsBody->GetYVelocity() < 0) m_physicsBody->SetYVelocity(0.0f);
-        }
-
-        if (refKeyStates.at(m_jumpKeyDown) && !m_isJumping && m_canJump && (m_onGround || m_coyoteTime < COYOTE_TIME_DURATION)) // Start new jump
-        {
-            m_coyoteTime = COYOTE_TIME_DURATION;
-
-            m_canJump = false;
-            m_isJumping = true;
-            m_physicsBody->SetYVelocity(0.0f);
-            m_physicsBody->ApplyImpulseToBox({ 0.0f, -MIN_JUMP_FORCE * m_physicsBody->GetSizeInMeters() });
-        }
-
-        if (m_isJumping) // Update current jump
-        {
-            if (m_jumpCharge < MAX_JUMP_CHARGE)
-                m_jumpCharge += JUMP_CHARGE_INCREMENT;
-
-            m_physicsBody->ApplyForceToBox({ 0.0f, -JUMP_FORCE * (MAX_JUMP_CHARGE - m_jumpCharge) * m_physicsBody->GetSizeInMeters() });
-        }
+    void Player::endHorizontalMove(std::pair<float, float>& force, const float currentVelocityX, const float ACCELERATIONDAMPENING)
+    {
+		force.first = -currentVelocityX * X_DECELERATION * ACCELERATIONDAMPENING * m_physicsBody->GetSizeInMeters();
 	}
