@@ -141,7 +141,7 @@
                 endHorizontalMove();
             }
 
-            if (refKeyStates.at(m_jumpKeyUp) || m_physicsBody->GetYVelocity() > 0)
+            if (refKeyStates.at(m_jumpKeyUp) || m_physicsBody->GetYVelocity() > 0 || m_physicsBody->GetHasTopCollision())
             {
                 TransitionToState(PlayerState::Falling);
             }
