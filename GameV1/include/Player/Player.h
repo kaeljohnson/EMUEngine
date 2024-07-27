@@ -8,7 +8,7 @@
 enum PlayerState
 {
 	Idle,
-	Walking,
+	HorizontalMovement,
 	Jumping,
 	Falling,
 };
@@ -52,7 +52,10 @@ protected:
 private:
 	// void checkForJump(bool onGround);
 
-	PlayerState m_playerState;
+	PlayerState m_currentState;
+
+	void UpdateMovement(std::pair<float, float>& force, const float currentVelocityX);
+	void TransitionToState(PlayerState newState);
 
 	void beginIdle();
 	void updateIdle();
