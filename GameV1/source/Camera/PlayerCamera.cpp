@@ -3,8 +3,8 @@
 #include "../../include/Camera/PlayerCamera.h"
 
 PlayerCamera::PlayerCamera() : m_smoothingFactor(0.001f),
-m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(false),
-m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(1.0f), m_lookAhead(0.0f), TargetCamera()
+m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(true),
+m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(0.5f), m_lookAhead(0.0f), TargetCamera()
 {
 }
 

@@ -2,7 +2,7 @@
 
 #include <Engine.h>
 #include "../include/EventListeners/AppManagementListener.h"
-#include "../include/Controllable/Controllable.h"
+#include "../include/Player/Player.h"
 #include "../include/Camera/PlayerCamera.h"
 
 int main(int argc, char* args[])
@@ -21,7 +21,7 @@ int main(int argc, char* args[])
 	// Temp
 	Engine::TexturePtr tempTextureRed = Engine::CreateTexture(0, 0, 0);
 	
-	Controllable player(1.0f, 1.0f, 0.75f, 0.75f, tempTextureRed);
+	Player player(1.0f, 1.0f, 0.75f, 0.75f, tempTextureRed);
 
 	Engine::ScrollingCamera scrollCamera;
 	scrollCamera.SetScrollingSpeeds(0.0005f, 0.0f);
