@@ -3,7 +3,7 @@
 #include "../../include/Camera/PlayerCamera.h"
 
 PlayerCamera::PlayerCamera() : m_smoothingFactor(0.001f),
-m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(false),
+m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(true),
 m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(1.0f), m_lookAhead(0.0f), TargetCamera()
 {
 }
@@ -19,7 +19,7 @@ void PlayerCamera::Update(const double interpolation)
     double lookAheadDifference = desiredLookAhead - m_lookAhead;
 
     // Calculate the step to move towards the desired look-ahead, ensuring we don't overshoot
-    m_lookAheadChangeSpeed = 0.005f / SCALEX;
+    m_lookAheadChangeSpeed = 0.01f / SCALEX;
 
     double lookAheadStep = std::min(std::abs(lookAheadDifference), m_lookAheadChangeSpeed * interpolation);
     lookAheadStep *= (lookAheadDifference > 0) ? 1 : -1; // Ensure the step has the correct direction
