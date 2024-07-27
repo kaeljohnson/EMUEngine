@@ -13,7 +13,7 @@
 #include "../include/Textures/ITexture.h"
 #include "../include/Textures/Texture.h"
 
-#include "../include/CommonFunctions.h"
+#include "../include/MathUtil.h"
 
 namespace Engine
 {
@@ -21,7 +21,7 @@ namespace Engine
 	RendererManager* RendererManager::instance = nullptr;
 
 	RendererManager::RendererManager() 
-		: VIRTUAL_WIDTH(1280), VIRTUAL_HEIGHT(720), SCALE_X(0), SCALE_Y(0), SCALE(0), 
+		: VIRTUAL_WIDTH(1280), VIRTUAL_HEIGHT(720), m_scale(0, 0), SCALE(0), 
 		m_viewportX(0), m_viewportY(0), m_viewportWidth(0), m_viewportHeight(0),
 		m_screenWidth(0), m_screenHeight(0),
 		m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), 
@@ -193,15 +193,15 @@ namespace Engine
 		SDL_RENDER_PRESENT(m_ptrRenderer);
 	}
 
-	void RendererManager::RenderScene(const double interpolation, const double cameraOffsetX, const double cameraOffsetY)
+	void RendererManager::RenderScene(const float interpolation, const Vector2D cameraOffset)
 	{
 		ClearScreen();
 
 		// Calculate camera bounds
-		double cameraLeft = cameraOffsetX;
-		double cameraRight = cameraOffsetX + (m_viewportWidth / m_ptrCurrentScene->GetPixelsPerMeter());
-		double cameraTop = cameraOffsetY;
-		double cameraBottom = cameraOffsetY + (m_viewportHeight / m_ptrCurrentScene->GetPixelsPerMeter());
+		float cameraLeft = cameraOffset.X;
+		float cameraRight = cameraOffset.X + (m_viewportWidth / m_ptrCurrentScene->GetPixelsPerMeter());
+		float cameraTop = cameraOffset.Y;
+		float cameraBottom = cameraOffset.Y + (m_viewportHeight / m_ptrCurrentScene->GetPixelsPerMeter());
 
 		for (auto& layer : m_ptrCurrentScene->GetLayers())
 		{
@@ -217,7 +217,7 @@ namespace Engine
 
 				if (isVisible)
 				{
-					Draw(sceneObject, m_ptrCurrentScene->GetPixelsPerMeter(), interpolation, cameraLeft, cameraTop);
+					Draw(sceneObject, m_ptrCurrentScene->GetPixelsPerMeter(), interpolation, Vector2D(cameraLeft, cameraTop));
 				}
 			}
 		}
@@ -226,7 +226,7 @@ namespace Engine
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation, const double offsetX, const double offsetY)
+	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const float interpolation, const Vector2D offset)
 	{
 		bool isTextureNull = sceneObject->GetTexture() == nullptr;
 
@@ -237,8 +237,8 @@ namespace Engine
 
 		SDLRect dst
 		{
-			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevX(), ptrBody->GetTopLeftXInMeters(), interpolation) - offsetX) * pixelsPerMeter * SCALE)),
-			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevY(), ptrBody->GetTopLeftYInMeters(), interpolation) - offsetY) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevX(), ptrBody->GetTopLeftXInMeters(), interpolation) - offset.X) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevY(), ptrBody->GetTopLeftYInMeters(), interpolation) - offset.Y) * pixelsPerMeter * SCALE)),
 
 			static_cast<int>(round(ptrBody->GetWidthInMeters() * pixelsPerMeter * SCALE)),
 			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))
@@ -282,10 +282,10 @@ namespace Engine
 		int windowWidth, windowHeight;
 		SDL_GET_WINDOW_SIZE(m_ptrWindow, &windowWidth, &windowHeight);
 
-		SCALE_X = static_cast<float>(windowWidth) / VIRTUAL_WIDTH;
-		SCALE_Y = static_cast<float>(windowHeight) / VIRTUAL_HEIGHT;
+		m_scale.X = static_cast<float>(windowWidth) / VIRTUAL_WIDTH;
+		m_scale.Y = static_cast<float>(windowHeight) / VIRTUAL_HEIGHT;
 
-		SCALE = std::min(SCALE_X, SCALE_Y);
+		SCALE = std::min(m_scale.X, m_scale.Y);
 
 		m_viewportWidth = static_cast<int>(VIRTUAL_WIDTH * SCALE);
 		m_viewportHeight = static_cast<int>(VIRTUAL_HEIGHT * SCALE);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Core.h"
+#include "../MathUtil.h"
 
 #include "Camera.h"
 
@@ -10,15 +11,14 @@ namespace Engine
 	{
 	public:
 		EMU_API ScrollingCamera();
-		EMU_API void SetScrollingSpeeds(const float xScrollingSpeed, const float yScrollingSpeed);
+		EMU_API void SetScrollingSpeeds(const Vector2D scrollSpeed);
 
 		~ScrollingCamera() = default;
 
 	public:
-		void Update(const double interpolation) override;
+		void Update(const float interpolation) override;
 
 	private:
-		float m_horizontalScrollSpeed;
-		float m_verticalScrollSpeed;
+		Vector2D m_scrollSpeed;
 	};
 }

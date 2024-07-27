@@ -24,6 +24,7 @@
 #include "../include/Camera/TargetCamera.h"
 
 #include "../include/CommonFunctions.h"
+#include "../include/MathUtil.h"
 
 namespace Engine
 {

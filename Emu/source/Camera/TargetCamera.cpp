@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../include/EngineConstants.h"
-#include "../../include/CommonFunctions.h"
+#include "../../include/MathUtil.h"
 
 #include "../../include/Camera/TargetCamera.h"
 
@@ -11,17 +11,16 @@ namespace Engine
 	{}
 
 	// Bug: Camera is stuttery for certain values of m_smoothingFactor and bounds.
-	void TargetCamera::Update(const double interpolation)
+	void TargetCamera::Update(const float interpolation)
 	{
-		double targetX = Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevX(), ptrCameraTarget->GetPhysicsBody()->GetCenterXInMeters(), interpolation);
-		double targetY = Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevY(), ptrCameraTarget->GetPhysicsBody()->GetCenterYInMeters(), interpolation);
+		float targetX = Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevX(), ptrCameraTarget->GetPhysicsBody()->GetCenterXInMeters(), interpolation);
+		float targetY = Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevY(), ptrCameraTarget->GetPhysicsBody()->GetCenterYInMeters(), interpolation);
 
 		// Desired camera position based on the target's position
-		double desiredCameraTopLeftX = targetX - (m_widthInMeters / 2.0);
-		double desiredCameraTopLeftY = targetY - (m_heightInMeters / 2.0);
+		float desiredCameraTopLeftX = targetX - (m_sizeInMeters.X / 2.0);
+		float desiredCameraTopLeftY = targetY - (m_sizeInMeters.Y / 2.0);
 
-		m_offsetX = desiredCameraTopLeftX;
-		m_offsetY = desiredCameraTopLeftY;
+		m_offset = Vector2D(desiredCameraTopLeftX, desiredCameraTopLeftY);
 
 		// Clamp after adjustments if clamping is enabled
 		if (m_clampingOn) Clamp();

@@ -5,18 +5,16 @@
 
 namespace Engine
 {
-	ScrollingCamera::ScrollingCamera() : m_horizontalScrollSpeed(0), m_verticalScrollSpeed(0), Camera() {}
+	ScrollingCamera::ScrollingCamera() : m_scrollSpeed(0, 0), Camera() {}
 
-	void ScrollingCamera::Update(const double interpolation)
+	void ScrollingCamera::Update(const float interpolation)
 	{
-		m_offsetX += m_horizontalScrollSpeed;
-		m_offsetY += m_verticalScrollSpeed;
+		m_offset += m_scrollSpeed;
 		if (m_clampingOn) Clamp();
 	}
 
-	void ScrollingCamera::SetScrollingSpeeds(const float xScrollingSpeed, const float yScrollingSpeed)
+	void ScrollingCamera::SetScrollingSpeeds(const Vector2D scrollSpeed)
 	{
-		m_horizontalScrollSpeed = xScrollingSpeed;
-		m_verticalScrollSpeed = yScrollingSpeed;
+		m_scrollSpeed = scrollSpeed;
 	}
 }

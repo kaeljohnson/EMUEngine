@@ -15,13 +15,13 @@ public:
 	void SetBottomTargetScreenBound(const float screenBound);
 	void SetLookAheadFactor(const float lookAhead);
 
-	 void Update(const double interpolation) override;
+	 void Update(const float interpolation) override;
 
 
 private:
 	bool m_smoothingOn;
-	double m_lookAhead;
-	double m_lookAheadFactor;
+	float m_lookAhead;
+	float m_lookAheadFactor;
 	float m_lookAheadChangeSpeed = 12.8f;
 
 	float m_smoothingFactor;
