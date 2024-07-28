@@ -15,7 +15,7 @@ public:
 	void SetBottomTargetScreenBound(const float screenBound);
 	void SetLookAheadFactor(const float lookAhead);
 
-	 void Update(const float interpolation) override;
+	 void Update(const double interpolation) override;
 
 
 private:

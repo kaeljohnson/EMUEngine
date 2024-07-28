@@ -8,10 +8,10 @@ m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFact
 {
 }
 
-void PlayerCamera::Update(const float interpolation)
+void PlayerCamera::Update(const double interpolation)
 {
-    float targetX = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevX(), ptrCameraTarget->GetPhysicsBody()->GetCenterXInMeters(), interpolation);
-    float targetY = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevY(), ptrCameraTarget->GetPhysicsBody()->GetCenterYInMeters(), interpolation);
+    float targetX = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevX(), ptrCameraTarget->GetPhysicsBody()->GetCenterXInMeters(), (float)interpolation);
+    float targetY = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevY(), ptrCameraTarget->GetPhysicsBody()->GetCenterYInMeters(), (float)interpolation);
 
     float desiredLookAhead = ptrCameraTarget->DirectionFacing * m_lookAheadFactor;
 
@@ -21,7 +21,7 @@ void PlayerCamera::Update(const float interpolation)
     // Calculate the step to move towards the desired look-ahead, ensuring we don't overshoot
     m_lookAheadChangeSpeed = 0.005f / refScale.X;
 
-    float lookAheadStep = std::min(std::abs(lookAheadDifference), m_lookAheadChangeSpeed * interpolation);
+    float lookAheadStep = std::min(std::abs(lookAheadDifference), m_lookAheadChangeSpeed * (float)interpolation);
     lookAheadStep *= (lookAheadDifference > 0) ? 1 : -1; // Ensure the step has the correct direction
 
     // Update the look-ahead

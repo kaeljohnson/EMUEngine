@@ -13,7 +13,7 @@ namespace Engine
 	public:
 		EMU_API TargetCamera();
 		EMU_API void SetCameraTarget(SceneObject* ptrTarget);
-		EMU_API virtual void Update(const float interpolation);
+		EMU_API virtual void Update(const double interpolation);
 
 		~TargetCamera() = default;
 	
