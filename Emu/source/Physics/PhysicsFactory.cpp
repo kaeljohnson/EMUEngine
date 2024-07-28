@@ -11,8 +11,7 @@
 namespace Engine
 {
     // Need to have less stuff in the constructor. User can set the rest of the values later.
-    std::shared_ptr<IPhysicsBody> CreatePhysicsBody(const BodyType bodyType, const bool fixed, const Vector2D position,
-        const Vector2D size)
+    std::shared_ptr<IPhysicsBody> CreatePhysicsBody(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
     {
         return std::make_shared<Box>(bodyType, fixed, position, size);
     }

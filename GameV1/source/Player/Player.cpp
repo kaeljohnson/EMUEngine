@@ -15,7 +15,7 @@
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
         m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right),
-        Entity(Engine::Vector2D(startingXInMeters, startingYInMeters), Engine::Vector2D(widthInMeters, heightInMeters), refTexture, 1)
+        Entity(Engine::Vector2D<float>(startingXInMeters, startingYInMeters), Engine::Vector2D<float>(widthInMeters, heightInMeters), refTexture, 1)
     {
     	m_physicsBody->SetFriction(0.0f);
     }
@@ -102,7 +102,7 @@
             {
                 // Apply deceleration when no movement keys are pressed
                 endHorizontalMove();
-                m_force.first = -currentVelocityX * X_DECELERATION * m_physicsBody->GetSizeInMeters();
+                m_force.X = -currentVelocityX * X_DECELERATION * m_physicsBody->GetSizeInMeters();
                 if (m_onGround && std::abs(currentVelocityX) < MIN_VELOCITY_THRESHOLD)
                 {
                     TransitionToState(PlayerState::Idle);
@@ -148,7 +148,7 @@
                 {
                     m_jumpCharge += JUMP_CHARGE_INCREMENT;
                 }
-                m_force.second = -JUMP_FORCE * (MAX_JUMP_CHARGE - m_jumpCharge) * m_physicsBody->GetSizeInMeters();
+                m_force.Y = -JUMP_FORCE * (MAX_JUMP_CHARGE - m_jumpCharge) * m_physicsBody->GetSizeInMeters();
             }
             break;
 
@@ -252,15 +252,15 @@
     {
         if (m_currentDirection == PlayerDirection::Right)
         {
-			m_force.first = X_ACCELERATION * m_physicsBody->GetSizeInMeters();
+			m_force.X = X_ACCELERATION * m_physicsBody->GetSizeInMeters();
 		}
         else
         {
-			m_force.first = -X_ACCELERATION * m_physicsBody->GetSizeInMeters();
+			m_force.X = -X_ACCELERATION * m_physicsBody->GetSizeInMeters();
 		}
     }
 
     void Player::endHorizontalMove()
     {
-		m_force.first = -m_physicsBody->GetXVelocity() * X_DECELERATION * m_physicsBody->GetSizeInMeters();
+		m_force.X = -m_physicsBody->GetXVelocity() * X_DECELERATION * m_physicsBody->GetSizeInMeters();
 	}

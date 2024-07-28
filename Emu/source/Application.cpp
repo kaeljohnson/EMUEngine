@@ -55,8 +55,8 @@ namespace Engine
 		EventManager* ptrEventManager = EventManager::GetInstance();
 
 		// Camera frames current scene.
-		m_cameraManager.m_ptrCurrentCamera->Frame(currentScene->GetPixelsPerMeter(), Vector2D((float)currentScene->GetLevelWidthInMeters(), (float)currentScene->GetLevelHeightInMeters()), 
-			Vector2D((float)ptrRendererManager->GetFullscreenWidth(), (float)ptrRendererManager->GetFullscreenHeight()), ptrRendererManager->GetScale());
+		m_cameraManager.m_ptrCurrentCamera->Frame(currentScene->GetPixelsPerMeter(), Vector2D<int>(currentScene->GetLevelWidthInMeters(), currentScene->GetLevelHeightInMeters()), 
+			Vector2D<int>(ptrRendererManager->GetFullscreenWidth(), ptrRendererManager->GetFullscreenHeight()), ptrRendererManager->GetScale());
 
 
 		ptrRendererManager->SetScene(currentScene);

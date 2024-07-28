@@ -23,7 +23,7 @@ namespace Engine
 		int LayerIdx;
 		int DirectionFacing;
 	public:
-		SceneObject(const BodyType bodyType, const bool fixed, const Vector2D position, const Vector2D size, std::shared_ptr<ITexture> refTexture, int directionFacing);
+		SceneObject(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size, std::shared_ptr<ITexture> refTexture, int directionFacing);
 
 		EMU_API virtual ~SceneObject() = default;
 

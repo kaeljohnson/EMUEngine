@@ -11,7 +11,7 @@ namespace Engine
 	public:
 		EMU_API Camera();
 		
-		EMU_API void SetCameraPosition(const Vector2D offset);
+		EMU_API void SetCameraPosition(const Vector2D<float> offset);
 		EMU_API void SetClampingOn(const bool clampingOn);
 
 		EMU_API void Clamp();
@@ -19,31 +19,31 @@ namespace Engine
 		virtual ~Camera() = default;
 
 	public:
-		Vector2D m_offset;
+		Vector2D<float> m_offset;
 
 	public:
 		virtual void Update(const float interpolation);
 
-		void Frame(const int pixelsPerMeter, const Vector2D mapBounds,
-			const Vector2D screenSize, const Vector2D scale);
+		void Frame(const int pixelsPerMeter, const Vector2D<int> mapBounds,
+			const Vector2D<int> screenSize, const Vector2D<float> scale);
 
 		Camera(const Camera& camera) = delete;
 		Camera& operator=(const Camera&) = delete;
 		Camera(Camera&&) = delete;
 		Camera& operator=(Camera&&) = delete;
 	protected:
-		Vector2D m_sizeInMeters;
+		Vector2D<float> m_sizeInMeters;
 
 		// int m_mapBoundRight;
 		// int m_mapBoundBottom;
-		Vector2D m_mapBounds;
+		Vector2D<int> m_mapBounds;
 		
 		bool m_clampingOn;
 
 		// Rendering viewport scale. The viewport is not necessarily the same as the window size.
-		Vector2D refScale;
+		Vector2D<float> refScale;
 
-		Vector2D m_screenSize;
+		Vector2D<int> m_screenSize;
 
 		int m_pixelsPerMeter;
 	};

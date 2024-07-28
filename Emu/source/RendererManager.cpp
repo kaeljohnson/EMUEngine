@@ -21,9 +21,8 @@ namespace Engine
 	RendererManager* RendererManager::instance = nullptr;
 
 	RendererManager::RendererManager() 
-		: VIRTUAL_WIDTH(1280), VIRTUAL_HEIGHT(720), m_scale(0, 0), SCALE(0), 
-		m_viewportX(0), m_viewportY(0), m_viewportWidth(0), m_viewportHeight(0),
-		m_screenWidth(0), m_screenHeight(0),
+		: m_virtualSize(1280, 720), m_scale(0, 0), SCALE(0), 
+		m_viewportPosition(0, 0), m_viewportSize(0, 0), m_screenSize(0, 0),
 		m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), 
 		m_ptrCurrentScene(nullptr)
 	{}
@@ -54,8 +53,8 @@ namespace Engine
 			ENGINE_CRITICAL_D("Get desktop display mode failed: " + std::string(SDL_GET_ERROR()));
 		}
 
-		m_screenWidth = displayMode.w;
-		m_screenHeight = displayMode.h;
+		m_screenSize.X = displayMode.w;
+		m_screenSize.Y = displayMode.h;
 
 
 		// Create renderer
@@ -113,12 +112,12 @@ namespace Engine
 
 	const int RendererManager::GetFullscreenWidth() const
 	{
-		return m_screenWidth;
+		return m_screenSize.X;
 	}
 
 	const int RendererManager::GetFullscreenHeight() const
 	{
-		return m_screenHeight;
+		return m_screenSize.Y;
 	}
 	
 	void RendererManager::ToggleFullscreen()
@@ -140,7 +139,7 @@ namespace Engine
 		{
 			// Default behavior for now will be to toggle fullscreen on for client.
 			// When the screen is toggled to windowed, the size will be half of the width and height.
-			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_screenWidth / 2, m_screenHeight / 2);
+			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_screenSize.X / 2, m_screenSize.Y / 2);
 			SDL_SET_WINDOW_POSITION(m_ptrWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
 	}
@@ -149,17 +148,17 @@ namespace Engine
 	{
 		ENGINE_TRACE_D(std::to_string(newWindowWidth) + ", " + std::to_string(newWindowHeight));
 
-		if (newWindowWidth < m_screenWidth / 2 && newWindowHeight < m_screenHeight / 2)
+		if (newWindowWidth < m_screenSize.X / 2 && newWindowHeight < m_screenSize.Y / 2)
 		{
-			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_screenWidth / 2, m_screenHeight / 2);
+			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_screenSize.X / 2, m_screenSize.Y / 2);
 		}
-		else if (newWindowWidth < m_screenWidth / 2)
+		else if (newWindowWidth < m_screenSize.X / 2)
 		{
-			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_screenWidth / 2, newWindowHeight);
+			SDL_SET_WINDOW_SIZE(m_ptrWindow, m_screenSize.X / 2, newWindowHeight);
 		}
-		else if (newWindowHeight < m_screenHeight / 2)
+		else if (newWindowHeight < m_screenSize.Y / 2)
 		{
-			SDL_SET_WINDOW_SIZE(m_ptrWindow, newWindowWidth, m_screenHeight / 2);
+			SDL_SET_WINDOW_SIZE(m_ptrWindow, newWindowWidth, m_screenSize.Y / 2);
 		}
 		else
 		{
@@ -193,15 +192,15 @@ namespace Engine
 		SDL_RENDER_PRESENT(m_ptrRenderer);
 	}
 
-	void RendererManager::RenderScene(const float interpolation, const Vector2D cameraOffset)
+	void RendererManager::RenderScene(const float interpolation, const Vector2D<float> cameraOffset)
 	{
 		ClearScreen();
 
 		// Calculate camera bounds
 		float cameraLeft = cameraOffset.X;
-		float cameraRight = cameraOffset.X + (m_viewportWidth / m_ptrCurrentScene->GetPixelsPerMeter());
+		float cameraRight = cameraOffset.X + (m_viewportSize.X / m_ptrCurrentScene->GetPixelsPerMeter());
 		float cameraTop = cameraOffset.Y;
-		float cameraBottom = cameraOffset.Y + (m_viewportHeight / m_ptrCurrentScene->GetPixelsPerMeter());
+		float cameraBottom = cameraOffset.Y + (m_viewportSize.Y / m_ptrCurrentScene->GetPixelsPerMeter());
 
 		for (auto& layer : m_ptrCurrentScene->GetLayers())
 		{
@@ -217,7 +216,7 @@ namespace Engine
 
 				if (isVisible)
 				{
-					Draw(sceneObject, m_ptrCurrentScene->GetPixelsPerMeter(), interpolation, Vector2D(cameraLeft, cameraTop));
+					Draw(sceneObject, m_ptrCurrentScene->GetPixelsPerMeter(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
 				}
 			}
 		}
@@ -226,7 +225,7 @@ namespace Engine
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const float interpolation, const Vector2D offset)
+	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const float interpolation, const Vector2D<float> offset)
 	{
 		bool isTextureNull = sceneObject->GetTexture() == nullptr;
 
@@ -282,18 +281,18 @@ namespace Engine
 		int windowWidth, windowHeight;
 		SDL_GET_WINDOW_SIZE(m_ptrWindow, &windowWidth, &windowHeight);
 
-		m_scale.X = static_cast<float>(windowWidth) / VIRTUAL_WIDTH;
-		m_scale.Y = static_cast<float>(windowHeight) / VIRTUAL_HEIGHT;
+		m_scale.X = static_cast<float>(windowWidth) / m_virtualSize.X;
+		m_scale.Y = static_cast<float>(windowHeight) / m_virtualSize.Y;
 
 		SCALE = std::min(m_scale.X, m_scale.Y);
 
-		m_viewportWidth = static_cast<int>(VIRTUAL_WIDTH * SCALE);
-		m_viewportHeight = static_cast<int>(VIRTUAL_HEIGHT * SCALE);
+		m_viewportSize.X = static_cast<int>(m_virtualSize.X * SCALE);
+		m_viewportSize.Y = static_cast<int>(m_virtualSize.Y * SCALE);
 
-		m_viewportX = (windowWidth - m_viewportWidth) / 2;
-		m_viewportY = (windowHeight - m_viewportHeight) / 2;
+		m_viewportPosition.X = (windowWidth - m_viewportSize.X) / 2;
+		m_viewportPosition.Y = (windowHeight - m_viewportSize.Y) / 2;
 
-		SDLRect viewport = { m_viewportX, m_viewportY, m_viewportWidth, m_viewportHeight };
+		SDLRect viewport = { m_viewportPosition.X, m_viewportPosition.Y, m_viewportSize.X, m_viewportSize.Y };
 		SDL_RENDER_SET_VIEWPORT(m_ptrRenderer, &viewport);
 	}
 

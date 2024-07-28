@@ -9,7 +9,7 @@
 
 namespace Engine
 {
-	Box::Box(const BodyType bodyType, const bool fixed, const Vector2D position, const Vector2D size)
+	Box::Box(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
 		: m_halfWidthInMeters(size.X / 2.0f), m_halfHeightInMeters(size.Y / 2.0f), 
 		m_widthInMeters(size.X), m_heightInMeters(size.Y),
 		m_bodyType(bodyType), m_collidable(true), m_fixed(fixed), m_body(nullptr), m_fixture(nullptr),
@@ -72,14 +72,14 @@ namespace Engine
 		}
 	}
 
-	void Box::ApplyForceToBox(std::pair<float, float> force)
+	void Box::ApplyForceToBox(Vector2D<float> force)
 	{
-		m_body->ApplyForceToCenter(b2Vec2(force.first, force.second), true);
+		m_body->ApplyForceToCenter(b2Vec2(force.X, force.Y), true);
 	}
 
-	void Box::ApplyImpulseToBox(std::pair<float, float> impulse)
+	void Box::ApplyImpulseToBox(Vector2D<float> impulse)
 	{
-		m_body->ApplyLinearImpulseToCenter(b2Vec2(impulse.first, impulse.second), true);
+		m_body->ApplyLinearImpulseToCenter(b2Vec2(impulse.X, impulse.Y), true);
 	}
 
 	void Box::SetContactFlags()

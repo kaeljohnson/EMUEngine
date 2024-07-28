@@ -53,8 +53,8 @@ namespace Engine
 
 		virtual void RemoveBodyFromWorld() = 0;
 		
-		virtual void ApplyForceToBox(std::pair<float, float> force) = 0;
-		virtual void ApplyImpulseToBox(std::pair<float, float> impulse) = 0;
+		virtual void ApplyForceToBox(Vector2D<float> force) = 0;
+		virtual void ApplyImpulseToBox(Vector2D<float> impulse) = 0;
 
 		virtual void SetContactFlags() = 0;
 		virtual void SetContactFlagsToFalse() = 0;

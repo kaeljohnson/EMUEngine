@@ -297,8 +297,8 @@ namespace Engine
 
     void EventManager::dispatchMouseMoveEvent(SDL_MouseMotionEvent& mouseMotion)
     {
-        m_mousePosition.first = mouseMotion.x;
-        m_mousePosition.second = mouseMotion.y;
+        m_mousePosition.X = mouseMotion.x;
+        m_mousePosition.Y = mouseMotion.y;
         eventQ.push({ MOUSE_MOVE, mouseMotion.x, mouseMotion.y });
     }
 
@@ -324,8 +324,8 @@ namespace Engine
     }
     void EventManager::dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent)
     {
-        m_scrollDirection.first = mouseWheelEvent.x;
-        m_scrollDirection.second = mouseWheelEvent.y;
+        m_scrollDirection.X = mouseWheelEvent.x;
+        m_scrollDirection.Y = mouseWheelEvent.y;
         switch (mouseWheelEvent.direction)
         {
         case (SDL_MOUSEWHEEL_NORMAL): eventQ.push({ MOUSE_WHEEL_MOVED, mouseWheelEvent.x, mouseWheelEvent.y }); break;

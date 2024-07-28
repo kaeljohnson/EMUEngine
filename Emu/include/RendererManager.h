@@ -25,8 +25,8 @@ namespace Engine
         const SDLTexture* LoadTexture(const char* filePath);
         void SetViewport();
         void ClearScreen();
-        void RenderScene(const float interpolation, const Vector2D offset);
-        void Draw(SceneObject* sceneObject, const int pixelsPerMeter, const float interpolation, const Vector2D offset);
+        void RenderScene(const float interpolation, const Vector2D<float> offset);
+        void Draw(SceneObject* sceneObject, const int pixelsPerMeter, const float interpolation, const Vector2D<float> offset);
         void Display();
 
         // Window related functions.
@@ -40,7 +40,7 @@ namespace Engine
         // inline const float GetScaleX() const { return SCALE_X; }
         // inline const float GetScaleY() const { return SCALE_Y; }
 
-        inline const Vector2D GetScale() const { return m_scale; }
+        inline const Vector2D<float> GetScale() const { return m_scale; }
 
         // Deleted functions to ensure our singleton instance cannot be copied or moved.
         RendererManager(const RendererManager&) = delete;
@@ -61,19 +61,24 @@ namespace Engine
         std::shared_ptr<Scene> m_ptrCurrentScene;
 
 	private:
-        int m_screenWidth;
-        int m_screenHeight;
+        // int m_screenWidth;
+        // int m_screenHeight;
+        Vector2D<int> m_screenSize;
 
-        const int VIRTUAL_WIDTH;
-        const int VIRTUAL_HEIGHT;
+        // const int VIRTUAL_WIDTH;
+        // const int VIRTUAL_HEIGHT;
+        Vector2D<int> m_virtualSize;
 
-        Vector2D m_scale;
+        Vector2D<float> m_scale;
         float SCALE;
 
-        int m_viewportWidth;
-        int m_viewportHeight;
-        int m_viewportX;
-        int m_viewportY;
+        // int m_viewportWidth;
+        // int m_viewportHeight;
+        Vector2D<int> m_viewportSize;
+
+        // int m_viewportX;
+        // int m_viewportY;
+        Vector2D<int> m_viewportPosition;
 
         bool m_rendererCreated;
 

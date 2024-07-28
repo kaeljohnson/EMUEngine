@@ -55,15 +55,15 @@ namespace Engine
 
 	public:
 		Box() = default;
-		Box(const BodyType bodyType, const bool fixed, const Vector2D position, const Vector2D size);
+		Box(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size);
 
 		~Box();
 
 		// Box2D specific functions
 		void RemoveBodyFromWorld() override;
 
-		void ApplyForceToBox(std::pair<float, float> force) override;
-		void ApplyImpulseToBox(std::pair<float, float> impulse) override;
+		void ApplyForceToBox(Vector2D<float> force) override;
+		void ApplyImpulseToBox(Vector2D<float> impulse) override;
 
 		// Box2d getter and setter wrappers
 		void CreateFixture() override;

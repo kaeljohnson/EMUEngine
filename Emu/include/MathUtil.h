@@ -7,12 +7,13 @@ namespace Engine
 		return (a * (1.0f - f)) + (b * f);
 	}
 
+	template <typename T>
 	struct Vector2D
 	{
-		float X, Y;
+		T X, Y;
 
 		Vector2D() : X(0), Y(0) {}
-		Vector2D(float x, float y) : X(x), Y(y) {}
+		Vector2D(T x, T y) : X(x), Y(y) {}
 
 		Vector2D operator+(const Vector2D& other) const
 		{
@@ -24,12 +25,12 @@ namespace Engine
 			return Vector2D(X - other.X, Y - other.Y);
 		}
 
-		Vector2D operator*(float scalar) const
+		Vector2D operator*(T scalar) const
 		{
 			return Vector2D(X * scalar, Y * scalar);
 		}
 
-		Vector2D operator/(float scalar) const
+		Vector2D operator/(T scalar) const
 		{
 			return Vector2D(X / scalar, Y / scalar);
 		}
