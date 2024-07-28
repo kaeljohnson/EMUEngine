@@ -9,7 +9,7 @@
 namespace Engine
 {
 	TileMap::TileMap(const std::string mapFile, const int numMetersPerTile)
-        : m_width(0), m_height(0), m_numMetersPerTile(numMetersPerTile)
+        : m_mapDimensions(0, 0), m_numMetersPerTile(numMetersPerTile)
 	{
         m_map.reserve(MAX_SIZE);
         
@@ -24,15 +24,15 @@ namespace Engine
         std::string line;
         while (std::getline(file, line)) 
         {
-            if (m_height == 0) 
+            if (m_mapDimensions.Y == 0) 
             {
                 // Set the width to the length of the first line
-                m_width = (int)line.length();
+                m_mapDimensions.X = (int)line.length();
             }
-            else if (line.length() != m_width)
+            else if (line.length() != m_mapDimensions.X)
             {
                 // Handle error: line does not have the same length as the first line
-                ENGINE_CRITICAL("Map is not a rectangle: line " + std::to_string(m_height + 1) + " has a different length");
+                ENGINE_CRITICAL("Map is not a rectangle: line " + std::to_string(m_mapDimensions.Y + 1) + " has a different length");
                 return;
             }
             for (char c : line) 
@@ -46,7 +46,7 @@ namespace Engine
                     ENGINE_CRITICAL("Map size exceeds maximum size of " + std::to_string(MAX_SIZE));
                 }
             }
-            m_height++;
+            m_mapDimensions.Y++;
         }
 	}
 
@@ -146,10 +146,10 @@ namespace Engine
 
     const char TileMap::GetTile(int x, int y) const
     {
-		if (x < 0 || x >= m_width || y < 0 || y >= m_height) 
+		if (x < 0 || x >= m_mapDimensions.X || y < 0 || y >= m_mapDimensions.Y) 
 		{
 			return ' ';
 		}
-		return m_map[y * m_width + x];
+		return m_map[y * m_mapDimensions.X + x];
 	}
 }

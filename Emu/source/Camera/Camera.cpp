@@ -27,7 +27,7 @@ namespace Engine
 
 		m_pixelsPerMeter = pixelsPerMeter;
 
-		m_sizeInMeters = Vector2D((float)screenSize.X / (pixelsPerMeter * scale.X), (float)screenSize.Y / (pixelsPerMeter * scale.Y));
+		m_sizeInMeters = Vector2D<float>(screenSize.X / (pixelsPerMeter * scale.X), screenSize.Y / (pixelsPerMeter * scale.Y));
 	}
 
 	void Camera::SetClampingOn(const bool clampingOn)

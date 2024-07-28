@@ -43,8 +43,8 @@ namespace Engine
 
 		m_bodyDef.fixedRotation = true;
 		m_bodyDef.userData.pointer = reinterpret_cast<intptr_t>(this);
-		m_prevX = position.X;
-		m_prevY = position.Y;
+		m_prevPosition.X = position.X;
+		m_prevPosition.Y = position.Y;
 		m_bodyDef.position.Set(position.X + m_halfWidthInMeters, position.Y + m_halfHeightInMeters);
 		m_shape.SetAsBox(m_halfWidthInMeters, m_halfHeightInMeters);
 		m_fixtureDef.shape = &m_shape;
@@ -179,7 +179,7 @@ namespace Engine
 		m_rightSensor = false;
 	}
 
-	void Box::UpdatePrevPosition() { m_prevX = GetTopLeftXInMeters(); m_prevY = GetTopLeftYInMeters(); }
+	void Box::UpdatePrevPosition() { m_prevPosition.X = GetTopLeftXInMeters(); m_prevPosition.Y = GetTopLeftYInMeters(); }
 
 	void Box::CreateFixture() { m_fixture = m_body->CreateFixture(&m_fixtureDef); }
 	void Box::SetGravity(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }

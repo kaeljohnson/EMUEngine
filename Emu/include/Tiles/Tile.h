@@ -15,10 +15,10 @@ namespace Engine
 		~Tile() = default;
 
 	public:
-		float x;
-		float y;
+		Vector2D<float> m_position;
 
-		float width;
-		float height;
+		// float width;
+		// float height;
+		Vector2D<float> m_size;
 	};
 }

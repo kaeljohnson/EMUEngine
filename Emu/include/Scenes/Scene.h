@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "../Core.h"
+#include "../MathUtil.h"
 
 #include "../Scenes/SceneObject.h"
 #include "../Scenes/SceneObjectStack.h"
@@ -38,11 +39,14 @@ namespace Engine
 	private:
 		int m_pixelsPerMeter;
 
-		int m_mapWidthInMeters;
-		int m_mapHeightInMeters;
+		// int m_mapWidthInMeters;
+		// int m_mapHeightInMeters;
+		Vector2D<int> m_mapDimensions;
 
-		float m_gravityX;
-		float m_gravityY;
+		// float m_gravityX;
+		// float m_gravityY;
+
+		Vector2D<float> m_gravity;
 		
 		EventListenerStack m_eventListeners;
 
@@ -54,8 +58,8 @@ namespace Engine
 		inline const int GetPixelsPerMeter() const { return m_pixelsPerMeter; }
 		inline EventListenerStack& GetEventListeners() { return m_eventListeners; }
 		inline std::vector<SceneObjectStack>& GetLayers() { return m_layers; }
-		inline const int GetLevelWidthInMeters() const { return m_mapWidthInMeters; }
-		inline const int GetLevelHeightInMeters() const { return m_mapHeightInMeters; }
+		inline const int GetLevelWidthInMeters() const { return m_mapDimensions.X; }
+		inline const int GetLevelHeightInMeters() const { return m_mapDimensions.Y; }
 
 		void CheckValid();
 		void Update();

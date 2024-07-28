@@ -30,8 +30,8 @@ void PlayerCamera::Update(const float interpolation)
     targetX += m_lookAhead;
 
     // Desired camera position based on the target's position
-    float desiredCameraTopLeftX = targetX - (m_sizeInMeters.X / 2.0);
-    float desiredCameraTopLeftY = targetY - (m_sizeInMeters.Y / 2.0);
+    float desiredCameraTopLeftX = targetX - (m_sizeInMeters.X / 2.0f);
+    float desiredCameraTopLeftY = targetY - (m_sizeInMeters.Y / 2.0f);
 
     m_offset.X += (desiredCameraTopLeftX - m_offset.X);
 

@@ -34,11 +34,7 @@ namespace Engine
 	protected:
 		Vector2D<float> m_sizeInMeters;
 
-		// int m_mapBoundRight;
-		// int m_mapBoundBottom;
 		Vector2D<int> m_mapBounds;
-		
-		bool m_clampingOn;
 
 		// Rendering viewport scale. The viewport is not necessarily the same as the window size.
 		Vector2D<float> refScale;
@@ -46,5 +42,6 @@ namespace Engine
 		Vector2D<int> m_screenSize;
 
 		int m_pixelsPerMeter;
+		bool m_clampingOn;
 	};
 }
