@@ -8,31 +8,26 @@
 
 namespace Engine
 {
-	Camera::Camera() : SCALEX(RendererManager::GetInstance()->GetScaleX()), SCALEY(RendererManager::GetInstance()->GetScaleY()), 
-		m_offsetX(0), m_offsetY(0), m_widthInMeters(0), m_heightInMeters(0), m_clampingOn(true) {}
+	Camera::Camera() : m_pixelsPerMeter(0), refScale(RendererManager::GetInstance()->GetScale()), 
+		m_offset(0, 0), m_sizeInMeters(0, 0), m_clampingOn(true) {}
 
-	void Camera::SetCameraPosition(const float x, const float y)
+	void Camera::SetCameraPosition(const Vector2D<float> offset)
 	{
-		m_offsetX = x;
-		m_offsetY = y;
+		m_offset = offset;
 	}
 
-	void Camera::Frame(const int pixelsPerMeter, const int levelWidthInMeters, const int levelHeightInMeters,
-		const int screenWidth, const int screenHeight, const float scaleX, const float scaleY)
+	void Camera::Frame(const int pixelsPerMeter, const Vector2D<int> mapBounds,
+		const Vector2D<int> screenSize, const Vector2D<float> scale)
 	{
-		m_mapBoundRight = levelWidthInMeters;
-		m_mapBoundBottom = levelHeightInMeters;
+		m_mapBounds = mapBounds;
 
-		SCALEX = scaleX;
-		SCALEY = scaleY;
+		refScale = scale;
 
-		m_screenWidth = screenWidth;
-		m_screenHeight = screenHeight;
+		m_screenSize = screenSize;
 
 		m_pixelsPerMeter = pixelsPerMeter;
 
-		m_widthInMeters = (float)screenWidth / (pixelsPerMeter * SCALEX);
-		m_heightInMeters = (float)screenHeight / (pixelsPerMeter * SCALEY);
+		m_sizeInMeters = Vector2D<float>(screenSize.X / (pixelsPerMeter * scale.X), screenSize.Y / (pixelsPerMeter * scale.Y));
 	}
 
 	void Camera::SetClampingOn(const bool clampingOn)
@@ -42,12 +37,12 @@ namespace Engine
 
 	void Camera::Clamp()
 	{
-		if (m_offsetX < 0) { m_offsetX = 0; }
-		if (m_offsetX + m_widthInMeters > m_mapBoundRight) { m_offsetX = m_mapBoundRight - m_widthInMeters; }
+		if (m_offset.X < 0) { m_offset.X = 0; }
+		if (m_offset.X + m_sizeInMeters.X > m_mapBounds.X) { m_offset.X = m_mapBounds.X - m_sizeInMeters.X; }
 
-		if (m_offsetY < 0) { m_offsetY = 0; }
-		if (m_offsetY + m_heightInMeters > m_mapBoundBottom) { m_offsetY = m_mapBoundBottom - m_heightInMeters; }
+		if (m_offset.Y < 0) { m_offset.Y = 0; }
+		if (m_offset.Y + m_sizeInMeters.Y > m_mapBounds.Y) { m_offset.Y = m_mapBounds.Y - m_sizeInMeters.Y; }
 	}
 
-	void Camera::Update(double interpolation) {}
+	void Camera::Update(float interpolation) {}
 }

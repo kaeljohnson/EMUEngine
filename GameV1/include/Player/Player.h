@@ -35,7 +35,7 @@ private:
 	float m_jumpCharge;
 	float m_coyoteTime;
 	bool m_onGround;
-	std::pair<float, float> m_force;
+	Engine::Vector2D<float> m_force;
 
 	Engine::EventType m_jumpKeyDown;
 	Engine::EventType m_jumpKeyUp;

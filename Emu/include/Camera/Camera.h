@@ -2,6 +2,8 @@
 
 #include "../Core.h"
 
+#include "../MathUtil.h"
+
 namespace Engine
 {
 	class Camera
@@ -9,7 +11,7 @@ namespace Engine
 	public:
 		EMU_API Camera();
 		
-		EMU_API void SetCameraPosition(const float x, const float y);
+		EMU_API void SetCameraPosition(const Vector2D<float> offset);
 		EMU_API void SetClampingOn(const bool clampingOn);
 
 		EMU_API void Clamp();
@@ -17,35 +19,29 @@ namespace Engine
 		virtual ~Camera() = default;
 
 	public:
-		double m_offsetX;
-		double m_offsetY;
+		Vector2D<float> m_offset;
 
 	public:
-		virtual void Update(const double interpolation);
+		virtual void Update(const float interpolation);
 
-		void Frame(const int pixelsPerMeter, const int levelWidthInMeters, const int levelHeightInMeters,
-			const int screenWidth, const int screenHeight, const float scaleX, const float scaleY);
+		void Frame(const int pixelsPerMeter, const Vector2D<int> mapBounds,
+			const Vector2D<int> screenSize, const Vector2D<float> scale);
 
 		Camera(const Camera& camera) = delete;
 		Camera& operator=(const Camera&) = delete;
 		Camera(Camera&&) = delete;
 		Camera& operator=(Camera&&) = delete;
 	protected:
-		float m_widthInMeters;
-		float m_heightInMeters;
+		Vector2D<float> m_sizeInMeters;
 
-		int m_mapBoundRight;
-		int m_mapBoundBottom;
-		
-		bool m_clampingOn;
+		Vector2D<int> m_mapBounds;
 
 		// Rendering viewport scale. The viewport is not necessarily the same as the window size.
-		float SCALEX;
-		float SCALEY;
+		Vector2D<float> refScale;
 
-		int m_screenWidth;
-		int m_screenHeight;
+		Vector2D<int> m_screenSize;
 
 		int m_pixelsPerMeter;
+		bool m_clampingOn;
 	};
 }

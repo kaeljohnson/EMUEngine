@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "../Core.h"
+#include "../MathUtil.h"
 #include "../SDLWrapper/SDLWrapper.h"
 #include "../Events/Event.h"
 
@@ -19,8 +20,8 @@ namespace Engine
         EMU_API static EventManager* GetInstance();
         EMU_API inline const std::unordered_map<EventType, bool>& GetKeyStates() const { return m_keyStates; }
         EMU_API inline const std::unordered_map<EventType, bool>& GetMouseButtonStates() const { return m_mouseButtonStates; }
-        EMU_API inline const std::pair<int, int>& GetMousePosition() const { return m_mousePosition; }
-        EMU_API inline const std::pair<int, int>& GetScrollDirection() const { return m_scrollDirection; }
+        EMU_API inline const Vector2D<int>& GetMousePosition() const { return m_mousePosition; }
+        EMU_API inline const Vector2D<int>& GetScrollDirection() const { return m_scrollDirection; }
 
     public:
         ~EventManager() = default;
@@ -38,8 +39,9 @@ namespace Engine
 
         std::unordered_map<EventType, bool> m_keyStates;
         std::unordered_map<EventType, bool> m_mouseButtonStates;
-        std::pair<int, int> m_mousePosition;
-        std::pair<int, int> m_scrollDirection;
+        // std::pair<int, int> m_mousePosition;
+        Vector2D<int> m_mousePosition;
+        Vector2D<int> m_scrollDirection;
 
         void dispatchQuitEvent();
         void dispatchWindowEvent(SDL_WindowEvent& windowEvent);

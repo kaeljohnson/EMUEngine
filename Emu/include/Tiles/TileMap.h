@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Core.h"
+#include "../MathUtil.h"
 
 #include <vector>
 
@@ -17,8 +18,8 @@ namespace Engine
 		EMU_API TileMap(const std::string mapFile, const int numMetersPerTile);
 		EMU_API const char GetTile(int x, int y) const;
 		
-		EMU_API inline int GetWidth() const { return m_width; }
-		EMU_API inline int GetHeight() const { return m_height; }
+		EMU_API inline int GetWidth() const { return m_mapDimensions.X; }
+		EMU_API inline int GetHeight() const { return m_mapDimensions.Y; }
 
 	public:
 		inline std::vector<Tile>& GetCollisionBodies() { return m_collisionBodies; }
@@ -37,8 +38,9 @@ namespace Engine
 		std::vector<char> m_map;
 		std::vector<Tile> m_collisionBodies;
 		std::vector<Tile> m_tiles;
-		int m_width;
-		int m_height;
+		// int m_width;
+		// int m_height;
+		Vector2D<int> m_mapDimensions;
 
 		int m_numMetersPerTile;
 	};

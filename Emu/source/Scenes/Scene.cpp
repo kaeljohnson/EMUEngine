@@ -12,7 +12,7 @@
 
 namespace Engine
 {
-	Scene::Scene() : m_pixelsPerMeter(0), m_gravityX(0), m_gravityY(0), m_layers(), m_mapWidthInMeters(0), m_mapHeightInMeters(0), HasTileMap(false),
+	Scene::Scene() : m_pixelsPerMeter(0), m_gravity(0, 0), m_layers(), m_mapDimensions(0, 0), HasTileMap(false),
 		m_world(nullptr), m_eventListeners() {}
 
 	void Scene::CheckValid()
@@ -39,10 +39,9 @@ namespace Engine
 		tileMap.LoadMap();
 		tileMap.CreateCollisionBodies();
 
-		m_mapWidthInMeters = tileMap.GetWidth();
-		m_mapHeightInMeters = tileMap.GetHeight();
+		m_mapDimensions = Vector2D<int>(tileMap.GetWidth(), tileMap.GetHeight());
 
-		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_mapWidthInMeters) + ", Map height: " + std::to_string(m_mapHeightInMeters));
+		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_mapDimensions.X) + ", Map height: " + std::to_string(m_mapDimensions.Y));
 
 		bool layerExists = false;
 		for (auto& tile : tileMap)
@@ -76,14 +75,14 @@ namespace Engine
 			ENGINE_INFO_D("Scene already has a map. Overriding map width!");
 		}
 
-		m_mapWidthInMeters = levelWidthInMeters;
+		m_mapDimensions.X = levelWidthInMeters;
 	}
 
 	void Scene::SetLevelHeightInMeters(const int levelHeightInMeters)
 	{
 		ENGINE_INFO_D("Scene already has a map. Overriding map height!");
 
-		m_mapHeightInMeters = levelHeightInMeters;
+		m_mapDimensions.Y = levelHeightInMeters;
 	}
 
 	void Scene::Update()
@@ -117,11 +116,11 @@ namespace Engine
 
 		m_pixelsPerMeter = pixelsPerMeter;
 
-		m_gravityX = gravityX;
-		m_gravityY = gravityY;
+		m_gravity.X = gravityX;
+		m_gravity.Y = gravityY;
 
 		ENGINE_INFO_D("Setting pixels per meter, time step, gravityX and gravityY at positions: " 
-			+ std::to_string(m_pixelsPerMeter) + ", " + std::to_string(m_gravityX) + ", " + std::to_string(m_gravityY));
+			+ std::to_string(m_pixelsPerMeter) + ", " + std::to_string(m_gravity.X) + ", " + std::to_string(m_gravity.Y));
 
 		if (m_world)
 		{
@@ -131,7 +130,7 @@ namespace Engine
 		
 		// Need a reset function for the world which resets all objects in the world.
 
-		m_world = CreateWorld(m_gravityX * m_pixelsPerMeter, m_gravityY * m_pixelsPerMeter, 8, 3);
+		m_world = CreateWorld(m_gravity.X * m_pixelsPerMeter, m_gravity.Y * m_pixelsPerMeter, 8, 3);
 
 		ENGINE_INFO_D("Client creating simulation with gravity: " + std::to_string(gravityX) + ", " + std::to_string(gravityY));
 

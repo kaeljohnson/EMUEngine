@@ -55,8 +55,8 @@ namespace Engine
 		EventManager* ptrEventManager = EventManager::GetInstance();
 
 		// Camera frames current scene.
-		m_cameraManager.m_ptrCurrentCamera->Frame(currentScene->GetPixelsPerMeter(), currentScene->GetLevelWidthInMeters(), currentScene->GetLevelHeightInMeters(), 
-			ptrRendererManager->GetFullscreenWidth(), ptrRendererManager->GetFullscreenHeight(), ptrRendererManager->GetScaleX(), ptrRendererManager->GetScaleY());
+		m_cameraManager.m_ptrCurrentCamera->Frame(currentScene->GetPixelsPerMeter(), Vector2D<int>(currentScene->GetLevelWidthInMeters(), currentScene->GetLevelHeightInMeters()), 
+			Vector2D<int>(ptrRendererManager->GetFullscreenWidth(), ptrRendererManager->GetFullscreenHeight()), ptrRendererManager->GetScale());
 
 
 		ptrRendererManager->SetScene(currentScene);
@@ -82,8 +82,8 @@ namespace Engine
 		const int pixelsPerMeter = currentScene->GetPixelsPerMeter();
 		const float timeStep = TIME_STEP;
 
-		double currentTime = SDL_GetTicks() / 1000.0;
-		double accumulator = 0.0;
+		float currentTime = (float)SDL_GetTicks() / 1000.0f;
+		float accumulator = 0.0;
 
 		// Application loop.
 		while (running)
@@ -97,8 +97,8 @@ namespace Engine
 				5. Display the rendered scene.
 			*/
 
-			double newTime = SDL_GetTicks() / 1000.0;
-			double frameTime = newTime - currentTime;
+			float newTime = (float)SDL_GetTicks() / 1000.0f;
+			float frameTime = newTime - currentTime;
 			currentTime = newTime;
 
 			accumulator += frameTime;
@@ -115,11 +115,11 @@ namespace Engine
 				accumulator -= timeStep;
 			}
 
-			const double interpolation = accumulator / timeStep;
+			const float interpolation = accumulator / timeStep;
 
 			m_cameraManager.m_ptrCurrentCamera->Update(interpolation);
 
-			ptrRendererManager->RenderScene(interpolation, m_cameraManager.m_ptrCurrentCamera->m_offsetX, m_cameraManager.m_ptrCurrentCamera->m_offsetY);
+			ptrRendererManager->RenderScene(interpolation, m_cameraManager.m_ptrCurrentCamera->m_offset);
 		}
 	}
 

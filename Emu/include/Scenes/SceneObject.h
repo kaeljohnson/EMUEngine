@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "../Core.h"
+#include "../MathUtil.h"
 
 #include "../Physics/IPhysicsBody.h"
 #include "../Textures/ITexture.h"
@@ -22,8 +23,7 @@ namespace Engine
 		int LayerIdx;
 		int DirectionFacing;
 	public:
-		SceneObject(const BodyType bodyType, const bool fixed, const float startingXInMeters,
-			const float startingYInMeters, const float widthInMeters, const float heightInMeters, std::shared_ptr<ITexture> refTexture, int directionFacing);
+		SceneObject(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size, std::shared_ptr<ITexture> refTexture, int directionFacing);
 
 		EMU_API virtual ~SceneObject() = default;
 

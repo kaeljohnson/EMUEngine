@@ -8,20 +8,20 @@ m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFact
 {
 }
 
-void PlayerCamera::Update(const double interpolation)
+void PlayerCamera::Update(const float interpolation)
 {
-    double targetX = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevX(), ptrCameraTarget->GetPhysicsBody()->GetCenterXInMeters(), interpolation);
-    double targetY = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevY(), ptrCameraTarget->GetPhysicsBody()->GetCenterYInMeters(), interpolation);
+    float targetX = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevX(), ptrCameraTarget->GetPhysicsBody()->GetCenterXInMeters(), interpolation);
+    float targetY = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevY(), ptrCameraTarget->GetPhysicsBody()->GetCenterYInMeters(), interpolation);
 
-    double desiredLookAhead = ptrCameraTarget->DirectionFacing * m_lookAheadFactor;
+    float desiredLookAhead = ptrCameraTarget->DirectionFacing * m_lookAheadFactor;
 
     // Calculate the difference between the current and desired look-ahead
-    double lookAheadDifference = desiredLookAhead - m_lookAhead;
+    float lookAheadDifference = desiredLookAhead - m_lookAhead;
 
     // Calculate the step to move towards the desired look-ahead, ensuring we don't overshoot
-    m_lookAheadChangeSpeed = 0.005f / SCALEX;
+    m_lookAheadChangeSpeed = 0.005f / refScale.X;
 
-    double lookAheadStep = std::min(std::abs(lookAheadDifference), m_lookAheadChangeSpeed * interpolation);
+    float lookAheadStep = std::min(std::abs(lookAheadDifference), m_lookAheadChangeSpeed * interpolation);
     lookAheadStep *= (lookAheadDifference > 0) ? 1 : -1; // Ensure the step has the correct direction
 
     // Update the look-ahead
@@ -30,26 +30,26 @@ void PlayerCamera::Update(const double interpolation)
     targetX += m_lookAhead;
 
     // Desired camera position based on the target's position
-    double desiredCameraTopLeftX = targetX - (m_widthInMeters / 2.0);
-    double desiredCameraTopLeftY = targetY - (m_heightInMeters / 2.0);
+    float desiredCameraTopLeftX = targetX - (m_sizeInMeters.X / 2.0f);
+    float desiredCameraTopLeftY = targetY - (m_sizeInMeters.Y / 2.0f);
 
-    m_offsetX += (desiredCameraTopLeftX - m_offsetX);
+    m_offset.X += (desiredCameraTopLeftX - m_offset.X);
 
-    if (targetY > m_offsetY + ((m_heightInMeters)*m_bottomTargetScreenBound))
+    if (targetY > m_offset.Y + ((m_sizeInMeters.Y) * m_bottomTargetScreenBound))
     {
-        m_offsetY = targetY - ((m_heightInMeters)*m_bottomTargetScreenBound);
+        m_offset.Y = targetY - ((m_sizeInMeters.Y) * m_bottomTargetScreenBound);
     }
-    else if (targetY < m_offsetY + ((m_heightInMeters)*m_topTargetScreenBound))
+    else if (targetY < m_offset.Y + ((m_sizeInMeters.Y)*m_topTargetScreenBound))
     {
-        m_offsetY = targetY - ((m_heightInMeters)*m_topTargetScreenBound);
+        m_offset.Y = targetY - ((m_sizeInMeters.Y)*m_topTargetScreenBound);
     }
     else if (m_smoothingOn)
     {
-        m_offsetY += (desiredCameraTopLeftY - m_offsetY) * (m_smoothingFactor / SCALEY);
+        m_offset.Y += (desiredCameraTopLeftY - m_offset.Y) * (m_smoothingFactor / refScale.Y);
     }
     else
     {
-        m_offsetY = desiredCameraTopLeftY;
+        m_offset.Y = desiredCameraTopLeftY;
     }
 
     if (m_clampingOn) Clamp();
