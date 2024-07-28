@@ -5,6 +5,6 @@
 
 namespace Engine
 {
-	Tile::Tile(const BodyType bodyType, const float x, const float y, const float width, const float height, const std::shared_ptr<ITexture> ptrTexture, int directionFacing)
-		: x(x), y(y), width(width), height(height), SceneObject(bodyType, true, x, y, width, height, ptrTexture, directionFacing) {}
+	Tile::Tile(const BodyType bodyType, const Vector2D position, const Vector2D size, const std::shared_ptr<ITexture> ptrTexture, int directionFacing)
+		: x(x), y(y), width(width), height(height), SceneObject(bodyType, true, position, size, ptrTexture, directionFacing) {}
 }

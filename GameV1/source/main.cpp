@@ -25,7 +25,7 @@ int main(int argc, char* args[])
 
 	Engine::ScrollingCamera scrollCamera;
 	scrollCamera.SetScrollingSpeeds(Engine::Vector2D(0.0005f, 0.0f));
-	scrollCamera.SetCameraPosition(0.0f, 38.5f);
+	scrollCamera.SetCameraPosition(Engine::Vector2D(0.0f, 38.5f));
 
 
 	PlayerCamera playerCamera;

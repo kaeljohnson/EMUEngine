@@ -15,7 +15,7 @@
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
         m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right),
-        Entity(startingXInMeters, startingYInMeters, widthInMeters, heightInMeters, refTexture, 1)
+        Entity(Engine::Vector2D(startingXInMeters, startingYInMeters), Engine::Vector2D(widthInMeters, heightInMeters), refTexture, 1)
     {
     	m_physicsBody->SetFriction(0.0f);
     }
@@ -61,7 +61,6 @@
         {
         case PlayerState::Idle:
             // Transition to HorizontalMovement if movement keys are pressed
-            CLIENT_INFO_D("Idle");
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
             {
                 m_currentDirection = PlayerDirection::Right;
@@ -87,7 +86,6 @@
             break;
 
         case PlayerState::HorizontalMovement:
-            CLIENT_INFO_D("Horizontal Movement");
 
             // Horizontal Movement
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
@@ -123,7 +121,6 @@
             break;
 
         case PlayerState::Jumping:
-            CLIENT_INFO_D("Jumping");
             // Allow horizontal movement while jumping
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
             {
@@ -156,7 +153,6 @@
             break;
 
         case PlayerState::Falling:
-            CLIENT_INFO_D("Falling");
             // Allow horizontal movement while falling
             bool continueMoving = false;
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))

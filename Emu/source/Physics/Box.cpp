@@ -1,6 +1,7 @@
 #pragma once
 
 #include <utility>
+#include "../../include/MathUtil.h"
 
 #include "../../include/Physics/Box.h"
 #include "../../include/Logging/Logger.h"
@@ -8,10 +9,9 @@
 
 namespace Engine
 {
-	Box::Box(const BodyType bodyType, const bool fixed, const float startingXInMeters, const float startingYInMeters,
-		const float widthInMeters, const float heightInMeters)
-		: m_halfWidthInMeters(widthInMeters / 2.0f), m_halfHeightInMeters(heightInMeters / 2.0f), 
-		m_widthInMeters(widthInMeters), m_heightInMeters(heightInMeters),
+	Box::Box(const BodyType bodyType, const bool fixed, const Vector2D position, const Vector2D size)
+		: m_halfWidthInMeters(size.X / 2.0f), m_halfHeightInMeters(size.Y / 2.0f), 
+		m_widthInMeters(size.X), m_heightInMeters(size.Y),
 		m_bodyType(bodyType), m_collidable(true), m_fixed(fixed), m_body(nullptr), m_fixture(nullptr),
 		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
 		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
@@ -43,9 +43,9 @@ namespace Engine
 
 		m_bodyDef.fixedRotation = true;
 		m_bodyDef.userData.pointer = reinterpret_cast<intptr_t>(this);
-		m_prevX = startingXInMeters;
-		m_prevY = startingYInMeters;
-		m_bodyDef.position.Set(startingXInMeters + m_halfWidthInMeters, startingYInMeters + m_halfHeightInMeters);
+		m_prevX = position.X;
+		m_prevY = position.Y;
+		m_bodyDef.position.Set(position.X + m_halfWidthInMeters, position.Y + m_halfHeightInMeters);
 		m_shape.SetAsBox(m_halfWidthInMeters, m_halfHeightInMeters);
 		m_fixtureDef.shape = &m_shape;
 		m_fixtureDef.restitution = 0.0f;
@@ -53,8 +53,8 @@ namespace Engine
 		m_fixtureDef.density = 1.0f;
 		m_fixtureDef.friction = 1.0f;
 
-		ENGINE_INFO_D("Box created at position: " + std::to_string(startingXInMeters) + "," 
-			+ std::to_string(startingYInMeters) + ". With width: " + std::to_string(m_widthInMeters) + ", height: " + std::to_string(m_heightInMeters));
+		ENGINE_INFO_D("Box created at position: " + std::to_string(position.X) + "," 
+			+ std::to_string(position.Y) + ". With width: " + std::to_string(size.X) + ", height: " + std::to_string(size.Y));
 	}
 
 	Box::~Box()

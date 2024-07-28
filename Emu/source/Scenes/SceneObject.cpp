@@ -11,9 +11,9 @@
 
 namespace Engine
 {
-	SceneObject::SceneObject(const BodyType bodyType, const bool fixed, const float startingXInMeters, const float startingYInMeters,
-		const float widthInMeters, const float heightInMeters, std::shared_ptr<ITexture> ptrTexture, int directionFacing)
-		: m_physicsBody(CreatePhysicsBody(bodyType, fixed, startingXInMeters, startingYInMeters, widthInMeters, heightInMeters)),
+	SceneObject::SceneObject(const BodyType bodyType, const bool fixed, const Vector2D position,
+		const Vector2D size, std::shared_ptr<ITexture> ptrTexture, int directionFacing)
+		: m_physicsBody(CreatePhysicsBody(bodyType, fixed, position, size)),
 		m_texture(ptrTexture), Enabled(true), Visible(true), LayerIdx(-1), uuid(CreateUUID()), DirectionFacing(directionFacing),
 		refKeyStates(EventManager::GetInstance()->GetKeyStates())
 	{

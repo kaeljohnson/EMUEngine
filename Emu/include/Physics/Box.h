@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Core.h"
+#include "../MathUtil.h"
 
 #include "ConversionFunctions.h"
 
@@ -54,8 +55,7 @@ namespace Engine
 
 	public:
 		Box() = default;
-		Box(const BodyType bodyType, const bool fixed, const float startingXInMeters,
-			const float startingYInMeters, const float widthInMeters, const float heightInMeters);
+		Box(const BodyType bodyType, const bool fixed, const Vector2D position, const Vector2D size);
 
 		~Box();
 

@@ -17,8 +17,8 @@ namespace Engine
 		float targetY = Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevY(), ptrCameraTarget->GetPhysicsBody()->GetCenterYInMeters(), interpolation);
 
 		// Desired camera position based on the target's position
-		float desiredCameraTopLeftX = targetX - (m_sizeInMeters.X / 2.0);
-		float desiredCameraTopLeftY = targetY - (m_sizeInMeters.Y / 2.0);
+		float desiredCameraTopLeftX = targetX - (m_sizeInMeters.X / 2.0f);
+		float desiredCameraTopLeftY = targetY - (m_sizeInMeters.Y / 2.0f);
 
 		m_offset = Vector2D(desiredCameraTopLeftX, desiredCameraTopLeftY);
 
