@@ -85,6 +85,10 @@ namespace Engine
 		double currentTime = SDL_GetTicks() / 1000.0;
 		double accumulator = 0.0;
 
+		double newTime = 0.0;
+		double frameTime = 0.0;
+		double interpolation = 0.0;
+
 		// Application loop.
 		while (running)
 		{
@@ -97,8 +101,8 @@ namespace Engine
 				5. Display the rendered scene.
 			*/
 
-			double newTime = SDL_GetTicks() / 1000.0;
-			double frameTime = newTime - currentTime;
+			newTime = SDL_GetTicks() / 1000.0;
+			frameTime = newTime - currentTime;
 			currentTime = newTime;
 
 			accumulator += frameTime;
@@ -115,7 +119,7 @@ namespace Engine
 				accumulator -= timeStep;
 			}
 
-			const double interpolation = accumulator / timeStep;
+			interpolation = accumulator / timeStep;
 
 			m_cameraManager.m_ptrCurrentCamera->Update(interpolation);
 
