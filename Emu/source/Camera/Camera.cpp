@@ -44,5 +44,5 @@ namespace Engine
 		if (m_offset.Y + m_sizeInMeters.Y > m_mapBounds.Y) { m_offset.Y = m_mapBounds.Y - m_sizeInMeters.Y; }
 	}
 
-	void Camera::Update(float interpolation) {}
+	void Camera::Update(double interpolation) {}
 }

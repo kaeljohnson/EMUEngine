@@ -22,7 +22,7 @@ namespace Engine
 		Vector2D<float> m_offset;
 
 	public:
-		virtual void Update(const float interpolation);
+		virtual void Update(const double interpolation);
 
 		void Frame(const int pixelsPerMeter, const Vector2D<int> mapBounds,
 			const Vector2D<int> screenSize, const Vector2D<float> scale);

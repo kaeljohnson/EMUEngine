@@ -82,8 +82,8 @@ namespace Engine
 		const int pixelsPerMeter = currentScene->GetPixelsPerMeter();
 		const float timeStep = TIME_STEP;
 
-		float currentTime = (float)SDL_GetTicks() / 1000.0f;
-		float accumulator = 0.0;
+		double currentTime = SDL_GetTicks() / 1000.0;
+		double accumulator = 0.0;
 
 		// Application loop.
 		while (running)
@@ -97,8 +97,8 @@ namespace Engine
 				5. Display the rendered scene.
 			*/
 
-			float newTime = (float)SDL_GetTicks() / 1000.0f;
-			float frameTime = newTime - currentTime;
+			double newTime = SDL_GetTicks() / 1000.0;
+			double frameTime = newTime - currentTime;
 			currentTime = newTime;
 
 			accumulator += frameTime;
@@ -115,7 +115,7 @@ namespace Engine
 				accumulator -= timeStep;
 			}
 
-			const float interpolation = accumulator / timeStep;
+			const double interpolation = accumulator / timeStep;
 
 			m_cameraManager.m_ptrCurrentCamera->Update(interpolation);
 

@@ -16,7 +16,7 @@ namespace Engine
 		~ScrollingCamera() = default;
 
 	public:
-		void Update(const float interpolation) override;
+		void Update(const double interpolation) override;
 
 	private:
 		Vector2D<float> m_scrollSpeed;

@@ -192,7 +192,7 @@ namespace Engine
 		SDL_RENDER_PRESENT(m_ptrRenderer);
 	}
 
-	void RendererManager::RenderScene(const float interpolation, const Vector2D<float> cameraOffset)
+	void RendererManager::RenderScene(const double interpolation, const Vector2D<float> cameraOffset)
 	{
 		ClearScreen();
 
@@ -225,7 +225,7 @@ namespace Engine
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const float interpolation, const Vector2D<float> offset)
+	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation, const Vector2D<float> offset)
 	{
 		bool isTextureNull = sceneObject->GetTexture() == nullptr;
 
@@ -236,8 +236,8 @@ namespace Engine
 
 		SDLRect dst
 		{
-			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevX(), ptrBody->GetTopLeftXInMeters(), interpolation) - offset.X) * pixelsPerMeter * SCALE)),
-			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevY(), ptrBody->GetTopLeftYInMeters(), interpolation) - offset.Y) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevX(), ptrBody->GetTopLeftXInMeters(), (float)interpolation) - offset.X) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevY(), ptrBody->GetTopLeftYInMeters(), (float)interpolation) - offset.Y) * pixelsPerMeter * SCALE)),
 
 			static_cast<int>(round(ptrBody->GetWidthInMeters() * pixelsPerMeter * SCALE)),
 			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))
