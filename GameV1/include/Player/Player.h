@@ -19,7 +19,7 @@ enum PlayerDirection
 	Right,
 };
 
-class Player : public Engine::Entity, public Engine::EventListener
+class Player : public Engine::Entity
 {
 public:
 	Player(const float startingXInMeters, const float startingYInMeters,

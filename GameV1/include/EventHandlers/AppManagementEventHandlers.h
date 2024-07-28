@@ -5,14 +5,12 @@
 
 // Example of client defined listener. Processes events related to application management.
 
-class AppManagementListener : public Engine::EventListener
+class AppManagementEventHandlers
 {
 private:
 	Engine::ICallbackSystemPtr ptrICallbackSystem;
 
 public:
-	AppManagementListener(std::string name);
-	~AppManagementListener();
-
-	void ProcessEvent(Engine::Event& e) override;
+	AppManagementEventHandlers(std::unordered_map<Engine::EventType, Engine::EventHandler>& eventHandlers);
+	~AppManagementEventHandlers();
 };

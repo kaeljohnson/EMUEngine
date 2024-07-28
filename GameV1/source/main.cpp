@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Engine.h>
-#include "../include/EventListeners/AppManagementListener.h"
+#include "../include/EventHandlers/AppManagementEventHandlers.h"
 #include "../include/Player/Player.h"
 #include "../include/Camera/PlayerCamera.h"
 
@@ -12,6 +12,9 @@ int main(int argc, char* args[])
 	CLIENT_INFO_D("Client Running!");
 
 	Engine::ApplicationPtr ptrAppInstance = Engine::Application::GetInstance();
+
+	std::unordered_map<Engine::EventType, Engine::EventHandler>& refEventHandlerMap = ptrAppInstance->GetEventHandlers();
+	AppManagementEventHandlers appManagementEventHandlers(refEventHandlerMap);
 
 	Engine::ScenePtr scene = Engine::CreateScene();
 
@@ -53,11 +56,9 @@ int main(int argc, char* args[])
 
 	scene->Add(player, PLAYER_LAYER);
 
-	AppManagementListener appManagementListener("App management listener");
+	// AppManagementListener appManagementListener("App management listener");
 
-	ptrAppInstance->CreateEventListener(appManagementListener);
-
-	scene->AddEventListener(player);
+	// ptrAppInstance->CreateEventListener(appManagementListener);
 	
 	ptrAppInstance->PlayScene(scene);
 	// Need to figure out how to change scenes, stop scenes, etc.

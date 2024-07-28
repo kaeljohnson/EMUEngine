@@ -1,23 +1,25 @@
 #pragma once
 
 #include <queue>
+#include <unordered_map>
+#include <functional>
 #include <memory>
 
 #include "Core.h"
-#include "Events/EventListener.h"
-#include "Physics/IWorld.h"
 #include "Scenes/Scene.h"
 #include "Camera/CameraManager.h"
 
 namespace Engine
 {
+	using EventHandler = std::function<void(Event&)>;
+
 	class Application
 	{
 	public:
 		EMU_API static Application* GetInstance();
-		EMU_API void CreateEventListener(EventListener& eventListener);
 		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
 		EMU_API inline CameraManager& GetCameraManager() { return m_cameraManager; }
+		EMU_API inline std::unordered_map<EventType, EventHandler>& GetEventHandlers() { return m_eventHandlers; }
 
 		~Application();
 
@@ -34,12 +36,14 @@ namespace Engine
 		bool running;
 
 		// Application needs one listener for app management events.
-		EventListener* m_ptrAppManagerListener;
+		std::unordered_map<EventType, EventHandler> m_eventHandlers;
 
 		// This will exist here for now.
 		CameraManager m_cameraManager;
 
 		void defineDefaultApplicationCallbacks();
 		void end();
+
+		void processEventQueue();
 	};
 }
