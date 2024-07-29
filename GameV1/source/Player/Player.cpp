@@ -8,9 +8,9 @@
 #include "../../include/Player/PlayerConfig.h"
 
     Player::Player(const float startingXInMeters, const float startingYInMeters,
-        const float widthInMeters, const float heightInMeters, std::shared_ptr<Engine::ITexture> refTexture)
+        const float widthInMeters, const float heightInMeters, std::shared_ptr<Engine::ITexture> refTexture, const std::unordered_map<Engine::EventType, bool>& keyStates)
         // These need to be set by client.
-        : m_coyoteTime(0.0f), m_canJump(false), m_jumpCharge(0.0f), m_onGround(false),
+        : refKeyStates(keyStates), m_coyoteTime(0.0f), m_canJump(false), m_jumpCharge(0.0f), m_onGround(false),
         m_jumpKeyDown(Engine::SPACE_KEY_DOWN), m_jumpKeyUp(Engine::SPACE_KEY_UP),
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),

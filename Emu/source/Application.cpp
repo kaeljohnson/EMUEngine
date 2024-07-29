@@ -101,7 +101,7 @@ namespace Engine
 			while (accumulator >= timeStep)
 			{
 				m_eventManager.HandleEvents();
-				processEventQueue();
+				m_eventManager.ProcessEvents();
 				
 
 				currentScene->Update();
@@ -135,39 +135,5 @@ namespace Engine
 			{
 				end();
 			});
-	}
-
-	void Application::processEventQueue()
-	{
-		// Process order for scene is opposite of render order.
-
-		// Potential for multithreading if there are a lot of events.
-
-		// Render order for layers
-		// EX:
-		// Background Layer -> Filled with Background textures.
-		// Game Layer -> Filled with Engine supported SceneObjects type.
-		// Foreground Layer -> Filled with Foreground textures.
-		// Debug Layer -> Wrapper for Game Layer. Shows important info like hit boxes, etc.
-		// UI Layer -> Filled with Engine supported UI type.
-
-		// EventManager* ptrEventManager = EventManager::GetInstance();
-
-		while (!m_eventManager.eventQ.empty())
-		{
-			Event& currentEvent = m_eventManager.eventQ.front();
-
-			if (m_eventManager.m_eventHandlers.find(currentEvent.Type) != m_eventManager.m_eventHandlers.end())
-			{
-				m_eventManager.m_eventHandlers[currentEvent.Type](currentEvent);
-			}
-
-			if (!currentEvent.Handled)
-			{
-				ENGINE_TRACE_D("Unhandled Event: " + std::to_string(static_cast<int>(currentEvent.Type)));
-			}
-
-			m_eventManager.eventQ.pop();
-		}
 	}
 }

@@ -17,8 +17,7 @@ namespace Engine
 		EMU_API static Application* GetInstance();
 		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
 		EMU_API inline CameraManager& GetCameraManager() { return m_cameraManager; }
-
-		EventManager m_eventManager;
+		EMU_API inline EventManager& GetEventManager() { return m_eventManager; }
 
 		~Application();
 
@@ -34,16 +33,10 @@ namespace Engine
 
 		bool running;
 
-		// Application needs one listener for app management events.
-		
-
-		// This will exist here for now.
-		// EventManager m_eventManager;
 		CameraManager m_cameraManager;
+		EventManager m_eventManager;
 
 		void defineDefaultApplicationCallbacks();
 		void end();
-
-		void processEventQueue();
 	};
 }

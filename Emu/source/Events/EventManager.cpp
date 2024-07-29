@@ -11,7 +11,8 @@
 
 namespace Engine
 {
-    EventManager::EventManager() : m_eventDispatcher(std::make_unique<EventDispatcher>(eventQ, m_keyStates, m_mouseButtonStates, m_mousePosition, m_scrollDirection)) {
+    EventManager::EventManager() : m_eventDispatcher(std::make_unique<EventDispatcher>(m_eventQ, m_keyStates, m_mouseButtonStates, m_mousePosition, m_scrollDirection))
+    {
         // Initialize all key down states to false
         m_keyStates[ESCAPE_KEY_DOWN] = false;
         m_keyStates[EQUALS_KEY_DOWN] = false;
@@ -130,5 +131,32 @@ namespace Engine
 		*/
 
         m_eventDispatcher->PollEvents();
+	}
+
+    void EventManager::ProcessEvents()
+    {
+		/*
+        	Process all events in the event queue. This function is called after 
+            all events have been polled and pushed to the event queue. The events 
+            are processed in the order they were pushed to the event queue. The 
+            events are then dispatched to their respective event handlers.
+        */
+
+        while (!m_eventQ.empty())
+        {
+            Event& currentEvent = m_eventQ.front();
+
+            if (m_eventHandlers.find(currentEvent.Type) != m_eventHandlers.end())
+            {
+                m_eventHandlers[currentEvent.Type](currentEvent);
+            }
+
+            if (!currentEvent.Handled)
+            {
+                ENGINE_TRACE_D("Unhandled Event: " + std::to_string(static_cast<int>(currentEvent.Type)));
+            }
+
+            m_eventQ.pop();
+        }
 	}
 }

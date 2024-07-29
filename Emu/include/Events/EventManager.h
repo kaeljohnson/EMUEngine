@@ -16,12 +16,13 @@ namespace Engine
     class EventDispatcher;
 
     using EventHandler = std::function<void(Event&)>;
+    using EventHandlerMap = std::unordered_map<EventType, EventHandler>;
 
     class EventManager
     {
     public:
-        std::queue<Event> eventQ;
-        std::unordered_map<EventType, EventHandler> m_eventHandlers;
+        
+        EventHandlerMap m_eventHandlers;
 
     public:
         EventManager();
@@ -35,6 +36,7 @@ namespace Engine
         ~EventManager() = default;
 
         void HandleEvents();
+        void ProcessEvents();
 
         EventManager(const EventManager&) = delete;
         EventManager& operator=(const EventManager&) = delete;
@@ -42,6 +44,7 @@ namespace Engine
         EventManager& operator=(EventManager&&) = delete;
 
     private:
+        std::queue<Event> m_eventQ;
         std::unordered_map<EventType, bool> m_keyStates;
         std::unordered_map<EventType, bool> m_mouseButtonStates;
 
