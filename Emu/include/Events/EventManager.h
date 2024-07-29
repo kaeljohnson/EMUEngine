@@ -3,21 +3,29 @@
 #include <queue>
 #include <unordered_map>
 #include <utility>
+#include <memory>
+#include <functional>
 
 #include "../Core.h"
 #include "../MathUtil.h"
-#include "../SDLWrapper/SDLWrapper.h"
+
 #include "../Events/Event.h"
 
 namespace Engine
 {
+    class EventDispatcher;
+
+    using EventHandler = std::function<void(Event&)>;
+
     class EventManager
     {
     public:
         std::queue<Event> eventQ;
+        std::unordered_map<EventType, EventHandler> m_eventHandlers;
 
     public:
-        EMU_API static EventManager* GetInstance();
+        EventManager();
+
         EMU_API inline const std::unordered_map<EventType, bool>& GetKeyStates() const { return m_keyStates; }
         EMU_API inline const std::unordered_map<EventType, bool>& GetMouseButtonStates() const { return m_mouseButtonStates; }
         EMU_API inline const Vector2D<int>& GetMousePosition() const { return m_mousePosition; }
@@ -34,22 +42,12 @@ namespace Engine
         EventManager& operator=(EventManager&&) = delete;
 
     private:
-        static EventManager* instance;
-        EventManager();
-
         std::unordered_map<EventType, bool> m_keyStates;
         std::unordered_map<EventType, bool> m_mouseButtonStates;
-        // std::pair<int, int> m_mousePosition;
+
         Vector2D<int> m_mousePosition;
         Vector2D<int> m_scrollDirection;
 
-        void dispatchQuitEvent();
-        void dispatchWindowEvent(SDL_WindowEvent& windowEvent);
-        void dispatchKeydownEvent(SDL_Keycode& keyCode);
-        void dispatchKeyupEvent(SDL_Keycode& keyCode);
-        void dispatchMouseMoveEvent(SDL_MouseMotionEvent& mouseMotion);
-        void dispatchMouseButtonDownEvent(SDL_MouseButtonEvent& mouseButtonEvent);
-        void dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent);
-        void dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent);
+        std::unique_ptr<EventDispatcher> m_eventDispatcher;
     };
 }

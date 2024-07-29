@@ -10,6 +10,7 @@
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
 #include "../include/Events/EventManager.h"
+#include "../include/Events/EventDispatcher.h"
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
@@ -35,7 +36,7 @@ namespace Engine
 	}
 
 	Application::Application()
-		: running(false),  m_cameraManager()
+		: running(false),  m_cameraManager(), m_eventManager()
 	{
 		RendererManager::GetInstance()->CreateRenderer();
 
@@ -49,7 +50,6 @@ namespace Engine
 		
 		// renderer manager and event manager are singletons in order to hide dependencies from client.
 		RendererManager* ptrRendererManager = RendererManager::GetInstance();
-		EventManager* ptrEventManager = EventManager::GetInstance();
 
 		// Camera frames current scene.
 		m_cameraManager.m_ptrCurrentCamera->Frame(currentScene->GetPixelsPerMeter(), Vector2D<int>(currentScene->GetLevelWidthInMeters(), currentScene->GetLevelHeightInMeters()), 
@@ -67,12 +67,6 @@ namespace Engine
 			ENGINE_CRITICAL_D("No scene loaded! Application must have a scene to run!");
 			end();
 		}
-
-		/*if (m_ptrAppManagerListener == nullptr)
-		{
-			ENGINE_CRITICAL_D("No event listener loaded! Application must have an event listener to run!");
-			end();
-		}*/
 
 		currentScene->CheckValid();
 
@@ -106,7 +100,7 @@ namespace Engine
 
 			while (accumulator >= timeStep)
 			{
-				ptrEventManager->HandleEvents();
+				m_eventManager.HandleEvents();
 				processEventQueue();
 				
 
@@ -157,15 +151,15 @@ namespace Engine
 		// Debug Layer -> Wrapper for Game Layer. Shows important info like hit boxes, etc.
 		// UI Layer -> Filled with Engine supported UI type.
 
-		EventManager* ptrEventManager = EventManager::GetInstance();
+		// EventManager* ptrEventManager = EventManager::GetInstance();
 
-		while (!ptrEventManager->eventQ.empty())
+		while (!m_eventManager.eventQ.empty())
 		{
-			Event& currentEvent = ptrEventManager->eventQ.front();
+			Event& currentEvent = m_eventManager.eventQ.front();
 
-			if (m_eventHandlers.find(currentEvent.Type) != m_eventHandlers.end())
+			if (m_eventManager.m_eventHandlers.find(currentEvent.Type) != m_eventManager.m_eventHandlers.end())
 			{
-				m_eventHandlers[currentEvent.Type](currentEvent);
+				m_eventManager.m_eventHandlers[currentEvent.Type](currentEvent);
 			}
 
 			if (!currentEvent.Handled)
@@ -173,7 +167,7 @@ namespace Engine
 				ENGINE_TRACE_D("Unhandled Event: " + std::to_string(static_cast<int>(currentEvent.Type)));
 			}
 
-			ptrEventManager->eventQ.pop();
+			m_eventManager.eventQ.pop();
 		}
 	}
 }

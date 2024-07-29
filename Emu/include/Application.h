@@ -2,24 +2,23 @@
 
 #include <queue>
 #include <unordered_map>
-#include <functional>
 #include <memory>
 
 #include "Core.h"
 #include "Scenes/Scene.h"
 #include "Camera/CameraManager.h"
+#include "Events/EventManager.h"
 
 namespace Engine
 {
-	using EventHandler = std::function<void(Event&)>;
-
 	class Application
 	{
 	public:
 		EMU_API static Application* GetInstance();
 		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
 		EMU_API inline CameraManager& GetCameraManager() { return m_cameraManager; }
-		EMU_API inline std::unordered_map<EventType, EventHandler>& GetEventHandlers() { return m_eventHandlers; }
+
+		EventManager m_eventManager;
 
 		~Application();
 
@@ -36,9 +35,10 @@ namespace Engine
 		bool running;
 
 		// Application needs one listener for app management events.
-		std::unordered_map<EventType, EventHandler> m_eventHandlers;
+		
 
 		// This will exist here for now.
+		// EventManager m_eventManager;
 		CameraManager m_cameraManager;
 
 		void defineDefaultApplicationCallbacks();

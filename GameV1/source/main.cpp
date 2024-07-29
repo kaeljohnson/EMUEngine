@@ -13,7 +13,7 @@ int main(int argc, char* args[])
 
 	Engine::ApplicationPtr ptrAppInstance = Engine::Application::GetInstance();
 
-	std::unordered_map<Engine::EventType, Engine::EventHandler>& refEventHandlerMap = ptrAppInstance->GetEventHandlers();
+	std::unordered_map<Engine::EventType, Engine::EventHandler>& refEventHandlerMap = ptrAppInstance->m_eventManager.m_eventHandlers;
 	AppManagementEventHandlers appManagementEventHandlers(refEventHandlerMap);
 
 	Engine::ScenePtr scene = Engine::CreateScene();
