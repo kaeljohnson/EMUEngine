@@ -36,7 +36,7 @@ namespace Engine
 	}
 
 	Application::Application()
-		: running(false),  m_cameraManager(), m_eventManager()
+		: running(false), m_cameraManager(), m_eventManager()
 	{
 		RendererManager::GetInstance()->CreateRenderer();
 
@@ -103,9 +103,7 @@ namespace Engine
 				m_eventManager.HandleEvents();
 				m_eventManager.ProcessEvents();
 				
-
 				currentScene->Update();
-				
 				
 				accumulator -= timeStep;
 			}

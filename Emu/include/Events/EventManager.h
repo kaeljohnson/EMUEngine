@@ -21,18 +21,14 @@ namespace Engine
     class EventManager
     {
     public:
-        
-        EventHandlerMap m_eventHandlers;
-
-    public:
-        EventManager();
-
+        EMU_API inline EventHandlerMap& GetEventHandlers() { return m_eventHandlers; }
         EMU_API inline const std::unordered_map<EventType, bool>& GetKeyStates() const { return m_keyStates; }
         EMU_API inline const std::unordered_map<EventType, bool>& GetMouseButtonStates() const { return m_mouseButtonStates; }
         EMU_API inline const Vector2D<int>& GetMousePosition() const { return m_mousePosition; }
         EMU_API inline const Vector2D<int>& GetScrollDirection() const { return m_scrollDirection; }
 
     public:
+        EventManager();
         ~EventManager() = default;
 
         void HandleEvents();
@@ -45,6 +41,7 @@ namespace Engine
 
     private:
         std::queue<Event> m_eventQ;
+        EventHandlerMap m_eventHandlers;
         std::unordered_map<EventType, bool> m_keyStates;
         std::unordered_map<EventType, bool> m_mouseButtonStates;
 
