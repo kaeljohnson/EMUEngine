@@ -15,8 +15,7 @@ int main(int argc, char* args[])
 	Engine::EventManager& refEventManager = ptrAppInstance->GetEventManager();
 	Engine::CameraManager& refCameraManager = ptrAppInstance->GetCameraManager();
 
-	Engine::EventHandlerMap& refEventHandlerMap = refEventManager.GetEventHandlers();
-	AppManagementEventHandlers appManagementEventHandlers(refEventHandlerMap);
+	AppManagementEventHandlers appManagementEventHandlers(refEventManager);
 
 	Engine::ScenePtr scene = Engine::CreateScene();
 

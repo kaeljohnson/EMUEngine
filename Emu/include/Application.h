@@ -1,8 +1,5 @@
 #pragma once
 
-#include <queue>
-#include <memory>
-
 #include "Core.h"
 #include "Scenes/Scene.h"
 #include "Camera/CameraManager.h"

@@ -118,6 +118,11 @@ namespace Engine
         m_keyStates[BACKSPACE_KEY_UP] = true;
     }
 
+    void EventManager::RegisterEventHandler(EventType type, EventHandler handler)
+    {
+		m_eventHandlers[type] = handler;
+	}
+
 	void EventManager::HandleEvents()
 	{
 		/*

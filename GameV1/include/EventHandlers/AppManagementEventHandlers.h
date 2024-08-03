@@ -7,10 +7,7 @@
 
 class AppManagementEventHandlers
 {
-private:
-	Engine::ICallbackSystemPtr ptrICallbackSystem;
-
 public:
-	AppManagementEventHandlers(std::unordered_map<Engine::EventType, Engine::EventHandler>& eventHandlers);
+	AppManagementEventHandlers(Engine::EventManager& eventManager);
 	~AppManagementEventHandlers();
 };
