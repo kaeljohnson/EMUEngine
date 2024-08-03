@@ -23,7 +23,7 @@ class Player : public Engine::Entity
 {
 public:
 	Player(const float startingXInMeters, const float startingYInMeters,
-		const float widthInMeters, const float heightInMeters, std::shared_ptr<Engine::ITexture> ptrTexture, const std::unordered_map<Engine::EventType, bool>& keyStates);
+		const float widthInMeters, const float heightInMeters, std::shared_ptr<Engine::ITexture> ptrTexture, const Engine::EventStatesMap& keyStates);
 	~Player() = default;
 	void Update() override;
 
@@ -37,7 +37,7 @@ private:
 	bool m_onGround;
 	Engine::Vector2D<float> m_force;
 
-	const std::unordered_map<Engine::EventType, bool>& refKeyStates;
+	const Engine::EventStatesMap& refKeyStates;
 
 	Engine::EventType m_jumpKeyDown;
 	Engine::EventType m_jumpKeyUp;
