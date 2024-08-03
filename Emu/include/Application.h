@@ -1,13 +1,9 @@
 #pragma once
 
-#include <queue>
-#include <memory>
-
 #include "Core.h"
-#include "Events/EventListener.h"
-#include "Physics/IWorld.h"
 #include "Scenes/Scene.h"
 #include "Camera/CameraManager.h"
+#include "Events/EventManager.h"
 
 namespace Engine
 {
@@ -15,9 +11,9 @@ namespace Engine
 	{
 	public:
 		EMU_API static Application* GetInstance();
-		EMU_API void CreateEventListener(EventListener& eventListener);
 		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
 		EMU_API inline CameraManager& GetCameraManager() { return m_cameraManager; }
+		EMU_API inline EventManager& GetEventManager() { return m_eventManager; }
 
 		~Application();
 
@@ -33,11 +29,8 @@ namespace Engine
 
 		bool running;
 
-		// Application needs one listener for app management events.
-		EventListener* m_ptrAppManagerListener;
-
-		// This will exist here for now.
 		CameraManager m_cameraManager;
+		EventManager m_eventManager;
 
 		void defineDefaultApplicationCallbacks();
 		void end();

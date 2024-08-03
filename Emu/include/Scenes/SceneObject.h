@@ -44,10 +44,5 @@ namespace Engine
 	protected:
 		std::shared_ptr<ITexture> m_texture;
 		std::shared_ptr<IPhysicsBody> m_physicsBody;
-
-	public:
-		// Reference to the key states in the event manager. Not
-		// sure if this should be here.
-		const std::unordered_map<EventType, bool>& refKeyStates;
 	};
 }

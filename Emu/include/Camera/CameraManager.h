@@ -16,6 +16,11 @@ namespace Engine
 		CameraManager();
 		~CameraManager() = default;
 
+		CameraManager(const CameraManager&) = delete;
+		CameraManager& operator=(const CameraManager&) = delete;
+		CameraManager(CameraManager&&) = delete;
+		CameraManager& operator=(CameraManager&&) = delete;
+
 	public:
 		Camera* m_ptrCurrentCamera;
 	};

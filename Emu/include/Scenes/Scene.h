@@ -7,8 +7,6 @@
 
 #include "../Scenes/SceneObject.h"
 #include "../Scenes/SceneObjectStack.h"
-#include "../Events/EventListenerStack.h"
-#include "../Events/EventListener.h"
 #include "../Physics/IWorld.h"
 #include "../Tiles/TileMap.h"
 
@@ -24,12 +22,10 @@ namespace Engine
 
 		// Adds scene object to the scene. Need to add a "order" parameter to determine the order of rendering.
 		EMU_API void Add(SceneObject& sceneObject, int layerNum);
-		EMU_API void AddEventListener(EventListener& eventListener);
 	
 		// Layer number is the index for now.
 		EMU_API void AddLayer(size_t layerIdx);
 		EMU_API void Remove(SceneObject& sceneObject);
-		EMU_API void RemoveEventListener(EventListener& eventListener);
 		EMU_API void AddTileMap(TileMap& tileMap, int layerIdx);
 
 		// IF theres no map in the level, client will decided the dimensions manually.
@@ -47,8 +43,6 @@ namespace Engine
 		// float m_gravityY;
 
 		Vector2D<float> m_gravity;
-		
-		EventListenerStack m_eventListeners;
 
 		std::vector<SceneObjectStack> m_layers;
 
@@ -56,7 +50,6 @@ namespace Engine
 
 	public:
 		inline const int GetPixelsPerMeter() const { return m_pixelsPerMeter; }
-		inline EventListenerStack& GetEventListeners() { return m_eventListeners; }
 		inline std::vector<SceneObjectStack>& GetLayers() { return m_layers; }
 		inline const int GetLevelWidthInMeters() const { return m_mapDimensions.X; }
 		inline const int GetLevelHeightInMeters() const { return m_mapDimensions.Y; }

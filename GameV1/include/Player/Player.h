@@ -19,11 +19,11 @@ enum PlayerDirection
 	Right,
 };
 
-class Player : public Engine::Entity, public Engine::EventListener
+class Player : public Engine::Entity
 {
 public:
 	Player(const float startingXInMeters, const float startingYInMeters,
-		const float widthInMeters, const float heightInMeters, std::shared_ptr<Engine::ITexture> ptrTexture);
+		const float widthInMeters, const float heightInMeters, std::shared_ptr<Engine::ITexture> ptrTexture, const Engine::EventStatesMap& keyStates);
 	~Player() = default;
 	void Update() override;
 
@@ -36,6 +36,8 @@ private:
 	float m_coyoteTime;
 	bool m_onGround;
 	Engine::Vector2D<float> m_force;
+
+	const Engine::EventStatesMap& refKeyStates;
 
 	Engine::EventType m_jumpKeyDown;
 	Engine::EventType m_jumpKeyUp;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Engine.h>
-#include "../include/EventListeners/AppManagementListener.h"
+#include "../include/EventHandlers/AppManagementEventHandlers.h"
 #include "../include/Player/Player.h"
 #include "../include/Camera/PlayerCamera.h"
 
@@ -12,6 +12,10 @@ int main(int argc, char* args[])
 	CLIENT_INFO_D("Client Running!");
 
 	Engine::ApplicationPtr ptrAppInstance = Engine::Application::GetInstance();
+	Engine::EventManager& refEventManager = ptrAppInstance->GetEventManager();
+	Engine::CameraManager& refCameraManager = ptrAppInstance->GetCameraManager();
+
+	AppManagementEventHandlers appManagementEventHandlers(refEventManager);
 
 	Engine::ScenePtr scene = Engine::CreateScene();
 
@@ -21,22 +25,16 @@ int main(int argc, char* args[])
 	// Temp
 	Engine::TexturePtr tempTextureRed = Engine::CreateTexture(0, 0, 0);
 	
-	Player player(1.0f, 1.0f, 0.75f, 0.75f, tempTextureRed);
+	Player player(1.0f, 1.0f, 0.75f, 0.75f, tempTextureRed, refEventManager.GetKeyStates());
 
 	Engine::ScrollingCamera scrollCamera;
 	scrollCamera.SetScrollingSpeeds(Engine::Vector2D<float>(0.0005f, 0.0f));
 	scrollCamera.SetCameraPosition(Engine::Vector2D<float>(0.0f, 38.5f));
 
-
 	PlayerCamera playerCamera;
 	playerCamera.SetCameraTarget(&player);
 
-
-	Engine::CameraManager& refCameraManager = ptrAppInstance->GetCameraManager();
-
 	refCameraManager.SetCurrentCamera(&playerCamera);
-	// refCameraManager.SetCurrentCamera(&scrollCamera);
-
 
 	CLIENT_INFO_D("Player UUID: " + player.GetUUID());
 
@@ -52,12 +50,6 @@ int main(int argc, char* args[])
 	scene->AddTileMap(testMap, MAP_LAYER);
 
 	scene->Add(player, PLAYER_LAYER);
-
-	AppManagementListener appManagementListener("App management listener");
-
-	ptrAppInstance->CreateEventListener(appManagementListener);
-
-	scene->AddEventListener(player);
 	
 	ptrAppInstance->PlayScene(scene);
 	// Need to figure out how to change scenes, stop scenes, etc.

@@ -13,7 +13,7 @@
 namespace Engine
 {
 	Scene::Scene() : m_pixelsPerMeter(0), m_gravity(0, 0), m_layers(), m_mapDimensions(0, 0), HasTileMap(false),
-		m_world(nullptr), m_eventListeners() {}
+		m_world(nullptr) {}
 
 	void Scene::CheckValid()
 	{
@@ -174,15 +174,5 @@ namespace Engine
 		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject.GetPhysicsBody());
 
 		ptrBox->RemoveBodyFromWorld();
-	}
-
-	void Scene::AddEventListener(EventListener& eventListener)
-	{
-		m_eventListeners.Push(&eventListener);
-	}
-
-	void Scene::RemoveEventListener(EventListener& eventListener)
-	{
-		m_eventListeners.Pop(&eventListener);
 	}
 }

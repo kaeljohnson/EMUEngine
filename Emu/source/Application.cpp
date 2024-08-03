@@ -9,8 +9,8 @@
 #include "../include/Logging/Logger.h"
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
-#include "../include/Events/EventListener.h"
 #include "../include/Events/EventManager.h"
+#include "../include/Events/EventDispatcher.h"
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
@@ -18,8 +18,6 @@
 
 namespace Engine
 {
-	void processEventQueue(std::shared_ptr<Scene> scene, EventManager* ptrEventManager, EventListener* ptrAppManagerListener); // Helper function for processing the event queue.
-
 	// Application singleton.
 	Application* Application::instance = nullptr;
 
@@ -38,7 +36,7 @@ namespace Engine
 	}
 
 	Application::Application()
-		: running(false), m_ptrAppManagerListener(nullptr), m_cameraManager()
+		: running(false), m_cameraManager(), m_eventManager()
 	{
 		RendererManager::GetInstance()->CreateRenderer();
 
@@ -52,7 +50,6 @@ namespace Engine
 		
 		// renderer manager and event manager are singletons in order to hide dependencies from client.
 		RendererManager* ptrRendererManager = RendererManager::GetInstance();
-		EventManager* ptrEventManager = EventManager::GetInstance();
 
 		// Camera frames current scene.
 		m_cameraManager.m_ptrCurrentCamera->Frame(currentScene->GetPixelsPerMeter(), Vector2D<int>(currentScene->GetLevelWidthInMeters(), currentScene->GetLevelHeightInMeters()), 
@@ -68,12 +65,6 @@ namespace Engine
 		if (currentScene == nullptr)
 		{
 			ENGINE_CRITICAL_D("No scene loaded! Application must have a scene to run!");
-			end();
-		}
-
-		if (m_ptrAppManagerListener == nullptr)
-		{
-			ENGINE_CRITICAL_D("No event listener loaded! Application must have an event listener to run!");
 			end();
 		}
 
@@ -109,12 +100,10 @@ namespace Engine
 
 			while (accumulator >= timeStep)
 			{
-				ptrEventManager->HandleEvents();
-				processEventQueue(currentScene, ptrEventManager, m_ptrAppManagerListener);
+				m_eventManager.HandleEvents();
+				m_eventManager.ProcessEvents();
 				
-
 				currentScene->Update();
-				
 				
 				accumulator -= timeStep;
 			}
@@ -125,13 +114,6 @@ namespace Engine
 
 			ptrRendererManager->RenderScene(interpolation, m_cameraManager.m_ptrCurrentCamera->m_offset);
 		}
-	}
-
-	void Application::CreateEventListener(EventListener& eventListener)
-	{
-		ENGINE_INFO_D("Adding event listener to app.");
-
-		m_ptrAppManagerListener = &eventListener;
 	}
 
 	void Application::end()
@@ -151,44 +133,5 @@ namespace Engine
 			{
 				end();
 			});
-	}
-
-	void processEventQueue(std::shared_ptr<Scene> scene, EventManager* ptrEventManager, EventListener* ptrAppManagerListener)
-	{
-		// Process order for scene is opposite of render order.
-
-		// Potential for multithreading if there are a lot of events.
-
-		// Render order for layers
-		// EX:
-		// Background Layer -> Filled with Background textures.
-		// Game Layer -> Filled with Engine supported SceneObjects type.
-		// Foreground Layer -> Filled with Foreground textures.
-		// Debug Layer -> Wrapper for Game Layer. Shows important info like hit boxes, etc.
-		// UI Layer -> Filled with Engine supported UI type.
-
-		while (!ptrEventManager->eventQ.empty())
-		{
-			Event& currentEvent = ptrEventManager->eventQ.front();
-
-			// Application events processed first.
-			ptrAppManagerListener->ProcessEvent(currentEvent);
-
-			for (auto& eventListener : scene->GetEventListeners())
-			{
-				eventListener->Enabled ? eventListener->ProcessEvent(currentEvent) : ENGINE_INFO_D("Event listener disabled");
-				if (currentEvent.Handled)
-				{
-					break;
-				}
-			}
-
-			/*if (!currentEvent.Handled)
-			{
-				ENGINE_TRACE_D("Unhandled Event: " + std::to_string(static_cast<int>(currentEvent.Type)));
-			}*/
-
-			ptrEventManager->eventQ.pop();
-		}
 	}
 }
