@@ -21,11 +21,8 @@ int main(int argc, char* args[])
 
 	// Need physcis to scale with pixels per meter.
 	scene->SetSimulation(0.0f, 3.1f, 32);
-
-	// Temp
-	Engine::TexturePtr tempTextureRed = Engine::CreateTexture(0, 0, 0);
 	
-	Player player(1.0f, 1.0f, 0.75f, 0.75f, tempTextureRed, refEventManager.GetKeyStates());
+	Player player(1.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 
 	Engine::ScrollingCamera scrollCamera;
 	scrollCamera.SetScrollingSpeeds(Engine::Vector2D<float>(0.0005f, 0.0f));

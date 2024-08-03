@@ -16,13 +16,12 @@ namespace Engine
     public:
         static RendererManager* GetInstance();
         void CreateRenderer();
-        SDLRenderer* GetRenderer() const;
 
         ~RendererManager();
 
         void SetScene(std::shared_ptr<Scene> scene);
 
-        const SDLTexture* LoadTexture(const char* filePath);
+        
         void SetViewport();
         void ClearScreen();
         void RenderScene(const double interpolation, const Vector2D<float> offset);
@@ -30,9 +29,9 @@ namespace Engine
         void Display();
 
         // Window related functions.
-        SDLWindow* GetWindow() const;
-        const int GetFullscreenWidth() const;
-        const int GetFullscreenHeight() const;
+        
+        inline const int GetFullscreenWidth() const { return m_screenSize.X; }
+        const int GetFullscreenHeight() const { return m_screenSize.Y; }
 
         void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
         void ToggleFullscreen();
@@ -57,6 +56,12 @@ namespace Engine
         SDLWindow* m_ptrWindow;
 
         SDLRenderer* m_ptrRenderer;
+
+        const SDLTexture* LoadTexture(const char* filePath);
+
+        SDLWindow* GetWindow() const;
+
+        SDLRenderer* GetRenderer() const;
 
         std::shared_ptr<Scene> m_ptrCurrentScene;
 

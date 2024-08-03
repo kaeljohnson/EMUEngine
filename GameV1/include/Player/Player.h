@@ -23,7 +23,7 @@ class Player : public Engine::Entity
 {
 public:
 	Player(const float startingXInMeters, const float startingYInMeters,
-		const float widthInMeters, const float heightInMeters, std::shared_ptr<Engine::ITexture> ptrTexture, const Engine::EventStatesMap& keyStates);
+		const float widthInMeters, const float heightInMeters, const Engine::EventStatesMap& keyStates);
 	~Player() = default;
 	void Update() override;
 

@@ -61,8 +61,7 @@ namespace Engine
                     m_tiles.emplace_back(
                         SENSOR,
 						Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numMetersPerTile), static_cast<float>(y) * static_cast<float>(m_numMetersPerTile)),
-						Vector2D<float>(static_cast<float>(m_numMetersPerTile), static_cast<float>(m_numMetersPerTile)),
-						nullptr, 0);
+						Vector2D<float>(static_cast<float>(m_numMetersPerTile), static_cast<float>(m_numMetersPerTile)), 0);
 				}
 			}
 		}
@@ -131,7 +130,7 @@ namespace Engine
                         STATIC,
                         Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numMetersPerTile), static_cast<float>(startY) * static_cast<float>(m_numMetersPerTile)),
                         Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numMetersPerTile), static_cast<float>(height) * static_cast<float>(m_numMetersPerTile)),
-                        nullptr, 0);
+                        0);
                 }
             }
         }

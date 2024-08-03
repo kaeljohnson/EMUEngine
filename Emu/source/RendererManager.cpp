@@ -109,16 +109,6 @@ namespace Engine
 	{
 		return m_ptrWindow;
 	}
-
-	const int RendererManager::GetFullscreenWidth() const
-	{
-		return m_screenSize.X;
-	}
-
-	const int RendererManager::GetFullscreenHeight() const
-	{
-		return m_screenSize.Y;
-	}
 	
 	void RendererManager::ToggleFullscreen()
 	{
@@ -227,8 +217,6 @@ namespace Engine
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
 	void RendererManager::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation, const Vector2D<float> offset)
 	{
-		bool isTextureNull = sceneObject->GetTexture() == nullptr;
-
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
 
@@ -243,12 +231,7 @@ namespace Engine
 			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))
 		};
 
-		SDLTexture* ptrTexture = nullptr;
-
-		if (!isTextureNull)
-			ptrTexture = static_cast<Texture*>(sceneObject->GetTexture().get())->m_texture;
-
-		SDL_RENDER_COPY_EX(m_ptrRenderer, ptrTexture, nullptr, &dst, ptrBody->GetAngleInDegrees(), nullptr, SDL_FLIP_NONE);
+		SDL_RENDER_COPY_EX(m_ptrRenderer, nullptr, nullptr, &dst, ptrBody->GetAngleInDegrees(), nullptr, SDL_FLIP_NONE);
 
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)

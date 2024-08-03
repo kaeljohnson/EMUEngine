@@ -23,13 +23,12 @@ namespace Engine
 		int LayerIdx;
 		int DirectionFacing;
 	public:
-		SceneObject(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size, std::shared_ptr<ITexture> refTexture, int directionFacing);
+		SceneObject(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size, int directionFacing);
 
 		EMU_API virtual ~SceneObject() = default;
 
 		// Should clients be able to get the physics body?
 		EMU_API inline std::shared_ptr<IPhysicsBody> GetPhysicsBody() { return m_physicsBody; }
-		EMU_API inline const std::shared_ptr<ITexture> GetTexture() const { return m_texture; }
 		EMU_API inline std::string GetUUID() const { return uuid; }
 
 	public:
@@ -42,7 +41,6 @@ namespace Engine
 		std::string uuid;
 
 	protected:
-		std::shared_ptr<ITexture> m_texture;
 		std::shared_ptr<IPhysicsBody> m_physicsBody;
 	};
 }
