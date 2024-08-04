@@ -18,7 +18,6 @@ namespace Engine
         ~RendererManager();
 
         void SetScene(std::shared_ptr<Scene> scene);
-
         void RenderScene(const double interpolation, const Vector2D<float> offset);
 
         // Window related functions.
@@ -42,18 +41,6 @@ namespace Engine
 
 	private:
         std::unique_ptr<WindowRenderer> m_ptrWindowRenderer;
-
-        /*Vector2D<int> m_screenSize;
-
-        Vector2D<int> m_virtualSize;
-
-        Vector2D<float> m_scale;
-        float SCALE;
-
-        Vector2D<int> m_viewportSize;
-
-        Vector2D<int> m_viewportPosition;*/
-
 
         void free();
     };
