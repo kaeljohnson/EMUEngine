@@ -12,9 +12,9 @@
 namespace Engine
 {
 	SceneObject::SceneObject(const BodyType bodyType, const bool fixed, const Vector2D<float> position,
-		const Vector2D<float> size, std::shared_ptr<ITexture> ptrTexture, int directionFacing)
+		const Vector2D<float> size, int directionFacing)
 		: m_physicsBody(CreatePhysicsBody(bodyType, fixed, position, size)),
-		m_texture(ptrTexture), Enabled(true), Visible(true), LayerIdx(-1), uuid(CreateUUID()), DirectionFacing(directionFacing)
+		Enabled(true), Visible(true), LayerIdx(-1), uuid(CreateUUID()), DirectionFacing(directionFacing)
 	{
 		ENGINE_INFO_D("SceneObject created");
 	}

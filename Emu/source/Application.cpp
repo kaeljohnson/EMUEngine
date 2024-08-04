@@ -14,7 +14,7 @@
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
-#include "../include/RendererManager.h"
+#include "../include/Rendering/RendererManager.h"
 
 namespace Engine
 {
@@ -36,10 +36,8 @@ namespace Engine
 	}
 
 	Application::Application()
-		: running(false), m_cameraManager(), m_eventManager()
+		: running(false), m_cameraManager(), m_eventManager(), m_rendererManager()
 	{
-		RendererManager::GetInstance()->CreateRenderer();
-
 		defineDefaultApplicationCallbacks();
 	}
 
@@ -49,14 +47,14 @@ namespace Engine
 		// Will need to add more functionality in here to handle scene switching.
 		
 		// renderer manager and event manager are singletons in order to hide dependencies from client.
-		RendererManager* ptrRendererManager = RendererManager::GetInstance();
+		// RendererManager* ptrRendererManager = RendererManager::GetInstance();
 
 		// Camera frames current scene.
 		m_cameraManager.m_ptrCurrentCamera->Frame(currentScene->GetPixelsPerMeter(), Vector2D<int>(currentScene->GetLevelWidthInMeters(), currentScene->GetLevelHeightInMeters()), 
-			Vector2D<int>(ptrRendererManager->GetFullscreenWidth(), ptrRendererManager->GetFullscreenHeight()), ptrRendererManager->GetScale());
+			Vector2D<int>(m_rendererManager.GetFullscreenWidth(), m_rendererManager.GetFullscreenHeight()), m_rendererManager.GetScale());
 
 
-		ptrRendererManager->SetScene(currentScene);
+		m_rendererManager.SetScene(currentScene);
 		
 
 		running = true;
@@ -112,7 +110,7 @@ namespace Engine
 
 			m_cameraManager.m_ptrCurrentCamera->Update(interpolation);
 
-			ptrRendererManager->RenderScene(interpolation, m_cameraManager.m_ptrCurrentCamera->m_offset);
+			m_rendererManager.RenderScene(interpolation, m_cameraManager.m_ptrCurrentCamera->m_offset);
 		}
 	}
 

@@ -13,7 +13,7 @@ namespace Engine
 	class Entity : public SceneObject
 	{
 	public:
-		EMU_API Entity(const Vector2D<float> position, const Vector2D<float> size, const std::shared_ptr<ITexture> ptrTexture, int directionFacing);
+		EMU_API Entity(const Vector2D<float> position, const Vector2D<float> size, int directionFacing);
 		~Entity() = default;
 	};
 }

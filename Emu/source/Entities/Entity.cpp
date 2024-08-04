@@ -7,7 +7,7 @@
 
 namespace Engine 
 {
-	Entity::Entity(const Vector2D<float> position, const Vector2D<float> size, const std::shared_ptr<ITexture> ptrTexture, int directionFacing)
-		: SceneObject(DYNAMIC, false, position, size, ptrTexture, directionFacing)
+	Entity::Entity(const Vector2D<float> position, const Vector2D<float> size, int directionFacing)
+		: SceneObject(DYNAMIC, false, position, size, directionFacing)
 	{}
 } 

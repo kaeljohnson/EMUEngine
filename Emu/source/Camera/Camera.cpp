@@ -3,12 +3,9 @@
 #include "../../include/Camera/Camera.h"
 #include "../../include/Logging/Logger.h"
 
-// TEMP
-#include "../../include/RendererManager.h"
-
 namespace Engine
 {
-	Camera::Camera() : m_pixelsPerMeter(0), refScale(RendererManager::GetInstance()->GetScale()), 
+	Camera::Camera() : m_pixelsPerMeter(0), refScale(Vector2D(0.0f, 0.0f)), 
 		m_offset(0, 0), m_sizeInMeters(0, 0), m_clampingOn(true) {}
 
 	void Camera::SetCameraPosition(const Vector2D<float> offset)

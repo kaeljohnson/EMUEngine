@@ -32,5 +32,4 @@ namespace Engine
 	using PhysicsBodyPtr = std::shared_ptr<IPhysicsBody>;
 	using ApplicationPtr = Application*;
 	using ICallbackSystemPtr = ICallbackSystem*;
-	using TexturePtr = std::shared_ptr<ITexture>;
 }
