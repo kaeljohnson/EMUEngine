@@ -28,7 +28,7 @@
 
         UpdateMovement();
 
-        m_physicsBody->ApplyForceToBox(m_force);
+        m_physicsBody->ApplyForceToBody(m_force);
 
         // Check if the current velocity is below the threshold and set it to zero
         if (std::abs(m_physicsBody->GetXVelocity()) < MIN_VELOCITY_THRESHOLD)
@@ -226,7 +226,7 @@
         case PlayerState::Jumping:
             m_canJump = false;
             m_physicsBody->SetYVelocity(0.0f);
-            m_physicsBody->ApplyImpulseToBox({ 0.0f, -MIN_JUMP_FORCE * m_physicsBody->GetSizeInMeters() });
+            m_physicsBody->ApplyImpulseToBody({ 0.0f, -MIN_JUMP_FORCE * m_physicsBody->GetSizeInMeters() });
             break;
 
         case PlayerState::Falling:

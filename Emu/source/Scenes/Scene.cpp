@@ -4,7 +4,7 @@
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Scenes/SceneObject.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/Physics/Box.h"
+#include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Physics/PhysicsFactory.h"
 #include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Tiles/TileMap.h"
@@ -60,9 +60,9 @@ namespace Engine
 		// separate from the tile map itself.
 		for (auto& tile : tileMap.GetCollisionBodies())
 		{
-			std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(tile.GetPhysicsBody());
+			std::shared_ptr<PhysicsBody> ptrBox = std::static_pointer_cast<PhysicsBody>(tile.GetPhysicsBody());
 
-			m_world->AddBox(ptrBox);
+			m_world->AddBody(ptrBox);
 		}
 
 		HasTileMap = true;
@@ -156,9 +156,9 @@ namespace Engine
 		sceneObject.LayerIdx = layerIdx;
 		m_layers[layerIdx].Push(&sceneObject);
 
-		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject.GetPhysicsBody());
+		std::shared_ptr<PhysicsBody> ptrBox = std::static_pointer_cast<PhysicsBody>(sceneObject.GetPhysicsBody());
 
-		m_world->AddBox(ptrBox);
+		m_world->AddBody(ptrBox);
 	}
 
 	void Scene::Remove(SceneObject& sceneObject)
@@ -171,8 +171,8 @@ namespace Engine
 
 		m_layers[sceneObject.LayerIdx].Pop(&sceneObject);
 
-		std::shared_ptr<Box> ptrBox = std::static_pointer_cast<Box>(sceneObject.GetPhysicsBody());
+		std::shared_ptr<PhysicsBody> ptrBody = std::static_pointer_cast<PhysicsBody>(sceneObject.GetPhysicsBody());
 
-		ptrBox->RemoveBodyFromWorld();
+		ptrBody->RemoveBodyFromWorld();
 	}
 }

@@ -17,7 +17,7 @@ namespace Engine
 	// is not meant to be used by the client. It is not the "entity" or "game object" class. It will not handle
 	// textures or animation.
 
-	class Box : public IPhysicsBody
+	class PhysicsBody : public IPhysicsBody
 	{
 	public:
 		const BodyType m_bodyType;
@@ -55,18 +55,18 @@ namespace Engine
 		bool m_rightSensor;
 
 	public:
-		Box() = default;
-		Box(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size);
+		PhysicsBody() = default;
+		PhysicsBody(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size);
 
-		~Box();
+		~PhysicsBody();
 
-		// Box2D specific functions
+		// PhysicsBody2D specific functions
 		void RemoveBodyFromWorld() override;
 
-		void ApplyForceToBox(Vector2D<float> force) override;
-		void ApplyImpulseToBox(Vector2D<float> impulse) override;
+		void ApplyForceToBody(Vector2D<float> force) override;
+		void ApplyImpulseToBody(Vector2D<float> impulse) override;
 
-		// Box2d getter and setter wrappers
+		// PhysicsBody2d getter and setter wrappers
 		void CreateFixture() override;
 		void SetGravity(bool enabled) override;
 		void SetXDeceleration(const float xDecel) override;
@@ -114,11 +114,11 @@ namespace Engine
 		inline const float GetAngleInRadians() const override { return m_body->GetAngle(); }
 		inline const float GetAngleInDegrees() const override { return radiansToDegrees(m_body->GetAngle()); }
 		
-		// Box2D does not track previous values.
+		// PhysicsBody2D does not track previous values.
 		// Need to update them here.
 		void UpdatePrevPosition() override;
 
-		// Non-box2d getters
+		// Non-PhysicsBody2d getters
 		inline const float GetTopLeftPrevX() const override { return m_prevPosition.X; }
 		inline const float GetTopLeftPrevY() const override { return m_prevPosition.Y; }
 		inline const float GetCenterPrevX() const override { return m_prevPosition.X + m_halfWidthInMeters; }

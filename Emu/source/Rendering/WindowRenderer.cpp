@@ -82,7 +82,7 @@ namespace Engine
 
 		// Calculate camera bounds
 		float cameraLeft = cameraOffset.X;
-		float cameraRight = cameraOffset.X + (m_viewportSize.X / currentScene->GetPixelsPerMeter());
+		float cameraRight = cameraOffset.X + ( m_viewportSize.X / currentScene->GetPixelsPerMeter());
 		float cameraTop = cameraOffset.Y;
 		float cameraBottom = cameraOffset.Y + (m_viewportSize.Y / currentScene->GetPixelsPerMeter());
 

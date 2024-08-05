@@ -3,13 +3,13 @@
 #include <utility>
 #include "../../include/MathUtil.h"
 
-#include "../../include/Physics/Box.h"
+#include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/BodyTypes.h"
 
 namespace Engine
 {
-	Box::Box(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
+	PhysicsBody::PhysicsBody(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
 		: m_halfWidthInMeters(size.X / 2.0f), m_halfHeightInMeters(size.Y / 2.0f), 
 		m_widthInMeters(size.X), m_heightInMeters(size.Y),
 		m_bodyType(bodyType), m_collidable(true), m_fixed(fixed), m_body(nullptr), m_fixture(nullptr),
@@ -57,13 +57,12 @@ namespace Engine
 			+ std::to_string(position.Y) + ". With width: " + std::to_string(size.X) + ", height: " + std::to_string(size.Y));
 	}
 
-	Box::~Box()
+	PhysicsBody::~PhysicsBody()
 	{
-		ENGINE_INFO_D("Freeing Box!");
 		RemoveBodyFromWorld();
 	}
 
-	void Box::RemoveBodyFromWorld()
+	void PhysicsBody::RemoveBodyFromWorld()
 	{
 		if (m_body != nullptr)
 		{
@@ -72,17 +71,17 @@ namespace Engine
 		}
 	}
 
-	void Box::ApplyForceToBox(Vector2D<float> force)
+	void PhysicsBody::ApplyForceToBody(Vector2D<float> force)
 	{
 		m_body->ApplyForceToCenter(b2Vec2(force.X, force.Y), true);
 	}
 
-	void Box::ApplyImpulseToBox(Vector2D<float> impulse)
+	void PhysicsBody::ApplyImpulseToBody(Vector2D<float> impulse)
 	{
 		m_body->ApplyLinearImpulseToCenter(b2Vec2(impulse.X, impulse.Y), true);
 	}
 
-	void Box::SetContactFlags()
+	void PhysicsBody::SetContactFlags()
 	{
 		m_bottomCollision = false;
 		m_topCollision = false;
@@ -103,7 +102,7 @@ namespace Engine
 				edge->contact->GetWorldManifold(&worldManifold);
 
 				b2Body* otherBody = edge->contact->GetFixtureA()->GetBody() == m_body ? edge->contact->GetFixtureB()->GetBody() : edge->contact->GetFixtureA()->GetBody();
-				Box* otherBox = reinterpret_cast<Box*>(otherBody->GetUserData().pointer);
+				PhysicsBody* otherPhysicsBody = reinterpret_cast<PhysicsBody*>(otherBody->GetUserData().pointer);
 
 				// Assuming the first point's normal is representative for the whole contact
 				b2Vec2 normal = worldManifold.normal;
@@ -111,28 +110,28 @@ namespace Engine
 				// Different trigger for contacts for kinematic bodies for now.
 				// Might need a custom body type for bodies that
 				// are meant to be the ground.
-				if (otherBox->GetBodyType() == SENSOR)
+				if (otherPhysicsBody->GetBodyType() == SENSOR)
 				{
 					if (normal.y < -0.5) // Collision from above `this`
 					{
 						this->SetBottomSensor(true);
-						otherBox->SetTopSensor(true);
+						otherPhysicsBody->SetTopSensor(true);
 					}
 					else if (normal.y > 0.5) // Collision from below `this`
 					{
 						this->SetTopSensor(true);
-						otherBox->SetBottomSensor(true);
+						otherPhysicsBody->SetBottomSensor(true);
 					}
 
 					if (normal.x > 0.5) // Collision from the left of `this`
 					{
 						this->SetLeftSensor(true);
-						otherBox->SetRightSensor(true);
+						otherPhysicsBody->SetRightSensor(true);
 					}
 					else if (normal.x < -0.5) // Collision from the right of `this`
 					{
 						this->SetRightSensor(true);
-						otherBox->SetLeftSensor(true);
+						otherPhysicsBody->SetLeftSensor(true);
 					}
 				}
 				else
@@ -142,23 +141,23 @@ namespace Engine
 					if (normal.y < -0.5) // Collision from above `this`
 					{
 						this->SetBottomCollision(true);
-						otherBox->SetTopCollision(true);
+						otherPhysicsBody->SetTopCollision(true);
 					}
 					else if (normal.y > 0.5) // Collision from below `this`
 					{
 						this->SetTopCollision(true);
-						otherBox->SetBottomCollision(true);
+						otherPhysicsBody->SetBottomCollision(true);
 					}
 
 					if (normal.x > 0.5) // Collision from the left of `this`
 					{
 						this->SetLeftCollision(true);
-						otherBox->SetRightCollision(true);
+						otherPhysicsBody->SetRightCollision(true);
 					}
 					else if (normal.x < -0.5) // Collision from the right of `this`
 					{
 						this->SetRightCollision(true);
-						otherBox->SetLeftCollision(true);
+						otherPhysicsBody->SetLeftCollision(true);
 					}
 				}
 			}
@@ -166,7 +165,7 @@ namespace Engine
 		}
 	}
 
-	void Box::SetContactFlagsToFalse()
+	void PhysicsBody::SetContactFlagsToFalse()
 	{
 		m_bottomCollision = false;
 		m_topCollision = false;
@@ -179,30 +178,30 @@ namespace Engine
 		m_rightSensor = false;
 	}
 
-	void Box::UpdatePrevPosition() { m_prevPosition.X = GetTopLeftXInMeters(); m_prevPosition.Y = GetTopLeftYInMeters(); }
+	void PhysicsBody::UpdatePrevPosition() { m_prevPosition.X = GetTopLeftXInMeters(); m_prevPosition.Y = GetTopLeftYInMeters(); }
 
-	void Box::CreateFixture() { m_fixture = m_body->CreateFixture(&m_fixtureDef); }
-	void Box::SetGravity(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
+	void PhysicsBody::CreateFixture() { m_fixture = m_body->CreateFixture(&m_fixtureDef); }
+	void PhysicsBody::SetGravity(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
 
-	void Box::SetXVelocity(const float xVel) { m_body->SetLinearVelocity(b2Vec2(xVel, m_body->GetLinearVelocity().y)); }
-	void Box::SetYVelocity(const float yVel) { m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, yVel)); }
-	void Box::SetXDeceleration(const float xDecel) { m_body->SetLinearDamping(xDecel); }
-	void Box::SetFixedRotation(bool fixed) { m_body->SetFixedRotation(fixed); }
-	void Box::SetDensity(const float density) { m_fixtureDef.density = density; }
-	void Box::SetFriction(const float friction) { m_fixtureDef.friction = friction; }
-	void Box::SetRestitution(const float restitution) { m_fixtureDef.restitution = restitution; }
-	void Box::SetRestitutionThreshold(const float threshold) { m_fixtureDef.restitutionThreshold = threshold; }
-	void Box::SetCollidable(const bool collidable) { m_collidable = collidable; }
-	void Box::SetWidthInMeters(const float widthInMeters) { m_shape.SetAsBox(widthInMeters / 2.0f, m_halfHeightInMeters); }
-	void Box::SetHeightInMeters(const float heightInMeters) { m_shape.SetAsBox(m_halfWidthInMeters, heightInMeters / 2.0f); }
+	void PhysicsBody::SetXVelocity(const float xVel) { m_body->SetLinearVelocity(b2Vec2(xVel, m_body->GetLinearVelocity().y)); }
+	void PhysicsBody::SetYVelocity(const float yVel) { m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, yVel)); }
+	void PhysicsBody::SetXDeceleration(const float xDecel) { m_body->SetLinearDamping(xDecel); }
+	void PhysicsBody::SetFixedRotation(bool fixed) { m_body->SetFixedRotation(fixed); }
+	void PhysicsBody::SetDensity(const float density) { m_fixtureDef.density = density; }
+	void PhysicsBody::SetFriction(const float friction) { m_fixtureDef.friction = friction; }
+	void PhysicsBody::SetRestitution(const float restitution) { m_fixtureDef.restitution = restitution; }
+	void PhysicsBody::SetRestitutionThreshold(const float threshold) { m_fixtureDef.restitutionThreshold = threshold; }
+	void PhysicsBody::SetCollidable(const bool collidable) { m_collidable = collidable; }
+	void PhysicsBody::SetWidthInMeters(const float widthInMeters) { m_shape.SetAsBox(widthInMeters / 2.0f, m_halfHeightInMeters); }
+	void PhysicsBody::SetHeightInMeters(const float heightInMeters) { m_shape.SetAsBox(m_halfWidthInMeters, heightInMeters / 2.0f); }
 
-	void Box::SetBottomCollision(const bool bottomCollision) { m_bottomCollision = bottomCollision; }
-	void Box::SetTopCollision(const bool topCollision) { m_topCollision = topCollision; }
-	void Box::SetLeftCollision(const bool leftCollision) { m_leftCollision = leftCollision; }
-	void Box::SetRightCollision(const bool rightCollision) { m_rightCollision = rightCollision; }
+	void PhysicsBody::SetBottomCollision(const bool bottomCollision) { m_bottomCollision = bottomCollision; }
+	void PhysicsBody::SetTopCollision(const bool topCollision) { m_topCollision = topCollision; }
+	void PhysicsBody::SetLeftCollision(const bool leftCollision) { m_leftCollision = leftCollision; }
+	void PhysicsBody::SetRightCollision(const bool rightCollision) { m_rightCollision = rightCollision; }
 
-	void Box::SetBottomSensor(const bool bottomSensor) { m_bottomSensor = bottomSensor; }
-	void Box::SetTopSensor(const bool topSensor) { m_topSensor = topSensor; }
-	void Box::SetLeftSensor(const bool leftSensor) { m_leftSensor = leftSensor; }
-	void Box::SetRightSensor(const bool rightSensor) { m_rightSensor = rightSensor; }
+	void PhysicsBody::SetBottomSensor(const bool bottomSensor) { m_bottomSensor = bottomSensor; }
+	void PhysicsBody::SetTopSensor(const bool topSensor) { m_topSensor = topSensor; }
+	void PhysicsBody::SetLeftSensor(const bool leftSensor) { m_leftSensor = leftSensor; }
+	void PhysicsBody::SetRightSensor(const bool rightSensor) { m_rightSensor = rightSensor; }
 }

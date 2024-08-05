@@ -5,7 +5,7 @@
 #include "IWorld.h"
 
 #include "box2d/box2d.h"
-#include "Box.h"
+#include "PhysicsBody.h"
 #include "ConversionFunctions.h"
 
 namespace Engine
@@ -32,7 +32,7 @@ namespace Engine
 		void SetGravity(const float gravityX, const float gravityY) override;
 
 		void Update() override;
-		void AddBox(std::shared_ptr<Box> body) override;
-		void RemoveBox(std::shared_ptr<Box> body) override;
+		void AddBody(std::shared_ptr<PhysicsBody> body) override;
+		void RemoveBody(std::shared_ptr<PhysicsBody> body) override;
 	};
 }

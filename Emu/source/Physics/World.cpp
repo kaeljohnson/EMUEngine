@@ -4,7 +4,7 @@
 
 #include "../../include/EngineConstants.h"
 #include "../../include/Physics/World.h"
-#include "../../include/Physics/Box.h"
+#include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Logging/Logger.h"
 
 namespace Engine
@@ -34,30 +34,30 @@ namespace Engine
 		m_world.Step(TIME_STEP, m_velocityIterations, m_positionIterations);
 	}
 
-	void World::AddBox(std::shared_ptr<Box> box)
+	void World::AddBody(std::shared_ptr<PhysicsBody> physicsBody)
 	{
-		if (box == nullptr)
+		if (physicsBody == nullptr)
 		{
-			ENGINE_ERROR_D("Box is null!");
+			ENGINE_ERROR_D("PhysicsBody is null!");
 			return;
 		}
 
-		box->m_body = m_world.CreateBody(&box->m_bodyDef);
-		box->CreateFixture();
+		physicsBody->m_body = m_world.CreateBody(&physicsBody->m_bodyDef);
+		physicsBody->CreateFixture();
 
-		ENGINE_INFO_D("Box added to world at position: " + std::to_string(box->GetCenterXInMeters()) + ", " 
-			+ std::to_string(box->GetCenterYInMeters()) + ". With width: " 
-			+ std::to_string(box->GetWidthInMeters()) + ", height: " + std::to_string(box->GetHeightInMeters()));
+		ENGINE_INFO_D("PhysicsBody added to world at position: " + std::to_string(physicsBody->GetCenterXInMeters()) + ", " 
+			+ std::to_string(physicsBody->GetCenterYInMeters()) + ". With width: " 
+			+ std::to_string(physicsBody->GetWidthInMeters()) + ", height: " + std::to_string(physicsBody->GetHeightInMeters()));
 	}
 
-	void World::RemoveBox(std::shared_ptr<Box> box)
+	void World::RemoveBody(std::shared_ptr<PhysicsBody> physicsBody)
 	{
-		if (box == nullptr)
+		if (physicsBody == nullptr)
 		{
-			ENGINE_ERROR_D("Box is null!");
+			ENGINE_ERROR_D("physicsBody is null!");
 			return;
 		}
-		box->RemoveBodyFromWorld();
+		physicsBody->RemoveBodyFromWorld();
 	}
 
 	void World::SetGravity(const float gravityX, const float gravityY)
