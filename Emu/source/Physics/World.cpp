@@ -44,10 +44,6 @@ namespace Engine
 
 		physicsBody->m_body = m_world.CreateBody(&physicsBody->m_bodyDef);
 		physicsBody->CreateFixture();
-
-		ENGINE_INFO_D("PhysicsBody added to world at position: " + std::to_string(physicsBody->GetCenterXInMeters()) + ", " 
-			+ std::to_string(physicsBody->GetCenterYInMeters()) + ". With width: " 
-			+ std::to_string(physicsBody->GetWidthInMeters()) + ", height: " + std::to_string(physicsBody->GetHeightInMeters()));
 	}
 
 	void World::RemoveBody(std::shared_ptr<PhysicsBody> physicsBody)

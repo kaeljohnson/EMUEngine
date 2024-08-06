@@ -5,15 +5,15 @@
 
 namespace Engine
 {
-	Camera::Camera() : m_pixelsPerMeter(0), refScale(Vector2D(0.0f, 0.0f)), 
-		m_offset(0, 0), m_sizeInMeters(0, 0), m_clampingOn(true) {}
+	Camera::Camera() : m_pixelsPerUnit(0), refScale(Vector2D(0.0f, 0.0f)), 
+		m_offset(0, 0), m_size(0, 0), m_clampingOn(true) {}
 
 	void Camera::SetCameraPosition(const Vector2D<float> offset)
 	{
 		m_offset = offset;
 	}
 
-	void Camera::Frame(const int pixelsPerMeter, const Vector2D<int> mapBounds,
+	void Camera::Frame(const int pixelsPerUnit, const Vector2D<int> mapBounds,
 		const Vector2D<int> screenSize, const Vector2D<float> scale)
 	{
 		m_mapBounds = mapBounds;
@@ -22,9 +22,9 @@ namespace Engine
 
 		m_screenSize = screenSize;
 
-		m_pixelsPerMeter = pixelsPerMeter;
+		m_pixelsPerUnit = pixelsPerUnit;
 
-		m_sizeInMeters = Vector2D<float>(screenSize.X / (pixelsPerMeter * scale.X), screenSize.Y / (pixelsPerMeter * scale.Y));
+		m_size = Vector2D<float>(screenSize.X / (pixelsPerUnit * scale.X), screenSize.Y / (pixelsPerUnit * scale.Y));
 	}
 
 	void Camera::SetClampingOn(const bool clampingOn)
@@ -35,10 +35,10 @@ namespace Engine
 	void Camera::Clamp()
 	{
 		if (m_offset.X < 0) { m_offset.X = 0; }
-		if (m_offset.X + m_sizeInMeters.X > m_mapBounds.X) { m_offset.X = m_mapBounds.X - m_sizeInMeters.X; }
+		if (m_offset.X + m_size.X > m_mapBounds.X) { m_offset.X = m_mapBounds.X - m_size.X; }
 
 		if (m_offset.Y < 0) { m_offset.Y = 0; }
-		if (m_offset.Y + m_sizeInMeters.Y > m_mapBounds.Y) { m_offset.Y = m_mapBounds.Y - m_sizeInMeters.Y; }
+		if (m_offset.Y + m_size.Y > m_mapBounds.Y) { m_offset.Y = m_mapBounds.Y - m_size.Y; }
 	}
 
 	void Camera::Update(double interpolation) {}

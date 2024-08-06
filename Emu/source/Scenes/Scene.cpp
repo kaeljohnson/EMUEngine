@@ -12,14 +12,14 @@
 
 namespace Engine
 {
-	Scene::Scene() : m_pixelsPerMeter(0), m_gravity(0, 0), m_layers(), m_mapDimensions(0, 0), HasTileMap(false),
+	Scene::Scene() : m_pixelsPerUnit(0), m_gravity(0, 0), m_layers(), m_mapDimensions(0, 0), HasTileMap(false),
 		m_world(nullptr) {}
 
 	void Scene::CheckValid()
 	{
 		(m_world == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
 		m_layers.size() > 0 ? ENGINE_INFO_D("Scene has at least one layer.") : ENGINE_CRITICAL_D("No layers exist in scene.");
-		(m_pixelsPerMeter <= 0) ? ENGINE_CRITICAL_D("Pixels per meter is invalid.") : ENGINE_INFO_D("Pixels per meter is valid.");
+		(m_pixelsPerUnit <= 0) ? ENGINE_CRITICAL_D("Pixels per meter is invalid.") : ENGINE_INFO_D("Pixels per meter is valid.");
 	}
 
 	void Scene::AddLayer(size_t layerIdx)
@@ -68,21 +68,21 @@ namespace Engine
 		HasTileMap = true;
 	}
 
-	void Scene::SetLevelWidthInMeters(const int levelWidthInMeters)
+	void Scene::SetLevelWidth(const int levelWidth)
 	{
 		if (HasTileMap)
 		{
 			ENGINE_INFO_D("Scene already has a map. Overriding map width!");
 		}
 
-		m_mapDimensions.X = levelWidthInMeters;
+		m_mapDimensions.X = levelWidth;
 	}
 
-	void Scene::SetLevelHeightInMeters(const int levelHeightInMeters)
+	void Scene::SetLevelHeight(const int levelHeight)
 	{
 		ENGINE_INFO_D("Scene already has a map. Overriding map height!");
 
-		m_mapDimensions.Y = levelHeightInMeters;
+		m_mapDimensions.Y = levelHeight;
 	}
 
 	void Scene::Update()
@@ -110,17 +110,17 @@ namespace Engine
 		m_world->Update();
 	};
 
-	void Scene::SetSimulation(const float gravityX, const float gravityY, const int pixelsPerMeter)
+	void Scene::SetSimulation(const float gravityX, const float gravityY, const int pixelsPerUnit)
 	{
 		// What happens if this is called multiple times for one scene? Make sure nothing bad.
 
-		m_pixelsPerMeter = pixelsPerMeter;
+		m_pixelsPerUnit = pixelsPerUnit;
 
 		m_gravity.X = gravityX;
 		m_gravity.Y = gravityY;
 
-		ENGINE_INFO_D("Setting pixels per meter, time step, gravityX and gravityY at positions: " 
-			+ std::to_string(m_pixelsPerMeter) + ", " + std::to_string(m_gravity.X) + ", " + std::to_string(m_gravity.Y));
+		ENGINE_INFO_D("Setting pixels per unit, time step, gravityX and gravityY at positions: " 
+			+ std::to_string(m_pixelsPerUnit) + ", " + std::to_string(m_gravity.X) + ", " + std::to_string(m_gravity.Y));
 
 		if (m_world)
 		{
@@ -130,7 +130,7 @@ namespace Engine
 		
 		// Need a reset function for the world which resets all objects in the world.
 
-		m_world = CreateWorld(m_gravity.X * m_pixelsPerMeter, m_gravity.Y * m_pixelsPerMeter, 8, 3);
+		m_world = CreateWorld(m_gravity.X * m_pixelsPerUnit, m_gravity.Y * m_pixelsPerUnit, 8, 3);
 
 		ENGINE_INFO_D("Client creating simulation with gravity: " + std::to_string(gravityX) + ", " + std::to_string(gravityY));
 

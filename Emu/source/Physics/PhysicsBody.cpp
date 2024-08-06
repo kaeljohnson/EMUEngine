@@ -10,8 +10,8 @@
 namespace Engine
 {
 	PhysicsBody::PhysicsBody(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
-		: m_halfWidthInMeters(size.X / 2.0f), m_halfHeightInMeters(size.Y / 2.0f), 
-		m_widthInMeters(size.X), m_heightInMeters(size.Y),
+		: m_halfWidth(size.X / 2.0f), m_halfHeight(size.Y / 2.0f), 
+		m_width(size.X), m_height(size.Y),
 		m_bodyType(bodyType), m_collidable(true), m_fixed(fixed), m_body(nullptr), m_fixture(nullptr),
 		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
 		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
@@ -45,8 +45,8 @@ namespace Engine
 		m_bodyDef.userData.pointer = reinterpret_cast<intptr_t>(this);
 		m_prevPosition.X = position.X;
 		m_prevPosition.Y = position.Y;
-		m_bodyDef.position.Set(position.X + m_halfWidthInMeters, position.Y + m_halfHeightInMeters);
-		m_shape.SetAsBox(m_halfWidthInMeters, m_halfHeightInMeters);
+		m_bodyDef.position.Set(position.X + m_halfWidth, position.Y + m_halfHeight);
+		m_shape.SetAsBox(m_halfWidth, m_halfHeight);
 		m_fixtureDef.shape = &m_shape;
 		m_fixtureDef.restitution = 0.0f;
 		m_fixtureDef.restitutionThreshold = 0.0f;
@@ -178,7 +178,7 @@ namespace Engine
 		m_rightSensor = false;
 	}
 
-	void PhysicsBody::UpdatePrevPosition() { m_prevPosition.X = GetTopLeftXInMeters(); m_prevPosition.Y = GetTopLeftYInMeters(); }
+	void PhysicsBody::UpdatePrevPosition() { m_prevPosition = GetTopLeftPosition(); }
 
 	void PhysicsBody::CreateFixture() { m_fixture = m_body->CreateFixture(&m_fixtureDef); }
 	void PhysicsBody::SetGravity(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
@@ -192,8 +192,8 @@ namespace Engine
 	void PhysicsBody::SetRestitution(const float restitution) { m_fixtureDef.restitution = restitution; }
 	void PhysicsBody::SetRestitutionThreshold(const float threshold) { m_fixtureDef.restitutionThreshold = threshold; }
 	void PhysicsBody::SetCollidable(const bool collidable) { m_collidable = collidable; }
-	void PhysicsBody::SetWidthInMeters(const float widthInMeters) { m_shape.SetAsBox(widthInMeters / 2.0f, m_halfHeightInMeters); }
-	void PhysicsBody::SetHeightInMeters(const float heightInMeters) { m_shape.SetAsBox(m_halfWidthInMeters, heightInMeters / 2.0f); }
+	void PhysicsBody::SetWidth(const float width) { m_shape.SetAsBox(width / 2.0f, m_halfHeight); }
+	void PhysicsBody::SetHeight(const float height) { m_shape.SetAsBox(m_halfWidth, height / 2.0f); }
 
 	void PhysicsBody::SetBottomCollision(const bool bottomCollision) { m_bottomCollision = bottomCollision; }
 	void PhysicsBody::SetTopCollision(const bool topCollision) { m_topCollision = topCollision; }

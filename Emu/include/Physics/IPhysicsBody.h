@@ -26,32 +26,28 @@ namespace Engine
 		virtual void SetGravity(bool enabled) = 0;
 		virtual void SetFixedRotation(bool fixed) = 0;
 		virtual void SetXDeceleration(const float xDecel) = 0;
+
 		virtual void SetXVelocity(const float xVel) = 0;
 		virtual void SetYVelocity(const float yVel) = 0;
-		virtual void SetWidthInMeters(const float width) = 0;
-		virtual void SetHeightInMeters(const float height) = 0;
 
-		virtual const float GetXVelocity() const = 0;
-		virtual const float GetYVelocity() const = 0;
-		virtual const float GetTopLeftPrevX() const = 0;
-		virtual const float GetTopLeftPrevY() const = 0;
-		virtual const float GetCenterPrevX() const = 0;
-		virtual const float GetCenterPrevY() const = 0;
-		virtual const float GetCenterXInMeters() const = 0;
-		virtual const float GetCenterYInMeters() const = 0;
-		virtual const float GetTopLeftXInMeters() const = 0;
-		virtual const float GetTopLeftYInMeters() const = 0;
+		virtual void SetWidth(const float width) = 0;
+		virtual void SetHeight(const float height) = 0;
 
-		virtual const float GetWidthInMeters() const = 0;
-		virtual const float GetHeightInMeters() const = 0;
-		virtual const float GetSizeInMeters() const = 0;
+		virtual const Vector2D<float> GetVelocity() const = 0;
+		virtual const Vector2D<float> GetTopLeftPrevPosition() const = 0;
+		virtual const Vector2D<float> GetCenterPrevPosition() const = 0;
+		virtual const Vector2D<float> GetCenterPosition() const = 0;
+		virtual const Vector2D<float> GetTopLeftPosition() const = 0; 
+		virtual const Vector2D<float> GetDimensions() const = 0;
+
+		virtual const float GetSize() const = 0;
 
 		virtual const float GetAngleInRadians() const = 0;
 		virtual const float GetAngleInDegrees() const = 0;
 
 		virtual const BodyType GetBodyType() const = 0;
 
-		virtual void RemoveBodyFromWorld() = 0;
+		virtual void RemoveBodyFromWorld() = 0; 
 		
 		virtual void ApplyForceToBody(Vector2D<float> force) = 0;
 		virtual void ApplyImpulseToBody(Vector2D<float> impulse) = 0;
@@ -64,19 +60,19 @@ namespace Engine
 		virtual void SetLeftCollision(const bool leftCollision) = 0;
 		virtual void SetRightCollision(const bool rightCollision) = 0;
 
-		virtual const bool GetHasBottomCollision() const = 0;
-		virtual const bool GetHasTopCollision() const = 0;
-		virtual const bool GetHasLeftCollision() const = 0;
-		virtual const bool GetHasRightCollision() const = 0;
-
 		virtual void SetBottomSensor(const bool bottomSensor) = 0;
 		virtual void SetTopSensor(const bool topSensor) = 0;
 		virtual void SetLeftSensor(const bool leftSensor) = 0;
 		virtual void SetRightSensor(const bool rightSensor) = 0;
 
-		virtual const bool GetHasBottomSensor() const = 0;
-		virtual const bool GetHasTopSensor() const = 0;
-		virtual const bool GetHasLeftSensor() const = 0;
-		virtual const bool GetHasRightSensor() const = 0;
+		virtual const bool GetHasSensorBelow() const = 0;
+		virtual const bool GetHasSensorAbove() const = 0;
+		virtual const bool GetHasSensorLeft() const = 0;
+		virtual const bool GetHasSensorRight() const = 0;
+
+		virtual const bool GetHasCollisionBelow() const = 0;
+		virtual const bool GetHasCollisionAbove() const = 0;
+		virtual const bool GetHasCollisionLeft() const = 0;
+		virtual const bool GetHasCollisionRight() const = 0;
 	};
 }

@@ -15,7 +15,7 @@ namespace Engine
 		// Client should probably decide this.
 		static const int MAX_SIZE = 100000;
 
-		EMU_API TileMap(const std::string mapFile, const int numMetersPerTile);
+		EMU_API TileMap(const std::string mapFile, const int numUnitsPerTile);
 		EMU_API const char GetTile(int x, int y) const;
 		
 		EMU_API inline int GetWidth() const { return m_mapDimensions.X; }
@@ -38,10 +38,8 @@ namespace Engine
 		std::vector<char> m_map;
 		std::vector<Tile> m_collisionBodies;
 		std::vector<Tile> m_tiles;
-		// int m_width;
-		// int m_height;
 		Vector2D<int> m_mapDimensions;
 
-		int m_numMetersPerTile;
+		int m_numUnitsPerTile;
 	};
 }

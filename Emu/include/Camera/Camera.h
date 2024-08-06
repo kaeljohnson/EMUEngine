@@ -24,7 +24,7 @@ namespace Engine
 	public:
 		virtual void Update(const double interpolation);
 
-		void Frame(const int pixelsPerMeter, const Vector2D<int> mapBounds,
+		void Frame(const int pixelsPerUnit, const Vector2D<int> mapBounds,
 			const Vector2D<int> screenSize, const Vector2D<float> scale);
 
 		Camera(const Camera& camera) = delete;
@@ -32,7 +32,7 @@ namespace Engine
 		Camera(Camera&&) = delete;
 		Camera& operator=(Camera&&) = delete;
 	protected:
-		Vector2D<float> m_sizeInMeters;
+		Vector2D<float> m_size;
 
 		Vector2D<int> m_mapBounds;
 
@@ -41,7 +41,7 @@ namespace Engine
 
 		Vector2D<int> m_screenSize;
 
-		int m_pixelsPerMeter;
+		int m_pixelsPerUnit;
 		bool m_clampingOn;
 	};
 }

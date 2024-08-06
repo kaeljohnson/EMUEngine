@@ -30,10 +30,10 @@ namespace Engine
 		b2Fixture* m_fixture;
 
 		// State members
-		const float m_halfWidthInMeters;
-		const float m_halfHeightInMeters;
-		const float m_widthInMeters;
-		const float m_heightInMeters;
+		const float m_halfWidth;
+		const float m_halfHeight;
+		const float m_width;
+		const float m_height;
 
 		// float m_prevX;
 		// float m_prevY;
@@ -78,8 +78,8 @@ namespace Engine
 		void SetRestitution(const float restitution) override;
 		void SetRestitutionThreshold(const float threshold) override;
 		void SetCollidable(const bool collidable) override;
-		void SetWidthInMeters(const float widthInMeters) override;
-		void SetHeightInMeters(const float heightInMeters) override;
+		void SetWidth(const float width) override;
+		void SetHeight(const float height) override;
 
 		void SetContactFlags() override;
 		void SetContactFlagsToFalse() override;
@@ -94,23 +94,22 @@ namespace Engine
 		void SetLeftSensor(const bool leftSensor) override;
 		void SetRightSensor(const bool rightSensor) override;
 
-		inline const bool GetHasBottomCollision() const { return m_bottomCollision; }
-		inline const bool GetHasTopCollision() const { return m_topCollision; }
-		inline const bool GetHasLeftCollision() const { return m_leftCollision; }
-		inline const bool GetHasRightCollision() const { return m_rightCollision; }
+		inline const bool GetHasCollisionBelow() const { return m_bottomCollision; }
+		inline const bool GetHasCollisionAbove() const { return m_topCollision; }
+		inline const bool GetHasCollisionLeft() const { return m_leftCollision; }
+		inline const bool GetHasCollisionRight() const { return m_rightCollision; }
 
-		inline const bool GetHasBottomSensor() const { return m_bottomSensor; }
-		inline const bool GetHasTopSensor() const { return m_topSensor; }
-		inline const bool GetHasLeftSensor() const { return m_leftSensor; }
-		inline const bool GetHasRightSensor() const { return m_rightSensor; }
+		inline const bool GetHasSensorBelow() const { return m_bottomSensor; }
+		inline const bool GetHasSensorAbove() const { return m_topSensor; }
+		inline const bool GetHasSensorLeft() const { return m_leftSensor; }
+		inline const bool GetHasSensorRight() const { return m_rightSensor; }
 
-		inline const float GetXVelocity() const override { return m_body->GetLinearVelocity().x; }
-		inline const float GetYVelocity() const override { return m_body->GetLinearVelocity().y; }
-		inline const float GetCenterXInMeters() const override { return m_body->GetPosition().x; }
-		inline const float GetCenterYInMeters() const override { return m_body->GetPosition().y; }
-		inline const float GetTopLeftXInMeters() const override { return (m_body->GetPosition().x - m_widthInMeters / 2.0f); }
-		inline const float GetTopLeftYInMeters() const override { return (m_body->GetPosition().y - m_heightInMeters / 2.0f); }
+		inline const Vector2D<float> GetVelocity() const override { return Vector2D<float>(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y); }
+		inline const Vector2D<float> GetCenterPosition() const override { return Vector2D<float>(m_body->GetPosition().x, m_body->GetPosition().y); }
+		inline const Vector2D<float> GetTopLeftPosition() const override { return Vector2D<float>(m_body->GetPosition().x - m_width / 2.0f, m_body->GetPosition().y - m_height / 2.0f); }
+
 		inline const BodyType GetBodyType() const override { return m_bodyType; }
+
 		inline const float GetAngleInRadians() const override { return m_body->GetAngle(); }
 		inline const float GetAngleInDegrees() const override { return radiansToDegrees(m_body->GetAngle()); }
 		
@@ -119,12 +118,11 @@ namespace Engine
 		void UpdatePrevPosition() override;
 
 		// Non-PhysicsBody2d getters
-		inline const float GetTopLeftPrevX() const override { return m_prevPosition.X; }
-		inline const float GetTopLeftPrevY() const override { return m_prevPosition.Y; }
-		inline const float GetCenterPrevX() const override { return m_prevPosition.X + m_halfWidthInMeters; }
-		inline const float GetCenterPrevY() const override { return m_prevPosition.Y + m_halfHeightInMeters; }
-		inline const float GetWidthInMeters() const override { return m_widthInMeters; }
-		inline const float GetHeightInMeters() const override { return m_heightInMeters; }
-		inline const float GetSizeInMeters() const override { return m_widthInMeters * m_heightInMeters; }
+		inline const Vector2D<float> GetTopLeftPrevPosition() const override { return m_prevPosition; }
+		inline const Vector2D<float> GetCenterPrevPosition() const override { return Vector2D<float>(m_prevPosition.X + m_halfWidth, m_prevPosition.Y + m_halfHeight); }
+
+		inline const Vector2D<float> GetDimensions() const override { return Vector2D<float>(m_width, m_height); }
+
+		inline const float GetSize() const override { return m_width * m_height; }
 	};
 }
