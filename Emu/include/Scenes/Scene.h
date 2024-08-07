@@ -37,9 +37,6 @@ namespace Engine
 
 		Vector2D<int> m_mapDimensions;
 
-		// float m_gravityX;
-		// float m_gravityY;
-
 		Vector2D<float> m_gravity;
 
 		std::vector<SceneObjectStack> m_layers;
