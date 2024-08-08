@@ -16,7 +16,7 @@ namespace Engine
         return std::make_shared<PhysicsBody>(bodyType, fixed, position, size);
     }
 
-    std::unique_ptr<IWorld> CreateWorld(const float gravityX, const float gravityY, const int velocityIterations, const int positionIterations)
+    std::unique_ptr<World> CreateWorld(const float gravityX, const float gravityY, const int velocityIterations, const int positionIterations)
     {
         return std::make_unique<World>(gravityX, gravityY, velocityIterations, positionIterations);
     }

@@ -7,7 +7,7 @@
 
 #include "../Scenes/SceneObject.h"
 #include "../Scenes/SceneObjectStack.h"
-#include "../Physics/IWorld.h"
+#include "../Physics/World.h"
 #include "../Tiles/TileMap.h"
 
 namespace Engine
@@ -41,7 +41,7 @@ namespace Engine
 
 		std::vector<SceneObjectStack> m_layers;
 
-		std::unique_ptr<IWorld> m_world;
+		std::unique_ptr<World> m_world;
 
 	public:
 		inline const int GetPixelsPerUnit() const { return m_pixelsPerUnit; }

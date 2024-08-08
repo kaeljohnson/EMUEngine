@@ -9,10 +9,10 @@
 
 namespace Engine
 {
-	World::World() : m_world({ 0.0f, 0.0f }), m_gravity({ 0.0f, 0.0f }), m_velocityIterations(0), m_positionIterations(0) {}
+	World::World() : m_world(new b2World(b2Vec2(0.0f, 0.0f))), m_gravity(Vector2D( 0.0f, 0.0f )), m_velocityIterations(0), m_positionIterations(0) {}
 
 	World::World(const float gravityX, const float gravityY, const int velocityIterations, const int positionIterations)
-		: m_gravity({ gravityX, gravityY }), m_world({ gravityX, gravityY}),
+		: m_gravity({ gravityX, gravityY }), m_world(new b2World(b2Vec2( gravityX, gravityY))),
 		m_velocityIterations(velocityIterations), m_positionIterations(positionIterations)
 	{}
 
@@ -20,18 +20,20 @@ namespace Engine
 	{
 		ENGINE_INFO_D("Freeing World!");
 		// Destroy all bodies in the world
-		b2Body* body = m_world.GetBodyList();
+		b2Body* body = m_world->GetBodyList();
 		while (body != nullptr)
 		{
 			b2Body* nextBody = body->GetNext();
-			m_world.DestroyBody(body);
+			m_world->DestroyBody(body);
 			body = nextBody;
 		}
+
+		delete m_world;
 	}
 
 	void World::Update()
 	{
-		m_world.Step(TIME_STEP, m_velocityIterations, m_positionIterations);
+		m_world->Step(TIME_STEP, m_velocityIterations, m_positionIterations);
 	}
 
 	void World::AddBody(std::shared_ptr<PhysicsBody> physicsBody)
@@ -66,7 +68,7 @@ namespace Engine
 		bodyDef.userData.pointer = reinterpret_cast<intptr_t>(physicsBody.get());
 		bodyDef.position.Set(physicsBody->m_startingPosition.X + physicsBody->m_halfWidth, physicsBody->m_startingPosition.Y + physicsBody->m_halfHeight);
 
-		physicsBody->m_body = m_world.CreateBody(&bodyDef);
+		physicsBody->m_body = m_world->CreateBody(&bodyDef);
 		
 		physicsBody->CreateFixture();
 	}
@@ -84,6 +86,6 @@ namespace Engine
 	void World::SetGravity(const float gravityX, const float gravityY)
 	{
 		m_gravity = { gravityX, gravityY };
-		m_world.SetGravity({ gravityX, gravityY });
+		m_world->SetGravity({ gravityX, gravityY });
 	}
 }
