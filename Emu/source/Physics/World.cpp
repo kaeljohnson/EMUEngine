@@ -42,7 +42,32 @@ namespace Engine
 			return;
 		}
 
-		physicsBody->m_body = m_world.CreateBody(&physicsBody->m_bodyDef);
+		b2BodyDef bodyDef;
+		switch (physicsBody->GetBodyType())
+		{
+		case STATIC:
+			bodyDef.type = b2_staticBody;
+			break;
+		case DYNAMIC:
+			bodyDef.type = b2_dynamicBody;
+			break;
+		case KINEMATIC:
+			bodyDef.type = b2_kinematicBody;
+			break;
+		case SENSOR:
+			bodyDef.type = b2_kinematicBody;
+			break;
+		default:
+			bodyDef.type = b2_staticBody;
+			break;
+		}
+
+		bodyDef.fixedRotation = physicsBody->m_fixedRotation;
+		bodyDef.userData.pointer = reinterpret_cast<intptr_t>(physicsBody.get());
+		bodyDef.position.Set(physicsBody->m_startingPosition.X + physicsBody->m_halfWidth, physicsBody->m_startingPosition.Y + physicsBody->m_halfHeight);
+
+		physicsBody->m_body = m_world.CreateBody(&bodyDef);
+		
 		physicsBody->CreateFixture();
 	}
 

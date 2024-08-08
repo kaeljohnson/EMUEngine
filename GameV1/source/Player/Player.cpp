@@ -17,7 +17,7 @@
         m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right),
         Entity(Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height), 1)
     {
-    	m_physicsBody->SetFriction(0.0f);
+    	m_physicsBody->m_friction = 0.0f;
     }
 
     void Player::Update()

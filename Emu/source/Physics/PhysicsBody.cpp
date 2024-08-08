@@ -7,51 +7,28 @@
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/BodyTypes.h"
 
+#include "box2d/box2d.h"
+
 namespace Engine
 {
 	PhysicsBody::PhysicsBody(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
 		: m_halfWidth(size.X / 2.0f), m_halfHeight(size.Y / 2.0f), 
-		m_width(size.X), m_height(size.Y),
-		m_bodyType(bodyType), m_collidable(true), m_fixed(fixed), m_body(nullptr), m_fixture(nullptr),
+		m_width(size.X), m_height(size.Y), m_startingPosition(position),
+		m_bodyType(bodyType), m_collidable(true), m_fixed(fixed), m_body(nullptr),
 		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
 		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
-		m_gravityOn(true)
+		m_gravityOn(true), m_isSensor(false), m_prevPosition(position)
 	{
-		switch (bodyType)
+		if (bodyType == SENSOR)
 		{
-		case STATIC:
-			ENGINE_TRACE_D("Creating static body.");
-			break;
-		case DYNAMIC:
-			m_bodyDef.type = b2_dynamicBody;
-			ENGINE_TRACE_D("Creating dynamic body.");
-			break;
-		case KINEMATIC:
-			m_bodyDef.type = b2_kinematicBody;
-			ENGINE_TRACE_D("Creating kinematic body.");
-			break;
-		case SENSOR:
-			m_bodyDef.type = b2_kinematicBody;
-			ENGINE_TRACE_D("Creating sensor.");
-			m_fixtureDef.isSensor = true;
-			break;
-		default:
-			m_bodyDef.type = b2_staticBody;
-			ENGINE_WARN_D("Invalid body type. Creating static body.");
-			break;
+			m_isSensor = true;
 		}
 
-		m_bodyDef.fixedRotation = true;
-		m_bodyDef.userData.pointer = reinterpret_cast<intptr_t>(this);
-		m_prevPosition.X = position.X;
-		m_prevPosition.Y = position.Y;
-		m_bodyDef.position.Set(position.X + m_halfWidth, position.Y + m_halfHeight);
-		m_shape.SetAsBox(m_halfWidth, m_halfHeight);
-		m_fixtureDef.shape = &m_shape;
-		m_fixtureDef.restitution = 0.0f;
-		m_fixtureDef.restitutionThreshold = 0.0f;
-		m_fixtureDef.density = 1.0f;
-		m_fixtureDef.friction = 1.0f;
+		m_fixedRotation = true;
+		m_restitution = 0.0f;
+		m_restitutionThreshold = 0.0f;
+		m_density = 1.0f;
+		m_friction = 1.0f;
 
 		ENGINE_INFO_D("Box created at position: " + std::to_string(position.X) + "," 
 			+ std::to_string(position.Y) + ". With width: " + std::to_string(size.X) + ", height: " + std::to_string(size.Y));
@@ -180,20 +157,26 @@ namespace Engine
 
 	void PhysicsBody::UpdatePrevPosition() { m_prevPosition = GetTopLeftPosition(); }
 
-	void PhysicsBody::CreateFixture() { m_fixture = m_body->CreateFixture(&m_fixtureDef); }
+	void PhysicsBody::CreateFixture() 
+	{
+		b2FixtureDef fixtureDef;
+		b2PolygonShape shape;
+
+		shape.SetAsBox(m_halfWidth, m_halfHeight);
+		fixtureDef.shape = &shape;
+		fixtureDef.restitution = m_restitution;
+		fixtureDef.restitutionThreshold = m_restitutionThreshold;
+		fixtureDef.density = m_density;
+		fixtureDef.friction = m_friction;
+		fixtureDef.isSensor = m_isSensor;
+		m_body->CreateFixture(&fixtureDef); 
+	}
 	void PhysicsBody::SetGravity(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
 
 	void PhysicsBody::SetXVelocity(const float xVel) { m_body->SetLinearVelocity(b2Vec2(xVel, m_body->GetLinearVelocity().y)); }
 	void PhysicsBody::SetYVelocity(const float yVel) { m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, yVel)); }
 	void PhysicsBody::SetXDeceleration(const float xDecel) { m_body->SetLinearDamping(xDecel); }
 	void PhysicsBody::SetFixedRotation(bool fixed) { m_body->SetFixedRotation(fixed); }
-	void PhysicsBody::SetDensity(const float density) { m_fixtureDef.density = density; }
-	void PhysicsBody::SetFriction(const float friction) { m_fixtureDef.friction = friction; }
-	void PhysicsBody::SetRestitution(const float restitution) { m_fixtureDef.restitution = restitution; }
-	void PhysicsBody::SetRestitutionThreshold(const float threshold) { m_fixtureDef.restitutionThreshold = threshold; }
-	void PhysicsBody::SetCollidable(const bool collidable) { m_collidable = collidable; }
-	void PhysicsBody::SetWidth(const float width) { m_shape.SetAsBox(width / 2.0f, m_halfHeight); }
-	void PhysicsBody::SetHeight(const float height) { m_shape.SetAsBox(m_halfWidth, height / 2.0f); }
 
 	void PhysicsBody::SetBottomCollision(const bool bottomCollision) { m_bottomCollision = bottomCollision; }
 	void PhysicsBody::SetTopCollision(const bool topCollision) { m_topCollision = topCollision; }
@@ -204,4 +187,11 @@ namespace Engine
 	void PhysicsBody::SetTopSensor(const bool topSensor) { m_topSensor = topSensor; }
 	void PhysicsBody::SetLeftSensor(const bool leftSensor) { m_leftSensor = leftSensor; }
 	void PhysicsBody::SetRightSensor(const bool rightSensor) { m_rightSensor = rightSensor; }
+
+	const Vector2D<float> PhysicsBody::GetVelocity() const { return Vector2D<float>(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y); }
+	const Vector2D<float> PhysicsBody::GetCenterPosition() const { return Vector2D<float>(m_body->GetPosition().x, m_body->GetPosition().y); }
+	const Vector2D<float> PhysicsBody::GetTopLeftPosition() const { return Vector2D<float>(m_body->GetPosition().x - m_width / 2.0f, m_body->GetPosition().y - m_height / 2.0f); }
+
+	const float PhysicsBody::GetAngleInRadians() const { return m_body->GetAngle(); }
+	const float PhysicsBody::GetAngleInDegrees() const { return radiansToDegrees(m_body->GetAngle()); }
 }

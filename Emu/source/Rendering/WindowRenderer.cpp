@@ -114,7 +114,7 @@ namespace Engine
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
 
-		std::shared_ptr<IPhysicsBody> ptrBody = sceneObject->GetPhysicsBody();
+		std::shared_ptr<PhysicsBody> ptrBody = sceneObject->GetPhysicsBody();
 
 		SDLRect dst
 		{
