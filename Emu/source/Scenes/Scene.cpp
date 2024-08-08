@@ -5,7 +5,6 @@
 #include "../../include/Scenes/SceneObject.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/PhysicsBody.h"
-#include "../../include/Physics/PhysicsFactory.h"
 #include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Tiles/TileMap.h"
 #include "../../include/Tiles/Tile.h"
@@ -130,7 +129,7 @@ namespace Engine
 		
 		// Need a reset function for the world which resets all objects in the world.
 
-		m_world = CreateWorld(m_gravity.X * m_pixelsPerUnit, m_gravity.Y * m_pixelsPerUnit, 8, 3);
+		m_world = std::make_unique<World>(m_gravity.X * m_pixelsPerUnit, m_gravity.Y * m_pixelsPerUnit, 8, 3);
 
 		ENGINE_INFO_D("Client creating simulation with gravity: " + std::to_string(gravityX) + ", " + std::to_string(gravityY));
 
