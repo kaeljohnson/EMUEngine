@@ -19,12 +19,11 @@ namespace Engine
 	class PhysicsBody
 	{
 	public:
+		b2Body* m_body = nullptr;
+	private:
 		const BodyType m_bodyType;
-
-		// Box2D specific members.
-		b2Body* m_body;
-
-		// Needed fields from box2d
+		
+		// Starting fields for box2d. NOT runtime fields.
 		bool m_isSensor;
 		float m_restitution;
 		float m_restitutionThreshold;
@@ -42,7 +41,6 @@ namespace Engine
 		const Vector2D<float> m_startingPosition;
 		Vector2D<float> m_prevPosition;
 		
-		bool m_collidable;
 		bool m_fixed;
 		bool m_gravityOn;
 
@@ -61,11 +59,26 @@ namespace Engine
 		EMU_API void ApplyImpulseToBody(Vector2D<float> impulse);
 
 		// PhysicsBody2d getter and setter wrappers
-		void CreateFixture();
 		EMU_API void SetGravity(bool enabled);
 		EMU_API void SetXDeceleration(const float xDecel);
 		EMU_API void SetXVelocity(const float xVel);
 		EMU_API void SetYVelocity(const float yVel);
+
+		EMU_API void SetStartingFriction(const float friction);
+		// In order to change friction or any other value during simulation, need to call GetFixtureList() first.
+
+		EMU_API inline Vector2D<float> GetStartingPosition() const { return m_startingPosition; }
+
+		EMU_API inline const float GetHalfWidth() const { return m_halfWidth; }
+		EMU_API inline const float GetHalfHeight() const { return m_halfHeight; }
+
+		EMU_API inline const bool GetIsSensor() const { return m_isSensor; }
+		EMU_API inline const bool GetIsRotationFixed() const { return m_fixedRotation; }
+
+		EMU_API inline const float GetStartingRestitution() const { return m_restitution; }
+		EMU_API inline const float GetStartingRestitutionThreshold() const { return m_restitutionThreshold; }
+		EMU_API inline const float GetStartingDensity() const { return m_density; }
+		EMU_API inline const float GetStartingFriction() const { return m_friction; }
 
 		EMU_API inline const bool GetHasCollisionBelow() const { return m_bottomCollision; }
 		EMU_API inline const bool GetHasCollisionAbove() const { return m_topCollision; }
@@ -95,6 +108,7 @@ namespace Engine
 		void RemoveBodyFromWorld();
 		
 		void SetFixedRotation(bool fixed);
+		void SetIsSensor(const bool sensor);
 
 		void SetContactFlags();
 		void SetContactFlagsToFalse();

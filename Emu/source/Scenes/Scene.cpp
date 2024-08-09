@@ -21,6 +21,12 @@ namespace Engine
 		(m_pixelsPerUnit <= 0) ? ENGINE_CRITICAL_D("Pixels per meter is invalid.") : ENGINE_INFO_D("Pixels per meter is valid.");
 	}
 
+	void Scene::OnScenePlay()
+	{
+		CheckValid();
+
+	}
+
 	void Scene::AddLayer(size_t layerIdx)
 	{
 		// Ensure the layer is appended to the end of the vector if the index is out of bounds.
@@ -155,9 +161,9 @@ namespace Engine
 		sceneObject.LayerIdx = layerIdx;
 		m_layers[layerIdx].Push(&sceneObject);
 
-		std::shared_ptr<PhysicsBody> ptrBox = std::static_pointer_cast<PhysicsBody>(sceneObject.GetPhysicsBody());
+		std::shared_ptr<PhysicsBody> ptrPhysicsBody = sceneObject.GetPhysicsBody();
 
-		m_world->AddBody(ptrBox);
+		m_world->AddBody(ptrPhysicsBody);
 	}
 
 	void Scene::Remove(SceneObject& sceneObject)

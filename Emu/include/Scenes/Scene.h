@@ -50,6 +50,7 @@ namespace Engine
 		inline const int GetLevelHeight() const { return m_mapDimensions.Y; }
 
 		void CheckValid();
+		void OnScenePlay();
 		void Update();
 
 		bool HasTileMap;

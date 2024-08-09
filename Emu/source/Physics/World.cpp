@@ -44,7 +44,11 @@ namespace Engine
 			return;
 		}
 
+		b2Body* body;
 		b2BodyDef bodyDef;
+		b2FixtureDef fixtureDef;
+		b2PolygonShape shape;
+
 		switch (physicsBody->GetBodyType())
 		{
 		case STATIC:
@@ -58,19 +62,29 @@ namespace Engine
 			break;
 		case SENSOR:
 			bodyDef.type = b2_kinematicBody;
+			physicsBody->SetIsSensor(true);
 			break;
 		default:
 			bodyDef.type = b2_staticBody;
 			break;
 		}
 
-		bodyDef.fixedRotation = physicsBody->m_fixedRotation;
+		bodyDef.fixedRotation = physicsBody->GetIsRotationFixed();
 		bodyDef.userData.pointer = reinterpret_cast<intptr_t>(physicsBody.get());
-		bodyDef.position.Set(physicsBody->m_startingPosition.X + physicsBody->m_halfWidth, physicsBody->m_startingPosition.Y + physicsBody->m_halfHeight);
+		bodyDef.position.Set(physicsBody->GetStartingPosition().X + physicsBody->GetHalfWidth(), physicsBody->GetStartingPosition().Y + physicsBody->GetHalfHeight());
 
-		physicsBody->m_body = m_world->CreateBody(&bodyDef);
+		body = m_world->CreateBody(&bodyDef);
 		
-		physicsBody->CreateFixture();
+		shape.SetAsBox(physicsBody->GetHalfWidth(), physicsBody->GetHalfHeight());
+		fixtureDef.shape = &shape;
+		fixtureDef.restitution = physicsBody->GetStartingRestitution();
+		fixtureDef.restitutionThreshold = physicsBody->GetStartingRestitutionThreshold();
+		fixtureDef.density = physicsBody->GetStartingDensity();
+		fixtureDef.friction = physicsBody->GetStartingFriction();
+		fixtureDef.isSensor = physicsBody->GetIsSensor();
+		body->CreateFixture(&fixtureDef);
+
+		physicsBody->m_body = body;
 	}
 
 	void World::RemoveBody(std::shared_ptr<PhysicsBody> physicsBody)

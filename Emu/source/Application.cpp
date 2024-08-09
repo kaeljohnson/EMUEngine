@@ -66,7 +66,7 @@ namespace Engine
 			end();
 		}
 
-		currentScene->CheckValid();
+		currentScene->OnScenePlay();
 
 		const int pixelsPerMeter = currentScene->GetPixelsPerUnit();
 		const float timeStep = TIME_STEP;
