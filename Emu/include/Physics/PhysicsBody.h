@@ -64,8 +64,14 @@ namespace Engine
 		EMU_API void SetXVelocity(const float xVel);
 		EMU_API void SetYVelocity(const float yVel);
 
+		EMU_API void SetStartingRestitution(const float restitution);
+		EMU_API void SetRestitution(const float restitution);
+
+		EMU_API void SetStartingDensity(const float density);
+		EMU_API void SetDensity(const float density);
+
 		EMU_API void SetStartingFriction(const float friction);
-		// In order to change friction or any other value during simulation, need to call GetFixtureList() first.
+		EMU_API void SetFriction(const float friction);
 
 		EMU_API inline Vector2D<float> GetStartingPosition() const { return m_startingPosition; }
 

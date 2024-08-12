@@ -53,9 +53,46 @@ namespace Engine
 		m_body->ApplyLinearImpulseToCenter(b2Vec2(impulse.X, impulse.Y), true);
 	}
 
+	void PhysicsBody::SetStartingDensity(const float density)
+	{
+		m_density = density;
+	}
+
+	void PhysicsBody::SetDensity(const float density)
+	{
+		b2Fixture* fixture = m_body->GetFixtureList();
+		if (fixture != nullptr)
+			fixture->SetDensity(density);
+		else
+			ENGINE_CRITICAL_D("No fixture found for body!");
+	}
+
+	void PhysicsBody::SetStartingRestitution(const float restitution)
+	{
+		m_restitution = restitution;
+	}
+
+	void PhysicsBody::SetRestitution(const float restitution)
+	{
+		b2Fixture* fixture = m_body->GetFixtureList();
+		if (fixture != nullptr)
+			fixture->SetRestitution(restitution);
+		else
+			ENGINE_CRITICAL_D("No fixture found for body!");
+	}
+
 	void PhysicsBody::SetStartingFriction(const float friction)
 	{
 		m_friction = friction;
+	}
+
+	void PhysicsBody::SetFriction(const float friction)
+	{
+		b2Fixture* fixture = m_body->GetFixtureList();
+		if (fixture != nullptr)
+			fixture->SetFriction(friction);
+		else
+			ENGINE_CRITICAL_D("No fixture found for body!");
 	}
 
 	void PhysicsBody::SetIsSensor(const bool isSensor)
