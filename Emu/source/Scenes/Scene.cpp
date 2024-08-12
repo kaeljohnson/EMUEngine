@@ -8,10 +8,11 @@
 #include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Tiles/TileMap.h"
 #include "../../include/Tiles/Tile.h"
+#include "../../include/MathUtil.h"
 
 namespace Engine
 {
-	Scene::Scene() : m_pixelsPerUnit(0), m_gravity(0, 0), m_layers(), m_mapDimensions(0, 0), HasTileMap(false),
+	Scene::Scene() : m_pixelsPerUnit(32), m_layers(), m_levelDimensionsInUnits(32, 32), HasTileMap(false),
 		m_world(nullptr) {}
 
 	void Scene::CheckValid()
@@ -44,9 +45,9 @@ namespace Engine
 		tileMap.LoadMap();
 		tileMap.CreateCollisionBodies();
 
-		m_mapDimensions = Vector2D<int>(tileMap.GetWidth(), tileMap.GetHeight());
+		m_levelDimensionsInUnits = Vector2D<int>(tileMap.GetWidth(), tileMap.GetHeight());
 
-		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_mapDimensions.X) + ", Map height: " + std::to_string(m_mapDimensions.Y));
+		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_levelDimensionsInUnits.X) + ", Map height: " + std::to_string(m_levelDimensionsInUnits.Y));
 
 		bool layerExists = false;
 		for (auto& tile : tileMap)
@@ -73,21 +74,14 @@ namespace Engine
 		HasTileMap = true;
 	}
 
-	void Scene::SetLevelWidth(const int levelWidth)
+	void Scene::SetLevelDimensions(const Vector2D<int> levelDimensions)
 	{
 		if (HasTileMap)
 		{
 			ENGINE_INFO_D("Scene already has a map. Overriding map width!");
 		}
 
-		m_mapDimensions.X = levelWidth;
-	}
-
-	void Scene::SetLevelHeight(const int levelHeight)
-	{
-		ENGINE_INFO_D("Scene already has a map. Overriding map height!");
-
-		m_mapDimensions.Y = levelHeight;
+		m_levelDimensionsInUnits = levelDimensions;
 	}
 
 	void Scene::Update()
@@ -115,17 +109,14 @@ namespace Engine
 		m_world->Update();
 	};
 
-	void Scene::SetSimulation(const float gravityX, const float gravityY, const int pixelsPerUnit)
+	void Scene::CreatePhysicsSimulation(const Vector2D<float> gravity, const int pixelsPerUnit)
 	{
 		// What happens if this is called multiple times for one scene? Make sure nothing bad.
 
 		m_pixelsPerUnit = pixelsPerUnit;
 
-		m_gravity.X = gravityX;
-		m_gravity.Y = gravityY;
-
 		ENGINE_INFO_D("Setting pixels per unit, time step, gravityX and gravityY at positions: " 
-			+ std::to_string(m_pixelsPerUnit) + ", " + std::to_string(m_gravity.X) + ", " + std::to_string(m_gravity.Y));
+			+ std::to_string(m_pixelsPerUnit) + ", " + std::to_string(gravity.X) + ", " + std::to_string(gravity.Y));
 
 		if (m_world)
 		{
@@ -135,9 +126,9 @@ namespace Engine
 		
 		// Need a reset function for the world which resets all objects in the world.
 
-		m_world = std::make_unique<World>(m_gravity.X * m_pixelsPerUnit, m_gravity.Y * m_pixelsPerUnit, 8, 3);
+		m_world = std::make_unique<World>(gravity.X * m_pixelsPerUnit, gravity.Y * m_pixelsPerUnit, 8, 3);
 
-		ENGINE_INFO_D("Client creating simulation with gravity: " + std::to_string(gravityX) + ", " + std::to_string(gravityY));
+		ENGINE_INFO_D("Creating simulation with gravity: " + std::to_string(gravity.X) + ", " + std::to_string(gravity.Y));
 
 		if (!HasTileMap)
 		{
@@ -147,6 +138,13 @@ namespace Engine
 		{
 			ENGINE_INFO_D("Map exists in the level. Setting level width and height to map width and height.");
 		}
+	}
+
+	void Scene::SetGravity(const Vector2D<float> gravity)
+	{
+
+		m_world->SetGravity(gravity.X, gravity.Y);
+	
 	}
 
 	void Scene::Add(SceneObject& sceneObject, int layerIdx)

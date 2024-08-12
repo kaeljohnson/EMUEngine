@@ -18,7 +18,8 @@ namespace Engine
 		EMU_API Scene();
 		EMU_API ~Scene() = default;
 
-		EMU_API void SetSimulation(const float gravityX, const float gravityY, const int pixelsPerUnit);
+		EMU_API void CreatePhysicsSimulation(const Vector2D<float>, const int pixelsPerUnit);
+		EMU_API void SetGravity(const Vector2D<float> gravity);
 
 		// Adds scene object to the scene. Need to add a "order" parameter to determine the order of rendering.
 		EMU_API void Add(SceneObject& sceneObject, int layerNum);
@@ -29,15 +30,12 @@ namespace Engine
 		EMU_API void AddTileMap(TileMap& tileMap, int layerIdx);
 
 		// IF theres no map in the level, client will decided the dimensions manually.
-		EMU_API void SetLevelWidth(const int levelWidth);
-		EMU_API void SetLevelHeight(const int levelHeight);
+		EMU_API void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
 
 	private:
 		int m_pixelsPerUnit;
 
-		Vector2D<int> m_mapDimensions;
-
-		Vector2D<float> m_gravity;
+		Vector2D<int> m_levelDimensionsInUnits;
 
 		std::vector<SceneObjectStack> m_layers;
 
@@ -46,8 +44,8 @@ namespace Engine
 	public:
 		inline const int GetPixelsPerUnit() const { return m_pixelsPerUnit; }
 		inline std::vector<SceneObjectStack>& GetLayers() { return m_layers; }
-		inline const int GetLevelWidth() const { return m_mapDimensions.X; }
-		inline const int GetLevelHeight() const { return m_mapDimensions.Y; }
+		inline const int GetLevelWidth() const { return m_levelDimensionsInUnits.X; }
+		inline const int GetLevelHeight() const { return m_levelDimensionsInUnits.Y; }
 
 		void CheckValid();
 		void OnScenePlay();
