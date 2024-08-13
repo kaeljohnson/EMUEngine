@@ -66,7 +66,7 @@ namespace Engine
 		// separate from the tile map itself.
 		for (auto& tile : tileMap.GetCollisionBodies())
 		{
-			std::shared_ptr<PhysicsBody> ptrBox = std::static_pointer_cast<PhysicsBody>(tile.GetPhysicsBody());
+			std::shared_ptr<PhysicsBody> ptrBox = tile.GetPhysicsBody();
 
 			m_world->AddBody(ptrBox);
 		}
@@ -174,7 +174,7 @@ namespace Engine
 
 		m_layers[sceneObject.LayerIdx].Pop(&sceneObject);
 
-		std::shared_ptr<PhysicsBody> ptrBody = std::static_pointer_cast<PhysicsBody>(sceneObject.GetPhysicsBody());
+		std::shared_ptr<PhysicsBody> ptrBody = sceneObject.GetPhysicsBody();
 
 		ptrBody->RemoveBodyFromWorld();
 	}
