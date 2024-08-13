@@ -7,43 +7,44 @@
 #include "../../include/Player/Player.h"
 #include "../../include/Player/PlayerConfig.h"
 
-    Player::Player(const float startingXInMeters, const float startingYInMeters,
-        const float widthInMeters, const float heightInMeters, const Engine::EventStatesMap& keyStates)
+    Player::Player(const float startingX, const float startingY,
+        const float width, const float height, const Engine::EventStatesMap& keyStates)
         // These need to be set by client.
         : refKeyStates(keyStates), m_coyoteTime(0.0f), m_canJump(false), m_jumpCharge(0.0f), m_onGround(false),
         m_jumpKeyDown(Engine::SPACE_KEY_DOWN), m_jumpKeyUp(Engine::SPACE_KEY_UP),
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
         m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right),
-        Entity(Engine::Vector2D<float>(startingXInMeters, startingYInMeters), Engine::Vector2D<float>(widthInMeters, heightInMeters), 1)
+        Entity(Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height), 1)
     {
-    	m_physicsBody->SetFriction(0.0f);
+        // Need to have them be able to set this during construction of physics body.
+    	m_physicsBody->SetStartingFriction(0.0f);
     }
 
     void Player::Update()
     {
-        m_onGround = m_physicsBody->GetHasBottomCollision();
+        m_onGround = m_physicsBody->GetHasCollisionBelow();
 
         m_force = { 0.0f, 0.0f };
 
         UpdateMovement();
 
-        m_physicsBody->ApplyForceToBox(m_force);
+        m_physicsBody->ApplyForceToBody(m_force);
 
         // Check if the current velocity is below the threshold and set it to zero
-        if (std::abs(m_physicsBody->GetXVelocity()) < MIN_VELOCITY_THRESHOLD)
+        if (std::abs(m_physicsBody->GetVelocity().X) < MIN_VELOCITY_THRESHOLD)
         {
             m_physicsBody->SetXVelocity(0.0f);
         }
         else
         {
             // Limit the velocity
-            if (m_physicsBody->GetXVelocity() >= X_MAX_VELOCITY)
+            if (m_physicsBody->GetVelocity().X >= X_MAX_VELOCITY)
             {
                 m_physicsBody->SetXVelocity(X_MAX_VELOCITY);
             }
 
-            if (m_physicsBody->GetXVelocity() <= -X_MAX_VELOCITY)
+            if (m_physicsBody->GetVelocity().X <= -X_MAX_VELOCITY)
             {
                 m_physicsBody->SetXVelocity(-X_MAX_VELOCITY);
             }
@@ -52,7 +53,7 @@
 
     void Player::UpdateMovement()
     {
-        float currentVelocityX = m_physicsBody->GetXVelocity();
+        float currentVelocityX = m_physicsBody->GetVelocity().X;
 
         if (m_currentDirection == PlayerDirection::Right) DirectionFacing = 1;
 		else DirectionFacing = -1;
@@ -102,7 +103,7 @@
             {
                 // Apply deceleration when no movement keys are pressed
                 endHorizontalMove();
-                m_force.X = -currentVelocityX * X_DECELERATION * m_physicsBody->GetSizeInMeters();
+                m_force.X = -currentVelocityX * X_DECELERATION * m_physicsBody->GetSize();
                 if (m_onGround && std::abs(currentVelocityX) < MIN_VELOCITY_THRESHOLD)
                 {
                     TransitionToState(PlayerState::Idle);
@@ -138,7 +139,7 @@
                 endHorizontalMove();
             }
 
-            if (refKeyStates.at(m_jumpKeyUp) || m_physicsBody->GetYVelocity() > 0 || m_physicsBody->GetHasTopCollision())
+            if (refKeyStates.at(m_jumpKeyUp) || m_physicsBody->GetVelocity().Y > 0 || m_physicsBody->GetHasCollisionAbove())
             {
                 TransitionToState(PlayerState::Falling);
             }
@@ -148,7 +149,7 @@
                 {
                     m_jumpCharge += JUMP_CHARGE_INCREMENT;
                 }
-                m_force.Y = -JUMP_FORCE * (MAX_JUMP_CHARGE - m_jumpCharge) * m_physicsBody->GetSizeInMeters();
+                m_force.Y = -JUMP_FORCE * (MAX_JUMP_CHARGE - m_jumpCharge) * m_physicsBody->GetSize();
             }
             break;
 
@@ -226,12 +227,12 @@
         case PlayerState::Jumping:
             m_canJump = false;
             m_physicsBody->SetYVelocity(0.0f);
-            m_physicsBody->ApplyImpulseToBox({ 0.0f, -MIN_JUMP_FORCE * m_physicsBody->GetSizeInMeters() });
+            m_physicsBody->ApplyImpulseToBody({ 0.0f, -MIN_JUMP_FORCE * m_physicsBody->GetSize() });
             break;
 
         case PlayerState::Falling:
             m_jumpCharge = 0.0f;
-            if (m_physicsBody->GetYVelocity() < 0)
+            if (m_physicsBody->GetVelocity().Y < 0)
             {
                 m_physicsBody->SetYVelocity(0.0f);
             }
@@ -252,15 +253,15 @@
     {
         if (m_currentDirection == PlayerDirection::Right)
         {
-			m_force.X = X_ACCELERATION * m_physicsBody->GetSizeInMeters();
+			m_force.X = X_ACCELERATION * m_physicsBody->GetSize();
 		}
         else
         {
-			m_force.X = -X_ACCELERATION * m_physicsBody->GetSizeInMeters();
+			m_force.X = -X_ACCELERATION * m_physicsBody->GetSize();
 		}
     }
 
     void Player::endHorizontalMove()
     {
-		m_force.X = -m_physicsBody->GetXVelocity() * X_DECELERATION * m_physicsBody->GetSizeInMeters();
+		m_force.X = -m_physicsBody->GetVelocity().X * X_DECELERATION * m_physicsBody->GetSize();
 	}

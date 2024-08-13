@@ -13,12 +13,12 @@ namespace Engine
 	// Bug: Camera is stuttery for certain values of m_smoothingFactor and bounds.
 	void TargetCamera::Update(const double interpolation)
 	{
-		float targetX = Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevX(), ptrCameraTarget->GetPhysicsBody()->GetCenterXInMeters(), (float)interpolation);
-		float targetY = Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevY(), ptrCameraTarget->GetPhysicsBody()->GetCenterYInMeters(), (float)interpolation);
+		float targetX = Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevPosition().X, ptrCameraTarget->GetPhysicsBody()->GetCenterPosition().X, (float)interpolation);
+		float targetY = Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevPosition().Y, ptrCameraTarget->GetPhysicsBody()->GetCenterPosition().Y, (float)interpolation);
 
 		// Desired camera position based on the target's position
-		float desiredCameraTopLeftX = targetX - (m_sizeInMeters.X / 2.0f);
-		float desiredCameraTopLeftY = targetY - (m_sizeInMeters.Y / 2.0f);
+		float desiredCameraTopLeftX = targetX - (m_size.X / 2.0f);
+		float desiredCameraTopLeftY = targetY - (m_size.Y / 2.0f);
 
 		m_offset = Vector2D(desiredCameraTopLeftX, desiredCameraTopLeftY);
 

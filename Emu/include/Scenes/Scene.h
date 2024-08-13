@@ -7,7 +7,7 @@
 
 #include "../Scenes/SceneObject.h"
 #include "../Scenes/SceneObjectStack.h"
-#include "../Physics/IWorld.h"
+#include "../Physics/World.h"
 #include "../Tiles/TileMap.h"
 
 namespace Engine
@@ -18,7 +18,8 @@ namespace Engine
 		EMU_API Scene();
 		EMU_API ~Scene() = default;
 
-		EMU_API void SetSimulation(const float gravityX, const float gravityY, const int pixelsPerMeter);
+		EMU_API void CreatePhysicsSimulation(const Vector2D<float>, const int pixelsPerUnit);
+		EMU_API void SetGravity(const Vector2D<float> gravity);
 
 		// Adds scene object to the scene. Need to add a "order" parameter to determine the order of rendering.
 		EMU_API void Add(SceneObject& sceneObject, int layerNum);
@@ -29,32 +30,25 @@ namespace Engine
 		EMU_API void AddTileMap(TileMap& tileMap, int layerIdx);
 
 		// IF theres no map in the level, client will decided the dimensions manually.
-		EMU_API void SetLevelWidthInMeters(const int levelWidthInMeters);
-		EMU_API void SetLevelHeightInMeters(const int levelHeightInMeters);
+		EMU_API void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
 
 	private:
-		int m_pixelsPerMeter;
+		int m_pixelsPerUnit;
 
-		// int m_mapWidthInMeters;
-		// int m_mapHeightInMeters;
-		Vector2D<int> m_mapDimensions;
-
-		// float m_gravityX;
-		// float m_gravityY;
-
-		Vector2D<float> m_gravity;
+		Vector2D<int> m_levelDimensionsInUnits;
 
 		std::vector<SceneObjectStack> m_layers;
 
-		std::unique_ptr<IWorld> m_world;
+		std::unique_ptr<World> m_world;
 
 	public:
-		inline const int GetPixelsPerMeter() const { return m_pixelsPerMeter; }
+		inline const int GetPixelsPerUnit() const { return m_pixelsPerUnit; }
 		inline std::vector<SceneObjectStack>& GetLayers() { return m_layers; }
-		inline const int GetLevelWidthInMeters() const { return m_mapDimensions.X; }
-		inline const int GetLevelHeightInMeters() const { return m_mapDimensions.Y; }
+		inline const int GetLevelWidth() const { return m_levelDimensionsInUnits.X; }
+		inline const int GetLevelHeight() const { return m_levelDimensionsInUnits.Y; }
 
 		void CheckValid();
+		void OnScenePlay();
 		void Update();
 
 		bool HasTileMap;

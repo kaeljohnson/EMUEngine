@@ -18,7 +18,7 @@ namespace Engine
 		~WindowRenderer();
 
 		void RenderScene(std::shared_ptr<Scene> currentScene, const double interpolation, const Vector2D<float> offset);
-		void Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation, const Vector2D<float> offset);
+		void Draw(SceneObject* sceneObject, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset);
 		void Display();
 
 		void SetViewport();

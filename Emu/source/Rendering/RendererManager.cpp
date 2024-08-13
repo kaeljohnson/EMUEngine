@@ -8,7 +8,7 @@
 #include "../../include/Logging/Logger.h"
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Scenes/SceneObject.h"
-#include "../../include/Physics/IPhysicsBody.h"
+#include "../../include/Physics/PhysicsBody.h"
 
 #include "../../include/Rendering/WindowRenderer.h"
 

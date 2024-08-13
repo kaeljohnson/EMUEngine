@@ -22,8 +22,8 @@ enum PlayerDirection
 class Player : public Engine::Entity
 {
 public:
-	Player(const float startingXInMeters, const float startingYInMeters,
-		const float widthInMeters, const float heightInMeters, const Engine::EventStatesMap& keyStates);
+	Player(const float startingX, const float startingY,
+		const float width, const float height, const Engine::EventStatesMap& keyStates);
 	~Player() = default;
 	void Update() override;
 

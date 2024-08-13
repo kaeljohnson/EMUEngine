@@ -19,8 +19,8 @@ int main(int argc, char* args[])
 
 	Engine::ScenePtr scene = Engine::CreateScene();
 
-	// Need physcis to scale with pixels per meter.
-	scene->SetSimulation(0.0f, 3.1f, 32);
+	// Need physcis to scale with pixels per unit.
+	scene->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 3.1f), 32);
 	
 	Player player(1.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 

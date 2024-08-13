@@ -7,7 +7,7 @@
 #include "../Core.h"
 #include "../MathUtil.h"
 
-#include "../Physics/IPhysicsBody.h"
+#include "../Physics/PhysicsBody.h"
 #include "../Textures/ITexture.h"
 #include "../Events/Event.h"
 
@@ -28,7 +28,7 @@ namespace Engine
 		EMU_API virtual ~SceneObject() = default;
 
 		// Should clients be able to get the physics body?
-		EMU_API inline std::shared_ptr<IPhysicsBody> GetPhysicsBody() { return m_physicsBody; }
+		EMU_API inline std::shared_ptr<PhysicsBody> GetPhysicsBody() { return m_physicsBody; }
 		EMU_API inline std::string GetUUID() const { return uuid; }
 
 	public:
@@ -41,6 +41,6 @@ namespace Engine
 		std::string uuid;
 
 	protected:
-		std::shared_ptr<IPhysicsBody> m_physicsBody;
+		std::shared_ptr<PhysicsBody> m_physicsBody;
 	};
 }

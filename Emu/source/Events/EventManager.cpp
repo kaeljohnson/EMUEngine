@@ -156,10 +156,10 @@ namespace Engine
                 m_eventHandlers[currentEvent.Type](currentEvent);
             }
 
-            if (!currentEvent.Handled)
-            {
-                ENGINE_TRACE_D("Unhandled Event: " + std::to_string(static_cast<int>(currentEvent.Type)));
-            }
+            // if (!currentEvent.Handled)
+            // {
+            //    ENGINE_TRACE_D("Unhandled Event: " + std::to_string(static_cast<int>(currentEvent.Type)));
+            // }
 
             m_eventQ.pop();
         }

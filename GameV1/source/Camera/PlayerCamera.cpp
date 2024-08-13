@@ -10,8 +10,8 @@ m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFact
 
 void PlayerCamera::Update(const double interpolation)
 {
-    float targetX = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevX(), ptrCameraTarget->GetPhysicsBody()->GetCenterXInMeters(), (float)interpolation);
-    float targetY = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevY(), ptrCameraTarget->GetPhysicsBody()->GetCenterYInMeters(), (float)interpolation);
+    float targetX = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevPosition().X, ptrCameraTarget->GetPhysicsBody()->GetCenterPosition().X, (float)interpolation);
+    float targetY = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevPosition().Y, ptrCameraTarget->GetPhysicsBody()->GetCenterPosition().Y, (float)interpolation);
 
     float desiredLookAhead = ptrCameraTarget->DirectionFacing * m_lookAheadFactor;
 
@@ -30,18 +30,18 @@ void PlayerCamera::Update(const double interpolation)
     targetX += m_lookAhead;
 
     // Desired camera position based on the target's position
-    float desiredCameraTopLeftX = targetX - (m_sizeInMeters.X / 2.0f);
-    float desiredCameraTopLeftY = targetY - (m_sizeInMeters.Y / 2.0f);
+    float desiredCameraTopLeftX = targetX - (m_size.X / 2.0f);
+    float desiredCameraTopLeftY = targetY - (m_size.Y / 2.0f);
 
     m_offset.X += (desiredCameraTopLeftX - m_offset.X);
 
-    if (targetY > m_offset.Y + ((m_sizeInMeters.Y) * m_bottomTargetScreenBound))
+    if (targetY > m_offset.Y + ((m_size.Y) * m_bottomTargetScreenBound))
     {
-        m_offset.Y = targetY - ((m_sizeInMeters.Y) * m_bottomTargetScreenBound);
+        m_offset.Y = targetY - ((m_size.Y) * m_bottomTargetScreenBound);
     }
-    else if (targetY < m_offset.Y + ((m_sizeInMeters.Y)*m_topTargetScreenBound))
+    else if (targetY < m_offset.Y + ((m_size.Y)*m_topTargetScreenBound))
     {
-        m_offset.Y = targetY - ((m_sizeInMeters.Y)*m_topTargetScreenBound);
+        m_offset.Y = targetY - ((m_size.Y)*m_topTargetScreenBound);
     }
     else if (m_smoothingOn)
     {

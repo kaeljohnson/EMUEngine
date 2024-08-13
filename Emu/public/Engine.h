@@ -12,8 +12,7 @@
 #include "../include/Physics/BodyTypes.h"
 #include "../include/Textures/ITexture.h"
 #include "../include/Textures/TextureFactory.h"
-#include "../include/Physics/IPhysicsBody.h"
-#include "../include/Physics/PhysicsFactory.h"
+#include "../include/Physics/PhysicsBody.h"
 #include "../include/Tiles/Tile.h"
 #include "../include/Tiles/TileMap.h"
 #include "../include/Entities/Entity.h"
@@ -29,7 +28,7 @@ namespace Engine
 {
 	using ScenePtr = std::shared_ptr<Scene>;
 	using SceneObjectPtr = std::shared_ptr<SceneObject>;
-	using PhysicsBodyPtr = std::shared_ptr<IPhysicsBody>;
+	using PhysicsBodyPtr = std::shared_ptr<PhysicsBody>;
 	using ApplicationPtr = Application*;
 	using ICallbackSystemPtr = ICallbackSystem*;
 }

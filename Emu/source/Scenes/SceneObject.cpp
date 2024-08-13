@@ -6,14 +6,13 @@
 #include "../../include/Scenes/SceneObject.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Textures/ITexture.h"
-#include "../../include/Physics/PhysicsFactory.h"
 #include "../../include/Events/EventManager.h"
 
 namespace Engine
 {
 	SceneObject::SceneObject(const BodyType bodyType, const bool fixed, const Vector2D<float> position,
 		const Vector2D<float> size, int directionFacing)
-		: m_physicsBody(CreatePhysicsBody(bodyType, fixed, position, size)),
+		: m_physicsBody(std::make_shared<PhysicsBody>(bodyType, fixed, position, size)),
 		Enabled(true), Visible(true), LayerIdx(-1), uuid(CreateUUID()), DirectionFacing(directionFacing)
 	{
 		ENGINE_INFO_D("SceneObject created");

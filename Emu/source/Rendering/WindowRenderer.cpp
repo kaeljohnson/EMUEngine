@@ -82,25 +82,25 @@ namespace Engine
 
 		// Calculate camera bounds
 		float cameraLeft = cameraOffset.X;
-		float cameraRight = cameraOffset.X + (m_viewportSize.X / currentScene->GetPixelsPerMeter());
+		float cameraRight = cameraOffset.X + ( m_viewportSize.X / currentScene->GetPixelsPerUnit());
 		float cameraTop = cameraOffset.Y;
-		float cameraBottom = cameraOffset.Y + (m_viewportSize.Y / currentScene->GetPixelsPerMeter());
+		float cameraBottom = cameraOffset.Y + (m_viewportSize.Y / currentScene->GetPixelsPerUnit());
 
 		for (auto& layer : currentScene->GetLayers())
 		{
 			for (auto& sceneObject : layer)
 			{
-				float objectLeft = sceneObject->GetPhysicsBody()->GetTopLeftXInMeters();
-				float objectRight = objectLeft + sceneObject->GetPhysicsBody()->GetWidthInMeters();
-				float objectTop = sceneObject->GetPhysicsBody()->GetTopLeftYInMeters();
-				float objectBottom = objectTop + sceneObject->GetPhysicsBody()->GetHeightInMeters();
+				float objectLeft = sceneObject->GetPhysicsBody()->GetTopLeftPosition().X;
+				float objectRight = objectLeft + sceneObject->GetPhysicsBody()->GetDimensions().X;
+				float objectTop = sceneObject->GetPhysicsBody()->GetTopLeftPosition().Y;
+				float objectBottom = objectTop + sceneObject->GetPhysicsBody()->GetDimensions().Y;
 
 				bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
 					objectBottom >= cameraTop && objectTop <= cameraBottom;
 
 				if (isVisible)
 				{
-					Draw(sceneObject, currentScene->GetPixelsPerMeter(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
+					Draw(sceneObject, currentScene->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
 				}
 			}
 		}
@@ -109,33 +109,33 @@ namespace Engine
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void WindowRenderer::Draw(SceneObject* sceneObject, const int pixelsPerMeter, const double interpolation, const Vector2D<float> offset)
+	void WindowRenderer::Draw(SceneObject* sceneObject, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset)
 	{
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
 
-		std::shared_ptr<IPhysicsBody> ptrBody = sceneObject->GetPhysicsBody();
+		std::shared_ptr<PhysicsBody> ptrBody = sceneObject->GetPhysicsBody();
 
 		SDLRect dst
 		{
-			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevX(), ptrBody->GetTopLeftXInMeters(), (float)interpolation) - offset.X) * pixelsPerMeter * SCALE)),
-			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevY(), ptrBody->GetTopLeftYInMeters(), (float)interpolation) - offset.Y) * pixelsPerMeter * SCALE)),
+			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevPosition().X, ptrBody->GetTopLeftPosition().X, (float)interpolation) - offset.X) * pixelsPerUnit * SCALE)),
+			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevPosition().Y, ptrBody->GetTopLeftPosition().Y, (float)interpolation) - offset.Y) * pixelsPerUnit * SCALE)),
 
-			static_cast<int>(round(ptrBody->GetWidthInMeters() * pixelsPerMeter * SCALE)),
-			static_cast<int>(round(ptrBody->GetHeightInMeters() * pixelsPerMeter * SCALE))
+			static_cast<int>(round(ptrBody->GetDimensions().X * pixelsPerUnit * SCALE)),
+			static_cast<int>(round(ptrBody->GetDimensions().Y * pixelsPerUnit * SCALE))
 		};
 
 		SDL_RENDER_COPY_EX(m_ptrRenderer, nullptr, nullptr, &dst, ptrBody->GetAngleInDegrees(), nullptr, SDL_FLIP_NONE);
 
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)
-		if (ptrBody->GetHasBottomCollision() || ptrBody->GetHasTopCollision() ||
-			ptrBody->GetHasLeftCollision() || ptrBody->GetHasRightCollision())
+		if (ptrBody->GetHasCollisionBelow() || ptrBody->GetHasCollisionAbove() ||
+			ptrBody->GetHasCollisionLeft() || ptrBody->GetHasCollisionRight())
 		{
 			SDL_SetRenderDrawColor(m_ptrRenderer, 0, 0, 255, 255);
 		}
-		else if (ptrBody->GetHasBottomSensor() || ptrBody->GetHasTopSensor() ||
-			ptrBody->GetHasLeftSensor() || ptrBody->GetHasRightSensor())
+		else if (ptrBody->GetHasSensorBelow() || ptrBody->GetHasSensorAbove() ||
+			ptrBody->GetHasSensorLeft() || ptrBody->GetHasSensorRight())
 		{
 			SDL_SetRenderDrawColor(m_ptrRenderer, 0, 255, 0, 255);
 		}
@@ -209,7 +209,7 @@ namespace Engine
 		// Incompatibility with native video mode?
 		bool isFullscreen = SDL_GET_WINDOW_FLAGS(m_ptrWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP;
 
-		// Engine should not support resizing the simulation. That is, the pixels per meter should not change.
+		// Engine should not support resizing the simulation. That is, the pixels per unit should not change.
 		// What will happen when the window size changes is that the camera will center on the player, or 
 		// whatever object the camera is locked onto, until it hits the edge of the screen.
 
