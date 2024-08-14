@@ -52,7 +52,7 @@ void PlayerCamera::Update(const double interpolation)
         m_offset.Y = desiredCameraTopLeftY;
     }
 
-    if (m_clampingOn) Clamp();
+    Clamp();
 }
 
 void PlayerCamera::SetLookAheadFactor(const float lookAheadFactor)

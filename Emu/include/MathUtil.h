@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 namespace Engine
 {
 	inline static float Lerp(float a, float b, float f)
@@ -20,9 +22,23 @@ namespace Engine
 			return Vector2D(X + other.X, Y + other.Y);
 		}
 
+		template <typename U>
+		Vector2D<typename std::common_type<T, U>::type> operator+(const Vector2D<U>& other) const
+		{
+			using ReturnType = typename std::common_type<T, U>::type;
+			return Vector2D<ReturnType>(X + other.X, Y + other.Y);
+		}
+
 		Vector2D operator-(const Vector2D& other) const
 		{
 			return Vector2D(X - other.X, Y - other.Y);
+		}
+
+		template <typename U>
+		Vector2D<typename std::common_type<T, U>::type> operator-(const Vector2D<U>& other) const
+		{
+			using ReturnType = typename std::common_type<T, U>::type;
+			return Vector2D<ReturnType>(X - other.X, Y - other.Y);
 		}
 
 		Vector2D operator*(T scalar) const
@@ -30,9 +46,23 @@ namespace Engine
 			return Vector2D(X * scalar, Y * scalar);
 		}
 
+		template <typename U>
+		Vector2D<typename std::common_type<T, U>::type> operator*(U scalar) const
+		{
+			using ReturnType = typename std::common_type<T, U>::type;
+			return Vector2D<ReturnType>(X * scalar, Y * scalar);
+		}
+
 		Vector2D operator/(T scalar) const
 		{
 			return Vector2D(X / scalar, Y / scalar);
+		}
+		
+		template <typename U>
+		Vector2D<typename std::common_type<T, U>::type> operator/(U scalar) const
+		{
+			using ReturnType = typename std::common_type<T, U>::type;
+			return Vector2D<ReturnType>(X / scalar, Y / scalar);
 		}
 
 		Vector2D& operator+=(const Vector2D& other)
@@ -74,4 +104,22 @@ namespace Engine
 		}
 	};
 
+
+	inline void Clamp(float& valueToBeClamped, const float minValue, const float maxValue)
+	{
+		if (valueToBeClamped < minValue)
+		{
+			valueToBeClamped = minValue;
+		}
+		else if (valueToBeClamped > maxValue)
+		{
+			valueToBeClamped = maxValue;
+		}
+	}
+
+	inline void clamp(Vector2D<float>& valueToBeClamped, const Vector2D<float>& minValue, const Vector2D<float>& maxValue)
+	{
+		Clamp(valueToBeClamped.X, minValue.X, maxValue.X);
+		Clamp(valueToBeClamped.Y, minValue.Y, maxValue.Y);
+	}
 }

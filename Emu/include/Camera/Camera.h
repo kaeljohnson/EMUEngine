@@ -12,7 +12,6 @@ namespace Engine
 		EMU_API Camera();
 		
 		EMU_API void SetCameraPosition(const Vector2D<float> offset);
-		EMU_API void SetClampingOn(const bool clampingOn);
 
 		EMU_API void Clamp();
 
@@ -36,12 +35,13 @@ namespace Engine
 
 		Vector2D<int> m_mapBounds;
 
+		Vector2D<float> m_cameraMaxBound;
+
 		// Rendering viewport scale. The viewport is not necessarily the same as the window size.
 		Vector2D<float> refScale;
 
 		Vector2D<int> m_screenSize;
 
 		int m_pixelsPerUnit;
-		bool m_clampingOn;
 	};
 }

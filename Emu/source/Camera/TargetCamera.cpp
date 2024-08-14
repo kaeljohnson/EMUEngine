@@ -23,7 +23,7 @@ namespace Engine
 		m_offset = Vector2D(desiredCameraTopLeftX, desiredCameraTopLeftY);
 
 		// Clamp after adjustments if clamping is enabled
-		if (m_clampingOn) Clamp();
+		Clamp();
 	}	
 
 	void TargetCamera::SetCameraTarget(SceneObject* target)

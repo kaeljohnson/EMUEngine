@@ -10,7 +10,7 @@ namespace Engine
 	void ScrollingCamera::Update(const double interpolation)
 	{
 		m_offset += m_scrollSpeed;
-		if (m_clampingOn) Clamp();
+		Clamp();
 	}
 
 	void ScrollingCamera::SetScrollingSpeeds(const Vector2D<float> scrollSpeed)
