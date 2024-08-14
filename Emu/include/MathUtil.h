@@ -41,6 +41,37 @@ namespace Engine
 			Y += other.Y;
 			return *this;
 		}
+
+		Vector2D& operator-=(const Vector2D& other)
+		{
+			X -= other.X;
+			Y -= other.Y;
+			return *this;
+		}
+
+		Vector2D& operator*=(T scalar)
+		{
+			X *= scalar;
+			Y *= scalar;
+			return *this;
+		}
+
+		Vector2D& operator/=(T scalar)
+		{
+			X /= scalar;
+			Y /= scalar;
+			return *this;
+		}
+
+		bool operator==(const Vector2D& other) const
+		{
+			return X == other.X && Y == other.Y;
+		}
+
+		bool operator!=(const Vector2D& other) const
+		{
+			return !(*this == other);
+		}
 	};
 
 }
