@@ -3,9 +3,7 @@
 #include <memory>
 
 #include "../MathUtil.h"
-
 #include "PhysicsBody.h"
-#include "ConversionFunctions.h"
 
 class b2World;
 

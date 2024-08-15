@@ -3,9 +3,7 @@
 #include <memory>
 
 #include "../MathUtil.h"
-
 #include "../../include/Scenes/Scene.h"
-#include "../Scenes/SceneObject.h"
 
 namespace Engine
 {

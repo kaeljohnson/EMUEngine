@@ -2,13 +2,11 @@
 
 #include <queue>
 #include <unordered_map>
-#include <utility>
 #include <memory>
 #include <functional>
 
 #include "../Core.h"
 #include "../MathUtil.h"
-
 #include "../Events/Event.h"
 
 namespace Engine

@@ -2,7 +2,6 @@
 
 #include "../Core.h"
 #include "../MathUtil.h"
-
 #include "Camera.h"
 
 namespace Engine

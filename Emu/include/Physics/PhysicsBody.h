@@ -2,9 +2,6 @@
 
 #include "../Core.h"
 #include "../MathUtil.h"
-
-#include "ConversionFunctions.h"
-
 #include "BodyTypes.h"
 
 class b2Body;

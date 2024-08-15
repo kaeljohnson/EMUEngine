@@ -4,6 +4,7 @@
 #include "../../include/MathUtil.h"
 
 #include "../../include/Physics/PhysicsBody.h"
+#include "../../include/Physics/ConversionFunctions.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/BodyTypes.h"
 
@@ -23,7 +24,7 @@ namespace Engine
 		m_restitution = 0.0f;
 		m_restitutionThreshold = 0.0f;
 		m_density = 1.0f;
-		m_friction = 1.0f;
+		m_friction = 0.0f;
 
 		ENGINE_INFO_D("Box created at position: " + std::to_string(position.X) + "," 
 			+ std::to_string(position.Y) + ". With width: " + std::to_string(size.X) + ", height: " + std::to_string(size.Y));

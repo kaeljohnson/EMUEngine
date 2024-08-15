@@ -4,9 +4,8 @@
 #include <unordered_map>
 
 #include "../MathUtil.h"
-#include "Event.h"
-
 #include "../SDLWrapper/SDLWrapper.h"
+#include "Event.h"
 
 namespace Engine
 {
