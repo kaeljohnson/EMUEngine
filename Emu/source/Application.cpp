@@ -47,8 +47,8 @@ namespace Engine
 		// Will need to add more functionality in here to handle scene switching
 
 		// Camera frames current scene.
-		m_cameraManager.m_ptrCurrentCamera->Frame(currentScene->GetPixelsPerUnit(), Vector2D<int>(currentScene->GetLevelWidth(), currentScene->GetLevelHeight()), 
-			Vector2D<int>(m_rendererManager.GetFullscreenWidth(), m_rendererManager.GetFullscreenHeight()), m_rendererManager.GetScale());
+		m_cameraManager.m_ptrCurrentCamera->Frame(currentScene->GetPixelsPerUnit(), Math::Vector2D<int>(currentScene->GetLevelWidth(), currentScene->GetLevelHeight()), 
+			Math::Vector2D<int>(m_rendererManager.GetFullscreenWidth(), m_rendererManager.GetFullscreenHeight()), m_rendererManager.GetScale());
 
 		m_rendererManager.SetScene(currentScene); 
 

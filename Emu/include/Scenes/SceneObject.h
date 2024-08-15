@@ -23,7 +23,7 @@ namespace Engine
 		int LayerIdx;
 		int DirectionFacing;
 	public:
-		SceneObject(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size, int directionFacing);
+		SceneObject(const BodyType bodyType, const bool fixed, const Math::Vector2D<float> position, const Math::Vector2D<float> size, int directionFacing);
 
 		EMU_API virtual ~SceneObject() = default;
 

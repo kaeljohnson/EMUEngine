@@ -14,7 +14,7 @@ namespace Engine
 	{
     public:
         EventDispatcher(std::queue<Event>& eventQ, std::unordered_map<EventType, bool>& keyStates, 
-            std::unordered_map<EventType, bool>& mouseButtonStates, Vector2D<int>& mousePosition, Vector2D<int>& scrollDirection);
+            std::unordered_map<EventType, bool>& mouseButtonStates, Math::Vector2D<int>& mousePosition, Math::Vector2D<int>& scrollDirection);
         void PollEvents();
     private:
         void dispatchQuitEvent();
@@ -29,7 +29,7 @@ namespace Engine
         std::queue<Event>& refEventQ;
         std::unordered_map<EventType, bool>& refKeyStates;
         std::unordered_map<EventType, bool>& refMouseButtonStates;
-        Vector2D<int>& refMousePosition;
-        Vector2D<int>& refScrollDirection;
+        Math::Vector2D<int>& refMousePosition;
+        Math::Vector2D<int>& refScrollDirection;
 	};
 }

@@ -45,7 +45,7 @@ namespace Engine
 		tileMap.LoadMap();
 		tileMap.CreateCollisionBodies();
 
-		m_levelDimensionsInUnits = Vector2D<int>(tileMap.GetWidth(), tileMap.GetHeight());
+		m_levelDimensionsInUnits = Math::Vector2D<int>(tileMap.GetWidth(), tileMap.GetHeight());
 
 		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_levelDimensionsInUnits.X) + ", Map height: " + std::to_string(m_levelDimensionsInUnits.Y));
 
@@ -74,7 +74,7 @@ namespace Engine
 		HasTileMap = true;
 	}
 
-	void Scene::SetLevelDimensions(const Vector2D<int> levelDimensions)
+	void Scene::SetLevelDimensions(const Math::Vector2D<int> levelDimensions)
 	{
 		if (HasTileMap)
 		{
@@ -109,7 +109,7 @@ namespace Engine
 		m_world->Update();
 	};
 
-	void Scene::CreatePhysicsSimulation(const Vector2D<float> gravity, const int pixelsPerUnit)
+	void Scene::CreatePhysicsSimulation(const Math::Vector2D<float> gravity, const int pixelsPerUnit)
 	{
 		// What happens if this is called multiple times for one scene? Make sure nothing bad.
 
@@ -140,7 +140,7 @@ namespace Engine
 		}
 	}
 
-	void Scene::SetGravity(const Vector2D<float> gravity)
+	void Scene::SetGravity(const Math::Vector2D<float> gravity)
 	{
 
 		m_world->SetGravity(gravity.X, gravity.Y);

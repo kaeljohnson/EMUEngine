@@ -5,7 +5,7 @@
 namespace Engine
 {
     EventDispatcher::EventDispatcher(std::queue<Event>& eventQ, std::unordered_map<EventType, bool>& keyStates,
-        std::unordered_map<EventType, bool>& mouseButtonStates, Vector2D<int>& mousePosition, Vector2D<int>& scrollDirection)
+        std::unordered_map<EventType, bool>& mouseButtonStates, Math::Vector2D<int>& mousePosition, Math::Vector2D<int>& scrollDirection)
         : refEventQ(eventQ), refKeyStates(keyStates), refMouseButtonStates(mouseButtonStates), 
         refMousePosition(mousePosition), refScrollDirection(scrollDirection)
     {}

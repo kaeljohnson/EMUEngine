@@ -10,8 +10,8 @@ m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFact
 
 void PlayerCamera::Update(const double interpolation)
 {
-    float targetX = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevPosition().X, ptrCameraTarget->GetPhysicsBody()->GetCenterPosition().X, (float)interpolation);
-    float targetY = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevPosition().Y, ptrCameraTarget->GetPhysicsBody()->GetCenterPosition().Y, (float)interpolation);
+    float targetX = Engine::Math::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevPosition().X, ptrCameraTarget->GetPhysicsBody()->GetCenterPosition().X, (float)interpolation);
+    float targetY = Engine::Math::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevPosition().Y, ptrCameraTarget->GetPhysicsBody()->GetCenterPosition().Y, (float)interpolation);
 
     float desiredLookAhead = ptrCameraTarget->DirectionFacing * m_lookAheadFactor;
 

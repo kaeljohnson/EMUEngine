@@ -38,8 +38,8 @@ namespace Engine
 		const float m_width;
 		const float m_height;
 
-		const Vector2D<float> m_startingPosition;
-		Vector2D<float> m_prevPosition;
+		const Math::Vector2D<float> m_startingPosition;
+		Math::Vector2D<float> m_prevPosition;
 		
 		bool m_fixed;
 		bool m_gravityOn;
@@ -55,8 +55,8 @@ namespace Engine
 		bool m_rightSensor;
 
 	public:
-		EMU_API void ApplyForceToBody(Vector2D<float> force);
-		EMU_API void ApplyImpulseToBody(Vector2D<float> impulse);
+		EMU_API void ApplyForceToBody(Math::Vector2D<float> force);
+		EMU_API void ApplyImpulseToBody(Math::Vector2D<float> impulse);
 
 		// PhysicsBody2d getter and setter wrappers
 		EMU_API void SetGravity(bool enabled);
@@ -73,7 +73,7 @@ namespace Engine
 		EMU_API void SetStartingFriction(const float friction);
 		EMU_API void SetFriction(const float friction);
 
-		EMU_API inline Vector2D<float> GetStartingPosition() const { return m_startingPosition; }
+		EMU_API inline Math::Vector2D<float> GetStartingPosition() const { return m_startingPosition; }
 
 		EMU_API inline const float GetHalfWidth() const { return m_halfWidth; }
 		EMU_API inline const float GetHalfHeight() const { return m_halfHeight; }
@@ -96,17 +96,17 @@ namespace Engine
 		EMU_API inline const bool GetHasSensorLeft() const { return m_leftSensor; }
 		EMU_API inline const bool GetHasSensorRight() const { return m_rightSensor; }
 
-		EMU_API const Vector2D<float> GetVelocity() const;
-		EMU_API const Vector2D<float> GetCenterPosition() const;
-		EMU_API const Vector2D<float> GetTopLeftPosition() const;
+		EMU_API const Math::Vector2D<float> GetVelocity() const;
+		EMU_API const Math::Vector2D<float> GetCenterPosition() const;
+		EMU_API const Math::Vector2D<float> GetTopLeftPosition() const;
 
-		EMU_API inline const Vector2D<float> GetDimensions() const { return Vector2D<float>(m_width, m_height); }
+		EMU_API inline const Math::Vector2D<float> GetDimensions() const { return Math::Vector2D<float>(m_width, m_height); }
 
 		EMU_API inline const float GetSize() const { return m_width * m_height; }
 
 	public:
 		PhysicsBody() = default;
-		PhysicsBody(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size);
+		PhysicsBody(const BodyType bodyType, const bool fixed, const Math::Vector2D<float> position, const Math::Vector2D<float> size);
 
 		~PhysicsBody();
 
@@ -139,7 +139,7 @@ namespace Engine
 		void UpdatePrevPosition();
 
 		// Non-PhysicsBody2d getters
-		inline const Vector2D<float> GetTopLeftPrevPosition() const { return m_prevPosition; }
-		inline const Vector2D<float> GetCenterPrevPosition() const { return Vector2D<float>(m_prevPosition.X + m_halfWidth, m_prevPosition.Y + m_halfHeight); }
+		inline const Math::Vector2D<float> GetTopLeftPrevPosition() const { return m_prevPosition; }
+		inline const Math::Vector2D<float> GetCenterPrevPosition() const { return Math::Vector2D<float>(m_prevPosition.X + m_halfWidth, m_prevPosition.Y + m_halfHeight); }
 	};
 }

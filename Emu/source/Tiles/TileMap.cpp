@@ -60,8 +60,8 @@ namespace Engine
                 {
                     m_tiles.emplace_back(
                         SENSOR,
-						Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
-						Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)), 0);
+						Math::Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
+						Math::Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)), 0);
 				}
 			}
 		}
@@ -128,8 +128,8 @@ namespace Engine
                     // Create the tile object with calculated dimensions
                     m_collisionBodies.emplace_back(
                         STATIC,
-                        Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
-                        Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)),
+                        Math::Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
+                        Math::Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)),
                         0);
                 }
             }

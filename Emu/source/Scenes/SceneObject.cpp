@@ -10,8 +10,8 @@
 
 namespace Engine
 {
-	SceneObject::SceneObject(const BodyType bodyType, const bool fixed, const Vector2D<float> position,
-		const Vector2D<float> size, int directionFacing)
+	SceneObject::SceneObject(const BodyType bodyType, const bool fixed, const Math::Vector2D<float> position,
+		const Math::Vector2D<float> size, int directionFacing)
 		: m_physicsBody(std::make_shared<PhysicsBody>(bodyType, fixed, position, size)),
 		Enabled(true), Visible(true), LayerIdx(-1), uuid(CreateUUID()), DirectionFacing(directionFacing)
 	{

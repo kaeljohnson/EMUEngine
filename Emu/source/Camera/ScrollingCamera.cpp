@@ -13,7 +13,7 @@ namespace Engine
 		Clamp();
 	}
 
-	void ScrollingCamera::SetScrollingSpeeds(const Vector2D<float> scrollSpeed)
+	void ScrollingCamera::SetScrollingSpeeds(const Math::Vector2D<float> scrollSpeed)
 	{
 		m_scrollSpeed = scrollSpeed;
 	}

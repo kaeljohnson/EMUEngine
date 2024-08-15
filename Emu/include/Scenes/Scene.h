@@ -18,8 +18,8 @@ namespace Engine
 		EMU_API Scene();
 		EMU_API ~Scene() = default;
 
-		EMU_API void CreatePhysicsSimulation(const Vector2D<float>, const int pixelsPerUnit);
-		EMU_API void SetGravity(const Vector2D<float> gravity);
+		EMU_API void CreatePhysicsSimulation(const Math::Vector2D<float>, const int pixelsPerUnit);
+		EMU_API void SetGravity(const Math::Vector2D<float> gravity);
 
 		// Adds scene object to the scene. Need to add a "order" parameter to determine the order of rendering.
 		EMU_API void Add(SceneObject& sceneObject, int layerNum);
@@ -30,12 +30,12 @@ namespace Engine
 		EMU_API void AddTileMap(TileMap& tileMap, int layerIdx);
 
 		// IF theres no map in the level, client will decided the dimensions manually.
-		EMU_API void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
+		EMU_API void SetLevelDimensions(const Math::Vector2D<int> levelWidthInUnits);
 
 	private:
 		int m_pixelsPerUnit;
 
-		Vector2D<int> m_levelDimensionsInUnits;
+		Math::Vector2D<int> m_levelDimensionsInUnits;
 
 		std::vector<SceneObjectStack> m_layers;
 

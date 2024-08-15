@@ -7,7 +7,7 @@
 
 namespace Engine 
 {
-	Entity::Entity(const Vector2D<float> position, const Vector2D<float> size, int directionFacing)
+	Entity::Entity(const Math::Vector2D<float> position, const Math::Vector2D<float> size, int directionFacing)
 		: SceneObject(DYNAMIC, false, position, size, directionFacing)
 	{}
 } 

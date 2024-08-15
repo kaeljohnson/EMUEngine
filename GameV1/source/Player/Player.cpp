@@ -15,7 +15,7 @@
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
         m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right),
-        Entity(Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height), 1)
+        Entity(Engine::Math::Vector2D<float>(startingX, startingY), Engine::Math::Vector2D<float>(width, height), 1)
     {
         // Need to have them be able to set this during construction of physics body.
     	m_physicsBody->SetStartingFriction(0.0f);

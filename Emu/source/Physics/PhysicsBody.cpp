@@ -11,7 +11,7 @@
 
 namespace Engine
 {
-	PhysicsBody::PhysicsBody(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
+	PhysicsBody::PhysicsBody(const BodyType bodyType, const bool fixed, const Math::Vector2D<float> position, const Math::Vector2D<float> size)
 		: m_halfWidth(size.X / 2.0f), m_halfHeight(size.Y / 2.0f), 
 		m_width(size.X), m_height(size.Y), m_startingPosition(position),
 		m_bodyType(bodyType), m_fixed(fixed), m_body(nullptr),
@@ -43,12 +43,12 @@ namespace Engine
 		}
 	}
 
-	void PhysicsBody::ApplyForceToBody(Vector2D<float> force)
+	void PhysicsBody::ApplyForceToBody(Math::Vector2D<float> force)
 	{
 		m_body->ApplyForceToCenter(b2Vec2(force.X, force.Y), true);
 	}
 
-	void PhysicsBody::ApplyImpulseToBody(Vector2D<float> impulse)
+	void PhysicsBody::ApplyImpulseToBody(Math::Vector2D<float> impulse)
 	{
 		m_body->ApplyLinearImpulseToCenter(b2Vec2(impulse.X, impulse.Y), true);
 	}
@@ -216,9 +216,9 @@ namespace Engine
 	void PhysicsBody::SetLeftSensor(const bool leftSensor) { m_leftSensor = leftSensor; }
 	void PhysicsBody::SetRightSensor(const bool rightSensor) { m_rightSensor = rightSensor; }
 
-	const Vector2D<float> PhysicsBody::GetVelocity() const { return Vector2D<float>(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y); }
-	const Vector2D<float> PhysicsBody::GetCenterPosition() const { return Vector2D<float>(m_body->GetPosition().x, m_body->GetPosition().y); }
-	const Vector2D<float> PhysicsBody::GetTopLeftPosition() const { return Vector2D<float>(m_body->GetPosition().x - m_width / 2.0f, m_body->GetPosition().y - m_height / 2.0f); }
+	const Math::Vector2D<float> PhysicsBody::GetVelocity() const { return Math::Vector2D<float>(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y); }
+	const Math::Vector2D<float> PhysicsBody::GetCenterPosition() const { return Math::Vector2D<float>(m_body->GetPosition().x, m_body->GetPosition().y); }
+	const Math::Vector2D<float> PhysicsBody::GetTopLeftPosition() const { return Math::Vector2D<float>(m_body->GetPosition().x - m_width / 2.0f, m_body->GetPosition().y - m_height / 2.0f); }
 
 	const float PhysicsBody::GetAngleInRadians() const { return m_body->GetAngle(); }
 	const float PhysicsBody::GetAngleInDegrees() const { return radiansToDegrees(m_body->GetAngle()); }

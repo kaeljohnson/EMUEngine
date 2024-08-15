@@ -21,7 +21,7 @@ namespace Engine
 	private:
 		// Box2D members
 		b2World* m_world;
-		Vector2D<float> m_gravity;
+		Math::Vector2D<float> m_gravity;
 
 		int m_velocityIterations;
 		int m_positionIterations;
