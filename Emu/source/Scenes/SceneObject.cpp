@@ -5,15 +5,14 @@
 #include "../../include/CommonFunctions.h"
 #include "../../include/Scenes/SceneObject.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/Textures/ITexture.h"
 #include "../../include/Events/EventManager.h"
 
 namespace Engine
 {
-	SceneObject::SceneObject(const BodyType bodyType, const bool fixed, const Vector2D<float> position,
-		const Vector2D<float> size, int directionFacing)
+	SceneObject::SceneObject(const BodyType bodyType, const bool fixed, const Math::Vector2D<float> position,
+		const Math::Vector2D<float> size, int directionFacing)
 		: m_physicsBody(std::make_shared<PhysicsBody>(bodyType, fixed, position, size)),
-		Enabled(true), Visible(true), LayerIdx(-1), uuid(CreateUUID()), DirectionFacing(directionFacing)
+		m_enabled(true), m_visible(true), m_layerIdx(-1), uuid(CreateUUID()), m_directionFacing(directionFacing)
 	{
 		ENGINE_INFO_D("SceneObject created");
 	}
@@ -50,4 +49,9 @@ namespace Engine
 	{
 		// Purely virtual function meant to be implemented by client of engine.
 	}
+
+	void SceneObject::SetDirectionFacing(int directionFacing) { m_directionFacing = directionFacing; }
+	void SceneObject::SetLayerIdx(int layerIdx) { m_layerIdx = layerIdx; }
+	void SceneObject::SetEnabled(bool enabled) { m_enabled = enabled; }
+	void SceneObject::SetVisible(bool visible) { m_visible = visible; }
 }

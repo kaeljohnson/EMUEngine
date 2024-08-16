@@ -7,7 +7,6 @@
 #include "../../include/Events/EventManager.h"
 #include "../../include/Events/EventDispatcher.h"
 #include "../../include/Events/Event.h"
-#include "../../include/Logging/Logger.h"
 
 namespace Engine
 {

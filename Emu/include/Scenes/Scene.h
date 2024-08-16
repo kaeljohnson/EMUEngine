@@ -4,7 +4,6 @@
 
 #include "../Core.h"
 #include "../MathUtil.h"
-
 #include "../Scenes/SceneObject.h"
 #include "../Scenes/SceneObjectStack.h"
 #include "../Physics/World.h"
@@ -18,27 +17,26 @@ namespace Engine
 		EMU_API Scene();
 		EMU_API ~Scene() = default;
 
-		EMU_API void CreatePhysicsSimulation(const Vector2D<float>, const int pixelsPerUnit);
-		EMU_API void SetGravity(const Vector2D<float> gravity);
+		EMU_API void CreatePhysicsSimulation(const Math::Vector2D<float>, const int pixelsPerUnit);
+		EMU_API void SetGravity(const Math::Vector2D<float> gravity);
 
-		// Adds scene object to the scene. Need to add a "order" parameter to determine the order of rendering.
-		EMU_API void Add(SceneObject& sceneObject, int layerNum);
-	
 		// Layer number is the index for now.
 		EMU_API void AddLayer(size_t layerIdx);
+
+		EMU_API void Add(SceneObject& sceneObject, int layerNum);
 		EMU_API void Remove(SceneObject& sceneObject);
+
 		EMU_API void AddTileMap(TileMap& tileMap, int layerIdx);
 
-		// IF theres no map in the level, client will decided the dimensions manually.
-		EMU_API void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
+		// IF theres no map in the level, client will decide the dimensions manually.
+		EMU_API void SetLevelDimensions(const Math::Vector2D<int> levelWidthInUnits);
 
 	private:
 		int m_pixelsPerUnit;
+		bool m_hasTileMap;
 
-		Vector2D<int> m_levelDimensionsInUnits;
-
+		Math::Vector2D<int> m_levelDimensionsInUnits;
 		std::vector<SceneObjectStack> m_layers;
-
 		std::unique_ptr<World> m_world;
 
 	public:
@@ -50,7 +48,5 @@ namespace Engine
 		void CheckValid();
 		void OnScenePlay();
 		void Update();
-
-		bool HasTileMap;
 	}; 
 }
