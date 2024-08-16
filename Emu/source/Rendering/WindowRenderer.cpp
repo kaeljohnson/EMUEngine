@@ -75,7 +75,7 @@ namespace Engine
 			});
 	}
 
-	void WindowRenderer::RenderScene(std::shared_ptr<Scene> currentScene, const double interpolation, const Math::Vector2D<float> cameraOffset)
+	void WindowRenderer::RenderScene(std::shared_ptr<Scene> currentScene, const double interpolation, const Vector2D<float> cameraOffset)
 	{
 
 		ClearScreen();
@@ -100,7 +100,7 @@ namespace Engine
 
 				if (isVisible)
 				{
-					Draw(sceneObject, currentScene->GetPixelsPerUnit(), interpolation, Math::Vector2D<float>(cameraLeft, cameraTop));
+					Draw(sceneObject, currentScene->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
 				}
 			}
 		}
@@ -109,7 +109,7 @@ namespace Engine
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void WindowRenderer::Draw(SceneObject* sceneObject, const int pixelsPerUnit, const double interpolation, const Math::Vector2D<float> offset)
+	void WindowRenderer::Draw(SceneObject* sceneObject, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset)
 	{
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
@@ -118,8 +118,8 @@ namespace Engine
 
 		SDLRect dst
 		{
-			static_cast<int>(round((Math::Lerp(ptrBody->GetTopLeftPrevPosition().X, ptrBody->GetTopLeftPosition().X, (float)interpolation) - offset.X) * pixelsPerUnit * SCALE)),
-			static_cast<int>(round((Math::Lerp(ptrBody->GetTopLeftPrevPosition().Y, ptrBody->GetTopLeftPosition().Y, (float)interpolation) - offset.Y) * pixelsPerUnit * SCALE)),
+			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevPosition().X, ptrBody->GetTopLeftPosition().X, (float)interpolation) - offset.X) * pixelsPerUnit * SCALE)),
+			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevPosition().Y, ptrBody->GetTopLeftPosition().Y, (float)interpolation) - offset.Y) * pixelsPerUnit * SCALE)),
 
 			static_cast<int>(round(ptrBody->GetDimensions().X * pixelsPerUnit * SCALE)),
 			static_cast<int>(round(ptrBody->GetDimensions().Y * pixelsPerUnit * SCALE))

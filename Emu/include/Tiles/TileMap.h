@@ -1,9 +1,10 @@
 #pragma once
 
-#include <vector>
-
 #include "../Core.h"
 #include "../MathUtil.h"
+
+#include <vector>
+
 #include "Tile.h"
 
 namespace Engine
@@ -37,7 +38,7 @@ namespace Engine
 		std::vector<char> m_map;
 		std::vector<Tile> m_collisionBodies;
 		std::vector<Tile> m_tiles;
-		Math::Vector2D<int> m_mapDimensions;
+		Vector2D<int> m_mapDimensions;
 
 		int m_numUnitsPerTile;
 	};

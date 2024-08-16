@@ -3,7 +3,9 @@
 #include <memory>
 
 #include "../MathUtil.h"
+
 #include "PhysicsBody.h"
+#include "ConversionFunctions.h"
 
 class b2World;
 
@@ -19,7 +21,7 @@ namespace Engine
 	private:
 		// Box2D members
 		b2World* m_world;
-		Math::Vector2D<float> m_gravity;
+		Vector2D<float> m_gravity;
 
 		int m_velocityIterations;
 		int m_positionIterations;
