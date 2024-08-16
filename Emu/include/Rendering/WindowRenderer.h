@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../SDLWrapper/SDLWrapper.h"
+// #include "../SDLWrapper/SDLWrapper.h"
 
 #include <memory>
 
@@ -11,6 +11,8 @@
 
 namespace Engine
 {
+	class ISDL;
+
 	class WindowRenderer
 	{
 	public: 
@@ -32,8 +34,10 @@ namespace Engine
 	public:
 		// May need to decouple if there is ever a need for 
 		// the application to have multiple windows.
-		SDLWindow* m_ptrWindow;
-		SDLRenderer* m_ptrRenderer;
+		// SDLWindow* m_ptrWindow;
+		// SDLRenderer* m_ptrRenderer;
+		void* m_ptrWindow;
+		void* m_ptrRenderer;
 
 		Vector2D<int> m_screenSize;
 		Vector2D<int> m_virtualSize;

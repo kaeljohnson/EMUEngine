@@ -8,7 +8,6 @@
 #include "../MathUtil.h"
 
 #include "../Physics/PhysicsBody.h"
-#include "../Textures/ITexture.h"
 #include "../Events/Event.h"
 
 namespace Engine
