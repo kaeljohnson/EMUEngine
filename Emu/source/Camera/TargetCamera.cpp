@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../include/MathUtil.h"
-
 #include "../../include/Camera/TargetCamera.h"
 
 namespace Engine

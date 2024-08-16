@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "../../include/Entities/Entity.h"
 #include "../../include/Scenes/SceneObject.h"
 
