@@ -1,13 +1,12 @@
 #pragma once
 
 #include <utility>
-#include "../../include/MathUtil.h"
 
+#include "../../include/MathUtil.h"
 #include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Physics/ConversionFunctions.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/BodyTypes.h"
-
 #include "box2d/box2d.h"
 
 namespace Engine

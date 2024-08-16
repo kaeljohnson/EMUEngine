@@ -13,7 +13,7 @@ void PlayerCamera::Update(const double interpolation)
     float targetX = Engine::Math::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevPosition().X, ptrCameraTarget->GetPhysicsBody()->GetCenterPosition().X, (float)interpolation);
     float targetY = Engine::Math::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevPosition().Y, ptrCameraTarget->GetPhysicsBody()->GetCenterPosition().Y, (float)interpolation);
 
-    float desiredLookAhead = ptrCameraTarget->DirectionFacing * m_lookAheadFactor;
+    float desiredLookAhead = ptrCameraTarget->GetDirectionFacing() * m_lookAheadFactor;
 
     // Calculate the difference between the current and desired look-ahead
     float lookAheadDifference = desiredLookAhead - m_lookAhead;

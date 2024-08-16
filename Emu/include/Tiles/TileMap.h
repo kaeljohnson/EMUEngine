@@ -1,10 +1,9 @@
 #pragma once
 
-#include "../Core.h"
-#include "../MathUtil.h"
-
 #include <vector>
 
+#include "../Core.h"
+#include "../MathUtil.h"
 #include "Tile.h"
 
 namespace Engine

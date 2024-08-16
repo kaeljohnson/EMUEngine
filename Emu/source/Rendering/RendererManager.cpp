@@ -3,16 +3,13 @@
 #include <memory>
 
 #include "../../include/SDLWrapper/SDLWrapper.h"
-
+#include "../../include/MathUtil.h"
 #include "../../include/Rendering/RendererManager.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Scenes/SceneObject.h"
 #include "../../include/Physics/PhysicsBody.h"
-
 #include "../../include/Rendering/WindowRenderer.h"
-
-#include "../../include/MathUtil.h"
 
 namespace Engine
 {

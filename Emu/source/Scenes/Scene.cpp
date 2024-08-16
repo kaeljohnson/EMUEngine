@@ -5,14 +5,13 @@
 #include "../../include/Scenes/SceneObject.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/PhysicsBody.h"
-#include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Tiles/TileMap.h"
 #include "../../include/Tiles/Tile.h"
 #include "../../include/MathUtil.h"
 
 namespace Engine
 {
-	Scene::Scene() : m_pixelsPerUnit(32), m_layers(), m_levelDimensionsInUnits(32, 32), HasTileMap(false),
+	Scene::Scene() : m_pixelsPerUnit(32), m_layers(), m_levelDimensionsInUnits(32, 32), m_hasTileMap(false),
 		m_world(nullptr) {}
 
 	void Scene::CheckValid()
@@ -71,12 +70,12 @@ namespace Engine
 			m_world->AddBody(ptrBox);
 		}
 
-		HasTileMap = true;
+		m_hasTileMap = true;
 	}
 
 	void Scene::SetLevelDimensions(const Math::Vector2D<int> levelDimensions)
 	{
-		if (HasTileMap)
+		if (m_hasTileMap)
 		{
 			ENGINE_INFO_D("Scene already has a map. Overriding map width!");
 		}
@@ -130,7 +129,7 @@ namespace Engine
 
 		ENGINE_INFO_D("Creating simulation with gravity: " + std::to_string(gravity.X) + ", " + std::to_string(gravity.Y));
 
-		if (!HasTileMap)
+		if (!m_hasTileMap)
 		{
 			ENGINE_INFO_D("No map in the level. Add map or set level dimensions manually.");
 		}
@@ -156,7 +155,7 @@ namespace Engine
 			return;
 		}
 
-		sceneObject.LayerIdx = layerIdx;
+		sceneObject.SetLayerIdx(layerIdx);
 		m_layers[layerIdx].Push(&sceneObject);
 
 		std::shared_ptr<PhysicsBody> ptrPhysicsBody = sceneObject.GetPhysicsBody();
@@ -166,13 +165,13 @@ namespace Engine
 
 	void Scene::Remove(SceneObject& sceneObject)
 	{
-		if (sceneObject.LayerIdx >= m_layers.size() || sceneObject.LayerIdx == -1)
+		if (sceneObject.GetLayerIdx() >= m_layers.size() || sceneObject.GetLayerIdx() == -1)
 		{
-			ENGINE_CRITICAL_D("Invalid layer index: " + std::to_string(sceneObject.LayerIdx) + ". Cannot remove SceneObject because it does not exist in a valid layer.");
+			ENGINE_CRITICAL_D("Invalid layer index: " + std::to_string(sceneObject.GetLayerIdx()) + ". Cannot remove SceneObject because it does not exist in a valid layer.");
 			return;
 		}
 
-		m_layers[sceneObject.LayerIdx].Pop(&sceneObject);
+		m_layers[sceneObject.GetLayerIdx()].Pop(&sceneObject);
 
 		std::shared_ptr<PhysicsBody> ptrBody = sceneObject.GetPhysicsBody();
 

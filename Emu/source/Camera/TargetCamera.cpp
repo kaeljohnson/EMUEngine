@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../include/EngineConstants.h"
 #include "../../include/MathUtil.h"
 
 #include "../../include/Camera/TargetCamera.h"

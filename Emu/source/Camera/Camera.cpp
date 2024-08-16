@@ -17,8 +17,8 @@ namespace Engine
 	{
 		m_scale = scale;
 		m_screenSize = screenSize;
-		m_cameraMaxBound = mapBounds - m_size;
 		m_size = Math::Vector2D<float>(screenSize.X / (pixelsPerUnit * scale.X), screenSize.Y / (pixelsPerUnit * scale.Y));
+		m_cameraMaxBound = mapBounds - m_size;
 	}
 
 	void Camera::Clamp()

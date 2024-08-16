@@ -55,8 +55,8 @@
     {
         float currentVelocityX = m_physicsBody->GetVelocity().X;
 
-        if (m_currentDirection == PlayerDirection::Right) DirectionFacing = 1;
-		else DirectionFacing = -1;
+        if (m_currentDirection == PlayerDirection::Right) m_directionFacing = 1;
+		else m_directionFacing = -1;
 
         switch (m_currentState)
         {

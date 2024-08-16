@@ -36,8 +36,6 @@ namespace Engine
 
     private:
         std::shared_ptr<Scene> m_ptrCurrentScene;
-
-	private:
         std::unique_ptr<WindowRenderer> m_ptrWindowRenderer;
 
         void free();

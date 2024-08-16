@@ -5,7 +5,6 @@
 #include <memory>
 
 #include "../MathUtil.h"
-
 #include "../Scenes/SceneObject.h"
 #include "../Scenes/Scene.h"
 
