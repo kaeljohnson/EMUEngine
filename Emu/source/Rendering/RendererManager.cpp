@@ -3,13 +3,16 @@
 #include <memory>
 
 #include "../../include/SDLWrapper/SDLWrapper.h"
-#include "../../include/MathUtil.h"
+
 #include "../../include/Rendering/RendererManager.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Scenes/SceneObject.h"
 #include "../../include/Physics/PhysicsBody.h"
+
 #include "../../include/Rendering/WindowRenderer.h"
+
+#include "../../include/MathUtil.h"
 
 namespace Engine
 {
@@ -27,7 +30,7 @@ namespace Engine
 		m_ptrWindowRenderer->ResizeWindow(newWindowWidth, newWindowHeight);
 	}
 
-	void RendererManager::RenderScene(const double interpolation, const Math::Vector2D<float> cameraOffset)
+	void RendererManager::RenderScene(const double interpolation, const Vector2D<float> cameraOffset)
 	{
 		m_ptrWindowRenderer->RenderScene(m_ptrCurrentScene, interpolation, cameraOffset);
 
@@ -43,7 +46,7 @@ namespace Engine
 		m_ptrWindowRenderer->SetViewport();
 	}
 
-	const Math::Vector2D<float> RendererManager::GetScale() const
+	const Vector2D<float> RendererManager::GetScale() const
 	{
 		return m_ptrWindowRenderer->m_scale;
 	}

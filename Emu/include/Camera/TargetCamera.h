@@ -1,8 +1,10 @@
 #pragma once
 
 #include "../Core.h"
-#include "../Scenes/SceneObject.h"
+
 #include "Camera.h"
+
+#include "../Scenes/SceneObject.h"
 
 namespace Engine
 {

@@ -9,7 +9,7 @@
 
 namespace Engine
 {
-	World::World() : m_world(new b2World(b2Vec2(0.0f, 0.0f))), m_gravity(Math::Vector2D( 0.0f, 0.0f )), m_velocityIterations(0), m_positionIterations(0) {}
+	World::World() : m_world(new b2World(b2Vec2(0.0f, 0.0f))), m_gravity(Vector2D( 0.0f, 0.0f )), m_velocityIterations(0), m_positionIterations(0) {}
 
 	World::World(const float gravityX, const float gravityY, const int velocityIterations, const int positionIterations)
 		: m_gravity({ gravityX, gravityY }), m_world(new b2World(b2Vec2( gravityX, gravityY))),

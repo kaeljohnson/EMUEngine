@@ -20,13 +20,13 @@ int main(int argc, char* args[])
 	Engine::ScenePtr scene = Engine::CreateScene();
 
 	// Need physcis to scale with pixels per unit.
-	scene->CreatePhysicsSimulation(Engine::Math::Vector2D(0.0f, 3.1f), 32);
+	scene->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 3.1f), 32);
 	
 	Player player(1.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 
 	Engine::ScrollingCamera scrollCamera;
-	scrollCamera.SetScrollingSpeeds(Engine::Math::Vector2D<float>(0.0005f, 0.0f));
-	scrollCamera.SetCameraPosition(Engine::Math::Vector2D<float>(0.0f, 38.5f));
+	scrollCamera.SetScrollingSpeeds(Engine::Vector2D<float>(0.0005f, 0.0f));
+	scrollCamera.SetCameraPosition(Engine::Vector2D<float>(0.0f, 38.5f));
 
 	PlayerCamera playerCamera;
 	playerCamera.SetCameraTarget(&player);

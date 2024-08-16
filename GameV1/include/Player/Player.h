@@ -35,7 +35,7 @@ private:
 	float m_jumpCharge;
 	float m_coyoteTime;
 	bool m_onGround;
-	Engine::Math::Vector2D<float> m_force;
+	Engine::Vector2D<float> m_force;
 
 	const Engine::EventStatesMap& refKeyStates;
 

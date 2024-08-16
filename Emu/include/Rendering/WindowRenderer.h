@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "../MathUtil.h"
+
 #include "../Scenes/SceneObject.h"
 #include "../Scenes/Scene.h"
 
@@ -16,8 +17,8 @@ namespace Engine
 		WindowRenderer();
 		~WindowRenderer();
 
-		void RenderScene(std::shared_ptr<Scene> currentScene, const double interpolation, const Math::Vector2D<float> offset);
-		void Draw(SceneObject* sceneObject, const int pixelsPerUnit, const double interpolation, const Math::Vector2D<float> offset);
+		void RenderScene(std::shared_ptr<Scene> currentScene, const double interpolation, const Vector2D<float> offset);
+		void Draw(SceneObject* sceneObject, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset);
 		void Display();
 
 		void SetViewport();
@@ -34,13 +35,13 @@ namespace Engine
 		SDLWindow* m_ptrWindow;
 		SDLRenderer* m_ptrRenderer;
 
-		Math::Vector2D<int> m_screenSize;
-		Math::Vector2D<int> m_virtualSize;
-		Math::Vector2D<float> m_scale;
+		Vector2D<int> m_screenSize;
+		Vector2D<int> m_virtualSize;
+		Vector2D<float> m_scale;
 		float SCALE;
 
-		Math::Vector2D<int> m_viewportSize;
-		Math::Vector2D<int> m_viewportPosition;
+		Vector2D<int> m_viewportSize;
+		Vector2D<int> m_viewportPosition;
 
 		bool m_rendererCreated;
 	};

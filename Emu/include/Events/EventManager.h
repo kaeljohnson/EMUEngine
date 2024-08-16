@@ -2,11 +2,13 @@
 
 #include <queue>
 #include <unordered_map>
+#include <utility>
 #include <memory>
 #include <functional>
 
 #include "../Core.h"
 #include "../MathUtil.h"
+
 #include "../Events/Event.h"
 
 namespace Engine
@@ -24,8 +26,8 @@ namespace Engine
         EMU_API void RegisterEventHandler(EventType type, EventHandler handler);
         EMU_API inline const EventStatesMap& GetKeyStates() const { return m_keyStates; }
         EMU_API inline const std::unordered_map<EventType, bool>& GetMouseButtonStates() const { return m_mouseButtonStates; }
-        EMU_API inline const Math::Vector2D<int>& GetMousePosition() const { return m_mousePosition; }
-        EMU_API inline const Math::Vector2D<int>& GetScrollDirection() const { return m_scrollDirection; }
+        EMU_API inline const Vector2D<int>& GetMousePosition() const { return m_mousePosition; }
+        EMU_API inline const Vector2D<int>& GetScrollDirection() const { return m_scrollDirection; }
 
     public:
         EventManager();
@@ -45,8 +47,8 @@ namespace Engine
         EventStatesMap m_keyStates;
         std::unordered_map<EventType, bool> m_mouseButtonStates;
 
-        Math::Vector2D<int> m_mousePosition;
-        Math::Vector2D<int> m_scrollDirection;
+        Vector2D<int> m_mousePosition;
+        Vector2D<int> m_scrollDirection;
 
         std::unique_ptr<EventDispatcher> m_eventDispatcher;
     };
