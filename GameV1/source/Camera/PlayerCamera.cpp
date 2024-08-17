@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Engine.h>
+
 #include "../../include/Camera/PlayerCamera.h"
 
 PlayerCamera::PlayerCamera() : m_smoothingFactor(0.001f),
@@ -19,7 +21,7 @@ void PlayerCamera::Update(const double interpolation)
     float lookAheadDifference = desiredLookAhead - m_lookAhead;
 
     // Calculate the step to move towards the desired look-ahead, ensuring we don't overshoot
-    m_lookAheadChangeSpeed = 0.005f / refScale.X;
+    m_lookAheadChangeSpeed = 0.005f / Engine::Screen::SCALE.X;
 
     float lookAheadStep = std::min(std::abs(lookAheadDifference), m_lookAheadChangeSpeed * (float)interpolation);
     lookAheadStep *= (lookAheadDifference > 0) ? 1 : -1; // Ensure the step has the correct direction
@@ -45,7 +47,7 @@ void PlayerCamera::Update(const double interpolation)
     }
     else if (m_smoothingOn)
     {
-        m_offset.Y += (desiredCameraTopLeftY - m_offset.Y) * (m_smoothingFactor / refScale.Y);
+        m_offset.Y += (desiredCameraTopLeftY - m_offset.Y) * (m_smoothingFactor / Engine::Screen::SCALE.Y);
     }
     else
     {

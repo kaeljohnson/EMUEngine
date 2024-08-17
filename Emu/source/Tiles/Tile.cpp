@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../include/Textures/ITexture.h"
 #include "../../include/Tiles/Tile.h"
 
 namespace Engine

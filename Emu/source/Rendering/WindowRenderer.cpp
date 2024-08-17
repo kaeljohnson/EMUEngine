@@ -10,8 +10,14 @@
 
 namespace Engine
 {
-	WindowRenderer::WindowRenderer() : m_virtualSize(1280, 720), m_scale(0, 0), SCALE(0),
-		m_viewportPosition(0, 0), m_viewportSize(0, 0), m_screenSize(0, 0), m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr)
+	Vector2D<int> Screen::VIEWPORT_SIZE = Vector2D<int>(0, 0);
+	Vector2D<int> Screen::VIEWPORT_POSITION = Vector2D<int>(0, 0);
+	Vector2D<float> Screen::SCALE = Vector2D<float>(0.0f, 0.0f);
+	float Screen::SCALE_CONSTANT = 0.0f;
+	Vector2D<int> Screen::SCREEN_SIZE = Vector2D<int>(0, 0);
+	Vector2D<int> Screen::VIRTUAL_SIZE = Vector2D<int>(1280, 720);
+
+	WindowRenderer::WindowRenderer() : m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr)
 	{
 		ENGINE_CRITICAL("Creating Renderer");
 
@@ -39,8 +45,8 @@ namespace Engine
 			ENGINE_CRITICAL_D("Get desktop display mode failed: " + std::string(ISDL::GetError()));
 		}
 
-		m_screenSize.X = displayMode.w;
-		m_screenSize.Y = displayMode.h;
+		Screen::SCREEN_SIZE.X = displayMode.w;
+		Screen::SCREEN_SIZE.Y = displayMode.h;
 
 
 		// Create renderer
@@ -83,9 +89,9 @@ namespace Engine
 
 		// Calculate camera bounds
 		float cameraLeft = cameraOffset.X;
-		float cameraRight = cameraOffset.X + ( m_viewportSize.X / currentScene->GetPixelsPerUnit());
+		float cameraRight = cameraOffset.X + (Screen::VIEWPORT_SIZE.X / currentScene->GetPixelsPerUnit());
 		float cameraTop = cameraOffset.Y;
-		float cameraBottom = cameraOffset.Y + (m_viewportSize.Y / currentScene->GetPixelsPerUnit());
+		float cameraBottom = cameraOffset.Y + (Screen::VIEWPORT_SIZE.Y / currentScene->GetPixelsPerUnit());
 
 		for (auto& layer : currentScene->GetLayers())
 		{
@@ -119,11 +125,11 @@ namespace Engine
 
 		SDLRect dst
 		{
-			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevPosition().X, ptrBody->GetTopLeftPosition().X, (float)interpolation) - offset.X) * pixelsPerUnit * SCALE)),
-			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevPosition().Y, ptrBody->GetTopLeftPosition().Y, (float)interpolation) - offset.Y) * pixelsPerUnit * SCALE)),
+			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevPosition().X, ptrBody->GetTopLeftPosition().X, (float)interpolation) - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevPosition().Y, ptrBody->GetTopLeftPosition().Y, (float)interpolation) - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 
-			static_cast<int>(round(ptrBody->GetDimensions().X * pixelsPerUnit * SCALE)),
-			static_cast<int>(round(ptrBody->GetDimensions().Y * pixelsPerUnit * SCALE))
+			static_cast<int>(round(ptrBody->GetDimensions().X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round(ptrBody->GetDimensions().Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
 		};
 
 		ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, ptrBody->GetAngleInDegrees(), nullptr, SDL_FLIP_NONE);
@@ -165,17 +171,17 @@ namespace Engine
 	{
 		ENGINE_TRACE_D(std::to_string(newWindowWidth) + ", " + std::to_string(newWindowHeight));
 
-		if (newWindowWidth < m_screenSize.X / 2 && newWindowHeight < m_screenSize.Y / 2)
+		if (newWindowWidth < Screen::SCREEN_SIZE.X / 2 && newWindowHeight < Screen::SCREEN_SIZE.Y / 2)
 		{
-			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, m_screenSize.X / 2, m_screenSize.Y / 2);
+			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, Screen::SCREEN_SIZE.X / 2, Screen::SCREEN_SIZE.Y / 2);
 		}
-		else if (newWindowWidth < m_screenSize.X / 2)
+		else if (newWindowWidth < Screen::SCREEN_SIZE.X / 2)
 		{
-			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, m_screenSize.X / 2, newWindowHeight);
+			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, Screen::SCREEN_SIZE.X / 2, newWindowHeight);
 		}
-		else if (newWindowHeight < m_screenSize.Y / 2)
+		else if (newWindowHeight < Screen::SCREEN_SIZE.Y / 2)
 		{
-			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, newWindowWidth, m_screenSize.Y / 2);
+			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, newWindowWidth, Screen::SCREEN_SIZE.Y / 2);
 		}
 		else
 		{
@@ -189,18 +195,16 @@ namespace Engine
 		int windowWidth, windowHeight;
 		ISDL::GetWindowSize((SDLWindow*)m_ptrWindow, &windowWidth, &windowHeight);
 
-		m_scale.X = static_cast<float>(windowWidth) / m_virtualSize.X;
-		m_scale.Y = static_cast<float>(windowHeight) / m_virtualSize.Y;
+		Screen::SCALE = Vector2D<float>(static_cast<float>(windowWidth) / Screen::VIRTUAL_SIZE.X, static_cast<float>(windowHeight) / Screen::VIRTUAL_SIZE.Y);
 
-		SCALE = std::min(m_scale.X, m_scale.Y);
+		Screen::SCALE_CONSTANT = std::min(Screen::SCALE.X, Screen::SCALE.Y);
 
-		m_viewportSize.X = static_cast<int>(m_virtualSize.X * SCALE);
-		m_viewportSize.Y = static_cast<int>(m_virtualSize.Y * SCALE);
+		Screen::VIEWPORT_SIZE = Vector2D<int>(Screen::VIRTUAL_SIZE.X * (int)Screen::SCALE_CONSTANT, Screen::VIRTUAL_SIZE.Y * (int)Screen::SCALE_CONSTANT);
 
-		m_viewportPosition.X = (windowWidth - m_viewportSize.X) / 2;
-		m_viewportPosition.Y = (windowHeight - m_viewportSize.Y) / 2;
+		Screen::VIEWPORT_POSITION.X = (windowWidth - Screen::VIEWPORT_SIZE.X) / 2;
+		Screen::VIEWPORT_POSITION.Y = (windowHeight - Screen::VIEWPORT_SIZE.Y) / 2;
 
-		SDLRect viewport = { m_viewportPosition.X, m_viewportPosition.Y, m_viewportSize.X, m_viewportSize.Y };
+		SDLRect viewport = { Screen::VIEWPORT_POSITION.X, Screen::VIEWPORT_POSITION.Y, Screen::VIEWPORT_SIZE.X, Screen::VIEWPORT_SIZE.Y };
 		ISDL::RenderSetViewport((SDLRenderer*)m_ptrRenderer, &viewport);
 	}
 
@@ -223,9 +227,17 @@ namespace Engine
 		{
 			// Default behavior for now will be to toggle fullscreen on for client.
 			// When the screen is toggled to windowed, the size will be half of the width and height.
-			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, m_screenSize.X / 2, m_screenSize.Y / 2);
+			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, Screen::SCREEN_SIZE.X / 2, Screen::SCREEN_SIZE.Y / 2);
 			ISDL::SetWindowPosition((SDLWindow*)m_ptrWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
+	}
+
+	const int WindowRenderer::GetFullscreenWidth() const { return Screen::SCREEN_SIZE.X; }
+	const int WindowRenderer::GetFullscreenHeight() const { return Screen::SCREEN_SIZE.Y; }
+
+	const Vector2D<float> WindowRenderer::GetScale() const
+	{
+		return Screen::SCALE;
 	}
 
 	void WindowRenderer::free()

@@ -14,7 +14,7 @@
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
-#include "../include/Rendering/RendererManager.h"
+#include "../include/Rendering/WindowRenderer.h"
 
 namespace Engine
 {
@@ -36,7 +36,7 @@ namespace Engine
 	}
 
 	Application::Application()
-		: running(false), m_cameraManager(), m_eventManager(), m_rendererManager()
+		: running(false), m_cameraManager(), m_eventManager(), m_windowRenderer()
 	{
 		defineDefaultApplicationCallbacks();
 	}
@@ -50,11 +50,7 @@ namespace Engine
 		// RendererManager* ptrRendererManager = RendererManager::GetInstance();
 
 		// Camera frames current scene.
-		m_cameraManager.m_ptrCurrentCamera->Frame(currentScene->GetPixelsPerUnit(), Vector2D<int>(currentScene->GetLevelWidth(), currentScene->GetLevelHeight()), 
-			Vector2D<int>(m_rendererManager.GetFullscreenWidth(), m_rendererManager.GetFullscreenHeight()), m_rendererManager.GetScale());
-
-
-		m_rendererManager.SetScene(currentScene);
+		m_cameraManager.m_ptrCurrentCamera->Frame(currentScene->GetPixelsPerUnit(), Vector2D<int>(currentScene->GetLevelWidth(), currentScene->GetLevelHeight()));
 		
 
 		running = true;
@@ -110,7 +106,7 @@ namespace Engine
 
 			m_cameraManager.m_ptrCurrentCamera->Update(interpolation);
 
-			m_rendererManager.RenderScene(interpolation, m_cameraManager.m_ptrCurrentCamera->m_offset);
+			m_windowRenderer.RenderScene(currentScene, interpolation, m_cameraManager.m_ptrCurrentCamera->m_offset);
 		}
 	}
 

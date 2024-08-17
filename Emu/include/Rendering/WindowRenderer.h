@@ -6,6 +6,8 @@
 
 #include "../MathUtil.h"
 
+#include "Screen.h"
+
 #include "../Scenes/SceneObject.h"
 #include "../Scenes/Scene.h"
 
@@ -27,6 +29,11 @@ namespace Engine
 		void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
 		void ToggleFullscreen();
 
+		const int GetFullscreenWidth() const;
+		const int GetFullscreenHeight() const;
+
+		const Vector2D<float> GetScale() const;
+
 		void ClearScreen();
 
 		void free();
@@ -39,13 +46,13 @@ namespace Engine
 		void* m_ptrWindow;
 		void* m_ptrRenderer;
 
-		Vector2D<int> m_screenSize;
+		/*Vector2D<int> m_screenSize;
 		Vector2D<int> m_virtualSize;
 		Vector2D<float> m_scale;
 		float SCALE;
 
 		Vector2D<int> m_viewportSize;
-		Vector2D<int> m_viewportPosition;
+		Vector2D<int> m_viewportPosition;*/
 
 		bool m_rendererCreated;
 	};
