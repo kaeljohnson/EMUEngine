@@ -5,7 +5,6 @@
 #include "Camera/CameraManager.h"
 #include "Events/EventManager.h"
 #include "Rendering/WindowRenderer.h"
-#include "Rendering/Screen.h"
 
 namespace Engine
 {
