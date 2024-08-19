@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "../../include/SDLWrapper/SDLWrapper.h"
+#include "../../include/ISDL/ISDL.h"
 
 #include "../../include/Logging/Logger.h"
 
