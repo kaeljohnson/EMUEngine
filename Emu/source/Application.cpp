@@ -50,7 +50,7 @@ namespace Engine
 		// RendererManager* ptrRendererManager = RendererManager::GetInstance();
 
 		// Camera frames current scene.
-		m_cameraManager.m_ptrCurrentCamera->Frame(currentScene->GetPixelsPerUnit(), Vector2D<int>(currentScene->GetLevelWidth(), currentScene->GetLevelHeight()));
+		m_cameraManager.m_ptrCurrentCamera->Frame(Vector2D<int>(currentScene->GetLevelWidth(), currentScene->GetLevelHeight()), currentScene->GetPixelsPerUnit());
 		
 
 		running = true;
@@ -64,7 +64,6 @@ namespace Engine
 
 		currentScene->OnScenePlay();
 
-		const int pixelsPerMeter = currentScene->GetPixelsPerUnit();
 		const float timeStep = TIME_STEP;
 
 		double currentTime = SDL_GetTicks() / 1000.0;

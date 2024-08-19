@@ -1,7 +1,5 @@
 #pragma once
 
-// #include "../SDLWrapper/SDLWrapper.h"
-
 #include <memory>
 
 #include "../MathUtil.h"
@@ -39,20 +37,8 @@ namespace Engine
 		void free();
 
 	public:
-		// May need to decouple if there is ever a need for 
-		// the application to have multiple windows.
-		// SDLWindow* m_ptrWindow;
-		// SDLRenderer* m_ptrRenderer;
 		void* m_ptrWindow;
 		void* m_ptrRenderer;
-
-		/*Vector2D<int> m_screenSize;
-		Vector2D<int> m_virtualSize;
-		Vector2D<float> m_scale;
-		float SCALE;
-
-		Vector2D<int> m_viewportSize;
-		Vector2D<int> m_viewportPosition;*/
 
 		bool m_rendererCreated;
 	};

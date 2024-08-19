@@ -14,12 +14,9 @@ namespace Engine
 		m_offset = offset;
 	}
 
-	void Camera::Frame(const int pixelsPerUnit, const Vector2D<int> mapBounds)
+	void Camera::Frame(const Vector2D<int> mapBounds, const int pixelsPerUnit)
 	{
 		m_mapBounds = mapBounds;
-
-
-		m_pixelsPerUnit = pixelsPerUnit;
 
 		m_size = Vector2D<float>(Screen::SCREEN_SIZE.X / (pixelsPerUnit * Screen::SCALE.X), Screen::SCREEN_SIZE.Y / (pixelsPerUnit * Screen::SCALE.Y));
 	}

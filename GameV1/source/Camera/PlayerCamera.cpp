@@ -21,7 +21,7 @@ void PlayerCamera::Update(const double interpolation)
     float lookAheadDifference = desiredLookAhead - m_lookAhead;
 
     // Calculate the step to move towards the desired look-ahead, ensuring we don't overshoot
-    m_lookAheadChangeSpeed = 0.005f / Engine::Screen::SCALE.X;
+    m_lookAheadChangeSpeed = 0.005f / (Engine::Screen::SCALE.X * Engine::Screen::VIEWPORT_SIZE.X);
 
     float lookAheadStep = std::min(std::abs(lookAheadDifference), m_lookAheadChangeSpeed * (float)interpolation);
     lookAheadStep *= (lookAheadDifference > 0) ? 1 : -1; // Ensure the step has the correct direction

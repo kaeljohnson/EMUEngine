@@ -24,7 +24,7 @@ namespace Engine
 	public:
 		virtual void Update(const double interpolation);
 
-		void Frame(const int pixelsPerUnit, const Vector2D<int> mapBounds);
+		void Frame(const Vector2D<int> mapBounds, const int pixelsPerMeter);
 
 		Camera(const Camera& camera) = delete;
 		Camera& operator=(const Camera&) = delete;
