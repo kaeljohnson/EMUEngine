@@ -5,7 +5,6 @@
 #include "../../include/CommonFunctions.h"
 #include "../../include/Scenes/SceneObject.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/Textures/ITexture.h"
 #include "../../include/Events/EventManager.h"
 
 namespace Engine

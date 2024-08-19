@@ -6,7 +6,7 @@
 #include "../MathUtil.h"
 #include "Event.h"
 
-#include "../SDLWrapper/SDLWrapper.h"
+#include "../ISDL/ISDL.h"
 
 namespace Engine
 {

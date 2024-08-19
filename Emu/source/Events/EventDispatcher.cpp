@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../include/SDLWrapper/SDLWrapper.h"
+
 #include "../../include/Events/EventDispatcher.h"
 
 namespace Engine
@@ -24,7 +26,7 @@ namespace Engine
 
         SDLEvent e;
 
-        while (SDL_POLL_EVENT(&e))
+        while (ISDL::PollEvent(&e))
         {
             // If the event is a keydown event and the key is repeating, we don't want to handle it.
             if (e.type == SDL_KEYDOWN && e.key.repeat == 1) return;

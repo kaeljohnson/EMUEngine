@@ -1,16 +1,18 @@
 #pragma once
 
-#include "../SDLWrapper/SDLWrapper.h"
-
 #include <memory>
 
 #include "../MathUtil.h"
+
+#include "Screen.h"
 
 #include "../Scenes/SceneObject.h"
 #include "../Scenes/Scene.h"
 
 namespace Engine
 {
+	class ISDL;
+
 	class WindowRenderer
 	{
 	public: 
@@ -25,23 +27,18 @@ namespace Engine
 		void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
 		void ToggleFullscreen();
 
+		const int GetFullscreenWidth() const;
+		const int GetFullscreenHeight() const;
+
+		const Vector2D<float> GetScale() const;
+
 		void ClearScreen();
 
 		void free();
 
 	public:
-		// May need to decouple if there is ever a need for 
-		// the application to have multiple windows.
-		SDLWindow* m_ptrWindow;
-		SDLRenderer* m_ptrRenderer;
-
-		Vector2D<int> m_screenSize;
-		Vector2D<int> m_virtualSize;
-		Vector2D<float> m_scale;
-		float SCALE;
-
-		Vector2D<int> m_viewportSize;
-		Vector2D<int> m_viewportPosition;
+		void* m_ptrWindow;
+		void* m_ptrRenderer;
 
 		bool m_rendererCreated;
 	};

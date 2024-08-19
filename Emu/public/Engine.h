@@ -10,12 +10,12 @@
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
 #include "../include/Physics/BodyTypes.h"
-#include "../include/Textures/ITexture.h"
-#include "../include/Textures/TextureFactory.h"
 #include "../include/Physics/PhysicsBody.h"
 #include "../include/Tiles/Tile.h"
 #include "../include/Tiles/TileMap.h"
 #include "../include/Entities/Entity.h"
+
+#include "../include/Rendering/Screen.h"
 
 #include "../include/Camera/Camera.h"
 #include "../include/Camera/ScrollingCamera.h"

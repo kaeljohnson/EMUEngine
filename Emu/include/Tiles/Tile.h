@@ -3,7 +3,6 @@
 #include "../Core.h"
 
 #include "../Scenes/SceneObject.h"
-#include "../Textures/ITexture.h"
 #include "../Physics/BodyTypes.h"
 
 namespace Engine

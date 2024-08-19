@@ -4,7 +4,7 @@
 #include "Scenes/Scene.h"
 #include "Camera/CameraManager.h"
 #include "Events/EventManager.h"
-#include "Rendering/RendererManager.h"
+#include "Rendering/WindowRenderer.h"
 
 namespace Engine
 {
@@ -32,7 +32,7 @@ namespace Engine
 
 		CameraManager m_cameraManager;
 		EventManager m_eventManager;
-		RendererManager m_rendererManager;
+		WindowRenderer m_windowRenderer;
 
 		void defineDefaultApplicationCallbacks();
 		void end();

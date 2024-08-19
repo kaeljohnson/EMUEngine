@@ -12,14 +12,13 @@
 
 namespace Engine
 {
-	Scene::Scene() : m_pixelsPerUnit(32), m_layers(), m_levelDimensionsInUnits(32, 32), HasTileMap(false),
+	Scene::Scene() : m_layers(), m_levelDimensionsInUnits(32, 32), HasTileMap(false),
 		m_world(nullptr) {}
 
 	void Scene::CheckValid()
 	{
 		(m_world == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
 		m_layers.size() > 0 ? ENGINE_INFO_D("Scene has at least one layer.") : ENGINE_CRITICAL_D("No layers exist in scene.");
-		(m_pixelsPerUnit <= 0) ? ENGINE_CRITICAL_D("Pixels per meter is invalid.") : ENGINE_INFO_D("Pixels per meter is valid.");
 	}
 
 	void Scene::OnScenePlay()

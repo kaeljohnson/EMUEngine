@@ -3,7 +3,7 @@
 #include <queue>
 #include <memory>
 
-#include "../../include/SDLWrapper/SDLWrapper.h"
+#include "../../include/ISDL/ISDL.h"
 #include "../../include/Events/EventManager.h"
 #include "../../include/Events/EventDispatcher.h"
 #include "../../include/Events/Event.h"

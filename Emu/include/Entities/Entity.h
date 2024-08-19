@@ -6,7 +6,6 @@
 #include "../MathUtil.h"
 
 #include "../Scenes/SceneObject.h"
-#include "../Textures/ITexture.h"
 
 namespace Engine
 {

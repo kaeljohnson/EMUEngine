@@ -42,10 +42,11 @@ namespace Engine
 		std::unique_ptr<World> m_world;
 
 	public:
-		inline const int GetPixelsPerUnit() const { return m_pixelsPerUnit; }
 		inline std::vector<SceneObjectStack>& GetLayers() { return m_layers; }
 		inline const int GetLevelWidth() const { return m_levelDimensionsInUnits.X; }
 		inline const int GetLevelHeight() const { return m_levelDimensionsInUnits.Y; }
+
+		inline const int GetPixelsPerUnit() const { return m_pixelsPerUnit; }
 
 		void CheckValid();
 		void OnScenePlay();

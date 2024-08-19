@@ -24,8 +24,7 @@ namespace Engine
 	public:
 		virtual void Update(const double interpolation);
 
-		void Frame(const int pixelsPerUnit, const Vector2D<int> mapBounds,
-			const Vector2D<int> screenSize, const Vector2D<float> scale);
+		void Frame(const Vector2D<int> mapBounds, const int pixelsPerMeter);
 
 		Camera(const Camera& camera) = delete;
 		Camera& operator=(const Camera&) = delete;
@@ -37,9 +36,6 @@ namespace Engine
 		Vector2D<int> m_mapBounds;
 
 		// Rendering viewport scale. The viewport is not necessarily the same as the window size.
-		Vector2D<float> refScale;
-
-		Vector2D<int> m_screenSize;
 
 		int m_pixelsPerUnit;
 		bool m_clampingOn;
