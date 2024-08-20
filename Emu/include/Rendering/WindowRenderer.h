@@ -8,6 +8,7 @@
 
 #include "../Scenes/SceneObject.h"
 #include "../Scenes/Scene.h"
+#include "../Camera/Camera.h"
 
 namespace Engine
 {
@@ -19,18 +20,14 @@ namespace Engine
 		WindowRenderer();
 		~WindowRenderer();
 
-		void RenderScene(std::shared_ptr<Scene> currentScene, const double interpolation, const Vector2D<float> offset);
+		void RenderScene(std::shared_ptr<Scene> currentScene, const double interpolation);
 		void Draw(SceneObject* sceneObject, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset);
 		void Display();
 
 		void SetViewport();
+		void SetCamera(Camera* refCurrentCamera);
 		void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
 		void ToggleFullscreen();
-
-		const int GetFullscreenWidth() const;
-		const int GetFullscreenHeight() const;
-
-		const Vector2D<float> GetScale() const;
 
 		void ClearScreen();
 
@@ -39,6 +36,8 @@ namespace Engine
 	public:
 		void* m_ptrWindow;
 		void* m_ptrRenderer;
+
+		Camera* ptrCurrentCamera;
 
 		bool m_rendererCreated;
 	};

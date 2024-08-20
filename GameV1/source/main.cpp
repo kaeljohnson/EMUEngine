@@ -15,12 +15,10 @@ int main(int argc, char* args[])
 	Engine::EventManager& refEventManager = ptrAppInstance->GetEventManager();
 	Engine::CameraManager& refCameraManager = ptrAppInstance->GetCameraManager();
 
-	AppManagementEventHandlers appManagementEventHandlers(refEventManager);
-
 	Engine::ScenePtr scene = Engine::CreateScene();
 
 	// Need physcis to scale with pixels per unit.
-	scene->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 3.1f), 32);
+	scene->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 	
 	Player player(1.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 
@@ -29,9 +27,12 @@ int main(int argc, char* args[])
 	scrollCamera.SetCameraPosition(Engine::Vector2D<float>(0.0f, 38.5f));
 
 	PlayerCamera playerCamera;
+	playerCamera.SetPixelsPerUnit(32);
 	playerCamera.SetCameraTarget(&player);
 
 	refCameraManager.SetCurrentCamera(&playerCamera);
+
+	AppManagementEventHandlers appManagementEventHandlers(refEventManager, playerCamera);
 
 	CLIENT_INFO_D("Player UUID: " + player.GetUUID());
 

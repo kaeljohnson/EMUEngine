@@ -108,14 +108,11 @@ namespace Engine
 		m_world->Update();
 	};
 
-	void Scene::CreatePhysicsSimulation(const Vector2D<float> gravity, const int pixelsPerUnit)
+	void Scene::CreatePhysicsSimulation(const Vector2D<float> gravity)
 	{
 		// What happens if this is called multiple times for one scene? Make sure nothing bad.
 
-		m_pixelsPerUnit = pixelsPerUnit;
-
-		ENGINE_INFO_D("Setting pixels per unit, time step, gravityX and gravityY at positions: " 
-			+ std::to_string(m_pixelsPerUnit) + ", " + std::to_string(gravity.X) + ", " + std::to_string(gravity.Y));
+		ENGINE_INFO_D("Setting gravity: " + std::to_string(gravity.X) + ", " + std::to_string(gravity.Y));
 
 		if (m_world)
 		{
@@ -125,9 +122,7 @@ namespace Engine
 		
 		// Need a reset function for the world which resets all objects in the world.
 
-		m_world = std::make_unique<World>(gravity.X * m_pixelsPerUnit, gravity.Y * m_pixelsPerUnit, 8, 3);
-
-		ENGINE_INFO_D("Creating simulation with gravity: " + std::to_string(gravity.X) + ", " + std::to_string(gravity.Y));
+		m_world = std::make_unique<World>(gravity.X, gravity.Y, 8, 3);
 
 		if (!HasTileMap)
 		{

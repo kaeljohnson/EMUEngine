@@ -6,19 +6,29 @@
 
 namespace Engine
 {
-	Camera::Camera() : m_pixelsPerUnit(0), 
+	Camera::Camera() : m_pixelsPerUnit(32), 
 		m_offset(0, 0), m_size(0, 0), m_clampingOn(true) {}
+
+	void Camera::SetPixelsPerUnit(const int pixelsPerUnit)
+	{
+		m_pixelsPerUnit = pixelsPerUnit;
+		SetSize();
+	}
+
+	void Camera::SetSize()
+	{
+		m_size = Vector2D<float>(Screen::VIEWPORT_SIZE.X / (m_pixelsPerUnit * Screen::SCALE.X), Screen::VIEWPORT_SIZE.Y / (m_pixelsPerUnit * Screen::SCALE.Y));
+	}
 
 	void Camera::SetCameraPosition(const Vector2D<float> offset)
 	{
 		m_offset = offset;
 	}
 
-	void Camera::Frame(const Vector2D<int> mapBounds, const int pixelsPerUnit)
+	void Camera::Frame(const Vector2D<int> mapBounds)
 	{
 		m_mapBounds = mapBounds;
-
-		m_size = Vector2D<float>(Screen::SCREEN_SIZE.X / (pixelsPerUnit * Screen::SCALE.X), Screen::SCREEN_SIZE.Y / (pixelsPerUnit * Screen::SCALE.Y));
+		SetSize();
 	}
 
 	void Camera::SetClampingOn(const bool clampingOn)

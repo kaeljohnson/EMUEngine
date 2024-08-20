@@ -5,7 +5,7 @@
 #include "../../include/EventHandlers/AppManagementEventHandlers.h"
 
 
-AppManagementEventHandlers::AppManagementEventHandlers(Engine::EventManager& eventManager) 
+AppManagementEventHandlers::AppManagementEventHandlers(Engine::EventManager& eventManager, Engine::Camera& camera) 
 {
 	eventManager.RegisterEventHandler(Engine::F_KEY_DOWN, [](Engine::Event& e)
 		{
@@ -33,6 +33,20 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::EventManager& eve
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::QUIT)));
 			Engine::ICallbackSystem::GetInstance()->TriggerCallback(Engine::Type::EndApplication, std::monostate{});
+			e.Handled = true;
+		});
+
+	eventManager.RegisterEventHandler(Engine::G_KEY_DOWN, [&](Engine::Event& e)
+		{
+			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::G_KEY_DOWN)));
+			camera.SetPixelsPerUnit(16);
+			e.Handled = true;
+		});
+
+	eventManager.RegisterEventHandler(Engine::H_KEY_DOWN, [&](Engine::Event& e)
+		{
+			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::H_KEY_DOWN)));
+			camera.SetPixelsPerUnit(32);
 			e.Handled = true;
 		});
 }
