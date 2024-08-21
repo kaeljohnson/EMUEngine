@@ -11,8 +11,11 @@ namespace Engine
 	public:
 		EMU_API void SetScene(std::shared_ptr<Scene> scene);
 		EMU_API void AddScene(std::shared_ptr<Scene> scene);
-		EMU_API inline std::shared_ptr<Scene> GetCurrentScene() const { return m_currentScene; };
+		EMU_API void LoadScene(std::string sceneName);
+		EMU_API void LoadScene(std::shared_ptr<Scene> scene);
+		EMU_API void UnloadCurrentScene();
 
+		EMU_API inline std::shared_ptr<Scene> GetCurrentScene() const { return m_currentScene; };
 	public:
 		SceneManager();
 		~SceneManager() = default;
