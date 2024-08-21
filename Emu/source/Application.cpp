@@ -50,8 +50,8 @@ namespace Engine
 		// RendererManager* ptrRendererManager = RendererManager::GetInstance();
 
 		// Camera frames current scene.
-		m_cameraManager.m_ptrCurrentCamera->Frame(Vector2D<int>(currentScene->GetLevelWidth(), currentScene->GetLevelHeight()), currentScene->GetPixelsPerUnit());
-		
+		m_cameraManager.m_ptrCurrentCamera->Frame(Vector2D<int>(currentScene->GetLevelWidth(), currentScene->GetLevelHeight()));
+		m_windowRenderer.SetCamera(m_cameraManager.m_ptrCurrentCamera);
 
 		running = true;
 
@@ -105,7 +105,7 @@ namespace Engine
 
 			m_cameraManager.m_ptrCurrentCamera->Update(interpolation);
 
-			m_windowRenderer.RenderScene(currentScene, interpolation, m_cameraManager.m_ptrCurrentCamera->m_offset);
+			m_windowRenderer.RenderScene(currentScene, interpolation);
 		}
 	}
 

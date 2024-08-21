@@ -11,8 +11,12 @@ namespace Engine
 	public:
 		EMU_API Camera();
 		
+		EMU_API void SetPixelsPerUnit(const int pixelsPerUnit);
 		EMU_API void SetCameraPosition(const Vector2D<float> offset);
 		EMU_API void SetClampingOn(const bool clampingOn);
+		EMU_API void SetSize();
+
+		EMU_API inline const int GetPixelsPerUnit() const { return m_pixelsPerUnit; }
 
 		EMU_API void Clamp();
 
@@ -24,7 +28,7 @@ namespace Engine
 	public:
 		virtual void Update(const double interpolation);
 
-		void Frame(const Vector2D<int> mapBounds, const int pixelsPerMeter);
+		void Frame(const Vector2D<int> mapBounds);
 
 		Camera(const Camera& camera) = delete;
 		Camera& operator=(const Camera&) = delete;

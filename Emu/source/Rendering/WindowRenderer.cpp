@@ -82,16 +82,21 @@ namespace Engine
 			});
 	}
 
-	void WindowRenderer::RenderScene(std::shared_ptr<Scene> currentScene, const double interpolation, const Vector2D<float> cameraOffset)
+	void WindowRenderer::SetCamera(Camera* currentCamera)
+	{
+		ptrCurrentCamera = currentCamera;
+	}
+
+	void WindowRenderer::RenderScene(std::shared_ptr<Scene> currentScene, const double interpolation)
 	{
 
 		ClearScreen();
 
 		// Calculate camera bounds
-		float cameraLeft = cameraOffset.X;
-		float cameraRight = cameraOffset.X + (Screen::VIEWPORT_SIZE.X / currentScene->GetPixelsPerUnit());
-		float cameraTop = cameraOffset.Y;
-		float cameraBottom = cameraOffset.Y + (Screen::VIEWPORT_SIZE.Y / currentScene->GetPixelsPerUnit());
+		float cameraLeft = ptrCurrentCamera->m_offset.X;
+		float cameraRight = ptrCurrentCamera->m_offset.X + (Screen::VIEWPORT_SIZE.X / ptrCurrentCamera->GetPixelsPerUnit());
+		float cameraTop = ptrCurrentCamera->m_offset.Y;
+		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->GetPixelsPerUnit());
 
 		for (auto& layer : currentScene->GetLayers())
 		{
@@ -107,7 +112,7 @@ namespace Engine
 
 				if (isVisible)
 				{
-					Draw(sceneObject, currentScene->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
+					Draw(sceneObject, ptrCurrentCamera->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
 				}
 			}
 		}
@@ -230,14 +235,6 @@ namespace Engine
 			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, Screen::SCREEN_SIZE.X / 2, Screen::SCREEN_SIZE.Y / 2);
 			ISDL::SetWindowPosition((SDLWindow*)m_ptrWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
-	}
-
-	const int WindowRenderer::GetFullscreenWidth() const { return Screen::SCREEN_SIZE.X; }
-	const int WindowRenderer::GetFullscreenHeight() const { return Screen::SCREEN_SIZE.Y; }
-
-	const Vector2D<float> WindowRenderer::GetScale() const
-	{
-		return Screen::SCALE;
 	}
 
 	void WindowRenderer::free()
