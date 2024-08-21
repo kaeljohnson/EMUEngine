@@ -4,17 +4,18 @@
 
 namespace Engine
 {
-	SceneManager* SceneManager::instance = nullptr;
-
-	SceneManager::SceneManager() {}
-
-	SceneManager* SceneManager::GetInstance()
+	SceneManager::SceneManager() 
 	{
-		if (instance == nullptr)
-		{
-			instance = new SceneManager();
-		}
+		
+	}
 
-		return instance;
+	void SceneManager::SetScene(std::shared_ptr<Scene> scene)
+	{
+		m_currentScene = scene;
+	}
+
+	void SceneManager::AddScene(std::shared_ptr<Scene> scene)
+	{
+		m_scenes.push_back(scene);
 	}
 }

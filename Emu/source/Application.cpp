@@ -41,13 +41,12 @@ namespace Engine
 		defineDefaultApplicationCallbacks();
 	}
 
-	void Application::PlayScene(std::shared_ptr<Scene> currentScene)
+	void Application::Start()
 	{
 		// Once sceme manager exists, this function will be a generic run funcion that queries the scene manager for the current scene.
 		// Will need to add more functionality in here to handle scene switching.
-		
-		// renderer manager and event manager are singletons in order to hide dependencies from client.
-		// RendererManager* ptrRendererManager = RendererManager::GetInstance();
+
+		std::shared_ptr<Scene> currentScene = m_sceneManager.GetCurrentScene();
 
 		// Camera frames current scene.
 		m_cameraManager.m_ptrCurrentCamera->Frame(Vector2D<int>(currentScene->GetLevelWidth(), currentScene->GetLevelHeight()));

@@ -9,6 +9,7 @@
 #include "../include/Scenes/SceneFactory.h"
 #include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
+#include "../include/Scenes/SceneManager.h"
 #include "../include/Physics/BodyTypes.h"
 #include "../include/Physics/PhysicsBody.h"
 #include "../include/Tiles/Tile.h"

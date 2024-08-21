@@ -14,8 +14,12 @@ int main(int argc, char* args[])
 	Engine::ApplicationPtr ptrAppInstance = Engine::Application::GetInstance();
 	Engine::EventManager& refEventManager = ptrAppInstance->GetEventManager();
 	Engine::CameraManager& refCameraManager = ptrAppInstance->GetCameraManager();
+	Engine::SceneManager& refSceneManager = ptrAppInstance->GetSceneManager();
 
 	Engine::ScenePtr scene = Engine::CreateScene();
+
+	refSceneManager.AddScene(scene);
+	refSceneManager.SetScene(scene);
 
 	// Need physcis to scale with pixels per unit.
 	scene->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
@@ -49,7 +53,7 @@ int main(int argc, char* args[])
 
 	scene->Add(player, PLAYER_LAYER);
 	
-	ptrAppInstance->PlayScene(scene);
+	ptrAppInstance->Start();
 	// Need to figure out how to change scenes, stop scenes, etc.
 
 	return 0;

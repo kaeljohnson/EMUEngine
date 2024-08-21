@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "Scenes/Scene.h"
+#include "Scenes/SceneManager.h"
 #include "Camera/CameraManager.h"
 #include "Events/EventManager.h"
 #include "Rendering/WindowRenderer.h"
@@ -12,9 +13,10 @@ namespace Engine
 	{
 	public:
 		EMU_API static Application* GetInstance();
-		EMU_API void PlayScene(std::shared_ptr<Scene> scene);
+		EMU_API void Start();
 		EMU_API inline CameraManager& GetCameraManager() { return m_cameraManager; }
 		EMU_API inline EventManager& GetEventManager() { return m_eventManager; }
+		EMU_API inline SceneManager& GetSceneManager() { return m_sceneManager; }
 
 		~Application();
 
@@ -33,6 +35,7 @@ namespace Engine
 		CameraManager m_cameraManager;
 		EventManager m_eventManager;
 		WindowRenderer m_windowRenderer;
+		SceneManager m_sceneManager;
 
 		void defineDefaultApplicationCallbacks();
 		void end();
