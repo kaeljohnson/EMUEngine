@@ -17,12 +17,14 @@ int main(int argc, char* args[])
 	Engine::SceneManager& refSceneManager = ptrAppInstance->GetSceneManager();
 
 	Engine::ScenePtr scene = Engine::CreateScene();
+	Engine::ScenePtr scene2 = Engine::CreateScene();
 
 	refSceneManager.AddScene(scene);
-	refSceneManager.SetScene(scene);
+	refSceneManager.LoadScene(scene);
 
 	// Need physcis to scale with pixels per unit.
 	scene->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
+	scene2->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 	
 	Player player(1.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 

@@ -9,7 +9,6 @@ namespace Engine
 	class SceneManager
 	{
 	public:
-		EMU_API void SetScene(std::shared_ptr<Scene> scene);
 		EMU_API void AddScene(std::shared_ptr<Scene> scene);
 		EMU_API void LoadScene(std::string sceneName);
 		EMU_API void LoadScene(std::shared_ptr<Scene> scene);
@@ -20,6 +19,9 @@ namespace Engine
 		SceneManager();
 		~SceneManager() = default;
 
+		const bool IsNewSceneStarting() const { return m_newSceneStarting; }
+		void NewSceneStarted() { m_newSceneStarting = false; }
+
 		SceneManager(const SceneManager&) = delete;
 		SceneManager& operator=(const SceneManager&) = delete;
 		SceneManager(SceneManager&&) = delete;
@@ -29,5 +31,7 @@ namespace Engine
 		std::vector<std::shared_ptr<Scene>> m_scenes;
 
 		std::shared_ptr<Scene> m_currentScene;
+
+		bool m_newSceneStarting;
 	};
 }

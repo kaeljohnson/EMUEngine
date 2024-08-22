@@ -46,6 +46,8 @@ namespace Engine
 		inline const int GetLevelHeight() const { return m_levelDimensionsInUnits.Y; }
 
 		void OnScenePlay();
+		void OnSceneEnd();
+
 		void AddPhysicsBodyToWorld(std::shared_ptr<PhysicsBody> physicsBody);
 		void DestroyPhysicsWorld();
 

@@ -4,14 +4,8 @@
 
 namespace Engine
 {
-	SceneManager::SceneManager() 
+	SceneManager::SceneManager() : m_newSceneStarting(false), m_currentScene(nullptr)
 	{
-		
-	}
-
-	void SceneManager::SetScene(std::shared_ptr<Scene> scene)
-	{
-		m_currentScene = scene;
 	}
 
 	void SceneManager::AddScene(std::shared_ptr<Scene> scene)
@@ -33,8 +27,10 @@ namespace Engine
 
 	void SceneManager::LoadScene(std::shared_ptr<Scene> scene)
 	{
-		// m_currentScene = scene;
-		// m_currentScene->Load();
+		if (m_currentScene) m_currentScene->OnSceneEnd();
+		m_currentScene = scene;
+		m_currentScene->OnScenePlay();
+		m_newSceneStarting = true;
 	}
 
 	void SceneManager::UnloadCurrentScene()

@@ -84,6 +84,16 @@ namespace Engine
 				5. Display the rendered scene.
 			*/
 
+			if (m_sceneManager.IsNewSceneStarting())
+			{
+				std::shared_ptr<Scene> currentScene = m_sceneManager.GetCurrentScene();
+
+				// Camera frames current scene.
+				m_cameraManager.m_ptrCurrentCamera->Frame(Vector2D<int>(currentScene->GetLevelWidth(), currentScene->GetLevelHeight()));
+				// m_windowRenderer.SetCamera(m_cameraManager.m_ptrCurrentCamera);
+				m_sceneManager.NewSceneStarted();
+			}
+
 			newTime = SDL_GetTicks() / 1000.0;
 			frameTime = newTime - currentTime;
 			currentTime = newTime;

@@ -15,7 +15,7 @@
 namespace Engine
 {
 	Scene::Scene() : m_layers(), m_levelDimensionsInUnits(32, 32), HasTileMap(false),
-		m_world(nullptr) {}
+		m_world(nullptr), m_tileMap(nullptr) {}
 
 	Scene::~Scene()
 	{
@@ -64,19 +64,11 @@ namespace Engine
 				AddPhysicsBodyToWorld(sceneObject->GetPhysicsBody());
 			}
 		}
+	}
 
-		/*bool layerExists = false;
-		for (auto& tile : *m_tileMap)
-		{
-			Add(tile, 0);
-			layerExists = true;
-		}
-
-		for (auto& collisionBody : m_tileMap->GetCollisionBodies())
-		{
-			Add(collisionBody, 0);
-		}*/
-
+	void Scene::OnSceneEnd()
+	{
+		DestroyPhysicsWorld();
 	}
 
 	void Scene::AddLayer(size_t layerIdx)
@@ -109,21 +101,6 @@ namespace Engine
 		{
 			Add(collisionBody, layerIdx);
 		}
-
-		//if (!layerExists)
-		//{
-		//	ENGINE_WARN_D("Invalid layer. Cannot add map to scene!");
-		//	return;
-		//}
-
-		//// Tile Maps underlying collision bodies exist in the physics world as continuous bodies,
-		//// separate from the tile map itself.
-		//for (auto& tile : tileMap.GetCollisionBodies())
-		//{
-		//	std::shared_ptr<PhysicsBody> ptrBox = tile.GetPhysicsBody();
-
-		//	AddPhysicsBodyToWorld(ptrBox);
-		//}
 
 		HasTileMap = true;
 	}

@@ -86,6 +86,8 @@ namespace Engine
 		EMU_API inline const float GetStartingDensity() const { return m_density; }
 		EMU_API inline const float GetStartingFriction() const { return m_friction; }
 
+		// EMU_API const bool IsCollidingWith(const PhysicsBody* otherBody) const;
+
 		EMU_API inline const bool GetHasCollisionBelow() const { return m_bottomCollision; }
 		EMU_API inline const bool GetHasCollisionAbove() const { return m_topCollision; }
 		EMU_API inline const bool GetHasCollisionLeft() const { return m_leftCollision; }
