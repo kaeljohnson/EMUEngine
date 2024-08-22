@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <string>
+#include <memory>
 
 #include "Scene.h"
 
@@ -9,7 +11,7 @@ namespace Engine
 	class SceneManager
 	{
 	public:
-		EMU_API void AddScene(std::shared_ptr<Scene> scene);
+		EMU_API void AddScene(std::string sceneName, std::shared_ptr<Scene> scene);
 		EMU_API void LoadScene(std::string sceneName);
 		EMU_API void LoadScene(std::shared_ptr<Scene> scene);
 		EMU_API void UnloadCurrentScene();
@@ -28,7 +30,7 @@ namespace Engine
 		SceneManager& operator=(SceneManager&&) = delete;
 
 	private:
-		std::vector<std::shared_ptr<Scene>> m_scenes;
+		std::unordered_map<std::string, std::shared_ptr<Scene>> m_scenes;
 
 		std::shared_ptr<Scene> m_currentScene;
 

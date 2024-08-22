@@ -2,27 +2,30 @@
 
 #include "../../include/Scenes/SceneManager.h"
 
+#include "../../include/Scenes/Scene.h"
+#include "../../include/Logging/Logger.h"
+
 namespace Engine
 {
 	SceneManager::SceneManager() : m_newSceneStarting(false), m_currentScene(nullptr)
 	{
 	}
 
-	void SceneManager::AddScene(std::shared_ptr<Scene> scene)
+	void SceneManager::AddScene(std::string sceneName, std::shared_ptr<Scene> scene)
 	{
-		m_scenes.push_back(scene);
+		m_scenes[sceneName] = scene;
 	}
 
 	void SceneManager::LoadScene(std::string sceneName)
 	{
-		/*for (auto scene : m_scenes)
+		if (m_scenes.find(sceneName) != m_scenes.end())
 		{
-			if (scene->GetName() == sceneName)
-			{
-				m_currentScene = scene;
-				m_currentScene->Load();
-			}
-		}*/
+			LoadScene(m_scenes[sceneName]);
+		}
+		else
+		{
+			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+		}
 	}
 
 	void SceneManager::LoadScene(std::shared_ptr<Scene> scene)
