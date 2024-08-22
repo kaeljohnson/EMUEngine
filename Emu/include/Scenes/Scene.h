@@ -7,8 +7,9 @@
 
 #include "../Scenes/SceneObject.h"
 #include "../Scenes/SceneObjectStack.h"
-#include "../Physics/World.h"
 #include "../Tiles/TileMap.h"
+
+class b2World;
 
 namespace Engine
 {
@@ -16,7 +17,7 @@ namespace Engine
 	{
 	public:
 		EMU_API Scene();
-		EMU_API ~Scene() = default;
+		EMU_API ~Scene();
 
 		EMU_API void CreatePhysicsSimulation(const Vector2D<float> gravity);
 		EMU_API void SetGravity(const Vector2D<float> gravity);
@@ -34,15 +35,17 @@ namespace Engine
 
 	private:
 		Vector2D<int> m_levelDimensionsInUnits;
-
 		std::vector<SceneObjectStack> m_layers;
-
-		std::unique_ptr<World> m_world;
+		b2World* m_world;
+		Vector2D<float> m_gravity;
 
 	public:
 		inline std::vector<SceneObjectStack>& GetLayers() { return m_layers; }
 		inline const int GetLevelWidth() const { return m_levelDimensionsInUnits.X; }
 		inline const int GetLevelHeight() const { return m_levelDimensionsInUnits.Y; }
+
+		void AddPhysicsBodyToWorld(std::shared_ptr<PhysicsBody> physicsBody);
+		void DestroyPhysicsWorld();
 
 		void CheckValid();
 		void OnScenePlay();

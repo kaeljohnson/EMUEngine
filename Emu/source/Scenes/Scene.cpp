@@ -1,5 +1,7 @@
 #pragma once
 
+#include "box2d/box2d.h"
+
 #include "../../include/EngineConstants.h"
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Scenes/SceneObject.h"
@@ -14,6 +16,34 @@ namespace Engine
 {
 	Scene::Scene() : m_layers(), m_levelDimensionsInUnits(32, 32), HasTileMap(false),
 		m_world(nullptr) {}
+
+	Scene::~Scene()
+	{
+		DestroyPhysicsWorld();
+	}
+
+	void Scene::DestroyPhysicsWorld()
+	{
+		if (m_world == nullptr)
+		{
+			ENGINE_INFO_D("World is already null. No need to destroy.");
+			return;
+		}
+
+		ENGINE_INFO_D("Freeing World!");
+		// Destroy all bodies in the world
+		b2Body* body = m_world->GetBodyList();
+		while (body != nullptr)
+		{
+			b2Body* nextBody = body->GetNext();
+			PhysicsBody* ptrBody = reinterpret_cast<PhysicsBody*>(body->GetUserData().pointer);
+			ptrBody->RemoveBodyFromWorld();
+			body = nextBody;
+		}
+
+		delete m_world;
+		m_world = nullptr;
+	}
 
 	void Scene::CheckValid()
 	{
@@ -67,7 +97,7 @@ namespace Engine
 		{
 			std::shared_ptr<PhysicsBody> ptrBox = tile.GetPhysicsBody();
 
-			m_world->AddBody(ptrBox);
+			AddPhysicsBodyToWorld(ptrBox);
 		}
 
 		HasTileMap = true;
@@ -105,7 +135,7 @@ namespace Engine
 			}
 		}
 
-		m_world->Update();
+		m_world->Step(TIME_STEP, 8, 3);
 	};
 
 	void Scene::CreatePhysicsSimulation(const Vector2D<float> gravity)
@@ -122,7 +152,9 @@ namespace Engine
 		
 		// Need a reset function for the world which resets all objects in the world.
 
-		m_world = std::make_unique<World>(gravity.X, gravity.Y, 8, 3);
+		// m_world = std::make_unique<World>(gravity.X, gravity.Y, 8, 3);
+		m_world = new b2World(b2Vec2(gravity.X, gravity.Y));
+		
 
 		if (!HasTileMap)
 		{
@@ -137,7 +169,7 @@ namespace Engine
 	void Scene::SetGravity(const Vector2D<float> gravity)
 	{
 
-		m_world->SetGravity(gravity.X, gravity.Y);
+		m_world->SetGravity(b2Vec2(m_gravity.X, m_gravity.Y));
 	
 	}
 
@@ -155,7 +187,7 @@ namespace Engine
 
 		std::shared_ptr<PhysicsBody> ptrPhysicsBody = sceneObject.GetPhysicsBody();
 
-		m_world->AddBody(ptrPhysicsBody);
+		AddPhysicsBodyToWorld(ptrPhysicsBody);
 	}
 
 	void Scene::Remove(SceneObject& sceneObject)
@@ -171,5 +203,56 @@ namespace Engine
 		std::shared_ptr<PhysicsBody> ptrBody = sceneObject.GetPhysicsBody();
 
 		ptrBody->RemoveBodyFromWorld();
+	}
+
+	void Scene::AddPhysicsBodyToWorld(std::shared_ptr<PhysicsBody> physicsBody)
+	{
+		if (physicsBody == nullptr)
+		{
+			ENGINE_ERROR_D("PhysicsBody is null!");
+			return;
+		}
+
+		b2Body* body;
+		b2BodyDef bodyDef;
+		b2FixtureDef fixtureDef;
+		b2PolygonShape shape;
+
+		switch (physicsBody->GetBodyType())
+		{
+		case STATIC:
+			bodyDef.type = b2_staticBody;
+			break;
+		case DYNAMIC:
+			bodyDef.type = b2_dynamicBody;
+			break;
+		case KINEMATIC:
+			bodyDef.type = b2_kinematicBody;
+			break;
+		case SENSOR:
+			bodyDef.type = b2_kinematicBody;
+			physicsBody->SetIsSensor(true);
+			break;
+		default:
+			bodyDef.type = b2_staticBody;
+			break;
+		}
+
+		bodyDef.fixedRotation = physicsBody->GetIsRotationFixed();
+		bodyDef.userData.pointer = reinterpret_cast<intptr_t>(physicsBody.get());
+		bodyDef.position.Set(physicsBody->GetStartingPosition().X + physicsBody->GetHalfWidth(), physicsBody->GetStartingPosition().Y + physicsBody->GetHalfHeight());
+
+		body = m_world->CreateBody(&bodyDef);
+
+		shape.SetAsBox(physicsBody->GetHalfWidth(), physicsBody->GetHalfHeight());
+		fixtureDef.shape = &shape;
+		fixtureDef.restitution = physicsBody->GetStartingRestitution();
+		fixtureDef.restitutionThreshold = physicsBody->GetStartingRestitutionThreshold();
+		fixtureDef.density = physicsBody->GetStartingDensity();
+		fixtureDef.friction = physicsBody->GetStartingFriction();
+		fixtureDef.isSensor = physicsBody->GetIsSensor();
+		body->CreateFixture(&fixtureDef);
+
+		physicsBody->m_body = body;
 	}
 }
