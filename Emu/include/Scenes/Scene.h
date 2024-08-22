@@ -36,6 +36,7 @@ namespace Engine
 	private:
 		Vector2D<int> m_levelDimensionsInUnits;
 		std::vector<SceneObjectStack> m_layers;
+		TileMap* m_tileMap;
 		b2World* m_world;
 		Vector2D<float> m_gravity;
 
@@ -44,11 +45,11 @@ namespace Engine
 		inline const int GetLevelWidth() const { return m_levelDimensionsInUnits.X; }
 		inline const int GetLevelHeight() const { return m_levelDimensionsInUnits.Y; }
 
+		void OnScenePlay();
 		void AddPhysicsBodyToWorld(std::shared_ptr<PhysicsBody> physicsBody);
 		void DestroyPhysicsWorld();
 
 		void CheckValid();
-		void OnScenePlay();
 		void Update();
 
 		bool HasTileMap;

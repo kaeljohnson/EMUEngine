@@ -12,7 +12,7 @@ namespace Engine
 	class Entity : public SceneObject
 	{
 	public:
-		EMU_API Entity(const Vector2D<float> position, const Vector2D<float> size, int directionFacing);
+		EMU_API Entity(const Vector2D<float> position, const Vector2D<float> size, int directionFacing, const bool visible);
 		~Entity() = default;
 	};
 }

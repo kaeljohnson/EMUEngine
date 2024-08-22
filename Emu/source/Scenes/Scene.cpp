@@ -55,6 +55,28 @@ namespace Engine
 	{
 		CheckValid();
 
+		m_world = new b2World(b2Vec2(m_gravity.X, m_gravity.Y));
+
+		for (auto& layer : m_layers)
+		{
+			for (auto& sceneObject : layer)
+			{
+				AddPhysicsBodyToWorld(sceneObject->GetPhysicsBody());
+			}
+		}
+
+		/*bool layerExists = false;
+		for (auto& tile : *m_tileMap)
+		{
+			Add(tile, 0);
+			layerExists = true;
+		}
+
+		for (auto& collisionBody : m_tileMap->GetCollisionBodies())
+		{
+			Add(collisionBody, 0);
+		}*/
+
 	}
 
 	void Scene::AddLayer(size_t layerIdx)
@@ -78,27 +100,30 @@ namespace Engine
 
 		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_levelDimensionsInUnits.X) + ", Map height: " + std::to_string(m_levelDimensionsInUnits.Y));
 
-		bool layerExists = false;
 		for (auto& tile : tileMap)
 		{
 			Add(tile, layerIdx);
-			layerExists = true;
 		}
 
-		if (!layerExists)
+		for (auto& collisionBody : tileMap.GetCollisionBodies())
 		{
-			ENGINE_WARN_D("Invalid layer. Cannot add map to scene!");
-			return;
+			Add(collisionBody, layerIdx);
 		}
 
-		// Tile Maps underlying collision bodies exist in the physics world as continuous bodies,
-		// separate from the tile map itself.
-		for (auto& tile : tileMap.GetCollisionBodies())
-		{
-			std::shared_ptr<PhysicsBody> ptrBox = tile.GetPhysicsBody();
+		//if (!layerExists)
+		//{
+		//	ENGINE_WARN_D("Invalid layer. Cannot add map to scene!");
+		//	return;
+		//}
 
-			AddPhysicsBodyToWorld(ptrBox);
-		}
+		//// Tile Maps underlying collision bodies exist in the physics world as continuous bodies,
+		//// separate from the tile map itself.
+		//for (auto& tile : tileMap.GetCollisionBodies())
+		//{
+		//	std::shared_ptr<PhysicsBody> ptrBox = tile.GetPhysicsBody();
+
+		//	AddPhysicsBodyToWorld(ptrBox);
+		//}
 
 		HasTileMap = true;
 	}
@@ -144,6 +169,8 @@ namespace Engine
 
 		ENGINE_INFO_D("Setting gravity: " + std::to_string(gravity.X) + ", " + std::to_string(gravity.Y));
 
+		m_gravity = gravity;
+
 		if (m_world)
 		{
 			ENGINE_INFO_D("World already set!");
@@ -153,8 +180,6 @@ namespace Engine
 		// Need a reset function for the world which resets all objects in the world.
 
 		// m_world = std::make_unique<World>(gravity.X, gravity.Y, 8, 3);
-		m_world = new b2World(b2Vec2(gravity.X, gravity.Y));
-		
 
 		if (!HasTileMap)
 		{
@@ -184,10 +209,6 @@ namespace Engine
 
 		sceneObject.LayerIdx = layerIdx;
 		m_layers[layerIdx].Push(&sceneObject);
-
-		std::shared_ptr<PhysicsBody> ptrPhysicsBody = sceneObject.GetPhysicsBody();
-
-		AddPhysicsBodyToWorld(ptrPhysicsBody);
 	}
 
 	void Scene::Remove(SceneObject& sceneObject)
