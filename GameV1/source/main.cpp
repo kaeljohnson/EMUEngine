@@ -17,13 +17,11 @@ int main(int argc, char* args[])
 	Engine::SceneManager& refSceneManager = ptrAppInstance->GetSceneManager();
 
 	Engine::ScenePtr scene = Engine::CreateScene();
-
-
 	Engine::ScenePtr scene2 = Engine::CreateScene();
 
 	refSceneManager.AddScene("Level1", scene);
 	refSceneManager.AddScene("Level2", scene2);
-	refSceneManager.LoadScene("Level1");
+	
 
 	// Need physcis to scale with pixels per unit.
 	scene->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
@@ -58,6 +56,8 @@ int main(int argc, char* args[])
 	Engine::TileMap testMap2("TestMap2.txt", 1);
 	scene2->AddTileMap(testMap2, MAP_LAYER);
 	scene2->Add(player, PLAYER_LAYER);
+
+	refSceneManager.LoadScene("Level1");
 	
 	AppManagementEventHandlers appManagementEventHandlers(refEventManager, playerCamera);
 

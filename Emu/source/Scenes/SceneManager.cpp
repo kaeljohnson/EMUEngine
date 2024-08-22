@@ -1,5 +1,8 @@
 #pragma once
 
+#include <thread>
+#include <chrono>
+
 #include "../../include/Scenes/SceneManager.h"
 
 #include "../../include/Scenes/Scene.h"
@@ -7,7 +10,7 @@
 
 namespace Engine
 {
-	SceneManager::SceneManager() : m_newSceneStarting(false), m_currentScene(nullptr)
+	SceneManager::SceneManager() : m_newSceneStarting(true), m_currentScene(nullptr)
 	{
 	}
 
@@ -30,7 +33,8 @@ namespace Engine
 
 	void SceneManager::LoadScene(std::shared_ptr<Scene> scene)
 	{
-		if (m_currentScene) m_currentScene->OnSceneEnd();
+		// std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		if (m_currentScene) { m_currentScene->OnSceneEnd(); }
 		m_currentScene = scene;
 		m_currentScene->OnScenePlay();
 		m_newSceneStarting = true;

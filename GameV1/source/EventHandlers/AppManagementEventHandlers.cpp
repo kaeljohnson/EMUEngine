@@ -49,6 +49,13 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::EventManager& eve
 			camera.SetPixelsPerUnit(32);
 			e.Handled = true;
 		});
+	
+	eventManager.RegisterEventHandler(Engine::L_KEY_DOWN, [&](Engine::Event& e)
+		{
+			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::L_KEY_DOWN)));
+			Engine::Application::GetInstance()->GetSceneManager().LoadScene("Level2");
+			e.Handled = true;
+		});
 }
 
 AppManagementEventHandlers::~AppManagementEventHandlers() {}

@@ -53,8 +53,6 @@ namespace Engine
 
 	void Scene::OnScenePlay()
 	{
-		CheckValid();
-
 		m_world = new b2World(b2Vec2(m_gravity.X, m_gravity.Y));
 
 		for (auto& layer : m_layers)

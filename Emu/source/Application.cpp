@@ -46,22 +46,11 @@ namespace Engine
 		// Once sceme manager exists, this function will be a generic run funcion that queries the scene manager for the current scene.
 		// Will need to add more functionality in here to handle scene switching.
 
-		std::shared_ptr<Scene> currentScene = m_sceneManager.GetCurrentScene();
-
-		// Camera frames current scene.
-		m_cameraManager.m_ptrCurrentCamera->Frame(Vector2D<int>(currentScene->GetLevelWidth(), currentScene->GetLevelHeight()));
 		m_windowRenderer.SetCamera(m_cameraManager.m_ptrCurrentCamera);
 
 		running = true;
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-		if (currentScene == nullptr)
-		{
-			ENGINE_CRITICAL_D("No scene loaded! Application must have a scene to run!");
-			end();
-		}
-
-		currentScene->OnScenePlay();
 
 		const float timeStep = TIME_STEP;
 
@@ -86,11 +75,8 @@ namespace Engine
 
 			if (m_sceneManager.IsNewSceneStarting())
 			{
-				std::shared_ptr<Scene> currentScene = m_sceneManager.GetCurrentScene();
-
 				// Camera frames current scene.
-				m_cameraManager.m_ptrCurrentCamera->Frame(Vector2D<int>(currentScene->GetLevelWidth(), currentScene->GetLevelHeight()));
-				// m_windowRenderer.SetCamera(m_cameraManager.m_ptrCurrentCamera);
+				m_cameraManager.m_ptrCurrentCamera->Frame(Vector2D<int>(m_sceneManager.GetCurrentScene()->GetLevelWidth(), m_sceneManager.GetCurrentScene()->GetLevelHeight()));
 				m_sceneManager.NewSceneStarted();
 			}
 
@@ -105,7 +91,7 @@ namespace Engine
 				m_eventManager.HandleEvents();
 				m_eventManager.ProcessEvents();
 				
-				currentScene->Update();
+				m_sceneManager.GetCurrentScene()->Update();
 				
 				accumulator -= timeStep;
 			}
@@ -114,7 +100,7 @@ namespace Engine
 
 			m_cameraManager.m_ptrCurrentCamera->Update(interpolation);
 
-			m_windowRenderer.RenderScene(currentScene, interpolation);
+			m_windowRenderer.RenderScene(m_sceneManager.GetCurrentScene(), interpolation);
 		}
 	}
 
