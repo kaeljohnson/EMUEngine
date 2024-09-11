@@ -10,7 +10,7 @@ namespace Engine
 	class Tile : public SceneObject
 	{
 	public:
-		EMU_API Tile(const BodyType bodyType, const Vector2D<float> position, const Vector2D<float> size, int directionFacing);
+		EMU_API Tile(const BodyType bodyType, const Vector2D<float> position, const Vector2D<float> size, int directionFacing, const bool visible);
 		~Tile() = default;
 
 	public:

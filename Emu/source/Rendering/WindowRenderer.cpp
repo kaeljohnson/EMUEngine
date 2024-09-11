@@ -17,7 +17,7 @@ namespace Engine
 	Vector2D<int> Screen::SCREEN_SIZE = Vector2D<int>(0, 0);
 	Vector2D<int> Screen::VIRTUAL_SIZE = Vector2D<int>(1280, 720);
 
-	WindowRenderer::WindowRenderer() : m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr)
+	WindowRenderer::WindowRenderer() : m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), ptrCurrentCamera(nullptr)
 	{
 		ENGINE_CRITICAL("Creating Renderer");
 
@@ -98,10 +98,13 @@ namespace Engine
 		float cameraTop = ptrCurrentCamera->m_offset.Y;
 		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->GetPixelsPerUnit());
 
+		// Objects should be submitted for rendering instead of iterating through every scene object. ECS would solve this.
 		for (auto& layer : currentScene->GetLayers())
 		{
 			for (auto& sceneObject : layer)
 			{
+				if (!sceneObject->Visible) continue;
+
 				float objectLeft = sceneObject->GetPhysicsBody()->GetTopLeftPosition().X;
 				float objectRight = objectLeft + sceneObject->GetPhysicsBody()->GetDimensions().X;
 				float objectTop = sceneObject->GetPhysicsBody()->GetTopLeftPosition().Y;

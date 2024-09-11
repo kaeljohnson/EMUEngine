@@ -1,5 +1,7 @@
 #pragma once
 
+#include "box2d/box2d.h"
+
 #include "../../include/EngineConstants.h"
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Scenes/SceneObject.h"
@@ -13,7 +15,35 @@
 namespace Engine
 {
 	Scene::Scene() : m_layers(), m_levelDimensionsInUnits(32, 32), HasTileMap(false),
-		m_world(nullptr) {}
+		m_world(nullptr), m_tileMap(nullptr) {}
+
+	Scene::~Scene()
+	{
+		DestroyPhysicsWorld();
+	}
+
+	void Scene::DestroyPhysicsWorld()
+	{
+		if (m_world == nullptr)
+		{
+			ENGINE_INFO_D("World is already null. No need to destroy.");
+			return;
+		}
+
+		ENGINE_INFO_D("Freeing World!");
+		// Destroy all bodies in the world
+		b2Body* body = m_world->GetBodyList();
+		while (body != nullptr)
+		{
+			b2Body* nextBody = body->GetNext();
+			PhysicsBody* ptrBody = reinterpret_cast<PhysicsBody*>(body->GetUserData().pointer);
+			ptrBody->RemoveBodyFromWorld();
+			body = nextBody;
+		}
+
+		delete m_world;
+		m_world = nullptr;
+	}
 
 	void Scene::CheckValid()
 	{
@@ -23,8 +53,20 @@ namespace Engine
 
 	void Scene::OnScenePlay()
 	{
-		CheckValid();
+		m_world = new b2World(b2Vec2(m_gravity.X, m_gravity.Y));
 
+		for (auto& layer : m_layers)
+		{
+			for (auto& sceneObject : layer)
+			{
+				AddPhysicsBodyToWorld(sceneObject->GetPhysicsBody());
+			}
+		}
+	}
+
+	void Scene::OnSceneEnd()
+	{
+		DestroyPhysicsWorld();
 	}
 
 	void Scene::AddLayer(size_t layerIdx)
@@ -48,26 +90,14 @@ namespace Engine
 
 		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_levelDimensionsInUnits.X) + ", Map height: " + std::to_string(m_levelDimensionsInUnits.Y));
 
-		bool layerExists = false;
 		for (auto& tile : tileMap)
 		{
 			Add(tile, layerIdx);
-			layerExists = true;
 		}
 
-		if (!layerExists)
+		for (auto& collisionBody : tileMap.GetCollisionBodies())
 		{
-			ENGINE_WARN_D("Invalid layer. Cannot add map to scene!");
-			return;
-		}
-
-		// Tile Maps underlying collision bodies exist in the physics world as continuous bodies,
-		// separate from the tile map itself.
-		for (auto& tile : tileMap.GetCollisionBodies())
-		{
-			std::shared_ptr<PhysicsBody> ptrBox = tile.GetPhysicsBody();
-
-			m_world->AddBody(ptrBox);
+			Add(collisionBody, layerIdx);
 		}
 
 		HasTileMap = true;
@@ -105,7 +135,7 @@ namespace Engine
 			}
 		}
 
-		m_world->Update();
+		m_world->Step(TIME_STEP, 8, 3);
 	};
 
 	void Scene::CreatePhysicsSimulation(const Vector2D<float> gravity)
@@ -114,6 +144,8 @@ namespace Engine
 
 		ENGINE_INFO_D("Setting gravity: " + std::to_string(gravity.X) + ", " + std::to_string(gravity.Y));
 
+		m_gravity = gravity;
+
 		if (m_world)
 		{
 			ENGINE_INFO_D("World already set!");
@@ -121,8 +153,6 @@ namespace Engine
 		}
 		
 		// Need a reset function for the world which resets all objects in the world.
-
-		m_world = std::make_unique<World>(gravity.X, gravity.Y, 8, 3);
 
 		if (!HasTileMap)
 		{
@@ -137,7 +167,7 @@ namespace Engine
 	void Scene::SetGravity(const Vector2D<float> gravity)
 	{
 
-		m_world->SetGravity(gravity.X, gravity.Y);
+		m_world->SetGravity(b2Vec2(m_gravity.X, m_gravity.Y));
 	
 	}
 
@@ -152,10 +182,6 @@ namespace Engine
 
 		sceneObject.LayerIdx = layerIdx;
 		m_layers[layerIdx].Push(&sceneObject);
-
-		std::shared_ptr<PhysicsBody> ptrPhysicsBody = sceneObject.GetPhysicsBody();
-
-		m_world->AddBody(ptrPhysicsBody);
 	}
 
 	void Scene::Remove(SceneObject& sceneObject)
@@ -171,5 +197,56 @@ namespace Engine
 		std::shared_ptr<PhysicsBody> ptrBody = sceneObject.GetPhysicsBody();
 
 		ptrBody->RemoveBodyFromWorld();
+	}
+
+	void Scene::AddPhysicsBodyToWorld(std::shared_ptr<PhysicsBody> physicsBody)
+	{
+		if (physicsBody == nullptr)
+		{
+			ENGINE_ERROR_D("PhysicsBody is null!");
+			return;
+		}
+
+		b2Body* body;
+		b2BodyDef bodyDef;
+		b2FixtureDef fixtureDef;
+		b2PolygonShape shape;
+
+		switch (physicsBody->GetBodyType())
+		{
+		case STATIC:
+			bodyDef.type = b2_staticBody;
+			break;
+		case DYNAMIC:
+			bodyDef.type = b2_dynamicBody;
+			break;
+		case KINEMATIC:
+			bodyDef.type = b2_kinematicBody;
+			break;
+		case SENSOR:
+			bodyDef.type = b2_kinematicBody;
+			physicsBody->SetIsSensor(true);
+			break;
+		default:
+			bodyDef.type = b2_staticBody;
+			break;
+		}
+
+		bodyDef.fixedRotation = physicsBody->GetIsRotationFixed();
+		bodyDef.userData.pointer = reinterpret_cast<intptr_t>(physicsBody.get());
+		bodyDef.position.Set(physicsBody->GetStartingPosition().X + physicsBody->GetHalfWidth(), physicsBody->GetStartingPosition().Y + physicsBody->GetHalfHeight());
+
+		body = m_world->CreateBody(&bodyDef);
+
+		shape.SetAsBox(physicsBody->GetHalfWidth(), physicsBody->GetHalfHeight());
+		fixtureDef.shape = &shape;
+		fixtureDef.restitution = physicsBody->GetStartingRestitution();
+		fixtureDef.restitutionThreshold = physicsBody->GetStartingRestitutionThreshold();
+		fixtureDef.density = physicsBody->GetStartingDensity();
+		fixtureDef.friction = physicsBody->GetStartingFriction();
+		fixtureDef.isSensor = physicsBody->GetIsSensor();
+		body->CreateFixture(&fixtureDef);
+
+		physicsBody->m_body = body;
 	}
 }
