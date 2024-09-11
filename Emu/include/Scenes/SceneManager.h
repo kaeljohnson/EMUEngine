@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <unordered_map>
 #include <string>
 #include <memory>
 
@@ -31,9 +31,7 @@ namespace Engine
 
 	private:
 		std::unordered_map<std::string, std::shared_ptr<Scene>> m_scenes;
-
 		std::shared_ptr<Scene> m_currentScene;
-
 		bool m_newSceneStarting;
 	};
 }

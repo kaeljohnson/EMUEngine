@@ -154,8 +154,6 @@ namespace Engine
 		
 		// Need a reset function for the world which resets all objects in the world.
 
-		// m_world = std::make_unique<World>(gravity.X, gravity.Y, 8, 3);
-
 		if (!HasTileMap)
 		{
 			ENGINE_INFO_D("No map in the level. Add map or set level dimensions manually.");

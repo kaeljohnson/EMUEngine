@@ -33,7 +33,6 @@ namespace Engine
 
 	void SceneManager::LoadScene(std::shared_ptr<Scene> scene)
 	{
-		// std::this_thread::sleep_for(std::chrono::milliseconds(500));
 		if (m_currentScene) { m_currentScene->OnSceneEnd(); }
 		m_currentScene = scene;
 		m_currentScene->OnScenePlay();
