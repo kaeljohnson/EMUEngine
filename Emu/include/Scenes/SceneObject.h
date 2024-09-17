@@ -26,7 +26,6 @@ namespace Engine
 
 		EMU_API virtual ~SceneObject() = default;
 
-		// Should clients be able to get the physics body?
 		EMU_API inline std::shared_ptr<PhysicsBody> GetPhysicsBody() { return m_physicsBody; }
 		EMU_API inline std::string GetUUID() const { return uuid; }
 
