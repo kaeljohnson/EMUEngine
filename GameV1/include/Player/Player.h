@@ -30,6 +30,8 @@ public:
 	PlayerState m_currentState;
 	PlayerDirection m_currentDirection;
 
+	Engine::Transform m_transform;
+
 private:
 	bool m_canJump;
 	float m_jumpCharge;

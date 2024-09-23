@@ -11,6 +11,8 @@
 #include "../../include/Tiles/TileMap.h"
 #include "../../include/Tiles/Tile.h"
 #include "../../include/MathUtil.h"
+#include "../../include/Transform.h"
+#include "../../include/ComponentManager/ComponentManager.h"
 
 namespace Engine
 {
@@ -115,6 +117,7 @@ namespace Engine
 
 	void Scene::Update()
 	{
+		// ENGINE_CRITICAL_D("Scene Update!");
 		// Faster way to do this? Should only have to update objects
 		// prev values if they have changed. In fact, should only update
 		// objects that have changed in general
@@ -126,16 +129,33 @@ namespace Engine
 		// In the future we can filter which layers need to be updated each frame.
 		// For instance, if the camera has not moved, we don't need to update the background layer,
 		// or the collision bodies layer, and likely not the entire map layer.
+
+		m_world->Step(TIME_STEP, 8, 3);
+
 		for (auto& layer : m_layers)
 		{
 			for (auto& sceneObject : layer)
 			{
+				// ENGINE_CRITICAL_D(std::to_string(sceneObject->GetUUID()));
+				// Update transforms
+				Transform* transform = ComponentManagerRegistry::GetManager<Transform>().GetComponent(sceneObject->GetUUID());
+
+				if (transform != nullptr)
+				{
+					// std::cout << "UHHH: " << transform << ": " << transform->Dimensions.X << "\n";
+					transform->PrevPosition = sceneObject->GetPhysicsBody()->GetTopLeftPrevPosition();
+					transform->Position = sceneObject->GetPhysicsBody()->GetTopLeftPosition();
+					transform->Dimensions = sceneObject->GetPhysicsBody()->GetDimensions();
+					transform->Rotation = sceneObject->GetPhysicsBody()->GetAngleInDegrees();
+				}
+
+				// Update scripts
 				sceneObject->EngineSideUpdate();
 				sceneObject->Update();
+
+				
 			}
 		}
-
-		m_world->Step(TIME_STEP, 8, 3);
 	};
 
 	void Scene::CreatePhysicsSimulation(const Vector2D<float> gravity)

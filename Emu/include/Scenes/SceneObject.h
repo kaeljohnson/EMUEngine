@@ -27,7 +27,7 @@ namespace Engine
 		EMU_API virtual ~SceneObject() = default;
 
 		EMU_API inline std::shared_ptr<PhysicsBody> GetPhysicsBody() { return m_physicsBody; }
-		EMU_API inline std::string GetUUID() const { return uuid; }
+		EMU_API inline size_t GetUUID() const { return uuid; }
 
 	public:
 		void EngineSideUpdate();
@@ -35,10 +35,8 @@ namespace Engine
 
 		virtual void Update();
 
-	private:
-		std::string uuid;
-
 	protected:
 		std::shared_ptr<PhysicsBody> m_physicsBody;
+		size_t uuid;
 	};
 }

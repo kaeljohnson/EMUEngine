@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <iostream>
 
 #include <Engine.h>
 
@@ -15,7 +16,8 @@
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
         m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right),
-        Entity(Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height), 1, true)
+        Entity(Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height), 1, true),
+		m_transform(uuid)
     {
         // Need to have them be able to set this during construction of physics body.
     	m_physicsBody->SetStartingFriction(0.0f);
@@ -23,6 +25,9 @@
 
     void Player::Update()
     {
+        // std::cout << "CLIENT: " << m_transform.m_id << ": " << &m_transform << "\n";
+		// std::cout << m_transform.Position.X << ", " << m_transform.Position.Y << "\n";
+
         m_onGround = m_physicsBody->GetHasCollisionBelow();
 
         m_force = { 0.0f, 0.0f };

@@ -3,11 +3,18 @@
 #include "../include/ISDL/ISDL.h"
 #include "../include/Init.h"
 #include "../include/Logging/Logger.h"
+#include "../include/CommonFunctions.h"
 
 namespace Engine
 {
+
+	// Define the static members
+	size_t IDGenerator::maxID = 0;
+	std::unordered_set<size_t> IDGenerator::usedIDs;
+
 	Init::Init()
 	{
+		IDGenerator::initialize(1000);
 
 		ENGINE_TRACE_D("Logger initialized!");
 

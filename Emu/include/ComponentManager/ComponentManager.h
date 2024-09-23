@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include <unordered_map>
 #include <memory>
 #include <string>
@@ -13,31 +15,33 @@ namespace Engine
     };
 
     template <typename T>
-    class ComponentManager : public ComponentManagerBase 
+    class ComponentManager : public ComponentManagerBase
     {
     public:
-        void AddComponent(std::string& objectID, T component) 
+        void AddComponent(size_t objectID, T* component) 
         {
             m_components[objectID] = component;
+			std::cout << "FROM COMPMANAGER: " << objectID << " added at " << component << "\n";
         }
 
-        T* GetComponent(std::string& entity)
+        T* GetComponent(size_t entity)
         {
             auto it = m_components.find(entity);
-            if (it != m_components.end()) 
+            if (it != m_components.end())
             {
-                return &it->second;
+                // std::cout << "FROM COMPMANAGER: " << it->first << " gotten from " << it->second << "\n";
+                return it->second;
             }
             return nullptr;
         }
 
-        std::unordered_map<std::string&, T>& GetAllComponents() 
+        std::unordered_map<size_t, T*>& GetAllComponents() 
         {
             return m_components;
         }
 
     private:
-        std::unordered_map<std::string&, T> m_components;
+        std::unordered_map<size_t, T*> m_components;
     };
 
     class ComponentManagerRegistry 

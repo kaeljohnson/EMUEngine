@@ -10,6 +10,8 @@
 #include "../Scenes/Scene.h"
 #include "../Camera/Camera.h"
 
+#include "../Transform.h"
+
 namespace Engine
 {
 	class ISDL;
@@ -21,7 +23,7 @@ namespace Engine
 		~WindowRenderer();
 
 		void RenderScene(std::shared_ptr<Scene> currentScene, const double interpolation);
-		void Draw(SceneObject* sceneObject, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset);
+		void Draw(Transform* sceneObject, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset);
 		void Display();
 
 		void SetViewport();

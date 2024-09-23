@@ -5,6 +5,8 @@
 
 #include "../../include/Camera/TargetCamera.h"
 
+#include "../../include/Transform.h"
+
 namespace Engine
 {
 	TargetCamera::TargetCamera() : ptrCameraTarget(nullptr), Camera()
@@ -13,8 +15,8 @@ namespace Engine
 	// Bug: Camera is stuttery for certain values of m_smoothingFactor and bounds.
 	void TargetCamera::Update(const double interpolation)
 	{
-		float targetX = Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevPosition().X, ptrCameraTarget->GetPhysicsBody()->GetCenterPosition().X, (float)interpolation);
-		float targetY = Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevPosition().Y, ptrCameraTarget->GetPhysicsBody()->GetCenterPosition().Y, (float)interpolation);
+		float targetX = Lerp(ptrCameraTarget->PrevPosition.X, ptrCameraTarget->Position.X, (float)interpolation);
+		float targetY = Lerp(ptrCameraTarget->PrevPosition.Y, ptrCameraTarget->Position.Y, (float)interpolation);
 
 		// Desired camera position based on the target's position
 		float desiredCameraTopLeftX = targetX - (m_size.X / 2.0f);
@@ -26,7 +28,7 @@ namespace Engine
 		if (m_clampingOn) Clamp();
 	}	
 
-	void TargetCamera::SetCameraTarget(SceneObject* target)
+	void TargetCamera::SetCameraTarget(Transform* target)
 	{
 		ptrCameraTarget = target;
 	}

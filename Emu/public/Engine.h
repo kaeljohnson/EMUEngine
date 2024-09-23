@@ -25,6 +25,8 @@
 #include "../include/CommonFunctions.h"
 #include "../include/MathUtil.h"
 
+#include "../include/Transform.h"
+
 namespace Engine
 {
 	using ScenePtr = std::shared_ptr<Scene>;

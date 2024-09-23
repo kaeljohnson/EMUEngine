@@ -13,7 +13,7 @@ namespace Engine
 	{
 	public:
 		// Client should probably decide this.
-		static const int MAX_SIZE = 100000;
+		static const int MAX_SIZE = 50000;
 
 		EMU_API TileMap(const std::string mapFile, const int numUnitsPerTile);
 		EMU_API const char GetTile(int x, int y) const;

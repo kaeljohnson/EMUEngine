@@ -3,6 +3,7 @@
 #include "../Core.h"
 
 #include "../Scenes/SceneObject.h"
+#include "../Transform.h"
 #include "../Physics/BodyTypes.h"
 
 namespace Engine
@@ -14,10 +15,6 @@ namespace Engine
 		~Tile() = default;
 
 	public:
-		Vector2D<float> m_position;
-
-		// float width;
-		// float height;
-		Vector2D<float> m_size;
+		Transform m_transform;
 	};
 }

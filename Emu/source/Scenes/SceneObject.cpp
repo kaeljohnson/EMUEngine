@@ -12,7 +12,7 @@ namespace Engine
 	SceneObject::SceneObject(const BodyType bodyType, const bool fixed, const Vector2D<float> position,
 		const Vector2D<float> size, int directionFacing, const bool visible)
 		: m_physicsBody(std::make_shared<PhysicsBody>(bodyType, fixed, position, size)),
-		Enabled(true), LayerIdx(-1), uuid(CreateUUID()), DirectionFacing(directionFacing), Visible(visible)
+		Enabled(true), LayerIdx(-1), uuid(IDGenerator::CreateUUID()), DirectionFacing(directionFacing), Visible(visible)
 	{}
 
 	void SceneObject::UpdatePrevPosition()

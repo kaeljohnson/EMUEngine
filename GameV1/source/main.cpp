@@ -28,6 +28,7 @@ int main(int argc, char* args[])
 	scene2->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 	
 	Player player(1.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
+	Player player2(2.0f, 2.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 
 	Engine::ScrollingCamera scrollCamera;
 	scrollCamera.SetScrollingSpeeds(Engine::Vector2D<float>(0.0005f, 0.0f));
@@ -35,7 +36,7 @@ int main(int argc, char* args[])
 
 	PlayerCamera playerCamera;
 	playerCamera.SetPixelsPerUnit(32);
-	playerCamera.SetCameraTarget(&player);
+	playerCamera.SetCameraTarget(&player.m_transform);
 
 	refCameraManager.SetCurrentCamera(&playerCamera);
 
@@ -46,16 +47,18 @@ int main(int argc, char* args[])
 	scene->AddLayer(MAP_LAYER);
 	scene->AddLayer(PLAYER_LAYER);
 
-	Engine::TileMap testMap("TestMap1.txt", 1);
+	Engine::TileMap testMap("testMap1.txt", 1);
 	scene->AddTileMap(testMap, MAP_LAYER);
+	// Engine::Tile tile(Engine::STATIC, Engine::Vector2D<float>(1.0f, 3.0f), Engine::Vector2D<float>(2.0f, 1.0f), 1, true);
+	// scene->Add(tile, MAP_LAYER);
 	scene->Add(player, PLAYER_LAYER);
 
 	scene2->AddLayer(MAP_LAYER);
 	scene2->AddLayer(PLAYER_LAYER);
 
-	Engine::TileMap testMap2("TestMap2.txt", 1);
-	scene2->AddTileMap(testMap2, MAP_LAYER);
-	scene2->Add(player, PLAYER_LAYER);
+	// Engine::TileMap testMap2("TestMap2.txt", 1);
+	// scene2->AddTileMap(testMap2, MAP_LAYER);
+	// scene2->Add(player, PLAYER_LAYER);
 
 	refSceneManager.LoadScene("Level1");
 	

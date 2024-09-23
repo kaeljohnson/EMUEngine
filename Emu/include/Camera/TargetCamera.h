@@ -4,7 +4,7 @@
 
 #include "Camera.h"
 
-#include "../Scenes/SceneObject.h"
+#include "../Transform.h"
 
 namespace Engine
 {
@@ -12,12 +12,12 @@ namespace Engine
 	{
 	public:
 		EMU_API TargetCamera();
-		EMU_API void SetCameraTarget(SceneObject* ptrTarget);
+		EMU_API void SetCameraTarget(Transform* ptrTarget);
 		EMU_API virtual void Update(const double interpolation);
 
 		~TargetCamera() = default;
 	
 	protected:
-		SceneObject* ptrCameraTarget;
+		Transform* ptrCameraTarget;
 	};
 }
