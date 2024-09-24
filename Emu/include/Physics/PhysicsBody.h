@@ -20,6 +20,7 @@ namespace Engine
 	{
 	public:
 		b2Body* m_body = nullptr;
+		const size_t m_id;
 	private:
 		const BodyType m_bodyType;
 		
@@ -105,10 +106,10 @@ namespace Engine
 		EMU_API inline const float GetSize() const { return m_width * m_height; }
 
 	public:
-		PhysicsBody() = default;
-		PhysicsBody(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size);
+		EMU_API PhysicsBody();
+		EMU_API PhysicsBody(const size_t id, const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size);
 
-		~PhysicsBody();
+		EMU_API ~PhysicsBody();
 
 		// PhysicsBody2D specific functions
 		void RemoveBodyFromWorld();
@@ -137,6 +138,7 @@ namespace Engine
 		// PhysicsBody2D does not track previous values.
 		// Need to update them here.
 		void UpdatePrevPosition();
+		void Update();
 
 		// Non-PhysicsBody2d getters
 		inline const Vector2D<float> GetTopLeftPrevPosition() const { return m_prevPosition; }

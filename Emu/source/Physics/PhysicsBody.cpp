@@ -6,18 +6,25 @@
 #include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/BodyTypes.h"
+#include "../../include/ComponentManager/ComponentManager.h"
 
 #include "box2d/box2d.h"
 
 namespace Engine
 {
-	PhysicsBody::PhysicsBody(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
+	PhysicsBody::PhysicsBody() : m_halfWidth(0.0f), m_halfHeight(0.0f), m_width(0.0f), m_height(0.0f),
+		m_startingPosition(Vector2D<float>(0.0f, 0.0f)), m_bodyType(STATIC), m_fixed(false), m_body(nullptr),
+		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
+		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
+		m_gravityOn(true), m_isSensor(false), m_prevPosition(Vector2D<float>(0.0f, 0.0f)), m_id(0) {}
+
+	PhysicsBody::PhysicsBody(const size_t id, const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
 		: m_halfWidth(size.X / 2.0f), m_halfHeight(size.Y / 2.0f), 
 		m_width(size.X), m_height(size.Y), m_startingPosition(position),
 		m_bodyType(bodyType), m_fixed(fixed), m_body(nullptr),
 		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
 		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
-		m_gravityOn(true), m_isSensor(false), m_prevPosition(position)
+		m_gravityOn(true), m_isSensor(false), m_prevPosition(position), m_id(id)
 	{
 		m_fixedRotation = true;
 		m_restitution = 0.0f;
@@ -25,8 +32,12 @@ namespace Engine
 		m_density = 1.0f;
 		m_friction = 1.0f;
 
-		ENGINE_INFO_D("Box created at position: " + std::to_string(position.X) + "," 
-			+ std::to_string(position.Y) + ". With width: " + std::to_string(size.X) + ", height: " + std::to_string(size.Y));
+		ENGINE_INFO_D("Body created at position: " + std::to_string(position.X) + "," 
+			+ std::to_string(position.Y) + ". With width: " + std::to_string(size.X) + ", height: " + std::to_string(size.Y) 
+			+ " with ID: " + std::to_string(id) + ", at address: ");
+		std::cout << this << "\n";
+
+		ComponentManagerRegistry::GetManager<PhysicsBody>().AddComponent(id, this);
 	}
 
 	PhysicsBody::~PhysicsBody()
@@ -198,6 +209,25 @@ namespace Engine
 	}
 
 	void PhysicsBody::UpdatePrevPosition() { m_prevPosition = GetTopLeftPosition(); }
+	void PhysicsBody::Update()
+	{
+		switch (GetBodyType())
+		{
+		case DYNAMIC:
+			UpdatePrevPosition();
+			SetContactFlags();
+			break;
+		case STATIC:
+			SetContactFlagsToFalse();
+			break;
+		case SENSOR:
+			SetContactFlagsToFalse();
+			break;
+		default:
+			ENGINE_WARN_D("Body type has no engine side updating.");
+			break;
+		}
+	}
 
 	void PhysicsBody::SetGravity(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
 

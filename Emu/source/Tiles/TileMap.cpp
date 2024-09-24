@@ -5,6 +5,7 @@
 
 #include "../../include/Tiles/TileMap.h"
 #include "../../include/Logging/Logger.h"
+#include "../../include/CommonFunctions.h"
 
 namespace Engine
 {
@@ -58,7 +59,10 @@ namespace Engine
             {
                 if (GetTile(x, y) != '-')
                 {
+                    const size_t tileID = IDGenerator::CreateUUID();
+
                     m_tiles.emplace_back(
+                        tileID,
                         SENSOR,
 						Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
 						Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)), 0, true);
@@ -125,8 +129,10 @@ namespace Engine
                         }
                     }
 
+					const size_t tileID = IDGenerator::CreateUUID();
                     // Create the tile object with calculated dimensions
                     m_collisionBodies.emplace_back(
+						tileID,
                         STATIC,
                         Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)),

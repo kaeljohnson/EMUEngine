@@ -12,24 +12,18 @@ namespace Engine
 	{
 		for (int i = 0; i < MAX_OBJECTS; i++)
 		{
-			m_sceneObjects[i] = nullptr;
+			m_sceneObjectIDs[i] = 0;
 		}
 	}
 
 	const size_t SceneObjectStack::Size() const { return m_sceneObjectCount; }
 
-	void SceneObjectStack::Push(SceneObject* sceneObject)
+	void SceneObjectStack::Push(const size_t id)
 	{
-		if (sceneObject == nullptr)
+		// Check if the entity already exists in the array
+		for (size_t& objectID : m_sceneObjectIDs)
 		{
-			ENGINE_CRITICAL_D("SceneObject is nullptr. Cannot push nullptr to the SceneObject stack.");
-			return;
-		}
-
-		// Check if the scene object already exists in the array
-		for (auto& existingSceneObject : m_sceneObjects)
-		{
-			if (existingSceneObject == sceneObject)
+			if (objectID == id)
 			{
 				ENGINE_WARN_D("SceneObject already exists in scene.");
 				return;
@@ -43,24 +37,18 @@ namespace Engine
 			return;
 		}
 
-		m_sceneObjects[m_sceneObjectCount] = sceneObject;
+		m_sceneObjectIDs[m_sceneObjectCount] = id;
 
 		m_sceneObjectCount++;
 	}
 
-	void SceneObjectStack::Pop(SceneObject* sceneObject)
+	void SceneObjectStack::Pop(const size_t id)
 	{
-		if (sceneObject == nullptr)
-		{
-			ENGINE_CRITICAL_D("SceneObject is nullptr. Cannot pop nullptr from the SceneObject stack.");
-			return;
-		}
-
 		// Find the object in the array
 		size_t index = 0;
 		for (; index < m_sceneObjectCount; index++)
 		{
-			if (m_sceneObjects[index] == sceneObject)
+			if (m_sceneObjectIDs[index] == id)
 			{
 				break;
 			}
@@ -69,7 +57,7 @@ namespace Engine
 		// If the scene object was not found, return
 		if (index == m_sceneObjectCount)
 		{
-			ENGINE_WARN_D("Scene object not found in scene.");
+			ENGINE_WARN_D("Scene object not found in layer.");
 			return;
 		}
 
@@ -77,7 +65,7 @@ namespace Engine
 		// The for loop below won't run if there is only one scene object in the array.
 		if (m_sceneObjectCount == 1)
 		{
-			m_sceneObjects[0] = nullptr;
+			m_sceneObjectIDs[0] = 0;
 			m_sceneObjectCount--;
 			return;
 		}
@@ -85,7 +73,7 @@ namespace Engine
 		// Remove the scene object from the array
 		for (size_t i = index; i < m_sceneObjectCount - 1; i++)
 		{
-			m_sceneObjects[i] = m_sceneObjects[i + 1];
+			m_sceneObjectIDs[i] = m_sceneObjectIDs[i + 1];
 		}
 
 		m_sceneObjectCount--;

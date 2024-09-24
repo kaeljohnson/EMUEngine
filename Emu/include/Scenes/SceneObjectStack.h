@@ -10,18 +10,18 @@ namespace Engine
 	{
 	private:
 		size_t m_sceneObjectCount = 0;
-		SceneObject* m_sceneObjects[MAX_OBJECTS];
+		size_t m_sceneObjectIDs[MAX_OBJECTS];
 
 	public:
 		SceneObjectStack();
 		~SceneObjectStack() = default;
 
 		const size_t Size() const;
-		void Push(SceneObject* object);
-		void Pop(SceneObject* object);
+		void Push(const size_t id);
+		void Pop(const size_t object);
 		void Pop();
 
-		SceneObject** const begin() { return m_sceneObjects; }
-		SceneObject** const end() { return m_sceneObjects + m_sceneObjectCount; }
+		const size_t* const begin() { return m_sceneObjectIDs; }
+		const size_t* const end() { return m_sceneObjectIDs + m_sceneObjectCount; }
 	};
 }

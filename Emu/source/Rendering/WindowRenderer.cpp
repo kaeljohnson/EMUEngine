@@ -104,21 +104,21 @@ namespace Engine
 		// Objects should be submitted for rendering instead of iterating through every scene object. ECS would solve this.
 		for (auto& layer : currentScene->GetLayers())
 		{
-			for (auto& sceneObject : layer)
+			for (auto& sceneObjectID : layer)
 			{
-				if (!sceneObject->Visible) continue;
+				// if (!sceneObject->Visible) continue;
 
-				Transform* transform = ComponentManagerRegistry::GetManager<Transform>().GetComponent(sceneObject->GetUUID());
+				Transform* transform = ComponentManagerRegistry::GetManager<Transform>().GetComponent(sceneObjectID);
 
 				if (transform == nullptr)
 				{
 					continue;
 				}
 
-				float objectLeft = sceneObject->GetPhysicsBody()->GetTopLeftPosition().X;
-				float objectRight = objectLeft + sceneObject->GetPhysicsBody()->GetDimensions().X;
-				float objectTop = sceneObject->GetPhysicsBody()->GetTopLeftPosition().Y;
-				float objectBottom = objectTop + sceneObject->GetPhysicsBody()->GetDimensions().Y;
+				float objectLeft = transform->Position.X; // sceneObject->GetPhysicsBody()->GetTopLeftPosition().X;
+				float objectRight = transform->Dimensions.X; // objectLeft + sceneObject->GetPhysicsBody()->GetDimensions().X;
+				float objectTop = transform->Position.Y; // sceneObject->GetPhysicsBody()->GetTopLeftPosition().Y;
+				float objectBottom = transform->Dimensions.Y; // objectTop + sceneObject->GetPhysicsBody()->GetDimensions().Y;
 
 				bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
 				objectBottom >= cameraTop && objectTop <= cameraBottom;

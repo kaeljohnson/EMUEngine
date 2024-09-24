@@ -11,21 +11,20 @@ namespace Engine
 {
 	SceneObject::SceneObject(const BodyType bodyType, const bool fixed, const Vector2D<float> position,
 		const Vector2D<float> size, int directionFacing, const bool visible)
-		: m_physicsBody(std::make_shared<PhysicsBody>(bodyType, fixed, position, size)),
-		Enabled(true), LayerIdx(-1), uuid(IDGenerator::CreateUUID()), DirectionFacing(directionFacing), Visible(visible)
+		: Enabled(true), LayerIdx(-1), uuid(IDGenerator::CreateUUID()), DirectionFacing(directionFacing), Visible(visible)
 	{}
 
 	void SceneObject::UpdatePrevPosition()
 	{ 
 		// If we can be sure that the object has not moved, 
 		// we don't have to update the previous position.
-		m_physicsBody->UpdatePrevPosition();
+		// m_physicsBody->UpdatePrevPosition();
 	}
 
 	void SceneObject::EngineSideUpdate()
 	{
 		// World updates physics bodies.
-		switch (m_physicsBody->GetBodyType())
+		/*switch (m_physicsBody->GetBodyType())
 		{
 			case DYNAMIC:
 				m_physicsBody->UpdatePrevPosition();
@@ -40,7 +39,7 @@ namespace Engine
 			default:
 				ENGINE_WARN_D("Body type has no engine side updating.");
 				break;
-		}
+		}*/
 	}
 
 	void SceneObject::Update()

@@ -25,11 +25,13 @@ namespace Engine
 	{
 		ENGINE_INFO_D("Transform component created with ID: " + std::to_string(id));
 		// std::cout << "FROM TRANSFORM APP: ADDRESS: " << this << std::endl;
+		ComponentManagerRegistry::GetManager<Transform>().AddComponent(id, this);
 	}
 
 	Transform::Transform(const size_t id, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction)
 		: m_id(id), PrevPosition(position), Position(position), Dimensions(dimensions), Rotation(rotation), Scale(scale), DirectionFacing(direction)
 	{
+		ComponentManagerRegistry::GetManager<Transform>().AddComponent(id, this);
 	}
 
 	void Transform::AttachToSceneObject(const size_t id)

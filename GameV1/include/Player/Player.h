@@ -19,18 +19,19 @@ enum PlayerDirection
 	Right,
 };
 
-class Player : public Engine::Entity
+class Player
 {
 public:
-	Player(const float startingX, const float startingY,
+	Player(const size_t id, const float startingX, const float startingY,
 		const float width, const float height, const Engine::EventStatesMap& keyStates);
 	~Player() = default;
-	void Update() override;
+	void Update();
 
 	PlayerState m_currentState;
 	PlayerDirection m_currentDirection;
 
 	Engine::Transform m_transform;
+	Engine::PhysicsBody m_physicsBody;
 
 private:
 	bool m_canJump;

@@ -5,6 +5,8 @@
 #include <sstream>
 #include <unordered_set>
 
+#include "Core.h"
+
 namespace Engine
 {
 	// Not guaranteed to be unique, but good enough for our purposes.
@@ -17,14 +19,14 @@ namespace Engine
             IDGenerator::maxID = maxID;
         }
 
-        static size_t CreateUUID() 
+        EMU_API static size_t CreateUUID() 
         {
             if (usedIDs.size() >= maxID + 1) 
             {
                 throw std::runtime_error("Error: All IDs are taken.");
             }
 
-            for (size_t id = 0; id <= maxID; ++id) 
+            for (size_t id = 1; id <= maxID; ++id) 
             {
                 if (usedIDs.find(id) == usedIDs.end()) 
                 {

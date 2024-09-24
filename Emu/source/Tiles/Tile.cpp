@@ -4,9 +4,7 @@
 
 namespace Engine
 {
-	Tile::Tile(const BodyType bodyType, const Vector2D<float> position, const Vector2D<float> size, int directionFacing, const bool visible)
-		: SceneObject(bodyType, true, position, size, directionFacing, visible), m_transform() 
-	{
-		m_transform = Transform(uuid);
-	}
+	Tile::Tile(const size_t id, const BodyType bodyType, const Vector2D<float> position, const Vector2D<float> size, int directionFacing, const bool visible)
+		: m_id(id), m_transform(id), m_physicsBody(id, bodyType, false, position, size)
+	{}
 }

@@ -27,8 +27,10 @@ int main(int argc, char* args[])
 	scene->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 	scene2->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 	
-	Player player(1.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
-	Player player2(2.0f, 2.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
+	const size_t playerID = Engine::IDGenerator::CreateUUID();
+	Player player(playerID, 1.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
+	// const size_t player2ID = Engine::IDGenerator::CreateUUID();
+	// Player player2(player2ID, 2.0f, 2.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 
 	Engine::ScrollingCamera scrollCamera;
 	scrollCamera.SetScrollingSpeeds(Engine::Vector2D<float>(0.0005f, 0.0f));
@@ -49,9 +51,11 @@ int main(int argc, char* args[])
 
 	Engine::TileMap testMap("testMap1.txt", 1);
 	scene->AddTileMap(testMap, MAP_LAYER);
-	// Engine::Tile tile(Engine::STATIC, Engine::Vector2D<float>(1.0f, 3.0f), Engine::Vector2D<float>(2.0f, 1.0f), 1, true);
-	// scene->Add(tile, MAP_LAYER);
-	scene->Add(player, PLAYER_LAYER);
+	const size_t tileID = Engine::IDGenerator::CreateUUID();
+	Engine::Tile tile(tileID, Engine::STATIC, Engine::Vector2D<float>(1.0f, 12.0f), Engine::Vector2D<float>(2.0f, 1.0f), 1, true);
+	scene->Add(tileID, MAP_LAYER);
+
+	scene->Add(playerID, PLAYER_LAYER);
 
 	scene2->AddLayer(MAP_LAYER);
 	scene2->AddLayer(PLAYER_LAYER);

@@ -59,9 +59,15 @@ namespace Engine
 
 		for (auto& layer : m_layers)
 		{
-			for (auto& sceneObject : layer)
+			for (auto sceneObjectID : layer)
 			{
-				AddPhysicsBodyToWorld(sceneObject->GetPhysicsBody());
+				ENGINE_CRITICAL_D("SceneObjectID: " + std::to_string(sceneObjectID));
+				PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(sceneObjectID);
+				if (physicsBody != nullptr)
+				{
+					std::cout << "PENISSSSS: " <<  physicsBody->GetCenterPosition().X << ", " << physicsBody->GetCenterPosition().Y << "\n";
+					AddPhysicsBodyToWorld(physicsBody);
+				}
 			}
 		}
 	}
@@ -94,12 +100,12 @@ namespace Engine
 
 		for (auto& tile : tileMap)
 		{
-			Add(tile, layerIdx);
+			Add(tile.m_id, layerIdx);
 		}
 
 		for (auto& collisionBody : tileMap.GetCollisionBodies())
 		{
-			Add(collisionBody, layerIdx);
+			Add(collisionBody.m_id, layerIdx);
 		}
 
 		HasTileMap = true;
@@ -134,24 +140,38 @@ namespace Engine
 
 		for (auto& layer : m_layers)
 		{
-			for (auto& sceneObject : layer)
+			for (auto& sceneObjectID : layer)
 			{
 				// ENGINE_CRITICAL_D(std::to_string(sceneObject->GetUUID()));
 				// Update transforms
-				Transform* transform = ComponentManagerRegistry::GetManager<Transform>().GetComponent(sceneObject->GetUUID());
+				Transform* transform = ComponentManagerRegistry::GetManager<Transform>().GetComponent(sceneObjectID);
+				PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(sceneObjectID);
 
-				if (transform != nullptr)
+				if (transform == nullptr) ENGINE_CRITICAL_D("Transform is null!");
+				if (physicsBody == nullptr) ENGINE_CRITICAL_D("PhysicsBody is null!");
+
+				if (transform != nullptr && physicsBody != nullptr)
 				{
 					// std::cout << "UHHH: " << transform << ": " << transform->Dimensions.X << "\n";
-					transform->PrevPosition = sceneObject->GetPhysicsBody()->GetTopLeftPrevPosition();
+					/*transform->PrevPosition = sceneObject->GetPhysicsBody()->GetTopLeftPrevPosition();
 					transform->Position = sceneObject->GetPhysicsBody()->GetTopLeftPosition();
 					transform->Dimensions = sceneObject->GetPhysicsBody()->GetDimensions();
-					transform->Rotation = sceneObject->GetPhysicsBody()->GetAngleInDegrees();
+					transform->Rotation = sceneObject->GetPhysicsBody()->GetAngleInDegrees();*/
+					physicsBody->Update();
+
+					transform->PrevPosition = physicsBody->GetTopLeftPrevPosition();
+					transform->Position = physicsBody->GetTopLeftPosition();
+					transform->Dimensions = physicsBody->GetDimensions();
+					transform->Rotation = physicsBody->GetAngleInDegrees();
+				}
+				else
+				{
+					ENGINE_CRITICAL_D("Transform or PhysicsBody is null!");
 				}
 
 				// Update scripts
-				sceneObject->EngineSideUpdate();
-				sceneObject->Update();
+				// sceneObject->EngineSideUpdate();
+				// sceneObject->Update(); // Need scripts to be components
 
 				
 			}
@@ -191,7 +211,7 @@ namespace Engine
 	
 	}
 
-	void Scene::Add(SceneObject& sceneObject, int layerIdx)
+	void Scene::Add(const size_t id, int layerIdx)
 	{
 		// Check if layerIdx is valid
 		if (layerIdx >= m_layers.size()) 
@@ -200,26 +220,30 @@ namespace Engine
 			return;
 		}
 
-		sceneObject.LayerIdx = layerIdx;
-		m_layers[layerIdx].Push(&sceneObject);
+		// sceneObject.LayerIdx = layerIdx;
+		m_layers[layerIdx].Push(id);
 	}
 
-	void Scene::Remove(SceneObject& sceneObject)
+	void Scene::Remove(const size_t id)
 	{
-		if (sceneObject.LayerIdx >= m_layers.size() || sceneObject.LayerIdx == -1)
+		for (auto& layer : m_layers)
 		{
-			ENGINE_CRITICAL_D("Invalid layer index: " + std::to_string(sceneObject.LayerIdx) + ". Cannot remove SceneObject because it does not exist in a valid layer.");
-			return;
+			layer.Pop(id);
 		}
 
-		m_layers[sceneObject.LayerIdx].Pop(&sceneObject);
+		/*std::shared_ptr<PhysicsBody> ptrBody = sceneObject.GetPhysicsBody();
 
-		std::shared_ptr<PhysicsBody> ptrBody = sceneObject.GetPhysicsBody();
+		ptrBody->RemoveBodyFromWorld();*/
 
-		ptrBody->RemoveBodyFromWorld();
+		// If scene object has a physics body, remove it from the world.
+		PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(id);
+		if (physicsBody != nullptr)
+		{
+			physicsBody->RemoveBodyFromWorld();
+		}
 	}
 
-	void Scene::AddPhysicsBodyToWorld(std::shared_ptr<PhysicsBody> physicsBody)
+	void Scene::AddPhysicsBodyToWorld(PhysicsBody* physicsBody)
 	{
 		if (physicsBody == nullptr)
 		{
@@ -253,7 +277,7 @@ namespace Engine
 		}
 
 		bodyDef.fixedRotation = physicsBody->GetIsRotationFixed();
-		bodyDef.userData.pointer = reinterpret_cast<intptr_t>(physicsBody.get());
+		bodyDef.userData.pointer = (uintptr_t)physicsBody;
 		bodyDef.position.Set(physicsBody->GetStartingPosition().X + physicsBody->GetHalfWidth(), physicsBody->GetStartingPosition().Y + physicsBody->GetHalfHeight());
 
 		body = m_world->CreateBody(&bodyDef);
