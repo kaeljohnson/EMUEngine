@@ -12,7 +12,7 @@ namespace Engine
 	{
 	public:
 		EMU_API Tile(const size_t id, const BodyType bodyType, const Vector2D<float> position, const Vector2D<float> size, int directionFacing, const bool visible);
-		~Tile() = default;
+		EMU_API ~Tile();
 
 	public:
 		const size_t m_id;

@@ -56,6 +56,11 @@ namespace Engine
 		bool m_rightSensor;
 
 	public:
+		EMU_API PhysicsBody();
+		EMU_API PhysicsBody(const size_t id, const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size);
+
+		EMU_API ~PhysicsBody();
+
 		EMU_API void ApplyForceToBody(Vector2D<float> force);
 		EMU_API void ApplyImpulseToBody(Vector2D<float> impulse);
 
@@ -106,11 +111,6 @@ namespace Engine
 		EMU_API inline const float GetSize() const { return m_width * m_height; }
 
 	public:
-		EMU_API PhysicsBody();
-		EMU_API PhysicsBody(const size_t id, const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size);
-
-		EMU_API ~PhysicsBody();
-
 		// PhysicsBody2D specific functions
 		void RemoveBodyFromWorld();
 		

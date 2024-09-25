@@ -39,4 +39,10 @@ namespace Engine
 		m_id = id;
 		ComponentManagerRegistry::GetManager<Transform>().AddComponent(id, this);
 	}
+
+	Transform::~Transform()
+	{
+		ENGINE_INFO_D("Transform component destroyed with ID: " + std::to_string(m_id));
+		ComponentManagerRegistry::GetManager<Transform>().RemoveComponent(m_id);
+	}
 }

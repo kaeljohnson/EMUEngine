@@ -84,6 +84,12 @@ namespace Engine
 		tileMap.LoadMap();
 		tileMap.CreateCollisionBodies();
 
+		for (auto& tile : tileMap)
+		{
+			ENGINE_CRITICAL_D("Tile: " + std::to_string(tile.m_id) + ", " + std::to_string(tile.m_physicsBody.GetStartingPosition().X) 
+				+ ", " + std::to_string(tile.m_physicsBody.GetStartingPosition().Y));
+		}
+
 		m_levelDimensionsInUnits = Vector2D<int>(tileMap.GetWidth(), tileMap.GetHeight());
 
 		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_levelDimensionsInUnits.X) + ", Map height: " + std::to_string(m_levelDimensionsInUnits.Y));
@@ -137,8 +143,8 @@ namespace Engine
 				Transform* transform = ComponentManagerRegistry::GetManager<Transform>().GetComponent(sceneObjectID);
 				PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(sceneObjectID);
 
-				if (transform == nullptr) ENGINE_CRITICAL_D("Transform is null!");
-				if (physicsBody == nullptr) ENGINE_CRITICAL_D("PhysicsBody is null!");
+				// if (transform == nullptr) ENGINE_CRITICAL_D("Transform is null!");
+				// if (physicsBody == nullptr) ENGINE_CRITICAL_D("PhysicsBody is null!");
 
 				if (transform != nullptr && physicsBody != nullptr)
 				{
@@ -156,7 +162,7 @@ namespace Engine
 				}
 				else
 				{
-					ENGINE_CRITICAL_D("Transform or PhysicsBody is null!");
+					// ENGINE_CRITICAL_D("Transform or PhysicsBody is null!");
 				}
 
 				// Update scripts
@@ -279,13 +285,13 @@ namespace Engine
 					bodyDef.userData.pointer = (uintptr_t)physicsBody.second;
 					ENGINE_CRITICAL_D("PLERP");
 					bodyDef.position.Set(physicsBody.second->GetStartingPosition().X + physicsBody.second->GetHalfWidth(), physicsBody.second->GetStartingPosition().Y + physicsBody.second->GetHalfHeight());
-					ENGINE_CRITICAL_D(std::to_string(physicsBody.second->GetStartingPosition().X));// +physicsBody.second->GetHalfWidth(), physicsBody.second->GetStartingPosition().Y + physicsBody.second->GetHalfHeight()));
+					ENGINE_CRITICAL_D(std::to_string(physicsBody.second->GetHalfWidth()));// +physicsBody.second->GetHalfWidth(), physicsBody.second->GetStartingPosition().Y + physicsBody.second->GetHalfHeight()));
 					ENGINE_CRITICAL_D("FLIG");
 					body = m_world->CreateBody(&bodyDef);
 
-					ENGINE_CRITICAL_D("FUCK");
+					ENGINE_CRITICAL_D("fkip");
 					shape.SetAsBox(physicsBody.second->GetHalfWidth(), physicsBody.second->GetHalfHeight());
-					ENGINE_CRITICAL_D("ME");
+					ENGINE_CRITICAL_D("spip");
 					fixtureDef.shape = &shape;
 					fixtureDef.restitution = physicsBody.second->GetStartingRestitution();
 					ENGINE_CRITICAL_D("5");

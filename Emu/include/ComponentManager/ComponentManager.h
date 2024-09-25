@@ -24,12 +24,18 @@ namespace Engine
 			std::cout << "FROM COMPMANAGER: " << objectID << " added at " << component << "\n";
         }
 
+        void RemoveComponent(size_t objectID)
+        {
+            m_components.erase(objectID);
+            std::cout << "FROM COMPMANAGER: " << objectID << " removed\n";
+        }
+
         T* GetComponent(size_t entity)
         {
             auto it = m_components.find(entity);
             if (it != m_components.end())
             {
-                std::cout << "FROM COMPMANAGER: " << it->first << " gotten from " << it->second << "\n";
+                // std::cout << "FROM COMPMANAGER: " << it->first << " gotten from " << it->second << "\n";
                 return it->second;
             }
             return nullptr;

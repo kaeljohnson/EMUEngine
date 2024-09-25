@@ -13,6 +13,7 @@ namespace Engine
         : m_mapDimensions(0, 0), m_numUnitsPerTile(numMetersPerTile)
 	{
         m_map.reserve(MAX_SIZE);
+		m_collisionBodies.reserve(MAX_SIZE);
         
         std::ifstream file(mapFile);
         if (!file) 
@@ -60,6 +61,9 @@ namespace Engine
                 if (GetTile(x, y) != '-')
                 {
                     const size_t tileID = IDGenerator::CreateUUID();
+
+                    ENGINE_CRITICAL_D("FROM TILEMAP Load map: " + std::to_string(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile)));
+                    ENGINE_CRITICAL_D("FROM TILEMAP Load map: " + std::to_string(static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)));
 
                     m_tiles.emplace_back(
                         tileID,
@@ -130,6 +134,10 @@ namespace Engine
                     }
 
 					const size_t tileID = IDGenerator::CreateUUID();
+
+                    ENGINE_CRITICAL_D("FROM TILEMAP: " + std::to_string(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile)));
+                    ENGINE_CRITICAL_D("FROM TILEMAP: " + std::to_string(static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)));
+
                     // Create the tile object with calculated dimensions
                     m_collisionBodies.emplace_back(
 						tileID,

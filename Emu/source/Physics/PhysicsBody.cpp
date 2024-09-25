@@ -43,6 +43,8 @@ namespace Engine
 
 	PhysicsBody::~PhysicsBody()
 	{
+		ENGINE_INFO_D("PhysicsBody destroyed with ID: " + std::to_string(m_id));
+		ComponentManagerRegistry::GetManager<PhysicsBody>().RemoveComponent(m_id);
 		RemoveBodyFromWorld();
 	}
 

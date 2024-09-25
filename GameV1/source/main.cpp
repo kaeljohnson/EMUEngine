@@ -51,9 +51,9 @@ int main(int argc, char* args[])
 
 	Engine::TileMap testMap("testMap1.txt", 1);
 	scene->AddTileMap(testMap, MAP_LAYER);
-	const size_t tileID = Engine::IDGenerator::CreateUUID();
-	Engine::Tile tile(tileID, Engine::STATIC, Engine::Vector2D<float>(1.0f, 12.0f), Engine::Vector2D<float>(2.0f, 1.0f), 1, true);
-	scene->Add(tileID, MAP_LAYER);
+	// const size_t tileID = Engine::IDGenerator::CreateUUID();
+	// Engine::Tile tile(tileID, Engine::STATIC, Engine::Vector2D<float>(1.0f, 12.0f), Engine::Vector2D<float>(2.0f, 1.0f), 1, true);
+	// scene->Add(tileID, MAP_LAYER);
 
 	scene->Add(playerID, PLAYER_LAYER);
 
