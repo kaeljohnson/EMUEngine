@@ -48,7 +48,7 @@ namespace Engine
 		void OnScenePlay();
 		void OnSceneEnd();
 
-		void AddPhysicsBodyToWorld(PhysicsBody* physicsBody);
+		void AddPhysicsBodiesToWorld();
 		void DestroyPhysicsWorld();
 
 		void CheckValid();

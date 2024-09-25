@@ -16,7 +16,12 @@ namespace Engine
 		m_startingPosition(Vector2D<float>(0.0f, 0.0f)), m_bodyType(STATIC), m_fixed(false), m_body(nullptr),
 		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
 		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
-		m_gravityOn(true), m_isSensor(false), m_prevPosition(Vector2D<float>(0.0f, 0.0f)), m_id(0) {}
+		m_gravityOn(true), m_isSensor(false), m_prevPosition(Vector2D<float>(0.0f, 0.0f)), m_fixedRotation(true), m_restitution(0.0f),
+		m_restitutionThreshold(0.0f), m_density(1.0f), m_friction(1.0f), m_id(0)
+	
+	{
+		ENGINE_CRITICAL_D("PhysicsBody default constructor called.");
+	}
 
 	PhysicsBody::PhysicsBody(const size_t id, const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
 		: m_halfWidth(size.X / 2.0f), m_halfHeight(size.Y / 2.0f), 
@@ -24,17 +29,13 @@ namespace Engine
 		m_bodyType(bodyType), m_fixed(fixed), m_body(nullptr),
 		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
 		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
-		m_gravityOn(true), m_isSensor(false), m_prevPosition(position), m_id(id)
+		m_gravityOn(true), m_isSensor(false), m_prevPosition(position), m_fixedRotation(true), m_restitution(0.0f),
+		m_restitutionThreshold(0.0f), m_density(1.0f), m_friction(1.0f),
+		m_id(id)
 	{
-		m_fixedRotation = true;
-		m_restitution = 0.0f;
-		m_restitutionThreshold = 0.0f;
-		m_density = 1.0f;
-		m_friction = 1.0f;
-
 		ENGINE_INFO_D("Body created at position: " + std::to_string(position.X) + "," 
 			+ std::to_string(position.Y) + ". With width: " + std::to_string(size.X) + ", height: " + std::to_string(size.Y) 
-			+ " with ID: " + std::to_string(id) + ", at address: ");
+			+ " with ID: " + std::to_string(m_id) + ", at address: ");
 		std::cout << this << "\n";
 
 		ComponentManagerRegistry::GetManager<PhysicsBody>().AddComponent(id, this);

@@ -57,19 +57,9 @@ namespace Engine
 	{
 		m_world = new b2World(b2Vec2(m_gravity.X, m_gravity.Y));
 
-		for (auto& layer : m_layers)
-		{
-			for (auto sceneObjectID : layer)
-			{
-				ENGINE_CRITICAL_D("SceneObjectID: " + std::to_string(sceneObjectID));
-				PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(sceneObjectID);
-				if (physicsBody != nullptr)
-				{
-					std::cout << "PENISSSSS: " <<  physicsBody->GetCenterPosition().X << ", " << physicsBody->GetCenterPosition().Y << "\n";
-					AddPhysicsBodyToWorld(physicsBody);
-				}
-			}
-		}
+		AddPhysicsBodiesToWorld();
+
+		
 	}
 
 	void Scene::OnSceneEnd()
@@ -243,54 +233,75 @@ namespace Engine
 		}
 	}
 
-	void Scene::AddPhysicsBodyToWorld(PhysicsBody* physicsBody)
+	void Scene::AddPhysicsBodiesToWorld()
 	{
-		if (physicsBody == nullptr)
+		// for (auto& layer : m_layers)
 		{
-			ENGINE_ERROR_D("PhysicsBody is null!");
-			return;
+			for (auto& physicsBody : ComponentManagerRegistry::GetManager<PhysicsBody>().GetAllComponents())
+			{
+				if (physicsBody.second != nullptr)
+				{
+					std::cout << "Adding physics body to world: " << physicsBody.first << "\n";
+
+					if (physicsBody.second == nullptr)
+					{
+						ENGINE_ERROR_D("PhysicsBody is null!");
+						return;
+					}
+
+					b2Body* body;
+					b2BodyDef bodyDef;
+					b2FixtureDef fixtureDef;
+					b2PolygonShape shape;
+					ENGINE_CRITICAL_D("BRRRRRRRP");
+					switch (physicsBody.second->GetBodyType())
+					{
+					case STATIC:
+						bodyDef.type = b2_staticBody;
+						break;
+					case DYNAMIC:
+						bodyDef.type = b2_dynamicBody;
+						break;
+					case KINEMATIC:
+						bodyDef.type = b2_kinematicBody;
+						break;
+					case SENSOR:
+						bodyDef.type = b2_kinematicBody;
+						physicsBody.second->SetIsSensor(true);
+						break;
+					default:
+						bodyDef.type = b2_staticBody;
+						break;
+					}
+
+					ENGINE_CRITICAL_D("CHIBCHON");
+					bodyDef.fixedRotation = physicsBody.second->GetIsRotationFixed();
+					bodyDef.userData.pointer = (uintptr_t)physicsBody.second;
+					ENGINE_CRITICAL_D("PLERP");
+					bodyDef.position.Set(physicsBody.second->GetStartingPosition().X + physicsBody.second->GetHalfWidth(), physicsBody.second->GetStartingPosition().Y + physicsBody.second->GetHalfHeight());
+					ENGINE_CRITICAL_D(std::to_string(physicsBody.second->GetStartingPosition().X));// +physicsBody.second->GetHalfWidth(), physicsBody.second->GetStartingPosition().Y + physicsBody.second->GetHalfHeight()));
+					ENGINE_CRITICAL_D("FLIG");
+					body = m_world->CreateBody(&bodyDef);
+
+					ENGINE_CRITICAL_D("FUCK");
+					shape.SetAsBox(physicsBody.second->GetHalfWidth(), physicsBody.second->GetHalfHeight());
+					ENGINE_CRITICAL_D("ME");
+					fixtureDef.shape = &shape;
+					fixtureDef.restitution = physicsBody.second->GetStartingRestitution();
+					ENGINE_CRITICAL_D("5");
+					fixtureDef.restitutionThreshold = physicsBody.second->GetStartingRestitutionThreshold();
+					ENGINE_CRITICAL_D("6");
+					fixtureDef.density = physicsBody.second->GetStartingDensity();
+					ENGINE_CRITICAL_D("7");
+					fixtureDef.friction = physicsBody.second->GetStartingFriction();
+					ENGINE_CRITICAL_D("8");
+					fixtureDef.isSensor = physicsBody.second->GetIsSensor();
+					ENGINE_CRITICAL_D("9");
+					body->CreateFixture(&fixtureDef);
+
+					physicsBody.second->m_body = body;
+				}
+			}
 		}
-
-		b2Body* body;
-		b2BodyDef bodyDef;
-		b2FixtureDef fixtureDef;
-		b2PolygonShape shape;
-
-		switch (physicsBody->GetBodyType())
-		{
-		case STATIC:
-			bodyDef.type = b2_staticBody;
-			break;
-		case DYNAMIC:
-			bodyDef.type = b2_dynamicBody;
-			break;
-		case KINEMATIC:
-			bodyDef.type = b2_kinematicBody;
-			break;
-		case SENSOR:
-			bodyDef.type = b2_kinematicBody;
-			physicsBody->SetIsSensor(true);
-			break;
-		default:
-			bodyDef.type = b2_staticBody;
-			break;
-		}
-
-		bodyDef.fixedRotation = physicsBody->GetIsRotationFixed();
-		bodyDef.userData.pointer = (uintptr_t)physicsBody;
-		bodyDef.position.Set(physicsBody->GetStartingPosition().X + physicsBody->GetHalfWidth(), physicsBody->GetStartingPosition().Y + physicsBody->GetHalfHeight());
-
-		body = m_world->CreateBody(&bodyDef);
-
-		shape.SetAsBox(physicsBody->GetHalfWidth(), physicsBody->GetHalfHeight());
-		fixtureDef.shape = &shape;
-		fixtureDef.restitution = physicsBody->GetStartingRestitution();
-		fixtureDef.restitutionThreshold = physicsBody->GetStartingRestitutionThreshold();
-		fixtureDef.density = physicsBody->GetStartingDensity();
-		fixtureDef.friction = physicsBody->GetStartingFriction();
-		fixtureDef.isSensor = physicsBody->GetIsSensor();
-		body->CreateFixture(&fixtureDef);
-
-		physicsBody->m_body = body;
 	}
 }

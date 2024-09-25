@@ -29,7 +29,7 @@ namespace Engine
             auto it = m_components.find(entity);
             if (it != m_components.end())
             {
-                // std::cout << "FROM COMPMANAGER: " << it->first << " gotten from " << it->second << "\n";
+                std::cout << "FROM COMPMANAGER: " << it->first << " gotten from " << it->second << "\n";
                 return it->second;
             }
             return nullptr;
