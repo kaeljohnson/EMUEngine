@@ -28,7 +28,7 @@ int main(int argc, char* args[])
 	scene2->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 	
 	const size_t playerID = Engine::IDGenerator::CreateUUID();
-	Player player(playerID, 1.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
+	Player player(playerID, 6.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 	// const size_t player2ID = Engine::IDGenerator::CreateUUID();
 	// Player player2(player2ID, 2.0f, 2.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 

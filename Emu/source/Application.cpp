@@ -76,7 +76,8 @@ namespace Engine
 			if (m_sceneManager.IsNewSceneStarting())
 			{
 				// Camera frames current scene.
-				m_cameraManager.m_ptrCurrentCamera->Frame(Vector2D<int>(m_sceneManager.GetCurrentScene()->GetLevelWidth(), m_sceneManager.GetCurrentScene()->GetLevelHeight()));
+				m_cameraManager.m_ptrCurrentCamera->Frame(Vector2D<int>(m_sceneManager.GetCurrentScene()->GetLevelWidth(), 
+					m_sceneManager.GetCurrentScene()->GetLevelHeight()));
 				m_sceneManager.NewSceneStarted();
 			}
 

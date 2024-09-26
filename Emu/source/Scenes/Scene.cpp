@@ -84,6 +84,10 @@ namespace Engine
 		tileMap.LoadMap();
 		tileMap.CreateCollisionBodies();
 
+		ENGINE_INFO_D("Tile map text file size: " + std::to_string(tileMap.m_map.size()));
+		ENGINE_INFO_D("Tile map tile map size: " + std::to_string(tileMap.m_tiles.size()));
+		ENGINE_INFO_D("Tile map collision bodies size: " + std::to_string(tileMap.m_collisionBodies.size()));
+
 		for (auto& tile : tileMap)
 		{
 			ENGINE_CRITICAL_D("Tile: " + std::to_string(tile.m_id) + ", " + std::to_string(tile.m_physicsBody.GetStartingPosition().X) 
@@ -162,7 +166,7 @@ namespace Engine
 				}
 				else
 				{
-					// ENGINE_CRITICAL_D("Transform or PhysicsBody is null!");
+					ENGINE_CRITICAL_D("Transform or PhysicsBody is null!");
 				}
 
 				// Update scripts
@@ -259,7 +263,6 @@ namespace Engine
 					b2BodyDef bodyDef;
 					b2FixtureDef fixtureDef;
 					b2PolygonShape shape;
-					ENGINE_CRITICAL_D("BRRRRRRRP");
 					switch (physicsBody.second->GetBodyType())
 					{
 					case STATIC:
@@ -280,29 +283,19 @@ namespace Engine
 						break;
 					}
 
-					ENGINE_CRITICAL_D("CHIBCHON");
 					bodyDef.fixedRotation = physicsBody.second->GetIsRotationFixed();
 					bodyDef.userData.pointer = (uintptr_t)physicsBody.second;
-					ENGINE_CRITICAL_D("PLERP");
 					bodyDef.position.Set(physicsBody.second->GetStartingPosition().X + physicsBody.second->GetHalfWidth(), physicsBody.second->GetStartingPosition().Y + physicsBody.second->GetHalfHeight());
-					ENGINE_CRITICAL_D(std::to_string(physicsBody.second->GetHalfWidth()));// +physicsBody.second->GetHalfWidth(), physicsBody.second->GetStartingPosition().Y + physicsBody.second->GetHalfHeight()));
-					ENGINE_CRITICAL_D("FLIG");
+					
 					body = m_world->CreateBody(&bodyDef);
 
-					ENGINE_CRITICAL_D("fkip");
 					shape.SetAsBox(physicsBody.second->GetHalfWidth(), physicsBody.second->GetHalfHeight());
-					ENGINE_CRITICAL_D("spip");
 					fixtureDef.shape = &shape;
 					fixtureDef.restitution = physicsBody.second->GetStartingRestitution();
-					ENGINE_CRITICAL_D("5");
 					fixtureDef.restitutionThreshold = physicsBody.second->GetStartingRestitutionThreshold();
-					ENGINE_CRITICAL_D("6");
 					fixtureDef.density = physicsBody.second->GetStartingDensity();
-					ENGINE_CRITICAL_D("7");
 					fixtureDef.friction = physicsBody.second->GetStartingFriction();
-					ENGINE_CRITICAL_D("8");
 					fixtureDef.isSensor = physicsBody.second->GetIsSensor();
-					ENGINE_CRITICAL_D("9");
 					body->CreateFixture(&fixtureDef);
 
 					physicsBody.second->m_body = body;

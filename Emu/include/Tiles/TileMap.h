@@ -13,7 +13,7 @@ namespace Engine
 	{
 	public:
 		// Client should probably decide this.
-		static const int MAX_SIZE = 700;
+		static const int MAX_SIZE = 20000;
 
 		EMU_API TileMap(const std::string mapFile, const int numUnitsPerTile);
 		EMU_API const char GetTile(int x, int y) const;
@@ -34,7 +34,7 @@ namespace Engine
 		std::vector<Tile>::const_iterator begin() const { return m_tiles.begin(); }
 		std::vector<Tile>::const_iterator end() const { return m_tiles.end(); }
 
-	private:
+	public:
 		std::vector<char> m_map;
 		std::vector<Tile> m_collisionBodies;
 		std::vector<Tile> m_tiles;

@@ -109,6 +109,7 @@ namespace Engine
 				// if (!sceneObject->Visible) continue;
 
 				Transform* transform = ComponentManagerRegistry::GetManager<Transform>().GetComponent(sceneObjectID);
+				PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(sceneObjectID);
 
 				if (transform == nullptr)
 				{
@@ -116,9 +117,13 @@ namespace Engine
 				}
 
 				float objectLeft = transform->Position.X; // sceneObject->GetPhysicsBody()->GetTopLeftPosition().X;
-				float objectRight = transform->Dimensions.X; // objectLeft + sceneObject->GetPhysicsBody()->GetDimensions().X;
+				// float objectLeft = physicsBody->GetTopLeftPosition().X;
+				float objectRight = objectLeft + transform->Dimensions.X; // objectLeft + sceneObject->GetPhysicsBody()->GetDimensions().X;
+				// float objectRight = physicsBody->GetTopLeftPosition().X + physicsBody->GetDimensions().X;
 				float objectTop = transform->Position.Y; // sceneObject->GetPhysicsBody()->GetTopLeftPosition().Y;
-				float objectBottom = transform->Dimensions.Y; // objectTop + sceneObject->GetPhysicsBody()->GetDimensions().Y;
+				// float objectTop = physicsBody->GetTopLeftPosition().Y;
+				float objectBottom = objectTop + transform->Dimensions.Y; // objectTop + sceneObject->GetPhysicsBody()->GetDimensions().Y;
+				// float objectBottom = physicsBody->GetTopLeftPosition().Y + physicsBody->GetDimensions().Y;
 
 				bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
 				objectBottom >= cameraTop && objectTop <= cameraBottom;
@@ -127,6 +132,10 @@ namespace Engine
 				{
 					// Draw(transform, ptrCurrentCamera->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
 					Draw(transform, ptrCurrentCamera->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
+				}
+				else if (sceneObjectID == 1)
+				{
+					ENGINE_CRITICAL_D("Player not visible!");
 				}
 			}
 		}
