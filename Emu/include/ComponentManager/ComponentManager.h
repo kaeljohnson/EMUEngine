@@ -1,9 +1,6 @@
 #pragma once
 
-#include <iostream>
-
 #include <unordered_map>
-#include <string>
 
 namespace Engine
 {
@@ -20,13 +17,11 @@ namespace Engine
         void AddComponent(size_t objectID, T* component) 
         {
             m_components[objectID] = component;
-			std::cout << "FROM COMPMANAGER: " << objectID << " added at " << component << "\n";
         }
 
         void RemoveComponent(size_t objectID)
         {
             m_components.erase(objectID);
-            std::cout << "FROM COMPMANAGER: " << objectID << " removed\n";
         }
 
         T* GetComponent(size_t entity)
@@ -34,7 +29,6 @@ namespace Engine
             auto it = m_components.find(entity);
             if (it != m_components.end())
             {
-                // std::cout << "FROM COMPMANAGER: " << it->first << " gotten from " << it->second << "\n";
                 return it->second;
             }
             return nullptr;

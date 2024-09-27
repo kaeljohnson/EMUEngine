@@ -3,7 +3,6 @@
 #include "../../include/EngineConstants.h"
 
 #include "../../include/Scenes/SceneObjectStack.h"
-#include "../../include/Scenes/SceneObject.h"
 #include "../../include/Logging/Logger.h"
 
 namespace Engine

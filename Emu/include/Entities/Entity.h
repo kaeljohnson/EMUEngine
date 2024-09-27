@@ -5,11 +5,10 @@
 #include "../Core.h"
 #include "../MathUtil.h"
 
-#include "../Scenes/SceneObject.h"
 
 namespace Engine
 {
-	class Entity : public SceneObject
+	class Entity 
 	{
 	public:
 		EMU_API Entity(const Vector2D<float> position, const Vector2D<float> size, int directionFacing, const bool visible);

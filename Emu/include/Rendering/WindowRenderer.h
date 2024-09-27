@@ -6,7 +6,6 @@
 
 #include "Screen.h"
 
-#include "../Scenes/SceneObject.h"
 #include "../Scenes/Scene.h"
 #include "../Camera/Camera.h"
 

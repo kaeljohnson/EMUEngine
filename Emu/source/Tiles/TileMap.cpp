@@ -74,6 +74,7 @@ namespace Engine
 		}
 	}
 
+    // Collision bodies should just be physics bodies, not tiles.
     void TileMap::CreateCollisionBodies()
     {
         // Creates collision bodies for the map. This creates a collision body for each block of tiles.

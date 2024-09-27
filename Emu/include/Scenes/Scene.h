@@ -5,7 +5,6 @@
 #include "../Core.h"
 #include "../MathUtil.h"
 
-#include "../Scenes/SceneObject.h"
 #include "../Scenes/SceneObjectStack.h"
 #include "../Tiles/TileMap.h"
 

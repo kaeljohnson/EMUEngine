@@ -4,7 +4,6 @@
 
 #include "../../include/EngineConstants.h"
 #include "../../include/Scenes/Scene.h"
-#include "../../include/Scenes/SceneObject.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/PhysicsBody.h"
 #include "../../include/CallbackSystem/CallbackSystem.h"
@@ -87,12 +86,6 @@ namespace Engine
 		ENGINE_INFO_D("Tile map text file size: " + std::to_string(tileMap.m_map.size()));
 		ENGINE_INFO_D("Tile map tile map size: " + std::to_string(tileMap.m_tiles.size()));
 		ENGINE_INFO_D("Tile map collision bodies size: " + std::to_string(tileMap.m_collisionBodies.size()));
-
-		for (auto& tile : tileMap)
-		{
-			ENGINE_CRITICAL_D("Tile: " + std::to_string(tile.m_id) + ", " + std::to_string(tile.m_physicsBody.GetStartingPosition().X) 
-				+ ", " + std::to_string(tile.m_physicsBody.GetStartingPosition().Y));
-		}
 
 		m_levelDimensionsInUnits = Vector2D<int>(tileMap.GetWidth(), tileMap.GetHeight());
 
@@ -209,7 +202,6 @@ namespace Engine
 			return;
 		}
 
-		// sceneObject.LayerIdx = layerIdx;
 		m_layers[layerIdx].Push(id);
 	}
 
@@ -219,10 +211,6 @@ namespace Engine
 		{
 			layer.Pop(id);
 		}
-
-		/*std::shared_ptr<PhysicsBody> ptrBody = sceneObject.GetPhysicsBody();
-
-		ptrBody->RemoveBodyFromWorld();*/
 
 		// If scene object has a physics body, remove it from the world.
 		PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(id);
@@ -234,61 +222,57 @@ namespace Engine
 
 	void Scene::AddPhysicsBodiesToWorld()
 	{
-		// for (auto& layer : m_layers)
+		for (auto& physicsBody : ComponentManagerRegistry::GetManager<PhysicsBody>().GetAllComponents())
 		{
-			for (auto& physicsBody : ComponentManagerRegistry::GetManager<PhysicsBody>().GetAllComponents())
+			if (physicsBody.second != nullptr)
 			{
-				if (physicsBody.second != nullptr)
+				if (physicsBody.second == nullptr)
 				{
-					std::cout << "Adding physics body to world: " << physicsBody.first << "\n";
-
-					if (physicsBody.second == nullptr)
-					{
-						ENGINE_ERROR_D("PhysicsBody is null!");
-						return;
-					}
-
-					b2Body* body;
-					b2BodyDef bodyDef;
-					b2FixtureDef fixtureDef;
-					b2PolygonShape shape;
-					switch (physicsBody.second->GetBodyType())
-					{
-					case STATIC:
-						bodyDef.type = b2_staticBody;
-						break;
-					case DYNAMIC:
-						bodyDef.type = b2_dynamicBody;
-						break;
-					case KINEMATIC:
-						bodyDef.type = b2_kinematicBody;
-						break;
-					case SENSOR:
-						bodyDef.type = b2_kinematicBody;
-						physicsBody.second->SetIsSensor(true);
-						break;
-					default:
-						bodyDef.type = b2_staticBody;
-						break;
-					}
-
-					bodyDef.fixedRotation = physicsBody.second->GetIsRotationFixed();
-					bodyDef.userData.pointer = (uintptr_t)physicsBody.second;
-					bodyDef.position.Set(physicsBody.second->GetStartingPosition().X + physicsBody.second->GetHalfWidth(), physicsBody.second->GetStartingPosition().Y + physicsBody.second->GetHalfHeight());
-					
-					body = m_world->CreateBody(&bodyDef);
-
-					shape.SetAsBox(physicsBody.second->GetHalfWidth(), physicsBody.second->GetHalfHeight());
-					fixtureDef.shape = &shape;
-					fixtureDef.restitution = physicsBody.second->GetStartingRestitution();
-					fixtureDef.restitutionThreshold = physicsBody.second->GetStartingRestitutionThreshold();
-					fixtureDef.density = physicsBody.second->GetStartingDensity();
-					fixtureDef.friction = physicsBody.second->GetStartingFriction();
-					fixtureDef.isSensor = physicsBody.second->GetIsSensor();
-					body->CreateFixture(&fixtureDef);
-
-					physicsBody.second->m_body = body;
+					ENGINE_ERROR_D("PhysicsBody is null!");
+					return;
 				}
+
+				b2Body* body;
+				b2BodyDef bodyDef;
+				b2FixtureDef fixtureDef;
+				b2PolygonShape shape;
+				switch (physicsBody.second->GetBodyType())
+				{
+				case STATIC:
+					bodyDef.type = b2_staticBody;
+					break;
+				case DYNAMIC:
+					bodyDef.type = b2_dynamicBody;
+					break;
+				case KINEMATIC:
+					bodyDef.type = b2_kinematicBody;
+					break;
+				case SENSOR:
+					bodyDef.type = b2_kinematicBody;
+					physicsBody.second->SetIsSensor(true);
+					break;
+				default:
+					bodyDef.type = b2_staticBody;
+					break;
+				}
+
+				bodyDef.fixedRotation = physicsBody.second->GetIsRotationFixed();
+				bodyDef.userData.pointer = (uintptr_t)physicsBody.second;
+				bodyDef.position.Set(physicsBody.second->GetStartingPosition().X + physicsBody.second->GetHalfWidth(), 
+					physicsBody.second->GetStartingPosition().Y + physicsBody.second->GetHalfHeight());
+					
+				body = m_world->CreateBody(&bodyDef);
+
+				shape.SetAsBox(physicsBody.second->GetHalfWidth(), physicsBody.second->GetHalfHeight());
+				fixtureDef.shape = &shape;
+				fixtureDef.restitution = physicsBody.second->GetStartingRestitution();
+				fixtureDef.restitutionThreshold = physicsBody.second->GetStartingRestitutionThreshold();
+				fixtureDef.density = physicsBody.second->GetStartingDensity();
+				fixtureDef.friction = physicsBody.second->GetStartingFriction();
+				fixtureDef.isSensor = physicsBody.second->GetIsSensor();
+				body->CreateFixture(&fixtureDef);
+
+				physicsBody.second->m_body = body;
 			}
 		}
 	}

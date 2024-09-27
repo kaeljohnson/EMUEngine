@@ -7,7 +7,6 @@
 
 namespace Engine
 {
-
 	// Define the static members
 	size_t IDGenerator::maxID = 0;
 	std::unordered_set<size_t> IDGenerator::usedIDs;

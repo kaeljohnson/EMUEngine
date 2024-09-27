@@ -11,7 +11,8 @@ namespace Engine
 	class Tile
 	{
 	public:
-		EMU_API Tile(const size_t id, const BodyType bodyType, const Vector2D<float> position, const Vector2D<float> size, int directionFacing, const bool visible);
+		EMU_API Tile(const size_t id, const BodyType bodyType, const Vector2D<float> position, 
+			const Vector2D<float> size, int directionFacing, const bool visible);
 		EMU_API ~Tile();
 
 	public:

@@ -32,7 +32,8 @@ namespace Engine
 
 		// Create window
 		m_ptrWindow = ISDL::CreateWindow(
-			"DEFAULT WINDOW", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP
+			"DEFAULT WINDOW", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, 
+			SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP
 		);
 
 		if (m_ptrWindow == nullptr)
@@ -145,8 +146,10 @@ namespace Engine
 
 		SDLRect dst
 		{
-			static_cast<int>(round((Lerp(transform->PrevPosition.X, transform->Position.X, (float)interpolation) - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round((Lerp(transform->PrevPosition.Y, transform->Position.Y, (float)interpolation) - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((Lerp(transform->PrevPosition.X, transform->Position.X, \
+				(float)interpolation) - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((Lerp(transform->PrevPosition.Y, transform->Position.Y, 
+				(float)interpolation) - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 
 			static_cast<int>(round(transform->Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 			static_cast<int>(round(transform->Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
@@ -215,11 +218,13 @@ namespace Engine
 		int windowWidth, windowHeight;
 		ISDL::GetWindowSize((SDLWindow*)m_ptrWindow, &windowWidth, &windowHeight);
 
-		Screen::SCALE = Vector2D<float>(static_cast<float>(windowWidth) / Screen::VIRTUAL_SIZE.X, static_cast<float>(windowHeight) / Screen::VIRTUAL_SIZE.Y);
+		Screen::SCALE = Vector2D<float>(static_cast<float>(windowWidth) / Screen::VIRTUAL_SIZE.X, 
+			static_cast<float>(windowHeight) / Screen::VIRTUAL_SIZE.Y);
 
 		Screen::SCALE_CONSTANT = std::min(Screen::SCALE.X, Screen::SCALE.Y);
 
-		Screen::VIEWPORT_SIZE = Vector2D<int>(Screen::VIRTUAL_SIZE.X * (int)Screen::SCALE_CONSTANT, Screen::VIRTUAL_SIZE.Y * (int)Screen::SCALE_CONSTANT);
+		Screen::VIEWPORT_SIZE = Vector2D<int>(Screen::VIRTUAL_SIZE.X * (int)Screen::SCALE_CONSTANT, 
+			Screen::VIRTUAL_SIZE.Y * (int)Screen::SCALE_CONSTANT);
 
 		Screen::VIEWPORT_POSITION.X = (windowWidth - Screen::VIEWPORT_SIZE.X) / 2;
 		Screen::VIEWPORT_POSITION.Y = (windowHeight - Screen::VIEWPORT_SIZE.Y) / 2;

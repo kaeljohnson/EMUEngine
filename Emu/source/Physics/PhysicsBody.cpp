@@ -33,11 +33,6 @@ namespace Engine
 		m_restitutionThreshold(0.0f), m_density(1.0f), m_friction(1.0f),
 		m_id(id)
 	{
-		ENGINE_INFO_D("Body created at position: " + std::to_string(position.X) + "," 
-			+ std::to_string(position.Y) + ". With width: " + std::to_string(size.X) + ", height: " + std::to_string(size.Y) 
-			+ " with ID: " + std::to_string(m_id) + ", at address: ");
-		std::cout << this << "\n";
-
 		ComponentManagerRegistry::GetManager<PhysicsBody>().AddComponent(id, this);
 	}
 
