@@ -142,21 +142,12 @@ namespace Engine
 		{
 			for (auto& sceneObjectID : layer)
 			{
-				// ENGINE_CRITICAL_D(std::to_string(sceneObject->GetUUID()));
 				// Update transforms
 				Transform* transform = ComponentManagerRegistry::GetManager<Transform>().GetComponent(sceneObjectID);
 				PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(sceneObjectID);
 
-				// if (transform == nullptr) ENGINE_CRITICAL_D("Transform is null!");
-				// if (physicsBody == nullptr) ENGINE_CRITICAL_D("PhysicsBody is null!");
-
 				if (transform != nullptr && physicsBody != nullptr)
 				{
-					// std::cout << "UHHH: " << transform << ": " << transform->Dimensions.X << "\n";
-					/*transform->PrevPosition = sceneObject->GetPhysicsBody()->GetTopLeftPrevPosition();
-					transform->Position = sceneObject->GetPhysicsBody()->GetTopLeftPosition();
-					transform->Dimensions = sceneObject->GetPhysicsBody()->GetDimensions();
-					transform->Rotation = sceneObject->GetPhysicsBody()->GetAngleInDegrees();*/
 					physicsBody->Update();
 
 					transform->PrevPosition = physicsBody->GetTopLeftPrevPosition();
@@ -172,8 +163,6 @@ namespace Engine
 				// Update scripts
 				// sceneObject->EngineSideUpdate();
 				// sceneObject->Update(); // Need scripts to be components
-
-				
 			}
 		}
 	};

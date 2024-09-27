@@ -109,28 +109,22 @@ namespace Engine
 				// if (!sceneObject->Visible) continue;
 
 				Transform* transform = ComponentManagerRegistry::GetManager<Transform>().GetComponent(sceneObjectID);
-				PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(sceneObjectID);
 
 				if (transform == nullptr)
 				{
 					continue;
 				}
 
-				float objectLeft = transform->Position.X; // sceneObject->GetPhysicsBody()->GetTopLeftPosition().X;
-				// float objectLeft = physicsBody->GetTopLeftPosition().X;
-				float objectRight = objectLeft + transform->Dimensions.X; // objectLeft + sceneObject->GetPhysicsBody()->GetDimensions().X;
-				// float objectRight = physicsBody->GetTopLeftPosition().X + physicsBody->GetDimensions().X;
-				float objectTop = transform->Position.Y; // sceneObject->GetPhysicsBody()->GetTopLeftPosition().Y;
-				// float objectTop = physicsBody->GetTopLeftPosition().Y;
-				float objectBottom = objectTop + transform->Dimensions.Y; // objectTop + sceneObject->GetPhysicsBody()->GetDimensions().Y;
-				// float objectBottom = physicsBody->GetTopLeftPosition().Y + physicsBody->GetDimensions().Y;
+				float objectLeft = transform->Position.X;
+				float objectRight = objectLeft + transform->Dimensions.X;
+				float objectTop = transform->Position.Y;
+				float objectBottom = objectTop + transform->Dimensions.Y;
 
 				bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
 				objectBottom >= cameraTop && objectTop <= cameraBottom;
 
 				if (isVisible)
 				{
-					// Draw(transform, ptrCurrentCamera->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
 					Draw(transform, ptrCurrentCamera->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
 				}
 				else if (sceneObjectID == 1)
@@ -148,8 +142,6 @@ namespace Engine
 	{
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
-
-		// std::shared_ptr<PhysicsBody> ptrBody = sceneObject->GetPhysicsBody();
 
 		SDLRect dst
 		{
@@ -182,45 +174,6 @@ namespace Engine
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 #endif
 	}
-
-//	void WindowRenderer::Draw(SceneObject* sceneObject, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset)
-//	{
-//		// The x, y, height, and width of the portion of the texture we want to render.
-//		SDLRect src = { 0, 0, 0, 0 };
-//
-//		std::shared_ptr<PhysicsBody> ptrBody = sceneObject->GetPhysicsBody();
-//
-//		SDLRect dst
-//		{
-//			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevPosition().X, ptrBody->GetTopLeftPosition().X, (float)interpolation) - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-//			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevPosition().Y, ptrBody->GetTopLeftPosition().Y, (float)interpolation) - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-//
-//			static_cast<int>(round(ptrBody->GetDimensions().X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-//			static_cast<int>(round(ptrBody->GetDimensions().Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
-//		};
-//
-//		ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, ptrBody->GetAngleInDegrees(), nullptr, SDL_FLIP_NONE);
-//
-//		// This should show the boundary of the physics body, not the texture.
-//#if defined(DEBUG)
-//		if (ptrBody->GetHasCollisionBelow() || ptrBody->GetHasCollisionAbove() ||
-//			ptrBody->GetHasCollisionLeft() || ptrBody->GetHasCollisionRight())
-//		{
-//			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 255, 255);
-//		}
-//		else if (ptrBody->GetHasSensorBelow() || ptrBody->GetHasSensorAbove() ||
-//			ptrBody->GetHasSensorLeft() || ptrBody->GetHasSensorRight())
-//		{
-//			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, 255);
-//		}
-//		else
-//		{
-//			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, 255);
-//		}
-//		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
-//		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
-//#endif
-//	}
 
 	// Wrapper for SDL_RenderPresent. Talks to the actual hardwares renderer to display the renderer.
 	void WindowRenderer::Display()
