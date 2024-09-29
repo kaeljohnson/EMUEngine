@@ -2,8 +2,6 @@
 
 #include "../EngineConstants.h"
 
-#include "SceneObject.h"
-
 namespace Engine
 {
 	class SceneObjectStack

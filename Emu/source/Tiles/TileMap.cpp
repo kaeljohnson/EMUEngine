@@ -6,6 +6,9 @@
 #include "../../include/Tiles/TileMap.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/CommonFunctions.h"
+#include "../../include/ComponentManager/ComponentManager.h"
+#include "../../include/Physics/PhysicsBody.h"
+#include "../../include/Transform.h"
 
 namespace Engine
 {
@@ -82,6 +85,9 @@ namespace Engine
         // When a tile is moved or removed, the corresponding collision body needs to be updated.
         // 
 
+		ComponentManager<Transform>& transformManager = ComponentManagerRegistry::GetManager<Transform>();
+		ComponentManager<PhysicsBody>& physicsBodyManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
+
         std::vector<std::vector<bool>> processed(GetHeight(), std::vector<bool>(GetWidth(), false));
 
         for (int y = 0; y < GetHeight(); ++y)
@@ -143,7 +149,7 @@ namespace Engine
                             static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile), 
                             static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)),
-                        0, false);
+                            0, false);
                 }
             }
         }

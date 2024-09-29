@@ -39,6 +39,7 @@ namespace Engine
 		std::vector<Tile> m_collisionBodies;
 		std::vector<Tile> m_tiles;
 		Vector2D<int> m_mapDimensions;
+		Vector2D<size_t> m_sceneObjectIDs;
 
 		int m_numUnitsPerTile;
 	};

@@ -159,7 +159,8 @@ namespace Engine
 
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)
-		/*if (ptrBody->GetHasCollisionBelow() || ptrBody->GetHasCollisionAbove() ||
+		PhysicsBody* ptrBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(transform->m_id);
+		if (ptrBody->GetHasCollisionBelow() || ptrBody->GetHasCollisionAbove() ||
 			ptrBody->GetHasCollisionLeft() || ptrBody->GetHasCollisionRight())
 		{
 			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 255, 255);
@@ -169,7 +170,7 @@ namespace Engine
 		{
 			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, 255);
 		}
-		else*/
+		else
 		{
 			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, 255);
 		}

@@ -12,6 +12,7 @@
 #include "../../include/MathUtil.h"
 #include "../../include/Transform.h"
 #include "../../include/ComponentManager/ComponentManager.h"
+#include "../../include/ComponentManager/Updatable.h"
 
 namespace Engine
 {
@@ -129,24 +130,37 @@ namespace Engine
 		// For instance, if the camera has not moved, we don't need to update the background layer,
 		// or the collision bodies layer, and likely not the entire map layer.
 
+		auto& updatableManager = ComponentManagerRegistry::GetManager<Updatable>().GetAllComponents();
+
+		for (auto& updatable : updatableManager)
+		{
+			updatable.second->Update();
+		}
+
 		m_world->Step(TIME_STEP, 8, 3);
+
+		auto& physicsBodyManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
+		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>();
 
 		for (auto& layer : m_layers)
 		{
 			for (auto& sceneObjectID : layer)
 			{
+
+				// ENGINE_INFO_D("Updating scene object: " + std::to_string(sceneObjectID));
 				// Update transforms
-				Transform* transform = ComponentManagerRegistry::GetManager<Transform>().GetComponent(sceneObjectID);
-				PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(sceneObjectID);
+				Transform* transform = transformManager.GetComponent(sceneObjectID);
+				PhysicsBody* physicsBody = physicsBodyManager.GetComponent(sceneObjectID);
+
 
 				if (transform != nullptr && physicsBody != nullptr)
 				{
-					physicsBody->Update();
-
 					transform->PrevPosition = physicsBody->GetTopLeftPrevPosition();
 					transform->Position = physicsBody->GetTopLeftPosition();
 					transform->Dimensions = physicsBody->GetDimensions();
 					transform->Rotation = physicsBody->GetAngleInDegrees();
+
+					physicsBody->Update();
 				}
 				else
 				{
@@ -156,6 +170,8 @@ namespace Engine
 				// Update scripts
 				// sceneObject->EngineSideUpdate();
 				// sceneObject->Update(); // Need scripts to be components
+
+				
 			}
 		}
 	};

@@ -16,6 +16,7 @@ namespace Engine
     public:
         void AddComponent(size_t objectID, T* component) 
         {
+            // ENGINE_INFO_D("Adding component: " + std::to_string(objectID));
             m_components[objectID] = component;
         }
 
@@ -39,8 +40,14 @@ namespace Engine
             return m_components;
         }
 
+		std::vector<T*>& GetAllActiveComponents()
+		{
+			return m_activeComponents;
+		}
+
     private:
         std::unordered_map<size_t, T*> m_components;
+        std::vector<T*> m_activeComponents;
     };
 
     class ComponentManagerRegistry 

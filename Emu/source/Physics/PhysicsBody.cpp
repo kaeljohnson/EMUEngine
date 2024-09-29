@@ -168,13 +168,13 @@ namespace Engine
 
 					if (normal.y < -0.5) // Collision from above `this`
 					{
-						this->SetBottomCollision(true);
-						otherPhysicsBody->SetTopCollision(true);
+						this->SetTopCollision(true);
+						otherPhysicsBody->SetBottomCollision(true);
 					}
 					else if (normal.y > 0.5) // Collision from below `this`
 					{
-						this->SetTopCollision(true);
-						otherPhysicsBody->SetBottomCollision(true);
+						this->SetBottomCollision(true);
+						otherPhysicsBody->SetTopCollision(true);
 					}
 
 					if (normal.x > 0.5) // Collision from the left of `this`

@@ -11,7 +11,6 @@
 #include "../include/Events/Event.h"
 #include "../include/Events/EventManager.h"
 #include "../include/Events/EventDispatcher.h"
-#include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Rendering/WindowRenderer.h"
