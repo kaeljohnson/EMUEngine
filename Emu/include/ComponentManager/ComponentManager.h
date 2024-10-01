@@ -40,14 +40,8 @@ namespace Engine
             return m_components;
         }
 
-		std::vector<T*>& GetAllActiveComponents()
-		{
-			return m_activeComponents;
-		}
-
     private:
         std::unordered_map<size_t, T*> m_components;
-        std::vector<T*> m_activeComponents;
     };
 
     class ComponentManagerRegistry 

@@ -22,7 +22,7 @@ namespace Engine
 		EMU_API inline int GetHeight() const { return m_mapDimensions.Y; }
 
 	public:
-		inline std::vector<Tile>& GetCollisionBodies() { return m_collisionBodies; }
+		inline std::vector<PhysicsBody>& GetCollisionBodies() { return m_collisionBodies; }
 
 		void LoadMap();
 		void CreateCollisionBodies();
@@ -36,7 +36,7 @@ namespace Engine
 
 	public:
 		std::vector<char> m_map;
-		std::vector<Tile> m_collisionBodies;
+		std::vector<PhysicsBody> m_collisionBodies;
 		std::vector<Tile> m_tiles;
 		Vector2D<int> m_mapDimensions;
 		Vector2D<size_t> m_sceneObjectIDs;

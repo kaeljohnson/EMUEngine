@@ -3,7 +3,7 @@
 #include "../include/ISDL/ISDL.h"
 #include "../include/Init.h"
 #include "../include/Logging/Logger.h"
-#include "../include/CommonFunctions.h"
+#include "../include/IDGenerator.h"
 
 namespace Engine
 {

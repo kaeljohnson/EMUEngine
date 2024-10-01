@@ -20,7 +20,7 @@
 #include "../include/Camera/ScrollingCamera.h"
 #include "../include/Camera/TargetCamera.h"
 
-#include "../include/CommonFunctions.h"
+#include "../include/IDGenerator.h"
 #include "../include/MathUtil.h"
 
 #include "../include/Transform.h"

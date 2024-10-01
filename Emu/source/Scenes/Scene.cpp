@@ -76,7 +76,7 @@ namespace Engine
 			return;
 		}
 
-		m_layers.emplace_back(SceneObjectStack());
+		m_layers.emplace_back();
 	}
 
 	void Scene::AddTileMap(TileMap& tileMap, int layerIdx)
@@ -152,19 +152,17 @@ namespace Engine
 				Transform* transform = transformManager.GetComponent(sceneObjectID);
 				PhysicsBody* physicsBody = physicsBodyManager.GetComponent(sceneObjectID);
 
-
+				
 				if (transform != nullptr && physicsBody != nullptr)
 				{
 					transform->PrevPosition = physicsBody->GetTopLeftPrevPosition();
 					transform->Position = physicsBody->GetTopLeftPosition();
 					transform->Dimensions = physicsBody->GetDimensions();
 					transform->Rotation = physicsBody->GetAngleInDegrees();
-
-					physicsBody->Update();
 				}
-				else
+				if (physicsBody != nullptr)
 				{
-					ENGINE_CRITICAL_D("Transform or PhysicsBody is null!");
+					physicsBody->Update();
 				}
 
 				// Update scripts
@@ -209,7 +207,7 @@ namespace Engine
 	
 	}
 
-	void Scene::Add(const size_t id, int layerIdx)
+	void Scene::Add(const int id, int layerIdx)
 	{
 		// Check if layerIdx is valid
 		if (layerIdx >= m_layers.size()) 
@@ -221,7 +219,7 @@ namespace Engine
 		m_layers[layerIdx].Push(id);
 	}
 
-	void Scene::Remove(const size_t id)
+	void Scene::Remove(const int id)
 	{
 		for (auto& layer : m_layers)
 		{

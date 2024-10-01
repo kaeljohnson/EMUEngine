@@ -142,6 +142,7 @@ namespace Engine
 
 		// Non-PhysicsBody2d getters
 		inline const Vector2D<float> GetTopLeftPrevPosition() const { return m_prevPosition; }
-		inline const Vector2D<float> GetCenterPrevPosition() const { return Vector2D<float>(m_prevPosition.X + m_halfWidth, m_prevPosition.Y + m_halfHeight); }
+		inline const Vector2D<float> GetCenterPrevPosition() const 
+		{ return Vector2D<float>(m_prevPosition.X + m_halfWidth, m_prevPosition.Y + m_halfHeight); }
 	};
 }

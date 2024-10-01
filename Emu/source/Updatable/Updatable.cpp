@@ -9,7 +9,6 @@ namespace Engine
 	Updatable::Updatable(size_t id, UpdateCallback callback)
 		: m_id(id), m_callback(callback)
 	{
-		ENGINE_INFO_D("In updatable constructor: " + std::to_string(id));
 		auto& manager = ComponentManagerRegistry::GetManager<Updatable>();
 		manager.AddComponent(id, this);
 	}
@@ -22,7 +21,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_INFO_D("No Update function");
+			ENGINE_INFO_D("No Update function for updatable component: " + std::to_string(m_id));
 		}
 	}
 
@@ -31,10 +30,4 @@ namespace Engine
 		ENGINE_INFO_D("In updatable destructor: " + std::to_string(m_id));
 		ComponentManagerRegistry::GetManager<Updatable>().RemoveComponent(m_id);
 	}
-
-	size_t Updatable::GetID() const
-	{
-		return m_id;
-	}
-
 }

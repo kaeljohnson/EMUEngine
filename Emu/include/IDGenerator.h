@@ -9,8 +9,6 @@
 
 namespace Engine
 {
-	// Not guaranteed to be unique, but good enough for our purposes.
-	// Maybe switch to boost::uuids::uuid if we need a more robust solution.
     class IDGenerator 
     {
     public:
@@ -26,7 +24,7 @@ namespace Engine
                 throw std::runtime_error("Error: All IDs are taken.");
             }
 
-            for (size_t id = 1; id <= maxID; ++id) 
+            for (size_t id = 0; id <= maxID; ++id) 
             {
                 if (usedIDs.find(id) == usedIDs.end()) 
                 {

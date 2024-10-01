@@ -16,7 +16,7 @@ namespace Engine
 		EMU_API ~Tile();
 
 	public:
-		const size_t m_id;
+		const int m_id;
 		Transform m_transform;
 		PhysicsBody m_physicsBody;
 	};

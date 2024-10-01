@@ -128,10 +128,6 @@ namespace Engine
 				{
 					Draw(transform, ptrCurrentCamera->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
 				}
-				else if (sceneObjectID == 1)
-				{
-					ENGINE_CRITICAL_D("Player not visible!");
-				}
 			}
 		}
 
