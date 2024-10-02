@@ -50,7 +50,7 @@ namespace Engine
             );
         }
 
-        T* GetComponent(size_t entity)
+        T& GetComponent(size_t entity)
         {
             auto it = m_components.find(entity);
             if (it != m_components.end())
@@ -60,19 +60,20 @@ namespace Engine
             return nullptr;
         }
 
-        std::unordered_map<size_t, T*>& GetAllComponents() 
+        std::unordered_map<size_t, T>& GetAllComponents() 
         {
             return m_components;
         }
 
-		std::vector<T*>& GetActiveComponents()
+		std::vector<T>& GetActiveComponents()
 		{
 			return m_activeComponents;
 		}
 
     private:
-        std::unordered_map<size_t, T*> m_components;
-        std::vector<T*> m_activeComponents;
+		// Key: Entity ID, Component index
+        std::unordered_map<size_t, size_t> m_components;
+        std::vector<T> m_activeComponents;
     };
 
     class ComponentManagerRegistry 
