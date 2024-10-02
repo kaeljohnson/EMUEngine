@@ -57,13 +57,39 @@ namespace Engine
 	{
 		m_world = new b2World(b2Vec2(m_gravity.X, m_gravity.Y));
 
-		AddPhysicsBodiesToWorld();
+		auto& updatableManager = ComponentManagerRegistry::GetManager<Updatable>();
+		auto& physicsBodyManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
+		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>();
 
-		
+		for (auto& layer : m_layers)
+		{
+			for (auto& id : layer)
+			{
+				transformManager.AddToActiveComponents(id);
+				physicsBodyManager.AddToActiveComponents(id);
+				transformManager.AddToActiveComponents(id);
+			}
+		}
+
+		AddPhysicsBodiesToWorld();
 	}
 
 	void Scene::OnSceneEnd()
 	{
+		auto& updatableManager = ComponentManagerRegistry::GetManager<Updatable>();
+		auto& physicsBodyManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
+		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>();
+
+		for (auto& layer : m_layers)
+		{
+			for (auto& id : layer)
+			{
+				transformManager.RemoveFromActiveComponents(id);
+				physicsBodyManager.RemoveFromActiveComponents(id);
+				transformManager.RemoveFromActiveComponents(id);
+			}
+		}
+
 		DestroyPhysicsWorld();
 	}
 
@@ -140,7 +166,7 @@ namespace Engine
 		m_world->Step(TIME_STEP, 8, 3);
 
 		auto& physicsBodyManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
-		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>();
+		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>(); 
 
 		for (auto& layer : m_layers)
 		{

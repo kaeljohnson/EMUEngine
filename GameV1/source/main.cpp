@@ -60,9 +60,9 @@ int main(int argc, char* args[])
 	scene2->AddLayer(MAP_LAYER);
 	scene2->AddLayer(PLAYER_LAYER);
 
-	Engine::TileMap testMap2("TestMap2.txt", 1);
-	scene2->AddTileMap(testMap2, MAP_LAYER);
-	scene2->Add(playerID, PLAYER_LAYER);
+	// Engine::TileMap testMap2("TestMap2.txt", 1);
+	// scene2->AddTileMap(testMap2, MAP_LAYER);
+	// cene2->Add(playerID, PLAYER_LAYER);
 
 	refSceneManager.LoadScene("Level1");
 	

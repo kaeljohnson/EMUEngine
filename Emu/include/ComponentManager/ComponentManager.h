@@ -1,6 +1,8 @@
 #pragma once
 
+#include <vector>
 #include <unordered_map>
+#include <algorithm>
 
 namespace Engine
 {
@@ -25,6 +27,27 @@ namespace Engine
             m_components.erase(objectID);
         }
 
+        void AddToActiveComponents(size_t objectID)
+        {
+            // Maybe instead of storing pointers, store actual objects and just std::move them?
+            auto it = m_components.find(objectID);
+            if (it != m_components.find(objectID))
+            {
+                m_activeComponents.push_back(it->second);
+            }
+        }
+
+        void RemoveFromActiveComponents(size_t objectID)
+        {
+            m_activeComponents.erase(
+                std::remove_if(m_activeComponents.begin(), m_activeComponents.end(),
+                    [objectID](T* component) {
+                        return component && component->m_id == objectID;
+                    }),
+                m_activeComponents.end()
+            );
+        }
+
         T* GetComponent(size_t entity)
         {
             auto it = m_components.find(entity);
@@ -42,6 +65,7 @@ namespace Engine
 
     private:
         std::unordered_map<size_t, T*> m_components;
+        std::vector<T*> m_activeComponents{ 1000 };
     };
 
     class ComponentManagerRegistry 
