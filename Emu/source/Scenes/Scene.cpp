@@ -65,7 +65,7 @@ namespace Engine
 		{
 			for (auto& id : layer)
 			{
-				transformManager.AddToActiveComponents(id);
+				updatableManager.AddToActiveComponents(id);
 				physicsBodyManager.AddToActiveComponents(id);
 				transformManager.AddToActiveComponents(id);
 			}
@@ -84,7 +84,7 @@ namespace Engine
 		{
 			for (auto& id : layer)
 			{
-				transformManager.RemoveFromActiveComponents(id);
+				updatableManager.RemoveFromActiveComponents(id);
 				physicsBodyManager.RemoveFromActiveComponents(id);
 				transformManager.RemoveFromActiveComponents(id);
 			}
@@ -156,48 +156,76 @@ namespace Engine
 		// For instance, if the camera has not moved, we don't need to update the background layer,
 		// or the collision bodies layer, and likely not the entire map layer.
 
-		auto& updatableManager = ComponentManagerRegistry::GetManager<Updatable>().GetAllComponents();
+		auto& activeTransforms = ComponentManagerRegistry::GetManager<Transform>().GetActiveComponents();
+		auto& activePhysicsBodies = ComponentManagerRegistry::GetManager<PhysicsBody>().GetActiveComponents();
+		auto& activeUpdatables = ComponentManagerRegistry::GetManager<Updatable>().GetActiveComponents();
 
-		for (auto& updatable : updatableManager)
+		for (auto& updatable : activeUpdatables)
 		{
-			updatable.second->Update();
+			updatable->Update();
 		}
 
 		m_world->Step(TIME_STEP, 8, 3);
 
-		auto& physicsBodyManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
-		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>(); 
-
-		for (auto& layer : m_layers)
+		for (auto& transform : activeTransforms)
 		{
-			for (auto& sceneObjectID : layer)
+			PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(transform->m_id);
+			if (physicsBody != nullptr)
 			{
-
-				// ENGINE_INFO_D("Updating scene object: " + std::to_string(sceneObjectID));
-				// Update transforms
-				Transform* transform = transformManager.GetComponent(sceneObjectID);
-				PhysicsBody* physicsBody = physicsBodyManager.GetComponent(sceneObjectID);
-
-				
-				if (transform != nullptr && physicsBody != nullptr)
-				{
-					transform->PrevPosition = physicsBody->GetTopLeftPrevPosition();
-					transform->Position = physicsBody->GetTopLeftPosition();
-					transform->Dimensions = physicsBody->GetDimensions();
-					transform->Rotation = physicsBody->GetAngleInDegrees();
-				}
-				if (physicsBody != nullptr)
-				{
-					physicsBody->Update();
-				}
-
-				// Update scripts
-				// sceneObject->EngineSideUpdate();
-				// sceneObject->Update(); // Need scripts to be components
-
-				
+				transform->PrevPosition = physicsBody->GetTopLeftPrevPosition();
+				transform->Position = physicsBody->GetTopLeftPosition();
+				transform->Dimensions = physicsBody->GetDimensions();
+				transform->Rotation = physicsBody->GetAngleInDegrees();
 			}
 		}
+
+		for (auto& physicsBody : activePhysicsBodies)
+		{
+			physicsBody->Update();
+		}
+
+		//auto& updatableManager = ComponentManagerRegistry::GetManager<Updatable>().GetAllComponents();
+
+		//for (auto& updatable : updatableManager)
+		//{
+		//	updatable.second->Update();
+		//}
+
+		//m_world->Step(TIME_STEP, 8, 3);
+
+		//auto& physicsBodyManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
+		//auto& transformManager = ComponentManagerRegistry::GetManager<Transform>(); 
+
+		//for (auto& layer : m_layers)
+		//{
+		//	for (auto& sceneObjectID : layer)
+		//	{
+
+		//		// ENGINE_INFO_D("Updating scene object: " + std::to_string(sceneObjectID));
+		//		// Update transforms
+		//		Transform* transform = transformManager.GetComponent(sceneObjectID);
+		//		PhysicsBody* physicsBody = physicsBodyManager.GetComponent(sceneObjectID);
+
+		//		
+		//		if (transform != nullptr && physicsBody != nullptr)
+		//		{
+		//			transform->PrevPosition = physicsBody->GetTopLeftPrevPosition();
+		//			transform->Position = physicsBody->GetTopLeftPosition();
+		//			transform->Dimensions = physicsBody->GetDimensions();
+		//			transform->Rotation = physicsBody->GetAngleInDegrees();
+		//		}
+		//		if (physicsBody != nullptr)
+		//		{
+		//			physicsBody->Update();
+		//		}
+
+		//		// Update scripts
+		//		// sceneObject->EngineSideUpdate();
+		//		// sceneObject->Update(); // Need scripts to be components
+
+		//		
+		//	}
+		//}
 	};
 
 	void Scene::CreatePhysicsSimulation(const Vector2D<float> gravity)

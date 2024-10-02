@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <algorithm>
 
+#include "../Logging/Logger.h"
+
 namespace Engine
 {
     class ComponentManagerBase 
@@ -31,7 +33,7 @@ namespace Engine
         {
             // Maybe instead of storing pointers, store actual objects and just std::move them?
             auto it = m_components.find(objectID);
-            if (it != m_components.find(objectID))
+            if (it != m_components.end())
             {
                 m_activeComponents.push_back(it->second);
             }
@@ -63,9 +65,14 @@ namespace Engine
             return m_components;
         }
 
+		std::vector<T*>& GetActiveComponents()
+		{
+			return m_activeComponents;
+		}
+
     private:
         std::unordered_map<size_t, T*> m_components;
-        std::vector<T*> m_activeComponents{ 1000 };
+        std::vector<T*> m_activeComponents;
     };
 
     class ComponentManagerRegistry 
