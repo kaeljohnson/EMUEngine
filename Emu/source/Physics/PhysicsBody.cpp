@@ -33,13 +33,13 @@ namespace Engine
 		m_restitutionThreshold(0.0f), m_density(1.0f), m_friction(1.0f),
 		m_id(id)
 	{
-		ComponentManagerRegistry::GetManager<PhysicsBody>().AddComponent(id, this);
+		// ComponentManagerRegistry::GetManager<PhysicsBody>().AddComponent(id, this);
 	}
 
 	PhysicsBody::~PhysicsBody()
 	{
 		ENGINE_INFO_D("PhysicsBody destroyed with ID: " + std::to_string(m_id));
-		ComponentManagerRegistry::GetManager<PhysicsBody>().RemoveComponent(m_id);
+		// ComponentManagerRegistry::GetManager<PhysicsBody>().RemoveComponent(m_id);
 		RemoveBodyFromWorld();
 	}
 

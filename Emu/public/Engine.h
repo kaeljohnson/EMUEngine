@@ -25,6 +25,7 @@
 
 #include "../include/Transform.h"
 #include "../include/ComponentManager/Updatable.h"
+#include "../include/ComponentManager/ComponentManager.h
 
 namespace Engine
 {

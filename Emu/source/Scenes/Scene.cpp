@@ -61,15 +61,8 @@ namespace Engine
 		auto& physicsBodyManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
 		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>();
 
-		for (auto& layer : m_layers)
-		{
-			for (auto& id : layer)
-			{
-				updatableManager.AddToActiveComponents(id);
-				physicsBodyManager.AddToActiveComponents(id);
-				transformManager.AddToActiveComponents(id);
-			}
-		}
+		// Need to decide how to 
+
 
 		AddPhysicsBodiesToWorld();
 	}
@@ -80,15 +73,6 @@ namespace Engine
 		auto& physicsBodyManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
 		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>();
 
-		for (auto& layer : m_layers)
-		{
-			for (auto& id : layer)
-			{
-				updatableManager.RemoveFromActiveComponents(id);
-				physicsBodyManager.RemoveFromActiveComponents(id);
-				transformManager.RemoveFromActiveComponents(id);
-			}
-		}
 
 		DestroyPhysicsWorld();
 	}

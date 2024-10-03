@@ -18,61 +18,116 @@ namespace Engine
     class ComponentManager : public ComponentManagerBase
     {
     public:
-        void AddComponent(size_t objectID, T* component) 
+        template <typename T>
+        void AddComponent(size_t id, const T& component) 
         {
-            // ENGINE_INFO_D("Adding component: " + std::to_string(objectID));
-            m_components[objectID] = component;
-        }
-
-        void RemoveComponent(size_t objectID)
-        {
-            m_components.erase(objectID);
-        }
-
-        void AddToActiveComponents(size_t objectID)
-        {
-            // Maybe instead of storing pointers, store actual objects and just std::move them?
-            auto it = m_components.find(objectID);
-            if (it != m_components.end())
+            if (m_idToIndex.find(id) != m_idToIndex.end()) 
             {
-                m_activeComponents.push_back(it->second);
+                // Component already exists for this entity, update it instead
+                components[m_idToIndex[id]] = component;
+            }
+            else 
+            {
+                // Use emplace_back to construct the component in place, no copying
+                components.emplace_back(component);
+
+                // Store the index of the new component
+                size_t newIndex = components.size() - 1;
+                m_idToIndex[id] = newIndex;
+                // indexToEntity[newIndex] = entity;
             }
         }
 
-        void RemoveFromActiveComponents(size_t objectID)
+        template<typename... Args>
+        void AddComponent(size_t id, Args&&... args) 
         {
-            m_activeComponents.erase(
-                std::remove_if(m_activeComponents.begin(), m_activeComponents.end(),
-                    [objectID](T* component) {
-                        return component && component->m_id == objectID;
-                    }),
-                m_activeComponents.end()
-            );
+            if (m_idToIndex.find(id) != m_idToIndex.end()) 
+            {
+                // Update the existing component by constructing it with new arguments
+                m_components[m_idToIndex[id]] = ComponentType(std::forward<Args>(args)...);
+            }
+            else 
+            { 
+                // Use emplace_back to construct the component in place from arguments
+                m_components.emplace_back(std::forward<Args>(args)...);
+
+                // Store the index of the new component
+                size_t newIndex = components.size() - 1;
+                m_idToIndex[id] = newIndex;
+                // indexToEntity[newIndex] = entity;
+            }
         }
 
-        T* GetComponent(size_t entity)
+        template<typename... Args>
+        T* AddAndGetComponent(size_t id, Args&&... args)
         {
-            auto it = m_components.find(entity);
-            if (it != m_components.end())
+            if (m_idToIndex.find(id) != m_idToIndex.end())
+            {
+                // Update the existing component by constructing it with new arguments
+                m_components[m_idToIndex[id]] = ComponentType(std::forward<Args>(args)...);
+            }
+            else
+            {
+                // Use emplace_back to construct the component in place from arguments
+                m_components.emplace_back(std::forward<Args>(args)...);
+
+                // Store the index of the new component
+                size_t newIndex = components.size() - 1;
+                m_idToIndex[id] = newIndex;
+                // indexToEntity[newIndex] = entity;
+            }
+
+            return m_components[m_idToIndex[id]]
+        }
+
+        template<typename T>
+        void AddAndGetComponent(size_t id)
+        {
+            m_components.emplace_back();
+            entityToIndex[id] = components.size() - 1;  // Map entity to index
+        }
+        
+        T* GetComponent(size_t id) 
+        {
+            return &m_components[m_idToIndex[id]];
+        }
+
+        bool HasComponent(size_t id) const 
+        {
+            return m_idToIndex.find(id) != m_idToIndex.end();
+        }
+
+        
+
+        /*void RemoveComponent(size_t objectID)
+        {
+            m_components.erase(objectID);
+        }*/
+
+        /*T& GetComponent(size_t entity)
+        {
+            auto it = m_idToIndex.find(entity);
+            if (it != m_idToIndex.end())
             {
                 return it->second;
             }
             return nullptr;
-        }
+        }*/
 
-        std::unordered_map<size_t, T*>& GetAllComponents() 
+        /*std::unordered_map<size_t, T>& GetAllComponents() 
         {
             return m_components;
-        }
+        }*/
 
-		std::vector<T*>& GetActiveComponents()
+		/*std::vector<T>& GetActiveComponents()
 		{
 			return m_activeComponents;
-		}
+		}*/
 
     private:
-        std::unordered_map<size_t, T*> m_components;
-        std::vector<T*> m_activeComponents;
+        // Component ID, Index
+        std::unordered_map<size_t, size_t> m_idToIndex;
+        std::vector<T> m_components;
     };
 
     class ComponentManagerRegistry 

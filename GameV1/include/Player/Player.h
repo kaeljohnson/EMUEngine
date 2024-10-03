@@ -30,9 +30,9 @@ public:
 	PlayerState m_currentState;
 	PlayerDirection m_currentDirection;
 
-	Engine::Transform m_transform;
-	Engine::PhysicsBody m_physicsBody;
-	Engine::Updatable m_updatable;
+	Engine::Transform* m_transform;
+	Engine::PhysicsBody* m_physicsBody;
+	Engine::Updatable* m_updatable;
 
 private:
 	bool m_canJump;
