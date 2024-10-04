@@ -38,7 +38,7 @@ int main(int argc, char* args[])
 
 	PlayerCamera playerCamera;
 	playerCamera.SetPixelsPerUnit(32);
-	playerCamera.SetCameraTarget(&player.m_transform);
+	playerCamera.SetCameraTarget(player.m_transform);
 
 	refCameraManager.SetCurrentCamera(&playerCamera);
 
@@ -55,9 +55,9 @@ int main(int argc, char* args[])
 	// Engine::Tile tile(tileID, Engine::STATIC, Engine::Vector2D<float>(1.0f, 12.0f), Engine::Vector2D<float>(2.0f, 1.0f), 1, true);
 	// scene->Add(tileID, MAP_LAYER);
 
-	scene->Add(playerID, PLAYER_LAYER);
+	// scene->Add(playerID, PLAYER_LAYER);
 
-	scene2->AddLayer(MAP_LAYER);
+	// scene2->AddLayer(MAP_LAYER);
 	scene2->AddLayer(PLAYER_LAYER);
 
 	// Engine::TileMap testMap2("TestMap2.txt", 1);

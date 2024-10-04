@@ -61,15 +61,10 @@ namespace Engine
 		auto& physicsBodyManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
 		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>();
 
-		for (auto& layer : m_layers)
-		{
-			for (auto& id : layer)
-			{
-				updatableManager.AddToActiveComponents(id);
-				physicsBodyManager.AddToActiveComponents(id);
-				transformManager.AddToActiveComponents(id);
-			}
-		}
+		ENGINE_CRITICAL_D("Updatable component vector size: " + std::to_string(updatableManager.GetComponents().size()));
+		ENGINE_CRITICAL_D("PhysicsBody component vector size: " + std::to_string(physicsBodyManager.GetComponents().size()));
+		ENGINE_CRITICAL_D("Transform component vector size: " + std::to_string(transformManager.GetComponents().size()));
+
 
 		AddPhysicsBodiesToWorld();
 	}
@@ -80,15 +75,6 @@ namespace Engine
 		auto& physicsBodyManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
 		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>();
 
-		for (auto& layer : m_layers)
-		{
-			for (auto& id : layer)
-			{
-				updatableManager.RemoveFromActiveComponents(id);
-				physicsBodyManager.RemoveFromActiveComponents(id);
-				transformManager.RemoveFromActiveComponents(id);
-			}
-		}
 
 		DestroyPhysicsWorld();
 	}
@@ -156,76 +142,33 @@ namespace Engine
 		// For instance, if the camera has not moved, we don't need to update the background layer,
 		// or the collision bodies layer, and likely not the entire map layer.
 
-		auto& activeTransforms = ComponentManagerRegistry::GetManager<Transform>().GetActiveComponents();
-		auto& activePhysicsBodies = ComponentManagerRegistry::GetManager<PhysicsBody>().GetActiveComponents();
-		auto& activeUpdatables = ComponentManagerRegistry::GetManager<Updatable>().GetActiveComponents();
+		auto& activeTransforms = ComponentManagerRegistry::GetManager<Transform>().GetComponents();
+		auto& activePhysicsBodies = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponents();
+		auto& activeUpdatables = ComponentManagerRegistry::GetManager<Updatable>().GetComponents();
 
 		for (auto& updatable : activeUpdatables)
 		{
-			updatable->Update();
+			updatable.Update();
+		}
+
+		for (auto& physicsBody : activePhysicsBodies)
+		{
+			physicsBody.Update();
 		}
 
 		m_world->Step(TIME_STEP, 8, 3);
 
 		for (auto& transform : activeTransforms)
-		{
-			PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(transform->m_id);
+		{	
+			PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(transform.m_id);
 			if (physicsBody != nullptr)
 			{
-				transform->PrevPosition = physicsBody->GetTopLeftPrevPosition();
-				transform->Position = physicsBody->GetTopLeftPosition();
-				transform->Dimensions = physicsBody->GetDimensions();
-				transform->Rotation = physicsBody->GetAngleInDegrees();
+				transform.PrevPosition = physicsBody->GetTopLeftPrevPosition();
+				transform.Position = physicsBody->GetTopLeftPosition();
+				transform.Dimensions = physicsBody->GetDimensions();
+				transform.Rotation = physicsBody->GetAngleInDegrees();
 			}
 		}
-
-		for (auto& physicsBody : activePhysicsBodies)
-		{
-			physicsBody->Update();
-		}
-
-		//auto& updatableManager = ComponentManagerRegistry::GetManager<Updatable>().GetAllComponents();
-
-		//for (auto& updatable : updatableManager)
-		//{
-		//	updatable.second->Update();
-		//}
-
-		//m_world->Step(TIME_STEP, 8, 3);
-
-		//auto& physicsBodyManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
-		//auto& transformManager = ComponentManagerRegistry::GetManager<Transform>(); 
-
-		//for (auto& layer : m_layers)
-		//{
-		//	for (auto& sceneObjectID : layer)
-		//	{
-
-		//		// ENGINE_INFO_D("Updating scene object: " + std::to_string(sceneObjectID));
-		//		// Update transforms
-		//		Transform* transform = transformManager.GetComponent(sceneObjectID);
-		//		PhysicsBody* physicsBody = physicsBodyManager.GetComponent(sceneObjectID);
-
-		//		
-		//		if (transform != nullptr && physicsBody != nullptr)
-		//		{
-		//			transform->PrevPosition = physicsBody->GetTopLeftPrevPosition();
-		//			transform->Position = physicsBody->GetTopLeftPosition();
-		//			transform->Dimensions = physicsBody->GetDimensions();
-		//			transform->Rotation = physicsBody->GetAngleInDegrees();
-		//		}
-		//		if (physicsBody != nullptr)
-		//		{
-		//			physicsBody->Update();
-		//		}
-
-		//		// Update scripts
-		//		// sceneObject->EngineSideUpdate();
-		//		// sceneObject->Update(); // Need scripts to be components
-
-		//		
-		//	}
-		//}
 	};
 
 	void Scene::CreatePhysicsSimulation(const Vector2D<float> gravity)
@@ -290,22 +233,14 @@ namespace Engine
 
 	void Scene::AddPhysicsBodiesToWorld()
 	{
-		for (auto& physicsBody : ComponentManagerRegistry::GetManager<PhysicsBody>().GetAllComponents())
+		for (auto& physicsBody : ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponents())
 		{
-			if (physicsBody.second != nullptr)
+			b2Body* body;
+			b2BodyDef bodyDef;
+			b2FixtureDef fixtureDef;
+			b2PolygonShape shape;
+			switch (physicsBody.GetBodyType())
 			{
-				if (physicsBody.second == nullptr)
-				{
-					ENGINE_ERROR_D("PhysicsBody is null!");
-					return;
-				}
-
-				b2Body* body;
-				b2BodyDef bodyDef;
-				b2FixtureDef fixtureDef;
-				b2PolygonShape shape;
-				switch (physicsBody.second->GetBodyType())
-				{
 				case STATIC:
 					bodyDef.type = b2_staticBody;
 					break;
@@ -317,31 +252,30 @@ namespace Engine
 					break;
 				case SENSOR:
 					bodyDef.type = b2_kinematicBody;
-					physicsBody.second->SetIsSensor(true);
+					physicsBody.SetIsSensor(true);
 					break;
 				default:
 					bodyDef.type = b2_staticBody;
 					break;
-				}
-
-				bodyDef.fixedRotation = physicsBody.second->GetIsRotationFixed();
-				bodyDef.userData.pointer = (uintptr_t)physicsBody.second;
-				bodyDef.position.Set(physicsBody.second->GetStartingPosition().X + physicsBody.second->GetHalfWidth(), 
-					physicsBody.second->GetStartingPosition().Y + physicsBody.second->GetHalfHeight());
-					
-				body = m_world->CreateBody(&bodyDef);
-
-				shape.SetAsBox(physicsBody.second->GetHalfWidth(), physicsBody.second->GetHalfHeight());
-				fixtureDef.shape = &shape;
-				fixtureDef.restitution = physicsBody.second->GetStartingRestitution();
-				fixtureDef.restitutionThreshold = physicsBody.second->GetStartingRestitutionThreshold();
-				fixtureDef.density = physicsBody.second->GetStartingDensity();
-				fixtureDef.friction = physicsBody.second->GetStartingFriction();
-				fixtureDef.isSensor = physicsBody.second->GetIsSensor();
-				body->CreateFixture(&fixtureDef);
-
-				physicsBody.second->m_body = body;
 			}
+
+			bodyDef.fixedRotation = physicsBody.GetIsRotationFixed();
+			bodyDef.userData.pointer = (uintptr_t)&physicsBody;
+			bodyDef.position.Set(physicsBody.GetStartingPosition().X + physicsBody.GetHalfWidth(), 
+				physicsBody.GetStartingPosition().Y + physicsBody.GetHalfHeight());
+					
+			body = m_world->CreateBody(&bodyDef);
+
+			shape.SetAsBox(physicsBody.GetHalfWidth(), physicsBody.GetHalfHeight());
+			fixtureDef.shape = &shape;
+			fixtureDef.restitution = physicsBody.GetStartingRestitution();
+			fixtureDef.restitutionThreshold = physicsBody.GetStartingRestitutionThreshold();
+			fixtureDef.density = physicsBody.GetStartingDensity();
+			fixtureDef.friction = physicsBody.GetStartingFriction();
+			fixtureDef.isSensor = physicsBody.GetIsSensor();
+			body->CreateFixture(&fixtureDef);
+
+			physicsBody.m_body = body;
 		}
 	}
 }

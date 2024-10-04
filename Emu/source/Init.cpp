@@ -4,6 +4,10 @@
 #include "../include/Init.h"
 #include "../include/Logging/Logger.h"
 #include "../include/IDGenerator.h"
+#include "../include/ComponentManager/ComponentManager.h"
+#include "../include/Transform.h"
+#include "../include/Physics/PhysicsBody.h"
+#include "../include/ComponentManager/Updatable.h"
 
 namespace Engine
 {
@@ -14,6 +18,11 @@ namespace Engine
 	Init::Init()
 	{
 		IDGenerator::initialize(1000);
+
+		ComponentManagerRegistry::GetManager<Updatable>().Allocate(5000);
+		ComponentManagerRegistry::GetManager<PhysicsBody>().Allocate(5000);
+		ComponentManagerRegistry::GetManager<Transform>().Allocate(5000);
+
 
 		ENGINE_TRACE_D("Logger initialized!");
 

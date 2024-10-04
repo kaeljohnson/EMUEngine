@@ -102,32 +102,19 @@ namespace Engine
 		float cameraTop = ptrCurrentCamera->m_offset.Y;
 		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->GetPixelsPerUnit());
 
-		// Objects should be submitted for rendering instead of iterating through every scene object. ECS would solve this.
-		for (auto& layer : currentScene->GetLayers())
+		for (auto& transform : ComponentManagerRegistry::GetManager<Transform>().GetComponents())
 		{
-			for (auto& sceneObjectID : layer)
-			{
-				// if (!sceneObject->Visible) continue;
+			float objectLeft = transform.Position.X;
+			float objectRight = objectLeft + transform.Dimensions.X;
+			float objectTop = transform.Position.Y;
+			float objectBottom = objectTop + transform.Dimensions.Y;
 
-				Transform* transform = ComponentManagerRegistry::GetManager<Transform>().GetComponent(sceneObjectID);
-
-				if (transform == nullptr)
-				{
-					continue;
-				}
-
-				float objectLeft = transform->Position.X;
-				float objectRight = objectLeft + transform->Dimensions.X;
-				float objectTop = transform->Position.Y;
-				float objectBottom = objectTop + transform->Dimensions.Y;
-
-				bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
+			bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
 				objectBottom >= cameraTop && objectTop <= cameraBottom;
 
-				if (isVisible)
-				{
-					Draw(transform, ptrCurrentCamera->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
-				}
+			if (isVisible)
+			{
+				Draw(&transform, ptrCurrentCamera->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
 			}
 		}
 
@@ -156,6 +143,12 @@ namespace Engine
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)
 		PhysicsBody* ptrBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(transform->m_id);
+		if (ptrBody == nullptr)
+		{
+			ENGINE_CRITICAL("PhysicsBody not found for Transform with ID: " + std::to_string(transform->m_id));
+			return;
+		}
+
 		if (ptrBody->GetHasCollisionBelow() || ptrBody->GetHasCollisionAbove() ||
 			ptrBody->GetHasCollisionLeft() || ptrBody->GetHasCollisionRight())
 		{

@@ -64,14 +64,24 @@ namespace Engine
             {
                 if (GetTile(x, y) != '-')
                 {
+                    // Might need to add this to an array?
                     const size_t tileID = IDGenerator::CreateUUID();
 
-                    m_tiles.emplace_back(
-                        tileID,
-                        SENSOR,
-						Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), 
-                            static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
-						Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)), 0, true);
+                    // Create "Tiles"
+                    ComponentManagerRegistry::GetManager<Transform>().AddComponent(tileID, tileID,
+                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)), 
+                        Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
+                        1.0f, 1.0f, 1.0f);
+                    ComponentManagerRegistry::GetManager<PhysicsBody>().AddComponent(tileID, tileID, SENSOR, true,
+                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
+                        Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)));
+
+                    // m_tiles.emplace_back(
+                    //    tileID,
+                    //    SENSOR,
+					//	Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), 
+                    //        static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
+					//	Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)), 0, true);
 				}
 			}
 		}
@@ -138,15 +148,21 @@ namespace Engine
 
 					const size_t tileID = IDGenerator::CreateUUID();
 
+                    ComponentManagerRegistry::GetManager<PhysicsBody>().AddComponent(tileID, tileID, STATIC, true, 
+                        Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile),
+                            static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
+                        Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile),
+                            static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)));
+
                     // Create the collission body with calculated dimensions
-                    m_collisionBodies.emplace_back(
+                    /*m_collisionBodies.emplace_back(
 						tileID,
                         STATIC,
                         true,
                         Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile), 
                             static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile), 
-                            static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)));
+                            static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)));*/
                 }
             }
         }
