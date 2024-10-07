@@ -9,8 +9,7 @@ namespace Engine
 	Updatable::Updatable(size_t id, UpdateCallback callback)
 		: m_id(id), m_callback(callback)
 	{
-		// auto& manager = ComponentManagerRegistry::GetManager<Updatable>();
-		// manager.AddComponent(id, this);
+		ENGINE_CRITICAL_D("Updatable constructor called with ID: " + std::to_string(m_id));
 	}
 
 	void Updatable::Update()

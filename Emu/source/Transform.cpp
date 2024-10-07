@@ -10,12 +10,6 @@
 
 namespace Engine
 {
-	Transform::Transform() : m_id(0), PrevPosition(0.0f, 0.0f), Position(0.0f, 0.0f), 
-		Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1)
-	{
-		ENGINE_CRITICAL_D("Transform component created without an ID");
-	}
-
 	Transform::Transform(const size_t id)
 		: m_id(id), PrevPosition(0.0f, 0.0f), Position(0.0f, 0.0f),
 		Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1)
@@ -27,13 +21,10 @@ namespace Engine
 
 	Transform::Transform(const size_t id, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction)
 		: m_id(id), PrevPosition(position), Position(position), Dimensions(dimensions), Rotation(rotation), Scale(scale), DirectionFacing(direction)
-	{
-		// ComponentManagerRegistry::GetManager<Transform>().AddComponent(id, this);
-	}
+	{}
 
 	Transform::~Transform()
 	{
 		ENGINE_INFO_D("Transform component destroyed with ID: " + std::to_string(m_id));
-		// ComponentManagerRegistry::GetManager<Transform>().RemoveComponent(m_id);
 	}
 }

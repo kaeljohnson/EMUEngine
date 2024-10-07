@@ -129,7 +129,7 @@ namespace Engine
 
 		SDLRect dst
 		{
-			static_cast<int>(round((Lerp(transform->PrevPosition.X, transform->Position.X, \
+			static_cast<int>(round((Lerp(transform->PrevPosition.X, transform->Position.X, 
 				(float)interpolation) - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 			static_cast<int>(round((Lerp(transform->PrevPosition.Y, transform->Position.Y, 
 				(float)interpolation) - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
@@ -148,16 +148,18 @@ namespace Engine
 			ENGINE_CRITICAL("PhysicsBody not found for Transform with ID: " + std::to_string(transform->m_id));
 			return;
 		}
-
+		// ENGINE_CRITICAL_D("Drawing PhysicsBody for Transform with ID: " + std::to_string(transform->m_id));
+		
 		if (ptrBody->GetHasCollisionBelow() || ptrBody->GetHasCollisionAbove() ||
 			ptrBody->GetHasCollisionLeft() || ptrBody->GetHasCollisionRight())
 		{
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 255, 255);
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 255, 255); // BLUE
 		}
 		else if (ptrBody->GetHasSensorBelow() || ptrBody->GetHasSensorAbove() ||
 			ptrBody->GetHasSensorLeft() || ptrBody->GetHasSensorRight())
 		{
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, 255);
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, 255); // GREEN
+
 		}
 		else
 		{

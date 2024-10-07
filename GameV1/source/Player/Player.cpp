@@ -15,7 +15,8 @@
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
         m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right),
-		m_transform(Engine::ComponentManagerRegistry::GetManager<Engine::Transform>().AddAndGetComponent(id)), 
+		m_transform(Engine::ComponentManagerRegistry::GetManager<Engine::Transform>().AddAndGetComponent(id, id, 
+            Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f)),
         m_physicsBody(Engine::ComponentManagerRegistry::GetManager<Engine::PhysicsBody>().AddAndGetComponent(
             id, id, Engine::BodyType::DYNAMIC, false, Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height))),
         m_updatable(Engine::ComponentManagerRegistry::GetManager<Engine::Updatable>().AddAndGetComponent(id, id, [this]() { Update(); }))

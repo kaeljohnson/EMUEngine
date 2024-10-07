@@ -22,25 +22,21 @@ namespace Engine
 		EMU_API void SetGravity(const Vector2D<float> gravity);
 
 		// Adds scene object to the scene. Need to add a "order" parameter to determine the order of rendering.
-		EMU_API void Add(const int sceneObjectID, int layerNum);
+		// EMU_API void Add(const int sceneObjectID);
 	
-		// Layer number is the index for now.
-		EMU_API void AddLayer(size_t layerIdx);
 		EMU_API void Remove(const int sceneObjectID);
-		EMU_API void AddTileMap(TileMap& tileMap, int layerIdx);
+		EMU_API void AddTileMap(TileMap& tileMap);
 
 		// IF theres no map in the level, client will decided the dimensions manually.
 		EMU_API void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
 
 	private:
 		Vector2D<int> m_levelDimensionsInUnits;
-		std::vector<IntStack> m_layers;
 		TileMap* m_tileMap;
 		b2World* m_world;
 		Vector2D<float> m_gravity;
 
 	public:
-		inline std::vector<IntStack>& GetLayers() { return m_layers; }
 		inline const int GetLevelWidth() const { return m_levelDimensionsInUnits.X; }
 		inline const int GetLevelHeight() const { return m_levelDimensionsInUnits.Y; }
 

@@ -20,7 +20,6 @@ namespace Engine
 		float Scale;
 		int DirectionFacing;
 
-		EMU_API Transform();
 		EMU_API ~Transform();
 		EMU_API Transform(const size_t id);
 		EMU_API Transform(const size_t id, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction);

@@ -22,21 +22,16 @@ namespace Engine
     class ComponentManager : public ComponentManagerBase
     {
     public:
-        EMU_API static ComponentManager<T>& Instance() 
-        {
-            static ComponentManager<T> instance;
-            return instance;
-        }
 
         template <typename T>
         void AddComponent(size_t id, const T& component) 
         {
-            if (m_idToIndex.find(id) != m_idToIndex.end()) 
-            {
-                // Component already exists for this entity, update it instead
-                m_components[m_idToIndex[id]] = component;
-            }
-            else 
+            //if (m_idToIndex.find(id) != m_idToIndex.end()) 
+            //{
+            //    // Component already exists for this entity, update it instead
+            //    m_components[m_idToIndex[id]] = std::move(component);
+            //}
+            //else 
             {
                 // Use emplace_back to construct the component in place, no copying
                 m_components.emplace_back(component);
@@ -51,14 +46,16 @@ namespace Engine
         template<typename... Args>
         void AddComponent(size_t id, Args&&... args) 
         {
-            if (m_idToIndex.find(id) != m_idToIndex.end()) 
-            {
-                // Update the existing component by constructing it with new arguments
-                size_t index = m_idToIndex[id];
-                m_components[index].~T();
-                new (&m_components[index]) T(std::forward<Args>(args)...);
-            }
-            else 
+            ENGINE_CRITICAL_D("ADDING COMPONENT: " + std::to_string(id));
+            //if (m_idToIndex.find(id) != m_idToIndex.end()) 
+            //{
+            //    ENGINE_CRITICAL_D("Replacing component with ID: " + std::to_string(id));
+            //    // Update the existing component by constructing it with new arguments
+            //    size_t index = m_idToIndex[id];
+            //    m_components[index].~T();
+            //    new (&m_components[index]) T(id, std::forward<Args>(args)...);
+            //}
+            // else 
             { 
                 // Use emplace_back to construct the component in place from arguments
                 m_components.emplace_back(std::forward<Args>(args)...);
@@ -72,33 +69,17 @@ namespace Engine
         template<typename... Args>
         T* AddAndGetComponent(size_t id, Args&&... args)
         {
-            if (m_idToIndex.find(id) != m_idToIndex.end())
-            {
-                size_t index = m_idToIndex[id];
-                m_components[index].~T();
-                new (&m_components[index]) T(std::forward<Args>(args)...);
-            }
-            else
-            {
-                // Use emplace_back to construct the component in place from arguments
-                m_components.emplace_back(std::forward<Args>(args)...);
-
-                // Store the index of the new component
-                size_t newIndex = m_components.size() - 1;
-                m_idToIndex[id] = newIndex;
-                // indexToEntity[newIndex] = entity;
-                ENGINE_CRITICAL_D(std::to_string(m_components.size()));
-            }
+			AddComponent(id, std::forward<Args>(args)...);
 
             return &m_components[m_idToIndex[id]];
         }
 
-        template<typename T>
-        void AddAndGetComponent(size_t id)
-        {
-            m_components.emplace_back();
-            m_idToIndex[id] = m_components.size() - 1;  // Map entity to index
-        }
+        //template<typename T>
+        //void AddAndGetComponent(size_t id)
+        //{
+        //    m_components.emplace_back();
+        //    m_idToIndex[id] = m_components.size() - 1;  // Map entity to index
+        //}
         
         T* GetComponent(size_t id) 
         {

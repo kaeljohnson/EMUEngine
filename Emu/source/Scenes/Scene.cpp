@@ -16,7 +16,7 @@
 
 namespace Engine
 {
-	Scene::Scene() : m_layers(), m_levelDimensionsInUnits(32, 32), HasTileMap(false),
+	Scene::Scene() : m_levelDimensionsInUnits(32, 32), HasTileMap(false),
 		m_world(nullptr), m_tileMap(nullptr) {}
 
 	Scene::~Scene()
@@ -50,7 +50,6 @@ namespace Engine
 	void Scene::CheckValid()
 	{
 		(m_world == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
-		m_layers.size() > 0 ? ENGINE_INFO_D("Scene has at least one layer.") : ENGINE_CRITICAL_D("No layers exist in scene.");
 	}
 
 	void Scene::OnScenePlay()
@@ -79,19 +78,7 @@ namespace Engine
 		DestroyPhysicsWorld();
 	}
 
-	void Scene::AddLayer(size_t layerIdx)
-	{
-		// Ensure the layer is appended to the end of the vector if the index is out of bounds.
-		if (layerIdx > m_layers.size()) 
-		{
-			ENGINE_CRITICAL_D("Layer index is out of bounds. Add layers sequentially.");
-			return;
-		}
-
-		m_layers.emplace_back();
-	}
-
-	void Scene::AddTileMap(TileMap& tileMap, int layerIdx)
+	void Scene::AddTileMap(TileMap& tileMap)
 	{
 		tileMap.LoadMap();
 		tileMap.CreateCollisionBodies();
@@ -102,17 +89,8 @@ namespace Engine
 
 		m_levelDimensionsInUnits = Vector2D<int>(tileMap.GetWidth(), tileMap.GetHeight());
 
-		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_levelDimensionsInUnits.X) + ", Map height: " + std::to_string(m_levelDimensionsInUnits.Y));
-
-		for (auto& tile : tileMap)
-		{
-			Add(tile.m_id, layerIdx);
-		}
-
-		for (auto& collisionBody : tileMap.GetCollisionBodies())
-		{
-			Add(collisionBody.m_id, layerIdx);
-		}
+		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_levelDimensionsInUnits.X) + ", Map height: " 
+			+ std::to_string(m_levelDimensionsInUnits.Y));
 
 		HasTileMap = true;
 	}
@@ -204,25 +182,8 @@ namespace Engine
 	
 	}
 
-	void Scene::Add(const int id, int layerIdx)
-	{
-		// Check if layerIdx is valid
-		if (layerIdx >= m_layers.size()) 
-		{
-			ENGINE_CRITICAL_D("Invalid layer index: " + std::to_string(layerIdx) + ". Cannot add SceneObject.");
-			return;
-		}
-
-		m_layers[layerIdx].Push(id);
-	}
-
 	void Scene::Remove(const int id)
 	{
-		for (auto& layer : m_layers)
-		{
-			layer.Pop(id);
-		}
-
 		// If scene object has a physics body, remove it from the world.
 		PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(id);
 		if (physicsBody != nullptr)

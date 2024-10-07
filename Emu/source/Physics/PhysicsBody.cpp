@@ -12,15 +12,14 @@
 
 namespace Engine
 {
-	PhysicsBody::PhysicsBody() : m_halfWidth(0.0f), m_halfHeight(0.0f), m_width(0.0f), m_height(0.0f),
+	PhysicsBody::PhysicsBody(const size_t id) : m_halfWidth(0.0f), m_halfHeight(0.0f), m_width(0.0f), m_height(0.0f),
 		m_startingPosition(Vector2D<float>(0.0f, 0.0f)), m_bodyType(STATIC), m_fixed(false), m_body(nullptr),
 		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
 		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
 		m_gravityOn(true), m_isSensor(false), m_prevPosition(Vector2D<float>(0.0f, 0.0f)), m_fixedRotation(true), m_restitution(0.0f),
-		m_restitutionThreshold(0.0f), m_density(1.0f), m_friction(1.0f), m_id(0)
+		m_restitutionThreshold(0.0f), m_density(1.0f), m_friction(1.0f), m_id(id)
 	
 	{
-		ENGINE_CRITICAL_D("PhysicsBody default constructor called.");
 	}
 
 	PhysicsBody::PhysicsBody(const size_t id, const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
@@ -32,14 +31,11 @@ namespace Engine
 		m_gravityOn(true), m_isSensor(false), m_prevPosition(position), m_fixedRotation(true), m_restitution(0.0f),
 		m_restitutionThreshold(0.0f), m_density(1.0f), m_friction(1.0f),
 		m_id(id)
-	{
-		// ComponentManagerRegistry::GetManager<PhysicsBody>().AddComponent(id, this);
-	}
+	{}
 
 	PhysicsBody::~PhysicsBody()
 	{
 		ENGINE_INFO_D("PhysicsBody destroyed with ID: " + std::to_string(m_id));
-		// ComponentManagerRegistry::GetManager<PhysicsBody>().RemoveComponent(m_id);
 		RemoveBodyFromWorld();
 	}
 
@@ -129,37 +125,53 @@ namespace Engine
 				b2WorldManifold worldManifold;
 				edge->contact->GetWorldManifold(&worldManifold);
 
-				b2Body* otherBody = edge->contact->GetFixtureA()->GetBody() == m_body ? edge->contact->GetFixtureB()->GetBody() : edge->contact->GetFixtureA()->GetBody();
+				b2Body* otherBody;
+				int directionFactor = 1;
+				if (edge->contact->GetFixtureA()->GetBody() == m_body)
+				{
+					otherBody = edge->contact->GetFixtureB()->GetBody();
+				}
+				else
+				{
+					directionFactor = -1;
+					otherBody = edge->contact->GetFixtureA()->GetBody();
+				}
+								
 				PhysicsBody* otherPhysicsBody = reinterpret_cast<PhysicsBody*>(otherBody->GetUserData().pointer);
 
 				// Assuming the first point's normal is representative for the whole contact
 				b2Vec2 normal = worldManifold.normal;
+
+				normal.x *= directionFactor;
+				normal.y *= directionFactor;
 
 				// Different trigger for contacts for kinematic bodies for now.
 				// Might need a custom body type for bodies that
 				// are meant to be the ground.
 				if (otherPhysicsBody->GetBodyType() == SENSOR)
 				{
+					// ENGINE_CRITICAL_D("Sensor collision detected");
+					
 					if (normal.y < -0.5) // Collision from above `this`
-					{
-						this->SetBottomSensor(true);
-						otherPhysicsBody->SetTopSensor(true);
-					}
-					else if (normal.y > 0.5) // Collision from below `this`
 					{
 						this->SetTopSensor(true);
 						otherPhysicsBody->SetBottomSensor(true);
 					}
-
-					if (normal.x > 0.5) // Collision from the left of `this`
+					else if (normal.y > 0.5) // Collision from below `this`
 					{
-						this->SetLeftSensor(true);
-						otherPhysicsBody->SetRightSensor(true);
+						this->SetBottomSensor(true);
+						otherPhysicsBody->SetTopSensor(true);
 					}
-					else if (normal.x < -0.5) // Collision from the right of `this`
+
+					if (normal.x > 0.5) // Collision from the Right of `this`
 					{
 						this->SetRightSensor(true);
 						otherPhysicsBody->SetLeftSensor(true);
+					}
+					else if (normal.x < -0.5) // Collision from the Left of `this`
+					{
+						this->SetLeftSensor(true);
+						otherPhysicsBody->SetRightSensor(true);
 					}
 				}
 				else
@@ -177,15 +189,15 @@ namespace Engine
 						otherPhysicsBody->SetTopCollision(true);
 					}
 
-					if (normal.x > 0.5) // Collision from the left of `this`
-					{
-						this->SetLeftCollision(true);
-						otherPhysicsBody->SetRightCollision(true);
-					}
-					else if (normal.x < -0.5) // Collision from the right of `this`
+					if (normal.x > 0.5) // Collision from the right of `this`
 					{
 						this->SetRightCollision(true);
 						otherPhysicsBody->SetLeftCollision(true);
+					}
+					else if (normal.x < -0.5) // Collision from the left of `this` 
+					{
+						this->SetLeftCollision(true);
+						otherPhysicsBody->SetRightCollision(true);
 					}
 				}
 			}
