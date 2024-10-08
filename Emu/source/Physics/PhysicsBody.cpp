@@ -150,8 +150,6 @@ namespace Engine
 				// are meant to be the ground.
 				if (otherPhysicsBody->GetBodyType() == SENSOR)
 				{
-					// ENGINE_CRITICAL_D("Sensor collision detected");
-					
 					if (normal.y < -0.5) // Collision from above `this`
 					{
 						this->SetTopSensor(true);

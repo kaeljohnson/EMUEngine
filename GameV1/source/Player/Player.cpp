@@ -15,11 +15,11 @@
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
         m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right),
-		m_transform(Engine::ComponentManagerRegistry::GetManager<Engine::Transform>().AddAndGetComponent(id, id, 
+		m_transform(Engine::ComponentManagerRegistry::GetManager<Engine::Transform>().AddAndGetComponent(id, 
             Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f)),
         m_physicsBody(Engine::ComponentManagerRegistry::GetManager<Engine::PhysicsBody>().AddAndGetComponent(
-            id, id, Engine::BodyType::DYNAMIC, false, Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height))),
-        m_updatable(Engine::ComponentManagerRegistry::GetManager<Engine::Updatable>().AddAndGetComponent(id, id, [this]() { Update(); }))
+            id, Engine::BodyType::DYNAMIC, false, Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height))),
+        m_updatable(Engine::ComponentManagerRegistry::GetManager<Engine::Updatable>().AddAndGetComponent(id, [this]() { Update(); }))
     {
         // Need to have them be able to set this during construction of physics body.
     	m_physicsBody->SetStartingFriction(0.0f);
