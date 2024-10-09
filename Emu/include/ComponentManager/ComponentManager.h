@@ -28,7 +28,7 @@ namespace Engine
         {
             if (m_idToIndex.find(id) != m_idToIndex.end()) 
             {
-                // Component already exists for this entity, update it instead
+				// Replace the existing component with the new one
                 m_components[m_idToIndex[id]] = std::move(component);
             }
             else 
@@ -79,6 +79,22 @@ namespace Engine
             return &m_components[m_idToIndex[id]];
         }
         
+		void ActivateComponent(size_t id)
+		{
+			if (m_idToIndex.find(id) != m_idToIndex.end())
+			{
+				m_components[m_idToIndex[id]].SetActive(true);
+			}
+		}
+
+        void DeactivateComponent(size_t id)
+        {
+            if (m_idToIndex.find(id) != m_idToIndex.end())
+            {
+                m_components[m_idToIndex[id]].SetActive(false);
+            }
+        }
+
         T* GetComponent(size_t id) 
         {
 			if (m_idToIndex.find(id) == m_idToIndex.end())
@@ -114,10 +130,5 @@ namespace Engine
     public:
         template <typename T>
         EMU_API static ComponentManager<T>& GetManager();
-        /*{
-            static ComponentManager<T> manager;
-            std::cout << typeid(T).name() << ": " << & manager << std::endl;
-            return manager;
-        }*/
     };
 }

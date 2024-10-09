@@ -17,25 +17,27 @@ int main(int argc, char* args[])
 	Engine::SceneManager& refSceneManager = ptrAppInstance->GetSceneManager();
 
 	Engine::ScenePtr scene = Engine::CreateScene();
-	// Engine::ScenePtr scene2 = Engine::CreateScene();
+	Engine::ScenePtr scene2 = Engine::CreateScene();
 
 	refSceneManager.AddScene("Level1", scene);
-	//// refSceneManager.AddScene("Level2", scene2);
+	refSceneManager.AddScene("Level2", scene2);
 
 
 	//// Need physcis to scale with pixels per unit.
 	scene->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
-	//// scene2->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
+	scene2->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 
 	Engine::TileMap testMap("testMap1.txt", 1);
 	scene->AddTileMap(testMap);
 	
-	const size_t playerID = Engine::IDGenerator::CreateUUID();
-	CLIENT_CRITICAL_D("Player ID: " + std::to_string(playerID));
-	Player player(playerID, 6.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
+	const Engine::Entity playerEntity = Engine::IDGenerator::CreateUUID();
+	scene->Add(playerEntity);
+	CLIENT_CRITICAL_D("Player ID: " + std::to_string(playerEntity));
+	Player player(playerEntity, 6.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 
-	//// const size_t player2ID = Engine::IDGenerator::CreateUUID();
-	//// Player player2(player2ID, 2.0f, 2.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
+	const Engine::Entity player2ID = Engine::IDGenerator::CreateUUID();
+	Player player2(player2ID, 2.0f, 2.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
+	// scene2->Add(player2ID);
 
 	//Engine::ScrollingCamera scrollCamera;
 	//scrollCamera.SetScrollingSpeeds(Engine::Vector2D<float>(0.0005f, 0.0f));
@@ -46,22 +48,18 @@ int main(int argc, char* args[])
 	playerCamera.SetCameraTarget(player.m_transform);
 
 	refCameraManager.SetCurrentCamera(&playerCamera);
-	//
-	//// const size_t tileID = Engine::IDGenerator::CreateUUID();
-	//// Engine::Tile tile(tileID, Engine::STATIC, Engine::Vector2D<float>(1.0f, 12.0f), Engine::Vector2D<float>(2.0f, 1.0f), 1, true);
-	//// scene->Add(tileID, MAP_LAYER);
-
-	//// scene->Add(playerID, PLAYER_LAYER);
 
 	//// scene2->AddLayer(MAP_LAYER);
 	//// scene2->AddLayer(PLAYER_LAYER);
 
-	//// Engine::TileMap testMap2("TestMap2.txt", 1);
-	//// scene2->AddTileMap(testMap2, MAP_LAYER);
-	//// cene2->Add(playerID, PLAYER_LAYER);
+	scene2->Add(playerEntity);
+
+	Engine::TileMap testMap2("TestMap2.txt", 1);
+	scene2->AddTileMap(testMap2);
+	
 
 	refSceneManager.LoadScene("Level1");
-	//
+
 	AppManagementEventHandlers appManagementEventHandlers(refEventManager, playerCamera);
 
 	ptrAppInstance->Start();

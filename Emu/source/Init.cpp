@@ -17,7 +17,7 @@ namespace Engine
 
 	Init::Init()
 	{
-		IDGenerator::initialize(1000);
+		IDGenerator::initialize(10000);
 
 		ComponentManagerRegistry::GetManager<Updatable>().Allocate(5000);
 		ComponentManagerRegistry::GetManager<PhysicsBody>().Allocate(5000);

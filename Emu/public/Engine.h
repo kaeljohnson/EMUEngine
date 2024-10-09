@@ -33,4 +33,5 @@ namespace Engine
 	using PhysicsBodyPtr = std::shared_ptr<PhysicsBody>;
 	using ApplicationPtr = Application*;
 	using ICallbackSystemPtr = ICallbackSystem*;
+	using Entity = size_t;
 }

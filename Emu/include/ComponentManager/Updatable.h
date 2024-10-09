@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Component.h"
+
 #include "../Core.h"
 
 #include <functional>
@@ -8,7 +10,7 @@
 
 namespace Engine
 { 
-    class Updatable 
+	class Updatable : public Component
     {
     public:
         using UpdateCallback = std::function<void()>;
@@ -18,7 +20,7 @@ namespace Engine
         EMU_API ~Updatable();
 
     public:
-        const size_t m_id;
+        // const size_t m_id;
         const UpdateCallback m_callback;
 
         void Update();

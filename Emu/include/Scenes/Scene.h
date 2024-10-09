@@ -27,6 +27,8 @@ namespace Engine
 		EMU_API void Remove(const int sceneObjectID);
 		EMU_API void AddTileMap(TileMap& tileMap);
 
+		EMU_API void Add(const size_t sceneObjectID);
+
 		// IF theres no map in the level, client will decided the dimensions manually.
 		EMU_API void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
 
@@ -35,6 +37,8 @@ namespace Engine
 		TileMap* m_tileMap;
 		b2World* m_world;
 		Vector2D<float> m_gravity;
+
+		std::vector<size_t> m_sceneObjects;
 
 	public:
 		inline const int GetLevelWidth() const { return m_levelDimensionsInUnits.X; }

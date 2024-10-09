@@ -6,7 +6,6 @@
 
 #include "Screen.h"
 
-#include "../Scenes/Scene.h"
 #include "../Camera/Camera.h"
 
 #include "../Transform.h"
@@ -21,8 +20,8 @@ namespace Engine
 		WindowRenderer();
 		~WindowRenderer();
 
-		void RenderScene(std::shared_ptr<Scene> currentScene, const double interpolation);
-		void Draw(Transform* sceneObject, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset);
+		void RenderScene(const double interpolation);
+		void Draw(Transform* transform, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset);
 		void Display();
 
 		void SetViewport();

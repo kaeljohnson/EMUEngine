@@ -64,6 +64,12 @@ namespace Engine
 		ENGINE_CRITICAL_D("PhysicsBody component vector size: " + std::to_string(physicsBodyManager.GetComponents().size()));
 		ENGINE_CRITICAL_D("Transform component vector size: " + std::to_string(transformManager.GetComponents().size()));
 
+		for (auto& sceneObject : m_sceneObjects)
+		{
+			updatableManager.ActivateComponent(sceneObject);
+			physicsBodyManager.ActivateComponent(sceneObject);
+			transformManager.ActivateComponent(sceneObject);
+		}
 
 		AddPhysicsBodiesToWorld();
 	}
@@ -74,14 +80,21 @@ namespace Engine
 		auto& physicsBodyManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
 		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>();
 
+		for (auto& sceneObject : m_sceneObjects)
+		{
+			updatableManager.DeactivateComponent(sceneObject);
+			physicsBodyManager.DeactivateComponent(sceneObject);
+			transformManager.DeactivateComponent(sceneObject);
+		}
 
 		DestroyPhysicsWorld();
 	}
 
 	void Scene::AddTileMap(TileMap& tileMap)
 	{
-		tileMap.LoadMap();
-		tileMap.CreateCollisionBodies();
+		// Get a temp vector or tile IDs from the tile map. Both the transforms and the physics bodies.
+		std::vector<size_t> tileMapEntities = tileMap.LoadMap();
+		std::vector<size_t> mapCollisionBodies = tileMap.CreateCollisionBodies();
 
 		ENGINE_INFO_D("Tile map text file size: " + std::to_string(tileMap.m_map.size()));
 		ENGINE_INFO_D("Tile map tile map size: " + std::to_string(tileMap.m_tiles.size()));
@@ -93,6 +106,21 @@ namespace Engine
 			+ std::to_string(m_levelDimensionsInUnits.Y));
 
 		HasTileMap = true;
+
+		for (auto& id : tileMapEntities)
+		{
+			Add(id);
+		}
+
+		for (auto& id : mapCollisionBodies)
+		{
+			Add(id);
+		}
+	}
+
+	void Scene::Add(const size_t sceneObjectID)
+	{
+		m_sceneObjects.push_back(sceneObjectID);
 	}
 
 	void Scene::SetLevelDimensions(const Vector2D<int> levelDimensions)
@@ -107,38 +135,30 @@ namespace Engine
 
 	void Scene::Update()
 	{
-		// ENGINE_CRITICAL_D("Scene Update!");
-		// Faster way to do this? Should only have to update objects
-		// prev values if they have changed. In fact, should only update
-		// objects that have changed in general
+		auto& transforms = ComponentManagerRegistry::GetManager<Transform>().GetComponents();
+		auto& physicsBodies = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponents();
+		auto& updatables = ComponentManagerRegistry::GetManager<Updatable>().GetComponents();
 
-		// Need correct order for updating objects.
-		// Dyanmic bodies must be updated after static.
-
-		// Iterate through every layer for now and update.
-		// In the future we can filter which layers need to be updated each frame.
-		// For instance, if the camera has not moved, we don't need to update the background layer,
-		// or the collision bodies layer, and likely not the entire map layer.
-
-		auto& activeTransforms = ComponentManagerRegistry::GetManager<Transform>().GetComponents();
-		auto& activePhysicsBodies = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponents();
-		auto& activeUpdatables = ComponentManagerRegistry::GetManager<Updatable>().GetComponents();
-
-		for (auto& updatable : activeUpdatables)
+		for (auto& updatable : updatables)
 		{
 			updatable.Update();
 		}
 
-		for (auto& physicsBody : activePhysicsBodies)
+		for (auto& physicsBody : physicsBodies)
 		{
 			physicsBody.Update();
 		}
 
 		m_world->Step(TIME_STEP, 8, 3);
 
-		for (auto& transform : activeTransforms)
+		for (auto& transform : transforms)
 		{	
-			PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(transform.m_id);
+			if (!transform.IsActive())
+			{
+				continue;
+			}
+
+			PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(transform.GetID());
 			if (physicsBody != nullptr)
 			{
 				transform.PrevPosition = physicsBody->GetTopLeftPrevPosition();
@@ -196,6 +216,11 @@ namespace Engine
 	{
 		for (auto& physicsBody : ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponents())
 		{
+			if (!physicsBody.IsActive())
+			{
+				continue;
+			}
+
 			b2Body* body;
 			b2BodyDef bodyDef;
 			b2FixtureDef fixtureDef;

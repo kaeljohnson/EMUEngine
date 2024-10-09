@@ -100,7 +100,7 @@ namespace Engine
 
 			m_cameraManager.m_ptrCurrentCamera->Update(interpolation);
 
-			m_windowRenderer.RenderScene(m_sceneManager.GetCurrentScene(), interpolation);
+			m_windowRenderer.RenderScene(interpolation);
 		}
 	}
 

@@ -56,8 +56,10 @@ namespace Engine
         }
 	}
 
-    void TileMap::LoadMap()
+    std::vector<size_t> TileMap::LoadMap()
     {
+		std::vector<size_t> tileIDs;
+
         for (int y = 0; y < GetHeight(); ++y)
         {
             for (int x = 0; x < GetWidth(); ++x)
@@ -77,20 +79,19 @@ namespace Engine
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)));
 
-                    // m_tiles.emplace_back(
-                    //    tileID,
-                    //    SENSOR,
-					//	Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), 
-                    //        static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
-					//	Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)), 0, true);
+					tileIDs.push_back(tileID);
 				}
 			}
 		}
+
+		return tileIDs;
 	}
 
     // Collision bodies should just be physics bodies, not tiles.
-    void TileMap::CreateCollisionBodies()
+    std::vector<size_t> TileMap::CreateCollisionBodies()
     {
+		std::vector<size_t> collisionBodyIDs;
+
         // Creates collision bodies for the map. This creates a collision body for each block of tiles.
         // 
         // When a tile is moved or removed, the corresponding collision body needs to be updated.
@@ -149,31 +150,18 @@ namespace Engine
 
 					const size_t tileID = IDGenerator::CreateUUID();
 
-					/*ComponentManagerRegistry::GetManager<Transform>().AddComponent(tileID, tileID,
-						Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile),
-							static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
-						Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile),
-							static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)),
-						1.0f, 1.0f, 1.0f);*/
-
                     ComponentManagerRegistry::GetManager<PhysicsBody>().AddComponent(tileID, STATIC, true,
                         Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile),
                             static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile),
                             static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)));
 
-                    // Create the collission body with calculated dimensions
-                    /*m_collisionBodies.emplace_back(
-						tileID,
-                        STATIC,
-                        true,
-                        Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile), 
-                            static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
-                        Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile), 
-                            static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)));*/
+					collisionBodyIDs.push_back(tileID);
                 }
             }
         }
+
+		return collisionBodyIDs;
     }
 
     // Call this sparingly.

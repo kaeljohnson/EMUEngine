@@ -10,6 +10,7 @@
 
 #include "../../include/ComponentManager/ComponentManager.h"
 #include "../../include/Transform.h"
+#include "../../include/Physics/PhysicsBody.h"
 
 namespace Engine
 {
@@ -91,7 +92,7 @@ namespace Engine
 		ptrCurrentCamera = currentCamera;
 	}
 
-	void WindowRenderer::RenderScene(std::shared_ptr<Scene> currentScene, const double interpolation)
+	void WindowRenderer::RenderScene(const double interpolation)
 	{
 
 		ClearScreen();
@@ -104,6 +105,8 @@ namespace Engine
 
 		for (auto& transform : ComponentManagerRegistry::GetManager<Transform>().GetComponents())
 		{
+			if (!transform.IsActive()) continue;
+
 			float objectLeft = transform.Position.X;
 			float objectRight = objectLeft + transform.Dimensions.X;
 			float objectTop = transform.Position.Y;
@@ -142,10 +145,10 @@ namespace Engine
 
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)
-		PhysicsBody* ptrBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(transform->m_id);
+		PhysicsBody* ptrBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(transform->GetID());
 		if (ptrBody == nullptr)
 		{
-			ENGINE_CRITICAL("PhysicsBody not found for Transform with ID: " + std::to_string(transform->m_id));
+			ENGINE_CRITICAL("PhysicsBody not found for Transform with ID: " + std::to_string(transform->GetID()));
 			return;
 		}
 		// ENGINE_CRITICAL_D("Drawing PhysicsBody for Transform with ID: " + std::to_string(transform->m_id));

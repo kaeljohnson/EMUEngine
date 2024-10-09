@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Component.h"
+
 #include "Core.h"
 
 #include <string>
@@ -7,9 +9,9 @@
 
 namespace Engine
 {
-	struct Transform
+	struct Transform : public Component
 	{
-		const size_t m_id;
+		// const size_t m_id;
 
 		Vector2D<float> PrevPosition;
 		Vector2D<float> Position;

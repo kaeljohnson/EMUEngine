@@ -7,13 +7,18 @@
 namespace Engine
 {
 	Updatable::Updatable(size_t id, UpdateCallback callback)
-		: m_id(id), m_callback(callback)
+		: m_callback(callback), Component(id)
 	{
 		ENGINE_CRITICAL_D("Updatable constructor called with ID: " + std::to_string(m_id));
 	}
 
 	void Updatable::Update()
 	{
+		if (!m_isActive)
+		{
+			return;
+		}
+
 		if (m_callback)
 		{
 			m_callback();

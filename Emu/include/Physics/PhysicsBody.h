@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Component.h"
+
 #include "../Core.h"
 #include "../MathUtil.h"
 
@@ -16,11 +18,11 @@ namespace Engine
 	// is not meant to be used by the client. It is not the "entity" or "game object" class. It will not handle
 	// textures or animation.
 
-	class PhysicsBody
+	class PhysicsBody : public Component
 	{
 	public:
 		b2Body* m_body = nullptr;
-		const size_t m_id;
+		// const size_t m_id;
 	private:
 		const BodyType m_bodyType;
 		
