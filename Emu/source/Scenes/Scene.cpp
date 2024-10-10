@@ -251,7 +251,9 @@ namespace Engine
 			}
 
 			bodyDef.fixedRotation = physicsBody.GetIsRotationFixed();
-			bodyDef.userData.pointer = (uintptr_t)&physicsBody;
+
+			bodyDef.userData.pointer = (uintptr_t)&physicsBody; // MUST BE CHANGED IF COMPONENT MANAGER SORTS COMPONENTS
+
 			bodyDef.position.Set(physicsBody.GetStartingPosition().X + physicsBody.GetHalfWidth(), 
 				physicsBody.GetStartingPosition().Y + physicsBody.GetHalfHeight());
 					
