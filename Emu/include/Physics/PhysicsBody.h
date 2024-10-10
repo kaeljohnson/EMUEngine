@@ -24,7 +24,7 @@ namespace Engine
 		b2Body* m_body = nullptr;
 		// const size_t m_id;
 	private:
-		const BodyType m_bodyType;
+		BodyType m_bodyType;
 		
 		// Starting fields for box2d. NOT runtime fields.
 		bool m_isSensor;
@@ -36,12 +36,12 @@ namespace Engine
 		bool m_fixedRotation;
 
 		// State members
-		const float m_halfWidth;
-		const float m_halfHeight;
-		const float m_width;
-		const float m_height;
+		float m_halfWidth;
+		float m_halfHeight;
+		float m_width;
+		float m_height;
 
-		const Vector2D<float> m_startingPosition;
+		Vector2D<float> m_startingPosition;
 		Vector2D<float> m_prevPosition;
 		
 		bool m_fixed;

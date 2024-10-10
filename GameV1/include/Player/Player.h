@@ -30,11 +30,13 @@ public:
 	PlayerState m_currentState;
 	PlayerDirection m_currentDirection;
 
-	Engine::Transform* m_transform;
-	Engine::PhysicsBody* m_physicsBody;
-	Engine::Updatable* m_updatable;
+	// Engine::Transform* m_transform;
+	// Engine::PhysicsBody* m_physicsBody;
+	// Engine::Updatable* m_updatable;
 
 private:
+	const size_t m_entityID;
+
 	bool m_canJump;
 	float m_jumpCharge;
 	float m_coyoteTime;
@@ -52,16 +54,16 @@ private:
 	Engine::EventType m_moveRightKeyUp;
 
 private:
-	void UpdateMovement();
-	void TransitionToState(PlayerState newState);
+	void UpdateMovement(Engine::PhysicsBody* physicsBodyComponent);
+	void TransitionToState(PlayerState newState, Engine::PhysicsBody* physicsBodyComponent);
 
 	void beginIdle();
 	void updateIdle();
 	void endIdle();
 
-	void startHorizontalMove();
-	void updateHorizontalMove();
-	void endHorizontalMove();
+	void startHorizontalMove(Engine::PhysicsBody* physicsBodyComponent);
+	void updateHorizontalMove(Engine::PhysicsBody* physicsBodyComponent);
+	void endHorizontalMove(Engine::PhysicsBody* physicsBodyComponent);
 
 
 	void beginJump();

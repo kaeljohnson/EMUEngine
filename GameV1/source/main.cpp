@@ -45,7 +45,7 @@ int main(int argc, char* args[])
 
 	PlayerCamera playerCamera;
 	playerCamera.SetPixelsPerUnit(32);
-	playerCamera.SetCameraTarget(player.m_transform);
+	playerCamera.SetCameraTarget(Engine::ComponentManagerRegistry::GetManager<Engine::Transform>().GetComponent(playerEntity));
 
 	refCameraManager.SetCurrentCamera(&playerCamera);
 

@@ -21,7 +21,7 @@ namespace Engine
 
     public:
         // const size_t m_id;
-        const UpdateCallback m_callback;
+        UpdateCallback m_callback;
 
         void Update();
     };

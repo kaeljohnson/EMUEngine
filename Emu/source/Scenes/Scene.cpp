@@ -71,6 +71,11 @@ namespace Engine
 			transformManager.ActivateComponent(sceneObject);
 		}
 
+		updatableManager.PoolActiveComponents();
+		physicsBodyManager.PoolActiveComponents();
+		transformManager.PoolActiveComponents();
+
+		// Physics bodies need to be added to the world after they are activated and pooled.
 		AddPhysicsBodiesToWorld();
 	}
 
