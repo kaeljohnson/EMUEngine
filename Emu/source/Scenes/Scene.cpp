@@ -38,7 +38,7 @@ namespace Engine
 		while (body != nullptr)
 		{
 			b2Body* nextBody = body->GetNext();
-			PhysicsBody* ptrBody = reinterpret_cast<PhysicsBody*>(body->GetUserData().pointer);
+			PhysicsBody* ptrBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(body->GetUserData().pointer);
 			ptrBody->RemoveBodyFromWorld();
 			body = nextBody;
 		}
@@ -252,7 +252,7 @@ namespace Engine
 
 			bodyDef.fixedRotation = physicsBody.GetIsRotationFixed();
 
-			bodyDef.userData.pointer = (uintptr_t)&physicsBody; // MUST BE CHANGED IF COMPONENT MANAGER SORTS COMPONENTS
+			bodyDef.userData.pointer = physicsBody.GetID(); // NOTE: This is the entity ID of the physics body. Not a pointer to the physics body.
 
 			bodyDef.position.Set(physicsBody.GetStartingPosition().X + physicsBody.GetHalfWidth(), 
 				physicsBody.GetStartingPosition().Y + physicsBody.GetHalfHeight());

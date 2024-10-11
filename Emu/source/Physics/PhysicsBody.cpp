@@ -137,7 +137,8 @@ namespace Engine
 					otherBody = edge->contact->GetFixtureA()->GetBody();
 				}
 								
-				PhysicsBody* otherPhysicsBody = reinterpret_cast<PhysicsBody*>(otherBody->GetUserData().pointer);
+				PhysicsBody* otherPhysicsBody = 
+					ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(otherBody->GetUserData().pointer);
 
 				// Assuming the first point's normal is representative for the whole contact
 				b2Vec2 normal = worldManifold.normal;

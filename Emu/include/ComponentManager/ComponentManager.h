@@ -88,10 +88,7 @@ namespace Engine
 
         T* GetComponent(size_t id) 
         {
-			if (m_idToIndex.find(id) == m_idToIndex.end())
-			{
-				return nullptr;
-			}
+			// Call HasComponent first to check if the component exists
             return &m_components[m_idToIndex[id]];
         }
 
@@ -111,14 +108,9 @@ namespace Engine
             {
                 if (m_components[i].IsActive())
                 {
-                    ENGINE_CRITICAL_D("num active components: " 
-                        + std::to_string(m_activeComponentCount) + ", size of components array: " + std::to_string(m_components.size()));
-                    // Manually swap the elements
-                    T temp = std::move(m_components[i]);
+                    T temp = std::move(m_components[i]); // Will create copy which will be destroyed.
                     m_components[i] = std::move(m_components[m_activeComponentCount]);
                     m_components[m_activeComponentCount] = std::move(temp);
-
-                    ENGINE_CRITICAL_D("UH OFFFF");
 
                     // Update the index of the component
                     m_idToIndex[m_components[m_activeComponentCount].GetID()] = m_activeComponentCount;
