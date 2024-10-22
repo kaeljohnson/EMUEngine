@@ -14,4 +14,7 @@ public:
 protected:
 	size_t m_id;
 	bool m_isActive = false;
+
+	bool m_isLastActive = false;
+	size_t m_layerIdx = 0;
 };
