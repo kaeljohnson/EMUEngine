@@ -140,6 +140,7 @@ namespace Engine
 
 	void Scene::Update()
 	{
+		// Should move some of this logic to ECS itself?
 		auto& transforms = ComponentManagerRegistry::GetManager<Transform>().GetComponents();
 		auto& physicsBodies = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponents();
 		auto& updatables = ComponentManagerRegistry::GetManager<Updatable>().GetComponents();
@@ -147,11 +148,13 @@ namespace Engine
 		for (auto& updatable : updatables)
 		{
 			updatable.Update();
+			if (updatable.IsLastActive()) break;
 		}
 
 		for (auto& physicsBody : physicsBodies)
 		{
 			physicsBody.Update();
+			if (physicsBody.IsLastActive()) break;
 		}
 
 		m_world->Step(TIME_STEP, 8, 3);
@@ -161,6 +164,7 @@ namespace Engine
 			if (!transform.IsActive())
 			{
 				continue;
+
 			}
 
 			PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(transform.GetID());
@@ -171,6 +175,8 @@ namespace Engine
 				transform.Dimensions = physicsBody->GetDimensions();
 				transform.Rotation = physicsBody->GetAngleInDegrees();
 			}
+
+			if (transform.IsLastActive()) break;
 		}
 	};
 

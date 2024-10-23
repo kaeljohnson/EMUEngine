@@ -82,6 +82,7 @@ namespace Engine
             if (m_idToIndex.find(id) != m_idToIndex.end())
             {
                 m_components[m_idToIndex[id]].SetActive(false);
+				m_components[m_idToIndex[id]].SetLastActive(false);
 				m_activeComponentCount--;
             }
         }
@@ -121,9 +122,17 @@ namespace Engine
                     
                 }
 
-                if (m_activeComponentCount == m_components.size()) return;
+                if (m_activeComponentCount == m_components.size()) break;
             }
+
+			if (m_activeComponentCount > 0)
+			    m_components[m_activeComponentCount - 1].SetLastActive(true);
         }
+
+		const size_t GetActiveComponentCount() const
+		{
+			return m_activeComponentCount;
+		}
 
 		void Allocate(size_t size)
 		{

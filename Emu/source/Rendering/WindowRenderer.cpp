@@ -119,6 +119,8 @@ namespace Engine
 			{
 				Draw(&transform, ptrCurrentCamera->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
 			}
+
+			if (transform.IsLastActive()) break;
 		}
 
 		Display();

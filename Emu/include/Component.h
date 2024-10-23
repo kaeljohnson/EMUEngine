@@ -8,8 +8,11 @@ public:
 
 	inline const size_t GetID() const { return m_id; }
 	inline const bool IsActive() const { return m_isActive; }
+	inline const bool IsLastActive() const { return m_isLastActive; }
+	inline const size_t GetLayerIdx() const { return m_layerIdx; }
 
 	inline void SetActive(const bool active) { m_isActive = active; }
+	inline void SetLastActive(const bool lastActive) { m_isLastActive = lastActive; }
 
 protected:
 	size_t m_id;
