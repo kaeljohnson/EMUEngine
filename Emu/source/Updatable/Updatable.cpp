@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../include/ComponentManager/Updatable.h"
+#include "../../include/Updatable/Updatable.h"
 
 #include "../../include/Logging/Logger.h"
 

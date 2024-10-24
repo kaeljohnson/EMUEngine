@@ -118,6 +118,40 @@ namespace Engine
             }
         }
 
+        void RemoveComponent(size_t id)
+        {
+            if (m_idToIndex.find(id) == m_idToIndex.end()) 
+            {
+                return; // Component doesn't exist
+            }
+
+            size_t indexToRemove = m_idToIndex[id];
+
+			if (!m_components[indexToRemove].IsActive())
+			{
+				std::swap(m_components[indexToRemove], m_components[m_components.size() - 1]);
+				m_idToIndex[m_components[indexToRemove].GetID()] = indexToRemove;
+                return;
+			}
+
+            // Component Active Case
+			// shift all active components to the left
+			// Once all active components are shifted, decrement the active component count
+			// swap the now empty slot with the last component
+			// remove the last component
+			for (size_t i = indexToRemove; i < m_activeComponentCount - 1; ++i)
+			{
+				std::swap(m_components[i], m_components[i + 1]);
+				m_idToIndex[m_components[i].GetID()] = i;
+			}
+
+			m_idToIndex.erase(id);
+			m_components.pop_back();
+			--m_activeComponentCount;
+        }
+
+
+
         T* GetComponent(size_t id) 
         {
 			// Call HasComponent first to check if the component exists

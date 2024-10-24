@@ -20,12 +20,12 @@
 #include "../include/Camera/ScrollingCamera.h"
 #include "../include/Camera/TargetCamera.h"
 
-#include "../include/IDGenerator.h"
+#include "../include/ECS/EntityManager.h"
 #include "../include/MathUtil.h"
 
 #include "../include/Transform.h"
-#include "../include/ComponentManager/Updatable.h"
-#include "../include/ComponentManager/ComponentManager.h"
+#include "../include/Updatable/Updatable.h"
+#include "../include/ECS/ComponentManager.h"
 
 namespace Engine
 {

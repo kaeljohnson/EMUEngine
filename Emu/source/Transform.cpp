@@ -5,7 +5,7 @@
 #include "../include/Logging/Logger.h"
 
 #include "../Include/Transform.h"
-#include "../include/ComponentManager/ComponentManager.h"
+#include "../include/ECS/ComponentManager.h"
 
 
 namespace Engine

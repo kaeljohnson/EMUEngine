@@ -5,8 +5,8 @@
 
 #include "../../include/Tiles/TileMap.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/IDGenerator.h"
-#include "../../include/ComponentManager/ComponentManager.h"
+#include "../../include/ECS/EntityManager.h"
+#include "../../include/ECS/ComponentManager.h"
 #include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Transform.h"
 
@@ -67,7 +67,7 @@ namespace Engine
                 if (GetTile(x, y) != '-')
                 {
                     // Might need to add this to an array?
-                    const size_t tileID = IDGenerator::CreateUUID();
+                    const size_t tileID = EntityManager::CreateEntity();
 
                     // Create "Tiles"
                     ComponentManagerRegistry::GetManager<Transform>().AddComponent(tileID,
@@ -148,7 +148,7 @@ namespace Engine
                         }
                     }
 
-					const size_t tileID = IDGenerator::CreateUUID();
+					const size_t tileID = EntityManager::CreateEntity();
 
                     ComponentManagerRegistry::GetManager<PhysicsBody>().AddComponent(tileID, STATIC, true,
                         Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile),

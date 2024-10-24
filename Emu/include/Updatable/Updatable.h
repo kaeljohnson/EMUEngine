@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../Component.h"
+#include "../ECS/Component.h"
 
 #include "../Core.h"
 
 #include <functional>
 
-#include "ComponentManager.h"
+#include "../ECS/ComponentManager.h"
 
 namespace Engine
 { 

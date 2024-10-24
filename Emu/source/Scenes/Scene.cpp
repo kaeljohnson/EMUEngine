@@ -11,8 +11,8 @@
 #include "../../include/Tiles/Tile.h"
 #include "../../include/MathUtil.h"
 #include "../../include/Transform.h"
-#include "../../include/ComponentManager/ComponentManager.h"
-#include "../../include/ComponentManager/Updatable.h"
+#include "../../include/ECS/ComponentManager.h"
+#include "../../include/Updatable/Updatable.h"
 
 namespace Engine
 {
@@ -158,8 +158,6 @@ namespace Engine
 				ptrTransform->Dimensions = physicsBody->GetDimensions();
 				ptrTransform->Rotation = physicsBody->GetAngleInDegrees();
 			}
-
-			if (ptrTransform->IsLastActive()) break;
 		}
 	};
 

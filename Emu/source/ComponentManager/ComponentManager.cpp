@@ -2,9 +2,9 @@
 
 #include "../../include/Transform.h"
 #include "../../include/Physics/PhysicsBody.h"
-#include "../../include/ComponentManager/Updatable.h"
+#include "../../include/Updatable/Updatable.h"
 
-#include "../../include/ComponentManager/ComponentManager.h"
+#include "../../include/ECS/ComponentManager.h"
 
 #define INSTANTIATE_GET_MANAGER(T) template ComponentManager<T>& ComponentManagerRegistry::GetManager<T>();
 

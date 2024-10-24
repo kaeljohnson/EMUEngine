@@ -30,12 +30,12 @@ int main(int argc, char* args[])
 	Engine::TileMap testMap("testMap1.txt", 1);
 	scene->AddTileMap(testMap);
 	
-	const Engine::Entity playerEntity = Engine::IDGenerator::CreateUUID();
+	const Engine::Entity playerEntity = Engine::EntityManager::CreateEntity();
 	scene->Add(playerEntity);
 	CLIENT_CRITICAL_D("Player ID: " + std::to_string(playerEntity));
 	Player player(playerEntity, 6.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 
-	const Engine::Entity player2ID = Engine::IDGenerator::CreateUUID();
+	const Engine::Entity player2ID = Engine::EntityManager::CreateEntity();
 	Player player2(player2ID, 2.0f, 2.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 	// scene2->Add(player2ID);
 

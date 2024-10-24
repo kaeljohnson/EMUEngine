@@ -6,7 +6,7 @@
 #include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/BodyTypes.h"
-#include "../../include/ComponentManager/ComponentManager.h"
+#include "../../include/ECS/ComponentManager.h"
 
 #include "box2d/box2d.h"
 

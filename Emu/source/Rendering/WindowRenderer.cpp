@@ -8,7 +8,7 @@
 #include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Rendering/WindowRenderer.h"
 
-#include "../../include/ComponentManager/ComponentManager.h"
+#include "../../include/ECS/ComponentManager.h"
 #include "../../include/Transform.h"
 #include "../../include/Physics/PhysicsBody.h"
 
