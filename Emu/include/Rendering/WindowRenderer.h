@@ -21,7 +21,7 @@ namespace Engine
 		~WindowRenderer();
 
 		void RenderScene(const double interpolation);
-		void Draw(Transform* transform, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset);
+		void Draw(Transform& transform, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset);
 		void Display();
 
 		void SetViewport();

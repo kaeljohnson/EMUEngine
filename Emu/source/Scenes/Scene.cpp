@@ -64,16 +64,9 @@ namespace Engine
 		ENGINE_CRITICAL_D("PhysicsBody component vector size: " + std::to_string(physicsBodyManager.GetComponents().size()));
 		ENGINE_CRITICAL_D("Transform component vector size: " + std::to_string(transformManager.GetComponents().size()));
 
-		for (auto& sceneObject : m_sceneObjects)
-		{
-			updatableManager.ActivateComponent(sceneObject);
-			physicsBodyManager.ActivateComponent(sceneObject);
-			transformManager.ActivateComponent(sceneObject);
-		}
-
-		updatableManager.PoolActiveComponents();
-		physicsBodyManager.PoolActiveComponents();
-		transformManager.PoolActiveComponents();
+		updatableManager.ActivateComponents(m_sceneObjects);
+		physicsBodyManager.ActivateComponents(m_sceneObjects);
+		transformManager.ActivateComponents(m_sceneObjects);
 
 		// Physics bodies need to be added to the world after they are activated and pooled.
 		AddPhysicsBodiesToWorld();
@@ -85,12 +78,10 @@ namespace Engine
 		auto& physicsBodyManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
 		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>();
 
-		for (auto& sceneObject : m_sceneObjects)
-		{
-			updatableManager.DeactivateComponent(sceneObject);
-			physicsBodyManager.DeactivateComponent(sceneObject);
-			transformManager.DeactivateComponent(sceneObject);
-		}
+		updatableManager.DeactivateComponents(m_sceneObjects);
+		physicsBodyManager.DeactivateComponents(m_sceneObjects);
+		transformManager.DeactivateComponents(m_sceneObjects);
+		
 
 		DestroyPhysicsWorld();
 	}
@@ -141,42 +132,34 @@ namespace Engine
 	void Scene::Update()
 	{
 		// Should move some of this logic to ECS itself?
-		auto& transforms = ComponentManagerRegistry::GetManager<Transform>().GetComponents();
-		auto& physicsBodies = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponents();
-		auto& updatables = ComponentManagerRegistry::GetManager<Updatable>().GetComponents();
+		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>();
+		auto& physicsBodiesManager = ComponentManagerRegistry::GetManager<PhysicsBody>();
+		auto& updatableManager = ComponentManagerRegistry::GetManager<Updatable>();
 
-		for (auto& updatable : updatables)
+		for (auto ptrUpdatable = updatableManager.active_begin(); ptrUpdatable != updatableManager.active_end(); ++ptrUpdatable)
 		{
-			updatable.Update();
-			if (updatable.IsLastActive()) break;
+			ptrUpdatable->Update();
 		}
 
-		for (auto& physicsBody : physicsBodies)
+		for (auto ptrPhysicsBody = physicsBodiesManager.active_begin(); ptrPhysicsBody != physicsBodiesManager.active_end(); ++ptrPhysicsBody)
 		{
-			physicsBody.Update();
-			if (physicsBody.IsLastActive()) break;
+			ptrPhysicsBody->Update();
 		}
 
 		m_world->Step(TIME_STEP, 8, 3);
 
-		for (auto& transform : transforms)
-		{	
-			if (!transform.IsActive())
-			{
-				continue;
-
-			}
-
-			PhysicsBody* physicsBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(transform.GetID());
+		for (auto ptrTransform = transformManager.active_begin(); ptrTransform != transformManager.active_end(); ++ptrTransform)
+		{
+			PhysicsBody* physicsBody = physicsBodiesManager.GetComponent(ptrTransform->GetID());
 			if (physicsBody != nullptr)
 			{
-				transform.PrevPosition = physicsBody->GetTopLeftPrevPosition();
-				transform.Position = physicsBody->GetTopLeftPosition();
-				transform.Dimensions = physicsBody->GetDimensions();
-				transform.Rotation = physicsBody->GetAngleInDegrees();
+				ptrTransform->PrevPosition = physicsBody->GetTopLeftPrevPosition();
+				ptrTransform->Position = physicsBody->GetTopLeftPosition();
+				ptrTransform->Dimensions = physicsBody->GetDimensions();
+				ptrTransform->Rotation = physicsBody->GetAngleInDegrees();
 			}
 
-			if (transform.IsLastActive()) break;
+			if (ptrTransform->IsLastActive()) break;
 		}
 	};
 

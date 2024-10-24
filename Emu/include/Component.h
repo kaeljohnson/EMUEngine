@@ -12,7 +12,6 @@ public:
 	inline const size_t GetLayerIdx() const { return m_layerIdx; }
 
 	inline void SetActive(const bool active) { m_isActive = active; }
-	inline void SetLastActive(const bool lastActive) { m_isLastActive = lastActive; }
 
 protected:
 	size_t m_id;

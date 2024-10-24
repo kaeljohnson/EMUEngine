@@ -103,54 +103,52 @@ namespace Engine
 		float cameraTop = ptrCurrentCamera->m_offset.Y;
 		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->GetPixelsPerUnit());
 
-		for (auto& transform : ComponentManagerRegistry::GetManager<Transform>().GetComponents())
-		{
-			if (!transform.IsActive()) continue;
+		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>();
 
-			float objectLeft = transform.Position.X;
-			float objectRight = objectLeft + transform.Dimensions.X;
-			float objectTop = transform.Position.Y;
-			float objectBottom = objectTop + transform.Dimensions.Y;
+		for (auto ptrTransform = transformManager.active_begin(); ptrTransform != transformManager.active_end(); ++ptrTransform)
+		{
+			float objectLeft = ptrTransform->Position.X;
+			float objectRight = objectLeft + ptrTransform->Dimensions.X;
+			float objectTop = ptrTransform->Position.Y;
+			float objectBottom = objectTop + ptrTransform->Dimensions.Y;
 
 			bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
 				objectBottom >= cameraTop && objectTop <= cameraBottom;
 
 			if (isVisible)
 			{
-				Draw(&transform, ptrCurrentCamera->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
+				Draw(*ptrTransform, ptrCurrentCamera->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
 			}
-
-			if (transform.IsLastActive()) break;
 		}
 
 		Display();
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void WindowRenderer::Draw(Transform* transform, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset)
+	void WindowRenderer::Draw(Transform& transform, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset)
 	{
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
 
 		SDLRect dst
 		{
-			static_cast<int>(round((Lerp(transform->PrevPosition.X, transform->Position.X, 
+			static_cast<int>(round((Lerp(transform.PrevPosition.X, transform.Position.X, 
 				(float)interpolation) - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round((Lerp(transform->PrevPosition.Y, transform->Position.Y, 
+			static_cast<int>(round((Lerp(transform.PrevPosition.Y, transform.Position.Y, 
 				(float)interpolation) - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 
-			static_cast<int>(round(transform->Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round(transform->Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
+			static_cast<int>(round(transform.Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round(transform.Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
 		};
 
-		ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, transform->Rotation, nullptr, SDL_FLIP_NONE);
+		ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
 
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)
-		PhysicsBody* ptrBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(transform->GetID());
+		PhysicsBody* ptrBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(transform.GetID());
 		if (ptrBody == nullptr)
 		{
-			ENGINE_CRITICAL("PhysicsBody not found for Transform with ID: " + std::to_string(transform->GetID()));
+			ENGINE_CRITICAL("PhysicsBody not found for Transform with ID: " + std::to_string(transform.GetID()));
 			return;
 		}
 		// ENGINE_CRITICAL_D("Drawing PhysicsBody for Transform with ID: " + std::to_string(transform->m_id));

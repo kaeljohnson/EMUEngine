@@ -23,6 +23,21 @@ namespace Engine
     class ComponentManager : public ComponentManagerBase
     {
     public:
+        using iterator = typename std::vector<T>::iterator;
+        using const_iterator = typename std::vector<T>::const_iterator;
+
+        // Iterator for all components (begin to end)
+        auto begin() { return m_components.begin(); }
+        auto end() { return m_components.end(); }
+        auto begin() const { return m_components.begin(); }
+        auto end() const { return m_components.end(); }
+
+        // Iterator for active components (from begin to m_activeComponentCount)
+        auto active_begin() { return m_components.begin(); }
+        auto active_end() { return m_components.begin() + m_activeComponentCount; }
+        auto active_begin() const { return m_components.begin(); }
+        auto active_end() const { return m_components.begin() + m_activeComponentCount; }
+
 
         template <typename T>
         void AddComponent(size_t id, const T& component) 
@@ -49,7 +64,6 @@ namespace Engine
         {
             auto argsTuple = std::make_tuple(std::forward<Args>(args)...);
             auto& id = std::get<0>(argsTuple);
-            ENGINE_CRITICAL_D("ADDING COMPONENT: " + std::to_string(id));
             if (m_idToIndex.find(id) != m_idToIndex.end()) 
             {
                 ENGINE_CRITICAL_D("Replacing component with ID: " + std::to_string(id));
@@ -68,22 +82,39 @@ namespace Engine
                 // indexToEntity[newIndex] = entity;
             }
         }
-        
-		void ActivateComponent(size_t id)
+
+		void ActivateComponents(std::vector<size_t>& ids)
 		{
-			if (m_idToIndex.find(id) != m_idToIndex.end())
-			{
-				m_components[m_idToIndex[id]].SetActive(true);
-			}
+            for (auto& id : ids)
+            {
+                if (m_idToIndex.find(id) == m_idToIndex.end()) { continue; }
+
+                size_t currentIndex = m_idToIndex[id];
+
+                // Swap components directly without creating a temporary object
+                std::swap(m_components[currentIndex], m_components[m_activeComponentCount]);
+
+                // Swap indices
+                m_idToIndex[m_components[m_activeComponentCount].GetID()] = currentIndex;
+                m_idToIndex[id] = m_activeComponentCount;
+
+                m_components[m_activeComponentCount].SetActive(true);
+
+                // Increment the count of active components
+                ++m_activeComponentCount;
+            }
+
 		}
 
-        void DeactivateComponent(size_t id)
+        void DeactivateComponents(std::vector<size_t>& ids)
         {
-            if (m_idToIndex.find(id) != m_idToIndex.end())
+            for (auto& id : ids)
             {
-                m_components[m_idToIndex[id]].SetActive(false);
-				m_components[m_idToIndex[id]].SetLastActive(false);
-				m_activeComponentCount--;
+                if (m_idToIndex.find(id) != m_idToIndex.end())
+                {
+                    m_components[m_idToIndex[id]].SetActive(false);
+                    m_activeComponentCount--;
+                }
             }
         }
 
@@ -102,32 +133,6 @@ namespace Engine
 		{
 			return m_components;
 		}
-
-        void PoolActiveComponents()
-        {
-            for (size_t i = 0; i < m_components.size(); i++)
-            {
-                if (m_components[i].IsActive())
-                {
-                    T temp = std::move(m_components[i]); // Will create copy which will be destroyed.
-                    m_components[i] = std::move(m_components[m_activeComponentCount]);
-                    m_components[m_activeComponentCount] = std::move(temp);
-
-                    // Update the index of the component
-                    m_idToIndex[m_components[m_activeComponentCount].GetID()] = m_activeComponentCount;
-                    m_idToIndex[m_components[i].GetID()] = i;
-
-                    // Increment the count of active components
-                    ++m_activeComponentCount;
-                    
-                }
-
-                if (m_activeComponentCount == m_components.size()) break;
-            }
-
-			if (m_activeComponentCount > 0)
-			    m_components[m_activeComponentCount - 1].SetLastActive(true);
-        }
 
 		const size_t GetActiveComponentCount() const
 		{
