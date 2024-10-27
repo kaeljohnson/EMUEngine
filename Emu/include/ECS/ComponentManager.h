@@ -17,6 +17,8 @@ namespace Engine
     {
     public:
         virtual ~ComponentManagerBase() = default;
+		virtual void Allocate(size_t size) = 0;
+		virtual void RemoveComponent(size_t id) = 0;
     };
 
     template <typename T>
@@ -118,7 +120,7 @@ namespace Engine
             }
         }
 
-        void RemoveComponent(size_t id)
+		void RemoveComponent(size_t id) override
         {
             if (m_idToIndex.find(id) == m_idToIndex.end()) 
             {
@@ -173,7 +175,7 @@ namespace Engine
 			return m_activeComponentCount;
 		}
 
-		void Allocate(size_t size)
+		void Allocate(size_t size) override
 		{
 			m_components.reserve(size);
 		}
@@ -186,10 +188,10 @@ namespace Engine
 		size_t m_activeComponentCount = 0;
     };
 
-    class ComponentManagerRegistry 
+    /*class ComponentManagerRegistry 
     {
     public:
         template <typename T>
         EMU_API static ComponentManager<T>& GetManager();
-    };
+    };*/
 }

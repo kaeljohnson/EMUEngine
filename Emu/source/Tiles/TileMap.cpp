@@ -70,12 +70,12 @@ namespace Engine
                     const size_t tileID = EntityManager::CreateEntity();
 
                     // Create "Tiles"
-                    ComponentManagerRegistry::GetManager<Transform>().AddComponent(tileID,
+                    EntityManager::AddComponent<Transform>(tileID,
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)), 
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
                         1.0f, 1.0f, 1.0f);
 
-                    ComponentManagerRegistry::GetManager<PhysicsBody>().AddComponent(tileID, SENSOR, true,
+                    EntityManager::AddComponent<PhysicsBody>(tileID, SENSOR, true,
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)));
 
@@ -150,7 +150,7 @@ namespace Engine
 
 					const size_t tileID = EntityManager::CreateEntity();
 
-                    ComponentManagerRegistry::GetManager<PhysicsBody>().AddComponent(tileID, STATIC, true,
+                    EntityManager::AddComponent<PhysicsBody>(tileID, STATIC, true,
                         Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile),
                             static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile),

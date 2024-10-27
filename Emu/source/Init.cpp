@@ -17,14 +17,17 @@ namespace Engine
 
 	Init::Init()
 	{
+		ENGINE_TRACE_D("Logger initialized!");
+
 		EntityManager::initialize(10000);
 
-		ComponentManagerRegistry::GetManager<Updatable>().Allocate(5000);
-		ComponentManagerRegistry::GetManager<PhysicsBody>().Allocate(5000);
-		ComponentManagerRegistry::GetManager<Transform>().Allocate(5000);
+		// ComponentManagerRegistry::GetManager<Updatable>().Allocate(5000);
+		// ComponentManagerRegistry::GetManager<PhysicsBody>().Allocate(5000);
+		// ComponentManagerRegistry::GetManager<Transform>().Allocate(5000);
 
-
-		ENGINE_TRACE_D("Logger initialized!");
+		EntityManager::RegisterComponentManager<Updatable>();
+		EntityManager::RegisterComponentManager<PhysicsBody>();
+		EntityManager::RegisterComponentManager<Transform>();
 
 		if (!ISDL::ImgInit(IMG_INIT_PNG))
 			ENGINE_CRITICAL("IMG Init failed! SDL_Error: " + std::string(ISDL::GetError()));

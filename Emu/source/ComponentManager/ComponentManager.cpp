@@ -4,23 +4,22 @@
 #include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Updatable/Updatable.h"
 
-#include "../../include/ECS/ComponentManager.h"
-
-#define INSTANTIATE_GET_MANAGER(T) template ComponentManager<T>& ComponentManagerRegistry::GetManager<T>();
+#include "../../include/ECS/EntityManager.h"
 
 namespace Engine
 {
-    
-    template <typename T>
-    ComponentManager<T>& ComponentManagerRegistry::GetManager()
+    std::unordered_map<std::type_index, std::unique_ptr<Engine::ComponentManagerBase>> EntityManager::m_componentManagers;
+
+    /*template <typename T>
+    ComponentManager<T>& EntityManager::GetManager()
     {
         static ComponentManager<T> manager;
         return manager;
-    }
+    }*/
 
-    template EMU_API ComponentManager<Transform>& ComponentManagerRegistry::GetManager<Transform>();
-    template EMU_API ComponentManager<PhysicsBody>& ComponentManagerRegistry::GetManager<PhysicsBody>();
-    template EMU_API ComponentManager<Updatable>& ComponentManagerRegistry::GetManager<Updatable>();
+    template EMU_API ComponentManager<Transform>& EntityManager::GetComponentManager<Transform>();
+    template EMU_API ComponentManager<PhysicsBody>& EntityManager::GetComponentManager<PhysicsBody>();
+    template EMU_API ComponentManager<Updatable>& EntityManager::GetComponentManager<Updatable>();
 
 
     // Explicit template instantiation for the types you need

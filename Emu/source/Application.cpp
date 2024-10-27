@@ -14,6 +14,7 @@
 #include "../include/Scenes/Scene.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Rendering/WindowRenderer.h"
+#include "../include/ECS/EntityManager.h"
 
 namespace Engine
 {
@@ -101,6 +102,12 @@ namespace Engine
 			m_cameraManager.m_ptrCurrentCamera->Update(interpolation);
 
 			m_windowRenderer.RenderScene(interpolation);
+
+			if (running == false)
+			{ 
+				// Cleanup static objects
+				EntityManager::Cleanup();
+			}
 		}
 	}
 

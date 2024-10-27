@@ -8,7 +8,7 @@
 #include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Rendering/WindowRenderer.h"
 
-#include "../../include/ECS/ComponentManager.h"
+#include "../../include/ECS/EntityManager.h"
 #include "../../include/Transform.h"
 #include "../../include/Physics/PhysicsBody.h"
 
@@ -103,7 +103,7 @@ namespace Engine
 		float cameraTop = ptrCurrentCamera->m_offset.Y;
 		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->GetPixelsPerUnit());
 
-		auto& transformManager = ComponentManagerRegistry::GetManager<Transform>();
+		auto& transformManager = EntityManager::GetComponentManager<Transform>();
 
 		for (auto ptrTransform = transformManager.active_begin(); ptrTransform != transformManager.active_end(); ++ptrTransform)
 		{
@@ -145,7 +145,7 @@ namespace Engine
 
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)
-		PhysicsBody* ptrBody = ComponentManagerRegistry::GetManager<PhysicsBody>().GetComponent(transform.GetID());
+		PhysicsBody* ptrBody = EntityManager::GetComponentManager<PhysicsBody>().GetComponent(transform.GetID());
 		if (ptrBody == nullptr)
 		{
 			ENGINE_CRITICAL("PhysicsBody not found for Transform with ID: " + std::to_string(transform.GetID()));

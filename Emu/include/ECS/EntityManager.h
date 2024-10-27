@@ -4,13 +4,9 @@
 #include <random>
 #include <sstream>
 #include <unordered_set>
+#include <typeindex>
 
 #include "../Core.h"
-
-// Can't have this since its depending on exterior files to ECS...
-#include "../Updatable/Updatable.h"
-#include "../Physics/PhysicsBody.h"
-#include "../Transform.h"
 
 #include "ComponentManager.h"
 
@@ -54,17 +50,61 @@ namespace Engine
                 // Recycle the entity ID
                 releaseID(entityId);
 
-                // Should come up with a better way to update components in their respective managers than just calling all the 
-				// possible managers here. This is a temporary solution.
-                ComponentManagerRegistry::GetManager<Updatable>().RemoveComponent(entityId);
-                ComponentManagerRegistry::GetManager<PhysicsBody>().RemoveComponent(entityId);
-                ComponentManagerRegistry::GetManager<Transform>().RemoveComponent(entityId);
+				for (auto& manager : m_componentManagers)
+				{
+					manager.second->RemoveComponent(entityId);
+				}
             }
+        }
+
+		template <typename T>
+		static void RegisterComponentManager()
+		{
+            
+            m_componentManagers[std::type_index(typeid(T))] = std::make_unique<ComponentManager<T>>();
+			m_componentManagers[std::type_index(typeid(T))]->Allocate(maxID);
+		}
+
+		template<typename T>
+        static ComponentManager<T>& GetComponentManager()
+        {
+            auto it = m_componentManagers.find(std::type_index(typeid(T)));
+            if (it != m_componentManagers.end())
+            {
+                return *static_cast<ComponentManager<T>*>(it->second.get());
+            }
+        }
+
+        template <typename T, typename... Args>
+		static void AddComponent(Args&&... args)
+		{
+			auto it = m_componentManagers.find(std::type_index(typeid(T)));
+			if (it != m_componentManagers.end())
+			{
+				static_cast<ComponentManager<T>*>(it->second.get())->AddComponent(std::forward<Args>(args)...);
+			}
+		}
+
+		template <typename T>
+        static void RemoveComponent(Entity entity)
+        {
+            auto it = m_componentManagers.find(std::type_index(typeid(T)));
+            if (it != m_componentManagers.end())
+            {
+                static_cast<ComponentManager<T>*>(it->second.get())->RemoveComponent(entity);
+            }
+        }
+
+		static void Cleanup()
+		{
+			m_componentManagers.clear();
         }
 
     private:
         static Entity maxID;
         static std::unordered_set<size_t> usedIDs;
+
+        EMU_API static std::unordered_map<std::type_index, std::unique_ptr<ComponentManagerBase>> m_componentManagers;
 
         static void releaseID(size_t id)
         {

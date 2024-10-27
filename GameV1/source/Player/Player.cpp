@@ -18,19 +18,19 @@
     {
         // Need to have them be able to set this during construction of physics body.
     	// m_physicsBody->SetStartingFriction(0.0f);
-        Engine::ComponentManagerRegistry::GetManager<Engine::Transform>().AddComponent(id,
+        Engine::EntityManager::AddComponent<Engine::Transform>(id,
             Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f);
 
-        Engine::ComponentManagerRegistry::GetManager<Engine::PhysicsBody>().AddComponent(
+        Engine::EntityManager::AddComponent<Engine::PhysicsBody>(
             id, Engine::BodyType::DYNAMIC, false, Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height));
 
-		Engine::ComponentManagerRegistry::GetManager<Engine::Updatable>().AddComponent(id, [this]() { Update(); });
+		Engine::EntityManager::AddComponent<Engine::Updatable>(id, [this]() { Update(); });
     }
 
     void Player::Update()
     {
 		Engine::PhysicsBody* physicsBodyComponent = 
-            Engine::ComponentManagerRegistry::GetManager<Engine::PhysicsBody>().GetComponent(m_entityID);
+            Engine::EntityManager::GetComponentManager<Engine::PhysicsBody>().GetComponent(m_entityID);
 
 		if (physicsBodyComponent == nullptr)
 		{
@@ -69,7 +69,7 @@
     void Player::UpdateMovement(Engine::PhysicsBody* physicsBodyComponent)
     {
 		Engine::Transform* transformComponent =
-			Engine::ComponentManagerRegistry::GetManager<Engine::Transform>().GetComponent(m_entityID);
+			Engine::EntityManager::GetComponentManager<Engine::Transform>().GetComponent(m_entityID);
 
         float currentVelocityX = physicsBodyComponent->GetVelocity().X;
 
