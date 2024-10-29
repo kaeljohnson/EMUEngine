@@ -8,6 +8,7 @@
 #include "../include/Transform.h"
 #include "../include/Physics/PhysicsBody.h"
 #include "../include/Updatable/Updatable.h"
+#include "../include/Camera/Camera.h"
 
 namespace Engine
 {
@@ -28,6 +29,7 @@ namespace Engine
 		EntityManager::RegisterComponentManager<Updatable>();
 		EntityManager::RegisterComponentManager<PhysicsBody>();
 		EntityManager::RegisterComponentManager<Transform>();
+		EntityManager::RegisterComponentManager<Camera>();
 
 		if (!ISDL::ImgInit(IMG_INIT_PNG))
 			ENGINE_CRITICAL("IMG Init failed! SDL_Error: " + std::string(ISDL::GetError()));

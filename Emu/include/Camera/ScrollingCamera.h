@@ -5,20 +5,20 @@
 
 #include "Camera.h"
 
-namespace Engine
-{
-	class ScrollingCamera : public Camera
-	{
-	public:
-		EMU_API ScrollingCamera();
-		EMU_API void SetScrollingSpeeds(const Vector2D<float> scrollSpeed);
-
-		~ScrollingCamera() = default;
-
-	public:
-		void Update(const double interpolation) override;
-
-	private:
-		Vector2D<float> m_scrollSpeed;
-	};
-}
+//namespace Engine
+//{
+//	class ScrollingCamera : public Camera
+//	{
+//	public:
+//		EMU_API ScrollingCamera();
+//		EMU_API void SetScrollingSpeeds(const Vector2D<float> scrollSpeed);
+//
+//		~ScrollingCamera() = default;
+//
+//	public:
+//		void Update(const double interpolation) override;
+//
+//	private:
+//		Vector2D<float> m_scrollSpeed;
+//	};
+//}

@@ -35,7 +35,6 @@ namespace Engine
 
 	PhysicsBody::~PhysicsBody()
 	{
-		ENGINE_INFO_D("PhysicsBody destroyed with ID: " + std::to_string(m_id));
 		RemoveBodyFromWorld();
 	}
 

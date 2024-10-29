@@ -12,14 +12,18 @@
 #include "../include/Events/EventManager.h"
 #include "../include/Events/EventDispatcher.h"
 #include "../include/Scenes/Scene.h"
+#include "../include/Time.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Rendering/WindowRenderer.h"
 #include "../include/ECS/EntityManager.h"
+#include "../include/Updatable/Updatable.h"
 
 namespace Engine
 {
 	// Application singleton.
 	Application* Application::instance = nullptr;
+
+	float Time::INTERPOLATION_FACTOR = 0.0f;
 
 	Application* Application::GetInstance()
 	{
@@ -46,7 +50,7 @@ namespace Engine
 		// Once sceme manager exists, this function will be a generic run funcion that queries the scene manager for the current scene.
 		// Will need to add more functionality in here to handle scene switching.
 
-		m_windowRenderer.SetCamera(m_cameraManager.m_ptrCurrentCamera);
+		// m_windowRenderer.SetCamera(m_cameraManager.m_ptrCurrentCamera);
 
 		running = true;
 
@@ -59,7 +63,7 @@ namespace Engine
 
 		double newTime = 0.0;
 		double frameTime = 0.0;
-		double interpolation = 0.0;
+		float interpolation = 0.0;
 
 		// Application loop.
 		while (running)
@@ -76,8 +80,10 @@ namespace Engine
 			if (m_sceneManager.IsNewSceneStarting())
 			{
 				// Camera frames current scene.
-				m_cameraManager.m_ptrCurrentCamera->Frame(Vector2D<int>(m_sceneManager.GetCurrentScene()->GetLevelWidth(), 
+				EntityManager::GetComponentManager<Camera>().GetComponent(m_cameraManager.m_currentCameraEntityID)->Frame(Vector2D<int>(m_sceneManager.GetCurrentScene()->GetLevelWidth(),
 					m_sceneManager.GetCurrentScene()->GetLevelHeight()));
+				EntityManager::GetComponentManager<Camera>().GetComponent(m_cameraManager.m_currentCameraEntityID)->SetActive(true);
+				EntityManager::GetComponentManager<Updatable>().GetComponent(m_cameraManager.m_currentCameraEntityID)->SetActive(true);
 				m_sceneManager.NewSceneStarted();
 			}
 
@@ -94,14 +100,16 @@ namespace Engine
 				
 				m_sceneManager.GetCurrentScene()->Update();
 				
+				
 				accumulator -= timeStep;
 			}
 
 			interpolation = accumulator / timeStep;
+			Time::INTERPOLATION_FACTOR = interpolation;
 
-			m_cameraManager.m_ptrCurrentCamera->Update(interpolation);
+			EntityManager::GetComponentManager<Updatable>().GetComponent(m_cameraManager.m_currentCameraEntityID)->Update();
 
-			m_windowRenderer.RenderScene(interpolation);
+			m_windowRenderer.RenderScene(m_cameraManager.m_currentCameraEntityID, interpolation);
 
 			if (running == false)
 			{ 

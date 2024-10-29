@@ -10,7 +10,7 @@ namespace Engine
 	class CameraManager
 	{
 	public:
-		EMU_API void SetCurrentCamera(Camera* ptrCamera);
+		EMU_API void SetCurrentCamera(const size_t cameraEntityID);
 
 	public:
 		CameraManager();
@@ -22,6 +22,6 @@ namespace Engine
 		CameraManager& operator=(CameraManager&&) = delete;
 
 	public:
-		Camera* m_ptrCurrentCamera;
+		size_t m_currentCameraEntityID;
 	};
 }

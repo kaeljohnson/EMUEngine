@@ -72,7 +72,11 @@ namespace Engine
             if (it != m_componentManagers.end())
             {
                 return *static_cast<ComponentManager<T>*>(it->second.get());
-            }
+			}
+			else
+			{
+				throw std::runtime_error("Error: Component Manager not found.");
+			}
         }
 
         template <typename T, typename... Args>

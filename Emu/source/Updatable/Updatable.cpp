@@ -29,8 +29,5 @@ namespace Engine
 		}
 	}
 
-	Updatable::~Updatable()
-	{
-		ENGINE_INFO_D("In updatable destructor: " + std::to_string(m_id));
-	}
+	Updatable::~Updatable() {}
 }

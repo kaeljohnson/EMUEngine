@@ -6,8 +6,6 @@
 
 #include "Screen.h"
 
-#include "../Camera/Camera.h"
-
 #include "../Transform.h"
 
 namespace Engine
@@ -20,12 +18,11 @@ namespace Engine
 		WindowRenderer();
 		~WindowRenderer();
 
-		void RenderScene(const double interpolation);
+		void RenderScene(const size_t currentEntityID, const double interpolation);
 		void Draw(Transform& transform, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset);
 		void Display();
 
 		void SetViewport();
-		void SetCamera(Camera* refCurrentCamera);
 		void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
 		void ToggleFullscreen();
 
@@ -36,8 +33,6 @@ namespace Engine
 	public:
 		void* m_ptrWindow;
 		void* m_ptrRenderer;
-
-		Camera* ptrCurrentCamera;
 
 		bool m_rendererCreated;
 	};

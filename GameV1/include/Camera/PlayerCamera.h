@@ -2,10 +2,10 @@
 
 #include <Engine.h>
 
-class PlayerCamera : public Engine::TargetCamera
+class PlayerCamera // : public Engine::TargetCamera
 {
 public:
-	PlayerCamera();
+	PlayerCamera(const Engine::Entity entityID, const Engine::Entity playerEntityID);
 	~PlayerCamera() = default;
 
 	void SetTargetSmoothingFactor(const float smoothingFactor);
@@ -15,10 +15,15 @@ public:
 	void SetBottomTargetScreenBound(const float screenBound);
 	void SetLookAheadFactor(const float lookAhead);
 
-	 void Update(const double interpolation) override;
+	// void Update(const double interpolation) override;
+	void Update();
 
 
 private:
+	const Engine::Entity m_entityID;
+
+	const Engine::Entity m_cameraTargetEntityID;
+
 	bool m_smoothingOn;
 	float m_lookAhead;
 	float m_lookAheadFactor;

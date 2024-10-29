@@ -6,8 +6,8 @@
 
 namespace Engine
 {
-	Camera::Camera() : m_pixelsPerUnit(32), 
-		m_offset(0, 0), m_size(0, 0), m_clampingOn(true) {}
+	Camera::Camera(const size_t entityID) : m_pixelsPerUnit(32), 
+		m_offset(0, 0), m_size(0, 0), m_clampingOn(true), Component(entityID) {}
 
 	void Camera::SetPixelsPerUnit(const int pixelsPerUnit)
 	{
@@ -45,5 +45,5 @@ namespace Engine
 		if (m_offset.Y + m_size.Y > m_mapBounds.Y) { m_offset.Y = m_mapBounds.Y - m_size.Y; }
 	}
 
-	void Camera::Update(double interpolation) {}
+	// void Camera::Update(double interpolation) {}
 }

@@ -43,11 +43,11 @@ int main(int argc, char* args[])
 	//scrollCamera.SetScrollingSpeeds(Engine::Vector2D<float>(0.0005f, 0.0f));
 	//scrollCamera.SetCameraPosition(Engine::Vector2D<float>(0.0f, 38.5f));
 
-	PlayerCamera playerCamera;
-	playerCamera.SetPixelsPerUnit(32);
-	playerCamera.SetCameraTarget(Engine::EntityManager::GetComponentManager<Engine::Transform>().GetComponent(playerEntity));
+	const Engine::Entity cameraEntityID = Engine::EntityManager::CreateEntity();
+	PlayerCamera playerCamera(cameraEntityID, playerEntity);
+	refCameraManager.SetCurrentCamera(cameraEntityID);
 
-	refCameraManager.SetCurrentCamera(&playerCamera);
+	// refCameraManager.SetCurrentCamera(&playerCamera);
 
 	//// scene2->AddLayer(MAP_LAYER);
 	//// scene2->AddLayer(PLAYER_LAYER);
@@ -60,7 +60,7 @@ int main(int argc, char* args[])
 
 	refSceneManager.LoadScene("Level1");
 
-	AppManagementEventHandlers appManagementEventHandlers(refEventManager, playerCamera);
+	AppManagementEventHandlers appManagementEventHandlers(refEventManager, cameraEntityID);
 
 	ptrAppInstance->Start();
 	// Need to figure out how to change scenes, stop scenes, etc.

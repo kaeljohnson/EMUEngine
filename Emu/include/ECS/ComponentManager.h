@@ -64,6 +64,7 @@ namespace Engine
         template<typename... Args>
         void AddComponent(Args&&... args) 
         {
+			ENGINE_CRITICAL_D("Adding component with ID: " + std::to_string(std::get<0>(std::make_tuple(std::forward<Args>(args)...))));
             auto argsTuple = std::make_tuple(std::forward<Args>(args)...);
             auto& id = std::get<0>(argsTuple);
             if (m_idToIndex.find(id) != m_idToIndex.end()) 

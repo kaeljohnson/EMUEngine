@@ -11,6 +11,9 @@
 #include "../../include/ECS/EntityManager.h"
 #include "../../include/Transform.h"
 #include "../../include/Physics/PhysicsBody.h"
+#include "../../include/Camera/Camera.h"
+
+#include "../../include/Time.h"
 
 namespace Engine
 {
@@ -21,7 +24,7 @@ namespace Engine
 	Vector2D<int> Screen::SCREEN_SIZE = Vector2D<int>(0, 0);
 	Vector2D<int> Screen::VIRTUAL_SIZE = Vector2D<int>(1280, 720);
 
-	WindowRenderer::WindowRenderer() : m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), ptrCurrentCamera(nullptr)
+	WindowRenderer::WindowRenderer() : m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr)
 	{
 		ENGINE_CRITICAL("Creating Renderer");
 
@@ -87,13 +90,10 @@ namespace Engine
 			});
 	}
 
-	void WindowRenderer::SetCamera(Camera* currentCamera)
+	void WindowRenderer::RenderScene(const size_t currentCameraEntityID, const double interpolation)
 	{
-		ptrCurrentCamera = currentCamera;
-	}
 
-	void WindowRenderer::RenderScene(const double interpolation)
-	{
+		Camera* ptrCurrentCamera = EntityManager::GetComponentManager<Camera>().GetComponent(currentCameraEntityID);
 
 		ClearScreen();
 

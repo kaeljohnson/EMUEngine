@@ -15,6 +15,7 @@
 #include "../include/Tiles/TileMap.h"
 
 #include "../include/Rendering/Screen.h"
+#include "../include/Time.h"
 
 #include "../include/Camera/Camera.h"
 #include "../include/Camera/ScrollingCamera.h"
