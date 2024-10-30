@@ -11,8 +11,6 @@ namespace Engine
 {
 	struct Transform : public Component
 	{
-		// const size_t m_id;
-
 		Vector2D<float> PrevPosition;
 		Vector2D<float> Position;
 		Vector2D<float> Velocity;

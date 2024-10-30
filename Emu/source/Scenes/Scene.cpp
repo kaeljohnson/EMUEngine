@@ -2,7 +2,6 @@
 
 #include "box2d/box2d.h"
 
-#include "../../include/EngineConstants.h"
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/PhysicsBody.h"
@@ -13,6 +12,7 @@
 #include "../../include/Transform.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Updatable/Updatable.h"
+#include "../../include/Time.h"
 
 namespace Engine
 {
@@ -64,9 +64,9 @@ namespace Engine
 		ENGINE_CRITICAL_D("PhysicsBody component vector size: " + std::to_string(physicsBodyManager.GetComponents().size()));
 		ENGINE_CRITICAL_D("Transform component vector size: " + std::to_string(transformManager.GetComponents().size()));
 
-		updatableManager.ActivateComponents(m_sceneObjects);
-		physicsBodyManager.ActivateComponents(m_sceneObjects);
-		transformManager.ActivateComponents(m_sceneObjects);
+		updatableManager.ActivateComponents(m_entityIDs);
+		physicsBodyManager.ActivateComponents(m_entityIDs);
+		transformManager.ActivateComponents(m_entityIDs);
 
 		// Physics bodies need to be added to the world after they are activated and pooled.
 		AddPhysicsBodiesToWorld();
@@ -78,9 +78,9 @@ namespace Engine
 		auto& physicsBodyManager = ECS::GetComponentManager<PhysicsBody>();
 		auto& transformManager = ECS::GetComponentManager<Transform>();
 
-		updatableManager.DeactivateComponents(m_sceneObjects);
-		physicsBodyManager.DeactivateComponents(m_sceneObjects);
-		transformManager.DeactivateComponents(m_sceneObjects);
+		updatableManager.DeactivateComponents(m_entityIDs);
+		physicsBodyManager.DeactivateComponents(m_entityIDs);
+		transformManager.DeactivateComponents(m_entityIDs);
 		
 
 		DestroyPhysicsWorld();
@@ -114,9 +114,9 @@ namespace Engine
 		}
 	}
 
-	void Scene::Add(const size_t sceneObjectID)
+	void Scene::Add(const size_t entityID)
 	{
-		m_sceneObjects.push_back(sceneObjectID);
+		m_entityIDs.push_back(entityID);
 	}
 
 	void Scene::SetLevelDimensions(const Vector2D<int> levelDimensions)
@@ -146,7 +146,7 @@ namespace Engine
 			ptrPhysicsBody->Update();
 		}
 
-		m_world->Step(TIME_STEP, 8, 3);
+		m_world->Step(Time::GetTimeStep(), 8, 3);
 
 		for (auto ptrTransform = transformManager.active_begin(); ptrTransform != transformManager.active_end(); ++ptrTransform)
 		{

@@ -218,7 +218,7 @@
 
         if (!m_onGround)
         {
-            m_coyoteTime += TIME_STEP;
+            m_coyoteTime += Engine::Time::GetTimeStep();
         }
         else
         {

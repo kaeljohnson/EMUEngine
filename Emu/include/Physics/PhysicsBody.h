@@ -59,7 +59,8 @@ namespace Engine
 
 	public:
 		EMU_API PhysicsBody(const size_t id);
-		EMU_API PhysicsBody(const size_t id, const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size);
+		EMU_API PhysicsBody(const size_t id, const BodyType bodyType, const bool fixed, 
+			const Vector2D<float> position, const Vector2D<float> size);
 
 		EMU_API ~PhysicsBody();
 

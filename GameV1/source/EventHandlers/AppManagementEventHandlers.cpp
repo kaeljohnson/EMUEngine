@@ -5,7 +5,7 @@
 #include "../../include/EventHandlers/AppManagementEventHandlers.h"
 
 
-AppManagementEventHandlers::AppManagementEventHandlers(Engine::EventManager& eventManager, const size_t cameraEntityID) 
+AppManagementEventHandlers::AppManagementEventHandlers(Engine::EventManager& eventManager, const Engine::EntityID cameraEntityID) 
 {
 	eventManager.RegisterEventHandler(Engine::F_KEY_DOWN, [](Engine::Event& e)
 		{

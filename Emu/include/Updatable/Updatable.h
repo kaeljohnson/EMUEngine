@@ -6,8 +6,6 @@
 
 #include <functional>
 
-#include "../ECS/ComponentManager.h"
-
 namespace Engine
 { 
 	class Updatable : public Component

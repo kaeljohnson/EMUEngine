@@ -43,17 +43,17 @@ namespace Engine
             throw std::runtime_error("Error: Unable to generate a new ID.");
         }
 
-        static void DestroyEntity(EntityID entityId) 
+        static void DestroyEntity(EntityID entityID) 
         {
             // Ensure the entity is active
-            if (usedIDs.find(entityId) != usedIDs.end()) 
+            if (usedIDs.find(entityID) != usedIDs.end()) 
             {
                 // Recycle the entity ID
-                releaseID(entityId);
+                releaseID(entityID);
 
 				for (auto& manager : m_componentManagers)
 				{
-					manager.second->RemoveComponent(entityId);
+					manager.second->RemoveComponent(entityID);
 				}
             }
         }
@@ -90,12 +90,12 @@ namespace Engine
 		}
 
 		template <typename T>
-        static void RemoveComponent(EntityID entity)
+        static void RemoveComponent(EntityID entityID)
         {
             auto it = m_componentManagers.find(std::type_index(typeid(T)));
             if (it != m_componentManagers.end())
             {
-                static_cast<ComponentManager<T>*>(it->second.get())->RemoveComponent(entity);
+                static_cast<ComponentManager<T>*>(it->second.get())->RemoveComponent(entityID);
             }
         }
 

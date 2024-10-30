@@ -22,7 +22,7 @@ enum PlayerDirection
 class Player
 {
 public:
-	Player(const Engine::EntityID entity, const float startingX, const float startingY,
+	Player(const Engine::EntityID entityID, const float startingX, const float startingY,
 		const float width, const float height, const Engine::EventStatesMap& keyStates);
 	~Player() = default;
 	void Update();
@@ -35,7 +35,7 @@ public:
 	// Engine::Updatable* m_updatable;
 
 private:
-	const size_t m_entityID;
+	const Engine::EntityID m_entityID;
 
 	bool m_canJump;
 	float m_jumpCharge;

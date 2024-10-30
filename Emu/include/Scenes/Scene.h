@@ -5,7 +5,6 @@
 #include "../Core.h"
 #include "../MathUtil.h"
 
-#include "../Containers/IntStack.h"
 #include "../Tiles/TileMap.h" 
 
 class b2World;
@@ -20,14 +19,11 @@ namespace Engine
 
 		EMU_API void CreatePhysicsSimulation(const Vector2D<float> gravity);
 		EMU_API void SetGravity(const Vector2D<float> gravity);
-
-		// Adds scene object to the scene. Need to add a "order" parameter to determine the order of rendering.
-		// EMU_API void Add(const int sceneObjectID);
 	
-		EMU_API void Remove(const int sceneObjectID);
+		EMU_API void Remove(const int entityID);
 		EMU_API void AddTileMap(TileMap& tileMap);
 
-		EMU_API void Add(const size_t sceneObjectID);
+		EMU_API void Add(const size_t entityID);
 
 		// IF theres no map in the level, client will decided the dimensions manually.
 		EMU_API void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
@@ -38,7 +34,7 @@ namespace Engine
 		b2World* m_world;
 		Vector2D<float> m_gravity;
 
-		std::vector<size_t> m_sceneObjects;
+		std::vector<size_t> m_entityIDs;
 
 	public:
 		inline const int GetLevelWidth() const { return m_levelDimensionsInUnits.X; }

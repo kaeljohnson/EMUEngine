@@ -29,16 +29,16 @@ int main(int argc, char* args[])
 	Engine::TileMap testMap("testMap1.txt", 1);
 	scene->AddTileMap(testMap);
 	
-	const Engine::EntityID playerEntity = Engine::ECS::CreateEntity();
-	scene->Add(playerEntity);
+	const Engine::EntityID playerEntityID = Engine::ECS::CreateEntity();
+	scene->Add(playerEntityID);
 
-	Player player(playerEntity, 6.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
+	Player player(playerEntityID, 6.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 
 	const Engine::EntityID cameraEntityID = Engine::ECS::CreateEntity();
-	PlayerCamera playerCamera(cameraEntityID, playerEntity);
+	PlayerCamera playerCamera(cameraEntityID, playerEntityID);
 	refCameraManager.SetCurrentCamera(cameraEntityID);
 
-	scene2->Add(playerEntity);
+	scene2->Add(playerEntityID);
 
 	Engine::TileMap testMap2("TestMap2.txt", 1);
 	scene2->AddTileMap(testMap2);

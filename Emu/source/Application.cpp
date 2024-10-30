@@ -5,7 +5,6 @@
 #include <thread>
 #include <chrono>
 
-#include "../include/EngineConstants.h"
 #include "../include/Logging/Logger.h"
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
@@ -22,8 +21,6 @@ namespace Engine
 {
 	// Application singleton.
 	Application* Application::instance = nullptr;
-
-	float Time::INTERPOLATION_FACTOR = 0.0f;
 
 	Application* Application::GetInstance()
 	{
@@ -56,7 +53,7 @@ namespace Engine
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-		const float timeStep = TIME_STEP;
+		const float timeStep = Time::GetTimeStep();
 
 		double currentTime = SDL_GetTicks() / 1000.0;
 		double accumulator = 0.0;
@@ -103,7 +100,7 @@ namespace Engine
 				accumulator -= timeStep;
 			}
 
-			Time::INTERPOLATION_FACTOR = (float)accumulator / timeStep;
+			Time::SetInterpolationFactor((float)accumulator / timeStep);
 
 			ECS::GetComponentManager<Updatable>().GetComponent(m_cameraManager.m_currentCameraEntityID)->Update();
 
