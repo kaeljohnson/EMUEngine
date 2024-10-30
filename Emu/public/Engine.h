@@ -18,10 +18,8 @@
 #include "../include/Time.h"
 
 #include "../include/Camera/Camera.h"
-#include "../include/Camera/ScrollingCamera.h"
-#include "../include/Camera/TargetCamera.h"
 
-#include "../include/ECS/EntityManager.h"
+#include "../include/ECS/ECS.h"
 #include "../include/MathUtil.h"
 
 #include "../include/Transform.h"
@@ -34,5 +32,5 @@ namespace Engine
 	using PhysicsBodyPtr = std::shared_ptr<PhysicsBody>;
 	using ApplicationPtr = Application*;
 	using ICallbackSystemPtr = ICallbackSystem*;
-	using Entity = size_t;
+	using EntityID = size_t;
 }

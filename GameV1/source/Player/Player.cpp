@@ -7,7 +7,7 @@
 #include "../../include/Player/Player.h"
 #include "../../include/Player/PlayerConfig.h"
 
-    Player::Player(const size_t id, const float startingX, const float startingY,
+    Player::Player(const Engine::EntityID id, const float startingX, const float startingY,
         const float width, const float height, const Engine::EventStatesMap& keyStates)
         // These need to be set by client.
         : m_entityID(id), refKeyStates(keyStates), m_coyoteTime(0.0f), m_canJump(false), m_jumpCharge(0.0f), m_onGround(false),
@@ -18,19 +18,19 @@
     {
         // Need to have them be able to set this during construction of physics body.
     	// m_physicsBody->SetStartingFriction(0.0f);
-        Engine::EntityManager::AddComponent<Engine::Transform>(id,
+        Engine::ECS::AddComponent<Engine::Transform>(id,
             Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f);
 
-        Engine::EntityManager::AddComponent<Engine::PhysicsBody>(
+        Engine::ECS::AddComponent<Engine::PhysicsBody>(
             id, Engine::BodyType::DYNAMIC, false, Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height));
 
-		Engine::EntityManager::AddComponent<Engine::Updatable>(id, [this]() { Update(); });
+		Engine::ECS::AddComponent<Engine::Updatable>(id, [this]() { Update(); });
     }
 
     void Player::Update()
     {
 		Engine::PhysicsBody* physicsBodyComponent = 
-            Engine::EntityManager::GetComponentManager<Engine::PhysicsBody>().GetComponent(m_entityID);
+            Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(m_entityID);
 
 		if (physicsBodyComponent == nullptr)
 		{
@@ -69,7 +69,7 @@
     void Player::UpdateMovement(Engine::PhysicsBody* physicsBodyComponent)
     {
 		Engine::Transform* transformComponent =
-			Engine::EntityManager::GetComponentManager<Engine::Transform>().GetComponent(m_entityID);
+			Engine::ECS::GetComponentManager<Engine::Transform>().GetComponent(m_entityID);
 
         float currentVelocityX = physicsBodyComponent->GetVelocity().X;
 

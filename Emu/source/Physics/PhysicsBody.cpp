@@ -6,7 +6,7 @@
 #include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/BodyTypes.h"
-#include "../../include/ECS/EntityManager.h"
+#include "../../include/ECS/ECS.h"
 
 #include "box2d/box2d.h"
 
@@ -137,7 +137,7 @@ namespace Engine
 				}
 								
 				PhysicsBody* otherPhysicsBody = 
-					EntityManager::GetComponentManager<PhysicsBody>().GetComponent(otherBody->GetUserData().pointer);
+					ECS::GetComponentManager<PhysicsBody>().GetComponent(otherBody->GetUserData().pointer);
 
 				// Assuming the first point's normal is representative for the whole contact
 				b2Vec2 normal = worldManifold.normal;

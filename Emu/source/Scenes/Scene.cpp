@@ -11,7 +11,7 @@
 #include "../../include/Tiles/Tile.h"
 #include "../../include/MathUtil.h"
 #include "../../include/Transform.h"
-#include "../../include/ECS/EntityManager.h"
+#include "../../include/ECS/ECS.h"
 #include "../../include/Updatable/Updatable.h"
 
 namespace Engine
@@ -38,7 +38,7 @@ namespace Engine
 		while (body != nullptr)
 		{
 			b2Body* nextBody = body->GetNext();
-			PhysicsBody* ptrBody = EntityManager::GetComponentManager<PhysicsBody>().GetComponent(body->GetUserData().pointer);
+			PhysicsBody* ptrBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(body->GetUserData().pointer);
 			ptrBody->RemoveBodyFromWorld();
 			body = nextBody;
 		}
@@ -56,9 +56,9 @@ namespace Engine
 	{
 		m_world = new b2World(b2Vec2(m_gravity.X, m_gravity.Y));
 
-		auto& updatableManager = EntityManager::GetComponentManager<Updatable>();
-		auto& physicsBodyManager = EntityManager::GetComponentManager<PhysicsBody>();
-		auto& transformManager = EntityManager::GetComponentManager<Transform>();
+		auto& updatableManager = ECS::GetComponentManager<Updatable>();
+		auto& physicsBodyManager = ECS::GetComponentManager<PhysicsBody>();
+		auto& transformManager = ECS::GetComponentManager<Transform>();
 
 		ENGINE_CRITICAL_D("Updatable component vector size: " + std::to_string(updatableManager.GetComponents().size()));
 		ENGINE_CRITICAL_D("PhysicsBody component vector size: " + std::to_string(physicsBodyManager.GetComponents().size()));
@@ -74,9 +74,9 @@ namespace Engine
 
 	void Scene::OnSceneEnd()
 	{
-		auto& updatableManager = EntityManager::GetComponentManager<Updatable>();
-		auto& physicsBodyManager = EntityManager::GetComponentManager<PhysicsBody>();
-		auto& transformManager = EntityManager::GetComponentManager<Transform>();
+		auto& updatableManager = ECS::GetComponentManager<Updatable>();
+		auto& physicsBodyManager = ECS::GetComponentManager<PhysicsBody>();
+		auto& transformManager = ECS::GetComponentManager<Transform>();
 
 		updatableManager.DeactivateComponents(m_sceneObjects);
 		physicsBodyManager.DeactivateComponents(m_sceneObjects);
@@ -132,9 +132,9 @@ namespace Engine
 	void Scene::Update()
 	{
 		// Should move some of this logic to ECS itself?
-		auto& transformManager = EntityManager::GetComponentManager<Transform>();
-		auto& physicsBodiesManager = EntityManager::GetComponentManager<PhysicsBody>();
-		auto& updatableManager = EntityManager::GetComponentManager<Updatable>();
+		auto& transformManager = ECS::GetComponentManager<Transform>();
+		auto& physicsBodiesManager = ECS::GetComponentManager<PhysicsBody>();
+		auto& updatableManager = ECS::GetComponentManager<Updatable>();
 
 		for (auto ptrUpdatable = updatableManager.active_begin(); ptrUpdatable != updatableManager.active_end(); ++ptrUpdatable)
 		{
@@ -197,7 +197,7 @@ namespace Engine
 	void Scene::Remove(const int id)
 	{
 		// If scene object has a physics body, remove it from the world.
-		PhysicsBody* physicsBody = EntityManager::GetComponentManager<PhysicsBody>().GetComponent(id);
+		PhysicsBody* physicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(id);
 		if (physicsBody != nullptr)
 		{
 			physicsBody->RemoveBodyFromWorld();
@@ -206,7 +206,7 @@ namespace Engine
 
 	void Scene::AddPhysicsBodiesToWorld()
 	{
-		for (auto& physicsBody : EntityManager::GetComponentManager<PhysicsBody>().GetComponents())
+		for (auto& physicsBody : ECS::GetComponentManager<PhysicsBody>().GetComponents())
 		{
 			if (!physicsBody.IsActive())
 			{

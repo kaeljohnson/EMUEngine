@@ -28,14 +28,8 @@ namespace Engine
 		Vector2D<float> m_offset;
 
 	public:
-		// virtual void Update(const double interpolation);
-
 		void Frame(const Vector2D<int> mapBounds);
 
-		/*Camera(const Camera& camera) = delete;
-		Camera& operator=(const Camera&) = delete;
-		Camera(Camera&&) = delete;
-		Camera& operator=(Camera&&) = delete;*/
 	public:
 		Vector2D<float> m_size;
 

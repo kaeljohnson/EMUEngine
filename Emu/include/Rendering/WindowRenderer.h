@@ -18,8 +18,8 @@ namespace Engine
 		WindowRenderer();
 		~WindowRenderer();
 
-		void RenderScene(const size_t currentEntityID, const double interpolation);
-		void Draw(Transform& transform, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset);
+		void RenderScene(const size_t currentEntityID);
+		void Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Display();
 
 		void SetViewport();

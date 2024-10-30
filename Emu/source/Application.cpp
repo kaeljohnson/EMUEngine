@@ -15,7 +15,7 @@
 #include "../include/Time.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Rendering/WindowRenderer.h"
-#include "../include/ECS/EntityManager.h"
+#include "../include/ECS/ECS.h"
 #include "../include/Updatable/Updatable.h"
 
 namespace Engine
@@ -80,10 +80,10 @@ namespace Engine
 			if (m_sceneManager.IsNewSceneStarting())
 			{
 				// Camera frames current scene.
-				EntityManager::GetComponentManager<Camera>().GetComponent(m_cameraManager.m_currentCameraEntityID)->Frame(Vector2D<int>(m_sceneManager.GetCurrentScene()->GetLevelWidth(),
+				ECS::GetComponentManager<Camera>().GetComponent(m_cameraManager.m_currentCameraEntityID)->Frame(Vector2D<int>(m_sceneManager.GetCurrentScene()->GetLevelWidth(),
 					m_sceneManager.GetCurrentScene()->GetLevelHeight()));
-				EntityManager::GetComponentManager<Camera>().GetComponent(m_cameraManager.m_currentCameraEntityID)->SetActive(true);
-				EntityManager::GetComponentManager<Updatable>().GetComponent(m_cameraManager.m_currentCameraEntityID)->SetActive(true);
+				ECS::GetComponentManager<Camera>().GetComponent(m_cameraManager.m_currentCameraEntityID)->SetActive(true);
+				ECS::GetComponentManager<Updatable>().GetComponent(m_cameraManager.m_currentCameraEntityID)->SetActive(true);
 				m_sceneManager.NewSceneStarted();
 			}
 
@@ -99,22 +99,20 @@ namespace Engine
 				m_eventManager.ProcessEvents();
 				
 				m_sceneManager.GetCurrentScene()->Update();
-				
-				
+
 				accumulator -= timeStep;
 			}
 
-			interpolation = accumulator / timeStep;
-			Time::INTERPOLATION_FACTOR = interpolation;
+			Time::INTERPOLATION_FACTOR = (float)accumulator / timeStep;
 
-			EntityManager::GetComponentManager<Updatable>().GetComponent(m_cameraManager.m_currentCameraEntityID)->Update();
+			ECS::GetComponentManager<Updatable>().GetComponent(m_cameraManager.m_currentCameraEntityID)->Update();
 
-			m_windowRenderer.RenderScene(m_cameraManager.m_currentCameraEntityID, interpolation);
+			m_windowRenderer.RenderScene(m_cameraManager.m_currentCameraEntityID);
 
 			if (running == false)
 			{ 
 				// Cleanup static objects
-				EntityManager::Cleanup();
+				ECS::Cleanup();
 			}
 		}
 	}

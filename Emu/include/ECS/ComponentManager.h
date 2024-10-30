@@ -7,10 +7,6 @@
 #include <algorithm>
 #include <utility>
 
-#include "../Core.h"
-
-#include "../Logging/Logger.h"
-
 namespace Engine
 {
     class ComponentManagerBase 
@@ -40,36 +36,13 @@ namespace Engine
         auto active_begin() const { return m_components.begin(); }
         auto active_end() const { return m_components.begin() + m_activeComponentCount; }
 
-
-        template <typename T>
-        void AddComponent(size_t id, const T& component) 
-        {
-            if (m_idToIndex.find(id) != m_idToIndex.end()) 
-            {
-				// Replace the existing component with the new one
-                m_components[m_idToIndex[id]] = std::move(component);
-            }
-            else 
-            {
-                // Use emplace_back to construct the component in place, no copying
-                m_components.emplace_back(component);
-
-                // Store the index of the new component
-                size_t newIndex = m_components.size() - 1;
-                m_idToIndex[id] = newIndex;
-                // indexToEntity[newIndex] = entity;
-            }
-        }
-
         template<typename... Args>
         void AddComponent(Args&&... args) 
         {
-			ENGINE_CRITICAL_D("Adding component with ID: " + std::to_string(std::get<0>(std::make_tuple(std::forward<Args>(args)...))));
             auto argsTuple = std::make_tuple(std::forward<Args>(args)...);
             auto& id = std::get<0>(argsTuple);
             if (m_idToIndex.find(id) != m_idToIndex.end()) 
             {
-                ENGINE_CRITICAL_D("Replacing component with ID: " + std::to_string(id));
                 // Update the existing component by constructing it with new arguments
                 size_t index = m_idToIndex[id];
                 m_components[index].~T();
@@ -82,7 +55,6 @@ namespace Engine
                 // Store the index of the new component
                 size_t newIndex = m_components.size() - 1;
                 m_idToIndex[id] = newIndex;
-                // indexToEntity[newIndex] = entity;
             }
         }
 
@@ -137,11 +109,7 @@ namespace Engine
                 return;
 			}
 
-            // Component Active Case
-			// shift all active components to the left
-			// Once all active components are shifted, decrement the active component count
-			// swap the now empty slot with the last component
-			// remove the last component
+            // IsActive case
 			for (size_t i = indexToRemove; i < m_activeComponentCount - 1; ++i)
 			{
 				std::swap(m_components[i], m_components[i + 1]);
@@ -152,8 +120,6 @@ namespace Engine
 			m_components.pop_back();
 			--m_activeComponentCount;
         }
-
-
 
         T* GetComponent(size_t id) 
         {
@@ -188,11 +154,4 @@ namespace Engine
 
 		size_t m_activeComponentCount = 0;
     };
-
-    /*class ComponentManagerRegistry 
-    {
-    public:
-        template <typename T>
-        EMU_API static ComponentManager<T>& GetManager();
-    };*/
 }

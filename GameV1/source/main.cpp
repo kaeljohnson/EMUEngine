@@ -22,7 +22,6 @@ int main(int argc, char* args[])
 	refSceneManager.AddScene("Level1", scene);
 	refSceneManager.AddScene("Level2", scene2);
 
-
 	//// Need physcis to scale with pixels per unit.
 	scene->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 	scene2->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
@@ -30,33 +29,19 @@ int main(int argc, char* args[])
 	Engine::TileMap testMap("testMap1.txt", 1);
 	scene->AddTileMap(testMap);
 	
-	const Engine::Entity playerEntity = Engine::EntityManager::CreateEntity();
+	const Engine::EntityID playerEntity = Engine::ECS::CreateEntity();
 	scene->Add(playerEntity);
-	CLIENT_CRITICAL_D("Player ID: " + std::to_string(playerEntity));
+
 	Player player(playerEntity, 6.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 
-	const Engine::Entity player2ID = Engine::EntityManager::CreateEntity();
-	Player player2(player2ID, 2.0f, 2.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
-	// scene2->Add(player2ID);
-
-	//Engine::ScrollingCamera scrollCamera;
-	//scrollCamera.SetScrollingSpeeds(Engine::Vector2D<float>(0.0005f, 0.0f));
-	//scrollCamera.SetCameraPosition(Engine::Vector2D<float>(0.0f, 38.5f));
-
-	const Engine::Entity cameraEntityID = Engine::EntityManager::CreateEntity();
+	const Engine::EntityID cameraEntityID = Engine::ECS::CreateEntity();
 	PlayerCamera playerCamera(cameraEntityID, playerEntity);
 	refCameraManager.SetCurrentCamera(cameraEntityID);
-
-	// refCameraManager.SetCurrentCamera(&playerCamera);
-
-	//// scene2->AddLayer(MAP_LAYER);
-	//// scene2->AddLayer(PLAYER_LAYER);
 
 	scene2->Add(playerEntity);
 
 	Engine::TileMap testMap2("TestMap2.txt", 1);
 	scene2->AddTileMap(testMap2);
-	
 
 	refSceneManager.LoadScene("Level1");
 

@@ -8,7 +8,7 @@
 #include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Rendering/WindowRenderer.h"
 
-#include "../../include/ECS/EntityManager.h"
+#include "../../include/ECS/ECS.h"
 #include "../../include/Transform.h"
 #include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Camera/Camera.h"
@@ -90,10 +90,10 @@ namespace Engine
 			});
 	}
 
-	void WindowRenderer::RenderScene(const size_t currentCameraEntityID, const double interpolation)
+	void WindowRenderer::RenderScene(const size_t currentCameraEntityID)
 	{
 
-		Camera* ptrCurrentCamera = EntityManager::GetComponentManager<Camera>().GetComponent(currentCameraEntityID);
+		Camera* ptrCurrentCamera = ECS::GetComponentManager<Camera>().GetComponent(currentCameraEntityID);
 
 		ClearScreen();
 
@@ -103,7 +103,7 @@ namespace Engine
 		float cameraTop = ptrCurrentCamera->m_offset.Y;
 		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->GetPixelsPerUnit());
 
-		auto& transformManager = EntityManager::GetComponentManager<Transform>();
+		auto& transformManager = ECS::GetComponentManager<Transform>();
 
 		for (auto ptrTransform = transformManager.active_begin(); ptrTransform != transformManager.active_end(); ++ptrTransform)
 		{
@@ -117,7 +117,7 @@ namespace Engine
 
 			if (isVisible)
 			{
-				Draw(*ptrTransform, ptrCurrentCamera->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
+				Draw(*ptrTransform, ptrCurrentCamera->GetPixelsPerUnit(), Vector2D<float>(cameraLeft, cameraTop));
 			}
 		}
 
@@ -125,17 +125,19 @@ namespace Engine
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void WindowRenderer::Draw(Transform& transform, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset)
+	void WindowRenderer::Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset)
 	{
+		const float interpolation = Time::GetInterpolationFactor();
+
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
 
 		SDLRect dst
 		{
 			static_cast<int>(round((Lerp(transform.PrevPosition.X, transform.Position.X, 
-				(float)interpolation) - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+				interpolation) - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 			static_cast<int>(round((Lerp(transform.PrevPosition.Y, transform.Position.Y, 
-				(float)interpolation) - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+				interpolation) - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 
 			static_cast<int>(round(transform.Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 			static_cast<int>(round(transform.Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
@@ -145,7 +147,7 @@ namespace Engine
 
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)
-		PhysicsBody* ptrBody = EntityManager::GetComponentManager<PhysicsBody>().GetComponent(transform.GetID());
+		PhysicsBody* ptrBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(transform.GetID());
 		if (ptrBody == nullptr)
 		{
 			ENGINE_CRITICAL("PhysicsBody not found for Transform with ID: " + std::to_string(transform.GetID()));

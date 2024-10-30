@@ -5,7 +5,7 @@
 
 #include "../../include/Tiles/TileMap.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/ECS/EntityManager.h"
+#include "../../include/ECS/ECS.h"
 #include "../../include/ECS/ComponentManager.h"
 #include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Transform.h"
@@ -67,15 +67,15 @@ namespace Engine
                 if (GetTile(x, y) != '-')
                 {
                     // Might need to add this to an array?
-                    const size_t tileID = EntityManager::CreateEntity();
+                    const size_t tileID = ECS::CreateEntity();
 
                     // Create "Tiles"
-                    EntityManager::AddComponent<Transform>(tileID,
+                    ECS::AddComponent<Transform>(tileID,
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)), 
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
                         1.0f, 1.0f, 1.0f);
 
-                    EntityManager::AddComponent<PhysicsBody>(tileID, SENSOR, true,
+                    ECS::AddComponent<PhysicsBody>(tileID, SENSOR, true,
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)));
 
@@ -148,9 +148,9 @@ namespace Engine
                         }
                     }
 
-					const size_t tileID = EntityManager::CreateEntity();
+					const size_t tileID = ECS::CreateEntity();
 
-                    EntityManager::AddComponent<PhysicsBody>(tileID, STATIC, true,
+                    ECS::AddComponent<PhysicsBody>(tileID, STATIC, true,
                         Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile),
                             static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile),

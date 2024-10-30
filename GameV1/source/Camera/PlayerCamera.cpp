@@ -4,22 +4,22 @@
 
 #include "../../include/Camera/PlayerCamera.h"
 
-PlayerCamera::PlayerCamera(const Engine::Entity entityID, const Engine::Entity playerEntityID) : 
+PlayerCamera::PlayerCamera(const Engine::EntityID entityID, const Engine::EntityID playerEntityID) : 
     m_entityID(entityID), m_cameraTargetEntityID(playerEntityID), m_smoothingFactor(0.001f),
     m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(true),
     m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(0.5f), m_lookAhead(0.0f)
 {
-	Engine::EntityManager::AddComponent<Engine::Camera>(m_entityID);
-    Engine::EntityManager::AddComponent<Engine::Updatable>(m_entityID, [this]() { Update(); });
+	Engine::ECS::AddComponent<Engine::Camera>(m_entityID);
+    Engine::ECS::AddComponent<Engine::Updatable>(m_entityID, [this]() { Update(); });
 
-	Engine::Camera* playerCamera = Engine::EntityManager::GetComponentManager<Engine::Camera>().GetComponent(m_entityID);
+	Engine::Camera* playerCamera = Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(m_entityID);
     playerCamera->SetPixelsPerUnit(32);
 }
 
 void PlayerCamera::Update()
 {
-	Engine::Transform* ptrCameraTarget = Engine::EntityManager::GetComponentManager<Engine::Transform>().GetComponent(m_cameraTargetEntityID);
-	Engine::Camera* ptrCamera = Engine::EntityManager::GetComponentManager<Engine::Camera>().GetComponent(m_entityID);
+	Engine::Transform* ptrCameraTarget = Engine::ECS::GetComponentManager<Engine::Transform>().GetComponent(m_cameraTargetEntityID);
+	Engine::Camera* ptrCamera = Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(m_entityID);
 
 	// Need something like Time::GetInterpolationFactor=() to get the time between frames
 
