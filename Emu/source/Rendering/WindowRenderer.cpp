@@ -2,17 +2,13 @@
 
 #include <memory>
 #include "../../include/ISDL/ISDL.h"
-
 #include "../../include/Logging/Logger.h"
-
 #include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Rendering/WindowRenderer.h"
-
 #include "../../include/ECS/ECS.h"
 #include "../../include/Transform.h"
 #include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Camera/Camera.h"
-
 #include "../../include/Time.h"
 
 namespace Engine
@@ -90,9 +86,8 @@ namespace Engine
 			});
 	}
 
-	void WindowRenderer::RenderScene(const size_t currentCameraEntityID)
+	void WindowRenderer::Render(const size_t currentCameraEntityID)
 	{
-
 		Camera* ptrCurrentCamera = ECS::GetComponentManager<Camera>().GetComponent(currentCameraEntityID);
 
 		ClearScreen();

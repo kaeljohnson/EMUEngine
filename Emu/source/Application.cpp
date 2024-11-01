@@ -104,7 +104,7 @@ namespace Engine
 
 			ECS::GetComponentManager<Updatable>().GetComponent(m_cameraManager.m_currentCameraEntityID)->Update();
 
-			m_windowRenderer.RenderScene(m_cameraManager.m_currentCameraEntityID);
+			m_windowRenderer.Render(m_cameraManager.m_currentCameraEntityID);
 
 			if (running == false)
 			{ 

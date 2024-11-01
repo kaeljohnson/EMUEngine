@@ -1,13 +1,10 @@
 #pragma once
 
-#include "../ECS/Component.h"
-
-#include "../Core.h"
-#include "../MathUtil.h"
-
 #include "ConversionFunctions.h"
-
 #include "BodyTypes.h"
+#include "../Core.h"
+#include "../ECS/Component.h"
+#include "../MathUtil.h"
 
 class b2Body;
 
@@ -42,7 +39,6 @@ namespace Engine
 		float m_height;
 
 		Vector2D<float> m_startingPosition;
-		Vector2D<float> m_prevPosition;
 		
 		bool m_fixed;
 		bool m_gravityOn;
@@ -138,14 +134,6 @@ namespace Engine
 		const float GetAngleInRadians() const;
 		const float GetAngleInDegrees() const;
 
-		// PhysicsBody2D does not track previous values.
-		// Need to update them here.
-		void UpdatePrevPosition();
 		void Update();
-
-		// Non-PhysicsBody2d getters
-		inline const Vector2D<float> GetTopLeftPrevPosition() const { return m_prevPosition; }
-		inline const Vector2D<float> GetCenterPrevPosition() const 
-		{ return Vector2D<float>(m_prevPosition.X + m_halfWidth, m_prevPosition.Y + m_halfHeight); }
 	};
 }

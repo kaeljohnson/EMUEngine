@@ -1,11 +1,8 @@
 #pragma once
 
 #include <memory>
-
-#include "../MathUtil.h"
-
 #include "Screen.h"
-
+#include "../MathUtil.h"
 #include "../Transform.h"
 
 namespace Engine
@@ -18,7 +15,7 @@ namespace Engine
 		WindowRenderer();
 		~WindowRenderer();
 
-		void RenderScene(const size_t currentEntityID);
+		void Render(const size_t currentEntityID);
 		void Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Display();
 

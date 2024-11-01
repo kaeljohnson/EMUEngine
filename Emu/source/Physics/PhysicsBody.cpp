@@ -16,7 +16,7 @@ namespace Engine
 		m_startingPosition(Vector2D<float>(0.0f, 0.0f)), m_bodyType(STATIC), m_fixed(false), m_body(nullptr),
 		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
 		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
-		m_gravityOn(true), m_isSensor(false), m_prevPosition(Vector2D<float>(0.0f, 0.0f)), m_fixedRotation(true), m_restitution(0.0f),
+		m_gravityOn(true), m_isSensor(false), m_fixedRotation(true), m_restitution(0.0f),
 		m_restitutionThreshold(0.0f), m_density(1.0f), m_friction(0.0f), Component(id)
 	
 	{
@@ -28,7 +28,7 @@ namespace Engine
 		m_bodyType(bodyType), m_fixed(fixed), m_body(nullptr),
 		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
 		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
-		m_gravityOn(true), m_isSensor(false), m_prevPosition(position), m_fixedRotation(true), m_restitution(0.0f),
+		m_gravityOn(true), m_isSensor(false), m_fixedRotation(true), m_restitution(0.0f),
 		m_restitutionThreshold(0.0f), m_density(1.0f), m_friction(0.0f),
 		Component(id)
 	{}
@@ -216,15 +216,11 @@ namespace Engine
 		m_rightSensor = false;
 	}
 
-	void PhysicsBody::UpdatePrevPosition() { m_prevPosition = GetTopLeftPosition(); }
 	void PhysicsBody::Update()
 	{
-		if (!m_isActive) return;
-
 		switch (GetBodyType())
 		{
 		case DYNAMIC:
-			UpdatePrevPosition();
 			SetContactFlags();
 			break;
 		case STATIC:

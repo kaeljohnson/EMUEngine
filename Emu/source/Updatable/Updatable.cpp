@@ -14,11 +14,6 @@ namespace Engine
 
 	void Updatable::Update()
 	{
-		if (!m_isActive)
-		{
-			return;
-		}
-
 		if (m_callback)
 		{
 			m_callback();

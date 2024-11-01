@@ -1,11 +1,7 @@
 #pragma once
 
-#include <iostream>
-
 #include <vector>
 #include <unordered_map>
-#include <algorithm>
-#include <utility>
 
 namespace Engine
 {
@@ -13,8 +9,8 @@ namespace Engine
     {
     public:
         virtual ~ComponentManagerBase() = default;
-		virtual void Allocate(size_t size) = 0;
-		virtual void RemoveComponent(size_t id) = 0;
+        virtual void Allocate(size_t size) = 0;
+        virtual void RemoveComponent(size_t id) = 0;
     };
 
     template <typename T>
@@ -78,7 +74,6 @@ namespace Engine
                 // Increment the count of active components
                 ++m_activeComponentCount;
             }
-
 		}
 
         void DeactivateComponents(std::vector<size_t>& ids)
@@ -93,6 +88,7 @@ namespace Engine
             }
         }
 
+        // Avoid calling during application runtime!!!
 		void RemoveComponent(size_t id) override
         {
             if (m_idToIndex.find(id) == m_idToIndex.end()) 

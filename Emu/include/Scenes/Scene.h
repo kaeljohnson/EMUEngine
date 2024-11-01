@@ -4,8 +4,12 @@
 
 #include "../Core.h"
 #include "../MathUtil.h"
-
 #include "../Tiles/TileMap.h" 
+#include "../ECS/ComponentManager.h"
+#include "../ECS/ECS.h"
+#include "../Physics/PhysicsBody.h"
+#include "../Updatable/Updatable.h"
+#include "../Transform.h"
 
 class b2World;
 
@@ -35,6 +39,10 @@ namespace Engine
 		Vector2D<float> m_gravity;
 
 		std::vector<size_t> m_entityIDs;
+
+		ComponentManager<Transform>& refTransformManager;
+		ComponentManager<PhysicsBody>& refPhysicsBodyManager;
+		ComponentManager<Updatable>& refUpdatableManager;
 
 	public:
 		inline const int GetLevelWidth() const { return m_levelDimensionsInUnits.X; }
