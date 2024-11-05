@@ -77,14 +77,20 @@ namespace Engine
 				throw std::runtime_error("Error: Component Manager not found.");
 			}
         }
-
-        template <typename T, typename... Args>
-		static void AddComponent(Args&&... args)
+        
+		static void ActivateEntities(std::vector<size_t>& entityIDs)
 		{
-			auto it = m_componentManagers.find(std::type_index(typeid(T)));
-			if (it != m_componentManagers.end())
+			for (auto& manager : m_componentManagers)
 			{
-				static_cast<ComponentManager<T>*>(it->second.get())->AddComponent(std::forward<Args>(args)...);
+				manager.second->ActivateComponents(entityIDs);
+			}
+		}
+
+        static void DeactivateEntities()
+		{
+			for (auto& manager : m_componentManagers)
+			{
+				manager.second->DeactivateComponents();
 			}
 		}
 

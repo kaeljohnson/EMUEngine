@@ -79,8 +79,6 @@ namespace Engine
 				// Camera frames current scene.
 				ECS::GetComponentManager<Camera>().GetComponent(m_cameraManager.m_currentCameraEntityID)->Frame(Vector2D<int>(m_sceneManager.GetCurrentScene()->GetLevelWidth(),
 					m_sceneManager.GetCurrentScene()->GetLevelHeight()));
-				ECS::GetComponentManager<Camera>().GetComponent(m_cameraManager.m_currentCameraEntityID)->SetActive(true);
-				ECS::GetComponentManager<Updatable>().GetComponent(m_cameraManager.m_currentCameraEntityID)->SetActive(true);
 				m_sceneManager.NewSceneStarted();
 			}
 
@@ -102,6 +100,7 @@ namespace Engine
 
 			Time::SetInterpolationFactor((float)accumulator / timeStep);
 
+			// Camera system. Change to "CameraSystem".
 			ECS::GetComponentManager<Updatable>().GetComponent(m_cameraManager.m_currentCameraEntityID)->Update();
 
 			m_windowRenderer.Render(m_cameraManager.m_currentCameraEntityID);

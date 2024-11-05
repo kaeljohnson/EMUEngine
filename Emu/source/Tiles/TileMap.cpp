@@ -70,12 +70,12 @@ namespace Engine
                     const size_t tileID = ECS::CreateEntity();
 
                     // Create "Tiles"
-                    ECS::AddComponent<Transform>(tileID,
+                    ECS::GetComponentManager<Transform>().AddComponent(tileID,
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)), 
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
                         1.0f, 1.0f, 1.0f);
 
-                    ECS::AddComponent<PhysicsBody>(tileID, SENSOR, true,
+                    ECS::GetComponentManager<PhysicsBody>().AddComponent(tileID, SENSOR, true,
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)));
 
@@ -150,7 +150,7 @@ namespace Engine
 
 					const size_t tileID = ECS::CreateEntity();
 
-                    ECS::AddComponent<PhysicsBody>(tileID, STATIC, true,
+                    ECS::GetComponentManager<PhysicsBody>().AddComponent(tileID, STATIC, true,
                         Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile),
                             static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile),

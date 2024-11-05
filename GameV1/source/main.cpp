@@ -29,6 +29,12 @@ int main(int argc, char* args[])
 	Engine::TileMap testMap("testMap1.txt", 1);
 	scene->AddTileMap(testMap);
 	
+	const size_t tileID = Engine::ECS::CreateEntity();
+	const size_t tileID2 = Engine::ECS::CreateEntity();
+
+	scene->Add(tileID);
+	scene->Add(tileID2);
+
 	const Engine::EntityID playerEntityID = Engine::ECS::CreateEntity();
 	scene->Add(playerEntityID);
 
