@@ -7,6 +7,7 @@
 #include "../Tiles/TileMap.h" 
 #include "../ECS/ComponentManager.h"
 #include "../ECS/ECS.h"
+#include "../ECS/Entity.h"
 #include "../Physics/PhysicsBody.h"
 #include "../Updatable/Updatable.h"
 #include "../Transform.h"
@@ -27,7 +28,7 @@ namespace Engine
 		EMU_API void Remove(const int entityID);
 		EMU_API void AddTileMap(TileMap& tileMap);
 
-		EMU_API void Add(const size_t entityID);
+		EMU_API void Add(Entity* entity);
 
 		// IF theres no map in the level, client will decided the dimensions manually.
 		EMU_API void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
@@ -38,7 +39,7 @@ namespace Engine
 		b2World* m_world;
 		Vector2D<float> m_gravity;
 
-		std::vector<size_t> m_entityIDs;
+		std::vector<Entity*> m_entities;
 
 		ComponentManager<Transform>& refTransformManager;
 		ComponentManager<PhysicsBody>& refPhysicsBodyManager;

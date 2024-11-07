@@ -22,7 +22,7 @@ enum PlayerDirection
 class Player
 {
 public:
-	Player(const Engine::EntityID entityID, const float startingX, const float startingY,
+	Player(Engine::Entity* entityID, const float startingX, const float startingY,
 		const float width, const float height, const Engine::EventStatesMap& keyStates);
 	~Player() = default;
 	void Update();

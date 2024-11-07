@@ -7,8 +7,8 @@ namespace Engine
 	CameraManager::CameraManager()
 	{}
 
-	void CameraManager::SetCurrentCamera(const size_t cameraEntityID)
+	void CameraManager::SetCurrentCamera(Entity* ptrCameraEntity)
 	{
-		m_currentCameraEntityID = cameraEntityID;
+		m_currentCameraEntity = ptrCameraEntity;
 	}
 }

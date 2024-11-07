@@ -86,9 +86,9 @@ namespace Engine
 			});
 	}
 
-	void WindowRenderer::Render(const size_t currentCameraEntityID)
+	void WindowRenderer::Render(Entity* currentCameraEntity)
 	{
-		Camera* ptrCurrentCamera = ECS::GetComponentManager<Camera>().GetComponent(currentCameraEntityID);
+		Camera* ptrCurrentCamera = ECS::GetComponentManager<Camera>().GetComponent(currentCameraEntity);
 
 		ClearScreen();
 
@@ -102,6 +102,8 @@ namespace Engine
 
 		for (auto ptrTransform = transformManager.active_begin(); ptrTransform != transformManager.active_end(); ++ptrTransform)
 		{
+			if (!ptrTransform->IsActive()) continue;
+
 			float objectLeft = ptrTransform->Position.X;
 			float objectRight = objectLeft + ptrTransform->Dimensions.X;
 			float objectTop = ptrTransform->Position.Y;
@@ -142,10 +144,10 @@ namespace Engine
 
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)
-		PhysicsBody* ptrBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(transform.GetID());
+		PhysicsBody* ptrBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(transform.GetEntity()->GetID());
 		if (ptrBody == nullptr)
 		{
-			ENGINE_CRITICAL("PhysicsBody not found for Transform with ID: " + std::to_string(transform.GetID()));
+			ENGINE_CRITICAL("PhysicsBody not found for Transform with ID: " + std::to_string(transform.GetEntity()->GetID()));
 			return;
 		}
 		// ENGINE_CRITICAL_D("Drawing PhysicsBody for Transform with ID: " + std::to_string(transform->m_id));

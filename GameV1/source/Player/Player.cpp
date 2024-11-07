@@ -7,10 +7,10 @@
 #include "../../include/Player/Player.h"
 #include "../../include/Player/PlayerConfig.h"
 
-    Player::Player(const Engine::EntityID id, const float startingX, const float startingY,
+    Player::Player(Engine::Entity* ptrEntity, const float startingX, const float startingY,
         const float width, const float height, const Engine::EventStatesMap& keyStates)
         // These need to be set by client.
-        : m_entityID(id), refKeyStates(keyStates), m_coyoteTime(0.0f), m_canJump(false), m_jumpCharge(0.0f), m_onGround(false),
+        : m_entityID(ptrEntity->GetID()), refKeyStates(keyStates), m_coyoteTime(0.0f), m_canJump(false), m_jumpCharge(0.0f), m_onGround(false),
         m_jumpKeyDown(Engine::SPACE_KEY_DOWN), m_jumpKeyUp(Engine::SPACE_KEY_UP),
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
@@ -18,13 +18,13 @@
     {
         // Need to have them be able to set this during construction of physics body.
     	// m_physicsBody->SetStartingFriction(0.0f);
-        Engine::ECS::GetComponentManager<Engine::Transform>().AddComponent(id,
+        Engine::ECS::GetComponentManager<Engine::Transform>().AddComponent(*ptrEntity,
             Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f);
 
         Engine::ECS::GetComponentManager<Engine::PhysicsBody>().AddComponent(
-            id, Engine::BodyType::DYNAMIC, false, Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height));
+            *ptrEntity, Engine::BodyType::DYNAMIC, false, Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height));
 
-		Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(id, [this]() { Update(); });
+		Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(*ptrEntity, [this]() { Update(); });
     }
 
     void Player::Update()

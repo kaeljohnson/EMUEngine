@@ -5,13 +5,14 @@
 #include "../MathUtil.h"
 
 #include "../ECS/Component.h"
+#include "../ECS/Entity.h"
 
 namespace Engine
 {
 	class Camera : public Component
 	{
 	public:
-		EMU_API Camera(const size_t entityID);
+		EMU_API Camera(Entity& entity);
 		
 		EMU_API void SetPixelsPerUnit(const int pixelsPerUnit);
 		EMU_API void SetCameraPosition(const Vector2D<float> offset);

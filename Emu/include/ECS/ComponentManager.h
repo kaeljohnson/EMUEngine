@@ -2,6 +2,10 @@
 
 #include <vector>
 #include <unordered_map>
+#include <algorithm>
+#include <stdexcept>
+
+#include "Entity.h"
 
 namespace Engine
 {
@@ -11,12 +15,14 @@ namespace Engine
         virtual ~ComponentManagerBase() = default;
         virtual void Allocate(size_t size) = 0;
         virtual void RemoveComponent(size_t id) = 0;
-		virtual void ActivateComponents(std::vector<size_t>& ids) = 0;
+		virtual void LoadComponents(std::vector<Entity*>& entities) = 0;
+		virtual void UnloadComponents() = 0;
+		virtual void ActivateComponents(std::vector<Entity*>& entities) = 0;
 		virtual void DeactivateComponents() = 0;
     };
 
     template <typename T>
-    class ComponentManager : public ComponentManagerBase
+    class ComponentManager : public ComponentManagerBase 
     {
     public:
         using iterator = typename std::vector<T>::iterator;
@@ -29,150 +35,216 @@ namespace Engine
         auto end() const { return m_components.end(); }
 
         // Iterator for active components (from begin to end)
-        auto active_begin() { return m_activeComponents.begin(); }
-        auto active_end() { return m_activeComponents.end(); }
-        auto active_begin() const { return m_activeComponents.begin(); }
-        auto active_end() const { return m_activeComponents.end(); }
+        auto active_begin() { return m_hotComponents.begin(); }
+        auto active_end() { return m_hotComponents.end(); }
+        auto active_begin() const { return m_hotComponents.begin(); }
+        auto active_end() const { return m_hotComponents.end(); }
 
+        // Loads and activates components, ordering them by priority
+        void LoadComponents(std::vector<Entity*>& entities)
+        {
+            for (Entity* entity : entities)
+            {
+				size_t id = entity->GetID();
+                auto it = m_inactiveIdToIndex.find(id);
+                if (it != m_inactiveIdToIndex.end())
+                {
+                    size_t index = it->second;
+
+                    // Move component to m_hotComponents
+                    m_hotComponents.push_back(std::move(m_components[index]));
+
+                    m_hotIdToIndex[id] = m_hotComponents.size() - 1;
+
+                    // If index is not the last element, move the last element to fill its place
+                    if (index != m_components.size() - 1)
+                    {
+                        m_components[index] = std::move(m_components.back());
+                        // Update the index of the moved component in m_inactiveIdToIndex
+                        size_t movedId = m_components[index].GetEntity()->GetID();
+                        m_inactiveIdToIndex[movedId] = index;
+                    }
+
+                    m_components.pop_back();
+                    m_inactiveIdToIndex.erase(it);
+                }
+            }
+
+            SortHotComponentsByPriority();
+        }
+
+
+        // Adds or updates an inactive component
         template<typename... Args>
         void AddComponent(Args&&... args)
         {
             auto argsTuple = std::make_tuple(std::forward<Args>(args)...);
-            auto& id = std::get<0>(argsTuple);
+            auto id = std::get<0>(argsTuple).GetID();
 
-            if (m_inactiveIdToIndex.find(id) != m_inactiveIdToIndex.end() ||
-                m_activeIdToIndex.find(id) != m_activeIdToIndex.end())
+            if (m_inactiveIdToIndex.count(id) || m_hotIdToIndex.count(id))
             {
                 return; // Component already exists
             }
 
-            // Add a new inactive component to m_components
             m_components.emplace_back(std::forward<Args>(args)...);
             m_inactiveIdToIndex[id] = m_components.size() - 1;
         }
 
-        void ActivateComponent(size_t id)
-        {
-            auto it = m_inactiveIdToIndex.find(id);
-            if (it == m_inactiveIdToIndex.end()) return; // Component is not inactive
-
-            size_t index = it->second;
-
-            // Move the component to m_activeComponents
-            m_activeComponents.push_back(std::move(m_components[index]));
-            m_activeIdToIndex[id] = m_activeComponents.size() - 1;
-
-            // Remove the component from m_components by swapping and popping
-            if (index != m_components.size() - 1)
-            {
-                std::swap(m_components[index], m_components.back());
-                m_inactiveIdToIndex[m_components[index].GetID()] = index;
-            }
-            m_components.pop_back();
-            m_inactiveIdToIndex.erase(it);
-        }
-
-		void ActivateComponents(std::vector<size_t>& ids) override
-		{
-			for (size_t id : ids)
-			{
-				ActivateComponent(id);
-			}
-		}
-
-        void DeactivateComponent(size_t id)
-        {
-            auto it = m_activeIdToIndex.find(id);
-            if (it == m_activeIdToIndex.end()) return; // Component is not active
-
-            size_t index = it->second;
-
-            // Move the component back to m_components
-            m_components.push_back(std::move(m_activeComponents[index]));
-            m_inactiveIdToIndex[id] = m_components.size() - 1;
-
-            // Remove the component from m_activeComponents by swapping and popping
-            if (index != m_activeComponents.size() - 1)
-            {
-                std::swap(m_activeComponents[index], m_activeComponents.back());
-                m_activeIdToIndex[m_activeComponents[index].GetID()] = index;
-            }
-            m_activeComponents.pop_back();
-            m_activeIdToIndex.erase(it);
-        }
-
-		void DeactivateComponents()
-		{
-            std::vector<size_t> keysToDeactivate;
-            for (const auto& pair : m_activeIdToIndex)
-            {
-                keysToDeactivate.push_back(pair.first);
-            }
-
-            for (const auto& key : keysToDeactivate)
-            {
-                DeactivateComponent(key);
-            }
-		}
-
         void RemoveComponent(size_t id) override
         {
-            if (m_inactiveIdToIndex.count(id))
+            auto it = m_inactiveIdToIndex.find(id);
+            if (it != m_inactiveIdToIndex.end())
             {
-                // Remove from inactive components
-                size_t index = m_inactiveIdToIndex[id];
-                if (index != m_components.size() - 1) {
-                    std::swap(m_components[index], m_components.back());
-                    m_inactiveIdToIndex[m_components[index].GetID()] = index;
-                }
-                m_components.pop_back();
-                m_inactiveIdToIndex.erase(id);
+                m_components.erase(m_components.begin() + it->second);
+                m_inactiveIdToIndex.erase(it);
+                return;
             }
-            else if (m_activeIdToIndex.count(id))
+
+            it = m_hotIdToIndex.find(id);
+            if (it != m_hotIdToIndex.end())
             {
-                // Remove from active components
-                size_t index = m_activeIdToIndex[id];
-                if (index != m_activeComponents.size() - 1) {
-                    std::swap(m_activeComponents[index], m_activeComponents.back());
-                    m_activeIdToIndex[m_activeComponents[index].GetID()] = index;
-                }
-                m_activeComponents.pop_back();
-                m_activeIdToIndex.erase(id);
+                m_hotComponents.erase(m_hotComponents.begin() + it->second);
+                m_hotIdToIndex.erase(it);
+                return;
             }
         }
+
+        std::vector<T>& GetComponents()
+        {
+            return m_hotComponents;
+        }
+
+		T* GetComponent(Entity* entity)
+		{
+			return GetComponent(entity->GetID());
+		}
 
         T* GetComponent(size_t id)
         {
+            // Call HasComponent before calling GetComponent to check if the component exists
+            auto it = m_hotIdToIndex.find(id);
+            if (it != m_hotIdToIndex.end())
+            {
+                return &m_hotComponents[it->second];
+            }
 
-            if (m_activeIdToIndex.count(id))
-                return &m_activeComponents[m_activeIdToIndex[id]];
+            it = m_inactiveIdToIndex.find(id);
+            if (it != m_inactiveIdToIndex.end())
+            {
+                return &m_components[it->second];
+            }
 
-            if (m_inactiveIdToIndex.count(id))
-                return &m_components[m_inactiveIdToIndex[id]];
-
-            return nullptr; // Component doesn't exist
+            return nullptr;
         }
 
-        bool HasComponent(size_t id) const
+        void HasComponent(size_t id)
         {
-            return m_inactiveIdToIndex.count(id) || m_activeIdToIndex.count(id);
+            auto it = m_hotIdToIndex.find(id);
+            if (it != m_hotIdToIndex.end())
+            {
+                return true;
+            }
+
+            it = m_inactiveIdToIndex.find(id);
+            if (it != m_inactiveIdToIndex.end())
+            {
+                return true;
+            }
+
+            return false;
         }
 
-        std::vector<T>& GetComponents() { return m_components; }
+        void ActivateComponent(Entity* entity)
+		{
+			auto id = entity->GetID();
+            auto it = m_hotIdToIndex.find(id);
+            if (it == m_hotIdToIndex.end())
+            {
+                return;
+            }
+
+            size_t index = it->second;
+
+			m_hotComponents[index].SetActive(true);
+        }
+
+        // Deactivate component by removing it from m_hotComponents
+        void DeactivateComponent(size_t id)
+        {
+            auto it = m_hotIdToIndex.find(id);
+            if (it == m_hotIdToIndex.end())
+            {
+                return;
+            }
+
+            size_t index = it->second;
+
+			m_hotComponents[index].SetActive(false);
+        }
+
+        void ActivateComponents(std::vector<Entity*>& entities) override
+        {
+            for (Entity* entity : entities)
+            {
+                ActivateComponent(entity);
+            }
+        }
+
+        void DeactivateComponents() override
+        {
+			for (auto& component : m_hotComponents)
+            {
+				component.SetActive(false);
+            }
+        }
+
+        // Sort hot components by priority based on m_hotComponents
+        void SortHotComponentsByPriority()
+        {
+            std::sort(m_hotComponents.begin(), m_hotComponents.end(),
+                [this](const T& a, const T& b)
+                {
+                    return a.GetEntity()->GetPriority() > b.GetEntity()->GetPriority();
+                });
+
+            // Update the m_hotIdToIndex map to reflect the new order
+            for (size_t i = 0; i < m_hotComponents.size(); ++i)
+            {
+                size_t id = m_hotComponents[i].GetEntity()->GetID();
+                m_hotIdToIndex[id] = i;
+            }
+        }
+
+        // Unloads components, moving them from m_hotComponents back to m_components
+        void UnloadComponents()
+        {
+            for (T& component : m_hotComponents)
+            {
+                size_t id = component.GetEntity()->GetID();
+
+                // Move the component back to m_components (order is not important here)
+                m_components.push_back(std::move(component));
+                m_inactiveIdToIndex[id] = m_components.size() - 1;
+            }
+
+            m_hotComponents.clear();
+            m_hotIdToIndex.clear();
+        }
 
         void Allocate(size_t size) override
-        {
-            m_components.reserve(size);
-            m_activeComponents.reserve(size);
-        }
+		{
+			m_components.reserve(size);
+			m_hotComponents.reserve(size);
+		}
 
     private:
-        // Separate ID-to-index maps for active and inactive components
-        std::unordered_map<size_t, size_t> m_inactiveIdToIndex;
-        std::unordered_map<size_t, size_t> m_activeIdToIndex;
+        std::unordered_map<size_t, size_t> m_inactiveIdToIndex;  // Maps entity ID to index in m_components
+        std::unordered_map<size_t, size_t> m_hotIdToIndex;       // Maps entity ID to index in m_hotComponents
 
-        std::vector<T> m_components;          // Holds inactive components
-        std::vector<T> m_activeComponents;    // Holds active components
+        std::vector<T> m_components;               // Holds inactive components
+        std::vector<T> m_hotComponents;            // Holds active components
     };
+
+
 
 }

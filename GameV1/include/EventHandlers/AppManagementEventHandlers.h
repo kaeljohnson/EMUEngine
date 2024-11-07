@@ -8,6 +8,6 @@
 class AppManagementEventHandlers
 {
 public:
-	AppManagementEventHandlers(Engine::EventManager& eventManager, const Engine::EntityID cameraEntityID);
+	AppManagementEventHandlers(Engine::EventManager& eventManager, Engine::Entity* cameraEntityID);
 	~AppManagementEventHandlers();
 };

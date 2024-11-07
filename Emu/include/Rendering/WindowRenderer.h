@@ -4,6 +4,7 @@
 #include "Screen.h"
 #include "../MathUtil.h"
 #include "../Transform.h"
+#include "../ECS/Entity.h"
 
 namespace Engine
 {
@@ -15,7 +16,7 @@ namespace Engine
 		WindowRenderer();
 		~WindowRenderer();
 
-		void Render(const size_t currentEntityID);
+		void Render(Entity* currentEntity);
 		void Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Display();
 

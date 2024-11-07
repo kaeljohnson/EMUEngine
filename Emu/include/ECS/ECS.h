@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #include "ComponentManager.h"
+#include "Entity.h"
 
 #include "../Core.h"
 
@@ -22,7 +23,7 @@ namespace Engine
             ECS::maxID = maxID;
         }
         
-        static EntityID CreateEntity() 
+        static Entity* CreateEntity() 
         {
             if (usedIDs.size() >= maxID + 1) 
             {
@@ -34,13 +35,20 @@ namespace Engine
                 if (usedIDs.find(id) == usedIDs.end()) 
                 {
                     usedIDs.insert(id);
-                    return id;
+                    Entity* ptrEntity = new Entity(id);
+					m_entities.emplace(id, ptrEntity);
+                    return ptrEntity;
                 }
             }
 
             // This point should never be reached due to the earlier check
             throw std::runtime_error("Error: Unable to generate a new ID.");
         }
+
+		static Entity* GetEntity(EntityID entityID)
+		{
+			return m_entities[entityID];
+		}
 
         static void DestroyEntity(EntityID entityID) 
         {
@@ -78,11 +86,27 @@ namespace Engine
 			}
         }
         
-		static void ActivateEntities(std::vector<size_t>& entityIDs)
+		static void LoadEntities(std::vector<Entity*>& entities)
 		{
 			for (auto& manager : m_componentManagers)
 			{
-				manager.second->ActivateComponents(entityIDs);
+				manager.second->LoadComponents(entities);
+			}
+		}
+
+        static void UnloadEntities()
+        {
+            for (auto& manager : m_componentManagers)
+            {
+                manager.second->UnloadComponents();
+            }
+        }
+
+		static void ActivateEntities(std::vector<Entity*>& entities)
+		{
+			for (auto& manager : m_componentManagers)
+			{
+				manager.second->ActivateComponents(entities);
 			}
 		}
 
@@ -113,6 +137,7 @@ namespace Engine
         // These must be exposed through API so the client app shares the same objects.
         EMU_API static EntityID maxID;
         EMU_API static std::unordered_set<size_t> usedIDs;
+		EMU_API static std::unordered_map<size_t, Entity*> m_entities; // Is it necessary to have this?
         EMU_API static std::unordered_map<std::type_index, std::unique_ptr<ComponentManagerBase>> m_componentManagers;
 
         static void releaseID(size_t id)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../ECS/Component.h"
+#include "../ECS/Entity.h"
 
 #include "../Core.h"
 
@@ -13,7 +14,7 @@ namespace Engine
     public:
         using UpdateCallback = std::function<void()>;
 
-        EMU_API Updatable(size_t id, UpdateCallback callback);
+        EMU_API Updatable(Entity& entity, UpdateCallback callback);
 
         EMU_API ~Updatable();
 

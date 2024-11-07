@@ -5,7 +5,7 @@
 class PlayerCamera // : public Engine::TargetCamera
 {
 public:
-	PlayerCamera(const Engine::EntityID entityID, const Engine::EntityID playerEntityID);
+	PlayerCamera(Engine::Entity* ptrEntity, Engine::Entity* ptrPlayerEntity);
 	~PlayerCamera() = default;
 
 	void SetTargetSmoothingFactor(const float smoothingFactor);

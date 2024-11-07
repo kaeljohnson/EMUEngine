@@ -6,10 +6,9 @@
 
 namespace Engine
 {
-	Updatable::Updatable(size_t id, UpdateCallback callback)
-		: m_callback(callback), Component(id)
+	Updatable::Updatable(Entity& entity, UpdateCallback callback)
+		: m_callback(callback), Component(entity)
 	{
-		ENGINE_CRITICAL_D("Updatable constructor called with ID: " + std::to_string(m_id));
 	}
 
 	void Updatable::Update()
@@ -17,10 +16,6 @@ namespace Engine
 		if (m_callback)
 		{
 			m_callback();
-		}
-		else
-		{
-			ENGINE_INFO_D("No Update function for updatable component: " + std::to_string(m_id));
 		}
 	}
 

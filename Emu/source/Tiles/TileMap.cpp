@@ -41,6 +41,7 @@ namespace Engine
                 ENGINE_CRITICAL("Map is not a rectangle: line " + std::to_string(m_mapDimensions.Y + 1) + " has a different length");
                 return;
             }
+
             for (char c : line) 
             {
                 if (m_map.size() < MAX_SIZE) 
@@ -52,13 +53,14 @@ namespace Engine
                     ENGINE_CRITICAL("Map size exceeds maximum size of " + std::to_string(MAX_SIZE));
                 }
             }
+
             m_mapDimensions.Y++;
         }
 	}
 
-    std::vector<size_t> TileMap::LoadMap()
+    std::vector<Entity*> TileMap::LoadMap()
     {
-		std::vector<size_t> tileIDs;
+		std::vector<Entity*> ptrTiles;
 
         for (int y = 0; y < GetHeight(); ++y)
         {
@@ -67,30 +69,30 @@ namespace Engine
                 if (GetTile(x, y) != '-')
                 {
                     // Might need to add this to an array?
-                    const size_t tileID = ECS::CreateEntity();
+                    Entity* ptrTile = ECS::CreateEntity();
 
                     // Create "Tiles"
-                    ECS::GetComponentManager<Transform>().AddComponent(tileID,
+                    ECS::GetComponentManager<Transform>().AddComponent(*ptrTile,
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)), 
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
                         1.0f, 1.0f, 1.0f);
 
-                    ECS::GetComponentManager<PhysicsBody>().AddComponent(tileID, SENSOR, true,
+                    ECS::GetComponentManager<PhysicsBody>().AddComponent(*ptrTile, SENSOR, true,
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)));
 
-					tileIDs.push_back(tileID);
+					ptrTiles.push_back(ptrTile);
 				}
 			}
 		}
 
-		return tileIDs;
+		return ptrTiles;
 	}
 
     // Collision bodies should just be physics bodies, not tiles.
-    std::vector<size_t> TileMap::CreateCollisionBodies()
+    std::vector<Entity*> TileMap::CreateCollisionBodies()
     {
-		std::vector<size_t> collisionBodyIDs;
+		std::vector<Entity*> collisionBodyIDs;
 
         // Creates collision bodies for the map. This creates a collision body for each block of tiles.
         // 
@@ -148,15 +150,15 @@ namespace Engine
                         }
                     }
 
-					const size_t tileID = ECS::CreateEntity();
+					Entity* ptrTile = ECS::CreateEntity();
 
-                    ECS::GetComponentManager<PhysicsBody>().AddComponent(tileID, STATIC, true,
+                    ECS::GetComponentManager<PhysicsBody>().AddComponent(*ptrTile, STATIC, true,
                         Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile),
                             static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile),
                             static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)));
 
-					collisionBodyIDs.push_back(tileID);
+					collisionBodyIDs.push_back(ptrTile);
                 }
             }
         }

@@ -3,6 +3,7 @@
 #include "../Core.h"
 
 #include "Camera.h"
+#include "../ECS/Entity.h"
 
 
 namespace Engine
@@ -10,7 +11,7 @@ namespace Engine
 	class CameraManager
 	{
 	public:
-		EMU_API void SetCurrentCamera(const size_t cameraEntityID);
+		EMU_API void SetCurrentCamera(Entity* cameraEntity);
 
 	public:
 		CameraManager();
@@ -22,6 +23,6 @@ namespace Engine
 		CameraManager& operator=(CameraManager&&) = delete;
 
 	public:
-		size_t m_currentCameraEntityID;
+		Entity* m_currentCameraEntity;
 	};
 }

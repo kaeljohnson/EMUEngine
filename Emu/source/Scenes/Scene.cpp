@@ -63,7 +63,9 @@ namespace Engine
 		ENGINE_CRITICAL_D("PhysicsBody component vector size: " + std::to_string(refPhysicsBodyManager.GetComponents().size()));
 		ENGINE_CRITICAL_D("Transform component vector size: " + std::to_string(refTransformManager.GetComponents().size()));
 
-		ECS::ActivateEntities(m_entityIDs);
+		ECS::LoadEntities(m_entities);
+
+		ECS::ActivateEntities(m_entities);
 
 		// Physics bodies need to be added to the world after they are activated and pooled.
 		AddPhysicsBodiesToWorld();
@@ -74,13 +76,15 @@ namespace Engine
 		DestroyPhysicsWorld();
 
 		ECS::DeactivateEntities();
+
+		ECS::UnloadEntities();
 	}
 
 	void Scene::AddTileMap(TileMap& tileMap)
 	{
 		// Get a temp vector or tile IDs from the tile map. Both the transforms and the physics bodies.
-		std::vector<size_t> tileMapEntities = tileMap.LoadMap();
-		std::vector<size_t> mapCollisionBodies = tileMap.CreateCollisionBodies();
+		std::vector<Entity*> tileMapEntities = tileMap.LoadMap();
+		std::vector<Entity*> mapCollisionBodies = tileMap.CreateCollisionBodies();
 
 		ENGINE_INFO_D("Tile map text file size: " + std::to_string(tileMap.m_map.size()));
 		ENGINE_INFO_D("Tile map tile map size: " + std::to_string(tileMap.m_tiles.size()));
@@ -93,20 +97,20 @@ namespace Engine
 
 		HasTileMap = true;
 
-		for (auto& id : tileMapEntities)
+		for (auto& entity : tileMapEntities)
 		{
-			Add(id);
+			Add(entity);
 		}
 
-		for (auto& id : mapCollisionBodies)
+		for (auto& entity : mapCollisionBodies)
 		{
-			Add(id);
+			Add(entity);
 		}
 	}
 
-	void Scene::Add(const size_t entityID)
+	void Scene::Add(Entity* ptrEntity)
 	{
-		m_entityIDs.push_back(entityID);
+		m_entities.push_back(ptrEntity);
 	}
 
 	void Scene::SetLevelDimensions(const Vector2D<int> levelDimensions)
@@ -123,6 +127,7 @@ namespace Engine
 	{
 		for (auto ptrUpdatable = refUpdatableManager.active_begin(); ptrUpdatable != refUpdatableManager.active_end(); ++ptrUpdatable)
 		{
+			if (!ptrUpdatable->IsActive()) continue;
 			ptrUpdatable->Update();
 		}
 
@@ -130,8 +135,10 @@ namespace Engine
 
 		for (auto ptrPhysicsBody = refPhysicsBodyManager.active_begin(); ptrPhysicsBody != refPhysicsBodyManager.active_end(); ++ptrPhysicsBody)
 		{
+			if (!ptrPhysicsBody->IsActive()) continue;
+
 			ptrPhysicsBody->Update();
-			Transform* ptrTransform = refTransformManager.GetComponent(ptrPhysicsBody->GetID());
+			Transform* ptrTransform = refTransformManager.GetComponent(ptrPhysicsBody->GetEntity()->GetID());
 			if (ptrTransform != nullptr)
 			{
 				ptrTransform->PrevPosition = ptrTransform->Position;
@@ -189,6 +196,8 @@ namespace Engine
 	{
 		for (auto ptrPhysicsBody = refPhysicsBodyManager.active_begin(); ptrPhysicsBody != refPhysicsBodyManager.active_end(); ++ptrPhysicsBody)
 		{
+			if (!ptrPhysicsBody->IsActive()) continue;
+
 			b2Body* body;
 			b2BodyDef bodyDef;
 			b2FixtureDef fixtureDef;
@@ -215,7 +224,7 @@ namespace Engine
 
 			bodyDef.fixedRotation = ptrPhysicsBody->GetIsRotationFixed();
 
-			bodyDef.userData.pointer = ptrPhysicsBody->GetID(); // NOTE: This is the entity ID of the physics body. Not a pointer to the physics body.
+			bodyDef.userData.pointer = ptrPhysicsBody->GetEntity()->GetID(); // NOTE: This is the entity ID of the physics body. Not a pointer to the physics body.
 
 			bodyDef.position.Set(ptrPhysicsBody->GetStartingPosition().X + ptrPhysicsBody->GetHalfWidth(),
 				ptrPhysicsBody->GetStartingPosition().Y + ptrPhysicsBody->GetHalfHeight());

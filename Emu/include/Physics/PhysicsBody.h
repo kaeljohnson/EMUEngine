@@ -54,8 +54,8 @@ namespace Engine
 		bool m_rightSensor;
 
 	public:
-		EMU_API PhysicsBody(const size_t id);
-		EMU_API PhysicsBody(const size_t id, const BodyType bodyType, const bool fixed, 
+		EMU_API PhysicsBody(Entity& entity);
+		EMU_API PhysicsBody(Entity& entity, const BodyType bodyType, const bool fixed, 
 			const Vector2D<float> position, const Vector2D<float> size);
 
 		EMU_API ~PhysicsBody();

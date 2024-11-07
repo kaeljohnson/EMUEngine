@@ -5,7 +5,7 @@
 #include "../../include/EventHandlers/AppManagementEventHandlers.h"
 
 
-AppManagementEventHandlers::AppManagementEventHandlers(Engine::EventManager& eventManager, const Engine::EntityID cameraEntityID) 
+AppManagementEventHandlers::AppManagementEventHandlers(Engine::EventManager& eventManager, Engine::Entity* cameraEntity) 
 {
 	eventManager.RegisterEventHandler(Engine::F_KEY_DOWN, [](Engine::Event& e)
 		{
@@ -39,14 +39,14 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::EventManager& eve
 	eventManager.RegisterEventHandler(Engine::G_KEY_DOWN, [&](Engine::Event& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::G_KEY_DOWN)));
-			Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(cameraEntityID)->SetPixelsPerUnit(16);
+			Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(cameraEntity)->SetPixelsPerUnit(16);
 			e.Handled = true;
 		});
 
 	eventManager.RegisterEventHandler(Engine::H_KEY_DOWN, [&](Engine::Event& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::H_KEY_DOWN)));
-			Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(cameraEntityID)->SetPixelsPerUnit(32);
+			Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(cameraEntity)->SetPixelsPerUnit(32);
 			e.Handled = true;
 		});
 	

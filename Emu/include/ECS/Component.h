@@ -1,13 +1,22 @@
 #pragma once
 
-class Component
+#include "Entity.h"
+
+namespace Engine
 {
-public:
-	Component(const size_t id) : m_id(id) {}
-	virtual ~Component() = default;
+	class Component
+	{
+	public:
+		Component(Entity& refEntity) : m_entity(&refEntity) {}
+		virtual ~Component() = default;
 
-	inline const size_t GetID() const { return m_id; }
+		inline const Entity* GetEntity() const { return m_entity; }
+		inline const bool IsActive() const { return m_active; }
+		inline void SetActive(bool active) { m_active = active; }
 
-protected:
-	size_t m_id;
-};
+	private:
+		Entity* m_entity;
+		bool m_active = false;
+	};
+
+}

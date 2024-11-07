@@ -29,29 +29,29 @@ int main(int argc, char* args[])
 	Engine::TileMap testMap("testMap1.txt", 1);
 	scene->AddTileMap(testMap);
 	
-	const size_t tileID = Engine::ECS::CreateEntity();
-	const size_t tileID2 = Engine::ECS::CreateEntity();
+	Engine::Entity* ptrTile = Engine::ECS::CreateEntity();
+	Engine::Entity * ptrTile2 = Engine::ECS::CreateEntity();
 
-	scene->Add(tileID);
-	scene->Add(tileID2);
+	scene->Add(ptrTile);
+	scene->Add(ptrTile2);
 
-	const Engine::EntityID playerEntityID = Engine::ECS::CreateEntity();
-	scene->Add(playerEntityID);
+	Engine::Entity* ptrPlayerEntity = Engine::ECS::CreateEntity();
+	scene->Add(ptrPlayerEntity);
 
-	Player player(playerEntityID, 6.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
+	Player player(ptrPlayerEntity, 6.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 
-	const Engine::EntityID cameraEntityID = Engine::ECS::CreateEntity();
-	PlayerCamera playerCamera(cameraEntityID, playerEntityID);
-	refCameraManager.SetCurrentCamera(cameraEntityID);
+	Engine::Entity* ptrCameraEntity = Engine::ECS::CreateEntity();
+	PlayerCamera playerCamera(ptrCameraEntity, ptrPlayerEntity);
+	refCameraManager.SetCurrentCamera(ptrCameraEntity);
 
-	scene2->Add(playerEntityID);
+	scene2->Add(ptrPlayerEntity);
 
 	Engine::TileMap testMap2("TestMap2.txt", 1);
 	scene2->AddTileMap(testMap2);
 
 	refSceneManager.LoadScene("Level1");
 
-	AppManagementEventHandlers appManagementEventHandlers(refEventManager, cameraEntityID);
+	AppManagementEventHandlers appManagementEventHandlers(refEventManager, ptrCameraEntity);
 
 	ptrAppInstance->Start();
 	// Need to figure out how to change scenes, stop scenes, etc.
