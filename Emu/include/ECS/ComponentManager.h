@@ -29,16 +29,16 @@ namespace Engine
         using const_iterator = typename std::vector<T>::const_iterator;
 
         // Iterator for all components (begin to end)
-        auto begin() { return m_components.begin(); }
-        auto end() { return m_components.end(); }
-        auto begin() const { return m_components.begin(); }
-        auto end() const { return m_components.end(); }
+        auto begin() { return m_hotComponents.begin(); }
+        auto end() { return m_hotComponents.end(); }
+        auto begin() const { return m_hotComponents.begin(); }
+        auto end() const { return m_hotComponents.end(); }
 
         // Iterator for active components (from begin to end)
-        auto active_begin() { return m_hotComponents.begin(); }
-        auto active_end() { return m_hotComponents.end(); }
-        auto active_begin() const { return m_hotComponents.begin(); }
-        auto active_end() const { return m_hotComponents.end(); }
+        auto all_components_begin() { return m_components.begin(); }
+        auto all_components_end() { return m_components.end(); }
+        auto all_components_begin() const { return m_components.begin(); }
+        auto all_components_end() const { return m_components.end(); }
 
         // Loads and activates components, ordering them by priority
         void LoadComponents(std::vector<Entity*>& entities)
@@ -79,7 +79,7 @@ namespace Engine
         void AddComponent(Args&&... args)
         {
             auto argsTuple = std::make_tuple(std::forward<Args>(args)...);
-            auto id = std::get<0>(argsTuple).GetID();
+            auto id = std::get<0>(argsTuple)->GetID();
 
             if (m_inactiveIdToIndex.count(id) || m_hotIdToIndex.count(id))
             {

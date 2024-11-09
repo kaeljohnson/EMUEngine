@@ -14,7 +14,7 @@ namespace Engine
     public:
         using UpdateCallback = std::function<void()>;
 
-        EMU_API Updatable(Entity& entity, UpdateCallback callback);
+        EMU_API Updatable(Entity* entity, UpdateCallback callback);
 
         EMU_API ~Updatable();
 

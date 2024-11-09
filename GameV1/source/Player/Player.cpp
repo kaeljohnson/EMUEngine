@@ -18,13 +18,13 @@
     {
         // Need to have them be able to set this during construction of physics body.
     	// m_physicsBody->SetStartingFriction(0.0f);
-        Engine::ECS::GetComponentManager<Engine::Transform>().AddComponent(*ptrEntity,
+        Engine::ECS::GetComponentManager<Engine::Transform>().AddComponent(ptrEntity,
             Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f);
 
         Engine::ECS::GetComponentManager<Engine::PhysicsBody>().AddComponent(
-            *ptrEntity, Engine::BodyType::DYNAMIC, false, Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height));
+            ptrEntity, Engine::BodyType::DYNAMIC, false, Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height));
 
-		Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(*ptrEntity, [this]() { Update(); });
+		Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
     }
 
     void Player::Update()

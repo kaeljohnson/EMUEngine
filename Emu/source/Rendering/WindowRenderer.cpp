@@ -100,21 +100,21 @@ namespace Engine
 
 		auto& transformManager = ECS::GetComponentManager<Transform>();
 
-		for (auto ptrTransform = transformManager.active_begin(); ptrTransform != transformManager.active_end(); ++ptrTransform)
+		for (Transform& refTransform : transformManager)// = transformManager.active_begin(); ptrTransform != transformManager.active_end(); ++ptrTransform)
 		{
-			if (!ptrTransform->IsActive()) continue;
+			if (!refTransform.IsActive()) continue;
 
-			float objectLeft = ptrTransform->Position.X;
-			float objectRight = objectLeft + ptrTransform->Dimensions.X;
-			float objectTop = ptrTransform->Position.Y;
-			float objectBottom = objectTop + ptrTransform->Dimensions.Y;
+			float objectLeft = refTransform.Position.X;
+			float objectRight = objectLeft + refTransform.Dimensions.X;
+			float objectTop = refTransform.Position.Y;
+			float objectBottom = objectTop + refTransform.Dimensions.Y;
 
 			bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
 				objectBottom >= cameraTop && objectTop <= cameraBottom;
 
 			if (isVisible)
 			{
-				Draw(*ptrTransform, ptrCurrentCamera->GetPixelsPerUnit(), Vector2D<float>(cameraLeft, cameraTop));
+				Draw(refTransform, ptrCurrentCamera->GetPixelsPerUnit(), Vector2D<float>(cameraLeft, cameraTop));
 			}
 		}
 

@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	Camera::Camera(Entity& entity) : m_pixelsPerUnit(32), 
+	Camera::Camera(Entity* entity) : m_pixelsPerUnit(32), 
 		m_offset(0, 0), m_size(0, 0), m_clampingOn(true), Component(entity) {}
 
 	void Camera::SetPixelsPerUnit(const int pixelsPerUnit)

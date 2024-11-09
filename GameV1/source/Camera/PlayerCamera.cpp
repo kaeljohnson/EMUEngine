@@ -9,8 +9,8 @@ PlayerCamera::PlayerCamera(Engine::Entity* ptrEntity, Engine::Entity* ptrPlayerE
     m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(true),
     m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(0.5f), m_lookAhead(0.0f)
 {
-	Engine::ECS::GetComponentManager<Engine::Camera>().AddComponent(*ptrEntity);
-    Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(*ptrEntity, [this]() { Update(); });
+	Engine::ECS::GetComponentManager<Engine::Camera>().AddComponent(ptrEntity);
+    Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
 
 	Engine::Camera* playerCamera = Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(m_entityID);
     playerCamera->SetPixelsPerUnit(32);
@@ -25,9 +25,6 @@ void PlayerCamera::Update()
 
     float targetX = Engine::Lerp(ptrCameraTarget->PrevPosition.X, ptrCameraTarget->Position.X, Engine::Time::GetInterpolationFactor());
     float targetY = Engine::Lerp(ptrCameraTarget->PrevPosition.Y, ptrCameraTarget->Position.Y, Engine::Time::GetInterpolationFactor());
-
-	// float targetX = ptrCameraTarget->Position.X;
-	// float targetY = ptrCameraTarget->Position.Y;
 
     float desiredLookAhead = ptrCameraTarget->DirectionFacing * m_lookAheadFactor;
 

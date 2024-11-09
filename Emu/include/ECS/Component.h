@@ -7,7 +7,7 @@ namespace Engine
 	class Component
 	{
 	public:
-		Component(Entity& refEntity) : m_entity(&refEntity) {}
+		Component(Entity* ptrEntity) : m_entity(ptrEntity) {}
 		virtual ~Component() = default;
 
 		inline const Entity* GetEntity() const { return m_entity; }

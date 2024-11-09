@@ -12,7 +12,7 @@ namespace Engine
 	class Camera : public Component
 	{
 	public:
-		EMU_API Camera(Entity& entity);
+		EMU_API Camera(Entity* entity);
 		
 		EMU_API void SetPixelsPerUnit(const int pixelsPerUnit);
 		EMU_API void SetCameraPosition(const Vector2D<float> offset);

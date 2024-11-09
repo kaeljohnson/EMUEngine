@@ -12,7 +12,7 @@
 
 namespace Engine
 {
-	PhysicsBody::PhysicsBody(Entity& entity) : m_halfWidth(0.0f), m_halfHeight(0.0f), m_width(0.0f), m_height(0.0f),
+	PhysicsBody::PhysicsBody(Entity* entity) : m_halfWidth(0.0f), m_halfHeight(0.0f), m_width(0.0f), m_height(0.0f),
 		m_startingPosition(Vector2D<float>(0.0f, 0.0f)), m_bodyType(STATIC), m_fixed(false), m_body(nullptr),
 		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
 		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
@@ -22,7 +22,7 @@ namespace Engine
 	{
 	}
 
-	PhysicsBody::PhysicsBody(Entity& entity, const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
+	PhysicsBody::PhysicsBody(Entity* entity, const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
 		: m_halfWidth(size.X / 2.0f), m_halfHeight(size.Y / 2.0f), 
 		m_width(size.X), m_height(size.Y), m_startingPosition(position),
 		m_bodyType(bodyType), m_fixed(fixed), m_body(nullptr),

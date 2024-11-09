@@ -16,8 +16,6 @@ namespace Engine
         : m_mapDimensions(0, 0), m_numUnitsPerTile(numMetersPerTile)
 	{
         m_map.reserve(MAX_SIZE);
-		m_collisionBodies.reserve(MAX_SIZE);
-		m_tiles.reserve(MAX_SIZE);
         
         std::ifstream file(mapFile);
         if (!file) 
@@ -70,14 +68,15 @@ namespace Engine
                 {
                     // Might need to add this to an array?
                     Entity* ptrTile = ECS::CreateEntity();
+					ptrTile->SetPriority(1);
 
                     // Create "Tiles"
-                    ECS::GetComponentManager<Transform>().AddComponent(*ptrTile,
+                    ECS::GetComponentManager<Transform>().AddComponent(ptrTile,
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)), 
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
                         1.0f, 1.0f, 1.0f);
 
-                    ECS::GetComponentManager<PhysicsBody>().AddComponent(*ptrTile, SENSOR, true,
+                    ECS::GetComponentManager<PhysicsBody>().AddComponent(ptrTile, SENSOR, true,
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)));
 
@@ -151,8 +150,9 @@ namespace Engine
                     }
 
 					Entity* ptrTile = ECS::CreateEntity();
+					ptrTile->SetPriority(1);
 
-                    ECS::GetComponentManager<PhysicsBody>().AddComponent(*ptrTile, STATIC, true,
+                    ECS::GetComponentManager<PhysicsBody>().AddComponent(ptrTile, STATIC, true,
                         Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile),
                             static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile),
@@ -169,8 +169,6 @@ namespace Engine
     // Call this sparingly.
     void TileMap::UnloadMap()
 	{
-		m_tiles.clear();
-        m_tiles.shrink_to_fit();
 	}
 
     const char TileMap::GetTile(int x, int y) const

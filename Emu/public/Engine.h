@@ -11,7 +11,6 @@
 #include "../include/Scenes/SceneManager.h"
 #include "../include/Physics/BodyTypes.h"
 #include "../include/Physics/PhysicsBody.h"
-#include "../include/Tiles/Tile.h"
 #include "../include/Tiles/TileMap.h"
 
 #include "../include/Rendering/Screen.h"

@@ -4,8 +4,10 @@
 #include "../MathUtil.h"
 
 #include <vector>
+#include <string>
 
-#include "Tile.h"
+#include "../Physics/PhysicsBody.h"
+#include "../ECS/Entity.h"
 
 namespace Engine
 {
@@ -28,16 +30,9 @@ namespace Engine
 		std::vector<Entity*> CreateCollisionBodies();
 		void UnloadMap();
 
-		std::vector<Tile>::iterator begin() { return m_tiles.begin(); }
-		std::vector<Tile>::iterator end() { return m_tiles.end(); }
-
-		std::vector<Tile>::const_iterator begin() const { return m_tiles.begin(); }
-		std::vector<Tile>::const_iterator end() const { return m_tiles.end(); }
-
 	public:
 		std::vector<char> m_map;
 		std::vector<PhysicsBody> m_collisionBodies;
-		std::vector<Tile> m_tiles;
 		Vector2D<int> m_mapDimensions;
 		Vector2D<size_t> m_sceneObjectIDs;
 

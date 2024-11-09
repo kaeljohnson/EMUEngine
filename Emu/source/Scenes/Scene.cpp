@@ -7,7 +7,6 @@
 #include "../../include/Physics/PhysicsBody.h"
 #include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Tiles/TileMap.h"
-#include "../../include/Tiles/Tile.h"
 #include "../../include/MathUtil.h"
 #include "../../include/Transform.h"
 #include "../../include/ECS/ECS.h"
@@ -87,7 +86,6 @@ namespace Engine
 		std::vector<Entity*> mapCollisionBodies = tileMap.CreateCollisionBodies();
 
 		ENGINE_INFO_D("Tile map text file size: " + std::to_string(tileMap.m_map.size()));
-		ENGINE_INFO_D("Tile map tile map size: " + std::to_string(tileMap.m_tiles.size()));
 		ENGINE_INFO_D("Tile map collision bodies size: " + std::to_string(tileMap.m_collisionBodies.size()));
 
 		m_levelDimensionsInUnits = Vector2D<int>(tileMap.GetWidth(), tileMap.GetHeight());
@@ -125,26 +123,26 @@ namespace Engine
 
 	void Scene::Update()
 	{
-		for (auto ptrUpdatable = refUpdatableManager.active_begin(); ptrUpdatable != refUpdatableManager.active_end(); ++ptrUpdatable)
+		for (Updatable& refUpdatable : refUpdatableManager)
 		{
-			if (!ptrUpdatable->IsActive()) continue;
-			ptrUpdatable->Update();
+			if (!refUpdatable.IsActive()) continue;
+			refUpdatable.Update();
 		}
 
 		m_world->Step(Time::GetTimeStep(), 8, 3);
 
-		for (auto ptrPhysicsBody = refPhysicsBodyManager.active_begin(); ptrPhysicsBody != refPhysicsBodyManager.active_end(); ++ptrPhysicsBody)
+		for (PhysicsBody& refPhysicsBody : refPhysicsBodyManager)
 		{
-			if (!ptrPhysicsBody->IsActive()) continue;
+			if (!refPhysicsBody.IsActive()) continue;
 
-			ptrPhysicsBody->Update();
-			Transform* ptrTransform = refTransformManager.GetComponent(ptrPhysicsBody->GetEntity()->GetID());
+			refPhysicsBody.Update();
+			Transform* ptrTransform = refTransformManager.GetComponent(refPhysicsBody.GetEntity()->GetID());
 			if (ptrTransform != nullptr)
 			{
 				ptrTransform->PrevPosition = ptrTransform->Position;
-				ptrTransform->Position = ptrPhysicsBody->GetTopLeftPosition();
-				ptrTransform->Dimensions = ptrPhysicsBody->GetDimensions();
-				ptrTransform->Rotation = ptrPhysicsBody->GetAngleInDegrees();
+				ptrTransform->Position = refPhysicsBody.GetTopLeftPosition();
+				ptrTransform->Dimensions = refPhysicsBody.GetDimensions();
+				ptrTransform->Rotation = refPhysicsBody.GetAngleInDegrees();
 			}
 		}
 	};
@@ -194,15 +192,15 @@ namespace Engine
 
 	void Scene::AddPhysicsBodiesToWorld()
 	{
-		for (auto ptrPhysicsBody = refPhysicsBodyManager.active_begin(); ptrPhysicsBody != refPhysicsBodyManager.active_end(); ++ptrPhysicsBody)
+		for (PhysicsBody& refPhysicsBody : refPhysicsBodyManager)
 		{
-			if (!ptrPhysicsBody->IsActive()) continue;
+			if (!refPhysicsBody.IsActive()) continue;
 
 			b2Body* body;
 			b2BodyDef bodyDef;
 			b2FixtureDef fixtureDef;
 			b2PolygonShape shape;
-			switch (ptrPhysicsBody->GetBodyType())
+			switch (refPhysicsBody.GetBodyType())
 			{
 				case STATIC:
 					bodyDef.type = b2_staticBody;
@@ -215,32 +213,32 @@ namespace Engine
 					break;
 				case SENSOR:
 					bodyDef.type = b2_kinematicBody;
-					ptrPhysicsBody->SetIsSensor(true);
+					refPhysicsBody.SetIsSensor(true);
 					break;
 				default:
 					bodyDef.type = b2_staticBody;
 					break;
 			}
 
-			bodyDef.fixedRotation = ptrPhysicsBody->GetIsRotationFixed();
+			bodyDef.fixedRotation = refPhysicsBody.GetIsRotationFixed();
 
-			bodyDef.userData.pointer = ptrPhysicsBody->GetEntity()->GetID(); // NOTE: This is the entity ID of the physics body. Not a pointer to the physics body.
+			bodyDef.userData.pointer = refPhysicsBody.GetEntity()->GetID(); // NOTE: This is the entity ID of the physics body. Not a pointer to the physics body.
 
-			bodyDef.position.Set(ptrPhysicsBody->GetStartingPosition().X + ptrPhysicsBody->GetHalfWidth(),
-				ptrPhysicsBody->GetStartingPosition().Y + ptrPhysicsBody->GetHalfHeight());
+			bodyDef.position.Set(refPhysicsBody.GetStartingPosition().X + refPhysicsBody.GetHalfWidth(),
+				refPhysicsBody.GetStartingPosition().Y + refPhysicsBody.GetHalfHeight());
 					
 			body = m_world->CreateBody(&bodyDef);
 
-			shape.SetAsBox(ptrPhysicsBody->GetHalfWidth(), ptrPhysicsBody->GetHalfHeight());
+			shape.SetAsBox(refPhysicsBody.GetHalfWidth(), refPhysicsBody.GetHalfHeight());
 			fixtureDef.shape = &shape;
-			fixtureDef.restitution = ptrPhysicsBody->GetStartingRestitution();
-			fixtureDef.restitutionThreshold = ptrPhysicsBody->GetStartingRestitutionThreshold();
-			fixtureDef.density = ptrPhysicsBody->GetStartingDensity();
-			fixtureDef.friction = ptrPhysicsBody->GetStartingFriction();
-			fixtureDef.isSensor = ptrPhysicsBody->GetIsSensor();
+			fixtureDef.restitution = refPhysicsBody.GetStartingRestitution();
+			fixtureDef.restitutionThreshold = refPhysicsBody.GetStartingRestitutionThreshold();
+			fixtureDef.density = refPhysicsBody.GetStartingDensity();
+			fixtureDef.friction = refPhysicsBody.GetStartingFriction();
+			fixtureDef.isSensor = refPhysicsBody.GetIsSensor();
 			body->CreateFixture(&fixtureDef);
 
-			ptrPhysicsBody->m_body = body;
+			refPhysicsBody.m_body = body;
 		}
 	}
 }

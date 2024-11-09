@@ -28,19 +28,16 @@ int main(int argc, char* args[])
 
 	Engine::TileMap testMap("testMap1.txt", 1);
 	scene->AddTileMap(testMap);
-	
-	Engine::Entity* ptrTile = Engine::ECS::CreateEntity();
-	Engine::Entity * ptrTile2 = Engine::ECS::CreateEntity();
-
-	scene->Add(ptrTile);
-	scene->Add(ptrTile2);
 
 	Engine::Entity* ptrPlayerEntity = Engine::ECS::CreateEntity();
+	ptrPlayerEntity->SetPriority(0);
 	scene->Add(ptrPlayerEntity);
 
 	Player player(ptrPlayerEntity, 6.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 
 	Engine::Entity* ptrCameraEntity = Engine::ECS::CreateEntity();
+	ptrCameraEntity->SetPriority(0);
+
 	PlayerCamera playerCamera(ptrCameraEntity, ptrPlayerEntity);
 	refCameraManager.SetCurrentCamera(ptrCameraEntity);
 

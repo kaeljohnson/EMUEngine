@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	Updatable::Updatable(Entity& entity, UpdateCallback callback)
+	Updatable::Updatable(Entity* entity, UpdateCallback callback)
 		: m_callback(callback), Component(entity)
 	{
 	}

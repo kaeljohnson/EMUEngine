@@ -22,7 +22,7 @@ namespace Engine
 		int DirectionFacing;
 
 		EMU_API ~Transform();
-		EMU_API Transform(Entity& entity);
-		EMU_API Transform(Entity& entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction);
+		EMU_API Transform(Entity* entity);
+		EMU_API Transform(Entity* entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction);
 	};
 }
