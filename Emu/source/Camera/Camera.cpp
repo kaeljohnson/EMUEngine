@@ -3,6 +3,7 @@
 #include "../../include/Camera/Camera.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Rendering/Screen.h"
+#include "../../include/ECS/Entity.h"
 
 namespace Engine
 {

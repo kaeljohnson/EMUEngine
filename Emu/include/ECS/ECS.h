@@ -36,7 +36,7 @@ namespace Engine
                 {
                     usedIDs.insert(id);
                     Entity* ptrEntity = new Entity(id);
-					m_entities.emplace(id, ptrEntity);
+					// m_entities.emplace(id, ptrEntity);
                     return ptrEntity;
                 }
             }
@@ -45,10 +45,10 @@ namespace Engine
             throw std::runtime_error("Error: Unable to generate a new ID.");
         }
 
-		static Entity* GetEntity(EntityID entityID)
+		/*static Entity* GetEntity(EntityID entityID)
 		{
 			return m_entities[entityID];
-		}
+		}*/
 
         static void DestroyEntity(EntityID entityID) 
         {
@@ -137,7 +137,7 @@ namespace Engine
         // These must be exposed through API so the client app shares the same objects.
         EMU_API static EntityID maxID;
         EMU_API static std::unordered_set<size_t> usedIDs;
-		EMU_API static std::unordered_map<size_t, Entity*> m_entities; // Is it necessary to have this?
+		// EMU_API static std::unordered_map<size_t, Entity*> m_entities; // Is it necessary to have this?
         EMU_API static std::unordered_map<std::type_index, std::unique_ptr<ComponentManagerBase>> m_componentManagers;
 
         static void releaseID(size_t id)
