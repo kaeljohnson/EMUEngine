@@ -9,6 +9,6 @@ namespace Engine
 
 	void CameraManager::SetCurrentCamera(Entity* ptrCameraEntity)
 	{
-		m_ptrCurrentCameraEntity = ptrCameraEntity;
+		m_currentCameraEntity = ptrCameraEntity;
 	}
 }
