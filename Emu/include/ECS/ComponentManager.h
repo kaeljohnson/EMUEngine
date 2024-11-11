@@ -73,6 +73,22 @@ namespace Engine
             SortHotComponentsByPriority();
         }
 
+        // Sort hot components by priority based on m_hotComponents
+        void SortHotComponentsByPriority()
+        {
+            std::sort(m_hotComponents.begin(), m_hotComponents.end(),
+                [this](const T& a, const T& b)
+                {
+                    return a.GetEntity()->GetPriority() > b.GetEntity()->GetPriority();
+                });
+
+            // Update the m_hotIdToIndex map to reflect the new order
+            for (size_t i = 0; i < m_hotComponents.size(); ++i)
+            {
+                size_t id = m_hotComponents[i].GetEntity()->GetID();
+                m_hotIdToIndex[id] = i;
+            }
+        }
 
         // Adds or updates an inactive component
         template<typename... Args>
@@ -195,23 +211,6 @@ namespace Engine
 			for (auto& component : m_hotComponents)
             {
 				component.SetActive(false);
-            }
-        }
-
-        // Sort hot components by priority based on m_hotComponents
-        void SortHotComponentsByPriority()
-        {
-            std::sort(m_hotComponents.begin(), m_hotComponents.end(),
-                [this](const T& a, const T& b)
-                {
-                    return a.GetEntity()->GetPriority() > b.GetEntity()->GetPriority();
-                });
-
-            // Update the m_hotIdToIndex map to reflect the new order
-            for (size_t i = 0; i < m_hotComponents.size(); ++i)
-            {
-                size_t id = m_hotComponents[i].GetEntity()->GetID();
-                m_hotIdToIndex[id] = i;
             }
         }
 
