@@ -38,8 +38,9 @@ if not exist build\bin\%CONFIG%\ (
     echo Building %CONFIG%...
     if not exist build\ (mkdir build)
     cd build
-    cmake .. 
-    cmake --build . --config %CONFIG%
+    cmake -DBOX2D_BUILD_DOCS=ON -DCMAKE_INSTALL_PREFIX="install" ..
+    cmake --build .
+    cmake --build . --target INSTALL
     cd ..
 )
 

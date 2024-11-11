@@ -24,15 +24,13 @@ project "Emu"
     {
         "%{prj.name}/external/vcpkg/installed/x64-windows/include",
         "%{prj.name}/external/spdlog/include",
-        "%{prj.name}/external/box2d/include"
+        "%{prj.name}/external/box2d/build/install/include"
     }
 
     libdirs
 	{
 		"%{prj.name}/external/vcpkg/installed/x64-windows/lib",
-		"%{prj.name}/external/box2d/build/bin/Debug",
-		"%{prj.name}/external/box2d/build/bin/Release",
-		"%{prj.name}/external/box2d/build/bin/Dist"
+		"%{prj.name}/external/box2d/build/install/lib"
 	}
 
     links
@@ -47,6 +45,7 @@ project "Emu"
         cppdialect "C++20"
         staticruntime "off"
         systemversion "latest"
+        buildoptions { "/utf-8" }
 
         defines
         {
