@@ -12,7 +12,7 @@
 #include "../../include/ECS/ECS.h"
 #include "../../include/Updatable/Updatable.h"
 #include "../../include/Time.h"
-
+#include "../../include/GameState.h"
 namespace Engine
 {
 	Scene::Scene() : m_levelDimensionsInUnits(32, 32), HasTileMap(false),
@@ -47,6 +47,7 @@ namespace Engine
 
 		delete m_world;
 		m_world = nullptr;
+		ENGINE_INFO_D("World freed!");
 	}
 
 	void Scene::CheckValid()
@@ -66,10 +67,14 @@ namespace Engine
 
 		// Physics bodies need to be added to the world after they are activated and pooled.
 		AddPhysicsBodiesToWorld();
+
+		GameState::IN_SCENE = true;
 	}
 
 	void Scene::OnSceneEnd()
 	{
+		GameState::IN_SCENE = false;
+
 		DestroyPhysicsWorld();
 
 		ECS::UnloadEntities();

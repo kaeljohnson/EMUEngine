@@ -7,8 +7,6 @@
 
 #include "Entity.h"
 
-#include "../Logging/Logger.h"
-
 namespace Engine
 {
     class ComponentManagerBase 
@@ -198,7 +196,6 @@ namespace Engine
             auto it = m_hotIdToIndex.find(id);
             if (it == m_hotIdToIndex.end())
             {
-                ENGINE_CRITICAL_D("FUCK");
                 return;
             }
 

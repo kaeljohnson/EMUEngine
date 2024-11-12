@@ -7,7 +7,7 @@
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/BodyTypes.h"
 #include "../../include/ECS/ECS.h"
-#include "../../include/Time.h"
+#include "../../include/GameState.h"
 
 #include "box2d/box2d.h"
 
@@ -107,13 +107,13 @@ namespace Engine
 
 	void PhysicsBody::OnDeactivate()
 	{
-		if (Time::IsAppRunning())
+		if (GameState::IN_SCENE)
 			m_body->SetAwake(false);
 	}
 
 	void PhysicsBody::OnActivate()
 	{
-		if (Time::IsAppRunning())
+		if (GameState::IN_SCENE)
 			m_body->SetAwake(true);
 	}
 
