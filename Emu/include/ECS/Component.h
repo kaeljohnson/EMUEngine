@@ -10,7 +10,7 @@ namespace Engine
 		Component(Entity* ptrEntity) : m_ptrEntity(ptrEntity) {}
 		virtual ~Component() = default;
 
-		inline const Entity* GetEntity() const { return m_ptrEntity; }
+		inline Entity* GetEntity() const { return m_ptrEntity; }
 		inline const bool IsActive() const { return m_active; }
 		inline void SetActive(bool active) 
 		{

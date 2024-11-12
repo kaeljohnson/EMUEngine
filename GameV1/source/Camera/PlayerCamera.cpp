@@ -5,21 +5,21 @@
 #include "../../include/Camera/PlayerCamera.h"
 
 PlayerCamera::PlayerCamera(Engine::Entity* ptrEntity, Engine::Entity* ptrPlayerEntity) : 
-    m_entityID(ptrEntity->GetID()), m_cameraTargetEntityID(ptrPlayerEntity->GetID()), m_smoothingFactor(0.001f),
+    m_ptrEntity(ptrEntity), m_ptrCameraTargetEntity(ptrPlayerEntity), m_smoothingFactor(0.001f),
     m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(true),
     m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(0.5f), m_lookAhead(0.0f)
 {
 	Engine::ECS::GetComponentManager<Engine::Camera>().AddComponent(ptrEntity);
     Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
 
-	Engine::Camera* playerCamera = Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(m_entityID);
+	Engine::Camera* playerCamera = Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
     playerCamera->SetPixelsPerUnit(32);
 }
 
 void PlayerCamera::Update()
 {
-	Engine::Transform* ptrCameraTarget = Engine::ECS::GetComponentManager<Engine::Transform>().GetComponent(m_cameraTargetEntityID);
-	Engine::Camera* ptrCamera = Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(m_entityID);
+	Engine::Transform* ptrCameraTarget = Engine::ECS::GetComponentManager<Engine::Transform>().GetComponent(m_ptrCameraTargetEntity);
+	Engine::Camera* ptrCamera = Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
 
 	// Need something like Time::GetInterpolationFactor=() to get the time between frames
 

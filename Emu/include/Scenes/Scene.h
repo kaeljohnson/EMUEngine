@@ -27,7 +27,7 @@ namespace Engine
 		EMU_API void CreatePhysicsSimulation(const Vector2D<float> gravity);
 		EMU_API void SetGravity(const Vector2D<float> gravity);
 	
-		EMU_API void Remove(const int entityID);
+		EMU_API void Remove(Entity* entityID);
 		EMU_API void AddTileMap(TileMap& tileMap);
 
 		EMU_API void Add(Entity* entity);

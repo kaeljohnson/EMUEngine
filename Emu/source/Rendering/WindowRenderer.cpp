@@ -144,7 +144,7 @@ namespace Engine
 
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)
-		PhysicsBody* ptrBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(transform.GetEntity()->GetID());
+		PhysicsBody* ptrBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(transform.GetEntity());
 		if (ptrBody == nullptr)
 		{
 			ENGINE_CRITICAL("PhysicsBody not found for Transform with ID: " + std::to_string(transform.GetEntity()->GetID()));

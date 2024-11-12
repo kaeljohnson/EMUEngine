@@ -14,13 +14,13 @@ namespace Engine
     public:
         virtual ~ComponentManagerBase() = default;
         virtual void Allocate(size_t size) = 0;
-        virtual void RemoveComponent(size_t id) = 0;
 		virtual void LoadComponents(std::vector<Entity*>& entities) = 0;
 		virtual void UnloadComponents() = 0;
 		virtual void ActivateComponents(std::vector<Entity*>& entities) = 0;
-		virtual void ActivateComponent(Entity* entity) = 0;
+		virtual void ActivateComponent(Entity* ptrEntity) = 0;
 		virtual void DeactivateComponents() = 0;
-		virtual void DeactivateComponent(Entity* entity) = 0;
+		virtual void DeactivateComponent(Entity* ptrEntity) = 0;
+		virtual void RemoveComponent(Entity* ptrEntity) = 0;
     };
 
     template <typename T>
@@ -30,19 +30,19 @@ namespace Engine
         using iterator = typename std::vector<T>::iterator;
         using const_iterator = typename std::vector<T>::const_iterator;
 
-        // Iterator for all components (begin to end)
+        // Iterator for hot components (begin to end)
         auto begin() { return m_hotComponents.begin(); }
         auto end() { return m_hotComponents.end(); }
         auto begin() const { return m_hotComponents.begin(); }
         auto end() const { return m_hotComponents.end(); }
 
-        // Iterator for active components (from begin to end)
+        // Iterator for all components (from begin to end)
         auto all_components_begin() { return m_components.begin(); }
         auto all_components_end() { return m_components.end(); }
         auto all_components_begin() const { return m_components.begin(); }
         auto all_components_end() const { return m_components.end(); }
 
-        // Loads and activates components, ordering them by priority
+        // Loads components into hot array, ordering them by priority.
         void LoadComponents(std::vector<Entity*>& entities)
         {
             for (Entity* entity : entities)
@@ -76,7 +76,7 @@ namespace Engine
             SortHotComponentsByPriority();
         }
 
-        // Unloads components, moving them from m_hotComponents back to m_components
+        // Unloads components, moving them from hot array back to component array.
         void UnloadComponents()
         {
             for (T& component : m_hotComponents)
@@ -84,7 +84,7 @@ namespace Engine
                 size_t id = component.GetEntity()->GetID();
 				component.SetActive(false);
 
-                // Move the component back to m_components (order is not important here)
+				// Move the component back to m_components in any order.
                 m_components.push_back(std::move(component));
                 m_inactiveIdToIndex[id] = m_components.size() - 1;
             }
@@ -93,7 +93,7 @@ namespace Engine
             m_hotIdToIndex.clear();
         }
 
-        // Sort hot components by priority based on m_hotComponents
+        // Sort hot components by priority
         void SortHotComponentsByPriority()
         {
             std::sort(m_hotComponents.begin(), m_hotComponents.end(),
@@ -119,15 +119,16 @@ namespace Engine
 
             if (m_inactiveIdToIndex.count(id) || m_hotIdToIndex.count(id))
             {
-                return; // Component already exists
+                return; // Component already exists 
             }
 
             m_components.emplace_back(std::forward<Args>(args)...);
             m_inactiveIdToIndex[id] = m_components.size() - 1;
         }
 
-        void RemoveComponent(size_t id) override
+        void RemoveComponent(Entity* ptrEntity) override
         {
+			size_t id = ptrEntity->GetID();
             auto it = m_inactiveIdToIndex.find(id);
             if (it != m_inactiveIdToIndex.end())
             {
@@ -152,12 +153,11 @@ namespace Engine
 
 		T* GetComponent(Entity* entity)
 		{
-			return GetComponent(entity->GetID());
-		}
+			// Only call this function if the component certainly 
+            // exists as it throws an exception otherwise. Call
+			// HasComponent() to check if the component exists.
 
-        T* GetComponent(size_t id)
-        {
-            // Call HasComponent before calling GetComponent to check if the component exists
+			size_t id = entity->GetID();
             auto it = m_hotIdToIndex.find(id);
             if (it != m_hotIdToIndex.end())
             {
@@ -170,11 +170,12 @@ namespace Engine
                 return &m_components[it->second];
             }
 
-            return nullptr;
-        }
+			throw std::runtime_error("Component does not exist.");
+		}
 
-        void HasComponent(size_t id)
+        bool HasComponent(Entity* ptrEntity)
         {
+			size_t id = ptrEntity->GetID();
             auto it = m_hotIdToIndex.find(id);
             if (it != m_hotIdToIndex.end())
             {
@@ -190,7 +191,7 @@ namespace Engine
             return false;
         }
 
-        void ActivateComponent(Entity* entity)
+		void ActivateComponent(Entity* entity) override
 		{
 			auto id = entity->GetID();
             auto it = m_hotIdToIndex.find(id);
@@ -204,10 +205,18 @@ namespace Engine
 			m_hotComponents[index].SetActive(true);
         }
 
-        // Deactivate component by removing it from m_hotComponents
-        void DeactivateComponent(Entity* entity)
+        void ActivateComponents(std::vector<Entity*>& entities) override
         {
-			auto id = entity->GetID();
+            for (Entity* entity : entities)
+            {
+                ActivateComponent(entity);
+            }
+        }
+
+        // Deactivate component by removing it from m_hotComponents
+        void DeactivateComponent(Entity* entity) override
+        {
+            auto id = entity->GetID();
             auto it = m_hotIdToIndex.find(id);
             if (it == m_hotIdToIndex.end())
             {
@@ -216,15 +225,7 @@ namespace Engine
 
             size_t index = it->second;
 
-			m_hotComponents[index].SetActive(false);
-        }
-
-        void ActivateComponents(std::vector<Entity*>& entities) override
-        {
-            for (Entity* entity : entities)
-            {
-                ActivateComponent(entity);
-            }
+            m_hotComponents[index].SetActive(false);
         }
 
         void DeactivateComponents() override

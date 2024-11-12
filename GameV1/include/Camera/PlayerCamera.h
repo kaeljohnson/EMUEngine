@@ -20,9 +20,9 @@ public:
 
 
 private:
-	const Engine::EntityID m_entityID;
+	Engine::Entity* m_ptrEntity;
 
-	const Engine::EntityID m_cameraTargetEntityID;
+	Engine::Entity* m_ptrCameraTargetEntity;
 
 	bool m_smoothingOn;
 	float m_lookAhead;

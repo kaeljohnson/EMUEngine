@@ -40,7 +40,7 @@ namespace Engine
 		while (body != nullptr)
 		{
 			b2Body* nextBody = body->GetNext();
-			PhysicsBody* ptrBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(body->GetUserData().pointer);
+			PhysicsBody* ptrBody = ECS::GetComponentManager<PhysicsBody>().GetComponent((Entity*)body->GetUserData().pointer);
 			ptrBody->RemoveBodyFromWorld();
 			body = nextBody;
 		}
@@ -112,6 +112,13 @@ namespace Engine
 		m_entities.push_back(ptrEntity);
 	}
 
+	void Scene::Remove(Entity* ptrEntity)
+	{
+		// Remove entity from the scene. Do not remove the entity from the ECS, just deactivate it.
+		m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), ptrEntity), m_entities.end());
+		ECS::Deactivate(ptrEntity);
+	}
+
 	void Scene::SetLevelDimensions(const Vector2D<int> levelDimensions)
 	{
 		if (HasTileMap)
@@ -137,9 +144,13 @@ namespace Engine
 			if (!refPhysicsBody.IsActive()) continue;
 
 			refPhysicsBody.Update();
-			Transform* ptrTransform = refTransformManager.GetComponent(refPhysicsBody.GetEntity()->GetID());
-			if (ptrTransform != nullptr)
+
+			Entity* ptrEntity = refPhysicsBody.GetEntity();
+
+			if (refTransformManager.HasComponent(ptrEntity))
 			{
+				Transform* ptrTransform = refTransformManager.GetComponent(ptrEntity);
+				
 				ptrTransform->PrevPosition = ptrTransform->Position;
 				ptrTransform->Position = refPhysicsBody.GetTopLeftPosition();
 				ptrTransform->Dimensions = refPhysicsBody.GetDimensions();
@@ -176,19 +187,7 @@ namespace Engine
 
 	void Scene::SetGravity(const Vector2D<float> gravity)
 	{
-
 		m_world->SetGravity(b2Vec2(m_gravity.X, m_gravity.Y));
-	
-	}
-
-	void Scene::Remove(const int id)
-	{
-		// If scene object has a physics body, remove it from the world.
-		PhysicsBody* physicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(id);
-		if (physicsBody != nullptr)
-		{
-			physicsBody->RemoveBodyFromWorld();
-		}
 	}
 
 	void Scene::AddPhysicsBodiesToWorld()
@@ -223,7 +222,7 @@ namespace Engine
 
 			bodyDef.fixedRotation = refPhysicsBody.GetIsRotationFixed();
 
-			bodyDef.userData.pointer = refPhysicsBody.GetEntity()->GetID(); // NOTE: This is the entity ID of the physics body. Not a pointer to the physics body.
+			bodyDef.userData.pointer = (uintptr_t)refPhysicsBody.GetEntity(); // NOTE: This is the entity ID of the physics body. Not a pointer to the physics body.
 
 			bodyDef.position.Set(refPhysicsBody.GetStartingPosition().X + refPhysicsBody.GetHalfWidth(),
 				refPhysicsBody.GetStartingPosition().Y + refPhysicsBody.GetHalfHeight());

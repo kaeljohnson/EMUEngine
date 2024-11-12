@@ -150,7 +150,7 @@ namespace Engine
 				}
 								
 				PhysicsBody* otherPhysicsBody = 
-					ECS::GetComponentManager<PhysicsBody>().GetComponent(otherBody->GetUserData().pointer);
+					ECS::GetComponentManager<PhysicsBody>().GetComponent((Entity*)otherBody->GetUserData().pointer);
 
 				// Assuming the first point's normal is representative for the whole contact
 				b2Vec2 normal = worldManifold.normal;
