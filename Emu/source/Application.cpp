@@ -37,7 +37,7 @@ namespace Engine
 	}
 
 	Application::Application()
-		: running(false), m_cameraManager(), m_eventManager(), m_windowRenderer()
+		: m_cameraManager(), m_eventManager(), m_windowRenderer()
 	{
 		defineDefaultApplicationCallbacks();
 	}
@@ -49,7 +49,7 @@ namespace Engine
 
 		// m_windowRenderer.SetCamera(m_cameraManager.m_ptrCurrentCamera);
 
-		running = true;
+		Time::SetAppRunning(true);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
@@ -63,7 +63,7 @@ namespace Engine
 		float interpolation = 0.0;
 
 		// Application loop.
-		while (running)
+		while (Time::IsAppRunning())
 		{
 			/*
 			Each game loop iteration should:
@@ -106,7 +106,7 @@ namespace Engine
 
 			m_windowRenderer.Render(m_cameraManager.m_ptrCurrentCameraEntity);
 
-			if (running == false)
+			if (!Time::IsAppRunning())
 			{ 
 				// Cleanup static objects
 				ECS::Cleanup();
@@ -118,7 +118,7 @@ namespace Engine
 	{
 		ENGINE_INFO_D("Application ending!");
 
-		running = false;
+		Time::SetAppRunning(false);
 	}
 
 	Application::~Application() {}

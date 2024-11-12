@@ -7,6 +7,8 @@
 
 #include "Entity.h"
 
+#include "../Logging/Logger.h"
+
 namespace Engine
 {
     class ComponentManagerBase 
@@ -18,7 +20,9 @@ namespace Engine
 		virtual void LoadComponents(std::vector<Entity*>& entities) = 0;
 		virtual void UnloadComponents() = 0;
 		virtual void ActivateComponents(std::vector<Entity*>& entities) = 0;
+		virtual void ActivateComponent(Entity* entity) = 0;
 		virtual void DeactivateComponents() = 0;
+		virtual void DeactivateComponent(Entity* entity) = 0;
     };
 
     template <typename T>
@@ -53,6 +57,7 @@ namespace Engine
 
                     // Move component to m_hotComponents
                     m_hotComponents.push_back(std::move(m_components[index]));
+					m_hotComponents.back().SetActive(true);
 
                     m_hotIdToIndex[id] = m_hotComponents.size() - 1;
 
@@ -71,6 +76,23 @@ namespace Engine
             }
 
             SortHotComponentsByPriority();
+        }
+
+        // Unloads components, moving them from m_hotComponents back to m_components
+        void UnloadComponents()
+        {
+            for (T& component : m_hotComponents)
+            {
+                size_t id = component.GetEntity()->GetID();
+				component.SetActive(false);
+
+                // Move the component back to m_components (order is not important here)
+                m_components.push_back(std::move(component));
+                m_inactiveIdToIndex[id] = m_components.size() - 1;
+            }
+
+            m_hotComponents.clear();
+            m_hotIdToIndex.clear();
         }
 
         // Sort hot components by priority based on m_hotComponents
@@ -176,6 +198,7 @@ namespace Engine
             auto it = m_hotIdToIndex.find(id);
             if (it == m_hotIdToIndex.end())
             {
+                ENGINE_CRITICAL_D("FUCK");
                 return;
             }
 
@@ -185,8 +208,9 @@ namespace Engine
         }
 
         // Deactivate component by removing it from m_hotComponents
-        void DeactivateComponent(size_t id)
+        void DeactivateComponent(Entity* entity)
         {
+			auto id = entity->GetID();
             auto it = m_hotIdToIndex.find(id);
             if (it == m_hotIdToIndex.end())
             {
@@ -212,22 +236,6 @@ namespace Engine
             {
 				component.SetActive(false);
             }
-        }
-
-        // Unloads components, moving them from m_hotComponents back to m_components
-        void UnloadComponents()
-        {
-            for (T& component : m_hotComponents)
-            {
-                size_t id = component.GetEntity()->GetID();
-
-                // Move the component back to m_components (order is not important here)
-                m_components.push_back(std::move(component));
-                m_inactiveIdToIndex[id] = m_components.size() - 1;
-            }
-
-            m_hotComponents.clear();
-            m_hotIdToIndex.clear();
         }
 
         void Allocate(size_t size) override

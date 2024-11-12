@@ -48,7 +48,7 @@ int main(int argc, char* args[])
 
 	refSceneManager.LoadScene("Level1");
 
-	AppManagementEventHandlers appManagementEventHandlers(refEventManager, ptrCameraEntity);
+	AppManagementEventHandlers appManagementEventHandlers(refEventManager, ptrCameraEntity, ptrPlayerEntity);
 
 	ptrAppInstance->Start();
 	// Need to figure out how to change scenes, stop scenes, etc.

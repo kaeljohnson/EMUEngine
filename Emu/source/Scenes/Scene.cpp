@@ -64,8 +64,6 @@ namespace Engine
 
 		ECS::LoadEntities(m_entities);
 
-		ECS::ActivateEntities(m_entities);
-
 		// Physics bodies need to be added to the world after they are activated and pooled.
 		AddPhysicsBodiesToWorld();
 	}
@@ -73,8 +71,6 @@ namespace Engine
 	void Scene::OnSceneEnd()
 	{
 		DestroyPhysicsWorld();
-
-		ECS::DeactivateEntities();
 
 		ECS::UnloadEntities();
 	}

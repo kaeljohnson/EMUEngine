@@ -35,7 +35,7 @@ public:
 	// Engine::Updatable* m_updatable;
 
 private:
-	const Engine::EntityID m_entityID;
+	Engine::Entity* m_ptrEntity;
 
 	bool m_canJump;
 	float m_jumpCharge;

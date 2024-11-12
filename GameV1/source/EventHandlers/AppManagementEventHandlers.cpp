@@ -5,7 +5,7 @@
 #include "../../include/EventHandlers/AppManagementEventHandlers.h"
 
 
-AppManagementEventHandlers::AppManagementEventHandlers(Engine::EventManager& eventManager, Engine::Entity* cameraEntity) 
+AppManagementEventHandlers::AppManagementEventHandlers(Engine::EventManager& eventManager, Engine::Entity* cameraEntity, Engine::Entity* playerEntity) 
 {
 	eventManager.RegisterEventHandler(Engine::F_KEY_DOWN, [](Engine::Event& e)
 		{
@@ -56,6 +56,19 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::EventManager& eve
 			Engine::Application::GetInstance()->GetSceneManager().LoadScene("Level2");
 			e.Handled = true;
 		});
+
+	eventManager.RegisterEventHandler(Engine::O_KEY_DOWN, [&](Engine::Event& e)
+		{
+			Engine::ECS::Deactivate(playerEntity);
+		});
+
+	eventManager.RegisterEventHandler(Engine::O_KEY_UP, [&](Engine::Event& e)
+		{
+			Engine::ECS::Activate(playerEntity);
+		});
+	
+
+
 }
 
 AppManagementEventHandlers::~AppManagementEventHandlers() {}

@@ -104,6 +104,22 @@ namespace Engine
 			}
 		}
 
+		static void Activate(Entity* entity)
+		{
+			for (auto& manager : m_componentManagers)
+			{
+				manager.second->ActivateComponent(entity);
+			}
+		}
+
+		static void Deactivate(Entity* entity)
+		{
+			for (auto& manager : m_componentManagers)
+			{
+				manager.second->DeactivateComponent(entity);
+			}
+		}
+
         static void DeactivateEntities()
 		{
 			for (auto& manager : m_componentManagers)

@@ -109,9 +109,15 @@ namespace Engine
 
 		EMU_API inline const float GetSize() const { return m_width * m_height; }
 
+		EMU_API void OnDeactivate() override;
+		EMU_API void OnActivate() override;
+
 	public:
 		// PhysicsBody2D specific functions
 		void RemoveBodyFromWorld();
+
+		// May want non-runtime activation and deactivation functions.
+		
 		
 		void SetFixedRotation(bool fixed);
 		void SetIsSensor(const bool sensor);

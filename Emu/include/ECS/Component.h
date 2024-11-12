@@ -12,7 +12,13 @@ namespace Engine
 
 		inline const Entity* GetEntity() const { return m_ptrEntity; }
 		inline const bool IsActive() const { return m_active; }
-		inline void SetActive(bool active) { m_active = active; }
+		inline void SetActive(bool active) 
+		{
+			active ? OnActivate() : OnDeactivate();
+			m_active = active; 
+		}
+		inline virtual void OnDeactivate() {}
+		inline virtual void OnActivate() {}
 
 	private:
 		Entity* m_ptrEntity;

@@ -10,7 +10,7 @@
     Player::Player(Engine::Entity* ptrEntity, const float startingX, const float startingY,
         const float width, const float height, const Engine::EventStatesMap& keyStates)
         // These need to be set by client.
-        : m_entityID(ptrEntity->GetID()), refKeyStates(keyStates), m_coyoteTime(0.0f), m_canJump(false), m_jumpCharge(0.0f), m_onGround(false),
+        : m_ptrEntity(ptrEntity), refKeyStates(keyStates), m_coyoteTime(0.0f), m_canJump(false), m_jumpCharge(0.0f), m_onGround(false),
         m_jumpKeyDown(Engine::SPACE_KEY_DOWN), m_jumpKeyUp(Engine::SPACE_KEY_UP),
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
@@ -30,13 +30,7 @@
     void Player::Update()
     {
 		Engine::PhysicsBody* physicsBodyComponent = 
-            Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(m_entityID);
-
-		if (physicsBodyComponent == nullptr)
-		{
-			ENGINE_ERROR("PhysicsBody component not found for entity: " + std::to_string(m_entityID));
-			return;
-		}
+            Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(m_ptrEntity);
 
         m_onGround = physicsBodyComponent->GetHasCollisionBelow();
 
@@ -69,7 +63,7 @@
     void Player::UpdateMovement(Engine::PhysicsBody* physicsBodyComponent)
     {
 		Engine::Transform* transformComponent =
-			Engine::ECS::GetComponentManager<Engine::Transform>().GetComponent(m_entityID);
+			Engine::ECS::GetComponentManager<Engine::Transform>().GetComponent(m_ptrEntity);
 
         float currentVelocityX = physicsBodyComponent->GetVelocity().X;
 

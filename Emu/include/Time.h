@@ -12,13 +12,17 @@ namespace Engine
 		EMU_API inline static void SetInterpolationFactor(const float interpolationFactor) { INTERPOLATION_FACTOR = interpolationFactor; }
 		EMU_API inline static void SetTimeStep(const float timeStep) { TIME_STEP = timeStep; }
 
-
+		inline static void SetAppRunning(const bool appRunning) { APP_RUNNING = appRunning; }
+		inline static const bool IsAppRunning() { return APP_RUNNING; }
 	private:
 		static float INTERPOLATION_FACTOR;
 
 		static float TIME_STEP;
+
+		static bool APP_RUNNING;
 	};
 
 	inline float Time::INTERPOLATION_FACTOR = 0.0f;
 	inline float Time::TIME_STEP = 1.0f / 60.0f;
+	inline bool Time::APP_RUNNING = false;
 }
