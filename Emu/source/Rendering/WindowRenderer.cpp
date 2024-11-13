@@ -100,7 +100,7 @@ namespace Engine
 
 		auto& transformManager = ECS::GetComponentManager<Transform>();
 
-		for (Transform& refTransform : transformManager)// = transformManager.active_begin(); ptrTransform != transformManager.active_end(); ++ptrTransform)
+		for (Transform& refTransform : transformManager)
 		{
 			if (!refTransform.IsActive()) continue;
 
@@ -150,7 +150,6 @@ namespace Engine
 			ENGINE_CRITICAL("PhysicsBody not found for Transform with ID: " + std::to_string(transform.GetEntity()->GetID()));
 			return;
 		}
-		// ENGINE_CRITICAL_D("Drawing PhysicsBody for Transform with ID: " + std::to_string(transform->m_id));
 		
 		if (ptrBody->GetHasCollisionBelow() || ptrBody->GetHasCollisionAbove() ||
 			ptrBody->GetHasCollisionLeft() || ptrBody->GetHasCollisionRight())

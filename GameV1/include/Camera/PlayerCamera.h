@@ -2,7 +2,7 @@
 
 #include <Engine.h>
 
-class PlayerCamera // : public Engine::TargetCamera
+class PlayerCamera
 {
 public:
 	PlayerCamera(Engine::Entity* ptrEntity, Engine::Entity* ptrPlayerEntity);

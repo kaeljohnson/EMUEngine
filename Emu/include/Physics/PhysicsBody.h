@@ -19,7 +19,6 @@ namespace Engine
 	{
 	public:
 		b2Body* m_body = nullptr;
-		// const size_t m_id;
 	private:
 		BodyType m_bodyType;
 		
@@ -117,7 +116,6 @@ namespace Engine
 		void RemoveBodyFromWorld();
 
 		// May want non-runtime activation and deactivation functions.
-		
 		
 		void SetFixedRotation(bool fixed);
 		void SetIsSensor(const bool sensor);
