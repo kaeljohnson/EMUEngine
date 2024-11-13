@@ -54,7 +54,7 @@ namespace Engine
 
 				for (auto& manager : m_componentManagers)
 				{
-					manager.second->RemoveComponent(ptrEntity);
+					manager.second->DestroyComponent(ptrEntity);
 				}
             }
         }
@@ -96,11 +96,11 @@ namespace Engine
             }
         }
 
-		static void ActivateEntities(std::vector<Entity*>& entities)
+		static void ActivateEntities()
 		{
 			for (auto& manager : m_componentManagers)
 			{
-				manager.second->ActivateComponents(entities);
+				manager.second->ActivateComponents();
 			}
 		}
 

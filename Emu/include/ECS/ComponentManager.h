@@ -16,11 +16,11 @@ namespace Engine
         virtual void Allocate(size_t size) = 0;
 		virtual void LoadComponents(std::vector<Entity*>& entities) = 0;
 		virtual void UnloadComponents() = 0;
-		virtual void ActivateComponents(std::vector<Entity*>& entities) = 0;
+		virtual void ActivateComponents() = 0;
 		virtual void ActivateComponent(Entity* ptrEntity) = 0;
 		virtual void DeactivateComponents() = 0;
 		virtual void DeactivateComponent(Entity* ptrEntity) = 0;
-		virtual void RemoveComponent(Entity* ptrEntity) = 0;
+		virtual void DestroyComponent(Entity* ptrEntity) = 0;
     };
 
     template <typename T>
@@ -48,8 +48,8 @@ namespace Engine
             for (Entity* entity : entities)
             {
 				size_t id = entity->GetID();
-                auto it = m_inactiveIdToIndex.find(id);
-                if (it != m_inactiveIdToIndex.end())
+                auto it = m_idToIndex.find(id);
+                if (it != m_idToIndex.end())
                 {
                     size_t index = it->second;
 
@@ -59,24 +59,25 @@ namespace Engine
 
                     m_hotIdToIndex[id] = m_hotComponents.size() - 1;
 
-                    // If index is not the last element, move the last element to fill its place
+                    // If index is not the last element, move the last element to fill its place.
                     if (index != m_components.size() - 1)
                     {
                         m_components[index] = std::move(m_components.back());
-                        // Update the index of the moved component in m_inactiveIdToIndex
+
+                        // Update the index of the moved component in idToIndex map.
                         size_t movedId = m_components[index].GetEntity()->GetID();
-                        m_inactiveIdToIndex[movedId] = index;
+                        m_idToIndex[movedId] = index;
                     }
 
                     m_components.pop_back();
-                    m_inactiveIdToIndex.erase(it);
+                    m_idToIndex.erase(it);
                 }
             }
 
             SortHotComponentsByPriority();
         }
 
-        // Unloads components, moving them from hot array back to component array.
+        // Unloads components, moving them from hot component array back to component array.
         void UnloadComponents()
         {
             for (T& component : m_hotComponents)
@@ -86,7 +87,7 @@ namespace Engine
 
 				// Move the component back to m_components in any order.
                 m_components.push_back(std::move(component));
-                m_inactiveIdToIndex[id] = m_components.size() - 1;
+                m_idToIndex[id] = m_components.size() - 1;
             }
 
             m_hotComponents.clear();
@@ -102,7 +103,7 @@ namespace Engine
                     return a.GetEntity()->GetPriority() > b.GetEntity()->GetPriority();
                 });
 
-            // Update the m_hotIdToIndex map to reflect the new order
+            // Update the m_hotIdToIndex map to reflect the new order.
             for (size_t i = 0; i < m_hotComponents.size(); ++i)
             {
                 size_t id = m_hotComponents[i].GetEntity()->GetID();
@@ -110,30 +111,31 @@ namespace Engine
             }
         }
 
-        // Adds or updates an inactive component
+        // Adds to or updates a component in the components array.
         template<typename... Args>
         void AddComponent(Args&&... args)
         {
             auto argsTuple = std::make_tuple(std::forward<Args>(args)...);
             auto id = std::get<0>(argsTuple)->GetID();
 
-            if (m_inactiveIdToIndex.count(id) || m_hotIdToIndex.count(id))
+            if (m_idToIndex.count(id) || m_hotIdToIndex.count(id))
             {
                 return; // Component already exists 
             }
 
             m_components.emplace_back(std::forward<Args>(args)...);
-            m_inactiveIdToIndex[id] = m_components.size() - 1;
+            m_idToIndex[id] = m_components.size() - 1;
         }
 
-        void RemoveComponent(Entity* ptrEntity) override
+		// Finds component by entity ID and destroys it.
+        void DestroyComponent(Entity* ptrEntity) override
         {
 			size_t id = ptrEntity->GetID();
-            auto it = m_inactiveIdToIndex.find(id);
-            if (it != m_inactiveIdToIndex.end())
+            auto it = m_idToIndex.find(id);
+            if (it != m_idToIndex.end())
             {
                 m_components.erase(m_components.begin() + it->second);
-                m_inactiveIdToIndex.erase(it);
+                m_idToIndex.erase(it);
                 return;
             }
 
@@ -146,26 +148,22 @@ namespace Engine
             }
         }
 
-        std::vector<T>& GetComponents()
-        {
-            return m_hotComponents;
-        }
-
-		T* GetComponent(Entity* entity)
+		// Returns a component by entity pointer. Throw exception if component does not exist.
+		T* GetComponent(Entity* ptrEntity)
 		{
 			// Only call this function if the component certainly 
             // exists as it throws an exception otherwise. Call
 			// HasComponent() to check if the component exists.
 
-			size_t id = entity->GetID();
+			size_t id = ptrEntity->GetID();
             auto it = m_hotIdToIndex.find(id);
             if (it != m_hotIdToIndex.end())
             {
                 return &m_hotComponents[it->second];
             }
 
-            it = m_inactiveIdToIndex.find(id);
-            if (it != m_inactiveIdToIndex.end())
+            it = m_idToIndex.find(id);
+            if (it != m_idToIndex.end())
             {
                 return &m_components[it->second];
             }
@@ -173,6 +171,7 @@ namespace Engine
 			throw std::runtime_error("Component does not exist.");
 		}
 
+        // Check if entity has a component attached.
         bool HasComponent(Entity* ptrEntity)
         {
 			size_t id = ptrEntity->GetID();
@@ -182,8 +181,8 @@ namespace Engine
                 return true;
             }
 
-            it = m_inactiveIdToIndex.find(id);
-            if (it != m_inactiveIdToIndex.end())
+            it = m_idToIndex.find(id);
+            if (it != m_idToIndex.end())
             {
                 return true;
             }
@@ -191,9 +190,10 @@ namespace Engine
             return false;
         }
 
-		void ActivateComponent(Entity* entity) override
+        // Activate component in hot component array.
+		void ActivateComponent(Entity* ptrEntity) override
 		{
-			auto id = entity->GetID();
+			auto id = ptrEntity->GetID();
             auto it = m_hotIdToIndex.find(id);
             if (it == m_hotIdToIndex.end())
             {
@@ -205,15 +205,16 @@ namespace Engine
 			m_hotComponents[index].SetActive(true);
         }
 
-        void ActivateComponents(std::vector<Entity*>& entities) override
+		// Activate components in hot component array.
+        void ActivateComponents() override
         {
-            for (Entity* entity : entities)
+            for (T& component : m_hotComponents)
             {
-                ActivateComponent(entity);
+				ActivateComponent(component.GetEntity());
             }
         }
 
-        // Deactivate component by removing it from m_hotComponents
+        // Deactivate component by removing it from m_hotComponents.
         void DeactivateComponent(Entity* entity) override
         {
             auto id = entity->GetID();
@@ -228,6 +229,7 @@ namespace Engine
             m_hotComponents[index].SetActive(false);
         }
 
+		// Deactivate all components in hot component array.
         void DeactivateComponents() override
         {
 			for (auto& component : m_hotComponents)
@@ -236,6 +238,7 @@ namespace Engine
             }
         }
 
+		// Allocate memory for components and hot components array.
         void Allocate(size_t size) override
 		{
 			m_components.reserve(size);
@@ -243,11 +246,11 @@ namespace Engine
 		}
 
     private:
-        std::unordered_map<size_t, size_t> m_inactiveIdToIndex;  // Maps entity ID to index in m_components
+        std::unordered_map<size_t, size_t> m_idToIndex;          // Maps entity ID to index in m_components
         std::unordered_map<size_t, size_t> m_hotIdToIndex;       // Maps entity ID to index in m_hotComponents
 
-        std::vector<T> m_components;               // Holds inactive components
-        std::vector<T> m_hotComponents;            // Holds active components
+        std::vector<T> m_components;                             // Holds all components
+        std::vector<T> m_hotComponents;                          // Holds hot components
     };
 
 

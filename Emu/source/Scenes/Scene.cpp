@@ -59,10 +59,6 @@ namespace Engine
 	{
 		m_world = new b2World(b2Vec2(m_gravity.X, m_gravity.Y));
 
-		ENGINE_CRITICAL_D("Updatable component vector size: " + std::to_string(refUpdatableManager.GetComponents().size()));
-		ENGINE_CRITICAL_D("PhysicsBody component vector size: " + std::to_string(refPhysicsBodyManager.GetComponents().size()));
-		ENGINE_CRITICAL_D("Transform component vector size: " + std::to_string(refTransformManager.GetComponents().size()));
-
 		ECS::LoadEntities(m_entities);
 
 		// Physics bodies need to be added to the world after they are activated and pooled.

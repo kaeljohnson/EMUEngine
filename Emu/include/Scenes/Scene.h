@@ -27,10 +27,12 @@ namespace Engine
 		EMU_API void CreatePhysicsSimulation(const Vector2D<float> gravity);
 		EMU_API void SetGravity(const Vector2D<float> gravity);
 	
-		EMU_API void Remove(Entity* entityID);
-		EMU_API void AddTileMap(TileMap& tileMap);
+		EMU_API void Add(Entity* ptrEntity);
 
-		EMU_API void Add(Entity* entity);
+		// Removes entity from scene by removing entity
+		// from entities array and deactivating entity in ECS.
+		EMU_API void Remove(Entity* ptrEntity);
+		EMU_API void AddTileMap(TileMap& tileMap);
 
 		// IF theres no map in the level, client will decided the dimensions manually.
 		EMU_API void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
