@@ -12,8 +12,6 @@
 #include "../Updatable/Updatable.h"
 #include "../Transform.h"
 
-#include "../GameState.h"
-
 class b2World;
 
 namespace Engine

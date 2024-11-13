@@ -44,6 +44,4 @@ namespace Engine
 		if (m_offset.Y < 0) { m_offset.Y = 0; }
 		if (m_offset.Y + m_size.Y > m_mapBounds.Y) { m_offset.Y = m_mapBounds.Y - m_size.Y; }
 	}
-
-	// void Camera::Update(double interpolation) {}
 }

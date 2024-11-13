@@ -19,7 +19,6 @@ namespace Engine
         EMU_API ~Updatable();
 
     public:
-        // const size_t m_id;
         UpdateCallback m_callback;
 
         void Update();

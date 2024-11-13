@@ -47,8 +47,6 @@ namespace Engine
 		// Once sceme manager exists, this function will be a generic run funcion that queries the scene manager for the current scene.
 		// Will need to add more functionality in here to handle scene switching.
 
-		// m_windowRenderer.SetCamera(m_cameraManager.m_ptrCurrentCamera);
-
 		Time::SetAppRunning(true);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
