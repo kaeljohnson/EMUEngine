@@ -6,28 +6,33 @@
 #include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/BodyTypes.h"
+#include "../../include/ECS/ECS.h"
+#include "../../include/GameState.h"
 
 #include "box2d/box2d.h"
 
 namespace Engine
 {
-	PhysicsBody::PhysicsBody(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
+	PhysicsBody::PhysicsBody(Entity* entity) : m_halfWidth(0.0f), m_halfHeight(0.0f), m_width(0.0f), m_height(0.0f),
+		m_startingPosition(Vector2D<float>(0.0f, 0.0f)), m_bodyType(STATIC), m_fixed(false), m_body(nullptr),
+		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
+		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
+		m_gravityOn(true), m_isSensor(false), m_fixedRotation(true), m_restitution(0.0f),
+		m_restitutionThreshold(0.0f), m_density(1.0f), m_friction(0.0f), Component(entity)
+	
+	{
+	}
+
+	PhysicsBody::PhysicsBody(Entity* entity, const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
 		: m_halfWidth(size.X / 2.0f), m_halfHeight(size.Y / 2.0f), 
 		m_width(size.X), m_height(size.Y), m_startingPosition(position),
 		m_bodyType(bodyType), m_fixed(fixed), m_body(nullptr),
 		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
 		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
-		m_gravityOn(true), m_isSensor(false), m_prevPosition(position)
-	{
-		m_fixedRotation = true;
-		m_restitution = 0.0f;
-		m_restitutionThreshold = 0.0f;
-		m_density = 1.0f;
-		m_friction = 1.0f;
-
-		ENGINE_INFO_D("Box created at position: " + std::to_string(position.X) + "," 
-			+ std::to_string(position.Y) + ". With width: " + std::to_string(size.X) + ", height: " + std::to_string(size.Y));
-	}
+		m_gravityOn(true), m_isSensor(false), m_fixedRotation(true), m_restitution(0.0f),
+		m_restitutionThreshold(0.0f), m_density(1.0f), m_friction(0.0f),
+		Component(entity)
+	{}
 
 	PhysicsBody::~PhysicsBody()
 	{
@@ -100,6 +105,18 @@ namespace Engine
 		m_isSensor = isSensor;
 	}
 
+	void PhysicsBody::OnDeactivate()
+	{
+		if (GameState::IN_SCENE)
+			m_body->SetAwake(false);
+	}
+
+	void PhysicsBody::OnActivate()
+	{
+		if (GameState::IN_SCENE)
+			m_body->SetAwake(true);
+	}
+
 	void PhysicsBody::SetContactFlags()
 	{
 		m_bottomCollision = false;
@@ -120,11 +137,26 @@ namespace Engine
 				b2WorldManifold worldManifold;
 				edge->contact->GetWorldManifold(&worldManifold);
 
-				b2Body* otherBody = edge->contact->GetFixtureA()->GetBody() == m_body ? edge->contact->GetFixtureB()->GetBody() : edge->contact->GetFixtureA()->GetBody();
-				PhysicsBody* otherPhysicsBody = reinterpret_cast<PhysicsBody*>(otherBody->GetUserData().pointer);
+				b2Body* otherBody;
+				int directionFactor = 1;
+				if (edge->contact->GetFixtureA()->GetBody() == m_body)
+				{
+					otherBody = edge->contact->GetFixtureB()->GetBody();
+				}
+				else
+				{
+					directionFactor = -1;
+					otherBody = edge->contact->GetFixtureA()->GetBody();
+				}
+								
+				PhysicsBody* otherPhysicsBody = 
+					ECS::GetComponentManager<PhysicsBody>().GetComponent((Entity*)otherBody->GetUserData().pointer);
 
 				// Assuming the first point's normal is representative for the whole contact
 				b2Vec2 normal = worldManifold.normal;
+
+				normal.x *= directionFactor;
+				normal.y *= directionFactor;
 
 				// Different trigger for contacts for kinematic bodies for now.
 				// Might need a custom body type for bodies that
@@ -133,24 +165,24 @@ namespace Engine
 				{
 					if (normal.y < -0.5) // Collision from above `this`
 					{
-						this->SetBottomSensor(true);
-						otherPhysicsBody->SetTopSensor(true);
-					}
-					else if (normal.y > 0.5) // Collision from below `this`
-					{
 						this->SetTopSensor(true);
 						otherPhysicsBody->SetBottomSensor(true);
 					}
-
-					if (normal.x > 0.5) // Collision from the left of `this`
+					else if (normal.y > 0.5) // Collision from below `this`
 					{
-						this->SetLeftSensor(true);
-						otherPhysicsBody->SetRightSensor(true);
+						this->SetBottomSensor(true);
+						otherPhysicsBody->SetTopSensor(true);
 					}
-					else if (normal.x < -0.5) // Collision from the right of `this`
+
+					if (normal.x > 0.5) // Collision from the Right of `this`
 					{
 						this->SetRightSensor(true);
 						otherPhysicsBody->SetLeftSensor(true);
+					}
+					else if (normal.x < -0.5) // Collision from the Left of `this`
+					{
+						this->SetLeftSensor(true);
+						otherPhysicsBody->SetRightSensor(true);
 					}
 				}
 				else
@@ -159,24 +191,24 @@ namespace Engine
 
 					if (normal.y < -0.5) // Collision from above `this`
 					{
-						this->SetBottomCollision(true);
-						otherPhysicsBody->SetTopCollision(true);
-					}
-					else if (normal.y > 0.5) // Collision from below `this`
-					{
 						this->SetTopCollision(true);
 						otherPhysicsBody->SetBottomCollision(true);
 					}
-
-					if (normal.x > 0.5) // Collision from the left of `this`
+					else if (normal.y > 0.5) // Collision from below `this`
 					{
-						this->SetLeftCollision(true);
-						otherPhysicsBody->SetRightCollision(true);
+						this->SetBottomCollision(true);
+						otherPhysicsBody->SetTopCollision(true);
 					}
-					else if (normal.x < -0.5) // Collision from the right of `this`
+
+					if (normal.x > 0.5) // Collision from the right of `this`
 					{
 						this->SetRightCollision(true);
 						otherPhysicsBody->SetLeftCollision(true);
+					}
+					else if (normal.x < -0.5) // Collision from the left of `this` 
+					{
+						this->SetLeftCollision(true);
+						otherPhysicsBody->SetRightCollision(true);
 					}
 				}
 			}
@@ -197,7 +229,24 @@ namespace Engine
 		m_rightSensor = false;
 	}
 
-	void PhysicsBody::UpdatePrevPosition() { m_prevPosition = GetTopLeftPosition(); }
+	void PhysicsBody::Update()
+	{
+		switch (GetBodyType())
+		{
+		case DYNAMIC:
+			SetContactFlags();
+			break;
+		case STATIC:
+			SetContactFlagsToFalse();
+			break;
+		case SENSOR:
+			SetContactFlagsToFalse();
+			break;
+		default:
+			ENGINE_WARN_D("Body type has no engine side updating.");
+			break;
+		}
+	}
 
 	void PhysicsBody::SetGravity(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
 

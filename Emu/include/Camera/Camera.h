@@ -4,12 +4,15 @@
 
 #include "../MathUtil.h"
 
+#include "../ECS/Component.h"
+#include "../ECS/Entity.h"
+
 namespace Engine
 {
-	class Camera
+	class Camera : public Component
 	{
 	public:
-		EMU_API Camera();
+		EMU_API Camera(Entity* ptrEntity);
 		
 		EMU_API void SetPixelsPerUnit(const int pixelsPerUnit);
 		EMU_API void SetCameraPosition(const Vector2D<float> offset);
@@ -26,15 +29,9 @@ namespace Engine
 		Vector2D<float> m_offset;
 
 	public:
-		virtual void Update(const double interpolation);
-
 		void Frame(const Vector2D<int> mapBounds);
 
-		Camera(const Camera& camera) = delete;
-		Camera& operator=(const Camera&) = delete;
-		Camera(Camera&&) = delete;
-		Camera& operator=(Camera&&) = delete;
-	protected:
+	public:
 		Vector2D<float> m_size;
 
 		Vector2D<int> m_mapBounds;

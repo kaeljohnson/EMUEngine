@@ -8,6 +8,6 @@
 class AppManagementEventHandlers
 {
 public:
-	AppManagementEventHandlers(Engine::EventManager& eventManager, Engine::Camera& camera);
+	AppManagementEventHandlers(Engine::EventManager& eventManager, Engine::Entity* cameraEntity, Engine::Entity* playerEntity);
 	~AppManagementEventHandlers();
 };

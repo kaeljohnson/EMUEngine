@@ -1,11 +1,10 @@
 #pragma once
 
-#include "../Core.h"
-#include "../MathUtil.h"
-
 #include "ConversionFunctions.h"
-
 #include "BodyTypes.h"
+#include "../Core.h"
+#include "../ECS/Component.h"
+#include "../MathUtil.h"
 
 class b2Body;
 
@@ -16,12 +15,12 @@ namespace Engine
 	// is not meant to be used by the client. It is not the "entity" or "game object" class. It will not handle
 	// textures or animation.
 
-	class PhysicsBody
+	class PhysicsBody : public Component
 	{
 	public:
 		b2Body* m_body = nullptr;
 	private:
-		const BodyType m_bodyType;
+		BodyType m_bodyType;
 		
 		// Starting fields for box2d. NOT runtime fields.
 		bool m_isSensor;
@@ -33,13 +32,12 @@ namespace Engine
 		bool m_fixedRotation;
 
 		// State members
-		const float m_halfWidth;
-		const float m_halfHeight;
-		const float m_width;
-		const float m_height;
+		float m_halfWidth;
+		float m_halfHeight;
+		float m_width;
+		float m_height;
 
-		const Vector2D<float> m_startingPosition;
-		Vector2D<float> m_prevPosition;
+		Vector2D<float> m_startingPosition;
 		
 		bool m_fixed;
 		bool m_gravityOn;
@@ -55,6 +53,12 @@ namespace Engine
 		bool m_rightSensor;
 
 	public:
+		EMU_API PhysicsBody(Entity* entity);
+		EMU_API PhysicsBody(Entity* entity, const BodyType bodyType, const bool fixed, 
+			const Vector2D<float> position, const Vector2D<float> size);
+
+		EMU_API ~PhysicsBody();
+
 		EMU_API void ApplyForceToBody(Vector2D<float> force);
 		EMU_API void ApplyImpulseToBody(Vector2D<float> impulse);
 
@@ -104,14 +108,14 @@ namespace Engine
 
 		EMU_API inline const float GetSize() const { return m_width * m_height; }
 
+		EMU_API void OnDeactivate() override;
+		EMU_API void OnActivate() override;
+
 	public:
-		PhysicsBody() = default;
-		PhysicsBody(const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size);
-
-		~PhysicsBody();
-
 		// PhysicsBody2D specific functions
 		void RemoveBodyFromWorld();
+
+		// May want non-runtime activation and deactivation functions.
 		
 		void SetFixedRotation(bool fixed);
 		void SetIsSensor(const bool sensor);
@@ -134,12 +138,6 @@ namespace Engine
 		const float GetAngleInRadians() const;
 		const float GetAngleInDegrees() const;
 
-		// PhysicsBody2D does not track previous values.
-		// Need to update them here.
-		void UpdatePrevPosition();
-
-		// Non-PhysicsBody2d getters
-		inline const Vector2D<float> GetTopLeftPrevPosition() const { return m_prevPosition; }
-		inline const Vector2D<float> GetCenterPrevPosition() const { return Vector2D<float>(m_prevPosition.X + m_halfWidth, m_prevPosition.Y + m_halfHeight); }
+		void Update();
 	};
 }

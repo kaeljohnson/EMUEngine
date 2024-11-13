@@ -5,16 +5,17 @@
 #include <thread>
 #include <chrono>
 
-#include "../include/EngineConstants.h"
 #include "../include/Logging/Logger.h"
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
 #include "../include/Events/EventManager.h"
 #include "../include/Events/EventDispatcher.h"
-#include "../include/Scenes/SceneObject.h"
 #include "../include/Scenes/Scene.h"
+#include "../include/Time.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Rendering/WindowRenderer.h"
+#include "../include/ECS/ECS.h"
+#include "../include/Updatable/Updatable.h"
 
 namespace Engine
 {
@@ -36,7 +37,7 @@ namespace Engine
 	}
 
 	Application::Application()
-		: running(false), m_cameraManager(), m_eventManager(), m_windowRenderer()
+		: m_cameraManager(), m_eventManager(), m_windowRenderer()
 	{
 		defineDefaultApplicationCallbacks();
 	}
@@ -46,23 +47,21 @@ namespace Engine
 		// Once sceme manager exists, this function will be a generic run funcion that queries the scene manager for the current scene.
 		// Will need to add more functionality in here to handle scene switching.
 
-		m_windowRenderer.SetCamera(m_cameraManager.m_ptrCurrentCamera);
-
-		running = true;
+		Time::SetAppRunning(true);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-		const float timeStep = TIME_STEP;
+		const float timeStep = Time::GetTimeStep();
 
 		double currentTime = SDL_GetTicks() / 1000.0;
 		double accumulator = 0.0;
 
 		double newTime = 0.0;
 		double frameTime = 0.0;
-		double interpolation = 0.0;
+		float interpolation = 0.0;
 
 		// Application loop.
-		while (running)
+		while (Time::IsAppRunning())
 		{
 			/*
 			Each game loop iteration should:
@@ -76,7 +75,9 @@ namespace Engine
 			if (m_sceneManager.IsNewSceneStarting())
 			{
 				// Camera frames current scene.
-				m_cameraManager.m_ptrCurrentCamera->Frame(Vector2D<int>(m_sceneManager.GetCurrentScene()->GetLevelWidth(), m_sceneManager.GetCurrentScene()->GetLevelHeight()));
+				ECS::GetComponentManager<Camera>().GetComponent(m_cameraManager.m_ptrCurrentCameraEntity)->Frame(
+					Vector2D<int>(m_sceneManager.GetCurrentScene()->GetLevelWidth(),
+					m_sceneManager.GetCurrentScene()->GetLevelHeight()));
 				m_sceneManager.NewSceneStarted();
 			}
 
@@ -92,15 +93,22 @@ namespace Engine
 				m_eventManager.ProcessEvents();
 				
 				m_sceneManager.GetCurrentScene()->Update();
-				
+
 				accumulator -= timeStep;
 			}
 
-			interpolation = accumulator / timeStep;
+			Time::SetInterpolationFactor((float)accumulator / timeStep);
 
-			m_cameraManager.m_ptrCurrentCamera->Update(interpolation);
+			// Camera system. Change to "CameraSystem".
+			ECS::GetComponentManager<Updatable>().GetComponent(m_cameraManager.m_ptrCurrentCameraEntity)->Update();
 
-			m_windowRenderer.RenderScene(m_sceneManager.GetCurrentScene(), interpolation);
+			m_windowRenderer.Render(m_cameraManager.m_ptrCurrentCameraEntity);
+
+			if (!Time::IsAppRunning())
+			{ 
+				// Cleanup static objects
+				ECS::Cleanup();
+			}
 		}
 	}
 
@@ -108,7 +116,7 @@ namespace Engine
 	{
 		ENGINE_INFO_D("Application ending!");
 
-		running = false;
+		Time::SetAppRunning(false);
 	}
 
 	Application::~Application() {}

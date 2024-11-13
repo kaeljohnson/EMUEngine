@@ -2,20 +2,24 @@
 
 #include "box2d/box2d.h"
 
-#include "../../include/EngineConstants.h"
 #include "../../include/Scenes/Scene.h"
-#include "../../include/Scenes/SceneObject.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Physics/PhysicsBody.h"
 #include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Tiles/TileMap.h"
-#include "../../include/Tiles/Tile.h"
 #include "../../include/MathUtil.h"
-
+#include "../../include/Transform.h"
+#include "../../include/ECS/ECS.h"
+#include "../../include/Updatable/Updatable.h"
+#include "../../include/Time.h"
+#include "../../include/GameState.h"
 namespace Engine
 {
-	Scene::Scene() : m_layers(), m_levelDimensionsInUnits(32, 32), HasTileMap(false),
-		m_world(nullptr), m_tileMap(nullptr) {}
+	Scene::Scene() : m_levelDimensionsInUnits(32, 32), HasTileMap(false),
+		m_world(nullptr), m_tileMap(nullptr),
+		refTransformManager(ECS::GetComponentManager<Transform>()),
+		refPhysicsBodyManager(ECS::GetComponentManager<PhysicsBody>()),
+		refUpdatableManager(ECS::GetComponentManager<Updatable>()) {}
 
 	Scene::~Scene()
 	{
@@ -36,71 +40,79 @@ namespace Engine
 		while (body != nullptr)
 		{
 			b2Body* nextBody = body->GetNext();
-			PhysicsBody* ptrBody = reinterpret_cast<PhysicsBody*>(body->GetUserData().pointer);
+			PhysicsBody* ptrBody = ECS::GetComponentManager<PhysicsBody>().GetComponent((Entity*)body->GetUserData().pointer);
 			ptrBody->RemoveBodyFromWorld();
 			body = nextBody;
 		}
 
 		delete m_world;
 		m_world = nullptr;
+		ENGINE_INFO_D("World freed!");
 	}
 
 	void Scene::CheckValid()
 	{
 		(m_world == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
-		m_layers.size() > 0 ? ENGINE_INFO_D("Scene has at least one layer.") : ENGINE_CRITICAL_D("No layers exist in scene.");
 	}
 
 	void Scene::OnScenePlay()
 	{
 		m_world = new b2World(b2Vec2(m_gravity.X, m_gravity.Y));
 
-		for (auto& layer : m_layers)
-		{
-			for (auto& sceneObject : layer)
-			{
-				AddPhysicsBodyToWorld(sceneObject->GetPhysicsBody());
-			}
-		}
+		ECS::LoadEntities(m_entities);
+
+		// Physics bodies need to be added to the world after they are activated and pooled.
+		AddPhysicsBodiesToWorld();
+
+		GameState::IN_SCENE = true;
 	}
 
 	void Scene::OnSceneEnd()
 	{
+		GameState::IN_SCENE = false;
+
 		DestroyPhysicsWorld();
+
+		ECS::UnloadEntities();
 	}
 
-	void Scene::AddLayer(size_t layerIdx)
+	void Scene::AddTileMap(TileMap& tileMap)
 	{
-		// Ensure the layer is appended to the end of the vector if the index is out of bounds.
-		if (layerIdx > m_layers.size()) 
-		{
-			ENGINE_CRITICAL_D("Layer index is out of bounds. Add layers sequentially.");
-			return;
-		}
+		// Get a temp vector or tile IDs from the tile map. Both the transforms and the physics bodies.
+		std::vector<Entity*> tileMapEntities = tileMap.LoadMap();
+		std::vector<Entity*> mapCollisionBodies = tileMap.CreateCollisionBodies();
 
-		m_layers.emplace_back(SceneObjectStack());
-	}
-
-	void Scene::AddTileMap(TileMap& tileMap, int layerIdx)
-	{
-		tileMap.LoadMap();
-		tileMap.CreateCollisionBodies();
+		ENGINE_INFO_D("Tile map text file size: " + std::to_string(tileMap.m_map.size()));
+		ENGINE_INFO_D("Tile map collision bodies size: " + std::to_string(tileMap.m_collisionBodies.size()));
 
 		m_levelDimensionsInUnits = Vector2D<int>(tileMap.GetWidth(), tileMap.GetHeight());
 
-		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_levelDimensionsInUnits.X) + ", Map height: " + std::to_string(m_levelDimensionsInUnits.Y));
-
-		for (auto& tile : tileMap)
-		{
-			Add(tile, layerIdx);
-		}
-
-		for (auto& collisionBody : tileMap.GetCollisionBodies())
-		{
-			Add(collisionBody, layerIdx);
-		}
+		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_levelDimensionsInUnits.X) + ", Map height: " 
+			+ std::to_string(m_levelDimensionsInUnits.Y));
 
 		HasTileMap = true;
+
+		for (auto& entity : tileMapEntities)
+		{
+			Add(entity);
+		}
+
+		for (auto& entity : mapCollisionBodies)
+		{
+			Add(entity);
+		}
+	}
+
+	void Scene::Add(Entity* ptrEntity)
+	{
+		m_entities.push_back(ptrEntity);
+	}
+
+	void Scene::Remove(Entity* ptrEntity)
+	{
+		// Remove entity from the scene. Do not remove the entity from the ECS, just deactivate it.
+		m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), ptrEntity), m_entities.end());
+		ECS::Deactivate(ptrEntity);
 	}
 
 	void Scene::SetLevelDimensions(const Vector2D<int> levelDimensions)
@@ -115,27 +127,32 @@ namespace Engine
 
 	void Scene::Update()
 	{
-		// Faster way to do this? Should only have to update objects
-		// prev values if they have changed. In fact, should only update
-		// objects that have changed in general
-
-		// Need correct order for updating objects.
-		// Dyanmic bodies must be updated after static.
-
-		// Iterate through every layer for now and update.
-		// In the future we can filter which layers need to be updated each frame.
-		// For instance, if the camera has not moved, we don't need to update the background layer,
-		// or the collision bodies layer, and likely not the entire map layer.
-		for (auto& layer : m_layers)
+		for (Updatable& refUpdatable : refUpdatableManager)
 		{
-			for (auto& sceneObject : layer)
-			{
-				sceneObject->EngineSideUpdate();
-				sceneObject->Update();
-			}
+			if (!refUpdatable.IsActive()) continue;
+			refUpdatable.Update();
 		}
 
-		m_world->Step(TIME_STEP, 8, 3);
+		m_world->Step(Time::GetTimeStep(), 8, 3);
+
+		for (PhysicsBody& refPhysicsBody : refPhysicsBodyManager)
+		{
+			if (!refPhysicsBody.IsActive()) continue;
+
+			refPhysicsBody.Update();
+
+			Entity* ptrEntity = refPhysicsBody.GetEntity();
+
+			if (refTransformManager.HasComponent(ptrEntity))
+			{
+				Transform* ptrTransform = refTransformManager.GetComponent(ptrEntity);
+				
+				ptrTransform->PrevPosition = ptrTransform->Position;
+				ptrTransform->Position = refPhysicsBody.GetTopLeftPosition();
+				ptrTransform->Dimensions = refPhysicsBody.GetDimensions();
+				ptrTransform->Rotation = refPhysicsBody.GetAngleInDegrees();
+			}
+		}
 	};
 
 	void Scene::CreatePhysicsSimulation(const Vector2D<float> gravity)
@@ -166,87 +183,58 @@ namespace Engine
 
 	void Scene::SetGravity(const Vector2D<float> gravity)
 	{
-
 		m_world->SetGravity(b2Vec2(m_gravity.X, m_gravity.Y));
-	
 	}
 
-	void Scene::Add(SceneObject& sceneObject, int layerIdx)
+	void Scene::AddPhysicsBodiesToWorld()
 	{
-		// Check if layerIdx is valid
-		if (layerIdx >= m_layers.size()) 
+		for (PhysicsBody& refPhysicsBody : refPhysicsBodyManager)
 		{
-			ENGINE_CRITICAL_D("Invalid layer index: " + std::to_string(layerIdx) + ". Cannot add SceneObject.");
-			return;
+			if (!refPhysicsBody.IsActive()) continue;
+
+			b2Body* body;
+			b2BodyDef bodyDef;
+			b2FixtureDef fixtureDef;
+			b2PolygonShape shape;
+			switch (refPhysicsBody.GetBodyType())
+			{
+				case STATIC:
+					bodyDef.type = b2_staticBody;
+					break;
+				case DYNAMIC:
+					bodyDef.type = b2_dynamicBody;
+					break;
+				case KINEMATIC:
+					bodyDef.type = b2_kinematicBody;
+					break;
+				case SENSOR:
+					bodyDef.type = b2_kinematicBody;
+					refPhysicsBody.SetIsSensor(true);
+					break;
+				default:
+					bodyDef.type = b2_staticBody;
+					break;
+			}
+
+			bodyDef.fixedRotation = refPhysicsBody.GetIsRotationFixed();
+
+			bodyDef.userData.pointer = (uintptr_t)refPhysicsBody.GetEntity(); // NOTE: This is the entity ID of the physics body. Not a pointer to the physics body.
+
+			bodyDef.position.Set(refPhysicsBody.GetStartingPosition().X + refPhysicsBody.GetHalfWidth(),
+				refPhysicsBody.GetStartingPosition().Y + refPhysicsBody.GetHalfHeight());
+					
+			body = m_world->CreateBody(&bodyDef);
+
+			shape.SetAsBox(refPhysicsBody.GetHalfWidth(), refPhysicsBody.GetHalfHeight());
+			fixtureDef.shape = &shape;
+			fixtureDef.restitution = refPhysicsBody.GetStartingRestitution();
+			fixtureDef.restitutionThreshold = refPhysicsBody.GetStartingRestitutionThreshold();
+			fixtureDef.density = refPhysicsBody.GetStartingDensity();
+			fixtureDef.friction = refPhysicsBody.GetStartingFriction();
+			fixtureDef.isSensor = refPhysicsBody.GetIsSensor();
+			body->CreateFixture(&fixtureDef);
+
+			refPhysicsBody.m_body = body;
 		}
-
-		sceneObject.LayerIdx = layerIdx;
-		m_layers[layerIdx].Push(&sceneObject);
-	}
-
-	void Scene::Remove(SceneObject& sceneObject)
-	{
-		if (sceneObject.LayerIdx >= m_layers.size() || sceneObject.LayerIdx == -1)
-		{
-			ENGINE_CRITICAL_D("Invalid layer index: " + std::to_string(sceneObject.LayerIdx) + ". Cannot remove SceneObject because it does not exist in a valid layer.");
-			return;
-		}
-
-		m_layers[sceneObject.LayerIdx].Pop(&sceneObject);
-
-		std::shared_ptr<PhysicsBody> ptrBody = sceneObject.GetPhysicsBody();
-
-		ptrBody->RemoveBodyFromWorld();
-	}
-
-	void Scene::AddPhysicsBodyToWorld(std::shared_ptr<PhysicsBody> physicsBody)
-	{
-		if (physicsBody == nullptr)
-		{
-			ENGINE_ERROR_D("PhysicsBody is null!");
-			return;
-		}
-
-		b2Body* body;
-		b2BodyDef bodyDef;
-		b2FixtureDef fixtureDef;
-		b2PolygonShape shape;
-
-		switch (physicsBody->GetBodyType())
-		{
-		case STATIC:
-			bodyDef.type = b2_staticBody;
-			break;
-		case DYNAMIC:
-			bodyDef.type = b2_dynamicBody;
-			break;
-		case KINEMATIC:
-			bodyDef.type = b2_kinematicBody;
-			break;
-		case SENSOR:
-			bodyDef.type = b2_kinematicBody;
-			physicsBody->SetIsSensor(true);
-			break;
-		default:
-			bodyDef.type = b2_staticBody;
-			break;
-		}
-
-		bodyDef.fixedRotation = physicsBody->GetIsRotationFixed();
-		bodyDef.userData.pointer = reinterpret_cast<intptr_t>(physicsBody.get());
-		bodyDef.position.Set(physicsBody->GetStartingPosition().X + physicsBody->GetHalfWidth(), physicsBody->GetStartingPosition().Y + physicsBody->GetHalfHeight());
-
-		body = m_world->CreateBody(&bodyDef);
-
-		shape.SetAsBox(physicsBody->GetHalfWidth(), physicsBody->GetHalfHeight());
-		fixtureDef.shape = &shape;
-		fixtureDef.restitution = physicsBody->GetStartingRestitution();
-		fixtureDef.restitutionThreshold = physicsBody->GetStartingRestitutionThreshold();
-		fixtureDef.density = physicsBody->GetStartingDensity();
-		fixtureDef.friction = physicsBody->GetStartingFriction();
-		fixtureDef.isSensor = physicsBody->GetIsSensor();
-		body->CreateFixture(&fixtureDef);
-
-		physicsBody->m_body = body;
 	}
 }

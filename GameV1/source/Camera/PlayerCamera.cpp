@@ -4,16 +4,27 @@
 
 #include "../../include/Camera/PlayerCamera.h"
 
-PlayerCamera::PlayerCamera() : m_smoothingFactor(0.001f),
-m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(true),
-m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(0.5f), m_lookAhead(0.0f), TargetCamera()
+PlayerCamera::PlayerCamera(Engine::Entity* ptrEntity, Engine::Entity* ptrPlayerEntity) : 
+    m_ptrEntity(ptrEntity), m_ptrCameraTargetEntity(ptrPlayerEntity), m_smoothingFactor(0.001f),
+    m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(true),
+    m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(0.5f), m_lookAhead(0.0f)
 {
+	Engine::ECS::GetComponentManager<Engine::Camera>().AddComponent(ptrEntity);
+    Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
+
+	Engine::Camera* playerCamera = Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
+    playerCamera->SetPixelsPerUnit(32);
 }
 
-void PlayerCamera::Update(const double interpolation)
+void PlayerCamera::Update()
 {
-    float targetX = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevPosition().X, ptrCameraTarget->GetPhysicsBody()->GetCenterPosition().X, (float)interpolation);
-    float targetY = Engine::Lerp(ptrCameraTarget->GetPhysicsBody()->GetCenterPrevPosition().Y, ptrCameraTarget->GetPhysicsBody()->GetCenterPosition().Y, (float)interpolation);
+	Engine::Transform* ptrCameraTarget = Engine::ECS::GetComponentManager<Engine::Transform>().GetComponent(m_ptrCameraTargetEntity);
+	Engine::Camera* ptrCamera = Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
+
+	// Need something like Time::GetInterpolationFactor=() to get the time between frames
+
+    float targetX = Engine::Lerp(ptrCameraTarget->PrevPosition.X, ptrCameraTarget->Position.X, Engine::Time::GetInterpolationFactor());
+    float targetY = Engine::Lerp(ptrCameraTarget->PrevPosition.Y, ptrCameraTarget->Position.Y, Engine::Time::GetInterpolationFactor());
 
     float desiredLookAhead = ptrCameraTarget->DirectionFacing * m_lookAheadFactor;
 
@@ -23,7 +34,7 @@ void PlayerCamera::Update(const double interpolation)
     // Calculate the step to move towards the desired look-ahead, ensuring we don't overshoot
     m_lookAheadChangeSpeed = 0.005f / Engine::Screen::GetScale().X;
 
-    float lookAheadStep = std::min(std::abs(lookAheadDifference), m_lookAheadChangeSpeed * (float)interpolation);
+    float lookAheadStep = std::min(std::abs(lookAheadDifference), m_lookAheadChangeSpeed * Engine::Time::GetInterpolationFactor());
     lookAheadStep *= (lookAheadDifference > 0) ? 1 : -1; // Ensure the step has the correct direction
 
     // Update the look-ahead
@@ -32,29 +43,29 @@ void PlayerCamera::Update(const double interpolation)
     targetX += m_lookAhead;
 
     // Desired camera position based on the target's position
-    float desiredCameraTopLeftX = targetX - (m_size.X / 2.0f);
-    float desiredCameraTopLeftY = targetY - (m_size.Y / 2.0f);
+    float desiredCameraTopLeftX = targetX - (ptrCamera->m_size.X / 2.0f);
+    float desiredCameraTopLeftY = targetY - (ptrCamera->m_size.Y / 2.0f);
 
-    m_offset.X += (desiredCameraTopLeftX - m_offset.X);
+    ptrCamera->m_offset.X += (desiredCameraTopLeftX - ptrCamera->m_offset.X);
 
-    if (targetY > m_offset.Y + ((m_size.Y) * m_bottomTargetScreenBound))
+    if (targetY > ptrCamera->m_offset.Y + ((ptrCamera->m_size.Y) * m_bottomTargetScreenBound))
     {
-        m_offset.Y = targetY - ((m_size.Y) * m_bottomTargetScreenBound);
+        ptrCamera->m_offset.Y = targetY - ((ptrCamera->m_size.Y) * m_bottomTargetScreenBound);
     }
-    else if (targetY < m_offset.Y + ((m_size.Y)*m_topTargetScreenBound))
+    else if (targetY < ptrCamera->m_offset.Y + ((ptrCamera->m_size.Y)*m_topTargetScreenBound))
     {
-        m_offset.Y = targetY - ((m_size.Y)*m_topTargetScreenBound);
+        ptrCamera->m_offset.Y = targetY - ((ptrCamera->m_size.Y)*m_topTargetScreenBound);
     }
     else if (m_smoothingOn)
     {
-        m_offset.Y += (desiredCameraTopLeftY - m_offset.Y) * (m_smoothingFactor / Engine::Screen::GetScale().Y);
+        ptrCamera->m_offset.Y += (desiredCameraTopLeftY - ptrCamera->m_offset.Y) * (m_smoothingFactor / Engine::Screen::GetScale().Y);
     }
     else
     {
-        m_offset.Y = desiredCameraTopLeftY;
+        ptrCamera->m_offset.Y = desiredCameraTopLeftY;
     }
 
-    if (m_clampingOn) Clamp();
+    if (ptrCamera->m_clampingOn) ptrCamera->Clamp();
 }
 
 void PlayerCamera::SetLookAheadFactor(const float lookAheadFactor)

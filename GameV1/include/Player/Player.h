@@ -19,18 +19,24 @@ enum PlayerDirection
 	Right,
 };
 
-class Player : public Engine::Entity
+class Player
 {
 public:
-	Player(const float startingX, const float startingY,
+	Player(Engine::Entity* entity, const float startingX, const float startingY,
 		const float width, const float height, const Engine::EventStatesMap& keyStates);
 	~Player() = default;
-	void Update() override;
+	void Update();
 
 	PlayerState m_currentState;
 	PlayerDirection m_currentDirection;
 
+	// Engine::Transform* m_transform;
+	// Engine::PhysicsBody* m_physicsBody;
+	// Engine::Updatable* m_updatable;
+
 private:
+	Engine::Entity* m_ptrEntity;
+
 	bool m_canJump;
 	float m_jumpCharge;
 	float m_coyoteTime;
@@ -48,16 +54,16 @@ private:
 	Engine::EventType m_moveRightKeyUp;
 
 private:
-	void UpdateMovement();
-	void TransitionToState(PlayerState newState);
+	void UpdateMovement(Engine::PhysicsBody* physicsBodyComponent);
+	void TransitionToState(PlayerState newState, Engine::PhysicsBody* physicsBodyComponent);
 
 	void beginIdle();
 	void updateIdle();
 	void endIdle();
 
-	void startHorizontalMove();
-	void updateHorizontalMove();
-	void endHorizontalMove();
+	void startHorizontalMove(Engine::PhysicsBody* physicsBodyComponent);
+	void updateHorizontalMove(Engine::PhysicsBody* physicsBodyComponent);
+	void endHorizontalMove(Engine::PhysicsBody* physicsBodyComponent);
 
 
 	void beginJump();

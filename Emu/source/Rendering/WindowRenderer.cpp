@@ -2,11 +2,14 @@
 
 #include <memory>
 #include "../../include/ISDL/ISDL.h"
-
 #include "../../include/Logging/Logger.h"
-
 #include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Rendering/WindowRenderer.h"
+#include "../../include/ECS/ECS.h"
+#include "../../include/Transform.h"
+#include "../../include/Physics/PhysicsBody.h"
+#include "../../include/Camera/Camera.h"
+#include "../../include/Time.h"
 
 namespace Engine
 {
@@ -17,7 +20,7 @@ namespace Engine
 	Vector2D<int> Screen::SCREEN_SIZE = Vector2D<int>(0, 0);
 	Vector2D<int> Screen::VIRTUAL_SIZE = Vector2D<int>(1280, 720);
 
-	WindowRenderer::WindowRenderer() : m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), ptrCurrentCamera(nullptr)
+	WindowRenderer::WindowRenderer() : m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr)
 	{
 		ENGINE_CRITICAL("Creating Renderer");
 
@@ -29,7 +32,8 @@ namespace Engine
 
 		// Create window
 		m_ptrWindow = ISDL::CreateWindow(
-			"DEFAULT WINDOW", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP
+			"DEFAULT WINDOW", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, 
+			SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP
 		);
 
 		if (m_ptrWindow == nullptr)
@@ -82,13 +86,9 @@ namespace Engine
 			});
 	}
 
-	void WindowRenderer::SetCamera(Camera* currentCamera)
+	void WindowRenderer::Render(Entity* currentCameraEntity)
 	{
-		ptrCurrentCamera = currentCamera;
-	}
-
-	void WindowRenderer::RenderScene(std::shared_ptr<Scene> currentScene, const double interpolation)
-	{
+		Camera* ptrCurrentCamera = ECS::GetComponentManager<Camera>().GetComponent(currentCameraEntity);
 
 		ClearScreen();
 
@@ -98,25 +98,23 @@ namespace Engine
 		float cameraTop = ptrCurrentCamera->m_offset.Y;
 		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->GetPixelsPerUnit());
 
-		// Objects should be submitted for rendering instead of iterating through every scene object. ECS would solve this.
-		for (auto& layer : currentScene->GetLayers())
+		auto& transformManager = ECS::GetComponentManager<Transform>();
+
+		for (Transform& refTransform : transformManager)
 		{
-			for (auto& sceneObject : layer)
+			if (!refTransform.IsActive()) continue;
+
+			float objectLeft = refTransform.Position.X;
+			float objectRight = objectLeft + refTransform.Dimensions.X;
+			float objectTop = refTransform.Position.Y;
+			float objectBottom = objectTop + refTransform.Dimensions.Y;
+
+			bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
+				objectBottom >= cameraTop && objectTop <= cameraBottom;
+
+			if (isVisible)
 			{
-				if (!sceneObject->Visible) continue;
-
-				float objectLeft = sceneObject->GetPhysicsBody()->GetTopLeftPosition().X;
-				float objectRight = objectLeft + sceneObject->GetPhysicsBody()->GetDimensions().X;
-				float objectTop = sceneObject->GetPhysicsBody()->GetTopLeftPosition().Y;
-				float objectBottom = objectTop + sceneObject->GetPhysicsBody()->GetDimensions().Y;
-
-				bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
-					objectBottom >= cameraTop && objectTop <= cameraBottom;
-
-				if (isVisible)
-				{
-					Draw(sceneObject, ptrCurrentCamera->GetPixelsPerUnit(), interpolation, Vector2D<float>(cameraLeft, cameraTop));
-				}
+				Draw(refTransform, ptrCurrentCamera->GetPixelsPerUnit(), Vector2D<float>(cameraLeft, cameraTop));
 			}
 		}
 
@@ -124,35 +122,45 @@ namespace Engine
 	}
 
 	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
-	void WindowRenderer::Draw(SceneObject* sceneObject, const int pixelsPerUnit, const double interpolation, const Vector2D<float> offset)
+	void WindowRenderer::Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset)
 	{
+		const float interpolation = Time::GetInterpolationFactor();
+
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
 
-		std::shared_ptr<PhysicsBody> ptrBody = sceneObject->GetPhysicsBody();
-
 		SDLRect dst
 		{
-			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevPosition().X, ptrBody->GetTopLeftPosition().X, (float)interpolation) - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round((Lerp(ptrBody->GetTopLeftPrevPosition().Y, ptrBody->GetTopLeftPosition().Y, (float)interpolation) - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((Lerp(transform.PrevPosition.X, transform.Position.X, 
+				interpolation) - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((Lerp(transform.PrevPosition.Y, transform.Position.Y, 
+				interpolation) - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 
-			static_cast<int>(round(ptrBody->GetDimensions().X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round(ptrBody->GetDimensions().Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
+			static_cast<int>(round(transform.Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round(transform.Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
 		};
 
-		ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, ptrBody->GetAngleInDegrees(), nullptr, SDL_FLIP_NONE);
+		ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
 
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)
+		PhysicsBody* ptrBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(transform.GetEntity());
+		if (ptrBody == nullptr)
+		{
+			ENGINE_CRITICAL("PhysicsBody not found for Transform with ID: " + std::to_string(transform.GetEntity()->GetID()));
+			return;
+		}
+		
 		if (ptrBody->GetHasCollisionBelow() || ptrBody->GetHasCollisionAbove() ||
 			ptrBody->GetHasCollisionLeft() || ptrBody->GetHasCollisionRight())
 		{
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 255, 255);
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 255, 255); // BLUE
 		}
 		else if (ptrBody->GetHasSensorBelow() || ptrBody->GetHasSensorAbove() ||
 			ptrBody->GetHasSensorLeft() || ptrBody->GetHasSensorRight())
 		{
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, 255);
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, 255); // GREEN
+
 		}
 		else
 		{
@@ -203,11 +211,13 @@ namespace Engine
 		int windowWidth, windowHeight;
 		ISDL::GetWindowSize((SDLWindow*)m_ptrWindow, &windowWidth, &windowHeight);
 
-		Screen::SCALE = Vector2D<float>(static_cast<float>(windowWidth) / Screen::VIRTUAL_SIZE.X, static_cast<float>(windowHeight) / Screen::VIRTUAL_SIZE.Y);
+		Screen::SCALE = Vector2D<float>(static_cast<float>(windowWidth) / Screen::VIRTUAL_SIZE.X, 
+			static_cast<float>(windowHeight) / Screen::VIRTUAL_SIZE.Y);
 
 		Screen::SCALE_CONSTANT = std::min(Screen::SCALE.X, Screen::SCALE.Y);
 
-		Screen::VIEWPORT_SIZE = Vector2D<int>(Screen::VIRTUAL_SIZE.X * (int)Screen::SCALE_CONSTANT, Screen::VIRTUAL_SIZE.Y * (int)Screen::SCALE_CONSTANT);
+		Screen::VIEWPORT_SIZE = Vector2D<int>(Screen::VIRTUAL_SIZE.X * (int)Screen::SCALE_CONSTANT, 
+			Screen::VIRTUAL_SIZE.Y * (int)Screen::SCALE_CONSTANT);
 
 		Screen::VIEWPORT_POSITION.X = (windowWidth - Screen::VIEWPORT_SIZE.X) / 2;
 		Screen::VIEWPORT_POSITION.Y = (windowHeight - Screen::VIEWPORT_SIZE.Y) / 2;

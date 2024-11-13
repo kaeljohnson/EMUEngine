@@ -21,45 +21,34 @@ int main(int argc, char* args[])
 
 	refSceneManager.AddScene("Level1", scene);
 	refSceneManager.AddScene("Level2", scene2);
-	
 
-	// Need physcis to scale with pixels per unit.
+	//// Need physcis to scale with pixels per unit.
 	scene->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 	scene2->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
-	
-	Player player(1.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 
-	Engine::ScrollingCamera scrollCamera;
-	scrollCamera.SetScrollingSpeeds(Engine::Vector2D<float>(0.0005f, 0.0f));
-	scrollCamera.SetCameraPosition(Engine::Vector2D<float>(0.0f, 38.5f));
+	Engine::TileMap testMap("testMap1.txt", 1);
+	scene->AddTileMap(testMap);
 
-	PlayerCamera playerCamera;
-	playerCamera.SetPixelsPerUnit(32);
-	playerCamera.SetCameraTarget(&player);
+	Engine::Entity* ptrPlayerEntity = Engine::ECS::CreateEntity();
+	ptrPlayerEntity->SetPriority(0);
+	scene->Add(ptrPlayerEntity);
 
-	refCameraManager.SetCurrentCamera(&playerCamera);
+	Player player(ptrPlayerEntity, 6.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
 
-	const int MAP_LAYER = 0;
-	const int PLAYER_LAYER = 1;
+	Engine::Entity* ptrCameraEntity = Engine::ECS::CreateEntity();
+	ptrCameraEntity->SetPriority(0);
 
-	// Make sure to document that the order of adding layers is important.
-	scene->AddLayer(MAP_LAYER);
-	scene->AddLayer(PLAYER_LAYER);
+	PlayerCamera playerCamera(ptrCameraEntity, ptrPlayerEntity);
+	refCameraManager.SetCurrentCamera(ptrCameraEntity);
 
-	Engine::TileMap testMap("TestMap1.txt", 1);
-	scene->AddTileMap(testMap, MAP_LAYER);
-	scene->Add(player, PLAYER_LAYER);
-
-	scene2->AddLayer(MAP_LAYER);
-	scene2->AddLayer(PLAYER_LAYER);
+	scene2->Add(ptrPlayerEntity);
 
 	Engine::TileMap testMap2("TestMap2.txt", 1);
-	scene2->AddTileMap(testMap2, MAP_LAYER);
-	scene2->Add(player, PLAYER_LAYER);
+	scene2->AddTileMap(testMap2);
 
 	refSceneManager.LoadScene("Level1");
-	
-	AppManagementEventHandlers appManagementEventHandlers(refEventManager, playerCamera);
+
+	AppManagementEventHandlers appManagementEventHandlers(refEventManager, ptrCameraEntity, ptrPlayerEntity);
 
 	ptrAppInstance->Start();
 	// Need to figure out how to change scenes, stop scenes, etc.

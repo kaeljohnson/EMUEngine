@@ -4,8 +4,10 @@
 #include "../MathUtil.h"
 
 #include <vector>
+#include <string>
 
-#include "Tile.h"
+#include "../Physics/PhysicsBody.h"
+#include "../ECS/Entity.h"
 
 namespace Engine
 {
@@ -13,7 +15,7 @@ namespace Engine
 	{
 	public:
 		// Client should probably decide this.
-		static const int MAX_SIZE = 100000;
+		static const int MAX_SIZE = 20000;
 
 		EMU_API TileMap(const std::string mapFile, const int numUnitsPerTile);
 		EMU_API const char GetTile(int x, int y) const;
@@ -22,23 +24,17 @@ namespace Engine
 		EMU_API inline int GetHeight() const { return m_mapDimensions.Y; }
 
 	public:
-		inline std::vector<Tile>& GetCollisionBodies() { return m_collisionBodies; }
+		inline std::vector<PhysicsBody>& GetCollisionBodies() { return m_collisionBodies; }
 
-		void LoadMap();
-		void CreateCollisionBodies();
+		std::vector<Entity*> LoadMap();
+		std::vector<Entity*> CreateCollisionBodies();
 		void UnloadMap();
 
-		std::vector<Tile>::iterator begin() { return m_tiles.begin(); }
-		std::vector<Tile>::iterator end() { return m_tiles.end(); }
-
-		std::vector<Tile>::const_iterator begin() const { return m_tiles.begin(); }
-		std::vector<Tile>::const_iterator end() const { return m_tiles.end(); }
-
-	private:
+	public:
 		std::vector<char> m_map;
-		std::vector<Tile> m_collisionBodies;
-		std::vector<Tile> m_tiles;
+		std::vector<PhysicsBody> m_collisionBodies;
 		Vector2D<int> m_mapDimensions;
+		Vector2D<size_t> m_sceneObjectIDs;
 
 		int m_numUnitsPerTile;
 	};

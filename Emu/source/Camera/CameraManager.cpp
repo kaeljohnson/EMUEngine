@@ -5,12 +5,10 @@
 namespace Engine
 {
 	CameraManager::CameraManager()
-	{
-		m_ptrCurrentCamera = nullptr;
-	}
+	{}
 
-	void CameraManager::SetCurrentCamera(Camera* ptrCamera)
+	void CameraManager::SetCurrentCamera(Entity* ptrCameraEntity)
 	{
-		m_ptrCurrentCamera = ptrCamera;
+		m_ptrCurrentCameraEntity = ptrCameraEntity;
 	}
 }

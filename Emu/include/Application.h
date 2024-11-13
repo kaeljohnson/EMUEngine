@@ -30,8 +30,6 @@ namespace Engine
 		static Application* instance;
 		Application();
 
-		bool running;
-
 		CameraManager m_cameraManager;
 		EventManager m_eventManager;
 		WindowRenderer m_windowRenderer;
