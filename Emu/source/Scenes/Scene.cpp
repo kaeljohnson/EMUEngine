@@ -13,6 +13,7 @@
 #include "../../include/Updatable/Updatable.h"
 #include "../../include/Time.h"
 #include "../../include/GameState.h"
+
 namespace Engine
 {
 	Scene::Scene() : m_levelDimensionsInUnits(32, 32), HasTileMap(false),
@@ -38,14 +39,14 @@ namespace Engine
 
 		ENGINE_INFO_D("Freeing World!");
 
+		b2DestroyWorld(*m_worldID);
+
 		for (Entity* entity : m_entities)
 		{
 			if (!refPhysicsBodyManager.HasComponent(entity)) continue;
 			PhysicsBody* ptrPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(entity);
-			ptrPhysicsBody->RemoveBodyFromWorld();
+			ptrPhysicsBody->SetPointersToNull();
 		}
-
-		b2DestroyWorld(*m_worldID);
 
 		delete m_worldID;
 		m_worldID = nullptr;

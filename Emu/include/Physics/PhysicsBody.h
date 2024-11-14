@@ -118,6 +118,7 @@ namespace Engine
 	public:
 		// PhysicsBody2D specific functions
 		void RemoveBodyFromWorld();
+		void SetPointersToNull();
 
 		// May want non-runtime activation and deactivation functions.
 		

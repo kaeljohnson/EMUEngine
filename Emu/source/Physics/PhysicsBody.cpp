@@ -46,9 +46,15 @@ namespace Engine
 		if (m_bodyID != nullptr)
 		{
 			b2DestroyBody(*m_bodyID);
-			m_bodyID = nullptr;
-			m_worldID = nullptr;
+			SetPointersToNull();
 		}
+	}
+
+	void PhysicsBody::SetPointersToNull()
+	{
+		m_bodyID = nullptr;
+		m_worldID = nullptr;
+		m_shapeID = nullptr;
 	}
 
 	void PhysicsBody::ApplyForceToBody(Vector2D<float> force)
