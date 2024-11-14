@@ -37,13 +37,15 @@ namespace Engine
 		}
 
 		ENGINE_INFO_D("Freeing World!");
-		b2DestroyWorld(*m_worldID);
 
 		for (Entity* entity : m_entities)
 		{
+			if (!refPhysicsBodyManager.HasComponent(entity)) continue;
 			PhysicsBody* ptrPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(entity);
 			ptrPhysicsBody->RemoveBodyFromWorld();
 		}
+
+		b2DestroyWorld(*m_worldID);
 
 		delete m_worldID;
 		m_worldID = nullptr;
@@ -233,22 +235,6 @@ namespace Engine
 			refPhysicsBody.m_bodyID = new b2BodyId(bodyId);
 			refPhysicsBody.m_shapeID = new b2ShapeId(shapeId);
 			refPhysicsBody.m_worldID = m_worldID;
-
-			// shapeDef.restitutionThreshold = refPhysicsBody.GetStartingRestitutionThreshold();
-
-			/*bodyDef.position.Set(refPhysicsBody.GetStartingPosition().X + refPhysicsBody.GetHalfWidth(),
-				refPhysicsBody.GetStartingPosition().Y + refPhysicsBody.GetHalfHeight());
-					
-			body = m_world->CreateBody(&bodyDef);*/
-
-			// shape.SetAsBox(refPhysicsBody.GetHalfWidth(), refPhysicsBody.GetHalfHeight());
-			// fixtureDef.shape = &shape;
-			// fixtureDef.restitution = refPhysicsBody.GetStartingRestitution();
-			// fixtureDef.restitutionThreshold = refPhysicsBody.GetStartingRestitutionThreshold();
-			// fixtureDef.density = refPhysicsBody.GetStartingDensity();
-			// fixtureDef.friction = refPhysicsBody.GetStartingFriction();
-			// fixtureDef.isSensor = refPhysicsBody.GetIsSensor();
-			// body->CreateFixture(&fixtureDef);
 		}
 	}
 }
