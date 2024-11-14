@@ -8,114 +8,134 @@
 #include "../../include/Events/EventDispatcher.h"
 #include "../../include/Events/Event.h"
 #include "../../include/Logging/Logger.h"
+#include "../../include/Events/KeyStates.h"
+#include "../../include/Events/MouseStates.h"
 
 namespace Engine
 {
-    EventManager::EventManager() : m_eventDispatcher(std::make_unique<EventDispatcher>(m_eventQ, m_keyStates, m_mouseButtonStates, m_mousePosition, m_scrollDirection))
+    // Provide the actual definition of the static member variable
+    KeyStatesMap KeyStates::m_keyStates;
+	MouseStatesMap MouseStates::m_mouseStates;
+    Vector2D<int> MouseStates::m_mousePosition;
+	Vector2D<int> MouseStates::m_scrollDirection;
+
+
+    EventManager::EventManager() : m_eventDispatcher(std::make_unique<EventDispatcher>(m_eventQ))
     {
         // Initialize all key down states to false
-        m_keyStates[ESCAPE_KEY_DOWN] = false;
-        m_keyStates[EQUALS_KEY_DOWN] = false;
-        m_keyStates[ZERO_KEY_DOWN] = false;
-        m_keyStates[ONE_KEY_DOWN] = false;
-        m_keyStates[TWO_KEY_DOWN] = false;
-        m_keyStates[THREE_KEY_DOWN] = false;
-        m_keyStates[FOUR_KEY_DOWN] = false;
-        m_keyStates[FIVE_KEY_DOWN] = false;
-        m_keyStates[SIX_KEY_DOWN] = false;
-        m_keyStates[SEVEN_KEY_DOWN] = false;
-        m_keyStates[EIGHT_KEY_DOWN] = false;
-        m_keyStates[NINE_KEY_DOWN] = false;
-        m_keyStates[Q_KEY_DOWN] = false;
-        m_keyStates[W_KEY_DOWN] = false;
-        m_keyStates[E_KEY_DOWN] = false;
-        m_keyStates[R_KEY_DOWN] = false;
-        m_keyStates[T_KEY_DOWN] = false;
-        m_keyStates[Y_KEY_DOWN] = false;
-        m_keyStates[U_KEY_DOWN] = false;
-        m_keyStates[I_KEY_DOWN] = false;
-        m_keyStates[O_KEY_DOWN] = false;
-        m_keyStates[P_KEY_DOWN] = false;
-        m_keyStates[A_KEY_DOWN] = false;
-        m_keyStates[S_KEY_DOWN] = false;
-        m_keyStates[D_KEY_DOWN] = false;
-        m_keyStates[F_KEY_DOWN] = false;
-        m_keyStates[G_KEY_DOWN] = false;
-        m_keyStates[H_KEY_DOWN] = false;
-        m_keyStates[J_KEY_DOWN] = false;
-        m_keyStates[K_KEY_DOWN] = false;
-        m_keyStates[L_KEY_DOWN] = false;
-        m_keyStates[Z_KEY_DOWN] = false;
-        m_keyStates[X_KEY_DOWN] = false;
-        m_keyStates[C_KEY_DOWN] = false;
-        m_keyStates[V_KEY_DOWN] = false;
-        m_keyStates[B_KEY_DOWN] = false;
-        m_keyStates[N_KEY_DOWN] = false;
-        m_keyStates[M_KEY_DOWN] = false;
-        m_keyStates[TAB_KEY_DOWN] = false;
-        m_keyStates[CAPS_LOCK_KEY_DOWN] = false;
-        m_keyStates[LEFT_SHIFT_KEY_DOWN] = false;
-        m_keyStates[RIGHT_SHIFT_KEY_DOWN] = false;
-        m_keyStates[ENTER_KEY_DOWN] = false;
-        m_keyStates[LEFT_ARROW_KEY_DOWN] = false;
-        m_keyStates[UP_ARROW_KEY_DOWN] = false;
-        m_keyStates[RIGHT_ARROW_KEY_DOWN] = false;
-        m_keyStates[DOWN_ARROW_KEY_DOWN] = false;
-        m_keyStates[SPACE_KEY_DOWN] = false;
-        m_keyStates[MINUS_KEY_DOWN] = false;
-        m_keyStates[BACKSPACE_KEY_DOWN] = false;
+        KeyStates::m_keyStates[ESCAPE_KEY_DOWN] = false;
+        KeyStates::m_keyStates[EQUALS_KEY_DOWN] = false;
+        KeyStates::m_keyStates[ZERO_KEY_DOWN] = false;
+        KeyStates::m_keyStates[ONE_KEY_DOWN] = false;
+        KeyStates::m_keyStates[TWO_KEY_DOWN] = false;
+        KeyStates::m_keyStates[THREE_KEY_DOWN] = false;
+        KeyStates::m_keyStates[FOUR_KEY_DOWN] = false;
+        KeyStates::m_keyStates[FIVE_KEY_DOWN] = false;
+        KeyStates::m_keyStates[SIX_KEY_DOWN] = false;
+        KeyStates::m_keyStates[SEVEN_KEY_DOWN] = false;
+        KeyStates::m_keyStates[EIGHT_KEY_DOWN] = false;
+        KeyStates::m_keyStates[NINE_KEY_DOWN] = false;
+        KeyStates::m_keyStates[Q_KEY_DOWN] = false;
+        KeyStates::m_keyStates[W_KEY_DOWN] = false;
+        KeyStates::m_keyStates[E_KEY_DOWN] = false;
+        KeyStates::m_keyStates[R_KEY_DOWN] = false;
+        KeyStates::m_keyStates[T_KEY_DOWN] = false;
+        KeyStates::m_keyStates[Y_KEY_DOWN] = false;
+        KeyStates::m_keyStates[U_KEY_DOWN] = false;
+        KeyStates::m_keyStates[I_KEY_DOWN] = false;
+        KeyStates::m_keyStates[O_KEY_DOWN] = false;
+        KeyStates::m_keyStates[P_KEY_DOWN] = false;
+        KeyStates::m_keyStates[A_KEY_DOWN] = false;
+        KeyStates::m_keyStates[S_KEY_DOWN] = false;
+        KeyStates::m_keyStates[D_KEY_DOWN] = false;
+        KeyStates::m_keyStates[F_KEY_DOWN] = false;
+        KeyStates::m_keyStates[G_KEY_DOWN] = false;
+        KeyStates::m_keyStates[H_KEY_DOWN] = false;
+        KeyStates::m_keyStates[J_KEY_DOWN] = false;
+        KeyStates::m_keyStates[K_KEY_DOWN] = false;
+        KeyStates::m_keyStates[L_KEY_DOWN] = false;
+        KeyStates::m_keyStates[Z_KEY_DOWN] = false;
+        KeyStates::m_keyStates[X_KEY_DOWN] = false;
+        KeyStates::m_keyStates[C_KEY_DOWN] = false;
+        KeyStates::m_keyStates[V_KEY_DOWN] = false;
+        KeyStates::m_keyStates[B_KEY_DOWN] = false;
+        KeyStates::m_keyStates[N_KEY_DOWN] = false;
+        KeyStates::m_keyStates[M_KEY_DOWN] = false;
+        KeyStates::m_keyStates[TAB_KEY_DOWN] = false;
+        KeyStates::m_keyStates[CAPS_LOCK_KEY_DOWN] = false;
+        KeyStates::m_keyStates[LEFT_SHIFT_KEY_DOWN] = false;
+        KeyStates::m_keyStates[RIGHT_SHIFT_KEY_DOWN] = false;
+        KeyStates::m_keyStates[ENTER_KEY_DOWN] = false;
+        KeyStates::m_keyStates[LEFT_ARROW_KEY_DOWN] = false;
+        KeyStates::m_keyStates[UP_ARROW_KEY_DOWN] = false;
+        KeyStates::m_keyStates[RIGHT_ARROW_KEY_DOWN] = false;
+        KeyStates::m_keyStates[DOWN_ARROW_KEY_DOWN] = false;
+        KeyStates::m_keyStates[SPACE_KEY_DOWN] = false;
+        KeyStates::m_keyStates[MINUS_KEY_DOWN] = false;
+        KeyStates::m_keyStates[BACKSPACE_KEY_DOWN] = false;
 
         // Initialize all key up states to true
-        m_keyStates[ESCAPE_KEY_UP] = true;
-        m_keyStates[EQUALS_KEY_UP] = true;
-        m_keyStates[ZERO_KEY_UP] = true;
-        m_keyStates[ONE_KEY_UP] = true;
-        m_keyStates[TWO_KEY_UP] = true;
-        m_keyStates[THREE_KEY_UP] = true;
-        m_keyStates[FOUR_KEY_UP] = true;
-        m_keyStates[FIVE_KEY_UP] = true;
-        m_keyStates[SIX_KEY_UP] = true;
-        m_keyStates[SEVEN_KEY_UP] = true;
-        m_keyStates[EIGHT_KEY_UP] = true;
-        m_keyStates[NINE_KEY_UP] = true;
-        m_keyStates[Q_KEY_UP] = true;
-        m_keyStates[W_KEY_UP] = true;
-        m_keyStates[E_KEY_UP] = true;
-        m_keyStates[R_KEY_UP] = true;
-        m_keyStates[T_KEY_UP] = true;
-        m_keyStates[Y_KEY_UP] = true;
-        m_keyStates[U_KEY_UP] = true;
-        m_keyStates[I_KEY_UP] = true;
-        m_keyStates[O_KEY_UP] = true;
-        m_keyStates[P_KEY_UP] = true;
-        m_keyStates[A_KEY_UP] = true;
-        m_keyStates[S_KEY_UP] = true;
-        m_keyStates[D_KEY_UP] = true;
-        m_keyStates[F_KEY_UP] = true;
-        m_keyStates[G_KEY_UP] = true;
-        m_keyStates[H_KEY_UP] = true;
-        m_keyStates[J_KEY_UP] = true;
-        m_keyStates[K_KEY_UP] = true;
-        m_keyStates[L_KEY_UP] = true;
-        m_keyStates[Z_KEY_UP] = true;
-        m_keyStates[X_KEY_UP] = true;
-        m_keyStates[C_KEY_UP] = true;
-        m_keyStates[V_KEY_UP] = true;
-        m_keyStates[B_KEY_UP] = true;
-        m_keyStates[N_KEY_UP] = true;
-        m_keyStates[M_KEY_UP] = true;
-        m_keyStates[TAB_KEY_UP] = true;
-        m_keyStates[CAPS_LOCK_KEY_UP] = true;
-        m_keyStates[LEFT_SHIFT_KEY_UP] = true;
-        m_keyStates[RIGHT_SHIFT_KEY_UP] = true;
-        m_keyStates[ENTER_KEY_UP] = true;
-        m_keyStates[LEFT_ARROW_KEY_UP] = true;
-        m_keyStates[UP_ARROW_KEY_UP] = true;
-        m_keyStates[RIGHT_ARROW_KEY_UP] = true;
-        m_keyStates[DOWN_ARROW_KEY_UP] = true;
-        m_keyStates[SPACE_KEY_UP] = true;
-        m_keyStates[MINUS_KEY_UP] = true;
-        m_keyStates[BACKSPACE_KEY_UP] = true;
+        KeyStates::m_keyStates[ESCAPE_KEY_UP] = true;
+        KeyStates::m_keyStates[EQUALS_KEY_UP] = true;
+        KeyStates::m_keyStates[ZERO_KEY_UP] = true;
+        KeyStates::m_keyStates[ONE_KEY_UP] = true;
+        KeyStates::m_keyStates[TWO_KEY_UP] = true;
+        KeyStates::m_keyStates[THREE_KEY_UP] = true;
+        KeyStates::m_keyStates[FOUR_KEY_UP] = true;
+        KeyStates::m_keyStates[FIVE_KEY_UP] = true;
+        KeyStates::m_keyStates[SIX_KEY_UP] = true;
+        KeyStates::m_keyStates[SEVEN_KEY_UP] = true;
+        KeyStates::m_keyStates[EIGHT_KEY_UP] = true;
+        KeyStates::m_keyStates[NINE_KEY_UP] = true;
+        KeyStates::m_keyStates[Q_KEY_UP] = true;
+        KeyStates::m_keyStates[W_KEY_UP] = true;
+        KeyStates::m_keyStates[E_KEY_UP] = true;
+        KeyStates::m_keyStates[R_KEY_UP] = true;
+        KeyStates::m_keyStates[T_KEY_UP] = true;
+        KeyStates::m_keyStates[Y_KEY_UP] = true;
+        KeyStates::m_keyStates[U_KEY_UP] = true;
+        KeyStates::m_keyStates[I_KEY_UP] = true;
+        KeyStates::m_keyStates[O_KEY_UP] = true;
+        KeyStates::m_keyStates[P_KEY_UP] = true;
+        KeyStates::m_keyStates[A_KEY_UP] = true;
+        KeyStates::m_keyStates[S_KEY_UP] = true;
+        KeyStates::m_keyStates[D_KEY_UP] = true;
+        KeyStates::m_keyStates[F_KEY_UP] = true;
+        KeyStates::m_keyStates[G_KEY_UP] = true;
+        KeyStates::m_keyStates[H_KEY_UP] = true;
+        KeyStates::m_keyStates[J_KEY_UP] = true;
+        KeyStates::m_keyStates[K_KEY_UP] = true;
+        KeyStates::m_keyStates[L_KEY_UP] = true;
+        KeyStates::m_keyStates[Z_KEY_UP] = true;
+        KeyStates::m_keyStates[X_KEY_UP] = true;
+        KeyStates::m_keyStates[C_KEY_UP] = true;
+        KeyStates::m_keyStates[V_KEY_UP] = true;
+        KeyStates::m_keyStates[B_KEY_UP] = true;
+        KeyStates::m_keyStates[N_KEY_UP] = true;
+        KeyStates::m_keyStates[M_KEY_UP] = true;
+        KeyStates::m_keyStates[TAB_KEY_UP] = true;
+        KeyStates::m_keyStates[CAPS_LOCK_KEY_UP] = true;
+        KeyStates::m_keyStates[LEFT_SHIFT_KEY_UP] = true;
+        KeyStates::m_keyStates[RIGHT_SHIFT_KEY_UP] = true;
+        KeyStates::m_keyStates[ENTER_KEY_UP] = true;
+        KeyStates::m_keyStates[LEFT_ARROW_KEY_UP] = true;
+        KeyStates::m_keyStates[UP_ARROW_KEY_UP] = true;
+        KeyStates::m_keyStates[RIGHT_ARROW_KEY_UP] = true;
+        KeyStates::m_keyStates[DOWN_ARROW_KEY_UP] = true;
+        KeyStates::m_keyStates[SPACE_KEY_UP] = true;
+        KeyStates::m_keyStates[MINUS_KEY_UP] = true;
+        KeyStates::m_keyStates[BACKSPACE_KEY_UP] = true;
+
+		// Initialize all mouse down states to false
+		MouseStates::m_mouseStates[MIDDLE_MOUSE_BUTTON_DOWN] = false;
+		MouseStates::m_mouseStates[LEFT_MOUSE_BUTTON_DOWN] = false;
+		MouseStates::m_mouseStates[RIGHT_MOUSE_BUTTON_DOWN] = false;
+
+		// Initialize all mouse up states to true
+		MouseStates::m_mouseStates[MIDDLE_MOUSE_BUTTON_UP] = true;
+		MouseStates::m_mouseStates[LEFT_MOUSE_BUTTON_UP] = true;
+		MouseStates::m_mouseStates[RIGHT_MOUSE_BUTTON_UP] = true;
+
     }
 
     void EventManager::RegisterEventHandler(EventType type, EventHandler handler)

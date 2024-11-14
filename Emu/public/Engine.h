@@ -13,6 +13,9 @@
 #include "../include/Physics/PhysicsBody.h"
 #include "../include/Tiles/TileMap.h"
 
+#include "../include/Events/KeyStates.h"
+#include "../include/Events/MouseStates.h"
+
 #include "../include/Rendering/Screen.h"
 #include "../include/Time.h"
 

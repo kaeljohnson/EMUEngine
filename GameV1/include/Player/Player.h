@@ -23,16 +23,12 @@ class Player
 {
 public:
 	Player(Engine::Entity* entity, const float startingX, const float startingY,
-		const float width, const float height, const Engine::EventStatesMap& keyStates);
+		const float width, const float height);
 	~Player() = default;
 	void Update();
 
 	PlayerState m_currentState;
 	PlayerDirection m_currentDirection;
-
-	// Engine::Transform* m_transform;
-	// Engine::PhysicsBody* m_physicsBody;
-	// Engine::Updatable* m_updatable;
 
 private:
 	Engine::Entity* m_ptrEntity;

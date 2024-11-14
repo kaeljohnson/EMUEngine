@@ -33,7 +33,7 @@ int main(int argc, char* args[])
 	ptrPlayerEntity->SetPriority(0);
 	scene->Add(ptrPlayerEntity);
 
-	Player player(ptrPlayerEntity, 6.0f, 1.0f, 0.75f, 0.75f, refEventManager.GetKeyStates());
+	Player player(ptrPlayerEntity, 6.0f, 1.0f, 0.75f, 0.75f);
 
 	Engine::Entity* ptrCameraEntity = Engine::ECS::CreateEntity();
 	ptrCameraEntity->SetPriority(0);
