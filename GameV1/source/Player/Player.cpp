@@ -8,9 +8,10 @@
 #include "../../include/Player/PlayerConfig.h"
 
     Player::Player(Engine::Entity* ptrEntity, const float startingX, const float startingY,
-        const float width, const float height, const Engine::EventStatesMap& keyStates)
+        const float width, const float height)
         // These need to be set by client.
-        : m_ptrEntity(ptrEntity), refKeyStates(keyStates), m_coyoteTime(0.0f), m_canJump(false), m_jumpCharge(0.0f), m_onGround(false),
+        : m_ptrEntity(ptrEntity), refKeyStates(Engine::KeyStates::GetKeyStates()), 
+        m_coyoteTime(0.0f), m_canJump(false), m_jumpCharge(0.0f), m_onGround(false),
         m_jumpKeyDown(Engine::SPACE_KEY_DOWN), m_jumpKeyUp(Engine::SPACE_KEY_UP),
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),

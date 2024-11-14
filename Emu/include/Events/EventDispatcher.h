@@ -6,6 +6,8 @@
 #include "../MathUtil.h"
 #include "Event.h"
 
+#include "KeyStates.h"
+#include "MouseStates.h"
 #include "../ISDL/ISDL.h"
 
 namespace Engine
@@ -13,8 +15,7 @@ namespace Engine
 	class EventDispatcher
 	{
     public:
-        EventDispatcher(std::queue<Event>& eventQ, std::unordered_map<EventType, bool>& keyStates, 
-            std::unordered_map<EventType, bool>& mouseButtonStates, Vector2D<int>& mousePosition, Vector2D<int>& scrollDirection);
+        EventDispatcher(std::queue<Event>& eventQ);
         void PollEvents();
     private:
         void dispatchQuitEvent();
