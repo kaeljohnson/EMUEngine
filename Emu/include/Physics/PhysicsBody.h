@@ -6,7 +6,9 @@
 #include "../ECS/Component.h"
 #include "../MathUtil.h"
 
-class b2Body;
+struct b2BodyId;
+struct b2WorldId;
+struct b2ShapeId;
 
 namespace Engine
 {
@@ -18,7 +20,9 @@ namespace Engine
 	class PhysicsBody : public Component
 	{
 	public:
-		b2Body* m_body = nullptr;
+		b2BodyId* m_bodyID = nullptr;
+		b2ShapeId* m_shapeID = nullptr;
+		b2WorldId* m_worldID = nullptr;
 	private:
 		BodyType m_bodyType;
 		

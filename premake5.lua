@@ -38,7 +38,7 @@ project "Emu"
 		"SDL2",
 		"/manual-link/SDL2main",
 		"SDL2_image",
-		"box2d"
+		"box2dd"
     }
 
     filter "system:windows"

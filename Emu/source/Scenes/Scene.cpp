@@ -16,7 +16,7 @@
 namespace Engine
 {
 	Scene::Scene() : m_levelDimensionsInUnits(32, 32), HasTileMap(false),
-		m_world(nullptr), m_tileMap(nullptr),
+		m_worldID(nullptr), m_tileMap(nullptr),
 		refTransformManager(ECS::GetComponentManager<Transform>()),
 		refPhysicsBodyManager(ECS::GetComponentManager<PhysicsBody>()),
 		refUpdatableManager(ECS::GetComponentManager<Updatable>()) {}
@@ -28,36 +28,38 @@ namespace Engine
 
 	void Scene::DestroyPhysicsWorld()
 	{
-		if (m_world == nullptr)
+
+
+		if (m_worldID == nullptr)
 		{
 			ENGINE_INFO_D("World is already null. No need to destroy.");
 			return;
 		}
 
 		ENGINE_INFO_D("Freeing World!");
-		// Destroy all bodies in the world
-		b2Body* body = m_world->GetBodyList();
-		while (body != nullptr)
+		b2DestroyWorld(*m_worldID);
+
+		for (Entity* entity : m_entities)
 		{
-			b2Body* nextBody = body->GetNext();
-			PhysicsBody* ptrBody = ECS::GetComponentManager<PhysicsBody>().GetComponent((Entity*)body->GetUserData().pointer);
-			ptrBody->RemoveBodyFromWorld();
-			body = nextBody;
+			PhysicsBody* ptrPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(entity);
+			ptrPhysicsBody->RemoveBodyFromWorld();
 		}
 
-		delete m_world;
-		m_world = nullptr;
+		delete m_worldID;
+		m_worldID = nullptr;
 		ENGINE_INFO_D("World freed!");
 	}
 
 	void Scene::CheckValid()
 	{
-		(m_world == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
+		(m_worldID == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
 	}
 
 	void Scene::OnScenePlay()
 	{
-		m_world = new b2World(b2Vec2(m_gravity.X, m_gravity.Y));
+		b2WorldDef worldDef = b2DefaultWorldDef();
+		worldDef.gravity = { m_gravity.X, m_gravity.Y };
+		m_worldID = new b2WorldId(b2CreateWorld(&worldDef));
 
 		ECS::LoadEntities(m_entities);
 
@@ -133,7 +135,7 @@ namespace Engine
 			refUpdatable.Update();
 		}
 
-		m_world->Step(Time::GetTimeStep(), 8, 3);
+		b2World_Step(*m_worldID, Time::GetTimeStep(), 4);
 
 		for (PhysicsBody& refPhysicsBody : refPhysicsBodyManager)
 		{
@@ -155,6 +157,7 @@ namespace Engine
 		}
 	};
 
+	// Is this function necessary?
 	void Scene::CreatePhysicsSimulation(const Vector2D<float> gravity)
 	{
 		// What happens if this is called multiple times for one scene? Make sure nothing bad.
@@ -162,12 +165,6 @@ namespace Engine
 		ENGINE_INFO_D("Setting gravity: " + std::to_string(gravity.X) + ", " + std::to_string(gravity.Y));
 
 		m_gravity = gravity;
-
-		if (m_world)
-		{
-			ENGINE_INFO_D("World already set!");
-			return;
-		}
 		
 		// Need a reset function for the world which resets all objects in the world.
 
@@ -183,7 +180,7 @@ namespace Engine
 
 	void Scene::SetGravity(const Vector2D<float> gravity)
 	{
-		m_world->SetGravity(b2Vec2(m_gravity.X, m_gravity.Y));
+		b2World_SetGravity(*m_worldID, b2Vec2(m_gravity.X, m_gravity.Y));
 	}
 
 	void Scene::AddPhysicsBodiesToWorld()
@@ -192,10 +189,13 @@ namespace Engine
 		{
 			if (!refPhysicsBody.IsActive()) continue;
 
-			b2Body* body;
-			b2BodyDef bodyDef;
-			b2FixtureDef fixtureDef;
-			b2PolygonShape shape;
+			b2BodyDef bodyDef = b2DefaultBodyDef();
+			bodyDef.position = 
+			{	
+				refPhysicsBody.GetStartingPosition().X + refPhysicsBody.GetHalfWidth(),
+				refPhysicsBody.GetStartingPosition().Y + refPhysicsBody.GetHalfHeight() 
+			};
+
 			switch (refPhysicsBody.GetBodyType())
 			{
 				case STATIC:
@@ -217,24 +217,38 @@ namespace Engine
 			}
 
 			bodyDef.fixedRotation = refPhysicsBody.GetIsRotationFixed();
+			bodyDef.userData = refPhysicsBody.GetEntity(); // NOTE: This is the entity  of the physics body. Not a pointer to the physics body.
 
-			bodyDef.userData.pointer = (uintptr_t)refPhysicsBody.GetEntity(); // NOTE: This is the entity ID of the physics body. Not a pointer to the physics body.
+			b2BodyId bodyId = b2CreateBody(*m_worldID, &bodyDef);
 
-			bodyDef.position.Set(refPhysicsBody.GetStartingPosition().X + refPhysicsBody.GetHalfWidth(),
+			b2ShapeDef shapeDef = b2DefaultShapeDef();
+			shapeDef.density = refPhysicsBody.GetStartingDensity();
+			shapeDef.friction = refPhysicsBody.GetStartingFriction();
+			shapeDef.restitution = refPhysicsBody.GetStartingRestitution();
+			shapeDef.isSensor = refPhysicsBody.GetIsSensor();
+
+			b2Polygon box = b2MakeBox(refPhysicsBody.GetHalfWidth(), refPhysicsBody.GetHalfHeight());
+			b2ShapeId shapeId = b2CreatePolygonShape(bodyId, &shapeDef, &box);
+
+			refPhysicsBody.m_bodyID = new b2BodyId(bodyId);
+			refPhysicsBody.m_shapeID = new b2ShapeId(shapeId);
+			refPhysicsBody.m_worldID = m_worldID;
+
+			// shapeDef.restitutionThreshold = refPhysicsBody.GetStartingRestitutionThreshold();
+
+			/*bodyDef.position.Set(refPhysicsBody.GetStartingPosition().X + refPhysicsBody.GetHalfWidth(),
 				refPhysicsBody.GetStartingPosition().Y + refPhysicsBody.GetHalfHeight());
 					
-			body = m_world->CreateBody(&bodyDef);
+			body = m_world->CreateBody(&bodyDef);*/
 
-			shape.SetAsBox(refPhysicsBody.GetHalfWidth(), refPhysicsBody.GetHalfHeight());
-			fixtureDef.shape = &shape;
-			fixtureDef.restitution = refPhysicsBody.GetStartingRestitution();
-			fixtureDef.restitutionThreshold = refPhysicsBody.GetStartingRestitutionThreshold();
-			fixtureDef.density = refPhysicsBody.GetStartingDensity();
-			fixtureDef.friction = refPhysicsBody.GetStartingFriction();
-			fixtureDef.isSensor = refPhysicsBody.GetIsSensor();
-			body->CreateFixture(&fixtureDef);
-
-			refPhysicsBody.m_body = body;
+			// shape.SetAsBox(refPhysicsBody.GetHalfWidth(), refPhysicsBody.GetHalfHeight());
+			// fixtureDef.shape = &shape;
+			// fixtureDef.restitution = refPhysicsBody.GetStartingRestitution();
+			// fixtureDef.restitutionThreshold = refPhysicsBody.GetStartingRestitutionThreshold();
+			// fixtureDef.density = refPhysicsBody.GetStartingDensity();
+			// fixtureDef.friction = refPhysicsBody.GetStartingFriction();
+			// fixtureDef.isSensor = refPhysicsBody.GetIsSensor();
+			// body->CreateFixture(&fixtureDef);
 		}
 	}
 }
