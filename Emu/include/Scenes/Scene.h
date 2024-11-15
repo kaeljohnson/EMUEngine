@@ -59,6 +59,7 @@ namespace Engine
 
 		void CheckValid();
 		void Update();
+		void ProcessContactEvents();
 
 		bool HasTileMap;
 	}; 

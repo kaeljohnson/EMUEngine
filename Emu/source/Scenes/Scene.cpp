@@ -29,8 +29,6 @@ namespace Engine
 
 	void Scene::DestroyPhysicsWorld()
 	{
-
-
 		if (m_worldID == nullptr)
 		{
 			ENGINE_INFO_D("World is already null. No need to destroy.");
@@ -139,6 +137,7 @@ namespace Engine
 		}
 
 		b2World_Step(*m_worldID, Time::GetTimeStep(), 4);
+		ProcessContactEvents();
 
 		for (PhysicsBody& refPhysicsBody : refPhysicsBodyManager)
 		{
@@ -159,6 +158,12 @@ namespace Engine
 			}
 		}
 	};
+
+	void Scene::ProcessContactEvents()
+	{
+		// Placeholder for future better contact event system.
+
+	}
 
 	// Is this function necessary?
 	void Scene::CreatePhysicsSimulation(const Vector2D<float> gravity)

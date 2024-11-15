@@ -126,6 +126,8 @@ namespace Engine
 		void SetIsSensor(const bool sensor);
 
 		void SetContactFlags();
+		void SetContactFlags(const bool leftCollision, const bool topCollision, const bool rightCollision, const bool bottomCollision);
+		void SetSensorFlags(const bool leftSensor, const bool topSensor, const bool rightSensor, const bool bottomSensor);
 		void SetContactFlagsToFalse();
 
 		void SetBottomCollision(const bool bottomCollision);

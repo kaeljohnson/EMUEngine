@@ -117,103 +117,75 @@ namespace Engine
 
 	void PhysicsBody::SetContactFlags()
 	{
-		m_bottomCollision = false;
-		m_topCollision = false;
-		m_leftCollision = false;
-		m_rightCollision = false;
 
-		m_bottomSensor = false;
-		m_topSensor = false;
-		m_leftSensor = false;
-		m_rightSensor = false;
+		SetContactFlagsToFalse();
 
-		// replace all below with contact listeners.
+		b2ContactData contactData[10];
+		int shapeContactCount = b2Shape_GetContactData(*m_shapeID, contactData, 10);
 
-		//b2ContactEdge* edge = m_body->GetContactList();
-		//while (edge)
-		//{
-		//	if (edge->contact->IsTouching())
-		//	{
-		//		b2WorldManifold worldManifold;
-		//		edge->contact->GetWorldManifold(&worldManifold);
+		for (int i = 0; i < shapeContactCount; i++)
+		{
+			b2Manifold manifold = contactData[i].manifold;
 
-		//		b2Body* otherBody;
-		//		int directionFactor = 1;
-		//		if (edge->contact->GetFixtureA()->GetBody() == m_body)
-		//		{
-		//			otherBody = edge->contact->GetFixtureB()->GetBody();
-		//		}
-		//		else
-		//		{
-		//			directionFactor = -1;
-		//			otherBody = edge->contact->GetFixtureA()->GetBody();
-		//		}
-		//						
-		//		PhysicsBody* otherPhysicsBody = 
-		//			ECS::GetComponentManager<PhysicsBody>().GetComponent((Entity*)otherBody->GetUserData().pointer);
+			b2BodyId bodyIdA = b2Shape_GetBody(contactData[i].shapeIdA);
+			b2BodyId bodyIdB = b2Shape_GetBody(contactData[i].shapeIdB);
 
-		//		// Assuming the first point's normal is representative for the whole contact
-		//		b2Vec2 normal = worldManifold.normal;
+			int directionFactor = -1;
+			PhysicsBody* otherPhysicsBody = nullptr;
+			if (contactData[i].shapeIdA.index1 == m_shapeID->index1)
+			{
+				directionFactor = 1;
+				Entity* otherEntity = (Entity*)b2Body_GetUserData(bodyIdB);
+				otherPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(otherEntity);
+			}
+			else
+			{
+				Entity* otherEntity = (Entity*)b2Body_GetUserData(bodyIdA);
+				otherPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(otherEntity);
+			}
 
-		//		normal.x *= directionFactor;
-		//		normal.y *= directionFactor;
+			b2Vec2 normal = manifold.normal;
+			normal = b2Vec2(directionFactor * normal.x, directionFactor * normal.y);
 
-		//		// Different trigger for contacts for kinematic bodies for now.
-		//		// Might need a custom body type for bodies that
-		//		// are meant to be the ground.
-		//		if (otherPhysicsBody->GetBodyType() == SENSOR)
-		//		{
-		//			if (normal.y < -0.5) // Collision from above `this`
-		//			{
-		//				this->SetTopSensor(true);
-		//				otherPhysicsBody->SetBottomSensor(true);
-		//			}
-		//			else if (normal.y > 0.5) // Collision from below `this`
-		//			{
-		//				this->SetBottomSensor(true);
-		//				otherPhysicsBody->SetTopSensor(true);
-		//			}
+			if (normal.y < -0.5) // Collision from above `this`
+			{
+				this->SetTopCollision(true);
+				otherPhysicsBody->SetBottomCollision(true);
+			}
+			else if (normal.y > 0.5) // Collision from below `this`
+			{
+				this->SetBottomCollision(true);
+				otherPhysicsBody->SetTopCollision(true);
+			}
 
-		//			if (normal.x > 0.5) // Collision from the Right of `this`
-		//			{
-		//				this->SetRightSensor(true);
-		//				otherPhysicsBody->SetLeftSensor(true);
-		//			}
-		//			else if (normal.x < -0.5) // Collision from the Left of `this`
-		//			{
-		//				this->SetLeftSensor(true);
-		//				otherPhysicsBody->SetRightSensor(true);
-		//			}
-		//		}
-		//		else
-		//		{
-		//			// Determine the direction of the collision for `this`
+			if (normal.x > 0.5) // Collision from the Right of `this`
+			{
+				this->SetRightCollision(true);
+				otherPhysicsBody->SetLeftCollision(true);
+			}
+			else if (normal.x < -0.5) // Collision from the Left of `this`
+			{
+				this->SetLeftCollision(true);
+				otherPhysicsBody->SetRightCollision(true);
+			}
 
-		//			if (normal.y < -0.5) // Collision from above `this`
-		//			{
-		//				this->SetTopCollision(true);
-		//				otherPhysicsBody->SetBottomCollision(true);
-		//			}
-		//			else if (normal.y > 0.5) // Collision from below `this`
-		//			{
-		//				this->SetBottomCollision(true);
-		//				otherPhysicsBody->SetTopCollision(true);
-		//			}
+		}
+	}
 
-		//			if (normal.x > 0.5) // Collision from the right of `this`
-		//			{
-		//				this->SetRightCollision(true);
-		//				otherPhysicsBody->SetLeftCollision(true);
-		//			}
-		//			else if (normal.x < -0.5) // Collision from the left of `this` 
-		//			{
-		//				this->SetLeftCollision(true);
-		//				otherPhysicsBody->SetRightCollision(true);
-		//			}
-		//		}
-		//	}
-		//	edge = edge->next;
-		//}
+	void PhysicsBody::SetContactFlags(const bool leftCollision, const bool topCollision, const bool rightCollision, const bool bottomCollision)
+	{
+		m_leftCollision = leftCollision;
+		m_topCollision = topCollision;
+		m_rightCollision = rightCollision;
+		m_bottomCollision = bottomCollision;
+	}
+
+	void PhysicsBody::SetSensorFlags(const bool leftSensor, const bool topSensor, const bool rightSensor, const bool bottomSensor)
+	{
+		m_leftSensor = leftSensor;
+		m_topSensor = topSensor;
+		m_rightSensor = rightSensor;
+		m_bottomSensor = bottomSensor;
 	}
 
 	void PhysicsBody::SetContactFlagsToFalse()
