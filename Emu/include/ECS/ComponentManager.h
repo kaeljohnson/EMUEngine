@@ -84,6 +84,7 @@ namespace Engine
             {
                 size_t id = component.GetEntity()->GetID();
 				component.SetActive(false);
+				component.OnUnload();
 
 				// Move the component back to m_components in any order.
                 m_components.push_back(std::move(component));

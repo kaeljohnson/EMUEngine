@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_map>
+
 #include "ConversionFunctions.h"
 #include "BodyTypes.h"
 #include "../Core.h"
@@ -16,6 +18,15 @@ namespace Engine
 	// engine as the object that adheres to physics and collission detection. This class
 	// is not meant to be used by the client. It is not the "entity" or "game object" class. It will not handle
 	// textures or animation.
+
+	enum ContactDirection
+	{
+		NO_CONTACT = 0,
+		LEFT = 1,
+		TOP = 2,
+		RIGHT = 3,
+		BOTTOM = 4
+	};
 
 	class PhysicsBody : public Component
 	{
@@ -55,6 +66,9 @@ namespace Engine
 		bool m_topSensor;
 		bool m_leftSensor;
 		bool m_rightSensor;
+
+		std::unordered_map<Entity*, ContactDirection> m_collidingBodies;
+		std::vector<Entity*> m_sensorContacts;
 
 	public:
 		EMU_API PhysicsBody(Entity* entity);
@@ -114,14 +128,21 @@ namespace Engine
 
 		EMU_API void OnDeactivate() override;
 		EMU_API void OnActivate() override;
+		EMU_API void OnUnload() override;
 
 	public:
 		// PhysicsBody2D specific functions
+		// Call sparingly!!!
 		void RemoveBodyFromWorld();
 		void SetPointersToNull();
 
 		// May want non-runtime activation and deactivation functions.
 		
+		void AddCollidingBody(Entity* body, const ContactDirection contactDirection);
+		void RemoveCollidingBody(Entity* body);
+		void AddSensorContact(Entity* entity);
+		void RemoveSensorContact(Entity* entity);
+
 		void SetFixedRotation(bool fixed);
 		void SetIsSensor(const bool sensor);
 

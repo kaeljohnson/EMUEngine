@@ -46,6 +46,7 @@ namespace Engine
 		if (m_bodyID != nullptr)
 		{
 			b2DestroyBody(*m_bodyID);
+			SetContactFlagsToFalse();
 			SetPointersToNull();
 		}
 	}
@@ -115,61 +116,85 @@ namespace Engine
 			b2Body_SetAwake(*m_bodyID, true);
 	}
 
+	void PhysicsBody::AddCollidingBody(Entity* otherEntity, const ContactDirection contactDirection)
+	{
+		m_collidingBodies[otherEntity] = contactDirection;
+	}
+
+	void PhysicsBody::RemoveCollidingBody(Entity* otherEntity)
+	{
+		m_collidingBodies.erase(otherEntity);
+	}
+
 	void PhysicsBody::SetContactFlags()
 	{
 
+		// TEMP WAY TO DO THIS
+		// Problem. flags could be set to false before the other body has a chance to set its flags.
 		SetContactFlagsToFalse();
 
-		b2ContactData contactData[10];
-		int shapeContactCount = b2Shape_GetContactData(*m_shapeID, contactData, 10);
-
-		for (int i = 0; i < shapeContactCount; i++)
+		for (auto& contactPair : m_collidingBodies)
 		{
-			b2Manifold manifold = contactData[i].manifold;
+			PhysicsBody* otherPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(contactPair.first);
+			ContactDirection contactDirection = contactPair.second;
 
-			b2BodyId bodyIdA = b2Shape_GetBody(contactData[i].shapeIdA);
-			b2BodyId bodyIdB = b2Shape_GetBody(contactData[i].shapeIdB);
-
-			int directionFactor = -1;
-			PhysicsBody* otherPhysicsBody = nullptr;
-			if (contactData[i].shapeIdA.index1 == m_shapeID->index1)
-			{
-				directionFactor = 1;
-				Entity* otherEntity = (Entity*)b2Body_GetUserData(bodyIdB);
-				otherPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(otherEntity);
-			}
-			else
-			{
-				Entity* otherEntity = (Entity*)b2Body_GetUserData(bodyIdA);
-				otherPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(otherEntity);
-			}
-
-			b2Vec2 normal = manifold.normal;
-			normal = b2Vec2(directionFactor * normal.x, directionFactor * normal.y);
-
-			if (normal.y < -0.5) // Collision from above `this`
+			if (contactDirection == ContactDirection::TOP)
 			{
 				this->SetTopCollision(true);
 				otherPhysicsBody->SetBottomCollision(true);
 			}
-			else if (normal.y > 0.5) // Collision from below `this`
+			else if (contactDirection == ContactDirection::BOTTOM)
 			{
 				this->SetBottomCollision(true);
 				otherPhysicsBody->SetTopCollision(true);
 			}
-
-			if (normal.x > 0.5) // Collision from the Right of `this`
-			{
-				this->SetRightCollision(true);
-				otherPhysicsBody->SetLeftCollision(true);
-			}
-			else if (normal.x < -0.5) // Collision from the Left of `this`
+			else if (contactDirection == ContactDirection::LEFT)
 			{
 				this->SetLeftCollision(true);
 				otherPhysicsBody->SetRightCollision(true);
 			}
-
+			else if (contactDirection == ContactDirection::RIGHT)
+			{
+				this->SetRightCollision(true);
+				otherPhysicsBody->SetLeftCollision(true);
+			}
 		}
+
+		for (auto& sensorContact : m_sensorContacts)
+		{
+			PhysicsBody* otherPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(sensorContact);
+			if (this->GetCenterPosition().Y < otherPhysicsBody->GetCenterPosition().Y)
+			{
+				this->SetTopSensor(true);
+				otherPhysicsBody->SetBottomSensor(true);
+			}
+			else if (this->GetCenterPosition().Y > otherPhysicsBody->GetCenterPosition().Y)
+			{
+				this->SetBottomSensor(true);
+				otherPhysicsBody->SetTopSensor(true);
+			}
+
+			if (this->GetCenterPosition().X < otherPhysicsBody->GetCenterPosition().X)
+			{
+				this->SetLeftSensor(true);
+				otherPhysicsBody->SetRightSensor(true);
+			}
+			else if (this->GetCenterPosition().X > otherPhysicsBody->GetCenterPosition().X)
+			{
+				this->SetRightSensor(true);
+				otherPhysicsBody->SetLeftSensor(true);
+			}
+		}
+	}
+
+	void PhysicsBody::AddSensorContact(Entity* ptrEntity)
+	{
+		m_sensorContacts.push_back(ptrEntity);
+	}
+
+	void PhysicsBody::RemoveSensorContact(Entity* ptrEntity)
+	{
+		m_sensorContacts.erase(std::remove(m_sensorContacts.begin(), m_sensorContacts.end(), ptrEntity), m_sensorContacts.end());
 	}
 
 	void PhysicsBody::SetContactFlags(const bool leftCollision, const bool topCollision, const bool rightCollision, const bool bottomCollision)
@@ -218,6 +243,14 @@ namespace Engine
 			ENGINE_WARN_D("Body type has no engine side updating.");
 			break;
 		}
+	}
+
+	void PhysicsBody::OnUnload()
+	{
+		m_collidingBodies.clear();
+		m_sensorContacts.clear();
+		SetPointersToNull();
+		SetContactFlagsToFalse();
 	}
 
 	void PhysicsBody::SetGravity(bool enabled) { b2Body_SetGravityScale(*m_bodyID, enabled ? 1.0f : 0.0f); }

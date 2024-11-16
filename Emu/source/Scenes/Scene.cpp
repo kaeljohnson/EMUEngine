@@ -161,8 +161,107 @@ namespace Engine
 
 	void Scene::ProcessContactEvents()
 	{
-		// Placeholder for future better contact event system.
+		b2ContactEvents contactEvents = b2World_GetContactEvents(*m_worldID);
 
+		for (int i = 0; i < contactEvents.beginCount; ++i)
+		{
+			b2ContactBeginTouchEvent* beginEvent = contactEvents.beginEvents + i;
+
+			b2ShapeId shapeIdA = beginEvent->shapeIdA;
+			b2ShapeId shapeIdB = beginEvent->shapeIdB;
+
+			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
+
+			// normal points from A to B
+			b2Vec2 normal = beginEvent->manifold.normal;
+
+			PhysicsBody* physicsBodyA = ECS::GetComponentManager<PhysicsBody>().GetComponent(entityA);
+			PhysicsBody* physicsBodyB = ECS::GetComponentManager<PhysicsBody>().GetComponent(entityB);
+
+			if (normal.y < -0.5)
+			{
+				physicsBodyA->AddCollidingBody(entityB, TOP);
+				physicsBodyB->AddCollidingBody(entityA, BOTTOM);
+			}
+			else if (normal.y > 0.5)
+			{
+				physicsBodyA->AddCollidingBody(entityB, BOTTOM);
+				physicsBodyB->AddCollidingBody(entityA, TOP);
+			}
+
+			if (normal.x > 0.5)
+			{
+				physicsBodyA->AddCollidingBody(entityB, RIGHT);
+				physicsBodyB->AddCollidingBody(entityA, LEFT);
+			}
+			else if (normal.x < -0.5)
+			{
+				physicsBodyA->AddCollidingBody(entityB, LEFT);
+				physicsBodyB->AddCollidingBody(entityA, RIGHT);
+			}
+			
+		}
+
+		for (int i = 0; i < contactEvents.endCount; ++i)
+		{
+			b2ContactEndTouchEvent* endEvent = contactEvents.endEvents + i;
+
+			b2ShapeId shapeIdA = endEvent->shapeIdA;
+			b2ShapeId shapeIdB = endEvent->shapeIdB;
+
+			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
+
+			PhysicsBody* physicsBodyA = ECS::GetComponentManager<PhysicsBody>().GetComponent(entityA);
+			PhysicsBody* physicsBodyB = ECS::GetComponentManager<PhysicsBody>().GetComponent(entityB);
+
+			physicsBodyA->RemoveCollidingBody(entityB);
+			physicsBodyB->RemoveCollidingBody(entityA);
+		}
+
+		/*for (int i = 0; i < contactEvents.hitCount; ++i)
+		{
+			b2ContactHitEvent* hitEvent = contactEvents.hitEvents + i;
+
+
+		}*/
+
+		b2SensorEvents sensorEvents = b2World_GetSensorEvents(*m_worldID);
+
+		for (int i = 0; i < sensorEvents.beginCount; ++i)
+		{
+			b2SensorBeginTouchEvent* beginEvent = sensorEvents.beginEvents + i;
+
+			b2ShapeId dynamicShapeId = beginEvent->visitorShapeId;
+			b2ShapeId sensorShapeId = beginEvent->sensorShapeId;
+
+			Entity* dynamicEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(dynamicShapeId));
+			Entity* sensorEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(sensorShapeId));
+
+			PhysicsBody* dynamicPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(dynamicEntity);
+			PhysicsBody* sensorPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(sensorEntity);
+
+			dynamicPhysicsBody->AddSensorContact(sensorEntity);
+			sensorPhysicsBody->AddSensorContact(dynamicEntity);
+		}
+
+		for (int i = 0; i < sensorEvents.endCount; ++i)
+		{
+			b2SensorEndTouchEvent* endEvent = sensorEvents.endEvents + i;
+
+			b2ShapeId dynamicShapeId = endEvent->visitorShapeId;
+			b2ShapeId sensorShapeId = endEvent->sensorShapeId;
+
+			Entity* dynamicEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(dynamicShapeId));
+			Entity* sensorEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(sensorShapeId));
+
+			PhysicsBody* dynamicPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(dynamicEntity);
+			PhysicsBody* sensorPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(sensorEntity);
+
+			dynamicPhysicsBody->RemoveSensorContact(sensorEntity);
+			sensorPhysicsBody->RemoveSensorContact(dynamicEntity);
+		}
 	}
 
 	// Is this function necessary?

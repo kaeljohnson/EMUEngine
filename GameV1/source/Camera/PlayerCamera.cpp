@@ -24,6 +24,15 @@ void PlayerCamera::Update()
     float targetX = Engine::Lerp(ptrCameraTarget->PrevPosition.X, ptrCameraTarget->Position.X, Engine::Time::GetInterpolationFactor());
     float targetY = Engine::Lerp(ptrCameraTarget->PrevPosition.Y, ptrCameraTarget->Position.Y, Engine::Time::GetInterpolationFactor());
 
+	ptrCamera->m_offset.X = targetX - (ptrCamera->m_size.X / 2.0f);
+	ptrCamera->m_offset.Y = targetY - (ptrCamera->m_size.Y / 2.0f);
+
+    if (ptrCamera->m_clampingOn) ptrCamera->Clamp();
+
+    return;
+
+    // DEAD CODE FOR NOW
+
     float desiredLookAhead = ptrCameraTarget->DirectionFacing * m_lookAheadFactor;
 
     // Calculate the difference between the current and desired look-ahead

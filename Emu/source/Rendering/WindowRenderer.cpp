@@ -144,27 +144,26 @@ namespace Engine
 
 		// This should show the boundary of the physics body, not the texture.
 #if defined(DEBUG)
-		PhysicsBody* ptrBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(transform.GetEntity());
-		if (ptrBody == nullptr)
+		if (ECS::GetComponentManager<PhysicsBody>().HasComponent(transform.GetEntity()))
 		{
-			ENGINE_CRITICAL("PhysicsBody not found for Transform with ID: " + std::to_string(transform.GetEntity()->GetID()));
-			return;
-		}
-		
-		if (ptrBody->GetHasCollisionBelow() || ptrBody->GetHasCollisionAbove() ||
-			ptrBody->GetHasCollisionLeft() || ptrBody->GetHasCollisionRight())
-		{
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 255, 255); // BLUE
-		}
-		else if (ptrBody->GetHasSensorBelow() || ptrBody->GetHasSensorAbove() ||
-			ptrBody->GetHasSensorLeft() || ptrBody->GetHasSensorRight())
-		{
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, 255); // GREEN
+			PhysicsBody* ptrBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(transform.GetEntity());
 
-		}
-		else
-		{
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, 255);
+
+			if (ptrBody->GetHasCollisionBelow() || ptrBody->GetHasCollisionAbove() ||
+				ptrBody->GetHasCollisionLeft() || ptrBody->GetHasCollisionRight())
+			{
+				SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 255, 255); // BLUE
+			}
+			else if (ptrBody->GetHasSensorBelow() || ptrBody->GetHasSensorAbove() ||
+				ptrBody->GetHasSensorLeft() || ptrBody->GetHasSensorRight())
+			{
+				SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, 255); // GREEN
+
+			}
+			else
+			{
+				SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, 255);
+			}
 		}
 		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
