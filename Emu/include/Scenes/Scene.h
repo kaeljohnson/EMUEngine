@@ -12,7 +12,7 @@
 #include "../Updatable/Updatable.h"
 #include "../Transform.h"
 
-class b2World;
+struct b2WorldId;
 
 namespace Engine
 {
@@ -38,7 +38,7 @@ namespace Engine
 	private:
 		Vector2D<int> m_levelDimensionsInUnits;
 		TileMap* m_tileMap;
-		b2World* m_world;
+		b2WorldId* m_worldID;
 		Vector2D<float> m_gravity;
 
 		std::vector<Entity*> m_entities;
@@ -59,6 +59,7 @@ namespace Engine
 
 		void CheckValid();
 		void Update();
+		void ProcessContactEvents();
 
 		bool HasTileMap;
 	}; 

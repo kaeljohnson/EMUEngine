@@ -20,6 +20,9 @@ namespace Engine
 		inline virtual void OnDeactivate() {}
 		inline virtual void OnActivate() {}
 
+		inline virtual void OnLoad() {}
+		inline virtual void OnUnload() {}
+
 	private:
 		Entity* m_ptrEntity;
 		bool m_active = false;

@@ -13,8 +13,9 @@
 
 namespace Engine
 {
-	PhysicsBody::PhysicsBody(Entity* entity) : m_halfWidth(0.0f), m_halfHeight(0.0f), m_width(0.0f), m_height(0.0f),
-		m_startingPosition(Vector2D<float>(0.0f, 0.0f)), m_bodyType(STATIC), m_fixed(false), m_body(nullptr),
+	PhysicsBody::PhysicsBody(Entity* entity) : m_bodyID(nullptr), m_worldID(nullptr), m_shapeID(nullptr), 
+		m_halfWidth(0.0f), m_halfHeight(0.0f), m_width(0.0f), m_height(0.0f),
+		m_startingPosition(Vector2D<float>(0.0f, 0.0f)), m_bodyType(STATIC), m_fixed(false), 
 		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
 		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
 		m_gravityOn(true), m_isSensor(false), m_fixedRotation(true), m_restitution(0.0f),
@@ -24,9 +25,10 @@ namespace Engine
 	}
 
 	PhysicsBody::PhysicsBody(Entity* entity, const BodyType bodyType, const bool fixed, const Vector2D<float> position, const Vector2D<float> size)
-		: m_halfWidth(size.X / 2.0f), m_halfHeight(size.Y / 2.0f), 
+		: m_bodyID(nullptr), m_worldID(nullptr), m_shapeID(nullptr),
+		m_halfWidth(size.X / 2.0f), m_halfHeight(size.Y / 2.0f), 
 		m_width(size.X), m_height(size.Y), m_startingPosition(position),
-		m_bodyType(bodyType), m_fixed(fixed), m_body(nullptr),
+		m_bodyType(bodyType), m_fixed(fixed), 
 		m_bottomCollision(false), m_topCollision(false), m_leftCollision(false), m_rightCollision(false),
 		m_bottomSensor(false), m_topSensor(false), m_leftSensor(false), m_rightSensor(false),
 		m_gravityOn(true), m_isSensor(false), m_fixedRotation(true), m_restitution(0.0f),
@@ -41,21 +43,29 @@ namespace Engine
 
 	void PhysicsBody::RemoveBodyFromWorld()
 	{
-		if (m_body != nullptr)
+		if (m_bodyID != nullptr)
 		{
-			m_body->GetWorld()->DestroyBody(m_body);
-			m_body = nullptr;
+			b2DestroyBody(*m_bodyID);
+			SetContactFlagsToFalse();
+			SetPointersToNull();
 		}
+	}
+
+	void PhysicsBody::SetPointersToNull()
+	{
+		m_bodyID = nullptr;
+		m_worldID = nullptr;
+		m_shapeID = nullptr;
 	}
 
 	void PhysicsBody::ApplyForceToBody(Vector2D<float> force)
 	{
-		m_body->ApplyForceToCenter(b2Vec2(force.X, force.Y), true);
+		b2Body_ApplyForceToCenter(*m_bodyID, b2Vec2(force.X, force.Y), true);
 	}
 
 	void PhysicsBody::ApplyImpulseToBody(Vector2D<float> impulse)
 	{
-		m_body->ApplyLinearImpulseToCenter(b2Vec2(impulse.X, impulse.Y), true);
+		b2Body_ApplyLinearImpulseToCenter(*m_bodyID, b2Vec2(impulse.X, impulse.Y), true);
 	}
 
 	void PhysicsBody::SetStartingDensity(const float density)
@@ -65,12 +75,9 @@ namespace Engine
 
 	void PhysicsBody::SetDensity(const float density)
 	{
-		b2Fixture* fixture = m_body->GetFixtureList();
-		if (fixture != nullptr)
-			fixture->SetDensity(density);
-		else
-			ENGINE_CRITICAL_D("No fixture found for body!");
+		b2Shape_SetDensity(*m_shapeID, density, true);
 	}
+
 
 	void PhysicsBody::SetStartingRestitution(const float restitution)
 	{
@@ -79,11 +86,7 @@ namespace Engine
 
 	void PhysicsBody::SetRestitution(const float restitution)
 	{
-		b2Fixture* fixture = m_body->GetFixtureList();
-		if (fixture != nullptr)
-			fixture->SetRestitution(restitution);
-		else
-			ENGINE_CRITICAL_D("No fixture found for body!");
+		b2Shape_SetRestitution(*m_shapeID, restitution);
 	}
 
 	void PhysicsBody::SetStartingFriction(const float friction)
@@ -93,11 +96,7 @@ namespace Engine
 
 	void PhysicsBody::SetFriction(const float friction)
 	{
-		b2Fixture* fixture = m_body->GetFixtureList();
-		if (fixture != nullptr)
-			fixture->SetFriction(friction);
-		else
-			ENGINE_CRITICAL_D("No fixture found for body!");
+		b2Shape_SetFriction(*m_shapeID, friction);
 	}
 
 	void PhysicsBody::SetIsSensor(const bool isSensor)
@@ -108,112 +107,110 @@ namespace Engine
 	void PhysicsBody::OnDeactivate()
 	{
 		if (GameState::IN_SCENE)
-			m_body->SetAwake(false);
+			b2Body_SetAwake(*m_bodyID, false);
 	}
 
 	void PhysicsBody::OnActivate()
 	{
 		if (GameState::IN_SCENE)
-			m_body->SetAwake(true);
+			b2Body_SetAwake(*m_bodyID, true);
+	}
+
+	void PhysicsBody::AddCollidingBody(Entity* otherEntity, const ContactDirection contactDirection)
+	{
+		m_collidingBodies[otherEntity] = contactDirection;
+	}
+
+	void PhysicsBody::RemoveCollidingBody(Entity* otherEntity)
+	{
+		m_collidingBodies.erase(otherEntity);
 	}
 
 	void PhysicsBody::SetContactFlags()
 	{
-		m_bottomCollision = false;
-		m_topCollision = false;
-		m_leftCollision = false;
-		m_rightCollision = false;
 
-		m_bottomSensor = false;
-		m_topSensor = false;
-		m_leftSensor = false;
-		m_rightSensor = false;
+		// TEMP WAY TO DO THIS
+		// Problem. flags could be set to false before the other body has a chance to set its flags.
+		SetContactFlagsToFalse();
 
-		b2ContactEdge* edge = m_body->GetContactList();
-		while (edge)
+		for (auto& contactPair : m_collidingBodies)
 		{
-			if (edge->contact->IsTouching())
+			PhysicsBody* otherPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(contactPair.first);
+			ContactDirection contactDirection = contactPair.second;
+
+			if (contactDirection == ContactDirection::TOP)
 			{
-				b2WorldManifold worldManifold;
-				edge->contact->GetWorldManifold(&worldManifold);
-
-				b2Body* otherBody;
-				int directionFactor = 1;
-				if (edge->contact->GetFixtureA()->GetBody() == m_body)
-				{
-					otherBody = edge->contact->GetFixtureB()->GetBody();
-				}
-				else
-				{
-					directionFactor = -1;
-					otherBody = edge->contact->GetFixtureA()->GetBody();
-				}
-								
-				PhysicsBody* otherPhysicsBody = 
-					ECS::GetComponentManager<PhysicsBody>().GetComponent((Entity*)otherBody->GetUserData().pointer);
-
-				// Assuming the first point's normal is representative for the whole contact
-				b2Vec2 normal = worldManifold.normal;
-
-				normal.x *= directionFactor;
-				normal.y *= directionFactor;
-
-				// Different trigger for contacts for kinematic bodies for now.
-				// Might need a custom body type for bodies that
-				// are meant to be the ground.
-				if (otherPhysicsBody->GetBodyType() == SENSOR)
-				{
-					if (normal.y < -0.5) // Collision from above `this`
-					{
-						this->SetTopSensor(true);
-						otherPhysicsBody->SetBottomSensor(true);
-					}
-					else if (normal.y > 0.5) // Collision from below `this`
-					{
-						this->SetBottomSensor(true);
-						otherPhysicsBody->SetTopSensor(true);
-					}
-
-					if (normal.x > 0.5) // Collision from the Right of `this`
-					{
-						this->SetRightSensor(true);
-						otherPhysicsBody->SetLeftSensor(true);
-					}
-					else if (normal.x < -0.5) // Collision from the Left of `this`
-					{
-						this->SetLeftSensor(true);
-						otherPhysicsBody->SetRightSensor(true);
-					}
-				}
-				else
-				{
-					// Determine the direction of the collision for `this`
-
-					if (normal.y < -0.5) // Collision from above `this`
-					{
-						this->SetTopCollision(true);
-						otherPhysicsBody->SetBottomCollision(true);
-					}
-					else if (normal.y > 0.5) // Collision from below `this`
-					{
-						this->SetBottomCollision(true);
-						otherPhysicsBody->SetTopCollision(true);
-					}
-
-					if (normal.x > 0.5) // Collision from the right of `this`
-					{
-						this->SetRightCollision(true);
-						otherPhysicsBody->SetLeftCollision(true);
-					}
-					else if (normal.x < -0.5) // Collision from the left of `this` 
-					{
-						this->SetLeftCollision(true);
-						otherPhysicsBody->SetRightCollision(true);
-					}
-				}
+				this->SetTopCollision(true);
+				otherPhysicsBody->SetBottomCollision(true);
 			}
-			edge = edge->next;
+			else if (contactDirection == ContactDirection::BOTTOM)
+			{
+				this->SetBottomCollision(true);
+				otherPhysicsBody->SetTopCollision(true);
+			}
+			else if (contactDirection == ContactDirection::LEFT)
+			{
+				this->SetLeftCollision(true);
+				otherPhysicsBody->SetRightCollision(true);
+			}
+			else if (contactDirection == ContactDirection::RIGHT)
+			{
+				this->SetRightCollision(true);
+				otherPhysicsBody->SetLeftCollision(true);
+			}
 		}
+
+		for (auto& sensorContact : m_sensorContacts)
+		{
+			PhysicsBody* otherPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(sensorContact);
+			if (this->GetCenterPosition().Y < otherPhysicsBody->GetCenterPosition().Y)
+			{
+				this->SetTopSensor(true);
+				otherPhysicsBody->SetBottomSensor(true);
+			}
+			else if (this->GetCenterPosition().Y > otherPhysicsBody->GetCenterPosition().Y)
+			{
+				this->SetBottomSensor(true);
+				otherPhysicsBody->SetTopSensor(true);
+			}
+
+			if (this->GetCenterPosition().X < otherPhysicsBody->GetCenterPosition().X)
+			{
+				this->SetLeftSensor(true);
+				otherPhysicsBody->SetRightSensor(true);
+			}
+			else if (this->GetCenterPosition().X > otherPhysicsBody->GetCenterPosition().X)
+			{
+				this->SetRightSensor(true);
+				otherPhysicsBody->SetLeftSensor(true);
+			}
+		}
+	}
+
+	void PhysicsBody::AddSensorContact(Entity* ptrEntity)
+	{
+		m_sensorContacts.push_back(ptrEntity);
+	}
+
+	void PhysicsBody::RemoveSensorContact(Entity* ptrEntity)
+	{
+		m_sensorContacts.erase(std::remove(m_sensorContacts.begin(), m_sensorContacts.end(), ptrEntity), m_sensorContacts.end());
+	}
+
+	void PhysicsBody::SetContactFlags(const bool leftCollision, const bool topCollision, const bool rightCollision, const bool bottomCollision)
+	{
+		m_leftCollision = leftCollision;
+		m_topCollision = topCollision;
+		m_rightCollision = rightCollision;
+		m_bottomCollision = bottomCollision;
+	}
+
+	void PhysicsBody::SetSensorFlags(const bool leftSensor, const bool topSensor, const bool rightSensor, const bool bottomSensor)
+	{
+		m_leftSensor = leftSensor;
+		m_topSensor = topSensor;
+		m_rightSensor = rightSensor;
+		m_bottomSensor = bottomSensor;
 	}
 
 	void PhysicsBody::SetContactFlagsToFalse()
@@ -248,12 +245,20 @@ namespace Engine
 		}
 	}
 
-	void PhysicsBody::SetGravity(bool enabled) { m_body->SetGravityScale(enabled ? 1.0f : 0.0f); }
+	void PhysicsBody::OnUnload()
+	{
+		m_collidingBodies.clear();
+		m_sensorContacts.clear();
+		SetPointersToNull();
+		SetContactFlagsToFalse();
+	}
 
-	void PhysicsBody::SetXVelocity(const float xVel) { m_body->SetLinearVelocity(b2Vec2(xVel, m_body->GetLinearVelocity().y)); }
-	void PhysicsBody::SetYVelocity(const float yVel) { m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, yVel)); }
-	void PhysicsBody::SetXDeceleration(const float xDecel) { m_body->SetLinearDamping(xDecel); }
-	void PhysicsBody::SetFixedRotation(bool fixed) { m_body->SetFixedRotation(fixed); }
+	void PhysicsBody::SetGravity(bool enabled) { b2Body_SetGravityScale(*m_bodyID, enabled ? 1.0f : 0.0f); }
+
+	void PhysicsBody::SetXVelocity(const float xVel) { b2Body_SetLinearVelocity(*m_bodyID, b2Vec2(xVel, b2Body_GetLinearVelocity(*m_bodyID).y)); }
+	void PhysicsBody::SetYVelocity(const float yVel) { b2Body_SetLinearVelocity(*m_bodyID, b2Vec2(b2Body_GetLinearVelocity(*m_bodyID).x, yVel)); }
+	void PhysicsBody::SetXDeceleration(const float xDecel) { b2Body_SetLinearDamping(*m_bodyID, xDecel); }
+	void PhysicsBody::SetFixedRotation(bool fixed) { b2Body_SetFixedRotation(*m_bodyID, fixed); }
 
 	void PhysicsBody::SetBottomCollision(const bool bottomCollision) { m_bottomCollision = bottomCollision; }
 	void PhysicsBody::SetTopCollision(const bool topCollision) { m_topCollision = topCollision; }
@@ -265,10 +270,15 @@ namespace Engine
 	void PhysicsBody::SetLeftSensor(const bool leftSensor) { m_leftSensor = leftSensor; }
 	void PhysicsBody::SetRightSensor(const bool rightSensor) { m_rightSensor = rightSensor; }
 
-	const Vector2D<float> PhysicsBody::GetVelocity() const { return Vector2D<float>(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y); }
-	const Vector2D<float> PhysicsBody::GetCenterPosition() const { return Vector2D<float>(m_body->GetPosition().x, m_body->GetPosition().y); }
-	const Vector2D<float> PhysicsBody::GetTopLeftPosition() const { return Vector2D<float>(m_body->GetPosition().x - m_width / 2.0f, m_body->GetPosition().y - m_height / 2.0f); }
+	const Vector2D<float> PhysicsBody::GetVelocity() const { return Vector2D<float>(b2Body_GetLinearVelocity(*m_bodyID).x, b2Body_GetLinearVelocity(*m_bodyID).y); }
+	const Vector2D<float> PhysicsBody::GetCenterPosition() const { return Vector2D<float>(b2Body_GetPosition(*m_bodyID).x, b2Body_GetPosition(*m_bodyID).y); }
+	const Vector2D<float> PhysicsBody::GetTopLeftPosition() const { return Vector2D<float>(b2Body_GetPosition(*m_bodyID).x - m_width / 2.0f, b2Body_GetPosition(*m_bodyID).y - m_height / 2.0f); }
 
-	const float PhysicsBody::GetAngleInRadians() const { return m_body->GetAngle(); }
-	const float PhysicsBody::GetAngleInDegrees() const { return radiansToDegrees(m_body->GetAngle()); }
+	const float PhysicsBody::GetAngleInRadians() const 
+	{
+		b2Rot rotation = b2Body_GetRotation(*m_bodyID);
+		float angleInRadians = b2Rot_GetAngle(rotation);
+		return angleInRadians;
+	}
+	const float PhysicsBody::GetAngleInDegrees() const { return radiansToDegrees(GetAngleInRadians()); }
 }

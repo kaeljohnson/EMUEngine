@@ -1,12 +1,16 @@
 #pragma once
 
+#include <unordered_map>
+
 #include "ConversionFunctions.h"
 #include "BodyTypes.h"
 #include "../Core.h"
 #include "../ECS/Component.h"
 #include "../MathUtil.h"
 
-class b2Body;
+struct b2BodyId;
+struct b2WorldId;
+struct b2ShapeId;
 
 namespace Engine
 {
@@ -15,10 +19,21 @@ namespace Engine
 	// is not meant to be used by the client. It is not the "entity" or "game object" class. It will not handle
 	// textures or animation.
 
+	enum ContactDirection
+	{
+		NO_CONTACT = 0,
+		LEFT = 1,
+		TOP = 2,
+		RIGHT = 3,
+		BOTTOM = 4
+	};
+
 	class PhysicsBody : public Component
 	{
 	public:
-		b2Body* m_body = nullptr;
+		b2BodyId* m_bodyID = nullptr;
+		b2ShapeId* m_shapeID = nullptr;
+		b2WorldId* m_worldID = nullptr;
 	private:
 		BodyType m_bodyType;
 		
@@ -51,6 +66,9 @@ namespace Engine
 		bool m_topSensor;
 		bool m_leftSensor;
 		bool m_rightSensor;
+
+		std::unordered_map<Entity*, ContactDirection> m_collidingBodies;
+		std::vector<Entity*> m_sensorContacts;
 
 	public:
 		EMU_API PhysicsBody(Entity* entity);
@@ -110,17 +128,27 @@ namespace Engine
 
 		EMU_API void OnDeactivate() override;
 		EMU_API void OnActivate() override;
+		EMU_API void OnUnload() override;
 
 	public:
 		// PhysicsBody2D specific functions
+		// Call sparingly!!!
 		void RemoveBodyFromWorld();
+		void SetPointersToNull();
 
 		// May want non-runtime activation and deactivation functions.
 		
+		void AddCollidingBody(Entity* body, const ContactDirection contactDirection);
+		void RemoveCollidingBody(Entity* body);
+		void AddSensorContact(Entity* entity);
+		void RemoveSensorContact(Entity* entity);
+
 		void SetFixedRotation(bool fixed);
 		void SetIsSensor(const bool sensor);
 
 		void SetContactFlags();
+		void SetContactFlags(const bool leftCollision, const bool topCollision, const bool rightCollision, const bool bottomCollision);
+		void SetSensorFlags(const bool leftSensor, const bool topSensor, const bool rightSensor, const bool bottomSensor);
 		void SetContactFlagsToFalse();
 
 		void SetBottomCollision(const bool bottomCollision);
