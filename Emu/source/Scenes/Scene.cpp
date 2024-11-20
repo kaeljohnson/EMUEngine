@@ -4,7 +4,7 @@
 
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/Physics/PhysicsBody.h"
+#include "../../include/Components/PhysicsBody.h"
 #include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Tiles/TileMap.h"
 #include "../../include/MathUtil.h"
@@ -13,27 +13,24 @@
 #include "../../include/Updatable/Updatable.h"
 #include "../../include/Time.h"
 #include "../../include/GameState.h"
+#include "../../include/Physics/Physics.h"
 
 namespace Engine
 {
 	Scene::Scene() : m_levelDimensionsInUnits(32, 32), HasTileMap(false),
-		m_worldID(nullptr), m_tileMap(nullptr),
+		m_tileMap(nullptr),
 		refTransformManager(ECS::GetComponentManager<Transform>()),
 		refPhysicsBodyManager(ECS::GetComponentManager<PhysicsBody>()),
 		refUpdatableManager(ECS::GetComponentManager<Updatable>()) {}
 
 	Scene::~Scene()
 	{
-		DestroyPhysicsWorld();
+		Physics::DestroyWorld();
 	}
 
-	void Scene::DestroyPhysicsWorld()
+	/*void Scene::DestroyPhysicsWorld()
 	{
-		if (m_worldID == nullptr)
-		{
-			ENGINE_INFO_D("World is already null. No need to destroy.");
-			return;
-		}
+
 
 		ENGINE_INFO_D("Freeing World!");
 
@@ -49,23 +46,21 @@ namespace Engine
 		delete m_worldID;
 		m_worldID = nullptr;
 		ENGINE_INFO_D("World freed!");
-	}
+	}*/
 
 	void Scene::CheckValid()
 	{
-		(m_worldID == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
+		// (m_worldID == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
 	}
 
 	void Scene::OnScenePlay()
 	{
-		b2WorldDef worldDef = b2DefaultWorldDef();
-		worldDef.gravity = { m_gravity.X, m_gravity.Y };
-		m_worldID = new b2WorldId(b2CreateWorld(&worldDef));
+		Physics::CreateWorld(m_gravity);
 
 		ECS::LoadEntities(m_entities);
 
 		// Physics bodies need to be added to the world after they are activated and pooled.
-		AddPhysicsBodiesToWorld();
+		Physics::AddPhysicsBodiesToWorld();
 
 		GameState::IN_SCENE = true;
 	}
@@ -74,7 +69,7 @@ namespace Engine
 	{
 		GameState::IN_SCENE = false;
 
-		DestroyPhysicsWorld();
+		Physics::DestroyWorld();
 
 		ECS::UnloadEntities();
 	}
@@ -136,14 +131,14 @@ namespace Engine
 			refUpdatable.Update();
 		}
 
-		b2World_Step(*m_worldID, Time::GetTimeStep(), 4);
-		ProcessContactEvents();
+		Physics::Update();
+
+		// b2World_Step(*m_worldID, Time::GetTimeStep(), 4);
+		// ProcessContactEvents();
 
 		for (PhysicsBody& refPhysicsBody : refPhysicsBodyManager)
 		{
 			if (!refPhysicsBody.IsActive()) continue;
-
-			refPhysicsBody.Update();
 
 			Entity* ptrEntity = refPhysicsBody.GetEntity();
 
@@ -152,118 +147,12 @@ namespace Engine
 				Transform* ptrTransform = refTransformManager.GetComponent(ptrEntity);
 				
 				ptrTransform->PrevPosition = ptrTransform->Position;
-				ptrTransform->Position = refPhysicsBody.GetTopLeftPosition();
-				ptrTransform->Dimensions = refPhysicsBody.GetDimensions();
-				ptrTransform->Rotation = refPhysicsBody.GetAngleInDegrees();
+				ptrTransform->Position = Physics::GetTopLeftPosition(ptrEntity);
+				ptrTransform->Dimensions = refPhysicsBody.m_dimensions;
+				ptrTransform->Rotation = Physics::GetAngleInDegrees(ptrEntity);
 			}
 		}
 	};
-
-	void Scene::ProcessContactEvents()
-	{
-		b2ContactEvents contactEvents = b2World_GetContactEvents(*m_worldID);
-
-		for (int i = 0; i < contactEvents.beginCount; ++i)
-		{
-			b2ContactBeginTouchEvent* beginEvent = contactEvents.beginEvents + i;
-
-			b2ShapeId shapeIdA = beginEvent->shapeIdA;
-			b2ShapeId shapeIdB = beginEvent->shapeIdB;
-
-			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
-			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
-
-			// normal points from A to B
-			b2Vec2 normal = beginEvent->manifold.normal;
-
-			PhysicsBody* physicsBodyA = ECS::GetComponentManager<PhysicsBody>().GetComponent(entityA);
-			PhysicsBody* physicsBodyB = ECS::GetComponentManager<PhysicsBody>().GetComponent(entityB);
-
-			if (normal.y < -0.5)
-			{
-				physicsBodyA->AddCollidingBody(entityB, TOP);
-				physicsBodyB->AddCollidingBody(entityA, BOTTOM);
-			}
-			else if (normal.y > 0.5)
-			{
-				physicsBodyA->AddCollidingBody(entityB, BOTTOM);
-				physicsBodyB->AddCollidingBody(entityA, TOP);
-			}
-
-			if (normal.x > 0.5)
-			{
-				physicsBodyA->AddCollidingBody(entityB, RIGHT);
-				physicsBodyB->AddCollidingBody(entityA, LEFT);
-			}
-			else if (normal.x < -0.5)
-			{
-				physicsBodyA->AddCollidingBody(entityB, LEFT);
-				physicsBodyB->AddCollidingBody(entityA, RIGHT);
-			}
-			
-		}
-
-		for (int i = 0; i < contactEvents.endCount; ++i)
-		{
-			b2ContactEndTouchEvent* endEvent = contactEvents.endEvents + i;
-
-			b2ShapeId shapeIdA = endEvent->shapeIdA;
-			b2ShapeId shapeIdB = endEvent->shapeIdB;
-
-			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
-			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
-
-			PhysicsBody* physicsBodyA = ECS::GetComponentManager<PhysicsBody>().GetComponent(entityA);
-			PhysicsBody* physicsBodyB = ECS::GetComponentManager<PhysicsBody>().GetComponent(entityB);
-
-			physicsBodyA->RemoveCollidingBody(entityB);
-			physicsBodyB->RemoveCollidingBody(entityA);
-		}
-
-		/*for (int i = 0; i < contactEvents.hitCount; ++i)
-		{
-			b2ContactHitEvent* hitEvent = contactEvents.hitEvents + i;
-
-
-		}*/
-
-		b2SensorEvents sensorEvents = b2World_GetSensorEvents(*m_worldID);
-
-		for (int i = 0; i < sensorEvents.beginCount; ++i)
-		{
-			b2SensorBeginTouchEvent* beginEvent = sensorEvents.beginEvents + i;
-
-			b2ShapeId dynamicShapeId = beginEvent->visitorShapeId;
-			b2ShapeId sensorShapeId = beginEvent->sensorShapeId;
-
-			Entity* dynamicEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(dynamicShapeId));
-			Entity* sensorEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(sensorShapeId));
-
-			PhysicsBody* dynamicPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(dynamicEntity);
-			PhysicsBody* sensorPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(sensorEntity);
-
-			dynamicPhysicsBody->AddSensorContact(sensorEntity);
-			sensorPhysicsBody->AddSensorContact(dynamicEntity);
-		}
-
-		for (int i = 0; i < sensorEvents.endCount; ++i)
-		{
-			b2SensorEndTouchEvent* endEvent = sensorEvents.endEvents + i;
-
-			b2ShapeId dynamicShapeId = endEvent->visitorShapeId;
-			b2ShapeId sensorShapeId = endEvent->sensorShapeId;
-
-			Entity* dynamicEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(dynamicShapeId));
-			Entity* sensorEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(sensorShapeId));
-
-			PhysicsBody* dynamicPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(dynamicEntity);
-			PhysicsBody* sensorPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(sensorEntity);
-
-			dynamicPhysicsBody->RemoveSensorContact(sensorEntity);
-			sensorPhysicsBody->RemoveSensorContact(dynamicEntity);
-		}
-	}
-
 	// Is this function necessary?
 	void Scene::CreatePhysicsSimulation(const Vector2D<float> gravity)
 	{
@@ -272,7 +161,7 @@ namespace Engine
 		ENGINE_INFO_D("Setting gravity: " + std::to_string(gravity.X) + ", " + std::to_string(gravity.Y));
 
 		m_gravity = gravity;
-		
+
 		// Need a reset function for the world which resets all objects in the world.
 
 		if (!HasTileMap)
@@ -285,61 +174,166 @@ namespace Engine
 		}
 	}
 
-	void Scene::SetGravity(const Vector2D<float> gravity)
+	//void Scene::ProcessContactEvents()
+	//{
+	//	b2ContactEvents contactEvents = b2World_GetContactEvents(*m_worldID);
+
+	//	for (int i = 0; i < contactEvents.beginCount; ++i)
+	//	{
+	//		b2ContactBeginTouchEvent* beginEvent = contactEvents.beginEvents + i;
+
+	//		b2ShapeId shapeIdA = beginEvent->shapeIdA;
+	//		b2ShapeId shapeIdB = beginEvent->shapeIdB;
+
+	//		Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+	//		Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
+
+	//		// normal points from A to B
+	//		b2Vec2 normal = beginEvent->manifold.normal;
+
+	//		PhysicsBody* physicsBodyA = ECS::GetComponentManager<PhysicsBody>().GetComponent(entityA);
+	//		PhysicsBody* physicsBodyB = ECS::GetComponentManager<PhysicsBody>().GetComponent(entityB);
+
+	//		if (normal.y < -0.5)
+	//		{
+	//			physicsBodyA->AddCollidingBody(entityB, TOP);
+	//			physicsBodyB->AddCollidingBody(entityA, BOTTOM);
+	//		}
+	//		else if (normal.y > 0.5)
+	//		{
+	//			physicsBodyA->AddCollidingBody(entityB, BOTTOM);
+	//			physicsBodyB->AddCollidingBody(entityA, TOP);
+	//		}
+
+	//		if (normal.x > 0.5)
+	//		{
+	//			physicsBodyA->AddCollidingBody(entityB, RIGHT);
+	//			physicsBodyB->AddCollidingBody(entityA, LEFT);
+	//		}
+	//		else if (normal.x < -0.5)
+	//		{
+	//			physicsBodyA->AddCollidingBody(entityB, LEFT);
+	//			physicsBodyB->AddCollidingBody(entityA, RIGHT);
+	//		}
+	//		
+	//	}
+
+	//	for (int i = 0; i < contactEvents.endCount; ++i)
+	//	{
+	//		b2ContactEndTouchEvent* endEvent = contactEvents.endEvents + i;
+
+	//		b2ShapeId shapeIdA = endEvent->shapeIdA;
+	//		b2ShapeId shapeIdB = endEvent->shapeIdB;
+
+	//		Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+	//		Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
+
+	//		PhysicsBody* physicsBodyA = ECS::GetComponentManager<PhysicsBody>().GetComponent(entityA);
+	//		PhysicsBody* physicsBodyB = ECS::GetComponentManager<PhysicsBody>().GetComponent(entityB);
+
+	//		physicsBodyA->RemoveCollidingBody(entityB);
+	//		physicsBodyB->RemoveCollidingBody(entityA);
+	//	}
+
+	//	/*for (int i = 0; i < contactEvents.hitCount; ++i)
+	//	{
+	//		b2ContactHitEvent* hitEvent = contactEvents.hitEvents + i;
+
+
+	//	}*/
+
+	//	b2SensorEvents sensorEvents = b2World_GetSensorEvents(*m_worldID);
+
+	//	for (int i = 0; i < sensorEvents.beginCount; ++i)
+	//	{
+	//		b2SensorBeginTouchEvent* beginEvent = sensorEvents.beginEvents + i;
+
+	//		b2ShapeId dynamicShapeId = beginEvent->visitorShapeId;
+	//		b2ShapeId sensorShapeId = beginEvent->sensorShapeId;
+
+	//		Entity* dynamicEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(dynamicShapeId));
+	//		Entity* sensorEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(sensorShapeId));
+
+	//		PhysicsBody* dynamicPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(dynamicEntity);
+	//		PhysicsBody* sensorPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(sensorEntity);
+
+	//		dynamicPhysicsBody->AddSensorContact(sensorEntity);
+	//		sensorPhysicsBody->AddSensorContact(dynamicEntity);
+	//	}
+
+	//	for (int i = 0; i < sensorEvents.endCount; ++i)
+	//	{
+	//		b2SensorEndTouchEvent* endEvent = sensorEvents.endEvents + i;
+
+	//		b2ShapeId dynamicShapeId = endEvent->visitorShapeId;
+	//		b2ShapeId sensorShapeId = endEvent->sensorShapeId;
+
+	//		Entity* dynamicEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(dynamicShapeId));
+	//		Entity* sensorEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(sensorShapeId));
+
+	//		PhysicsBody* dynamicPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(dynamicEntity);
+	//		PhysicsBody* sensorPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(sensorEntity);
+
+	//		dynamicPhysicsBody->RemoveSensorContact(sensorEntity);
+	//		sensorPhysicsBody->RemoveSensorContact(dynamicEntity);
+	//	}
+	//}
+
+	/*void Scene::SetGravity(const Vector2D<float> gravity)
 	{
 		b2World_SetGravity(*m_worldID, b2Vec2(m_gravity.X, m_gravity.Y));
-	}
+	}*/
 
-	void Scene::AddPhysicsBodiesToWorld()
-	{
-		for (PhysicsBody& refPhysicsBody : refPhysicsBodyManager)
-		{
-			if (!refPhysicsBody.IsActive()) continue;
+	//void Scene::AddPhysicsBodiesToWorld()
+	//{
+	//	for (PhysicsBody& refPhysicsBody : refPhysicsBodyManager)
+	//	{
+	//		if (!refPhysicsBody.IsActive()) continue;
 
-			b2BodyDef bodyDef = b2DefaultBodyDef();
-			bodyDef.position = 
-			{	
-				refPhysicsBody.GetStartingPosition().X + refPhysicsBody.GetHalfWidth(),
-				refPhysicsBody.GetStartingPosition().Y + refPhysicsBody.GetHalfHeight() 
-			};
+	//		b2BodyDef bodyDef = b2DefaultBodyDef();
+	//		bodyDef.position = 
+	//		{	
+	//			refPhysicsBody.GetStartingPosition().X + refPhysicsBody.GetHalfWidth(),
+	//			refPhysicsBody.GetStartingPosition().Y + refPhysicsBody.GetHalfHeight() 
+	//		};
 
-			switch (refPhysicsBody.GetBodyType())
-			{
-				case STATIC:
-					bodyDef.type = b2_staticBody;
-					break;
-				case DYNAMIC:
-					bodyDef.type = b2_dynamicBody;
-					break;
-				case KINEMATIC:
-					bodyDef.type = b2_kinematicBody;
-					break;
-				case SENSOR:
-					bodyDef.type = b2_kinematicBody;
-					refPhysicsBody.SetIsSensor(true);
-					break;
-				default:
-					bodyDef.type = b2_staticBody;
-					break;
-			}
+	//		switch (refPhysicsBody.GetBodyType())
+	//		{
+	//			case STATIC:
+	//				bodyDef.type = b2_staticBody;
+	//				break;
+	//			case DYNAMIC:
+	//				bodyDef.type = b2_dynamicBody;
+	//				break;
+	//			case KINEMATIC:
+	//				bodyDef.type = b2_kinematicBody;
+	//				break;
+	//			case SENSOR:
+	//				bodyDef.type = b2_kinematicBody;
+	//				refPhysicsBody.SetIsSensor(true);
+	//				break;
+	//			default:
+	//				bodyDef.type = b2_staticBody;
+	//				break;
+	//		}
 
-			bodyDef.fixedRotation = refPhysicsBody.GetIsRotationFixed();
-			bodyDef.userData = refPhysicsBody.GetEntity(); // NOTE: This is the entity  of the physics body. Not a pointer to the physics body.
+	//		bodyDef.fixedRotation = refPhysicsBody.GetIsRotationFixed();
+	//		bodyDef.userData = refPhysicsBody.GetEntity(); // NOTE: This is the entity  of the physics body. Not a pointer to the physics body.
 
-			b2BodyId bodyId = b2CreateBody(*m_worldID, &bodyDef);
+	//		b2BodyId bodyId = b2CreateBody(*m_worldID, &bodyDef);
 
-			b2ShapeDef shapeDef = b2DefaultShapeDef();
-			shapeDef.density = refPhysicsBody.GetStartingDensity();
-			shapeDef.friction = refPhysicsBody.GetStartingFriction();
-			shapeDef.restitution = refPhysicsBody.GetStartingRestitution();
-			shapeDef.isSensor = refPhysicsBody.GetIsSensor();
+	//		b2ShapeDef shapeDef = b2DefaultShapeDef();
+	//		shapeDef.density = refPhysicsBody.GetStartingDensity();
+	//		shapeDef.friction = refPhysicsBody.GetStartingFriction();
+	//		shapeDef.restitution = refPhysicsBody.GetStartingRestitution();
+	//		shapeDef.isSensor = refPhysicsBody.GetIsSensor();
 
-			b2Polygon box = b2MakeBox(refPhysicsBody.GetHalfWidth(), refPhysicsBody.GetHalfHeight());
-			b2ShapeId shapeId = b2CreatePolygonShape(bodyId, &shapeDef, &box);
+	//		b2Polygon box = b2MakeBox(refPhysicsBody.GetHalfWidth(), refPhysicsBody.GetHalfHeight());
+	//		b2ShapeId shapeId = b2CreatePolygonShape(bodyId, &shapeDef, &box);
 
-			refPhysicsBody.m_bodyID = new b2BodyId(bodyId);
-			refPhysicsBody.m_shapeID = new b2ShapeId(shapeId);
-			refPhysicsBody.m_worldID = m_worldID;
-		}
-	}
+	//		refPhysicsBody.m_bodyID = new b2BodyId(bodyId);
+	//		refPhysicsBody.m_shapeID = new b2ShapeId(shapeId);
+	//		refPhysicsBody.m_worldID = m_worldID;
+	//	}
+	//}
 }

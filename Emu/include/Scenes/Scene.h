@@ -37,8 +37,7 @@ namespace Engine
 
 	private:
 		Vector2D<int> m_levelDimensionsInUnits;
-		TileMap* m_tileMap;
-		b2WorldId* m_worldID;
+		TileMap* m_tileMap; 
 		Vector2D<float> m_gravity;
 
 		std::vector<Entity*> m_entities;
@@ -54,12 +53,8 @@ namespace Engine
 		void OnScenePlay();
 		void OnSceneEnd();
 
-		void AddPhysicsBodiesToWorld();
-		void DestroyPhysicsWorld();
-
 		void CheckValid();
 		void Update();
-		void ProcessContactEvents();
 
 		bool HasTileMap;
 	}; 

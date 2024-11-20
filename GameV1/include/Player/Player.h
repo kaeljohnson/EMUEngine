@@ -50,16 +50,16 @@ private:
 	Engine::EventType m_moveRightKeyUp;
 
 private:
-	void UpdateMovement(Engine::PhysicsBody* physicsBodyComponent);
-	void TransitionToState(PlayerState newState, Engine::PhysicsBody* physicsBodyComponent);
+	void UpdateMovement();
+	void TransitionToState(PlayerState newState);
 
 	void beginIdle();
 	void updateIdle();
 	void endIdle();
 
-	void startHorizontalMove(Engine::PhysicsBody* physicsBodyComponent);
-	void updateHorizontalMove(Engine::PhysicsBody* physicsBodyComponent);
-	void endHorizontalMove(Engine::PhysicsBody* physicsBodyComponent);
+	void startHorizontalMove();
+	void updateHorizontalMove();
+	void endHorizontalMove();
 
 
 	void beginJump();

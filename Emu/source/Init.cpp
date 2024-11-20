@@ -6,7 +6,7 @@
 #include "../include/ECS/ECS.h"
 #include "../include/ECS/ComponentManager.h"
 #include "../include/Transform.h"
-#include "../include/Physics/PhysicsBody.h"
+#include "../include/Components/PhysicsBody.h"
 #include "../include/Updatable/Updatable.h"
 #include "../include/Camera/Camera.h"
 

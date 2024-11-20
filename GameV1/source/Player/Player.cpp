@@ -22,51 +22,57 @@
         Engine::ECS::GetComponentManager<Engine::Transform>().AddComponent(ptrEntity,
             Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f);
 
-        Engine::ECS::GetComponentManager<Engine::PhysicsBody>().AddComponent(
-            ptrEntity, Engine::BodyType::DYNAMIC, false, Engine::Vector2D<float>(startingX, startingY), Engine::Vector2D<float>(width, height));
+        Engine::ECS::GetComponentManager<Engine::PhysicsBody>().AddComponent(ptrEntity);
+		Engine::PhysicsBody* ptrPhysicsBody =
+			Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(ptrEntity);
+		ptrPhysicsBody->m_bodyType = Engine::BodyType::DYNAMIC;
+        ptrPhysicsBody->m_startingPosition = Engine::Vector2D<float>(startingX, startingY);
+		ptrPhysicsBody->m_dimensions = Engine::Vector2D<float>(width, height);
+		ptrPhysicsBody->m_halfDimensions = ptrPhysicsBody->m_dimensions * 0.5f;
 
 		Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
     }
 
     void Player::Update()
     {
-		Engine::PhysicsBody* physicsBodyComponent = 
-            Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(m_ptrEntity);
+		// Engine::PhysicsBody* physicsBodyComponent = 
+        //    Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(m_ptrEntity);
 
-        m_onGround = physicsBodyComponent->GetHasCollisionBelow();
+        m_onGround = true;
 
         m_force = { 0.0f, 0.0f };
 
-        UpdateMovement(physicsBodyComponent);
+        UpdateMovement();
 
-        physicsBodyComponent->ApplyForceToBody(m_force);
+        Engine::Physics::ApplyForceToBody(m_ptrEntity, m_force);
 
         // Check if the current velocity is below the threshold and set it to zero
-        if (std::abs(physicsBodyComponent->GetVelocity().X) < MIN_VELOCITY_THRESHOLD)
+        if (std::abs(Engine::Physics::GetVelocity(m_ptrEntity).X) < MIN_VELOCITY_THRESHOLD)
         {
-            physicsBodyComponent->SetXVelocity(0.0f);
+            Engine::Physics::SetXVelocity(m_ptrEntity, 0.0f);
         }
         else
         {
             // Limit the velocity
-            if (physicsBodyComponent->GetVelocity().X >= X_MAX_VELOCITY)
+            if (Engine::Physics::GetVelocity(m_ptrEntity).X >= X_MAX_VELOCITY)
             {
-                physicsBodyComponent->SetXVelocity(X_MAX_VELOCITY);
+                Engine::Physics::SetXVelocity(m_ptrEntity, X_MAX_VELOCITY);
+
             }
 
-            if (physicsBodyComponent->GetVelocity().X <= -X_MAX_VELOCITY)
+            if (Engine::Physics::GetVelocity(m_ptrEntity).X <= -X_MAX_VELOCITY)
             {
-                physicsBodyComponent->SetXVelocity(-X_MAX_VELOCITY);
+                Engine::Physics::SetXVelocity(m_ptrEntity, -X_MAX_VELOCITY);
             }
         }
     }
 
-    void Player::UpdateMovement(Engine::PhysicsBody* physicsBodyComponent)
+    void Player::UpdateMovement()
     {
 		Engine::Transform* transformComponent =
 			Engine::ECS::GetComponentManager<Engine::Transform>().GetComponent(m_ptrEntity);
 
-        float currentVelocityX = physicsBodyComponent->GetVelocity().X;
+        float currentVelocityX = Engine::Physics::GetVelocity(m_ptrEntity).X;
 
         if (m_currentDirection == PlayerDirection::Right) transformComponent->DirectionFacing = 1;
 		else transformComponent->DirectionFacing = -1;
@@ -78,24 +84,24 @@
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
             {
                 m_currentDirection = PlayerDirection::Right;
-                TransitionToState(PlayerState::HorizontalMovement, physicsBodyComponent);
-                startHorizontalMove(physicsBodyComponent);
+                TransitionToState(PlayerState::HorizontalMovement);
+                startHorizontalMove();
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
             {
                 m_currentDirection = PlayerDirection::Left;
-                TransitionToState(PlayerState::HorizontalMovement, physicsBodyComponent);
-                startHorizontalMove(physicsBodyComponent);
+                TransitionToState(PlayerState::HorizontalMovement);
+                startHorizontalMove();
             }
             else
             {
 				// Apply deceleration when no movement keys are pressed
-				endHorizontalMove(physicsBodyComponent);
+				endHorizontalMove();
 			}
             // Transition to Jumping if jump key is pressed
             if (refKeyStates.at(m_jumpKeyDown) && m_canJump)
             {
-                TransitionToState(PlayerState::Jumping, physicsBodyComponent);
+                TransitionToState(PlayerState::Jumping);
             }
             break;
 
@@ -105,32 +111,34 @@
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
             {
                 m_currentDirection = PlayerDirection::Right;
-                updateHorizontalMove(physicsBodyComponent);
+                updateHorizontalMove();
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
             {
                 m_currentDirection = PlayerDirection::Left;
-                updateHorizontalMove(physicsBodyComponent);
+                updateHorizontalMove();
             }
             else
             {
                 // Apply deceleration when no movement keys are pressed
-                endHorizontalMove(physicsBodyComponent);
-                m_force.X = -currentVelocityX * X_DECELERATION * physicsBodyComponent->GetSize();
+                endHorizontalMove();
+                const float size = Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(m_ptrEntity)->m_dimensions.X *
+                    Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(m_ptrEntity)->m_dimensions.Y;
+                m_force.X = -currentVelocityX * X_DECELERATION * 1;
                 if (m_onGround && std::abs(currentVelocityX) < MIN_VELOCITY_THRESHOLD)
                 {
-                    TransitionToState(PlayerState::Idle, physicsBodyComponent);
+                    TransitionToState(PlayerState::Idle);
                 }
             }
 
             // Vertical Movement
             if (refKeyStates.at(m_jumpKeyDown) && m_canJump)
             {
-                TransitionToState(PlayerState::Jumping, physicsBodyComponent);
+                TransitionToState(PlayerState::Jumping);
             }
             else if (!m_onGround)
             {
-                TransitionToState(PlayerState::Falling, physicsBodyComponent);
+                TransitionToState(PlayerState::Falling);
             }
             break;
 
@@ -140,22 +148,22 @@
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
             {
                 m_currentDirection = PlayerDirection::Right;
-                updateHorizontalMove(physicsBodyComponent);
+                updateHorizontalMove();
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
             {
                 m_currentDirection = PlayerDirection::Left;
-                updateHorizontalMove(physicsBodyComponent);
+                updateHorizontalMove();
             }
             else
             {
                 // Apply deceleration when no movement keys are pressed
-                endHorizontalMove(physicsBodyComponent);
+                endHorizontalMove();
             }
 
-            if (refKeyStates.at(m_jumpKeyUp) || physicsBodyComponent->GetVelocity().Y > 0 || physicsBodyComponent->GetHasCollisionAbove())
+            if (refKeyStates.at(m_jumpKeyUp) || Engine::Physics::GetVelocity(m_ptrEntity).Y > 0 || false/*collision above*/)
             {
-                TransitionToState(PlayerState::Falling, physicsBodyComponent);
+                TransitionToState(PlayerState::Falling);
             }
             else
             {
@@ -163,7 +171,7 @@
                 {
                     m_jumpCharge += JUMP_CHARGE_INCREMENT;
                 }
-                m_force.Y = -JUMP_FORCE * (MAX_JUMP_CHARGE - m_jumpCharge) * physicsBodyComponent->GetSize();
+                m_force.Y = -JUMP_FORCE * (MAX_JUMP_CHARGE - m_jumpCharge);
             }
             break;
 
@@ -174,38 +182,38 @@
             {
                 m_currentDirection = PlayerDirection::Right;
                 // TransitionToState(PlayerState::HorizontalMovement);
-                updateHorizontalMove(physicsBodyComponent);
+                updateHorizontalMove();
                 continueMoving = true;
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
             {
                 m_currentDirection = PlayerDirection::Left;
                 // TransitionToState(PlayerState::HorizontalMovement);
-                startHorizontalMove(physicsBodyComponent);
+                startHorizontalMove();
                 continueMoving = true;
             }
             else
             {
                 // Apply deceleration when no movement keys are pressed
-                endHorizontalMove(physicsBodyComponent);
+                endHorizontalMove();
                 if (m_onGround && std::abs(currentVelocityX) < MIN_VELOCITY_THRESHOLD)
                 {
-                    TransitionToState(PlayerState::Idle, physicsBodyComponent);
+                    TransitionToState(PlayerState::Idle);
                 }
             }
 
             if (m_onGround && continueMoving)
             {
-                updateHorizontalMove(physicsBodyComponent);
-                TransitionToState(PlayerState::HorizontalMovement, physicsBodyComponent);
+                updateHorizontalMove();
+                TransitionToState(PlayerState::HorizontalMovement);
             }
             else if (m_onGround)
             {
-				TransitionToState(PlayerState::Idle, physicsBodyComponent);
+				TransitionToState(PlayerState::Idle);
 			}
             else if (refKeyStates.at(m_jumpKeyDown) && m_canJump && m_coyoteTime <= COYOTE_TIME_DURATION)
             {
-				TransitionToState(PlayerState::Jumping, physicsBodyComponent);
+				TransitionToState(PlayerState::Jumping);
 			}
 
             break;
@@ -226,13 +234,13 @@
         }
     }
 
-    void Player::TransitionToState(PlayerState newState, Engine::PhysicsBody* physicsBodyComponent)
+    void Player::TransitionToState(PlayerState newState)
     {
         switch (newState)
         {
         case PlayerState::Idle:
             m_jumpCharge = 0.0f;
-            physicsBodyComponent->SetXVelocity(0.0f);
+			Engine::Physics::SetXVelocity(m_ptrEntity, 0.0f);
             break;
 
         case PlayerState::HorizontalMovement:
@@ -240,15 +248,16 @@
 
         case PlayerState::Jumping:
             m_canJump = false;
-            physicsBodyComponent->SetYVelocity(0.0f);
-            physicsBodyComponent->ApplyImpulseToBody({ 0.0f, -MIN_JUMP_FORCE * physicsBodyComponent->GetSize() });
+            Engine::Physics::SetYVelocity(m_ptrEntity, 0.0f);
+            Engine::Physics::ApplyImpulseToBody(m_ptrEntity, { 0.0f, -MIN_JUMP_FORCE });
             break;
 
         case PlayerState::Falling:
             m_jumpCharge = 0.0f;
-            if (physicsBodyComponent->GetVelocity().Y < 0)
+            if (Engine::Physics::GetVelocity(m_ptrEntity).Y < 0)
             {
-                physicsBodyComponent->SetYVelocity(0.0f);
+                Engine::Physics::SetYVelocity(m_ptrEntity, 0.0f);
+
             }
             break;
         }
@@ -257,25 +266,25 @@
     }
 
 
-    void Player::startHorizontalMove(Engine::PhysicsBody* physicsBodyComponent)
+    void Player::startHorizontalMove()
     {
         // begin move right animation.
-        updateHorizontalMove(physicsBodyComponent);
+        updateHorizontalMove();
     }
 
-    void Player::updateHorizontalMove(Engine::PhysicsBody* physicsBodyComponent)
+    void Player::updateHorizontalMove()
     {
         if (m_currentDirection == PlayerDirection::Right)
         {
-			m_force.X = X_ACCELERATION * physicsBodyComponent->GetSize();
+			m_force.X = X_ACCELERATION;
 		}
         else
         {
-			m_force.X = -X_ACCELERATION * physicsBodyComponent->GetSize();
+			m_force.X = -X_ACCELERATION;
 		}
     }
 
-    void Player::endHorizontalMove(Engine::PhysicsBody* physicsBodyComponent)
+    void Player::endHorizontalMove()
     {
-		m_force.X = -physicsBodyComponent->GetVelocity().X * X_DECELERATION * physicsBodyComponent->GetSize();
+		m_force.X = -Engine::Physics::GetVelocity(m_ptrEntity).X * X_DECELERATION;
 	}
