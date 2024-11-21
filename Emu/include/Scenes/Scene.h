@@ -8,7 +8,6 @@
 #include "../ECS/ComponentManager.h"
 #include "../ECS/ECS.h"
 #include "../ECS/Entity.h"
-#include "../Physics/PhysicsBody.h"
 #include "../Updatable/Updatable.h"
 #include "../Transform.h"
 
@@ -23,7 +22,6 @@ namespace Engine
 		EMU_API ~Scene();
 
 		EMU_API void CreatePhysicsSimulation(const Vector2D<float> gravity);
-		EMU_API void SetGravity(const Vector2D<float> gravity);
 	
 		EMU_API void Add(Entity* ptrEntity);
 
@@ -37,8 +35,7 @@ namespace Engine
 
 	private:
 		Vector2D<int> m_levelDimensionsInUnits;
-		TileMap* m_tileMap;
-		b2WorldId* m_worldID;
+		TileMap* m_tileMap; 
 		Vector2D<float> m_gravity;
 
 		std::vector<Entity*> m_entities;
@@ -54,12 +51,8 @@ namespace Engine
 		void OnScenePlay();
 		void OnSceneEnd();
 
-		void AddPhysicsBodiesToWorld();
-		void DestroyPhysicsWorld();
-
 		void CheckValid();
 		void Update();
-		void ProcessContactEvents();
 
 		bool HasTileMap;
 	}; 

@@ -10,7 +10,9 @@
 #include "../include/Scenes/Scene.h"
 #include "../include/Scenes/SceneManager.h"
 #include "../include/Physics/BodyTypes.h"
-#include "../include/Physics/PhysicsBody.h"
+#include "../include/Physics/Physics.h"
+#include "../include/Components/PhysicsBody.h"
+#include "../include/Components/ContactEventListener.h"
 #include "../include/Tiles/TileMap.h"
 
 #include "../include/Events/KeyStates.h"

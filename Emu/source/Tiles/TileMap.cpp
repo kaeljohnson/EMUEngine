@@ -7,7 +7,6 @@
 #include "../../include/Logging/Logger.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/ECS/ComponentManager.h"
-#include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Transform.h"
 
 namespace Engine
@@ -76,9 +75,14 @@ namespace Engine
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
                         1.0f, 1.0f, 1.0f);
 
-                    ECS::GetComponentManager<PhysicsBody>().AddComponent(ptrTile, SENSOR, true,
-                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
-                        Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)));
+                    ECS::GetComponentManager<PhysicsBody>().AddComponent(ptrTile);
+					PhysicsBody* ptrPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrTile);
+                    ptrPhysicsBody->m_bodyType = SENSOR;
+                    ptrPhysicsBody->m_dimensions = 
+                        Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile));
+					ptrPhysicsBody->m_halfDimensions = ptrPhysicsBody->m_dimensions * 0.5f;
+                    ptrPhysicsBody->m_startingPosition = 
+                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile));
 
 					ptrTiles.push_back(ptrTile);
 				}
@@ -152,11 +156,14 @@ namespace Engine
 					Entity* ptrTile = ECS::CreateEntity();
 					ptrTile->SetPriority(1);
 
-                    ECS::GetComponentManager<PhysicsBody>().AddComponent(ptrTile, STATIC, true,
-                        Vector2D<float>(static_cast<float>(startX) * static_cast<float>(m_numUnitsPerTile),
-                            static_cast<float>(startY) * static_cast<float>(m_numUnitsPerTile)),
-                        Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile),
-                            static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)));
+                    ECS::GetComponentManager<PhysicsBody>().AddComponent(ptrTile);
+                    PhysicsBody* ptrPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrTile);
+                    ptrPhysicsBody->m_bodyType = STATIC;
+                    ptrPhysicsBody->m_dimensions =
+                        Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile));
+                    ptrPhysicsBody->m_halfDimensions = ptrPhysicsBody->m_dimensions * 0.5f;
+                    ptrPhysicsBody->m_startingPosition = 
+                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile));
 
 					collisionBodyIDs.push_back(ptrTile);
                 }

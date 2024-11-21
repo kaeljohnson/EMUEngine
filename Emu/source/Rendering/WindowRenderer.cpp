@@ -7,7 +7,7 @@
 #include "../../include/Rendering/WindowRenderer.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Transform.h"
-#include "../../include/Physics/PhysicsBody.h"
+#include "../../include/Components/PhysicsBody.h"
 #include "../../include/Camera/Camera.h"
 #include "../../include/Time.h"
 
@@ -143,31 +143,10 @@ namespace Engine
 		ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
 
 		// This should show the boundary of the physics body, not the texture.
-#if defined(DEBUG)
-		if (ECS::GetComponentManager<PhysicsBody>().HasComponent(transform.GetEntity()))
-		{
-			PhysicsBody* ptrBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(transform.GetEntity());
 
-
-			if (ptrBody->GetHasCollisionBelow() || ptrBody->GetHasCollisionAbove() ||
-				ptrBody->GetHasCollisionLeft() || ptrBody->GetHasCollisionRight())
-			{
-				SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 255, 255); // BLUE
-			}
-			else if (ptrBody->GetHasSensorBelow() || ptrBody->GetHasSensorAbove() ||
-				ptrBody->GetHasSensorLeft() || ptrBody->GetHasSensorRight())
-			{
-				SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, 255); // GREEN
-
-			}
-			else
-			{
-				SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, 255);
-			}
-		}
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, 255);
 		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
-#endif
 	}
 
 	// Wrapper for SDL_RenderPresent. Talks to the actual hardwares renderer to display the renderer.
@@ -202,7 +181,6 @@ namespace Engine
 		{
 			// Let OS handle resize.
 		}
-
 	}
 
 	void WindowRenderer::SetViewport()
