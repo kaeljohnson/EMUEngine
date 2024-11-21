@@ -8,7 +8,6 @@
 #include "../ECS/ComponentManager.h"
 #include "../ECS/ECS.h"
 #include "../ECS/Entity.h"
-#include "../Physics/PhysicsBody.h"
 #include "../Updatable/Updatable.h"
 #include "../Transform.h"
 
@@ -23,7 +22,6 @@ namespace Engine
 		EMU_API ~Scene();
 
 		EMU_API void CreatePhysicsSimulation(const Vector2D<float> gravity);
-		EMU_API void SetGravity(const Vector2D<float> gravity);
 	
 		EMU_API void Add(Entity* ptrEntity);
 

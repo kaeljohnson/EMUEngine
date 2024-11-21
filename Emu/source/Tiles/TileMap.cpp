@@ -7,7 +7,6 @@
 #include "../../include/Logging/Logger.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/ECS/ComponentManager.h"
-#include "../../include/Physics/PhysicsBody.h"
 #include "../../include/Transform.h"
 
 namespace Engine

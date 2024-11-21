@@ -122,9 +122,7 @@
             {
                 // Apply deceleration when no movement keys are pressed
                 endHorizontalMove();
-                const float size = Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(m_ptrEntity)->m_dimensions.X *
-                    Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(m_ptrEntity)->m_dimensions.Y;
-                m_force.X = -currentVelocityX * X_DECELERATION * 1;
+                m_force.X = -currentVelocityX * X_DECELERATION;
                 if (m_onGround && std::abs(currentVelocityX) < MIN_VELOCITY_THRESHOLD)
                 {
                     TransitionToState(PlayerState::Idle);
