@@ -34,7 +34,6 @@ namespace Engine
 		b2Vec2 position = b2Body_GetPosition(bodyId);
 		PhysicsBody* ptrPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity);
 		return Vector2D<float>(position.x - ptrPhysicsBody->m_halfDimensions.X, position.y - ptrPhysicsBody->m_halfDimensions.Y);
-
 	}
 
 	void Physics::ApplyForceToBody(Entity* ptrEntity, Vector2D<float> force)
@@ -221,38 +220,41 @@ namespace Engine
 			// normal points from A to B
 			b2Vec2 normal = beginEvent->manifold.normal;
 
+
 			if (normal.y < -0.5)
 			{
+
 				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->OnBeginContact(entityB, UP);
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, UP));
 
 				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->OnBeginContact(entityA, DOWN);
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, DOWN));
 			}
 			else if (normal.y > 0.5)
 			{
+
 				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->OnBeginContact(entityB, DOWN);
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, DOWN));
 
 				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->OnBeginContact(entityA, UP);
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, UP));
 			}
 
 			if (normal.x > 0.5)
 			{
 				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->OnBeginContact(entityB, RIGHT);
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, RIGHT));
 
 				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->OnBeginContact(entityA, LEFT);
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, LEFT));
 			}
 			else if (normal.x < -0.5)
 			{
 				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->OnBeginContact(entityB, LEFT);
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, LEFT));
 
 				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->OnBeginContact(entityA, RIGHT);
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, RIGHT));
 			}
 
 		}
@@ -268,10 +270,10 @@ namespace Engine
 			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
 			if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-				ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->OnEndContact(entityB);
+				ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onEndContact(EndContact(entityB));
 
 			if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-				ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->OnEndContact(entityA);
+				ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onEndContact(EndContact(entityA));
 		}
 
 		/*for (int i = 0; i < contactEvents.hitCount; ++i)

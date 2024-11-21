@@ -26,6 +26,8 @@ public:
 		const float width, const float height);
 	~Player() = default;
 	void Update();
+	void OnBeginContact(Engine::BeginContact beginContact);
+	void OnEndContact(Engine::EndContact ptrEntity);
 
 	PlayerState m_currentState;
 	PlayerDirection m_currentDirection;
