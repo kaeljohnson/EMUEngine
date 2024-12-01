@@ -47,4 +47,14 @@ namespace Engine
 		std::function<void(BeginContact)> m_onBeginContact;
 		std::function<void(EndContact)> m_onEndContact;
 	};
+
+	struct SimpleContact : public Component
+	{
+		SimpleContact(Entity* ptrEntity) : Component(ptrEntity) {}
+
+		bool m_contactAbove = false;
+		bool m_contactBelow = false;
+		bool m_contactRight = false;
+		bool m_contactLeft = false;
+	};
 }

@@ -24,6 +24,7 @@ namespace Engine
 		ECS::RegisterComponentManager<Transform>();
 		ECS::RegisterComponentManager<Camera>();
 		ECS::RegisterComponentManager<ContactEventListener>();
+		ECS::RegisterComponentManager<SimpleContact>();
 
 		if (!ISDL::ImgInit(IMG_INIT_PNG))
 			ENGINE_CRITICAL("IMG Init failed! SDL_Error: " + std::string(ISDL::GetError()));

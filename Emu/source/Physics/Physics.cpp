@@ -205,116 +205,157 @@ namespace Engine
 
 	void Physics::ProcessContactEvents()
 	{
-		b2ContactEvents contactEvents = b2World_GetContactEvents(*m_ptrWorldId);
-
-		for (int i = 0; i < contactEvents.beginCount; ++i)
+		// Process ContactComponents
+		for (SimpleContact& simpleContact : ECS::GetComponentManager<SimpleContact>())
 		{
-			b2ContactBeginTouchEvent* beginEvent = contactEvents.beginEvents + i;
+			// Better way to access. Maybe can just store shapeId directly in SimpleContact component?
+			Entity* ptrEntity = simpleContact.GetEntity();
+			b2ShapeId* shapeId = ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_shapeId;
 
-			b2ShapeId shapeIdA = beginEvent->shapeIdA;
-			b2ShapeId shapeIdB = beginEvent->shapeIdB;
+			b2ContactData contactData[10];
+			int shapeContactCount = b2Shape_GetContactData(*shapeId, contactData, 10);
 
-			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
-			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
-
-			// normal points from A to B
-			b2Vec2 normal = beginEvent->manifold.normal;
-
-
-			if (normal.y < -0.5)
+			int normalDirection = 1;
+			for (auto& contact : contactData)
 			{
+				if (!(b2Shape_GetUserData(contact.shapeIdA) == ptrEntity))
+				{
+					normalDirection = -1;
+				}
 
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, UP));
+				b2Vec2 normal = contact.manifold.normal * normalDirection;
 
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, DOWN));
+				if (normal.y < -0.5) // Collision from above `this`
+				{
+					simpleContact.m_contactAbove = true;
+				}
+				else if (normal.y > 0.5) // Collision from below `this`
+				{
+					simpleContact.m_contactBelow = true;
+				}
+
+				if (normal.x > 0.5) // Collision from the Right of `this`
+				{
+					simpleContact.m_contactRight = true;
+				}
+				else if (normal.x < -0.5) // Collision from the Left of `this`
+				{
+					simpleContact.m_contactLeft = true;
+				}
 			}
-			else if (normal.y > 0.5)
-			{
-
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, DOWN));
-
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, UP));
-			}
-
-			if (normal.x > 0.5)
-			{
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, RIGHT));
-
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, LEFT));
-			}
-			else if (normal.x < -0.5)
-			{
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, LEFT));
-
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, RIGHT));
-			}
-
+			
 		}
+		// Process ContactListeners
+		//b2ContactEvents contactEvents = b2World_GetContactEvents(*m_ptrWorldId);
 
-		for (int i = 0; i < contactEvents.endCount; ++i)
-		{
-			b2ContactEndTouchEvent* endEvent = contactEvents.endEvents + i;
+		//for (int i = 0; i < contactEvents.beginCount; ++i)
+		//{
+		//	b2ContactBeginTouchEvent* beginEvent = contactEvents.beginEvents + i;
 
-			b2ShapeId shapeIdA = endEvent->shapeIdA;
-			b2ShapeId shapeIdB = endEvent->shapeIdB;
+		//	b2ShapeId shapeIdA = beginEvent->shapeIdA;
+		//	b2ShapeId shapeIdB = beginEvent->shapeIdB;
 
-			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
-			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
+		//	Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+		//	Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
-			if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-				ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onEndContact(EndContact(entityB));
-
-			if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-				ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onEndContact(EndContact(entityA));
-		}
-
-		/*for (int i = 0; i < contactEvents.hitCount; ++i)
-		{
-			b2ContactHitEvent* hitEvent = contactEvents.hitEvents + i;
+		//	// normal points from A to B
+		//	b2Vec2 normal = beginEvent->manifold.normal;
 
 
-		}*/
+		//	if (normal.y < -0.5)
+		//	{
 
-		b2SensorEvents sensorEvents = b2World_GetSensorEvents(*m_ptrWorldId);
+		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
+		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, UP));
 
-		for (int i = 0; i < sensorEvents.beginCount; ++i)
-		{
-			b2SensorBeginTouchEvent* beginEvent = sensorEvents.beginEvents + i;
+		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
+		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, DOWN));
+		//	}
+		//	else if (normal.y > 0.5)
+		//	{
 
-			b2ShapeId dynamicShapeId = beginEvent->visitorShapeId;
-			b2ShapeId sensorShapeId = beginEvent->sensorShapeId;
+		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
+		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, DOWN));
 
-			Entity* dynamicEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(dynamicShapeId));
-			Entity* sensorEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(sensorShapeId));
+		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
+		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, UP));
+		//	}
 
-			// if (ECS::GetComponentManager<SensorEventListener>().HasComponent(dynamicEntity))
-			//		ECS::GetComponentManager<SensorEventListener>().GetComponent(dynamicEntity)->OnBeginSensorContact(sensorEntity);
-		}
+		//	if (normal.x > 0.5)
+		//	{
+		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
+		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, RIGHT));
 
-		for (int i = 0; i < sensorEvents.endCount; ++i)
-		{
-			b2SensorEndTouchEvent* endEvent = sensorEvents.endEvents + i;
+		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
+		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, LEFT));
+		//	}
+		//	else if (normal.x < -0.5)
+		//	{
+		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
+		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, LEFT));
 
-			b2ShapeId dynamicShapeId = endEvent->visitorShapeId;
-			b2ShapeId sensorShapeId = endEvent->sensorShapeId;
+		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
+		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, RIGHT));
+		//	}
 
-			Entity* dynamicEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(dynamicShapeId));
-			Entity* sensorEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(sensorShapeId));
+		//}
 
-			// dynamicPhysicsBody->RemoveSensorContact(sensorEntity);
-			// sensorPhysicsBody->RemoveSensorContact(dynamicEntity);
+		//for (int i = 0; i < contactEvents.endCount; ++i)
+		//{
+		//	b2ContactEndTouchEvent* endEvent = contactEvents.endEvents + i;
 
-			// if (ECS::GetComponentManager<SensorEventListener>().HasComponent(dynamicEntity))
-			//		ECS::GetComponentManager<SensorEventListener>().GetComponent(dynamicEntity)->OnEndSensorContact(sensorEntity);
-		}
+		//	b2ShapeId shapeIdA = endEvent->shapeIdA;
+		//	b2ShapeId shapeIdB = endEvent->shapeIdB;
+
+		//	Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+		//	Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
+
+		//	if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
+		//		ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onEndContact(EndContact(entityB));
+
+		//	if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
+		//		ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onEndContact(EndContact(entityA));
+		//}
+
+		///*for (int i = 0; i < contactEvents.hitCount; ++i)
+		//{
+		//	b2ContactHitEvent* hitEvent = contactEvents.hitEvents + i;
+
+
+		//}*/
+
+		//b2SensorEvents sensorEvents = b2World_GetSensorEvents(*m_ptrWorldId);
+
+		//for (int i = 0; i < sensorEvents.beginCount; ++i)
+		//{
+		//	b2SensorBeginTouchEvent* beginEvent = sensorEvents.beginEvents + i;
+
+		//	b2ShapeId dynamicShapeId = beginEvent->visitorShapeId;
+		//	b2ShapeId sensorShapeId = beginEvent->sensorShapeId;
+
+		//	Entity* dynamicEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(dynamicShapeId));
+		//	Entity* sensorEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(sensorShapeId));
+
+		//	// if (ECS::GetComponentManager<SensorEventListener>().HasComponent(dynamicEntity))
+		//	//		ECS::GetComponentManager<SensorEventListener>().GetComponent(dynamicEntity)->OnBeginSensorContact(sensorEntity);
+		//}
+
+		//for (int i = 0; i < sensorEvents.endCount; ++i)
+		//{
+		//	b2SensorEndTouchEvent* endEvent = sensorEvents.endEvents + i;
+
+		//	b2ShapeId dynamicShapeId = endEvent->visitorShapeId;
+		//	b2ShapeId sensorShapeId = endEvent->sensorShapeId;
+
+		//	Entity* dynamicEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(dynamicShapeId));
+		//	Entity* sensorEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(sensorShapeId));
+
+		//	// dynamicPhysicsBody->RemoveSensorContact(sensorEntity);
+		//	// sensorPhysicsBody->RemoveSensorContact(dynamicEntity);
+
+		//	// if (ECS::GetComponentManager<SensorEventListener>().HasComponent(dynamicEntity))
+		//	//		ECS::GetComponentManager<SensorEventListener>().GetComponent(dynamicEntity)->OnEndSensorContact(sensorEntity);
+		//}
 	}
 
 	void Physics::CreateWorld(const Vector2D<float> gravity)

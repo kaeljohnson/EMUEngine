@@ -32,9 +32,11 @@
 
 		Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
 
-		Engine::ECS::GetComponentManager<Engine::ContactEventListener>().AddComponent(ptrEntity, 
-            [this](Engine::BeginContact beginContact) { OnBeginContact(beginContact); },
-            [this](Engine::EndContact endContact) { OnEndContact(endContact); });
+		// Engine::ECS::GetComponentManager<Engine::ContactEventListener>().AddComponent(ptrEntity, 
+        //    [this](Engine::BeginContact beginContact) { OnBeginContact(beginContact); },
+        //    [this](Engine::EndContact endContact) { OnEndContact(endContact); });
+
+        Engine::ECS::GetComponentManager<Engine::SimpleContact>().AddComponent(ptrEntity);
     }
 
     void Player::OnBeginContact(Engine::BeginContact beginContact) 
