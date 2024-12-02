@@ -12,7 +12,8 @@
 #include "../include/Physics/BodyTypes.h"
 #include "../include/Physics/Physics.h"
 #include "../include/Components/PhysicsBody.h"
-#include "../include/Components/ContactEventListener.h"
+#include "../include/EventListeners/ContactEventListener.h"
+#include "../include/Components/SimpleContact.h"
 #include "../include/Tiles/TileMap.h"
 
 #include "../include/Events/KeyStates.h"
@@ -26,8 +27,8 @@
 #include "../include/ECS/ECS.h"
 #include "../include/MathUtil.h"
 
-#include "../include/Transform.h"
-#include "../include/Updatable/Updatable.h"
+#include "../include/Components/Transform.h"
+#include "../include/Components/Updatable.h"
 #include "../include/ECS/ComponentManager.h"
 
 namespace Engine

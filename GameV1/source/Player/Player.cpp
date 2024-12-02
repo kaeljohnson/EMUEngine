@@ -32,7 +32,7 @@
 
 		Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
 
-		// Engine::ECS::GetComponentManager<Engine::ContactEventListener>().AddComponent(ptrEntity, 
+		// Engine::EventSystem::AddEventListener<Engine::ContactEventListener>().AddComponent(ptrEntity, 
         //    [this](Engine::BeginContact beginContact) { OnBeginContact(beginContact); },
         //    [this](Engine::EndContact endContact) { OnEndContact(endContact); });
 
@@ -41,19 +41,10 @@
 
     void Player::OnBeginContact(Engine::BeginContact beginContact) 
     {
-		if (beginContact.m_direction == Engine::ContactDirection::DOWN)
-		{
-            CLIENT_CRITICAL_D("OnGround");
-			m_onGround = true;
-			m_canJump = true;
-			m_coyoteTime = 0.0f;
-		}
     }
 
     void Player::OnEndContact(Engine::EndContact endContact) 
     {
-		CLIENT_CRITICAL_D("OffGround");
-		m_onGround = false;
     }
 
     void Player::Update()

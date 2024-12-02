@@ -1,11 +1,12 @@
 #pragma once
 
-#include "ECS/Component.h"
-
-#include "Core.h"
-
 #include <string>
-#include "MathUtil.h"
+
+#include "../ECS/Component.h"
+
+#include "../Core.h"
+
+#include "../MathUtil.h"
 
 namespace Engine
 {

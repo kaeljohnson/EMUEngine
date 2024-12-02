@@ -4,8 +4,10 @@
 
 #include "../include/Logging/Logger.h"
 
-#include "../Include/Transform.h"
+#include "../include/Components/Transform.h"
 #include "../include/ECS/ComponentManager.h"
+
+#include "../include/MathUtil.h"
 
 
 namespace Engine

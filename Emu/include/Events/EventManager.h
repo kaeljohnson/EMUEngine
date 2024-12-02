@@ -40,6 +40,8 @@ namespace Engine
 
     private:
         EventQueue m_eventQ;
+
+		// move to Event listener class
         EventHandlerMap m_eventHandlers;
 
         

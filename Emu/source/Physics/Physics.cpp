@@ -4,7 +4,7 @@
 
 #include "../../include/Physics/Physics.h"
 #include "../../include/Components/PhysicsBody.h"
-#include "../../include/Components/ContactEventListener.h"
+#include "../../include/Components/SimpleContact.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Time.h"
 #include "../../include/Logging/Logger.h"
@@ -226,7 +226,7 @@ namespace Engine
 
 				int normalDirection = 1;
 
-				if ((Entity*)b2Body_GetUserData(b2Shape_GetBody(contact->shapeIdB)) == ptrEntity)
+				if ((Entity*)b2Body_GetUserData(b2Shape_GetBody(contact->shapeIdB)) == ptrEntity) 
 				{
 					normalDirection = -1;
 				}
@@ -235,28 +235,28 @@ namespace Engine
 
 				if (normal.y < -0.5) // Collision from above `this`
 				{
-					ENGINE_CRITICAL_D("Contact Above!");
+					// ENGINE_CRITICAL_D("Contact Above!");
 					simpleContact.m_contactAbove = true;
 				}
 				else if (normal.y > 0.5) // Collision from below `this`
 				{
-					ENGINE_CRITICAL_D("Contact Below!");
+					// ENGINE_CRITICAL_D("Contact Below!");
 					simpleContact.m_contactBelow = true;
 				}
 
 				if (normal.x > 0.5) // Collision from the Right of `this`
 				{
-					ENGINE_CRITICAL_D("Contact Right!");
+					// ENGINE_CRITICAL_D("Contact Right!");
 					simpleContact.m_contactRight = true;
 				}
 				else if (normal.x < -0.5) // Collision from the Left of `this`
 				{
-					ENGINE_CRITICAL_D("Contact Left!");
+					// ENGINE_CRITICAL_D("Contact Left!");
 					simpleContact.m_contactLeft = true;
 				}
-			}
-			
+			} 
 		}
+
 		// Process ContactListeners
 		//b2ContactEvents contactEvents = b2World_GetContactEvents(*m_ptrWorldId);
 
