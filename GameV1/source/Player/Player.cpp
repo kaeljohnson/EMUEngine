@@ -61,6 +61,7 @@
 		// Engine::PhysicsBody* physicsBodyComponent = 
         //    Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(m_ptrEntity);
 
+        m_onGround = Engine::ECS::GetComponentManager<Engine::SimpleContact>().GetComponent(m_ptrEntity)->m_contactBelow;
         // m_onGround = true;
 
         m_force = { 0.0f, 0.0f };

@@ -208,6 +208,11 @@ namespace Engine
 		// Process ContactComponents
 		for (SimpleContact& simpleContact : ECS::GetComponentManager<SimpleContact>())
 		{
+			simpleContact.m_contactAbove = false;
+			simpleContact.m_contactBelow = false;
+			simpleContact.m_contactLeft = false;
+			simpleContact.m_contactRight = false;
+
 			// Better way to access. Maybe can just store shapeId directly in SimpleContact component?
 			Entity* ptrEntity = simpleContact.GetEntity();
 			b2ShapeId* shapeId = ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_shapeId;
@@ -215,31 +220,38 @@ namespace Engine
 			b2ContactData contactData[10];
 			int shapeContactCount = b2Shape_GetContactData(*shapeId, contactData, 10);
 
-			int normalDirection = 1;
-			for (auto& contact : contactData)
+			for (int i = 0; i < shapeContactCount; ++i)
 			{
-				if (!(b2Shape_GetUserData(contact.shapeIdA) == ptrEntity))
+				b2ContactData* contact = contactData + i;
+
+				int normalDirection = 1;
+
+				if ((Entity*)b2Body_GetUserData(b2Shape_GetBody(contact->shapeIdB)) == ptrEntity)
 				{
 					normalDirection = -1;
 				}
 
-				b2Vec2 normal = contact.manifold.normal * normalDirection;
+				b2Vec2 normal = contact->manifold.normal * normalDirection;
 
 				if (normal.y < -0.5) // Collision from above `this`
 				{
+					ENGINE_CRITICAL_D("Contact Above!");
 					simpleContact.m_contactAbove = true;
 				}
 				else if (normal.y > 0.5) // Collision from below `this`
 				{
+					ENGINE_CRITICAL_D("Contact Below!");
 					simpleContact.m_contactBelow = true;
 				}
 
 				if (normal.x > 0.5) // Collision from the Right of `this`
 				{
+					ENGINE_CRITICAL_D("Contact Right!");
 					simpleContact.m_contactRight = true;
 				}
 				else if (normal.x < -0.5) // Collision from the Left of `this`
 				{
+					ENGINE_CRITICAL_D("Contact Left!");
 					simpleContact.m_contactLeft = true;
 				}
 			}
