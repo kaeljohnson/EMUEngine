@@ -32,26 +32,25 @@
 
 		Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
 
-		// Engine::EventSystem::AddEventListener<Engine::ContactEventListener>().AddComponent(ptrEntity, 
-        //    [this](Engine::BeginContact beginContact) { OnBeginContact(beginContact); },
-        //    [this](Engine::EndContact endContact) { OnEndContact(endContact); });
+		Engine::ECS::GetComponentManager<Engine::ContactEventListener>().AddComponent(ptrEntity, 
+            [this](Engine::BeginContact beginContact) { OnBeginContact(beginContact); },
+            [this](Engine::EndContact endContact) { OnEndContact(endContact); });
 
         Engine::ECS::GetComponentManager<Engine::SimpleContact>().AddComponent(ptrEntity);
     }
 
     void Player::OnBeginContact(Engine::BeginContact beginContact) 
     {
+		CLIENT_CRITICAL_D("Player OnBeginContact.");
     }
 
     void Player::OnEndContact(Engine::EndContact endContact) 
     {
+		CLIENT_CRITICAL_D("Player OnEndContact.");
     }
 
     void Player::Update()
     {
-		// Engine::PhysicsBody* physicsBodyComponent = 
-        //    Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(m_ptrEntity);
-
         m_onGround = Engine::ECS::GetComponentManager<Engine::SimpleContact>().GetComponent(m_ptrEntity)->m_contactBelow;
         // m_onGround = true;
 

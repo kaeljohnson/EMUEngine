@@ -5,9 +5,12 @@
 #include "../../include/Physics/Physics.h"
 #include "../../include/Components/PhysicsBody.h"
 #include "../../include/Components/SimpleContact.h"
+#include "../../include/EventListeners/ContactEventListener.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Time.h"
 #include "../../include/Logging/Logger.h"
+
+#include "../../include/MathUtil.h"
 
 namespace Engine
 {
@@ -258,76 +261,76 @@ namespace Engine
 		}
 
 		// Process ContactListeners
-		//b2ContactEvents contactEvents = b2World_GetContactEvents(*m_ptrWorldId);
+		b2ContactEvents contactEvents = b2World_GetContactEvents(*m_ptrWorldId);
 
-		//for (int i = 0; i < contactEvents.beginCount; ++i)
-		//{
-		//	b2ContactBeginTouchEvent* beginEvent = contactEvents.beginEvents + i;
+		for (int i = 0; i < contactEvents.beginCount; ++i)
+		{
+			b2ContactBeginTouchEvent* beginEvent = contactEvents.beginEvents + i;
 
-		//	b2ShapeId shapeIdA = beginEvent->shapeIdA;
-		//	b2ShapeId shapeIdB = beginEvent->shapeIdB;
+			b2ShapeId shapeIdA = beginEvent->shapeIdA;
+			b2ShapeId shapeIdB = beginEvent->shapeIdB;
 
-		//	Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
-		//	Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
+			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
-		//	// normal points from A to B
-		//	b2Vec2 normal = beginEvent->manifold.normal;
+			// normal points from A to B
+			Vector2D<float> normal = Vector2D(beginEvent->manifold.normal.x, beginEvent->manifold.normal.y);
 
 
-		//	if (normal.y < -0.5)
-		//	{
+			if (normal.Y < -0.5)
+			{
 
-		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, UP));
+				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, normal));
 
-		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, DOWN));
-		//	}
-		//	else if (normal.y > 0.5)
-		//	{
+				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, normal));
+			}
+			else if (normal.Y > 0.5)
+			{
 
-		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, DOWN));
+				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, normal));
 
-		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, UP));
-		//	}
+				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, normal));
+			}
 
-		//	if (normal.x > 0.5)
-		//	{
-		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, RIGHT));
+			if (normal.X > 0.5)
+			{
+				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, normal));
 
-		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, LEFT));
-		//	}
-		//	else if (normal.x < -0.5)
-		//	{
-		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, LEFT));
+				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, normal));
+			}
+			else if (normal.Y < -0.5)
+			{
+				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, normal));
 
-		//		if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-		//			ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, RIGHT));
-		//	}
+				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
+					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, normal));
+			}
 
-		//}
+		}
 
-		//for (int i = 0; i < contactEvents.endCount; ++i)
-		//{
-		//	b2ContactEndTouchEvent* endEvent = contactEvents.endEvents + i;
+		for (int i = 0; i < contactEvents.endCount; ++i)
+		{
+			b2ContactEndTouchEvent* endEvent = contactEvents.endEvents + i;
 
-		//	b2ShapeId shapeIdA = endEvent->shapeIdA;
-		//	b2ShapeId shapeIdB = endEvent->shapeIdB;
+			b2ShapeId shapeIdA = endEvent->shapeIdA;
+			b2ShapeId shapeIdB = endEvent->shapeIdB;
 
-		//	Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
-		//	Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
+			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
-		//	if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-		//		ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onEndContact(EndContact(entityB));
+			if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
+				ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onEndContact(EndContact(entityB));
 
-		//	if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-		//		ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onEndContact(EndContact(entityA));
-		//}
+			if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
+				ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onEndContact(EndContact(entityA));
+		}
 
 		///*for (int i = 0; i < contactEvents.hitCount; ++i)
 		//{
