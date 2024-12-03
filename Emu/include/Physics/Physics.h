@@ -22,7 +22,7 @@ namespace Engine
 		EMU_API static void SetXVelocity(Entity* ptrEntity, const float xVelocity);
 		EMU_API static void SetYVelocity(Entity* ptrEntity, const float yVelocity);
 		EMU_API static void SetDeceleration(Entity* ptrEntity, const float decel);
-		EMU_API static const Vector2D<int> GetVelocity(Entity* ptrEntity);
+		EMU_API static const Vector2D<float> GetVelocity(Entity* ptrEntity);
 		EMU_API static void SetRestitution(Entity* ptrEntity, const float restitution);
 		EMU_API static void SetDensity(Entity* ptrEntity, const float density);
 		EMU_API static void SetFriction(Entity* ptrEntity, const float friction);
