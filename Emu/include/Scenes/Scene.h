@@ -8,8 +8,7 @@
 #include "../ECS/ComponentManager.h"
 #include "../ECS/ECS.h"
 #include "../ECS/Entity.h"
-#include "../Components/Updatable.h"
-#include "../Components/Transform.h"
+#include "../Components.h"
 
 struct b2WorldId;
 

@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-#include "../Components/PhysicsBody.h"
+#include "../Components.h"
 #include "../ECS/Entity.h"
 
 namespace Engine

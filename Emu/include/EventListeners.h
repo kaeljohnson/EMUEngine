@@ -2,10 +2,10 @@
 
 #include <functional>
 
-#include "../ECS/Component.h"
-#include "../ECS/Entity.h"
+#include "ECS/Component.h"
+#include "ECS/Entity.h"
 
-#include "../MathUtil.h"
+#include "MathUtil.h"
 
 namespace Engine
 {

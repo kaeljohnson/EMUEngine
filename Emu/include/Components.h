@@ -1,0 +1,103 @@
+#pragma once
+
+#include <functional>
+
+#include "ECS/Component.h"
+#include "ECS/Entity.h"
+#include "MathUtil.h"
+#include "Physics/BodyTypes.h"
+#include "GameState.h"
+
+#include "Core.h"
+
+struct b2BodyId;
+struct b2ShapeId;
+struct b2WorldId;
+
+namespace Engine
+{
+	struct Transform : public Component
+	{
+		Vector2D<float> PrevPosition;
+		Vector2D<float> Position;
+		Vector2D<float> Velocity;
+		Vector2D<float> Dimensions;
+
+		int ZIndex;
+		float Rotation;
+		float Scale;
+		int DirectionFacing;
+
+		EMU_API Transform(Entity* entity) : PrevPosition(0.0f, 0.0f), Position(0.0f, 0.0f),
+			Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1), Component(entity) {}
+
+		EMU_API Transform(Entity* entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction) :
+			PrevPosition(position), Position(position),
+			Dimensions(dimensions), Rotation(rotation), Scale(scale), DirectionFacing(direction), Component(entity) {}
+
+		EMU_API ~Transform() = default;
+	};
+
+	struct PhysicsBody : public Component
+	{
+		EMU_API PhysicsBody(Entity* ptrEntity) :
+			m_bodyId(nullptr), m_shapeId(nullptr), m_worldId(nullptr),
+			m_bodyType(STATIC), m_dimensions(Vector2D<float>(1.0f, 1.0f)),
+			m_halfDimensions(Vector2D<float>(0.5f, 0.5f)), m_startingPosition(Vector2D<float>(1.0f, 1.0f)),
+			m_gravityOn(true), Component(ptrEntity) {}
+
+		EMU_API ~PhysicsBody() = default;
+
+		b2BodyId* m_bodyId;
+		b2ShapeId* m_shapeId;
+		b2WorldId* m_worldId;
+
+		BodyType m_bodyType;
+
+		Vector2D<float> m_dimensions;
+		Vector2D<float> m_halfDimensions;
+		Vector2D<float> m_startingPosition;
+
+		bool m_gravityOn;
+
+		// Temp
+		EMU_API void OnDeactivate() override;
+		EMU_API void OnActivate() override;
+	};
+
+    struct Updatable : public Component
+    {
+        using UpdateCallback = std::function<void()>;
+
+		EMU_API Updatable(Entity* entity, UpdateCallback callback) : m_callback(callback), Component(entity) {}
+		EMU_API ~Updatable() = default;
+
+        UpdateCallback m_callback;
+
+        void Update()
+		{
+			if (m_callback)
+			{
+				m_callback();
+			}
+		}
+    };
+
+	enum ContactDirection
+	{
+		UP,
+		DOWN,
+		LEFT,
+		RIGHT
+	};
+
+	struct SimpleContact : public Component
+	{
+		SimpleContact(Entity* ptrEntity) : Component(ptrEntity) {}
+
+		bool m_contactAbove = false;
+		bool m_contactBelow = false;
+		bool m_contactRight = false;
+		bool m_contactLeft = false;
+	};
+}

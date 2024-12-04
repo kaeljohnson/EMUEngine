@@ -3,7 +3,7 @@
 #include <memory>
 #include "Screen.h"
 #include "../MathUtil.h"
-#include "../Components/Transform.h"
+#include "../Components.h"
 #include "../ECS/Entity.h"
 
 namespace Engine

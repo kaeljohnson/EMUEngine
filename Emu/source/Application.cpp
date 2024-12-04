@@ -15,7 +15,7 @@
 #include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Rendering/WindowRenderer.h"
 #include "../include/ECS/ECS.h"
-#include "../include/Components/Updatable.h"
+#include "../include/Components.h"
 
 namespace Engine
 {

@@ -3,9 +3,8 @@
 #include <box2d/box2d.h>
 
 #include "../../include/Physics/Physics.h"
-#include "../../include/Components/PhysicsBody.h"
-#include "../../include/Components/SimpleContact.h"
-#include "../../include/EventListeners/EventListener.h"
+#include "../../include/Components.h"
+#include "../../include/EventListeners.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Time.h"
 #include "../../include/Logging/Logger.h"

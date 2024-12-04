@@ -5,11 +5,8 @@
 #include "../include/Logging/Logger.h"
 #include "../include/ECS/ECS.h"
 #include "../include/ECS/ComponentManager.h"
-#include "../include/Components/Transform.h"
-#include "../include/Components/PhysicsBody.h"
-#include "../include/Components/Updatable.h"
-#include "../include/Components/SimpleContact.h"
-#include "../include/EventListeners/EventListener.h"
+#include "../include/Components.h"
+#include "../include/EventListeners.h"
 #include "../include/Camera/Camera.h"
 
 namespace Engine

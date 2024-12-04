@@ -6,8 +6,7 @@
 #include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Rendering/WindowRenderer.h"
 #include "../../include/ECS/ECS.h"
-#include "../../include/Components/Transform.h"
-#include "../../include/Components/PhysicsBody.h"
+#include "../../include/Components.h"
 #include "../../include/Camera/Camera.h"
 #include "../../include/Time.h"
 

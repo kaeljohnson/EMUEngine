@@ -7,7 +7,7 @@
 #include "../../include/Logging/Logger.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/ECS/ComponentManager.h"
-#include "../../include/Components/Transform.h"
+#include "../../include/Components.h"
 
 namespace Engine
 {
