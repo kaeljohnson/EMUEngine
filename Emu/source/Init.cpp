@@ -4,6 +4,7 @@
 #include "../include/Init.h"
 #include "../include/Logging/Logger.h"
 #include "../include/ECS/ECS.h"
+#include "../include/Events/IOEventSystem.h"
 #include "../include/ECS/ComponentManager.h"
 #include "../include/Components.h"
 #include "../include/EventListeners.h"
@@ -14,6 +15,8 @@ namespace Engine
 	Init::Init()
 	{
 		ENGINE_TRACE_D("Logger initialized!");
+
+		IOEventSystem::Initialize();
 
 		ECS::initialize(10000);
 

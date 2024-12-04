@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "../../include/ISDL/ISDL.h"
-#include "../../include/Events/EventManager.h"
+#include "../../include/Events/IOEventSystem.h"
 #include "../../include/Events/EventDispatcher.h"
 #include "../../include/Events/Event.h"
 #include "../../include/Logging/Logger.h"
@@ -19,9 +19,17 @@ namespace Engine
     Vector2D<int> MouseStates::m_mousePosition;
 	Vector2D<int> MouseStates::m_scrollDirection;
 
+     EventQueue IOEventSystem::m_eventQ;
 
-    EventManager::EventManager() : m_eventDispatcher(std::make_unique<EventDispatcher>(m_eventQ))
+    // move to Event listener class
+    EventHandlerMap IOEventSystem::m_eventHandlers;
+
+    std::unique_ptr<EventDispatcher> IOEventSystem::m_eventDispatcher;
+
+    void IOEventSystem::Initialize()
     {
+		m_eventDispatcher = std::make_unique<EventDispatcher>(m_eventQ);
+
         // Initialize all key down states to false
         KeyStates::m_keyStates[ESCAPE_KEY_DOWN] = false;
         KeyStates::m_keyStates[EQUALS_KEY_DOWN] = false;
@@ -138,12 +146,12 @@ namespace Engine
 
     }
 
-    void EventManager::RegisterEventHandler(EventType type, EventHandler handler)
+    void IOEventSystem::RegisterEventHandler(EventType type, EventHandler handler)
     {
 		m_eventHandlers[type] = handler;
 	}
 
-	void EventManager::HandleEvents()
+	void IOEventSystem::HandleEvents()
 	{
 		/*
 			Poll for SDLevents and dispatch them to their respective event types.
@@ -158,7 +166,7 @@ namespace Engine
         m_eventDispatcher->PollEvents();
 	}
 
-    void EventManager::ProcessEvents()
+    void IOEventSystem::ProcessEvents()
     {
 		/*
         	Process all events in the event queue. This function is called after 

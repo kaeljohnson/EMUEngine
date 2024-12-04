@@ -18,6 +18,6 @@ namespace Engine
 		static KeyStatesMap m_keyStates;
 
 		friend class EventDispatcher;
-		friend class EventManager;
+		friend class IOEventSystem;
 	};
 }

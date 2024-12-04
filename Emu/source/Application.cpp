@@ -8,7 +8,7 @@
 #include "../include/Logging/Logger.h"
 #include "../include/Application.h"
 #include "../include/Events/Event.h"
-#include "../include/Events/EventManager.h"
+#include "../include/Events/IOEventSystem.h"
 #include "../include/Events/EventDispatcher.h"
 #include "../include/Scenes/Scene.h"
 #include "../include/Time.h"
@@ -37,7 +37,7 @@ namespace Engine
 	}
 
 	Application::Application()
-		: m_cameraManager(), m_eventManager(), m_windowRenderer()
+		: m_cameraManager(), m_windowRenderer()
 	{
 		defineDefaultApplicationCallbacks();
 	}
@@ -89,8 +89,8 @@ namespace Engine
 
 			while (accumulator >= timeStep)
 			{
-				m_eventManager.HandleEvents();
-				m_eventManager.ProcessEvents();
+				IOEventSystem::HandleEvents();
+				IOEventSystem::ProcessEvents();
 				
 				m_sceneManager.GetCurrentScene()->Update();
 

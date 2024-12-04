@@ -12,7 +12,6 @@ int main(int argc, char* args[])
 	CLIENT_INFO_D("Client Running!");
 
 	Engine::ApplicationPtr ptrAppInstance = Engine::Application::GetInstance();
-	Engine::EventManager& refEventManager = ptrAppInstance->GetEventManager();
 	Engine::CameraManager& refCameraManager = ptrAppInstance->GetCameraManager();
 	Engine::SceneManager& refSceneManager = ptrAppInstance->GetSceneManager();
 
@@ -48,7 +47,7 @@ int main(int argc, char* args[])
 
 	refSceneManager.LoadScene("Level1");
 
-	AppManagementEventHandlers appManagementEventHandlers(refEventManager, ptrCameraEntity, ptrPlayerEntity);
+	AppManagementEventHandlers appManagementEventHandlers(ptrCameraEntity, ptrPlayerEntity);
 
 	ptrAppInstance->Start();
 	// Need to figure out how to change scenes, stop scenes, etc.
