@@ -26,6 +26,22 @@ namespace Engine
 		Entity* m_ptrOtherEntity;
 	};
 
+	struct BeginSensing
+	{
+		BeginSensing(Entity* ptrEntity)
+			: m_ptrOtherEntity(ptrEntity) {}
+
+		Entity* m_ptrOtherEntity;
+	};
+
+	struct EndSensing
+	{
+		EndSensing(Entity* ptrEntity)
+			: m_ptrOtherEntity(ptrEntity) {}
+
+		Entity* m_ptrOtherEntity;
+	};
+
 	// May be a better way to do this... Via an event listener system?
 	struct ContactEventListener : public Component
 	{
@@ -36,5 +52,16 @@ namespace Engine
 
 		std::function<void(BeginContact)> m_onBeginContact;
 		std::function<void(EndContact)> m_onEndContact;
+	};
+
+	struct SensorEventListener : public Component
+	{
+		SensorEventListener(Entity* ptrEntity,
+			std::function<void(BeginSensing)> onBeginSensing,
+			std::function<void(EndSensing)> onEndSensing)
+			: m_onBeginSensing(onBeginSensing), m_onEndSensing(onEndSensing), Component(ptrEntity) {}
+
+		std::function<void(BeginSensing)> m_onBeginSensing;
+		std::function<void(EndSensing)> m_onEndSensing;
 	};
 }

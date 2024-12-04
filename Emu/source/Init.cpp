@@ -9,7 +9,7 @@
 #include "../include/Components/PhysicsBody.h"
 #include "../include/Components/Updatable.h"
 #include "../include/Components/SimpleContact.h"
-#include "../include/EventListeners/ContactEventListener.h"
+#include "../include/EventListeners/EventListener.h"
 #include "../include/Camera/Camera.h"
 
 namespace Engine
@@ -28,6 +28,7 @@ namespace Engine
 
 		// Event listeners will be components for now.
 		ECS::RegisterComponentManager<ContactEventListener>();
+		ECS::RegisterComponentManager<SensorEventListener>();
 
 		if (!ISDL::ImgInit(IMG_INIT_PNG))
 			ENGINE_CRITICAL("IMG Init failed! SDL_Error: " + std::string(ISDL::GetError()));

@@ -5,7 +5,7 @@
 #include "../../include/Physics/Physics.h"
 #include "../../include/Components/PhysicsBody.h"
 #include "../../include/Components/SimpleContact.h"
-#include "../../include/EventListeners/ContactEventListener.h"
+#include "../../include/EventListeners/EventListener.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Time.h"
 #include "../../include/Logging/Logger.h"
@@ -262,6 +262,9 @@ namespace Engine
 		}
 
 		// Process ContactListeners
+
+		// May need to ensure that only one contact event is created per contact. 
+		// So that we don't have multiple events for the same contact.
 		b2ContactEvents contactEvents = b2World_GetContactEvents(*m_ptrWorldId);
 
 		for (int i = 0; i < contactEvents.beginCount; ++i)
@@ -315,43 +318,56 @@ namespace Engine
 
 		///*for (int i = 0; i < contactEvents.hitCount; ++i)
 		//{
-		//	b2ContactHitEvent* hitEvent = contactEvents.hitEvents + i;
-
-
+		//	b2ContactHitEvent* hitEvent = contactEvents.hitEvents + i;\
 		//}*/
 
-		//b2SensorEvents sensorEvents = b2World_GetSensorEvents(*m_ptrWorldId);
+		b2SensorEvents sensorEvents = b2World_GetSensorEvents(*m_ptrWorldId);
 
-		//for (int i = 0; i < sensorEvents.beginCount; ++i)
-		//{
-		//	b2SensorBeginTouchEvent* beginEvent = sensorEvents.beginEvents + i;
+		for (int i = 0; i < sensorEvents.beginCount; ++i)
+		{
+			b2SensorBeginTouchEvent* beginEvent = sensorEvents.beginEvents + i;
 
-		//	b2ShapeId dynamicShapeId = beginEvent->visitorShapeId;
-		//	b2ShapeId sensorShapeId = beginEvent->sensorShapeId;
+			b2ShapeId shapeIdA = beginEvent->visitorShapeId;
+			b2ShapeId shapeIdB = beginEvent->sensorShapeId;
 
-		//	Entity* dynamicEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(dynamicShapeId));
-		//	Entity* sensorEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(sensorShapeId));
+			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
-		//	// if (ECS::GetComponentManager<SensorEventListener>().HasComponent(dynamicEntity))
-		//	//		ECS::GetComponentManager<SensorEventListener>().GetComponent(dynamicEntity)->OnBeginSensorContact(sensorEntity);
-		//}
+			SensorEventListener* ptrSensorEventListenerA = ECS::GetComponentManager<SensorEventListener>().GetComponent(entityA);
+			if (ptrSensorEventListenerA != nullptr)
+			{
+				ptrSensorEventListenerA->m_onBeginSensing(BeginSensing(entityB));
+			}
 
-		//for (int i = 0; i < sensorEvents.endCount; ++i)
-		//{
-		//	b2SensorEndTouchEvent* endEvent = sensorEvents.endEvents + i;
+			SensorEventListener* ptrSensorEventListenerB = ECS::GetComponentManager<SensorEventListener>().GetComponent(entityB);
+			if (ptrSensorEventListenerB != nullptr)
+			{
+				ptrSensorEventListenerB->m_onBeginSensing(BeginSensing(entityA));
+			}
+		}
 
-		//	b2ShapeId dynamicShapeId = endEvent->visitorShapeId;
-		//	b2ShapeId sensorShapeId = endEvent->sensorShapeId;
+		for (int i = 0; i < sensorEvents.endCount; ++i)
+		{
+			b2SensorEndTouchEvent* endEvent = sensorEvents.endEvents + i;
 
-		//	Entity* dynamicEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(dynamicShapeId));
-		//	Entity* sensorEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(sensorShapeId));
+			b2ShapeId shapeIdA = endEvent->visitorShapeId;
+			b2ShapeId shapeIdB = endEvent->sensorShapeId;
 
-		//	// dynamicPhysicsBody->RemoveSensorContact(sensorEntity);
-		//	// sensorPhysicsBody->RemoveSensorContact(dynamicEntity);
+			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
-		//	// if (ECS::GetComponentManager<SensorEventListener>().HasComponent(dynamicEntity))
-		//	//		ECS::GetComponentManager<SensorEventListener>().GetComponent(dynamicEntity)->OnEndSensorContact(sensorEntity);
-		//}
+			SensorEventListener* ptrSensorEventListenerA = ECS::GetComponentManager<SensorEventListener>().GetComponent(entityA);
+			if (ptrSensorEventListenerA != nullptr)
+			{
+				ptrSensorEventListenerA->m_onEndSensing(EndSensing(entityB));
+			}
+
+			SensorEventListener* ptrSensorEventListenerB = ECS::GetComponentManager<SensorEventListener>().GetComponent(entityB);
+			if (ptrSensorEventListenerB != nullptr)
+			{
+				ptrSensorEventListenerB->m_onEndSensing(EndSensing(entityA));
+			}
+		}
 	}
 
 	void Physics::CreateWorld(const Vector2D<float> gravity)

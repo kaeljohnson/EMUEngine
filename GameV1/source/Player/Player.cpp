@@ -36,6 +36,10 @@
             [this](Engine::BeginContact beginContact) { OnBeginContact(beginContact); },
             [this](Engine::EndContact endContact) { OnEndContact(endContact); });
 
+		Engine::ECS::GetComponentManager<Engine::SensorEventListener>().AddComponent(ptrEntity,
+			[this](Engine::BeginSensing beginSensing) { OnBeginSensing(beginSensing); },
+			[this](Engine::EndSensing endSensing) { OnEndSensing(endSensing); });
+
         Engine::ECS::GetComponentManager<Engine::SimpleContact>().AddComponent(ptrEntity);
     }
 
@@ -47,6 +51,16 @@
     void Player::OnEndContact(Engine::EndContact endContact) 
     {
 		CLIENT_CRITICAL_D("Player OnEndContact.");
+    }
+
+	void Player::OnBeginSensing(Engine::BeginSensing beginSensing)
+	{
+		CLIENT_CRITICAL_D("Player OnBeginSensing.");
+	}
+
+    void Player::OnEndSensing(Engine::EndSensing endSensing)
+    {
+        CLIENT_CRITICAL_D("Player OnEndSensing.");
     }
 
     void Player::Update()

@@ -12,7 +12,7 @@
 #include "../include/Physics/BodyTypes.h"
 #include "../include/Physics/Physics.h"
 #include "../include/Components/PhysicsBody.h"
-#include "../include/EventListeners/ContactEventListener.h"
+#include "../include/EventListeners/EventListener.h"
 #include "../include/Components/SimpleContact.h"
 #include "../include/Tiles/TileMap.h"
 
