@@ -3,11 +3,13 @@
 #include <box2d/box2d.h>
 
 #include "../../include/Physics/Physics.h"
-#include "../../include/Components/PhysicsBody.h"
-#include "../../include/Components/ContactEventListener.h"
+#include "../../include/Components.h"
+#include "../../include/EventListeners.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Time.h"
 #include "../../include/Logging/Logger.h"
+
+#include "../../include/MathUtil.h"
 
 namespace Engine
 {
@@ -85,11 +87,11 @@ namespace Engine
 		b2Body_SetLinearVelocity(bodyId, b2Vec2(velocity.x, yVel));
 	}
 
-	const Vector2D<int> Physics::GetVelocity(Entity* ptrEntity)
+	const Vector2D<float> Physics::GetVelocity(Entity* ptrEntity)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
 		b2Vec2 velocity = b2Body_GetLinearVelocity(bodyId);
-		return Vector2D<int>(velocity.x, velocity.y);
+		return Vector2D<float>(velocity.x, velocity.y);
 	}
 
 	void Physics::SetRestitution(Entity* ptrEntity, const float restitution)
@@ -112,8 +114,9 @@ namespace Engine
 
 	void Physics::RemoveBodyFromWorld(Entity* ptrEntity)
 	{
-		if (!ECS::GetComponentManager<PhysicsBody>().HasComponent(ptrEntity)) return;
 		PhysicsBody* ptrPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity);
+		if (ptrPhysicsBody->m_bodyId == nullptr) return;
+
 		b2DestroyBody(*ptrPhysicsBody->m_bodyId);
 		ptrPhysicsBody->m_bodyId = nullptr;
 		ptrPhysicsBody->m_shapeId = nullptr;
@@ -205,6 +208,62 @@ namespace Engine
 
 	void Physics::ProcessContactEvents()
 	{
+		// Process ContactComponents
+		for (SimpleContact& simpleContact : ECS::GetComponentManager<SimpleContact>())
+		{
+			simpleContact.m_contactAbove = false;
+			simpleContact.m_contactBelow = false;
+			simpleContact.m_contactLeft = false;
+			simpleContact.m_contactRight = false;
+
+			// Better way to access. Maybe can just store shapeId directly in SimpleContact component?
+			Entity* ptrEntity = simpleContact.GetEntity();
+			b2ShapeId* shapeId = ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_shapeId;
+
+			b2ContactData contactData[10];
+			int shapeContactCount = b2Shape_GetContactData(*shapeId, contactData, 10);
+
+			for (int i = 0; i < shapeContactCount; ++i)
+			{
+				b2ContactData* contact = contactData + i;
+
+				float normalDirection = 1.0f;
+
+				if ((Entity*)b2Body_GetUserData(b2Shape_GetBody(contact->shapeIdB)) == ptrEntity) 
+				{
+					normalDirection = -1.0f;
+				}
+
+				b2Vec2 normal = contact->manifold.normal * normalDirection;
+
+				if (normal.y < -0.5) // Collision from above `this`
+				{
+					// ENGINE_CRITICAL_D("Contact Above!");
+					simpleContact.m_contactAbove = true;
+				}
+				else if (normal.y > 0.5) // Collision from below `this`
+				{
+					// ENGINE_CRITICAL_D("Contact Below!");
+					simpleContact.m_contactBelow = true;
+				}
+
+				if (normal.x > 0.5) // Collision from the Right of `this`
+				{
+					// ENGINE_CRITICAL_D("Contact Right!");
+					simpleContact.m_contactRight = true;
+				}
+				else if (normal.x < -0.5) // Collision from the Left of `this`
+				{
+					// ENGINE_CRITICAL_D("Contact Left!");
+					simpleContact.m_contactLeft = true;
+				}
+			} 
+		}
+
+		// Process ContactListeners
+
+		// May need to ensure that only one contact event is created per contact. 
+		// So that we don't have multiple events for the same contact.
 		b2ContactEvents contactEvents = b2World_GetContactEvents(*m_ptrWorldId);
 
 		for (int i = 0; i < contactEvents.beginCount; ++i)
@@ -218,45 +277,19 @@ namespace Engine
 			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
 			// normal points from A to B
-			b2Vec2 normal = beginEvent->manifold.normal;
+			Vector2D<float> normal = Vector2D(beginEvent->manifold.normal.x, beginEvent->manifold.normal.y);
 
-
-			if (normal.y < -0.5)
+			ContactEventListener* ptrContactEventListenerA = ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA);
+			if (ptrContactEventListenerA != nullptr)
 			{
-
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, UP));
-
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, DOWN));
-			}
-			else if (normal.y > 0.5)
-			{
-
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, DOWN));
-
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, UP));
+				ptrContactEventListenerA->m_onBeginContact(BeginContact(entityB, normal));
 			}
 
-			if (normal.x > 0.5)
+			ContactEventListener* ptrContactEventListenerB = ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB);
+			if (ptrContactEventListenerB != nullptr)
 			{
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, RIGHT));
-
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, LEFT));
+				ptrContactEventListenerB->m_onBeginContact(BeginContact(entityA, normal));
 			}
-			else if (normal.x < -0.5)
-			{
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onBeginContact(BeginContact(entityB, LEFT));
-
-				if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-					ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onBeginContact(BeginContact(entityA, RIGHT));
-			}
-
 		}
 
 		for (int i = 0; i < contactEvents.endCount; ++i)
@@ -269,19 +302,23 @@ namespace Engine
 			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
 			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
-			if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityA))
-				ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA)->m_onEndContact(EndContact(entityB));
+			ContactEventListener* ptrContactEventListenerA = ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA);
+			if (ptrContactEventListenerA != nullptr)
+			{
+				ptrContactEventListenerA->m_onEndContact(EndContact(entityB));
+			}
 
-			if (ECS::GetComponentManager<ContactEventListener>().HasComponent(entityB))
-				ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB)->m_onEndContact(EndContact(entityA));
+			ContactEventListener* ptrContactEventListenerB = ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB);
+			if (ptrContactEventListenerB != nullptr)
+			{
+				ptrContactEventListenerB->m_onEndContact(EndContact(entityA));
+			}
 		}
 
-		/*for (int i = 0; i < contactEvents.hitCount; ++i)
-		{
-			b2ContactHitEvent* hitEvent = contactEvents.hitEvents + i;
-
-
-		}*/
+		///*for (int i = 0; i < contactEvents.hitCount; ++i)
+		//{
+		//	b2ContactHitEvent* hitEvent = contactEvents.hitEvents + i;\
+		//}*/
 
 		b2SensorEvents sensorEvents = b2World_GetSensorEvents(*m_ptrWorldId);
 
@@ -289,31 +326,46 @@ namespace Engine
 		{
 			b2SensorBeginTouchEvent* beginEvent = sensorEvents.beginEvents + i;
 
-			b2ShapeId dynamicShapeId = beginEvent->visitorShapeId;
-			b2ShapeId sensorShapeId = beginEvent->sensorShapeId;
+			b2ShapeId shapeIdA = beginEvent->visitorShapeId;
+			b2ShapeId shapeIdB = beginEvent->sensorShapeId;
 
-			Entity* dynamicEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(dynamicShapeId));
-			Entity* sensorEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(sensorShapeId));
+			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
-			// if (ECS::GetComponentManager<SensorEventListener>().HasComponent(dynamicEntity))
-			//		ECS::GetComponentManager<SensorEventListener>().GetComponent(dynamicEntity)->OnBeginSensorContact(sensorEntity);
+			SensorEventListener* ptrSensorEventListenerA = ECS::GetComponentManager<SensorEventListener>().GetComponent(entityA);
+			if (ptrSensorEventListenerA != nullptr)
+			{
+				ptrSensorEventListenerA->m_onBeginSensing(BeginSensing(entityB));
+			}
+
+			SensorEventListener* ptrSensorEventListenerB = ECS::GetComponentManager<SensorEventListener>().GetComponent(entityB);
+			if (ptrSensorEventListenerB != nullptr)
+			{
+				ptrSensorEventListenerB->m_onBeginSensing(BeginSensing(entityA));
+			}
 		}
 
 		for (int i = 0; i < sensorEvents.endCount; ++i)
 		{
 			b2SensorEndTouchEvent* endEvent = sensorEvents.endEvents + i;
 
-			b2ShapeId dynamicShapeId = endEvent->visitorShapeId;
-			b2ShapeId sensorShapeId = endEvent->sensorShapeId;
+			b2ShapeId shapeIdA = endEvent->visitorShapeId;
+			b2ShapeId shapeIdB = endEvent->sensorShapeId;
 
-			Entity* dynamicEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(dynamicShapeId));
-			Entity* sensorEntity = (Entity*)b2Body_GetUserData(b2Shape_GetBody(sensorShapeId));
+			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
-			// dynamicPhysicsBody->RemoveSensorContact(sensorEntity);
-			// sensorPhysicsBody->RemoveSensorContact(dynamicEntity);
+			SensorEventListener* ptrSensorEventListenerA = ECS::GetComponentManager<SensorEventListener>().GetComponent(entityA);
+			if (ptrSensorEventListenerA != nullptr)
+			{
+				ptrSensorEventListenerA->m_onEndSensing(EndSensing(entityB));
+			}
 
-			// if (ECS::GetComponentManager<SensorEventListener>().HasComponent(dynamicEntity))
-			//		ECS::GetComponentManager<SensorEventListener>().GetComponent(dynamicEntity)->OnEndSensorContact(sensorEntity);
+			SensorEventListener* ptrSensorEventListenerB = ECS::GetComponentManager<SensorEventListener>().GetComponent(entityB);
+			if (ptrSensorEventListenerB != nullptr)
+			{
+				ptrSensorEventListenerB->m_onEndSensing(EndSensing(entityA));
+			}
 		}
 	}
 

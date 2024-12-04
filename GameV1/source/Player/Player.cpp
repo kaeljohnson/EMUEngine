@@ -35,30 +35,37 @@
 		Engine::ECS::GetComponentManager<Engine::ContactEventListener>().AddComponent(ptrEntity, 
             [this](Engine::BeginContact beginContact) { OnBeginContact(beginContact); },
             [this](Engine::EndContact endContact) { OnEndContact(endContact); });
+
+		Engine::ECS::GetComponentManager<Engine::SensorEventListener>().AddComponent(ptrEntity,
+			[this](Engine::BeginSensing beginSensing) { OnBeginSensing(beginSensing); },
+			[this](Engine::EndSensing endSensing) { OnEndSensing(endSensing); });
+
+        Engine::ECS::GetComponentManager<Engine::SimpleContact>().AddComponent(ptrEntity);
     }
 
     void Player::OnBeginContact(Engine::BeginContact beginContact) 
     {
-		if (beginContact.m_direction == Engine::ContactDirection::DOWN)
-		{
-            CLIENT_CRITICAL_D("OnGround");
-			m_onGround = true;
-			m_canJump = true;
-			m_coyoteTime = 0.0f;
-		}
+		CLIENT_CRITICAL_D("Player OnBeginContact.");
     }
 
     void Player::OnEndContact(Engine::EndContact endContact) 
     {
-		CLIENT_CRITICAL_D("OffGround");
-		m_onGround = false;
+		CLIENT_CRITICAL_D("Player OnEndContact.");
+    }
+
+	void Player::OnBeginSensing(Engine::BeginSensing beginSensing)
+	{
+		CLIENT_CRITICAL_D("Player OnBeginSensing.");
+	}
+
+    void Player::OnEndSensing(Engine::EndSensing endSensing)
+    {
+        CLIENT_CRITICAL_D("Player OnEndSensing.");
     }
 
     void Player::Update()
     {
-		// Engine::PhysicsBody* physicsBodyComponent = 
-        //    Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(m_ptrEntity);
-
+        m_onGround = Engine::ECS::GetComponentManager<Engine::SimpleContact>().GetComponent(m_ptrEntity)->m_contactBelow;
         // m_onGround = true;
 
         m_force = { 0.0f, 0.0f };

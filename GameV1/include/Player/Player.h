@@ -28,6 +28,8 @@ public:
 	void Update();
 	void OnBeginContact(Engine::BeginContact beginContact);
 	void OnEndContact(Engine::EndContact ptrEntity);
+	void OnBeginSensing(Engine::BeginSensing beginSensing);
+	void OnEndSensing(Engine::EndSensing endSensing);
 
 	PlayerState m_currentState;
 	PlayerDirection m_currentDirection;

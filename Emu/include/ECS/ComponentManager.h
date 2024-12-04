@@ -169,7 +169,7 @@ namespace Engine
                 return &m_components[it->second];
             }
 
-			throw std::runtime_error("Component does not exist.");
+            return nullptr;
 		}
 
         // Check if entity has a component attached.

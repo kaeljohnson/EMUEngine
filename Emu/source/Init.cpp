@@ -5,10 +5,8 @@
 #include "../include/Logging/Logger.h"
 #include "../include/ECS/ECS.h"
 #include "../include/ECS/ComponentManager.h"
-#include "../include/Transform.h"
-#include "../include/Components/PhysicsBody.h"
-#include "../include/Components/ContactEventListener.h"
-#include "../include/Updatable/Updatable.h"
+#include "../include/Components.h"
+#include "../include/EventListeners.h"
 #include "../include/Camera/Camera.h"
 
 namespace Engine
@@ -23,7 +21,11 @@ namespace Engine
 		ECS::RegisterComponentManager<PhysicsBody>();
 		ECS::RegisterComponentManager<Transform>();
 		ECS::RegisterComponentManager<Camera>();
+		ECS::RegisterComponentManager<SimpleContact>();
+
+		// Event listeners will be components for now.
 		ECS::RegisterComponentManager<ContactEventListener>();
+		ECS::RegisterComponentManager<SensorEventListener>();
 
 		if (!ISDL::ImgInit(IMG_INIT_PNG))
 			ENGINE_CRITICAL("IMG Init failed! SDL_Error: " + std::string(ISDL::GetError()));
