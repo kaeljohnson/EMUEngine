@@ -260,6 +260,8 @@ namespace Engine
 			} 
 		}
 
+
+		// Is there a point to having event listeners be part of the ECS? Consider they fire when an event happens? Not sequentially in a component manager.
 		// Process ContactListeners
 
 		// May need to ensure that only one contact event is created per contact. 

@@ -4,7 +4,7 @@
 #include "../include/Application.h"
 #include "../include/Init.h"
 #include "../include/Events/IOEventSystem.h"
-#include "../include/Events/Event.h"
+#include "../include/Events/IOEvent.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Logging/Logger.h"
 #include "../include/Scenes/SceneFactory.h"

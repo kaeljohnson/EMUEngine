@@ -3,7 +3,7 @@
 namespace Engine
 {
 	// Custom event types to hide the SDL2 event types from the user.
-	enum EventType
+	enum IOEventType
 	{
 		QUIT = 0,
 		TOGGLE_FULLSCREEN, RESIZE_WINDOW,
@@ -65,16 +65,16 @@ namespace Engine
 	};
 	
 	// Custom event class to hide the SDL2 event from the user.
-	class Event
-	{	
-	public:
-		const EventType Type;
+	struct IOEvent
+	{
+		const IOEventType Type;
 		const int X_POS;
 		const int Y_POS;
 		bool Handled;
 
-		Event(const EventType);
-		Event(const EventType actionType, const int xPos, const int yPos);
+		IOEvent(const IOEventType eventType) : Type(eventType), X_POS(-1), Y_POS(-1), Handled(false) {}
+		IOEvent(const IOEventType eventType, const int xPos, const int yPos)
+			: Type(eventType), X_POS(xPos), Y_POS(yPos), Handled(false) {}
 	};
 }
  

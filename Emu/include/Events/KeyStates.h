@@ -1,14 +1,14 @@
 #pragma once
 #include <unordered_map>
 
-#include "Event.h"
+#include "IOEvent.h"
 
 #include "../Core.h"
 
 
 namespace Engine
 {
-	using KeyStatesMap = std::unordered_map<EventType, bool>;
+	using KeyStatesMap = std::unordered_map<IOEventType, bool>;
 
 	struct KeyStates
 	{
@@ -17,7 +17,7 @@ namespace Engine
 	protected:
 		static KeyStatesMap m_keyStates;
 
-		friend class EventDispatcher;
+		friend class IOEventDispatcher;
 		friend class IOEventSystem;
 	};
 }

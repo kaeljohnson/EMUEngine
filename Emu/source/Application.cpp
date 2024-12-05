@@ -7,9 +7,9 @@
 
 #include "../include/Logging/Logger.h"
 #include "../include/Application.h"
-#include "../include/Events/Event.h"
+#include "../include/Events/IOEvent.h"
 #include "../include/Events/IOEventSystem.h"
-#include "../include/Events/EventDispatcher.h"
+#include "../include/Events/IOEventDispatcher.h"
 #include "../include/Scenes/Scene.h"
 #include "../include/Time.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
