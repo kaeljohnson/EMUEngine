@@ -1,6 +1,8 @@
 #pragma once
 
 #include <functional>
+#include <cstddef>
+#include <utility>
 
 #include "ECS/Component.h"
 #include "ECS/Entity.h"
@@ -11,37 +13,64 @@
 
 namespace Engine
 {
+	struct ContactKey
+	{
+		ContactKey(const Entity* entity1, const Entity* entity2)
+			: m_key(GenerateKey(entity1->GetID(), entity2->GetID())) {}
+
+		bool operator==(const ContactKey& other) const
+		{
+			return m_key == other.m_key;
+		}
+
+		size_t m_key; // The unique key
+
+	private:
+		static size_t GenerateKey(size_t id1, size_t id2)
+		{
+			if (id1 > id2) std::swap(id1, id2); // Ensure consistent order
+
+			// Combine the two IDs into a unique key
+			return std::hash<size_t>()(id1) ^ (std::hash<size_t>()(id2) << 1);
+		}
+	};
+
 	// Temp
 	struct BeginContact
 	{
-		BeginContact(Entity* ptrEntity, Vector2D<float> normalVec)
-			: m_ptrOtherEntity(ptrEntity) {}
+		BeginContact(Entity* ptrEntityA, Entity* ptrEntityB, Vector2D<float> normalVec)
+			: m_ptrEntityA(ptrEntityA), m_ptrEntityB(ptrEntityB) {}
 
-		Entity* m_ptrOtherEntity;
+		Entity* m_ptrEntityA;
+		Entity* m_ptrEntityB;
+		Vector2D<float> m_normalVec;
 	};
 
 	struct EndContact
 	{
-		EndContact(Entity* ptrEntity)
-			: m_ptrOtherEntity(ptrEntity) {}
+		EndContact(Entity* ptrEntityA, Entity* ptrEntityB)
+			: m_ptrEntityA(ptrEntityA), m_ptrEntityB(ptrEntityB) {}
 
-		Entity* m_ptrOtherEntity;
+		Entity* m_ptrEntityA;
+		Entity* m_ptrEntityB;
 	};
 
 	struct BeginSensing
 	{
-		BeginSensing(Entity* ptrEntity)
-			: m_ptrOtherEntity(ptrEntity) {}
+		BeginSensing(Entity* ptrEntityA, Entity* ptrEntityB)
+			: m_ptrEntityA(ptrEntityA), m_ptrEntityB(ptrEntityB) {}
 
-		Entity* m_ptrOtherEntity;
+		Entity* m_ptrEntityA;
+		Entity* m_ptrEntityB;
 	};
 
 	struct EndSensing
 	{
-		EndSensing(Entity* ptrEntity)
-			: m_ptrOtherEntity(ptrEntity) {}
+		EndSensing(Entity* ptrEntityA, Entity* ptrEntityB)
+			: m_ptrEntityA(ptrEntityA), m_ptrEntityB(ptrEntityB) {}
 
-		Entity* m_ptrOtherEntity;
+		Entity* m_ptrEntityA;
+		Entity* m_ptrEntityB;
 	};
 
 	// May be a better way to do this... Via an event listener system?
@@ -65,5 +94,17 @@ namespace Engine
 
 		std::function<void(BeginSensing)> m_onBeginSensing;
 		std::function<void(EndSensing)> m_onEndSensing;
+	};
+}
+
+namespace std
+{
+	template <>
+	struct hash<Engine::ContactKey>
+	{
+		std::size_t operator()(const Engine::ContactKey& key) const
+		{
+			return key.m_key;
+		}
 	};
 }

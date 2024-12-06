@@ -14,6 +14,10 @@
 namespace Engine
 {
 	b2WorldId* Physics::m_ptrWorldId = nullptr;
+	std::unordered_map<ContactKey, std::function<void(BeginContact)>> Physics::m_onBeginContactMap;
+	std::unordered_map<ContactKey, std::function<void(EndContact)>> Physics::m_onEndContactMap;
+	std::unordered_map<ContactKey, std::function<void(BeginSensing)>> Physics::m_onBeginSensingMap;
+	std::unordered_map<ContactKey, std::function<void(EndSensing)>> Physics::m_onEndSensingMap;
 
 	// Physics System
 	void Physics::SetPosition(Entity* ptrEntity, Vector2D<float> position)
@@ -281,16 +285,22 @@ namespace Engine
 			// normal points from A to B
 			Vector2D<float> normal = Vector2D(beginEvent->manifold.normal.x, beginEvent->manifold.normal.y);
 
+			auto it = m_onBeginContactMap.find(ContactKey(entityA, entityB));
+			if (it != m_onBeginContactMap.end())
+			{
+				it->second(BeginContact(entityA, entityB, normal));
+			}
+
 			ContactEventListener* ptrContactEventListenerA = ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA);
 			if (ptrContactEventListenerA != nullptr)
 			{
-				ptrContactEventListenerA->m_onBeginContact(BeginContact(entityB, normal));
+				ptrContactEventListenerA->m_onBeginContact(BeginContact(entityA, entityB, normal));
 			}
 
 			ContactEventListener* ptrContactEventListenerB = ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB);
 			if (ptrContactEventListenerB != nullptr)
 			{
-				ptrContactEventListenerB->m_onBeginContact(BeginContact(entityA, normal));
+				ptrContactEventListenerB->m_onBeginContact(BeginContact(entityB, entityA, normal));
 			}
 		}
 
@@ -304,16 +314,22 @@ namespace Engine
 			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
 			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
+			auto it = m_onEndContactMap.find(ContactKey(entityA, entityB));
+			if (it != m_onEndContactMap.end())
+			{
+				it->second(EndContact(entityA, entityB));
+			}
+
 			ContactEventListener* ptrContactEventListenerA = ECS::GetComponentManager<ContactEventListener>().GetComponent(entityA);
 			if (ptrContactEventListenerA != nullptr)
 			{
-				ptrContactEventListenerA->m_onEndContact(EndContact(entityB));
+				ptrContactEventListenerA->m_onEndContact(EndContact(entityA, entityB));
 			}
 
 			ContactEventListener* ptrContactEventListenerB = ECS::GetComponentManager<ContactEventListener>().GetComponent(entityB);
 			if (ptrContactEventListenerB != nullptr)
 			{
-				ptrContactEventListenerB->m_onEndContact(EndContact(entityA));
+				ptrContactEventListenerB->m_onEndContact(EndContact(entityB, entityA));
 			}
 		}
 
@@ -334,16 +350,22 @@ namespace Engine
 			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
 			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
+			auto it = m_onBeginSensingMap.find(ContactKey(entityA, entityB));
+			if (it != m_onBeginSensingMap.end())
+			{
+				it->second(BeginSensing(entityA, entityB));
+			}
+
 			SensorEventListener* ptrSensorEventListenerA = ECS::GetComponentManager<SensorEventListener>().GetComponent(entityA);
 			if (ptrSensorEventListenerA != nullptr)
 			{
-				ptrSensorEventListenerA->m_onBeginSensing(BeginSensing(entityB));
+				ptrSensorEventListenerA->m_onBeginSensing(BeginSensing(entityA, entityB));
 			}
 
 			SensorEventListener* ptrSensorEventListenerB = ECS::GetComponentManager<SensorEventListener>().GetComponent(entityB);
 			if (ptrSensorEventListenerB != nullptr)
 			{
-				ptrSensorEventListenerB->m_onBeginSensing(BeginSensing(entityA));
+				ptrSensorEventListenerB->m_onBeginSensing(BeginSensing(entityB, entityA));
 			}
 		}
 
@@ -357,18 +379,45 @@ namespace Engine
 			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
 			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
+			auto it = m_onEndSensingMap.find(ContactKey(entityA, entityB));
+			if (it != m_onEndSensingMap.end())
+			{
+				it->second(EndSensing(entityA, entityB));
+			}
+
 			SensorEventListener* ptrSensorEventListenerA = ECS::GetComponentManager<SensorEventListener>().GetComponent(entityA);
 			if (ptrSensorEventListenerA != nullptr)
 			{
-				ptrSensorEventListenerA->m_onEndSensing(EndSensing(entityB));
+				ptrSensorEventListenerA->m_onEndSensing(EndSensing(entityA, entityB));
 			}
 
 			SensorEventListener* ptrSensorEventListenerB = ECS::GetComponentManager<SensorEventListener>().GetComponent(entityB);
 			if (ptrSensorEventListenerB != nullptr)
 			{
-				ptrSensorEventListenerB->m_onEndSensing(EndSensing(entityA));
+				ptrSensorEventListenerB->m_onEndSensing(EndSensing(entityB, entityA));
 			}
 		}
+	}
+
+	void Physics::RegisterOnBeginContact(ContactKey key, std::function<void(BeginContact)> callback)
+	{
+		m_onBeginContactMap[key] = callback;
+	}
+
+	void Physics::RegisterOnEndContact(ContactKey key, std::function<void(EndContact)> callback)
+	{
+		m_onEndContactMap[key] = callback;
+
+	}
+
+	void Physics::RegisterOnBeginSensing(ContactKey key, std::function<void(BeginSensing)> callback)
+	{
+		m_onBeginSensingMap[key] = callback;
+	}
+
+	void Physics::RegisterOnEndSensing(ContactKey key, std::function<void(EndSensing)> callback)
+	{
+		m_onEndSensingMap[key] = callback;
 	}
 
 	void Physics::CreateWorld(const Vector2D<float> gravity)

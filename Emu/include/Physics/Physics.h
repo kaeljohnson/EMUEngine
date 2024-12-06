@@ -4,6 +4,8 @@
 #include "../Core.h"
 #include "../MathUtil.h"
 
+#include "../EventListeners.h"
+
 struct b2WorldId;
 
 namespace Engine
@@ -18,7 +20,7 @@ namespace Engine
 		EMU_API static const Vector2D<float> GetTopLeftPosition(Entity* ptrEntity);
 		EMU_API static void ApplyForceToBody(Entity* ptrEntity, Vector2D<float> force);
 		EMU_API static void ApplyImpulseToBody(Entity* ptrEntity, Vector2D<float> impulse);
-		EMU_API static void SetVelocity(Entity* ptrEntity, const Vector2D<float> velocity);
+		EMU_API static void SetVelocity(Entity* ptrEntity, const Vector2D<float> velocity); 
 		EMU_API static void SetXVelocity(Entity* ptrEntity, const float xVelocity);
 		EMU_API static void SetYVelocity(Entity* ptrEntity, const float yVelocity);
 		EMU_API static void SetDeceleration(Entity* ptrEntity, const float decel);
@@ -40,7 +42,15 @@ namespace Engine
 
 		static void Update();
 		static void ProcessContactEvents();
+		EMU_API static void RegisterOnBeginContact(ContactKey, std::function<void(BeginContact)> callback);
+		EMU_API static void RegisterOnEndContact(ContactKey, std::function<void(EndContact)> callback);
+		EMU_API static void RegisterOnBeginSensing(ContactKey, std::function<void(BeginSensing)> callback);	
+		EMU_API static void RegisterOnEndSensing(ContactKey, std::function<void(EndSensing)> callback);
 	private:
 		static b2WorldId* m_ptrWorldId;
+		static std::unordered_map<ContactKey, std::function<void(BeginContact)>> m_onBeginContactMap;
+		static std::unordered_map<ContactKey, std::function<void(EndContact)>> m_onEndContactMap;
+		static std::unordered_map<ContactKey, std::function<void(BeginSensing)>> m_onBeginSensingMap;
+		static std::unordered_map<ContactKey, std::function<void(EndSensing)>> m_onEndSensingMap;
 	};
 }

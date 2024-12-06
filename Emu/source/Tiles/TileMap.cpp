@@ -82,7 +82,8 @@ namespace Engine
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile));
 					ptrPhysicsBody->m_halfDimensions = ptrPhysicsBody->m_dimensions * 0.5f;
                     ptrPhysicsBody->m_startingPosition = 
-                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile));
+                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), 
+                            static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile));
 
 					ptrTiles.push_back(ptrTile);
 				}
