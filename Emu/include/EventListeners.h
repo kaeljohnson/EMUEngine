@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <utility>
 
-#include "ECS/Component.h"
 #include "ECS/Entity.h"
 
 #include "Events/IOEvent.h"
@@ -13,12 +12,25 @@
 
 namespace Engine
 {
-	struct ContactKey
+	struct SingleEntityContactKey
 	{
-		ContactKey(const Entity* entity1, const Entity* entity2)
+		SingleEntityContactKey(const Entity* entity)
+			: m_key(entity->GetID()) {}
+
+		bool operator==(const SingleEntityContactKey& other) const
+		{
+			return m_key == other.m_key;
+		}
+
+		size_t m_key; // The unique key
+	};
+
+	struct MultiEntityContactKey
+	{
+		MultiEntityContactKey(const Entity* entity1, const Entity* entity2)
 			: m_key(GenerateKey(entity1->GetID(), entity2->GetID())) {}
 
-		bool operator==(const ContactKey& other) const
+		bool operator==(const MultiEntityContactKey& other) const
 		{
 			return m_key == other.m_key;
 		}
@@ -74,23 +86,23 @@ namespace Engine
 	};
 
 	// May be a better way to do this... Via an event listener system?
-	struct ContactEventListener : public Component
+	struct ContactEventListener
 	{
 		ContactEventListener(Entity* ptrEntity,
 			std::function<void(BeginContact)> onBeginContact,
 			std::function<void(EndContact)> onEndContact)
-			: m_onBeginContact(onBeginContact), m_onEndContact(onEndContact), Component(ptrEntity) {}
+			: m_onBeginContact(onBeginContact), m_onEndContact(onEndContact) {}
 
 		std::function<void(BeginContact)> m_onBeginContact;
 		std::function<void(EndContact)> m_onEndContact;
 	};
 
-	struct SensorEventListener : public Component
+	struct SensorEventListener
 	{
 		SensorEventListener(Entity* ptrEntity,
 			std::function<void(BeginSensing)> onBeginSensing,
 			std::function<void(EndSensing)> onEndSensing)
-			: m_onBeginSensing(onBeginSensing), m_onEndSensing(onEndSensing), Component(ptrEntity) {}
+			: m_onBeginSensing(onBeginSensing), m_onEndSensing(onEndSensing) {}
 
 		std::function<void(BeginSensing)> m_onBeginSensing;
 		std::function<void(EndSensing)> m_onEndSensing;
@@ -99,10 +111,19 @@ namespace Engine
 
 namespace std
 {
-	template <>
-	struct hash<Engine::ContactKey>
+	template<>
+	struct hash<Engine::SingleEntityContactKey>
 	{
-		std::size_t operator()(const Engine::ContactKey& key) const
+		std::size_t operator()(const Engine::SingleEntityContactKey& key) const
+		{
+			return key.m_key;
+		}
+	};
+
+	template <>
+	struct hash<Engine::MultiEntityContactKey>
+	{
+		std::size_t operator()(const Engine::MultiEntityContactKey& key) const
 		{
 			return key.m_key;
 		}

@@ -26,10 +26,6 @@ namespace Engine
 		ECS::RegisterComponentManager<Camera>();
 		ECS::RegisterComponentManager<SimpleContact>();
 
-		// Event listeners will be components for now.
-		ECS::RegisterComponentManager<ContactEventListener>();
-		ECS::RegisterComponentManager<SensorEventListener>();
-
 		if (!ISDL::ImgInit(IMG_INIT_PNG))
 			ENGINE_CRITICAL("IMG Init failed! SDL_Error: " + std::string(ISDL::GetError()));
 

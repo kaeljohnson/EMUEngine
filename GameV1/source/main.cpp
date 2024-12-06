@@ -49,22 +49,22 @@ int main(int argc, char* args[])
 	ptrPhysicsBody->m_halfDimensions = ptrPhysicsBody->m_dimensions * 0.5f;
 	ptrPhysicsBody->m_bodyType = Engine::BodyType::DYNAMIC;
 
-	Engine::Physics::RegisterOnBeginContact(Engine::ContactKey(ptrPlayerEntity, ptrTestEntity),
+	Engine::Physics::RegisterOnBeginContactEventListener(Engine::MultiEntityContactKey(ptrPlayerEntity, ptrTestEntity),
 		[](Engine::BeginContact contact) {
 			CLIENT_INFO_D("Begin test contact");
 		});
 
-	Engine::Physics::RegisterOnEndContact(Engine::ContactKey(ptrPlayerEntity, ptrTestEntity),
+	Engine::Physics::RegisterOnEndContactEventListener(Engine::MultiEntityContactKey(ptrPlayerEntity, ptrTestEntity),
 		[](Engine::EndContact contact) {
 			CLIENT_INFO_D("End test contact");
 		});
 
-	Engine::Physics::RegisterOnBeginSensing(Engine::ContactKey(ptrPlayerEntity, ptrTestEntity),
+	Engine::Physics::RegisterOnBeginSensingEventListener(Engine::MultiEntityContactKey(ptrPlayerEntity, ptrTestEntity),
 		[](Engine::BeginSensing contact) {
 			CLIENT_INFO_D("Begin test sensing");
 		});
 
-	Engine::Physics::RegisterOnEndSensing(Engine::ContactKey(ptrPlayerEntity, ptrTestEntity),
+	Engine::Physics::RegisterOnEndSensingEventListener(Engine::MultiEntityContactKey(ptrPlayerEntity, ptrTestEntity),
 		[](Engine::EndSensing contact) {
 			CLIENT_INFO_D("End test sensing");
 		});

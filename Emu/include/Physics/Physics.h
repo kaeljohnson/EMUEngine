@@ -42,15 +42,27 @@ namespace Engine
 
 		static void Update();
 		static void ProcessContactEvents();
-		EMU_API static void RegisterOnBeginContact(ContactKey, std::function<void(BeginContact)> callback);
-		EMU_API static void RegisterOnEndContact(ContactKey, std::function<void(EndContact)> callback);
-		EMU_API static void RegisterOnBeginSensing(ContactKey, std::function<void(BeginSensing)> callback);	
-		EMU_API static void RegisterOnEndSensing(ContactKey, std::function<void(EndSensing)> callback);
+
+		// Should these be in the event system instead?
+		EMU_API static void RegisterOnBeginContactEventListener(SingleEntityContactKey, std::function<void(BeginContact)> callback);
+		EMU_API static void RegisterOnEndContactEventListener(SingleEntityContactKey, std::function<void(EndContact)> callback);
+		EMU_API static void RegisterOnBeginSensingEventListener(SingleEntityContactKey, std::function<void(BeginSensing)> callback);
+		EMU_API static void RegisterOnEndSensingEventListener(SingleEntityContactKey, std::function<void(EndSensing)> callback);
+		EMU_API static void RegisterOnBeginContactEventListener(MultiEntityContactKey, std::function<void(BeginContact)> callback);
+		EMU_API static void RegisterOnEndContactEventListener(MultiEntityContactKey, std::function<void(EndContact)> callback);
+		EMU_API static void RegisterOnBeginSensingEventListener(MultiEntityContactKey, std::function<void(BeginSensing)> callback);
+		EMU_API static void RegisterOnEndSensingEventListener(MultiEntityContactKey, std::function<void(EndSensing)> callback);
 	private:
 		static b2WorldId* m_ptrWorldId;
-		static std::unordered_map<ContactKey, std::function<void(BeginContact)>> m_onBeginContactMap;
-		static std::unordered_map<ContactKey, std::function<void(EndContact)>> m_onEndContactMap;
-		static std::unordered_map<ContactKey, std::function<void(BeginSensing)>> m_onBeginSensingMap;
-		static std::unordered_map<ContactKey, std::function<void(EndSensing)>> m_onEndSensingMap;
+
+		static std::unordered_map<SingleEntityContactKey, std::function<void(BeginContact)>> m_onBeginContactSingleEntityMap;
+		static std::unordered_map<SingleEntityContactKey, std::function<void(EndContact)>> m_onEndContactSingleEntityMap;
+		static std::unordered_map<SingleEntityContactKey, std::function<void(BeginSensing)>> m_onBeginSensingSingleEntityMap;
+		static std::unordered_map<SingleEntityContactKey, std::function<void(EndSensing)>> m_onEndSensingSingleEntityMap;
+
+		static std::unordered_map<MultiEntityContactKey, std::function<void(BeginContact)>> m_onBeginContactMultiEntityMap;
+		static std::unordered_map<MultiEntityContactKey, std::function<void(EndContact)>> m_onEndContactMultiEntityMap;
+		static std::unordered_map<MultiEntityContactKey, std::function<void(BeginSensing)>> m_onBeginSensingMultiEntityMap;
+		static std::unordered_map<MultiEntityContactKey, std::function<void(EndSensing)>> m_onEndSensingMultiEntityMap;
 	};
 }
