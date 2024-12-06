@@ -36,7 +36,7 @@ namespace Engine
         static IOEventQueue m_eventQ;
 
 		// move to Event listener class
-        static IOEventHandlerMap m_ioEventListeners;
+        static IOEventHandlerMap m_ioEventListenerMap;
 
         static std::unique_ptr<IOEventDispatcher> m_eventDispatcher;
     };

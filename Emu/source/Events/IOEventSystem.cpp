@@ -22,7 +22,7 @@ namespace Engine
      IOEventQueue IOEventSystem::m_eventQ;
 
     // move to Event listener class
-    IOEventHandlerMap IOEventSystem::m_ioEventListeners;
+    IOEventHandlerMap IOEventSystem::m_ioEventListenerMap;
 
     std::unique_ptr<IOEventDispatcher> IOEventSystem::m_eventDispatcher;
 
@@ -148,7 +148,7 @@ namespace Engine
 
     void IOEventSystem::RegisterIOEventListener(IOEventType type, IOEventHandler handler)
     {
-		m_ioEventListeners[type] = handler;
+		m_ioEventListenerMap[type] = handler;
 	}
 
 	void IOEventSystem::HandleEvents()
@@ -179,9 +179,9 @@ namespace Engine
         {
             IOEvent& currentEvent = m_eventQ.front();
 
-            if (m_ioEventListeners.find(currentEvent.Type) != m_ioEventListeners.end())
+            if (m_ioEventListenerMap.find(currentEvent.Type) != m_ioEventListenerMap.end())
             {
-                m_ioEventListeners[currentEvent.Type](currentEvent);
+                m_ioEventListenerMap[currentEvent.Type](currentEvent);
             }
 
             // if (!currentEvent.Handled)
