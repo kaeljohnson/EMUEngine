@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "../MathUtil.h"
-#include "Event.h"
+#include "IOEvent.h"
 
 #include "KeyStates.h"
 #include "MouseStates.h"
@@ -12,13 +12,13 @@
 
 namespace Engine
 {
-	class EventDispatcher
+	class IOEventDispatcher
 	{
     public:
-        EventDispatcher(std::queue<Event>& eventQ);
+        IOEventDispatcher(std::queue<IOEvent>& eventQ);
         void PollEvents();
     private:
-        void dispatchQuitEvent();
+        void dispatchQuitEvent();   
         void dispatchWindowEvent(SDL_WindowEvent& windowEvent);
         void dispatchKeydownEvent(SDL_Keycode& keyCode);
         void dispatchKeyupEvent(SDL_Keycode& keyCode);
@@ -27,9 +27,9 @@ namespace Engine
         void dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent);
         void dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent);
 
-        std::queue<Event>& refEventQ;
-        std::unordered_map<EventType, bool>& refKeyStates;
-        std::unordered_map<EventType, bool>& refMouseButtonStates;
+        std::queue<IOEvent>& refEventQ;
+        std::unordered_map<IOEventType, bool>& refKeyStates;
+        std::unordered_map<IOEventType, bool>& refMouseButtonStates;
         Vector2D<int>& refMousePosition;
         Vector2D<int>& refScrollDirection;
 	};

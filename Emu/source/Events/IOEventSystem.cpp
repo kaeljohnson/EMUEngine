@@ -4,9 +4,9 @@
 #include <memory>
 
 #include "../../include/ISDL/ISDL.h"
-#include "../../include/Events/EventManager.h"
-#include "../../include/Events/EventDispatcher.h"
-#include "../../include/Events/Event.h"
+#include "../../include/Events/IOEventSystem.h"
+#include "../../include/Events/IOEventDispatcher.h"
+#include "../../include/Events/IOEvent.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Events/KeyStates.h"
 #include "../../include/Events/MouseStates.h"
@@ -19,9 +19,17 @@ namespace Engine
     Vector2D<int> MouseStates::m_mousePosition;
 	Vector2D<int> MouseStates::m_scrollDirection;
 
+     IOEventQueue IOEventSystem::m_eventQ;
 
-    EventManager::EventManager() : m_eventDispatcher(std::make_unique<EventDispatcher>(m_eventQ))
+    // move to Event listener class
+    IOEventHandlerMap IOEventSystem::m_ioEventListenerMap;
+
+    std::unique_ptr<IOEventDispatcher> IOEventSystem::m_eventDispatcher;
+
+    void IOEventSystem::Initialize()
     {
+		m_eventDispatcher = std::make_unique<IOEventDispatcher>(m_eventQ);
+
         // Initialize all key down states to false
         KeyStates::m_keyStates[ESCAPE_KEY_DOWN] = false;
         KeyStates::m_keyStates[EQUALS_KEY_DOWN] = false;
@@ -138,12 +146,12 @@ namespace Engine
 
     }
 
-    void EventManager::RegisterEventHandler(EventType type, EventHandler handler)
+    void IOEventSystem::RegisterIOEventListener(IOEventType type, IOEventHandler handler)
     {
-		m_eventHandlers[type] = handler;
+		m_ioEventListenerMap[type] = handler;
 	}
 
-	void EventManager::HandleEvents()
+	void IOEventSystem::HandleEvents()
 	{
 		/*
 			Poll for SDLevents and dispatch them to their respective event types.
@@ -158,7 +166,7 @@ namespace Engine
         m_eventDispatcher->PollEvents();
 	}
 
-    void EventManager::ProcessEvents()
+    void IOEventSystem::ProcessEvents()
     {
 		/*
         	Process all events in the event queue. This function is called after 
@@ -169,11 +177,11 @@ namespace Engine
 
         while (!m_eventQ.empty())
         {
-            Event& currentEvent = m_eventQ.front();
+            IOEvent& currentEvent = m_eventQ.front();
 
-            if (m_eventHandlers.find(currentEvent.Type) != m_eventHandlers.end())
+            if (m_ioEventListenerMap.find(currentEvent.Type) != m_ioEventListenerMap.end())
             {
-                m_eventHandlers[currentEvent.Type](currentEvent);
+                m_ioEventListenerMap[currentEvent.Type](currentEvent);
             }
 
             // if (!currentEvent.Handled)

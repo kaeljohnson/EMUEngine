@@ -43,15 +43,15 @@ private:
 	bool m_onGround;
 	Engine::Vector2D<float> m_force;
 
-	const Engine::EventStatesMap& refKeyStates;
+	const Engine::IOEventStatesMap& refKeyStates;
 
-	Engine::EventType m_jumpKeyDown;
-	Engine::EventType m_jumpKeyUp;
+	Engine::IOEventType m_jumpKeyDown;
+	Engine::IOEventType m_jumpKeyUp;
 
-	Engine::EventType m_moveLeftKeyDown;
-	Engine::EventType m_moveLeftKeyUp;
-	Engine::EventType m_moveRightKeyDown;
-	Engine::EventType m_moveRightKeyUp;
+	Engine::IOEventType m_moveLeftKeyDown;
+	Engine::IOEventType m_moveLeftKeyUp;
+	Engine::IOEventType m_moveRightKeyDown;
+	Engine::IOEventType m_moveRightKeyUp;
 
 private:
 	void UpdateMovement();

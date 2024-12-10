@@ -2,16 +2,16 @@
 
 #include "../../include/ISDL/ISDL.h"
 
-#include "../../include/Events/EventDispatcher.h"
+#include "../../include/Events/IOEventDispatcher.h"
 
 namespace Engine
 {
-    EventDispatcher::EventDispatcher(std::queue<Event>& eventQ)
+    IOEventDispatcher::IOEventDispatcher(std::queue<IOEvent>& eventQ)
         : refEventQ(eventQ), refKeyStates(KeyStates::m_keyStates), refMouseButtonStates(MouseStates::m_mouseStates), 
         refMousePosition(MouseStates::m_mousePosition), refScrollDirection(MouseStates::m_scrollDirection)
     {}
 
-    void EventDispatcher::PollEvents()
+    void IOEventDispatcher::PollEvents()
     {
         /*
             Poll for SDLevents and dispatch them to their respective event types.
@@ -45,12 +45,12 @@ namespace Engine
         }
     }
 
-    void EventDispatcher::dispatchQuitEvent()
+    void IOEventDispatcher::dispatchQuitEvent()
     {
         refEventQ.push({ QUIT });
     }
 
-    void EventDispatcher::dispatchWindowEvent(SDL_WindowEvent& windowEvent)
+    void IOEventDispatcher::dispatchWindowEvent(SDL_WindowEvent& windowEvent)
     {
         switch (windowEvent.event)
         {
@@ -59,7 +59,7 @@ namespace Engine
         }
     }
 
-    void EventDispatcher::dispatchKeydownEvent(SDL_Keycode& keyCode)
+    void IOEventDispatcher::dispatchKeydownEvent(SDL_Keycode& keyCode)
     {
         switch (keyCode)
         {
@@ -117,7 +117,7 @@ namespace Engine
         }
     }
 
-    void EventDispatcher::dispatchKeyupEvent(SDL_Keycode& keyCode)
+    void IOEventDispatcher::dispatchKeyupEvent(SDL_Keycode& keyCode)
     {
         switch (keyCode)
         {
@@ -175,14 +175,14 @@ namespace Engine
         }
     }
 
-    void EventDispatcher::dispatchMouseMoveEvent(SDL_MouseMotionEvent& mouseMotion)
+    void IOEventDispatcher::dispatchMouseMoveEvent(SDL_MouseMotionEvent& mouseMotion)
     {
         refMousePosition.X = mouseMotion.x;
         refMousePosition.Y = mouseMotion.y;
         refEventQ.push({ MOUSE_MOVE, mouseMotion.x, mouseMotion.y });
     }
 
-    void EventDispatcher::dispatchMouseButtonDownEvent(SDL_MouseButtonEvent& mouseButtonEvent)
+    void IOEventDispatcher::dispatchMouseButtonDownEvent(SDL_MouseButtonEvent& mouseButtonEvent)
     {
         switch (mouseButtonEvent.button)
         {
@@ -192,7 +192,7 @@ namespace Engine
         default: break;
         }
     }
-    void EventDispatcher::dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent)
+    void IOEventDispatcher::dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent)
     {
         switch (mouseButtonEvent.button)
         {
@@ -202,7 +202,7 @@ namespace Engine
         default: break;
         }
     }
-    void EventDispatcher::dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent)
+    void IOEventDispatcher::dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent)
     {
         refScrollDirection.X = mouseWheelEvent.x;
         refScrollDirection.Y = mouseWheelEvent.y;

@@ -12,7 +12,6 @@ int main(int argc, char* args[])
 	CLIENT_INFO_D("Client Running!");
 
 	Engine::ApplicationPtr ptrAppInstance = Engine::Application::GetInstance();
-	Engine::EventManager& refEventManager = ptrAppInstance->GetEventManager();
 	Engine::CameraManager& refCameraManager = ptrAppInstance->GetCameraManager();
 	Engine::SceneManager& refSceneManager = ptrAppInstance->GetSceneManager();
 
@@ -35,6 +34,41 @@ int main(int argc, char* args[])
 
 	Player player(ptrPlayerEntity, 6.0f, 1.0f, 0.75f, 0.75f);
 
+	Engine::Entity* ptrTestEntity = Engine::ECS::CreateEntity();
+	ptrTestEntity->SetPriority(1);
+	scene->Add(ptrTestEntity);
+	Engine::ECS::GetComponentManager<Engine::Transform>().AddComponent(ptrTestEntity,
+		Engine::Vector2D(12.0f, 12.0f), Engine::Vector2D(1.0f, 1.0f), 1.0f, 1.0f, 1.0f);
+
+	Engine::ECS::GetComponentManager<Engine::PhysicsBody>().AddComponent(ptrTestEntity);
+	Engine::PhysicsBody* ptrPhysicsBody =
+		Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(ptrTestEntity);
+	ptrPhysicsBody->m_bodyType = Engine::BodyType::DYNAMIC;
+	ptrPhysicsBody->m_startingPosition = Engine::Vector2D<float>(12.0f, 12.0f);
+	ptrPhysicsBody->m_dimensions = Engine::Vector2D<float>(1.0f, 1.0f);
+	ptrPhysicsBody->m_halfDimensions = ptrPhysicsBody->m_dimensions * 0.5f;
+	ptrPhysicsBody->m_bodyType = Engine::BodyType::DYNAMIC;
+
+	Engine::Physics::RegisterOnBeginContactEventListener(Engine::MultiEntityContactKey(ptrPlayerEntity, ptrTestEntity),
+		[](Engine::BeginContact contact) {
+			CLIENT_INFO_D("Begin test contact");
+		});
+
+	Engine::Physics::RegisterOnEndContactEventListener(Engine::MultiEntityContactKey(ptrPlayerEntity, ptrTestEntity),
+		[](Engine::EndContact contact) {
+			CLIENT_INFO_D("End test contact");
+		});
+
+	Engine::Physics::RegisterOnBeginSensingEventListener(Engine::MultiEntityContactKey(ptrPlayerEntity, ptrTestEntity),
+		[](Engine::BeginSensing contact) {
+			CLIENT_INFO_D("Begin test sensing");
+		});
+
+	Engine::Physics::RegisterOnEndSensingEventListener(Engine::MultiEntityContactKey(ptrPlayerEntity, ptrTestEntity),
+		[](Engine::EndSensing contact) {
+			CLIENT_INFO_D("End test sensing");
+		});
+
 	Engine::Entity* ptrCameraEntity = Engine::ECS::CreateEntity();
 	ptrCameraEntity->SetPriority(0);
 
@@ -48,7 +82,7 @@ int main(int argc, char* args[])
 
 	refSceneManager.LoadScene("Level1");
 
-	AppManagementEventHandlers appManagementEventHandlers(refEventManager, ptrCameraEntity, ptrPlayerEntity);
+	AppManagementEventHandlers appManagementEventHandlers(ptrCameraEntity, ptrPlayerEntity);
 
 	ptrAppInstance->Start();
 	// Need to figure out how to change scenes, stop scenes, etc.

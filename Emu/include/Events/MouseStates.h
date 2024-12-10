@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-#include "Event.h"
+#include "IOEvent.h"
 
 #include "../Core.h"
 #include "../MathUtil.h"
@@ -10,7 +10,7 @@
 
 namespace Engine
 {
-	using MouseStatesMap = std::unordered_map<EventType, bool>;
+	using MouseStatesMap = std::unordered_map<IOEventType, bool>;
 
 	struct MouseStates
 	{
@@ -23,7 +23,7 @@ namespace Engine
 		static Vector2D<int> m_mousePosition;
 		static Vector2D<int> m_scrollDirection;
 
-		friend class EventDispatcher;
-		friend class EventManager;
+		friend class IOEventDispatcher;
+		friend class IOEventSystem;
 	};
 }

@@ -5,9 +5,9 @@
 #include "../../include/EventHandlers/AppManagementEventHandlers.h"
 
 
-AppManagementEventHandlers::AppManagementEventHandlers(Engine::EventManager& eventManager, Engine::Entity* cameraEntity, Engine::Entity* playerEntity) 
+AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEntity, Engine::Entity* playerEntity) 
 {
-	eventManager.RegisterEventHandler(Engine::F_KEY_DOWN, [](Engine::Event& e)
+	Engine::IOEventSystem::RegisterIOEventListener(Engine::F_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			Engine::ICallbackSystem::GetInstance()->TriggerCallback(Engine::Type::ToggleFullscreen, std::monostate{});
 			// Could add a setter for handled state and put the trace in there.
@@ -15,54 +15,54 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::EventManager& eve
 			e.Handled = true;
 		});
 
-	eventManager.RegisterEventHandler(Engine::RESIZE_WINDOW, [](Engine::Event& e)
+	Engine::IOEventSystem::RegisterIOEventListener(Engine::RESIZE_WINDOW, [](Engine::IOEvent& e)
 		{
 			Engine::ICallbackSystem::GetInstance()->TriggerCallback(Engine::Type::ResizeWindow, std::make_pair(e.X_POS, e.Y_POS));
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::RESIZE_WINDOW)));
 			e.Handled = true;
 		});
 
-	eventManager.RegisterEventHandler(Engine::ESCAPE_KEY_DOWN, [](Engine::Event& e)
+	Engine::IOEventSystem::RegisterIOEventListener(Engine::ESCAPE_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::ESCAPE_KEY_DOWN)));
 			Engine::ICallbackSystem::GetInstance()->TriggerCallback(Engine::Type::EndApplication, std::monostate{});
 			e.Handled = true;
 		});
 
-	eventManager.RegisterEventHandler(Engine::QUIT, [](Engine::Event& e)
+	Engine::IOEventSystem::RegisterIOEventListener(Engine::QUIT, [](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::QUIT)));
 			Engine::ICallbackSystem::GetInstance()->TriggerCallback(Engine::Type::EndApplication, std::monostate{});
 			e.Handled = true;
 		});
 
-	eventManager.RegisterEventHandler(Engine::G_KEY_DOWN, [&](Engine::Event& e)
+	Engine::IOEventSystem::RegisterIOEventListener(Engine::G_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::G_KEY_DOWN)));
 			Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(cameraEntity)->SetPixelsPerUnit(16);
 			e.Handled = true;
 		});
 
-	eventManager.RegisterEventHandler(Engine::H_KEY_DOWN, [&](Engine::Event& e)
+	Engine::IOEventSystem::RegisterIOEventListener(Engine::H_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::H_KEY_DOWN)));
 			Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(cameraEntity)->SetPixelsPerUnit(32);
 			e.Handled = true;
 		});
 	
-	eventManager.RegisterEventHandler(Engine::L_KEY_DOWN, [&](Engine::Event& e)
+	Engine::IOEventSystem::RegisterIOEventListener(Engine::L_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::L_KEY_DOWN)));
 			Engine::Application::GetInstance()->GetSceneManager().LoadScene("Level2");
 			e.Handled = true;
 		});
 
-	eventManager.RegisterEventHandler(Engine::O_KEY_DOWN, [&](Engine::Event& e)
+	Engine::IOEventSystem::RegisterIOEventListener(Engine::O_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			Engine::ECS::Deactivate(playerEntity);
 		});
 
-	eventManager.RegisterEventHandler(Engine::O_KEY_UP, [&](Engine::Event& e)
+	Engine::IOEventSystem::RegisterIOEventListener(Engine::O_KEY_UP, [&](Engine::IOEvent& e)
 		{
 			Engine::ECS::Activate(playerEntity);
 		});

@@ -32,12 +32,16 @@
 
 		Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
 
-		Engine::ECS::GetComponentManager<Engine::ContactEventListener>().AddComponent(ptrEntity, 
-            [this](Engine::BeginContact beginContact) { OnBeginContact(beginContact); },
-            [this](Engine::EndContact endContact) { OnEndContact(endContact); });
+		Engine::Physics::RegisterOnBeginContactEventListener(Engine::SingleEntityContactKey(ptrEntity),
+			[this](Engine::BeginContact beginContact) { OnBeginContact(beginContact); });
 
-		Engine::ECS::GetComponentManager<Engine::SensorEventListener>().AddComponent(ptrEntity,
-			[this](Engine::BeginSensing beginSensing) { OnBeginSensing(beginSensing); },
+		Engine::Physics::RegisterOnEndContactEventListener(Engine::SingleEntityContactKey(ptrEntity),
+			[this](Engine::EndContact endContact) { OnEndContact(endContact); });
+
+		Engine::Physics::RegisterOnBeginSensingEventListener(Engine::SingleEntityContactKey(ptrEntity),
+			[this](Engine::BeginSensing beginSensing) { OnBeginSensing(beginSensing); });
+
+		Engine::Physics::RegisterOnEndSensingEventListener(Engine::SingleEntityContactKey(ptrEntity),
 			[this](Engine::EndSensing endSensing) { OnEndSensing(endSensing); });
 
         Engine::ECS::GetComponentManager<Engine::SimpleContact>().AddComponent(ptrEntity);
