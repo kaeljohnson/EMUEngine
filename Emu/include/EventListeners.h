@@ -1,5 +1,6 @@
 #pragma once
 
+#include <variant>
 #include <functional>
 #include <cstddef>
 #include <utility>
@@ -12,6 +13,9 @@
 
 namespace Engine
 {
+	
+
+	// Begin contact event handling
 	struct SingleEntityContactKey
 	{
 		SingleEntityContactKey(const Entity* entity)
@@ -47,45 +51,41 @@ namespace Engine
 		}
 	};
 
-	// Temp
-	struct BeginContact
+	struct ContactEvent
 	{
-		BeginContact(Entity* ptrEntityA, Entity* ptrEntityB, Vector2D<float> normalVec)
+		ContactEvent(Entity* ptrEntityA, Entity* ptrEntityB)
 			: m_ptrEntityA(ptrEntityA), m_ptrEntityB(ptrEntityB) {}
 
 		Entity* m_ptrEntityA;
 		Entity* m_ptrEntityB;
+	};
+
+	struct BeginContact : public ContactEvent
+	{
+		BeginContact(Entity* ptrEntityA, Entity* ptrEntityB, Vector2D<float> normalVec)
+			: m_normalVec(normalVec), ContactEvent(ptrEntityA, ptrEntityB) {}
+
 		Vector2D<float> m_normalVec;
 	};
 
-	struct EndContact
+	struct EndContact : public ContactEvent
 	{
 		EndContact(Entity* ptrEntityA, Entity* ptrEntityB)
-			: m_ptrEntityA(ptrEntityA), m_ptrEntityB(ptrEntityB) {}
-
-		Entity* m_ptrEntityA;
-		Entity* m_ptrEntityB;
+			: ContactEvent(ptrEntityA, ptrEntityB) {}
 	};
 
-	struct BeginSensing
+	struct BeginSensing : public ContactEvent
 	{
 		BeginSensing(Entity* ptrEntityA, Entity* ptrEntityB)
-			: m_ptrEntityA(ptrEntityA), m_ptrEntityB(ptrEntityB) {}
-
-		Entity* m_ptrEntityA;
-		Entity* m_ptrEntityB;
+			: ContactEvent(ptrEntityA, ptrEntityB) {}
 	};
 
-	struct EndSensing
+	struct EndSensing : public ContactEvent
 	{
 		EndSensing(Entity* ptrEntityA, Entity* ptrEntityB)
-			: m_ptrEntityA(ptrEntityA), m_ptrEntityB(ptrEntityB) {}
-
-		Entity* m_ptrEntityA;
-		Entity* m_ptrEntityB;
+			: ContactEvent(ptrEntityA, ptrEntityB) {}
 	};
 
-	// May be a better way to do this... Via an event listener system?
 	struct ContactEventListener
 	{
 		ContactEventListener(Entity* ptrEntity,
@@ -97,7 +97,7 @@ namespace Engine
 		std::function<void(EndContact)> m_onEndContact;
 	};
 
-	struct SensorEventListener
+	struct SensorEventListener        
 	{
 		SensorEventListener(Entity* ptrEntity,
 			std::function<void(BeginSensing)> onBeginSensing,
