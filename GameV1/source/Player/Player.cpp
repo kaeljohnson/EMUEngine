@@ -34,8 +34,8 @@
 
         CLIENT_CRITICAL_D("Player Entity ID: " + std::to_string(ptrEntity->GetID()));
 
-		Engine::Physics::RegisterContactListener(new PlayerContactListener(ptrEntity));
-		Engine::Physics::RegisterContactListener(new PlayerSensorListener(ptrEntity));
+		Engine::ContactSystem::RegisterContactListener(new PlayerContactListener(ptrEntity));
+		Engine::ContactSystem::RegisterContactListener(new PlayerSensorListener(ptrEntity));
 
 
         Engine::ECS::GetComponentManager<Engine::SimpleContact>().AddComponent(ptrEntity);

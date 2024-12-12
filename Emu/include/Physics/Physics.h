@@ -4,8 +4,7 @@
 #include "../Core.h"
 #include "../MathUtil.h"
 
-#include "ContactEvents.h"
-#include "ContactEventSystem.h"
+#include "ContactSystem.h"
 
 struct b2WorldId;
 
@@ -42,29 +41,8 @@ namespace Engine
 		static void DestroyWorld();
 
 		static void Update();
-		static void ProcessContactEvents();
-
-		// Should these be in the event system instead?
-		EMU_API static void RegisterContactListener(SingleEntityContactListener*);
-		EMU_API static void RegisterContactListener(MultiEntityContactListener*);
-		EMU_API static void RegisterContactListener(SingleEntitySensorListener*);
-		EMU_API static void RegisterContactListener(MultiEntitySensorListener*);
-
-		EMU_API static void RegisterContactEventHandler(SingleEntityBeginContactKey key, std::function<void(const ContactEvent&)> handler);
-		EMU_API static void RegisterContactEventHandler(SingleEntityEndContactKey key, std::function<void(const ContactEvent&)> handler);
-		EMU_API static void RegisterContactEventHandler(MultiEntityBeginContactKey key, std::function<void(const ContactEvent&)> handler);
-		EMU_API static void RegisterContactEventHandler(MultiEntityEndContactKey key, std::function<void(const ContactEvent&)> handler);
+		
 	private:
 		static b2WorldId* m_ptrWorldId;
-
-		static std::unordered_map<size_t, SingleEntityContactListener*> m_singleEntityContactListeners;
-		static std::unordered_map<size_t, MultiEntityContactListener*> m_multiEntityContactListeners;
-		static std::unordered_map<size_t, SingleEntitySensorListener*> m_singleEntitySensorListeners;
-		static std::unordered_map<size_t, MultiEntitySensorListener*> m_multiEntitySensorListeners;
-
-		static std::unordered_map<SingleEntityBeginContactKey, std::function<void(const ContactEvent&)>> m_beginContactEventHandlers;
-		static std::unordered_map<SingleEntityEndContactKey, std::function<void(const ContactEvent&)>> m_endContactEventHandlers;
-		static std::unordered_map<MultiEntityBeginContactKey, std::function<void(const ContactEvent&)>> m_multiContactEventHandlers;
-		static std::unordered_map<MultiEntityEndContactKey, std::function<void(const ContactEvent&)>> m_multiEndContactEventHandlers;
 	};
 }

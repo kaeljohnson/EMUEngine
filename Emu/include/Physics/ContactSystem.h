@@ -4,7 +4,11 @@
 #include <cstddef>
 #include <utility>
 
+#include "../Core.h"
+
 #include "../ECS/Entity.h"
+#include "../ECS/ECS.h"
+#include "../Components.h"
 
 #include "../MathUtil.h"
 
@@ -128,6 +132,34 @@ namespace Engine
 	{
 		MultiEntitySensorListener(Entity* entity1, Entity* entity2)
 			: ContactListener(GenerateKey(entity1->GetID(), entity2->GetID())) {}
+	};
+
+	class ContactSystem
+	{
+	public:
+		static void ProcessContacts(void* ptrWorldId);
+
+		// Should these be in the event system instead?
+		EMU_API static void RegisterContactListener(SingleEntityContactListener*);
+		EMU_API static void RegisterContactListener(MultiEntityContactListener*);
+		EMU_API static void RegisterContactListener(SingleEntitySensorListener*);
+		EMU_API static void RegisterContactListener(MultiEntitySensorListener*);
+
+		EMU_API static void RegisterContactEventHandler(SingleEntityBeginContactKey key, std::function<void(const ContactEvent&)> handler);
+		EMU_API static void RegisterContactEventHandler(SingleEntityEndContactKey key, std::function<void(const ContactEvent&)> handler);
+		EMU_API static void RegisterContactEventHandler(MultiEntityBeginContactKey key, std::function<void(const ContactEvent&)> handler);
+		EMU_API static void RegisterContactEventHandler(MultiEntityEndContactKey key, std::function<void(const ContactEvent&)> handler);
+
+	private:
+		static std::unordered_map<size_t, SingleEntityContactListener*> m_singleEntityContactListeners;
+		static std::unordered_map<size_t, MultiEntityContactListener*> m_multiEntityContactListeners;
+		static std::unordered_map<size_t, SingleEntitySensorListener*> m_singleEntitySensorListeners;
+		static std::unordered_map<size_t, MultiEntitySensorListener*> m_multiEntitySensorListeners;
+
+		static std::unordered_map<SingleEntityBeginContactKey, std::function<void(const ContactEvent&)>> m_beginContactEventHandlers;
+		static std::unordered_map<SingleEntityEndContactKey, std::function<void(const ContactEvent&)>> m_endContactEventHandlers;
+		static std::unordered_map<MultiEntityBeginContactKey, std::function<void(const ContactEvent&)>> m_multiContactEventHandlers;
+		static std::unordered_map<MultiEntityEndContactKey, std::function<void(const ContactEvent&)>> m_multiEndContactEventHandlers;
 	};
 }
 

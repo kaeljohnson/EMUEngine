@@ -84,10 +84,10 @@ int main(int argc, char* args[])
 	TestContactListener testContactListener(ptrPlayerEntity, ptrTestEntity);
 	TestSensorListener testSensorListener(ptrPlayerEntity, ptrTestEntity);
 
-	Engine::Physics::RegisterContactListener(&testContactListener);
-	Engine::Physics::RegisterContactListener(&testSensorListener);
+	Engine::ContactSystem::RegisterContactListener(&testContactListener);
+	Engine::ContactSystem::RegisterContactListener(&testSensorListener);
 
-	Engine::Physics::RegisterContactEventHandler(Engine::MultiEntityBeginContactKey(ptrPlayerEntity, ptrTestEntity), [](Engine::ContactEvent event)
+	Engine::ContactSystem::RegisterContactEventHandler(Engine::SingleEntityBeginContactKey(ptrTestEntity), [](Engine::ContactEvent event)
 		{
 			CLIENT_INFO_D("TEST");
 		});
