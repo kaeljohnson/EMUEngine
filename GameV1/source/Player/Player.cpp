@@ -32,17 +32,11 @@
 
 		Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
 
-		Engine::Physics::RegisterOnBeginContactEventListener(Engine::SingleEntityContactKey(ptrEntity),
-			[this](Engine::BeginContact beginContact) { OnBeginContact(beginContact); });
+        CLIENT_CRITICAL_D("Player Entity ID: " + std::to_string(ptrEntity->GetID()));
 
-		Engine::Physics::RegisterOnEndContactEventListener(Engine::SingleEntityContactKey(ptrEntity),
-			[this](Engine::EndContact endContact) { OnEndContact(endContact); });
+		Engine::Physics::RegisterContactListener(new PlayerContactListener(ptrEntity));
+		Engine::Physics::RegisterContactListener(new PlayerSensorListener(ptrEntity));
 
-		Engine::Physics::RegisterOnBeginSensingEventListener(Engine::SingleEntityContactKey(ptrEntity),
-			[this](Engine::BeginSensing beginSensing) { OnBeginSensing(beginSensing); });
-
-		Engine::Physics::RegisterOnEndSensingEventListener(Engine::SingleEntityContactKey(ptrEntity),
-			[this](Engine::EndSensing endSensing) { OnEndSensing(endSensing); });
 
         Engine::ECS::GetComponentManager<Engine::SimpleContact>().AddComponent(ptrEntity);
     }

@@ -4,7 +4,8 @@
 #include "../Core.h"
 #include "../MathUtil.h"
 
-#include "../EventListeners.h"
+#include "ContactEvents.h"
+#include "ContactEventSystem.h"
 
 struct b2WorldId;
 
@@ -44,25 +45,26 @@ namespace Engine
 		static void ProcessContactEvents();
 
 		// Should these be in the event system instead?
-		EMU_API static void RegisterOnBeginContactEventListener(SingleEntityContactKey, std::function<void(BeginContact)> callback);
-		EMU_API static void RegisterOnEndContactEventListener(SingleEntityContactKey, std::function<void(EndContact)> callback);
-		EMU_API static void RegisterOnBeginSensingEventListener(SingleEntityContactKey, std::function<void(BeginSensing)> callback);
-		EMU_API static void RegisterOnEndSensingEventListener(SingleEntityContactKey, std::function<void(EndSensing)> callback);
-		EMU_API static void RegisterOnBeginContactEventListener(MultiEntityContactKey, std::function<void(BeginContact)> callback);
-		EMU_API static void RegisterOnEndContactEventListener(MultiEntityContactKey, std::function<void(EndContact)> callback);
-		EMU_API static void RegisterOnBeginSensingEventListener(MultiEntityContactKey, std::function<void(BeginSensing)> callback);
-		EMU_API static void RegisterOnEndSensingEventListener(MultiEntityContactKey, std::function<void(EndSensing)> callback);
+		EMU_API static void RegisterContactListener(SingleEntityContactListener*);
+		EMU_API static void RegisterContactListener(MultiEntityContactListener*);
+		EMU_API static void RegisterContactListener(SingleEntitySensorListener*);
+		EMU_API static void RegisterContactListener(MultiEntitySensorListener*);
+
+		EMU_API static void RegisterContactEventHandler(SingleEntityBeginContactKey key, std::function<void(const ContactEvent&)> handler);
+		EMU_API static void RegisterContactEventHandler(SingleEntityEndContactKey key, std::function<void(const ContactEvent&)> handler);
+		EMU_API static void RegisterContactEventHandler(MultiEntityBeginContactKey key, std::function<void(const ContactEvent&)> handler);
+		EMU_API static void RegisterContactEventHandler(MultiEntityEndContactKey key, std::function<void(const ContactEvent&)> handler);
 	private:
 		static b2WorldId* m_ptrWorldId;
 
-		static std::unordered_map<SingleEntityContactKey, std::function<void(BeginContact)>> m_onBeginContactSingleEntityMap;
-		static std::unordered_map<SingleEntityContactKey, std::function<void(EndContact)>> m_onEndContactSingleEntityMap;
-		static std::unordered_map<SingleEntityContactKey, std::function<void(BeginSensing)>> m_onBeginSensingSingleEntityMap;
-		static std::unordered_map<SingleEntityContactKey, std::function<void(EndSensing)>> m_onEndSensingSingleEntityMap;
+		static std::unordered_map<size_t, SingleEntityContactListener*> m_singleEntityContactListeners;
+		static std::unordered_map<size_t, MultiEntityContactListener*> m_multiEntityContactListeners;
+		static std::unordered_map<size_t, SingleEntitySensorListener*> m_singleEntitySensorListeners;
+		static std::unordered_map<size_t, MultiEntitySensorListener*> m_multiEntitySensorListeners;
 
-		static std::unordered_map<MultiEntityContactKey, std::function<void(BeginContact)>> m_onBeginContactMultiEntityMap;
-		static std::unordered_map<MultiEntityContactKey, std::function<void(EndContact)>> m_onEndContactMultiEntityMap;
-		static std::unordered_map<MultiEntityContactKey, std::function<void(BeginSensing)>> m_onBeginSensingMultiEntityMap;
-		static std::unordered_map<MultiEntityContactKey, std::function<void(EndSensing)>> m_onEndSensingMultiEntityMap;
+		static std::unordered_map<SingleEntityBeginContactKey, std::function<void(const ContactEvent&)>> m_beginContactEventHandlers;
+		static std::unordered_map<SingleEntityEndContactKey, std::function<void(const ContactEvent&)>> m_endContactEventHandlers;
+		static std::unordered_map<MultiEntityBeginContactKey, std::function<void(const ContactEvent&)>> m_multiContactEventHandlers;
+		static std::unordered_map<MultiEntityEndContactKey, std::function<void(const ContactEvent&)>> m_multiEndContactEventHandlers;
 	};
 }

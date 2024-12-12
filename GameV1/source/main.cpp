@@ -5,6 +5,38 @@
 #include "../include/Player/Player.h"
 #include "../include/Camera/PlayerCamera.h"
 
+struct TestContactListener : public Engine::MultiEntityContactListener
+{
+	TestContactListener(Engine::Entity* ptrEntity1, Engine::Entity* ptrEntity2) 
+		: Engine::MultiEntityContactListener(ptrEntity1, ptrEntity2) {}
+
+	void OnContactBegin(const Engine::ContactEvent event) override
+	{
+		CLIENT_INFO_D("Contact Begin");
+	}
+
+	void OnContactEnd(const Engine::ContactEvent event) override
+	{
+		CLIENT_INFO_D("Contact End");
+	}
+};
+
+struct TestSensorListener : public Engine::MultiEntitySensorListener
+{
+	TestSensorListener(Engine::Entity* ptrEntity1, Engine::Entity* ptrEntity2) 
+		: Engine::MultiEntitySensorListener(ptrEntity1, ptrEntity2) {}
+
+	void OnContactBegin(const Engine::ContactEvent event) override
+	{
+		CLIENT_INFO_D("Sensor Begin");
+	}
+
+	void OnContactEnd(const Engine::ContactEvent event)
+	{
+		CLIENT_INFO_D("Sensor End");
+	}
+};
+
 int main(int argc, char* args[])
 {
 	Engine::Init();
@@ -49,24 +81,15 @@ int main(int argc, char* args[])
 	ptrPhysicsBody->m_halfDimensions = ptrPhysicsBody->m_dimensions * 0.5f;
 	ptrPhysicsBody->m_bodyType = Engine::BodyType::DYNAMIC;
 
-	Engine::Physics::RegisterOnBeginContactEventListener(Engine::MultiEntityContactKey(ptrPlayerEntity, ptrTestEntity),
-		[](Engine::BeginContact contact) {
-			CLIENT_INFO_D("Begin test contact");
-		});
+	TestContactListener testContactListener(ptrPlayerEntity, ptrTestEntity);
+	TestSensorListener testSensorListener(ptrPlayerEntity, ptrTestEntity);
 
-	Engine::Physics::RegisterOnEndContactEventListener(Engine::MultiEntityContactKey(ptrPlayerEntity, ptrTestEntity),
-		[](Engine::EndContact contact) {
-			CLIENT_INFO_D("End test contact");
-		});
+	Engine::Physics::RegisterContactListener(&testContactListener);
+	Engine::Physics::RegisterContactListener(&testSensorListener);
 
-	Engine::Physics::RegisterOnBeginSensingEventListener(Engine::MultiEntityContactKey(ptrPlayerEntity, ptrTestEntity),
-		[](Engine::BeginSensing contact) {
-			CLIENT_INFO_D("Begin test sensing");
-		});
-
-	Engine::Physics::RegisterOnEndSensingEventListener(Engine::MultiEntityContactKey(ptrPlayerEntity, ptrTestEntity),
-		[](Engine::EndSensing contact) {
-			CLIENT_INFO_D("End test sensing");
+	Engine::Physics::RegisterContactEventHandler(Engine::MultiEntityBeginContactKey(ptrPlayerEntity, ptrTestEntity), [](Engine::ContactEvent event)
+		{
+			CLIENT_INFO_D("TEST");
 		});
 
 	Engine::Entity* ptrCameraEntity = Engine::ECS::CreateEntity();

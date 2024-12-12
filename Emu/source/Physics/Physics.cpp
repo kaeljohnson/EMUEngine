@@ -4,7 +4,6 @@
 
 #include "../../include/Physics/Physics.h"
 #include "../../include/Components.h"
-#include "../../include/EventListeners.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Time.h"
 #include "../../include/Logging/Logger.h"
@@ -14,14 +13,16 @@
 namespace Engine
 {
 	b2WorldId* Physics::m_ptrWorldId = nullptr;
-	std::unordered_map<SingleEntityContactKey, std::function<void(BeginContact)>> Physics::m_onBeginContactSingleEntityMap;
-	std::unordered_map<SingleEntityContactKey, std::function<void(EndContact)>> Physics::m_onEndContactSingleEntityMap;
-	std::unordered_map<SingleEntityContactKey, std::function<void(BeginSensing)>> Physics::m_onBeginSensingSingleEntityMap;
-	std::unordered_map<SingleEntityContactKey, std::function<void(EndSensing)>> Physics::m_onEndSensingSingleEntityMap;
-	std::unordered_map<MultiEntityContactKey, std::function<void(BeginContact)>> Physics::m_onBeginContactMultiEntityMap;
-	std::unordered_map<MultiEntityContactKey, std::function<void(EndContact)>> Physics::m_onEndContactMultiEntityMap;
-	std::unordered_map<MultiEntityContactKey, std::function<void(BeginSensing)>> Physics::m_onBeginSensingMultiEntityMap;
-	std::unordered_map<MultiEntityContactKey, std::function<void(EndSensing)>> Physics::m_onEndSensingMultiEntityMap;
+
+	std::unordered_map<size_t, SingleEntityContactListener*> Physics::m_singleEntityContactListeners;
+	std::unordered_map<size_t, MultiEntityContactListener*> Physics::m_multiEntityContactListeners;
+	std::unordered_map<size_t, SingleEntitySensorListener*> Physics::m_singleEntitySensorListeners;
+	std::unordered_map<size_t, MultiEntitySensorListener*> Physics::m_multiEntitySensorListeners;
+
+	std::unordered_map<SingleEntityBeginContactKey, std::function<void(const ContactEvent&)>> Physics::m_beginContactEventHandlers;
+	std::unordered_map<SingleEntityEndContactKey, std::function<void(const ContactEvent&)>> Physics::m_endContactEventHandlers;
+	std::unordered_map<MultiEntityBeginContactKey, std::function<void(const ContactEvent&)>> Physics::m_multiContactEventHandlers;
+	std::unordered_map<MultiEntityEndContactKey, std::function<void(const ContactEvent&)>> Physics::m_multiEndContactEventHandlers;
 
 	// Physics System
 	void Physics::SetPosition(Entity* ptrEntity, Vector2D<float> position)
@@ -156,6 +157,8 @@ namespace Engine
 
 	void Physics::AddPhysicsBodiesToWorld()
 	{
+		ENGINE_CRITICAL_D("map size single entities: " + std::to_string(m_singleEntityContactListeners.size()));
+
 		ComponentManager<PhysicsBody>& physicsBodyManager = ECS::GetComponentManager<PhysicsBody>();
 		for (PhysicsBody& refPhysicsBody : physicsBodyManager)
 		{
@@ -237,7 +240,7 @@ namespace Engine
 
 				float normalDirection = 1.0f;
 
-				if ((Entity*)b2Body_GetUserData(b2Shape_GetBody(contact->shapeIdB)) == ptrEntity) 
+				if ((Entity*)b2Body_GetUserData(b2Shape_GetBody(contact->shapeIdB)) == ptrEntity)
 				{
 					normalDirection = -1.0f;
 				}
@@ -265,11 +268,12 @@ namespace Engine
 					// ENGINE_CRITICAL_D("Contact Left!");
 					simpleContact.m_contactLeft = true;
 				}
-			} 
+			}
 		}
 
 
-		// Is there a point to having event listeners be part of the ECS? Consider they fire when an event happens? Not sequentially in a component manager.
+		// Is there a point to having event listeners be part of the ECS? 
+		// Consider they fire when an event happens? Not sequentially in a component manager.
 		// Process ContactListeners
 
 		// May need to ensure that only one contact event is created per contact. 
@@ -289,16 +293,42 @@ namespace Engine
 			// normal points from A to B
 			Vector2D<float> normal = Vector2D(beginEvent->manifold.normal.x, beginEvent->manifold.normal.y);
 
-			auto beginSingleContactIterator = m_onBeginContactSingleEntityMap.find(SingleEntityContactKey(entityA));
-			if (beginSingleContactIterator != m_onBeginContactSingleEntityMap.end())
+			// Process Listeners
+			auto beginSingleContactIteratorA = m_singleEntityContactListeners.find(entityA->GetID());
+			if (beginSingleContactIteratorA != m_singleEntityContactListeners.end())
 			{
-				beginSingleContactIterator->second(BeginContact(entityA, entityB, normal));
+				beginSingleContactIteratorA->second->OnContactBegin(BeginContact(entityA, entityB, normal));
 			}
 
-			auto multiContactIterator = m_onBeginContactMultiEntityMap.find(MultiEntityContactKey(entityA, entityB));
-			if (multiContactIterator != m_onBeginContactMultiEntityMap.end())
+			auto beginSingleContactIteratorB = m_singleEntityContactListeners.find(entityB->GetID());
+			if (beginSingleContactIteratorB != m_singleEntityContactListeners.end())
 			{
-				multiContactIterator->second(BeginContact(entityA, entityB, normal));
+				beginSingleContactIteratorB->second->OnContactBegin(BeginContact(entityB, entityA, normal * -1.0f));
+			}
+
+			auto multiContactIterator = m_multiEntityContactListeners.find(GenerateKey(entityA->GetID(), entityB->GetID()));
+			if (multiContactIterator != m_multiEntityContactListeners.end())
+			{
+				multiContactIterator->second->OnContactBegin(BeginContact(entityA, entityB, normal));
+			}
+
+			// Process Event Handlers
+			auto singleContactEventHandlerA = m_beginContactEventHandlers.find(SingleEntityBeginContactKey(entityA));
+			if (singleContactEventHandlerA != m_beginContactEventHandlers.end())
+			{
+				singleContactEventHandlerA->second(BeginContact(entityA, entityB, normal));
+			}
+
+			auto singleContactEventHandlerB = m_beginContactEventHandlers.find(SingleEntityBeginContactKey(entityB));
+			if (singleContactEventHandlerB != m_beginContactEventHandlers.end())
+			{
+				singleContactEventHandlerB->second(BeginContact(entityB, entityA, normal * -1.0f));
+			}
+
+			auto multiContactEventHandler = m_multiContactEventHandlers.find(MultiEntityBeginContactKey(entityA, entityB));
+			if (multiContactEventHandler != m_multiContactEventHandlers.end())
+			{
+				multiContactEventHandler->second(BeginContact(entityA, entityB, normal));
 			}
 		}
 
@@ -312,16 +342,42 @@ namespace Engine
 			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
 			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
-			auto endSingleContactIterator = m_onEndContactSingleEntityMap.find(SingleEntityContactKey(entityA));
-			if (endSingleContactIterator != m_onEndContactSingleEntityMap.end())
+			// Process Listeners
+			auto endSingleContactIteratorA = m_singleEntityContactListeners.find(entityA->GetID());
+			if (endSingleContactIteratorA != m_singleEntityContactListeners.end())
 			{
-				endSingleContactIterator->second(EndContact(entityA, entityB));
+				endSingleContactIteratorA->second->OnContactEnd(EndContact(entityA, entityB));
 			}
 
-			auto endMultiContactIterator = m_onEndContactMultiEntityMap.find(MultiEntityContactKey(entityA, entityB));
-			if (endMultiContactIterator != m_onEndContactMultiEntityMap.end())
+			auto endSingleContactIteratorB = m_singleEntityContactListeners.find(entityB->GetID());
+			if (endSingleContactIteratorB != m_singleEntityContactListeners.end())
 			{
-				endMultiContactIterator->second(EndContact(entityA, entityB));
+				endSingleContactIteratorB->second->OnContactEnd(EndContact(entityB, entityA));
+			}
+
+			auto endMultiContactIterator = m_multiEntityContactListeners.find(GenerateKey(entityA->GetID(), entityB->GetID()));
+			if (endMultiContactIterator != m_multiEntityContactListeners.end())
+			{
+				endMultiContactIterator->second->OnContactEnd(EndContact(entityA, entityB));
+			}
+
+			// Process handlers
+			auto singleContactEventHandlerA = m_endContactEventHandlers.find(SingleEntityEndContactKey(entityA));
+			if (singleContactEventHandlerA != m_endContactEventHandlers.end())
+			{
+				singleContactEventHandlerA->second(EndContact(entityA, entityB));
+			}
+
+			auto singleContactEventHandlerB = m_endContactEventHandlers.find(SingleEntityEndContactKey(entityB));
+			if (singleContactEventHandlerB != m_endContactEventHandlers.end())
+			{
+				singleContactEventHandlerB->second(EndContact(entityB, entityA));
+			}
+
+			auto multiContactEventHandler = m_multiEndContactEventHandlers.find(MultiEntityEndContactKey(entityA, entityB));
+			if (multiContactEventHandler != m_multiEndContactEventHandlers.end())
+			{
+				multiContactEventHandler->second(EndContact(entityA, entityB));
 			}
 		}
 
@@ -342,16 +398,42 @@ namespace Engine
 			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
 			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
-			auto beginSingleSensingIterator = m_onBeginSensingSingleEntityMap.find(SingleEntityContactKey(entityA));
-			if (beginSingleSensingIterator != m_onBeginSensingSingleEntityMap.end())
+			// Process Listeners
+			auto beginSingleSensingIteratorA = m_singleEntitySensorListeners.find(entityA->GetID());
+			if (beginSingleSensingIteratorA != m_singleEntitySensorListeners.end())
 			{
-				beginSingleSensingIterator->second(BeginSensing(entityA, entityB));
+				beginSingleSensingIteratorA->second->OnContactBegin(BeginSensing(entityA, entityB));
 			}
 
-			auto beginMultiSensingIterator = m_onBeginSensingMultiEntityMap.find(MultiEntityContactKey(entityA, entityB));
-			if (beginMultiSensingIterator != m_onBeginSensingMultiEntityMap.end())
+			auto beingSingleSensingIteratorB = m_singleEntitySensorListeners.find(entityB->GetID());
+			if (beingSingleSensingIteratorB != m_singleEntitySensorListeners.end())
 			{
-				beginMultiSensingIterator->second(BeginSensing(entityA, entityB));
+				beingSingleSensingIteratorB->second->OnContactBegin(BeginSensing(entityB, entityA));
+			}
+
+			auto beginMultiSensingIterator = m_multiEntitySensorListeners.find(GenerateKey(entityA->GetID(), entityB->GetID()));
+			if (beginMultiSensingIterator != m_multiEntitySensorListeners.end())
+			{
+				beginMultiSensingIterator->second->OnContactBegin(BeginSensing(entityA, entityB));
+			}
+
+			// Process Event Handlers
+			auto singleSensorEventHandlerA = m_beginContactEventHandlers.find(SingleEntityBeginContactKey(entityA));
+			if (singleSensorEventHandlerA != m_beginContactEventHandlers.end())
+			{
+				singleSensorEventHandlerA->second(BeginSensing(entityA, entityB));
+			}
+
+			auto singleSensorEventHandlerB = m_beginContactEventHandlers.find(SingleEntityBeginContactKey(entityB));
+			if (singleSensorEventHandlerB != m_beginContactEventHandlers.end())
+			{
+				singleSensorEventHandlerB->second(BeginSensing(entityB, entityA));
+			}
+
+			auto multiSensorEventHandler = m_multiContactEventHandlers.find(MultiEntityBeginContactKey(entityA, entityB));
+			if (multiSensorEventHandler != m_multiContactEventHandlers.end())
+			{
+				multiSensorEventHandler->second(BeginSensing(entityA, entityB));
 			}
 		}
 
@@ -365,59 +447,84 @@ namespace Engine
 			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
 			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
-			auto endSingleSensingIterator = m_onEndSensingSingleEntityMap.find(SingleEntityContactKey(entityA));
-			if (endSingleSensingIterator != m_onEndSensingSingleEntityMap.end())
+			// Process Listeners
+			auto endSingleSensingIterator = m_singleEntitySensorListeners.find(entityA->GetID());
+			if (endSingleSensingIterator != m_singleEntitySensorListeners.end())
 			{
-				endSingleSensingIterator->second(EndSensing(entityA, entityB));
+				endSingleSensingIterator->second->OnContactEnd(EndSensing(entityA, entityB));
+			}
+			
+			auto endSingleSensingIteratorB = m_singleEntitySensorListeners.find(entityB->GetID());
+			if (endSingleSensingIteratorB != m_singleEntitySensorListeners.end())
+			{
+				endSingleSensingIteratorB->second->OnContactEnd(EndSensing(entityB, entityA));
 			}
 
-			auto endMultiSensingIterator = m_onEndSensingMultiEntityMap.find(MultiEntityContactKey(entityA, entityB));
-			if (endMultiSensingIterator != m_onEndSensingMultiEntityMap.end())
+			auto endMultiSensingIterator = m_multiEntitySensorListeners.find(GenerateKey(entityA->GetID(), entityB->GetID()));
+			if (endMultiSensingIterator != m_multiEntitySensorListeners.end())
 			{
-				endMultiSensingIterator->second(EndSensing(entityA, entityB));
+				endMultiSensingIterator->second->OnContactEnd(EndSensing(entityA, entityB));
+			}
+
+			// Process Event Handlers
+			auto singleSensorEventHandlerA = m_endContactEventHandlers.find(SingleEntityEndContactKey(entityA));
+			if (singleSensorEventHandlerA != m_endContactEventHandlers.end())
+			{
+				singleSensorEventHandlerA->second(EndSensing(entityA, entityB));
+			}
+
+			auto singleSensorEventHandlerB = m_endContactEventHandlers.find(SingleEntityEndContactKey(entityB));
+			if (singleSensorEventHandlerB != m_endContactEventHandlers.end())
+			{
+				singleSensorEventHandlerB->second(EndSensing(entityB, entityA));
+			}
+
+			auto multiSensorEventHandler = m_multiEndContactEventHandlers.find(MultiEntityEndContactKey(entityA, entityB));
+			if (multiSensorEventHandler != m_multiEndContactEventHandlers.end())
+			{
+				multiSensorEventHandler->second(EndSensing(entityA, entityB));
 			}
 		}
 	}
 
-	void Physics::RegisterOnBeginContactEventListener(SingleEntityContactKey key, std::function<void(BeginContact)> callback)
+	void Physics::RegisterContactListener(SingleEntityContactListener* listener)
 	{
-		m_onBeginContactSingleEntityMap[key] = callback;
+		m_singleEntityContactListeners.emplace(listener->GetKey(), listener);
 	}
 
-	void Physics::RegisterOnEndContactEventListener(SingleEntityContactKey key, std::function<void(EndContact)> callback)
+	void Physics::RegisterContactListener(MultiEntityContactListener* listener)
 	{
-		m_onEndContactSingleEntityMap[key] = callback;
+		m_multiEntityContactListeners.emplace(listener->GetKey(), listener);
 	}
 
-	void Physics::RegisterOnBeginSensingEventListener(SingleEntityContactKey key, std::function<void(BeginSensing)> callback)
+	void Physics::RegisterContactListener(SingleEntitySensorListener* listener)
 	{
-		m_onBeginSensingSingleEntityMap[key] = callback;
+		m_singleEntitySensorListeners.emplace(listener->GetKey(), listener);
 	}
 
-	void Physics::RegisterOnEndSensingEventListener(SingleEntityContactKey key, std::function<void(EndSensing)> callback)
+	void Physics::RegisterContactListener(MultiEntitySensorListener* listener)
 	{
-		m_onEndSensingSingleEntityMap[key] = callback;
+		m_multiEntitySensorListeners.emplace(listener->GetKey(), listener);
 	}
 
-	void Physics::RegisterOnBeginContactEventListener(MultiEntityContactKey key, std::function<void(BeginContact)> callback)
+	void Physics::RegisterContactEventHandler(SingleEntityBeginContactKey key, std::function<void(const ContactEvent&)> handler)
 	{
-		m_onBeginContactMultiEntityMap[key] = callback;
+		m_beginContactEventHandlers.emplace(key, handler);
 	}
 
-	void Physics::RegisterOnEndContactEventListener(MultiEntityContactKey key, std::function<void(EndContact)> callback)
+	void Physics::RegisterContactEventHandler(SingleEntityEndContactKey key, std::function<void(const ContactEvent&)> handler)
 	{
-		m_onEndContactMultiEntityMap[key] = callback;
-
+		m_endContactEventHandlers.emplace(key, handler);
 	}
 
-	void Physics::RegisterOnBeginSensingEventListener(MultiEntityContactKey key, std::function<void(BeginSensing)> callback)
+	void Physics::RegisterContactEventHandler(MultiEntityBeginContactKey key, std::function<void(const ContactEvent&)> handler)
 	{
-		m_onBeginSensingMultiEntityMap[key] = callback;
+		m_multiContactEventHandlers.emplace(key, handler);
 	}
-	
-	void Physics::RegisterOnEndSensingEventListener(MultiEntityContactKey key, std::function<void(EndSensing)> callback)
+
+	void Physics::RegisterContactEventHandler(MultiEntityEndContactKey key, std::function<void(const ContactEvent&)> handler)
 	{
-		m_onEndSensingMultiEntityMap[key] = callback;
+		m_multiEndContactEventHandlers.emplace(key, handler);
 	}
 
 	void Physics::CreateWorld(const Vector2D<float> gravity)
