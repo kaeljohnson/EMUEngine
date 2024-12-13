@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include "../../include/ISDL/ISDL.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/CallbackSystem/CallbackSystem.h"

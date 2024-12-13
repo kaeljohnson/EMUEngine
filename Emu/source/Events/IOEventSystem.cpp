@@ -1,8 +1,5 @@
 #pragma once
 
-#include <queue>
-#include <memory>
-
 #include "../../include/ISDL/ISDL.h"
 #include "../../include/Events/IOEventSystem.h"
 #include "../../include/Events/IOEventDispatcher.h"

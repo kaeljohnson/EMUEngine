@@ -1,17 +1,16 @@
 #pragma once
 
 #include "box2d/box2d.h"
-
+#include "../../include/Tiles/TileMap.h"
+#include "../../include/CallbackSystem/CallbackSystem.h"
+#include "../../include/Physics/Physics.h"
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Components.h"
-#include "../../include/CallbackSystem/CallbackSystem.h"
-#include "../../include/Tiles/TileMap.h"
 #include "../../include/MathUtil.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Time.h"
 #include "../../include/GameState.h"
-#include "../../include/Physics/Physics.h"
 
 namespace Engine
 {

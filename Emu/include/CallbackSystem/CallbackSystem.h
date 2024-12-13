@@ -1,12 +1,8 @@
 #pragma once
 
+#include "../Includes.h"
 #include "../Core.h"
-
 #include "CallbackType.h"
-
-#include <variant>
-#include <unordered_map>
-#include <functional>
 
 // This is the callback system interface. It is a singleton that allows anyone to create callbacks and trigger them.
 // There are built in types for registering and triggering callbacks. The types are defined in CallbackType.h.

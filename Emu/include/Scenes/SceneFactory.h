@@ -1,7 +1,6 @@
 #pragma once
 
-#include <memory>
-
+#include "../Includes.h"
 #include "Scene.h"
 
 namespace Engine

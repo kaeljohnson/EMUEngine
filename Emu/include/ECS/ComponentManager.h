@@ -1,10 +1,6 @@
 #pragma once
 
-#include <vector>
-#include <unordered_map>
-#include <algorithm>
-#include <stdexcept>
-
+#include "../Includes.h"
 #include "Entity.h"
 
 namespace Engine

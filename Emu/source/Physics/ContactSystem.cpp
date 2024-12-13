@@ -1,8 +1,7 @@
 #pragma once
 
-#include <box2d/box2d.h>
-
 #include "../../include/Physics/ContactSystem.h"
+#include <box2d/box2d.h>
 
 namespace Engine
 {

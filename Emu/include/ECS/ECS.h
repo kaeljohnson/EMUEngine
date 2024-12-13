@@ -1,15 +1,9 @@
 #pragma once
 
-#include <unordered_set>
-#include <typeindex>
-#include <unordered_map>
-#include <memory>
-#include <stdexcept>
-
+#include "../Core.h"
+#include "../Includes.h"
 #include "ComponentManager.h"
 #include "Entity.h"
-
-#include "../Core.h"
 
 namespace Engine
 {
