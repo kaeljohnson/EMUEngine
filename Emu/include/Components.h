@@ -1,13 +1,11 @@
 #pragma once
 
-#include <functional>
-
 #include "ECS/Component.h"
 #include "ECS/Entity.h"
-#include "MathUtil.h"
 #include "Physics/BodyTypes.h"
 #include "GameState.h"
-
+#include "Includes.h"
+#include "MathUtil.h"
 #include "Core.h"
 
 struct b2BodyId;
@@ -29,11 +27,11 @@ namespace Engine
 		int DirectionFacing;
 
 		EMU_API Transform(Entity* entity) : PrevPosition(0.0f, 0.0f), Position(0.0f, 0.0f),
-			Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1), Component(entity) {}
+			Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1), ZIndex(0), Component(entity) {}
 
 		EMU_API Transform(Entity* entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction) :
 			PrevPosition(position), Position(position),
-			Dimensions(dimensions), Rotation(rotation), Scale(scale), DirectionFacing(direction), Component(entity) {}
+			Dimensions(dimensions), Rotation(rotation), Scale(scale), DirectionFacing(direction), ZIndex(0), Component(entity) {}
 
 		EMU_API ~Transform() = default;
 	};

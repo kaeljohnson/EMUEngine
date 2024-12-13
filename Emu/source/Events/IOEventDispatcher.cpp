@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../include/ISDL/ISDL.h"
-
 #include "../../include/Events/IOEventDispatcher.h"
 
 namespace Engine

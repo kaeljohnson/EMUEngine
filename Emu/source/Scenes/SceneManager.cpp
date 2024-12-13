@@ -1,10 +1,6 @@
 #pragma once
 
-#include <thread>
-#include <chrono>
-
 #include "../../include/Scenes/SceneManager.h"
-
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Logging/Logger.h"
 

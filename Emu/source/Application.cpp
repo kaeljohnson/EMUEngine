@@ -1,21 +1,17 @@
 #pragma once
 
-#include <stdio.h>
-#include <queue>
-#include <thread>
-#include <chrono>
-
 #include "../include/Logging/Logger.h"
-#include "../include/Application.h"
 #include "../include/Events/IOEvent.h"
 #include "../include/Events/IOEventSystem.h"
 #include "../include/Events/IOEventDispatcher.h"
 #include "../include/Scenes/Scene.h"
-#include "../include/Time.h"
 #include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Rendering/WindowRenderer.h"
 #include "../include/ECS/ECS.h"
 #include "../include/Components.h"
+#include "../include/Includes.h"
+#include "../include/Time.h"
+#include "../include/Application.h"
 
 namespace Engine
 {

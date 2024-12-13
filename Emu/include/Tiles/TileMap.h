@@ -1,13 +1,10 @@
 #pragma once
 
+#include "../ECS/Entity.h"
+#include "../Includes.h"
 #include "../Core.h"
 #include "../MathUtil.h"
-
-#include <vector>
-#include <string>
-
 #include "../Components.h"
-#include "../ECS/Entity.h"
 
 namespace Engine
 {

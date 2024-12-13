@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Core.h"
 #include "Scenes/Scene.h"
 #include "Scenes/SceneManager.h"
 #include "Camera/CameraManager.h"
 #include "Rendering/WindowRenderer.h"
+#include "Core.h"
 
 namespace Engine
 {

@@ -1,15 +1,10 @@
 #pragma once
 
-#include <functional>
-#include <cstddef>
-#include <utility>
-
-#include "../Core.h"
-
 #include "../ECS/Entity.h"
 #include "../ECS/ECS.h"
+#include "../Includes.h"
+#include "../Core.h"
 #include "../Components.h"
-
 #include "../MathUtil.h"
 
 namespace Engine
