@@ -10,12 +10,12 @@ struct TestContactListener : public Engine::MultiEntityContactListener
 	TestContactListener(Engine::Entity* ptrEntity1, Engine::Entity* ptrEntity2) 
 		: Engine::MultiEntityContactListener(ptrEntity1, ptrEntity2) {}
 
-	void OnContactBegin(const Engine::ContactEvent event) override
+	void OnContactBegin(const Engine::Contact event) override
 	{
 		CLIENT_INFO_D("Contact Begin");
 	}
 
-	void OnContactEnd(const Engine::ContactEvent event) override
+	void OnContactEnd(const Engine::Contact event) override
 	{
 		CLIENT_INFO_D("Contact End");
 	}
@@ -26,12 +26,12 @@ struct TestSensorListener : public Engine::MultiEntitySensorListener
 	TestSensorListener(Engine::Entity* ptrEntity1, Engine::Entity* ptrEntity2) 
 		: Engine::MultiEntitySensorListener(ptrEntity1, ptrEntity2) {}
 
-	void OnContactBegin(const Engine::ContactEvent event) override
+	void OnContactBegin(const Engine::Contact event) override
 	{
 		CLIENT_INFO_D("Sensor Begin");
 	}
 
-	void OnContactEnd(const Engine::ContactEvent event)
+	void OnContactEnd(const Engine::Contact event)
 	{
 		CLIENT_INFO_D("Sensor End");
 	}
@@ -87,7 +87,7 @@ int main(int argc, char* args[])
 	Engine::ContactSystem::RegisterContactListener(&testContactListener);
 	Engine::ContactSystem::RegisterContactListener(&testSensorListener);
 
-	Engine::ContactSystem::RegisterContactEventHandler(Engine::SingleEntityBeginContactKey(ptrTestEntity), [](Engine::ContactEvent event)
+	Engine::ContactSystem::RegisterContactHandler(Engine::SingleEntityBeginContactKey(ptrTestEntity), [](Engine::Contact event)
 		{
 			CLIENT_INFO_D("TEST");
 		});

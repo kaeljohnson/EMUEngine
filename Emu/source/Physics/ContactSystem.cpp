@@ -12,10 +12,10 @@ namespace Engine
 	std::unordered_map<size_t, SingleEntitySensorListener*> ContactSystem::m_singleEntitySensorListeners;
 	std::unordered_map<size_t, MultiEntitySensorListener*> ContactSystem::m_multiEntitySensorListeners;
 
-	std::unordered_map<SingleEntityBeginContactKey, std::function<void(const ContactEvent&)>> ContactSystem::m_beginContactEventHandlers;
-	std::unordered_map<SingleEntityEndContactKey, std::function<void(const ContactEvent&)>> ContactSystem::m_endContactEventHandlers;
-	std::unordered_map<MultiEntityBeginContactKey, std::function<void(const ContactEvent&)>> ContactSystem::m_multiContactEventHandlers;
-	std::unordered_map<MultiEntityEndContactKey, std::function<void(const ContactEvent&)>> ContactSystem::m_multiEndContactEventHandlers;
+	std::unordered_map<SingleEntityBeginContactKey, std::function<void(const Contact&)>> ContactSystem::m_beginContactHandlers;
+	std::unordered_map<SingleEntityEndContactKey, std::function<void(const Contact&)>> ContactSystem::m_endContactHandlers;
+	std::unordered_map<MultiEntityBeginContactKey, std::function<void(const Contact&)>> ContactSystem::m_multiContactHandlers;
+	std::unordered_map<MultiEntityEndContactKey, std::function<void(const Contact&)>> ContactSystem::m_multiEndContactHandlers;
 
 	void ContactSystem::ProcessContacts(void* ptrWorldId)
 	{
@@ -108,20 +108,20 @@ namespace Engine
 			}
 
 			// Process Event Handlers
-			auto singleContactEventHandlerA = m_beginContactEventHandlers.find(SingleEntityBeginContactKey(entityA));
-			if (singleContactEventHandlerA != m_beginContactEventHandlers.end())
+			auto singleContactEventHandlerA = m_beginContactHandlers.find(SingleEntityBeginContactKey(entityA));
+			if (singleContactEventHandlerA != m_beginContactHandlers.end())
 			{
 				singleContactEventHandlerA->second(BeginContact(entityA, entityB, normal));
 			}
 
-			auto singleContactEventHandlerB = m_beginContactEventHandlers.find(SingleEntityBeginContactKey(entityB));
-			if (singleContactEventHandlerB != m_beginContactEventHandlers.end())
+			auto singleContactEventHandlerB = m_beginContactHandlers.find(SingleEntityBeginContactKey(entityB));
+			if (singleContactEventHandlerB != m_beginContactHandlers.end())
 			{
 				singleContactEventHandlerB->second(BeginContact(entityB, entityA, normal * -1.0f));
 			}
 
-			auto multiContactEventHandler = m_multiContactEventHandlers.find(MultiEntityBeginContactKey(entityA, entityB));
-			if (multiContactEventHandler != m_multiContactEventHandlers.end())
+			auto multiContactEventHandler = m_multiContactHandlers.find(MultiEntityBeginContactKey(entityA, entityB));
+			if (multiContactEventHandler != m_multiContactHandlers.end())
 			{
 				multiContactEventHandler->second(BeginContact(entityA, entityB, normal));
 			}
@@ -157,20 +157,20 @@ namespace Engine
 			}
 
 			// Process handlers
-			auto singleContactEventHandlerA = m_endContactEventHandlers.find(SingleEntityEndContactKey(entityA));
-			if (singleContactEventHandlerA != m_endContactEventHandlers.end())
+			auto singleContactEventHandlerA = m_endContactHandlers.find(SingleEntityEndContactKey(entityA));
+			if (singleContactEventHandlerA != m_endContactHandlers.end())
 			{
 				singleContactEventHandlerA->second(EndContact(entityA, entityB));
 			}
 
-			auto singleContactEventHandlerB = m_endContactEventHandlers.find(SingleEntityEndContactKey(entityB));
-			if (singleContactEventHandlerB != m_endContactEventHandlers.end())
+			auto singleContactEventHandlerB = m_endContactHandlers.find(SingleEntityEndContactKey(entityB));
+			if (singleContactEventHandlerB != m_endContactHandlers.end())
 			{
 				singleContactEventHandlerB->second(EndContact(entityB, entityA));
 			}
 
-			auto multiContactEventHandler = m_multiEndContactEventHandlers.find(MultiEntityEndContactKey(entityA, entityB));
-			if (multiContactEventHandler != m_multiEndContactEventHandlers.end())
+			auto multiContactEventHandler = m_multiEndContactHandlers.find(MultiEntityEndContactKey(entityA, entityB));
+			if (multiContactEventHandler != m_multiEndContactHandlers.end())
 			{
 				multiContactEventHandler->second(EndContact(entityA, entityB));
 			}
@@ -213,20 +213,20 @@ namespace Engine
 			}
 
 			// Process Event Handlers
-			auto singleSensorEventHandlerA = m_beginContactEventHandlers.find(SingleEntityBeginContactKey(entityA));
-			if (singleSensorEventHandlerA != m_beginContactEventHandlers.end())
+			auto singleSensorEventHandlerA = m_beginContactHandlers.find(SingleEntityBeginContactKey(entityA));
+			if (singleSensorEventHandlerA != m_beginContactHandlers.end())
 			{
 				singleSensorEventHandlerA->second(BeginSensing(entityA, entityB));
 			}
 
-			auto singleSensorEventHandlerB = m_beginContactEventHandlers.find(SingleEntityBeginContactKey(entityB));
-			if (singleSensorEventHandlerB != m_beginContactEventHandlers.end())
+			auto singleSensorEventHandlerB = m_beginContactHandlers.find(SingleEntityBeginContactKey(entityB));
+			if (singleSensorEventHandlerB != m_beginContactHandlers.end())
 			{
 				singleSensorEventHandlerB->second(BeginSensing(entityB, entityA));
 			}
 
-			auto multiSensorEventHandler = m_multiContactEventHandlers.find(MultiEntityBeginContactKey(entityA, entityB));
-			if (multiSensorEventHandler != m_multiContactEventHandlers.end())
+			auto multiSensorEventHandler = m_multiContactHandlers.find(MultiEntityBeginContactKey(entityA, entityB));
+			if (multiSensorEventHandler != m_multiContactHandlers.end())
 			{
 				multiSensorEventHandler->second(BeginSensing(entityA, entityB));
 			}
@@ -262,20 +262,20 @@ namespace Engine
 			}
 
 			// Process Event Handlers
-			auto singleSensorEventHandlerA = m_endContactEventHandlers.find(SingleEntityEndContactKey(entityA));
-			if (singleSensorEventHandlerA != m_endContactEventHandlers.end())
+			auto singleSensorEventHandlerA = m_endContactHandlers.find(SingleEntityEndContactKey(entityA));
+			if (singleSensorEventHandlerA != m_endContactHandlers.end())
 			{
 				singleSensorEventHandlerA->second(EndSensing(entityA, entityB));
 			}
 
-			auto singleSensorEventHandlerB = m_endContactEventHandlers.find(SingleEntityEndContactKey(entityB));
-			if (singleSensorEventHandlerB != m_endContactEventHandlers.end())
+			auto singleSensorEventHandlerB = m_endContactHandlers.find(SingleEntityEndContactKey(entityB));
+			if (singleSensorEventHandlerB != m_endContactHandlers.end())
 			{
 				singleSensorEventHandlerB->second(EndSensing(entityB, entityA));
 			}
 
-			auto multiSensorEventHandler = m_multiEndContactEventHandlers.find(MultiEntityEndContactKey(entityA, entityB));
-			if (multiSensorEventHandler != m_multiEndContactEventHandlers.end())
+			auto multiSensorEventHandler = m_multiEndContactHandlers.find(MultiEntityEndContactKey(entityA, entityB));
+			if (multiSensorEventHandler != m_multiEndContactHandlers.end())
 			{
 				multiSensorEventHandler->second(EndSensing(entityA, entityB));
 			}
@@ -302,23 +302,23 @@ namespace Engine
 		m_multiEntitySensorListeners.emplace(listener->GetKey(), listener);
 	}
 
-	void ContactSystem::RegisterContactEventHandler(SingleEntityBeginContactKey key, std::function<void(const ContactEvent&)> handler)
+	void ContactSystem::RegisterContactHandler(SingleEntityBeginContactKey key, ContactHandler handler)
 	{
-		m_beginContactEventHandlers.emplace(key, handler);
+		m_beginContactHandlers.emplace(key, handler);
 	}
 
-	void ContactSystem::RegisterContactEventHandler(SingleEntityEndContactKey key, std::function<void(const ContactEvent&)> handler)
+	void ContactSystem::RegisterContactHandler(SingleEntityEndContactKey key, ContactHandler handler)
 	{
-		m_endContactEventHandlers.emplace(key, handler);
+		m_endContactHandlers.emplace(key, handler);
 	}
 
-	void ContactSystem::RegisterContactEventHandler(MultiEntityBeginContactKey key, std::function<void(const ContactEvent&)> handler)
+	void ContactSystem::RegisterContactHandler(MultiEntityBeginContactKey key, ContactHandler handler)
 	{
-		m_multiContactEventHandlers.emplace(key, handler);
+		m_multiContactHandlers.emplace(key, handler);
 	}
 
-	void ContactSystem::RegisterContactEventHandler(MultiEntityEndContactKey key, std::function<void(const ContactEvent&)> handler)
+	void ContactSystem::RegisterContactHandler(MultiEntityEndContactKey key, ContactHandler handler)
 	{
-		m_multiEndContactEventHandlers.emplace(key, handler);
+		m_multiEndContactHandlers.emplace(key, handler);
 	}
 }

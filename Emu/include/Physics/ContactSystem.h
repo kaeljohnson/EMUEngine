@@ -59,40 +59,40 @@ namespace Engine
 			: ContactKey(GenerateKey(entity1->GetID(), entity2->GetID())) {}
 	};
 
-	// Event wrapper objects
-	struct ContactEvent
+	// Contact wrapper objects
+	struct Contact
 	{
-		ContactEvent(Entity* ptrEntityA, Entity* ptrEntityB)
+		Contact(Entity* ptrEntityA, Entity* ptrEntityB)
 			: m_ptrEntityA(ptrEntityA), m_ptrEntityB(ptrEntityB) {}
 
 		Entity* m_ptrEntityA;
 		Entity* m_ptrEntityB;
 	};
 
-	struct BeginContact : public ContactEvent
+	struct BeginContact : public Contact
 	{
 		BeginContact(Entity* ptrEntityA, Entity* ptrEntityB, Vector2D<float> normalVec)
-			: m_normalVec(normalVec), ContactEvent(ptrEntityA, ptrEntityB) {}
+			: m_normalVec(normalVec), Contact(ptrEntityA, ptrEntityB) {}
 
 		Vector2D<float> m_normalVec;
 	};
 
-	struct EndContact : public ContactEvent
+	struct EndContact : public Contact
 	{
 		EndContact(Entity* ptrEntityA, Entity* ptrEntityB)
-			: ContactEvent(ptrEntityA, ptrEntityB) {}
+			: Contact(ptrEntityA, ptrEntityB) {}
 	};
 
-	struct BeginSensing : public ContactEvent
+	struct BeginSensing : public Contact
 	{
 		BeginSensing(Entity* ptrEntityA, Entity* ptrEntityB)
-			: ContactEvent(ptrEntityA, ptrEntityB) {}
+			: Contact(ptrEntityA, ptrEntityB) {}
 	};
 
-	struct EndSensing : public ContactEvent
+	struct EndSensing : public Contact
 	{
 		EndSensing(Entity* ptrEntityA, Entity* ptrEntityB)
-			: ContactEvent(ptrEntityA, ptrEntityB) {}
+			: Contact(ptrEntityA, ptrEntityB) {}
 	};
 
 	struct ContactListener
@@ -101,15 +101,16 @@ namespace Engine
 
 		virtual ~ContactListener() = default;
 
-		virtual void OnContactBegin(const ContactEvent event) {};
-		virtual void OnContactEnd(const ContactEvent event) {};
+		virtual void OnContactBegin(const Contact event) {};
+		virtual void OnContactEnd(const Contact event) {};
 
 		size_t GetKey() const { return m_key; }
 
 	private:
-		size_t m_key;
+		const size_t m_key;
 	};
 
+	// Default contact listeners
 	struct SingleEntityContactListener : public ContactListener
 	{
 		SingleEntityContactListener(Entity* entity)
@@ -137,6 +138,8 @@ namespace Engine
 	class ContactSystem
 	{
 	public:
+		using ContactHandler = std::function<void(const Contact&)>;
+
 		static void ProcessContacts(void* ptrWorldId);
 
 		// Should these be in the event system instead?
@@ -145,10 +148,10 @@ namespace Engine
 		EMU_API static void RegisterContactListener(SingleEntitySensorListener*);
 		EMU_API static void RegisterContactListener(MultiEntitySensorListener*);
 
-		EMU_API static void RegisterContactEventHandler(SingleEntityBeginContactKey key, std::function<void(const ContactEvent&)> handler);
-		EMU_API static void RegisterContactEventHandler(SingleEntityEndContactKey key, std::function<void(const ContactEvent&)> handler);
-		EMU_API static void RegisterContactEventHandler(MultiEntityBeginContactKey key, std::function<void(const ContactEvent&)> handler);
-		EMU_API static void RegisterContactEventHandler(MultiEntityEndContactKey key, std::function<void(const ContactEvent&)> handler);
+		EMU_API static void RegisterContactHandler(SingleEntityBeginContactKey key, ContactHandler handler);
+		EMU_API static void RegisterContactHandler(SingleEntityEndContactKey key, ContactHandler handler);
+		EMU_API static void RegisterContactHandler(MultiEntityBeginContactKey key, ContactHandler handler);
+		EMU_API static void RegisterContactHandler(MultiEntityEndContactKey key, ContactHandler handler);
 
 	private:
 		static std::unordered_map<size_t, SingleEntityContactListener*> m_singleEntityContactListeners;
@@ -156,10 +159,10 @@ namespace Engine
 		static std::unordered_map<size_t, SingleEntitySensorListener*> m_singleEntitySensorListeners;
 		static std::unordered_map<size_t, MultiEntitySensorListener*> m_multiEntitySensorListeners;
 
-		static std::unordered_map<SingleEntityBeginContactKey, std::function<void(const ContactEvent&)>> m_beginContactEventHandlers;
-		static std::unordered_map<SingleEntityEndContactKey, std::function<void(const ContactEvent&)>> m_endContactEventHandlers;
-		static std::unordered_map<MultiEntityBeginContactKey, std::function<void(const ContactEvent&)>> m_multiContactEventHandlers;
-		static std::unordered_map<MultiEntityEndContactKey, std::function<void(const ContactEvent&)>> m_multiEndContactEventHandlers;
+		static std::unordered_map<SingleEntityBeginContactKey, ContactHandler> m_beginContactHandlers;
+		static std::unordered_map<SingleEntityEndContactKey, ContactHandler> m_endContactHandlers;
+		static std::unordered_map<MultiEntityBeginContactKey, ContactHandler> m_multiContactHandlers;
+		static std::unordered_map<MultiEntityEndContactKey, ContactHandler> m_multiEndContactHandlers;
 	};
 }
 
