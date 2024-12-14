@@ -12,7 +12,7 @@ namespace Engine
     class ECS
     {
     public:
-        static void initialize(size_t maxID) 
+        static void Initialize(size_t maxID) 
         {
             ECS::maxID = maxID;
         }

@@ -11,27 +11,12 @@
 #include "../include/Components.h"
 #include "../include/Includes.h"
 #include "../include/Time.h"
+#include "../include/Physics/Physics.h"
+#include "../include/Physics/ContactSystem.h"
 #include "../include/Application.h"
 
 namespace Engine
 {
-	// Application singleton.
-	Application* Application::instance = nullptr;
-
-	Application* Application::GetInstance()
-	{
-		if (instance == nullptr)
-		{
-			instance = new Application();
-			return instance;
-		}
-
-		// Don't want client to reference
-		// multiple instances of the application.
-		ENGINE_CRITICAL_D("Warning! Instance of application already exists. Multiple usage only recommended for testing.");
-		return instance;
-	}
-
 	Application::Application()
 		: m_cameraManager(), m_windowRenderer()
 	{
@@ -103,6 +88,8 @@ namespace Engine
 			if (!Time::IsAppRunning())
 			{ 
 				// Cleanup static objects
+				ContactSystem::Cleanup();
+				Physics::Cleanup();
 				ECS::Cleanup();
 			}
 		}

@@ -148,6 +148,8 @@ namespace Engine
 		EMU_API static void RegisterContactHandler(MultiEntityBeginContactKey key, ContactHandler handler);
 		EMU_API static void RegisterContactHandler(MultiEntityEndContactKey key, ContactHandler handler);
 
+		static void Cleanup();
+
 	private:
 		static std::unordered_map<size_t, SingleEntityContactListener*> m_singleEntityContactListeners;
 		static std::unordered_map<size_t, MultiEntityContactListener*> m_multiEntityContactListeners;

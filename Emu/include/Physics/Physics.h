@@ -38,6 +38,7 @@ namespace Engine
 		// Call sparingly!!!
 		static void RemoveBodyFromWorld(Entity* ptrEntity);
 		static void DestroyWorld();
+		static void Cleanup();
 
 		static void Update();
 		

@@ -17,7 +17,7 @@ namespace Engine
 
 		IOEventSystem::Initialize();
 
-		ECS::initialize(10000);
+		ECS::Initialize(10000);
 
 		ECS::RegisterComponentManager<Updatable>();
 		ECS::RegisterComponentManager<PhysicsBody>();

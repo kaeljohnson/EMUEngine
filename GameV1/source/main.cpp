@@ -43,9 +43,10 @@ int main(int argc, char* args[])
 
 	CLIENT_INFO_D("Client Running!");
 
-	Engine::ApplicationPtr ptrAppInstance = Engine::Application::GetInstance();
-	Engine::CameraManager& refCameraManager = ptrAppInstance->GetCameraManager();
-	Engine::SceneManager& refSceneManager = ptrAppInstance->GetSceneManager();
+	// Engine::ApplicationPtr ptrAppInstance = Engine::Application::GetInstance();
+	Engine::Application app;
+	Engine::CameraManager& refCameraManager = app.GetCameraManager();
+	Engine::SceneManager& refSceneManager = app.GetSceneManager();
 
 	Engine::ScenePtr scene = Engine::CreateScene();
 	Engine::ScenePtr scene2 = Engine::CreateScene();
@@ -107,7 +108,7 @@ int main(int argc, char* args[])
 
 	AppManagementEventHandlers appManagementEventHandlers(ptrCameraEntity, ptrPlayerEntity);
 
-	ptrAppInstance->Start();
+	app.Start();
 	// Need to figure out how to change scenes, stop scenes, etc.
 
 	return 0;

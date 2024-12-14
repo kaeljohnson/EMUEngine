@@ -11,12 +11,12 @@ namespace Engine
 	class Application
 	{
 	public:
-		EMU_API static Application* GetInstance();
+		EMU_API Application();
 		EMU_API void Start();
 		EMU_API inline CameraManager& GetCameraManager() { return m_cameraManager; }
 		EMU_API inline SceneManager& GetSceneManager() { return m_sceneManager; }
 
-		~Application();
+		EMU_API ~Application();
 
 		// Deleted functions to ensure our app instance cannot be copied or moved.
 		Application(const Application&) = delete;
@@ -25,8 +25,6 @@ namespace Engine
 		Application& operator=(Application&&) = delete;
 
 	private:
-		static Application* instance;
-		Application();
 
 		CameraManager m_cameraManager;
 		WindowRenderer m_windowRenderer;
