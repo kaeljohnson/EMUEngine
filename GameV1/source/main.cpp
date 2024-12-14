@@ -43,7 +43,6 @@ int main(int argc, char* args[])
 
 	CLIENT_INFO_D("Client Running!");
 
-	// Engine::ApplicationPtr ptrAppInstance = Engine::Application::GetInstance();
 	Engine::Application app;
 	Engine::CameraManager& refCameraManager = app.GetCameraManager();
 	Engine::SceneManager& refSceneManager = app.GetSceneManager();

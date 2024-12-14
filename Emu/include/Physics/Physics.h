@@ -30,13 +30,14 @@ namespace Engine
 		EMU_API static void SetFixedRotation(Entity* ptrEntity, bool fixed);
 		EMU_API static const float GetAngleInRadians(Entity* ptrEntity);
 		EMU_API static const float GetAngleInDegrees(Entity* ptrEntity);
+		EMU_API static void RemoveBodyFromWorld(Entity* ptrEntity);
 
 		static void CreateWorld(const Vector2D<float> gravity);
 		static void AddPhysicsBodiesToWorld();
 
 		// PhysicsBody2D specific functions
 		// Call sparingly!!!
-		static void RemoveBodyFromWorld(Entity* ptrEntity);
+		
 		static void DestroyWorld();
 		static void Cleanup();
 
