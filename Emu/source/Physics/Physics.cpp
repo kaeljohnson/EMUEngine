@@ -245,6 +245,14 @@ namespace Engine
 		ENGINE_INFO_D("World freed!");
 	}
 
+	void Physics::Cleanup()
+	{
+		if (m_ptrWorldId != nullptr)
+		{
+			DestroyWorld();
+		}
+	}
+
 	// Temp
 	void PhysicsBody::OnDeactivate()
 	{

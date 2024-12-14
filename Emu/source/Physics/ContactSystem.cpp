@@ -320,4 +320,17 @@ namespace Engine
 	{
 		m_multiEndContactHandlers.emplace(key, handler);
 	}
+
+	void ContactSystem::Cleanup()
+	{
+		m_singleEntityContactListeners.clear();
+		m_multiEntityContactListeners.clear();
+		m_singleEntitySensorListeners.clear();
+		m_multiEntitySensorListeners.clear();
+
+		m_beginContactHandlers.clear();
+		m_endContactHandlers.clear();
+		m_multiContactHandlers.clear();
+		m_multiEndContactHandlers.clear();
+	}
 }
