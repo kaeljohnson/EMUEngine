@@ -89,7 +89,7 @@ namespace Engine
 			{ 
 				// Cleanup static objects
 				ContactSystem::Cleanup();
-				Physics::Cleanup();
+				m_sceneManager.Cleanup();
 				ECS::Cleanup();
 			}
 		}

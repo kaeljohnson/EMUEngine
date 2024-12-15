@@ -22,9 +22,11 @@
         Engine::ECS::GetComponentManager<Engine::Transform>().AddComponent(ptrEntity,
             Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f);
 
+		Engine::Physics::CreateBody(ptrEntity);
+
         Engine::ECS::GetComponentManager<Engine::PhysicsBody>().AddComponent(ptrEntity);
 		Engine::PhysicsBody* ptrPhysicsBody =
-			Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(ptrEntity);
+			Engine::Physics::GetBody(ptrEntity);
 		ptrPhysicsBody->m_bodyType = Engine::BodyType::DYNAMIC;
         ptrPhysicsBody->m_startingPosition = Engine::Vector2D<float>(startingX, startingY);
 		ptrPhysicsBody->m_dimensions = Engine::Vector2D<float>(width, height);

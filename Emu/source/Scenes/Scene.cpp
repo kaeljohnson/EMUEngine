@@ -15,14 +15,14 @@
 namespace Engine
 {
 	Scene::Scene() : m_levelDimensionsInUnits(32, 32), HasTileMap(false),
-		m_tileMap(nullptr),
+		m_tileMap(nullptr), m_physicsSimulation(Vector2D<float>(0.0f, 100.0f)),
 		refTransformManager(ECS::GetComponentManager<Transform>()),
 		refPhysicsBodyManager(ECS::GetComponentManager<PhysicsBody>()),
 		refUpdatableManager(ECS::GetComponentManager<Updatable>()) {}
 
 	Scene::~Scene()
 	{
-		Physics::DestroyWorld();
+		m_physicsSimulation.DestroyWorld();
 	}
 
 	void Scene::CheckValid()
@@ -32,12 +32,12 @@ namespace Engine
 
 	void Scene::OnScenePlay()
 	{
-		Physics::CreateWorld(m_gravity);
+		// m_physicsSimulation.CreateWorld(m_gravity);
 
 		ECS::LoadEntities(m_entities);
 
 		// Physics bodies need to be added to the world after they are activated and pooled.
-		Physics::AddPhysicsBodiesToWorld();
+		m_physicsSimulation.AddPhysicsBodiesToWorld();
 
 		GameState::IN_SCENE = true;
 	}
@@ -46,7 +46,7 @@ namespace Engine
 	{
 		GameState::IN_SCENE = false;
 
-		Physics::DestroyWorld();
+		m_physicsSimulation.Cleanup();
 
 		ECS::UnloadEntities();
 	}
@@ -108,7 +108,7 @@ namespace Engine
 			refUpdatable.Update();
 		}
 
-		Physics::Update();
+		m_physicsSimulation.Update();
 
 		for (PhysicsBody& refPhysicsBody : refPhysicsBodyManager)
 		{
@@ -128,13 +128,15 @@ namespace Engine
 		}
 	};
 	// Is this function necessary?
-	void Scene::CreatePhysicsSimulation(const Vector2D<float> gravity)
+	void Scene::SetPhysicsSimulation(const Vector2D<float> gravity)
 	{
 		// What happens if this is called multiple times for one scene? Make sure nothing bad.
 
 		ENGINE_INFO_D("Setting gravity: " + std::to_string(gravity.X) + ", " + std::to_string(gravity.Y));
 
-		m_gravity = gravity;
+		// m_gravity = gravity;
+
+		m_physicsSimulation.UpdateGravity(gravity);
 
 		// Need a reset function for the world which resets all objects in the world.
 

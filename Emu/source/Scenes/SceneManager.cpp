@@ -41,4 +41,14 @@ namespace Engine
 		// 
 		// m_currentScene->Unload();
 	}
+
+	// Only called when the application is closing.
+	void SceneManager::Cleanup()
+	{
+		for (auto& scene : m_scenes)
+		{
+			scene.second->OnSceneEnd();
+		}
+		m_scenes.clear();
+	}
 }

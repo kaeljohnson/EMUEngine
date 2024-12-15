@@ -11,9 +11,19 @@
 
 namespace Engine
 {
-	b2WorldId* Physics::m_ptrWorldId = nullptr;
+	// b2WorldId* Physics::m_ptrWorldId = nullptr;
 
 	// Physics System
+	void Physics::CreateBody(Entity* ptrEntity)
+	{
+		ECS::GetComponentManager<PhysicsBody>().AddComponent(ptrEntity);
+	}
+
+	PhysicsBody* Physics::GetBody(Entity* ptrEntity)
+	{
+		return ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity);
+	}
+
 	void Physics::SetPosition(Entity* ptrEntity, Vector2D<float> position)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
@@ -144,7 +154,27 @@ namespace Engine
 
 	}
 
-	void Physics::AddPhysicsBodiesToWorld()
+	// Physics Simulation
+	PhysicsSimulation::PhysicsSimulation(const Vector2D<float> gravity)
+		: m_ptrWorldId(nullptr)
+	{
+		ENGINE_INFO_D("Creating World!");
+
+		b2WorldDef worldDef = b2DefaultWorldDef();
+		worldDef.gravity = { gravity.X, gravity.Y };
+		m_ptrWorldId = new b2WorldId(b2CreateWorld(&worldDef));
+
+		ENGINE_INFO_D("World created!");
+	}
+
+	void PhysicsSimulation::UpdateGravity(const Vector2D<float> gravity)
+	{
+		b2WorldDef worldDef = b2DefaultWorldDef();
+		worldDef.gravity = { gravity.X, gravity.Y };
+		b2World_SetGravity(*m_ptrWorldId, worldDef.gravity);
+	}
+
+	void PhysicsSimulation::AddPhysicsBodiesToWorld()
 	{
 		ComponentManager<PhysicsBody>& physicsBodyManager = ECS::GetComponentManager<PhysicsBody>();
 		for (PhysicsBody& refPhysicsBody : physicsBodyManager)
@@ -198,30 +228,13 @@ namespace Engine
 		}
 	}
 
-	void Physics::Update()
+	void PhysicsSimulation::Update()
 	{
 		b2World_Step(*m_ptrWorldId, Time::GetTimeStep(), 4);
 		ContactSystem::ProcessContacts(m_ptrWorldId);
 	}
 
-	void Physics::CreateWorld(const Vector2D<float> gravity)
-	{
-		if (m_ptrWorldId != nullptr)
-		{
-			ENGINE_INFO_D("World already exists.");
-			return;
-		}
-
-		ENGINE_INFO_D("Creating World!");
-
-		b2WorldDef worldDef = b2DefaultWorldDef();
-		worldDef.gravity = { gravity.X, gravity.Y };
-		m_ptrWorldId = new b2WorldId(b2CreateWorld(&worldDef));
-
-		ENGINE_INFO_D("World created!");
-	}
-
-	void Physics::DestroyWorld()
+	void PhysicsSimulation::DestroyWorld()
 	{
 		if (m_ptrWorldId == nullptr)
 		{
@@ -245,7 +258,7 @@ namespace Engine
 		ENGINE_INFO_D("World freed!");
 	}
 
-	void Physics::Cleanup()
+	void PhysicsSimulation::Cleanup()
 	{
 		if (m_ptrWorldId != nullptr)
 		{

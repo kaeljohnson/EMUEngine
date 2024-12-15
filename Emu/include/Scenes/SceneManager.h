@@ -20,6 +20,7 @@ namespace Engine
 
 		const bool IsNewSceneStarting() const { return m_newSceneStarting; }
 		void NewSceneStarted() { m_newSceneStarting = false; }
+		void Cleanup();
 
 		SceneManager(const SceneManager&) = delete;
 		SceneManager& operator=(const SceneManager&) = delete;
