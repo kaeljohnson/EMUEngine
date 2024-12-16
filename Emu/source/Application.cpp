@@ -5,7 +5,6 @@
 #include "../include/Events/IOEventSystem.h"
 #include "../include/Events/IOEventDispatcher.h"
 #include "../include/Scenes/Scene.h"
-#include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Rendering/WindowRenderer.h"
 #include "../include/ECS/ECS.h"
 #include "../include/Components.h"
@@ -19,9 +18,7 @@ namespace Engine
 {
 	Application::Application()
 		: m_cameraManager(), m_windowRenderer()
-	{
-		defineDefaultApplicationCallbacks();
-	}
+	{}
 
 	void Application::Start()
 	{
@@ -94,7 +91,7 @@ namespace Engine
 		}
 	}
 
-	void Application::end()
+	void Application::End()
 	{
 		ENGINE_INFO_D("Application ending!");
 
@@ -102,14 +99,4 @@ namespace Engine
 	}
 
 	Application::~Application() {}
-
-	void Application::defineDefaultApplicationCallbacks()
-	{
-		ICallbackSystem* ptrICallbackSystem = ICallbackSystem::GetInstance();
-
-		ptrICallbackSystem->NewCallback(Type::EndApplication, [&](Data data)
-			{
-				end();
-			});
-	}
 }

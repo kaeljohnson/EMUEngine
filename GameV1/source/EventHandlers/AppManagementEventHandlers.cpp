@@ -9,7 +9,7 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEnt
 {
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::F_KEY_DOWN, [](Engine::IOEvent& e)
 		{
-			Engine::ICallbackSystem::GetInstance()->TriggerCallback(Engine::Type::ToggleFullscreen, std::monostate{});
+			// Need interface to toggle fullscreen.
 			// Could add a setter for handled state and put the trace in there.
 			CLIENT_TRACE_D("Handled event:" + std::to_string(static_cast<int>(Engine::F_KEY_DOWN)));
 			e.Handled = true;
@@ -17,22 +17,22 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEnt
 
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::RESIZE_WINDOW, [](Engine::IOEvent& e)
 		{
-			Engine::ICallbackSystem::GetInstance()->TriggerCallback(Engine::Type::ResizeWindow, std::make_pair(e.X_POS, e.Y_POS));
+			// Window Interface to call the resize function.
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::RESIZE_WINDOW)));
 			e.Handled = true;
 		});
 
-	Engine::IOEventSystem::RegisterIOEventListener(Engine::ESCAPE_KEY_DOWN, [](Engine::IOEvent& e)
+	Engine::IOEventSystem::RegisterIOEventListener(Engine::ESCAPE_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::ESCAPE_KEY_DOWN)));
-			Engine::ICallbackSystem::GetInstance()->TriggerCallback(Engine::Type::EndApplication, std::monostate{});
+			refApp.End();
 			e.Handled = true;
 		});
 
-	Engine::IOEventSystem::RegisterIOEventListener(Engine::QUIT, [](Engine::IOEvent& e)
+	Engine::IOEventSystem::RegisterIOEventListener(Engine::QUIT, [&](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::QUIT)));
-			Engine::ICallbackSystem::GetInstance()->TriggerCallback(Engine::Type::EndApplication, std::monostate{});
+			refApp.End();
 			e.Handled = true;
 		});
 

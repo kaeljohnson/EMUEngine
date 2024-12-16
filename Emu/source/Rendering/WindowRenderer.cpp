@@ -2,7 +2,6 @@
 
 #include "../../include/ISDL/ISDL.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Rendering/WindowRenderer.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Components.h"
@@ -69,7 +68,7 @@ namespace Engine
 
 		ENGINE_CRITICAL("Renderer created.");
 
-		ICallbackSystem::GetInstance()->NewCallback(Type::ToggleFullscreen, [&](Data data)
+		/*ICallbackSystem::GetInstance()->NewCallback(Type::ToggleFullscreen, [&](Data data)
 			{
 				ToggleFullscreen();
 				SetViewport();
@@ -81,7 +80,7 @@ namespace Engine
 
 				ResizeWindow(windowSize.first, windowSize.second);
 				SetViewport();
-			});
+			});*/
 	}
 
 	void WindowRenderer::Render(Entity* currentCameraEntity)
