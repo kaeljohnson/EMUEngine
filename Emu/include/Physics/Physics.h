@@ -43,12 +43,12 @@ namespace Engine
 		// void CreateWorld(const Vector2D<float> gravity);
 		void UpdateGravity(const Vector2D<float> gravity);
 		void AddPhysicsBodiesToWorld();
-		
+
+		void Update();
+
 		void DestroyWorld();
 		void Cleanup();
 
-		void Update();
-		
 	private:
 		b2WorldId* m_ptrWorldId;
 	};

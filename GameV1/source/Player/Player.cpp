@@ -25,8 +25,7 @@
 		Engine::Physics::CreateBody(ptrEntity);
 
         Engine::ECS::GetComponentManager<Engine::PhysicsBody>().AddComponent(ptrEntity);
-		Engine::PhysicsBody* ptrPhysicsBody =
-			Engine::Physics::GetBody(ptrEntity);
+		Engine::PhysicsBody* ptrPhysicsBody = Engine::Physics::GetBody(ptrEntity);
 		ptrPhysicsBody->m_bodyType = Engine::BodyType::DYNAMIC;
         ptrPhysicsBody->m_startingPosition = Engine::Vector2D<float>(startingX, startingY);
 		ptrPhysicsBody->m_dimensions = Engine::Vector2D<float>(width, height);

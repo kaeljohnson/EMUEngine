@@ -11,8 +11,6 @@
 
 namespace Engine
 {
-	// b2WorldId* Physics::m_ptrWorldId = nullptr;
-
 	// Physics System
 	void Physics::CreateBody(Entity* ptrEntity)
 	{

@@ -22,7 +22,7 @@ namespace Engine
 
 	Scene::~Scene()
 	{
-		m_physicsSimulation.DestroyWorld();
+		m_physicsSimulation.Cleanup();
 	}
 
 	void Scene::CheckValid()

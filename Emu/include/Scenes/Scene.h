@@ -35,7 +35,7 @@ namespace Engine
 	private:
 		Vector2D<int> m_levelDimensionsInUnits;
 		TileMap* m_tileMap; 
-		// Vector2D<float> m_gravity;
+
 		PhysicsSimulation m_physicsSimulation;
 
 		std::vector<Entity*> m_entities;

@@ -87,7 +87,6 @@ namespace Engine
 
 			if (!Time::IsAppRunning())
 			{ 
-				// Cleanup static objects
 				ContactSystem::Cleanup();
 				m_sceneManager.Cleanup();
 				ECS::Cleanup();
