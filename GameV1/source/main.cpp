@@ -54,8 +54,8 @@ int main(int argc, char* args[])
 	refSceneManager.AddScene("Level2", scene2);
 
 	//// Need physcis to scale with pixels per unit.
-	scene->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
-	scene2->CreatePhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
+	scene->SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
+	scene2->SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 
 	Engine::TileMap testMap("testMap1.txt", 1);
 	scene->AddTileMap(testMap);
@@ -105,7 +105,7 @@ int main(int argc, char* args[])
 
 	refSceneManager.LoadScene("Level1");
 
-	AppManagementEventHandlers appManagementEventHandlers(ptrCameraEntity, ptrPlayerEntity);
+	AppManagementEventHandlers appManagementEventHandlers(ptrCameraEntity, ptrPlayerEntity, app);
 
 	app.Start();
 	// Need to figure out how to change scenes, stop scenes, etc.

@@ -4,6 +4,7 @@
 #include "../ECS/ECS.h"
 #include "../ECS/Entity.h"
 #include "../Tiles/TileMap.h" 
+#include "../Physics/Physics.h"
 #include "../Includes.h"
 #include "../Core.h"
 #include "../MathUtil.h"
@@ -19,7 +20,7 @@ namespace Engine
 		EMU_API Scene();
 		EMU_API ~Scene();
 
-		EMU_API void CreatePhysicsSimulation(const Vector2D<float> gravity);
+		EMU_API void SetPhysicsSimulation(const Vector2D<float> gravity);
 	
 		EMU_API void Add(Entity* ptrEntity);
 
@@ -34,7 +35,8 @@ namespace Engine
 	private:
 		Vector2D<int> m_levelDimensionsInUnits;
 		TileMap* m_tileMap; 
-		Vector2D<float> m_gravity;
+
+		PhysicsSimulation m_physicsSimulation;
 
 		std::vector<Entity*> m_entities;
 

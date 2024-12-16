@@ -5,7 +5,7 @@
 #include "../../include/EventHandlers/AppManagementEventHandlers.h"
 
 
-AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEntity, Engine::Entity* playerEntity) 
+AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEntity, Engine::Entity* playerEntity, Engine::Application& refApp) 
 {
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::F_KEY_DOWN, [](Engine::IOEvent& e)
 		{
@@ -53,7 +53,7 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEnt
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::L_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::L_KEY_DOWN)));
-			// Engine::Application::GetInstance()->GetSceneManager().LoadScene("Level2");
+			refApp.GetSceneManager().LoadScene("Level2");
 			e.Handled = true;
 		});
 
