@@ -19,8 +19,6 @@ namespace Engine
 
 		EMU_API ~Application();
 
-		WindowRenderer& GetWindowRenderer() { return m_windowRenderer; }
-
 		// Deleted functions to ensure our app instance cannot be copied or moved.
 		Application(const Application&) = delete;
 		Application& operator=(const Application&) = delete;

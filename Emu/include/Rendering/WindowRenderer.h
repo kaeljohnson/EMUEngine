@@ -14,9 +14,9 @@ namespace Engine
 	{
 	public:
 		// Client interface for now
-		EMU_API void SetViewport();
-		EMU_API void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
-		EMU_API void ToggleFullscreen();
+		void SetViewport();
+		void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
+		void ToggleFullscreen();
 
 	public: 
 		WindowRenderer();
