@@ -10,6 +10,8 @@
 
 namespace Engine
 {
+	bool Screen::WINDOW_RESIZE_REQUEST = false;
+	bool Screen::TOGGLE_FULLSCREEN_REQUEST = false;
 	Vector2D<int> Screen::VIEWPORT_SIZE = Vector2D<int>(0, 0);
 	Vector2D<int> Screen::VIEWPORT_POSITION = Vector2D<int>(0, 0);
 	Vector2D<float> Screen::SCALE = Vector2D<float>(0.0f, 0.0f);
@@ -88,6 +90,20 @@ namespace Engine
 		Camera* ptrCurrentCamera = ECS::GetComponentManager<Camera>().GetComponent(currentCameraEntity);
 
 		ClearScreen();
+
+		if (Screen::WINDOW_RESIZE_REQUEST)
+		{
+			ResizeWindow(Screen::SCREEN_SIZE.X, Screen::SCREEN_SIZE.Y);
+			SetViewport();
+			Screen::WINDOW_RESIZE_REQUEST = false;
+		}
+
+		if (Screen::TOGGLE_FULLSCREEN_REQUEST)
+		{
+			ToggleFullscreen();
+			SetViewport();
+			Screen::TOGGLE_FULLSCREEN_REQUEST = false;
+		}
 
 		// Calculate camera bounds
 		float cameraLeft = ptrCurrentCamera->m_offset.X;

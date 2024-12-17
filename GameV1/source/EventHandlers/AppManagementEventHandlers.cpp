@@ -7,17 +7,21 @@
 
 AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEntity, Engine::Entity* playerEntity, Engine::Application& refApp) 
 {
-	Engine::IOEventSystem::RegisterIOEventListener(Engine::F_KEY_DOWN, [](Engine::IOEvent& e)
+	Engine::IOEventSystem::RegisterIOEventListener(Engine::F_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			// Need interface to toggle fullscreen.
+			// refApp.GetWindowRenderer().ToggleFullscreen();
+			Engine::Screen::SetFullscreen();
 			// Could add a setter for handled state and put the trace in there.
 			CLIENT_TRACE_D("Handled event:" + std::to_string(static_cast<int>(Engine::F_KEY_DOWN)));
 			e.Handled = true;
 		});
 
-	Engine::IOEventSystem::RegisterIOEventListener(Engine::RESIZE_WINDOW, [](Engine::IOEvent& e)
+	Engine::IOEventSystem::RegisterIOEventListener(Engine::RESIZE_WINDOW, [&](Engine::IOEvent& e)
 		{
 			// Window Interface to call the resize function.
+			// refApp.GetWindowRenderer().ResizeWindow(e.X_POS, e.Y_POS);
+			Engine::Screen::SetWindowSize(Engine::Vector2D<int>(e.X_POS, e.Y_POS));
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::RESIZE_WINDOW)));
 			e.Handled = true;
 		});
