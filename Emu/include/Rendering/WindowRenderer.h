@@ -8,8 +8,6 @@
 
 namespace Engine
 {
-	//class ISDL;
-
 	class WindowRenderer
 	{
 	public:
