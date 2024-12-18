@@ -8,10 +8,14 @@
 
 namespace Engine
 {
-	class ISDL;
-
 	class WindowRenderer
 	{
+	public:
+		// Client interface for now
+		void SetViewport();
+		void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
+		void ToggleFullscreen();
+
 	public: 
 		WindowRenderer();
 		~WindowRenderer();
@@ -19,10 +23,6 @@ namespace Engine
 		void Render(Entity* currentEntity);
 		void Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Display();
-
-		void SetViewport();
-		void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
-		void ToggleFullscreen();
 
 		void ClearScreen();
 

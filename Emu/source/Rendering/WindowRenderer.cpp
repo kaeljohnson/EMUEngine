@@ -2,7 +2,6 @@
 
 #include "../../include/ISDL/ISDL.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/CallbackSystem/CallbackSystem.h"
 #include "../../include/Rendering/WindowRenderer.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Components.h"
@@ -11,6 +10,8 @@
 
 namespace Engine
 {
+	bool Screen::WINDOW_RESIZE_REQUEST = false;
+	bool Screen::TOGGLE_FULLSCREEN_REQUEST = false;
 	Vector2D<int> Screen::VIEWPORT_SIZE = Vector2D<int>(0, 0);
 	Vector2D<int> Screen::VIEWPORT_POSITION = Vector2D<int>(0, 0);
 	Vector2D<float> Screen::SCALE = Vector2D<float>(0.0f, 0.0f);
@@ -68,20 +69,6 @@ namespace Engine
 		m_rendererCreated = true;
 
 		ENGINE_CRITICAL("Renderer created.");
-
-		ICallbackSystem::GetInstance()->NewCallback(Type::ToggleFullscreen, [&](Data data)
-			{
-				ToggleFullscreen();
-				SetViewport();
-			});
-
-		ICallbackSystem::GetInstance()->NewCallback(Type::ResizeWindow, [&](Data data)
-			{
-				const std::pair<int, int> windowSize = std::get<const std::pair<int, int>>(data);
-
-				ResizeWindow(windowSize.first, windowSize.second);
-				SetViewport();
-			});
 	}
 
 	void WindowRenderer::Render(Entity* currentCameraEntity)
@@ -89,6 +76,20 @@ namespace Engine
 		Camera* ptrCurrentCamera = ECS::GetComponentManager<Camera>().GetComponent(currentCameraEntity);
 
 		ClearScreen();
+
+		if (Screen::WINDOW_RESIZE_REQUEST)
+		{
+			ResizeWindow(Screen::SCREEN_SIZE.X, Screen::SCREEN_SIZE.Y);
+			SetViewport();
+			Screen::WINDOW_RESIZE_REQUEST = false;
+		}
+
+		if (Screen::TOGGLE_FULLSCREEN_REQUEST)
+		{
+			ToggleFullscreen();
+			SetViewport();
+			Screen::TOGGLE_FULLSCREEN_REQUEST = false;
+		}
 
 		// Calculate camera bounds
 		float cameraLeft = ptrCurrentCamera->m_offset.X;

@@ -5,7 +5,6 @@
 #include "../include/Init.h"
 #include "../include/Events/IOEventSystem.h"
 #include "../include/Events/IOEvent.h"
-#include "../include/CallbackSystem/CallbackSystem.h"
 #include "../include/Logging/Logger.h"
 #include "../include/Scenes/SceneFactory.h"
 #include "../include/Scenes/Scene.h"
@@ -31,6 +30,5 @@ namespace Engine
 	using ScenePtr = std::shared_ptr<Scene>;
 	using PhysicsBodyPtr = std::shared_ptr<PhysicsBody>;
 	using ApplicationPtr = Application*;
-	using ICallbackSystemPtr = ICallbackSystem*;
 	using EntityID = size_t;
 }

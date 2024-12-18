@@ -15,6 +15,7 @@ namespace Engine
 		EMU_API void Start();
 		EMU_API inline CameraManager& GetCameraManager() { return m_cameraManager; }
 		EMU_API inline SceneManager& GetSceneManager() { return m_sceneManager; }
+		EMU_API void End();
 
 		EMU_API ~Application();
 
@@ -25,12 +26,8 @@ namespace Engine
 		Application& operator=(Application&&) = delete;
 
 	private:
-
 		CameraManager m_cameraManager;
 		WindowRenderer m_windowRenderer;
 		SceneManager m_sceneManager;
-
-		void defineDefaultApplicationCallbacks();
-		void end();
 	};
 }
