@@ -5,6 +5,9 @@
 
 namespace Engine
 {
+
+	// Interface for client to set window size and fullscreen along with other misc screen properties
+	// Should this class be un-staticified and given a pointer to the window?
 	struct Screen
 	{
 		EMU_API inline static const Vector2D<int> GetScreenSize() { return SCREEN_SIZE; }

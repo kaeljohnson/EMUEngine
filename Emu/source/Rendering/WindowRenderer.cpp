@@ -69,20 +69,6 @@ namespace Engine
 		m_rendererCreated = true;
 
 		ENGINE_CRITICAL("Renderer created.");
-
-		/*ICallbackSystem::GetInstance()->NewCallback(Type::ToggleFullscreen, [&](Data data)
-			{
-				ToggleFullscreen();
-				SetViewport();
-			});
-
-		ICallbackSystem::GetInstance()->NewCallback(Type::ResizeWindow, [&](Data data)
-			{
-				const std::pair<int, int> windowSize = std::get<const std::pair<int, int>>(data);
-
-				ResizeWindow(windowSize.first, windowSize.second);
-				SetViewport();
-			});*/
 	}
 
 	void WindowRenderer::Render(Entity* currentCameraEntity)
