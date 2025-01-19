@@ -14,21 +14,21 @@ namespace Engine
     public:
         static void Initialize(size_t maxID) 
         {
-            ECS::maxID = maxID;
+            m_maxID = maxID;
         }
         
         static Entity* CreateEntity() 
         {
-            if (usedIDs.size() >= maxID + 1) 
+            if (m_usedIDs.size() >= m_maxID + 1) 
             {
                 throw std::runtime_error("Error: All IDs are taken.");
             }
 
-            for (size_t id = 0; id <= maxID; ++id) 
+            for (size_t id = 0; id <= m_maxID; ++id) 
             {
-                if (usedIDs.find(id) == usedIDs.end()) 
+                if (m_usedIDs.find(id) == m_usedIDs.end()) 
                 {
-                    usedIDs.insert(id);
+                    m_usedIDs.insert(id);
                     Entity* ptrEntity = new Entity(id);
                     return ptrEntity;
                 }
@@ -41,7 +41,7 @@ namespace Engine
         static void DestroyEntity(Entity* ptrEntity) 
         {
             // Ensure the entity is active
-            if (usedIDs.find(ptrEntity->GetID()) != usedIDs.end()) 
+            if (m_usedIDs.find(ptrEntity->GetID()) != m_usedIDs.end()) 
             {
                 // Recycle the entity ID
                 releaseID(ptrEntity->GetID());
@@ -57,7 +57,7 @@ namespace Engine
 		static void RegisterComponentManager()
 		{
             m_componentManagers[std::type_index(typeid(T))] = std::make_unique<ComponentManager<T>>();
-			m_componentManagers[std::type_index(typeid(T))]->Allocate(maxID);
+			m_componentManagers[std::type_index(typeid(T))]->Allocate(m_maxID);
 		}
 
 		template<typename T>
@@ -139,13 +139,13 @@ namespace Engine
 
     private:
         // These must be exposed through API so the client app shares the same objects.
-        EMU_API static EntityID maxID;
-        EMU_API static std::unordered_set<size_t> usedIDs;
+        EMU_API static EntityID m_maxID;
+        EMU_API static std::unordered_set<size_t> m_usedIDs;
         EMU_API static std::unordered_map<std::type_index, std::unique_ptr<ComponentManagerBase>> m_componentManagers;
 
         static void releaseID(size_t id)
         {
-            usedIDs.erase(id);
+            m_usedIDs.erase(id);
         }
     };
 }

@@ -8,6 +8,7 @@
 #include "../include/ECS/ComponentManager.h"
 #include "../include/Components.h"
 #include "../include/Camera/Camera.h"
+#include "../include/EMU.h"
 
 namespace Engine
 {
@@ -30,5 +31,7 @@ namespace Engine
 
 		if (ISDL::Init() < 0)
 			ENGINE_CRITICAL("SDL Init failed! SDL_Error: " + std::string(ISDL::GetError()));
+
+		EMU::Init();
 	}
 }

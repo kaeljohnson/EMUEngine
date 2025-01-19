@@ -1,14 +1,13 @@
 #pragma once
 
 #include "../include/Core.h"
-#include "../include/Application.h"
 #include "../include/Init.h"
+#include "../include/EMU.h"
 #include "../include/Events/IOEventSystem.h"
 #include "../include/Events/IOEvent.h"
 #include "../include/Logging/Logger.h"
 #include "../include/Scenes/SceneFactory.h"
 #include "../include/Scenes/Scene.h"
-#include "../include/Scenes/SceneManager.h"
 #include "../include/Physics/BodyTypes.h"
 #include "../include/Physics/Physics.h"
 #include "../include/Components.h"
@@ -29,6 +28,5 @@ namespace Engine
 {
 	using ScenePtr = std::shared_ptr<Scene>;
 	using PhysicsBodyPtr = std::shared_ptr<PhysicsBody>;
-	using ApplicationPtr = Application*;
 	using EntityID = size_t;
 }

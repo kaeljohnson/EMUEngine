@@ -5,7 +5,7 @@
 #include "../../include/EventHandlers/AppManagementEventHandlers.h"
 
 
-AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEntity, Engine::Entity* playerEntity, Engine::Application& refApp) 
+AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEntity, Engine::Entity* playerEntity) 
 {
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::F_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
@@ -29,14 +29,14 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEnt
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::ESCAPE_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::ESCAPE_KEY_DOWN)));
-			refApp.End();
+			Engine::EMU::GetInstance()->EndApp();
 			e.Handled = true;
 		});
 
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::QUIT, [&](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::QUIT)));
-			refApp.End();
+			Engine::EMU::GetInstance()->EndApp();
 			e.Handled = true;
 		});
 
@@ -57,7 +57,7 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEnt
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::L_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::L_KEY_DOWN)));
-			refApp.GetSceneManager().LoadScene("Level2");
+			Engine::EMU::GetInstance()->LoadScene("Level2");
 			e.Handled = true;
 		});
 

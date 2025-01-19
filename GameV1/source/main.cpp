@@ -40,18 +40,16 @@ struct TestSensorListener : public Engine::MultiEntitySensorListener
 int main(int argc, char* args[])
 {
 	Engine::Init();
+	Engine::EMU* engine = Engine::EMU::GetInstance();
 
 	CLIENT_INFO_D("Client Running!");
 
-	Engine::Application app;
-	Engine::CameraManager& refCameraManager = app.GetCameraManager();
-	Engine::SceneManager& refSceneManager = app.GetSceneManager();
+	// Engine::Application app;
+	// Engine::CameraManager& refCameraManager = app.GetCameraManager();
+	// Engine::SceneManager& refSceneManager = app.GetSceneManager();
 
-	Engine::ScenePtr scene = Engine::CreateScene();
-	Engine::ScenePtr scene2 = Engine::CreateScene();
-
-	refSceneManager.AddScene("Level1", scene);
-	refSceneManager.AddScene("Level2", scene2);
+	Engine::ScenePtr scene = engine->CreateScene("Level1");
+	Engine::ScenePtr scene2 = engine->CreateScene("Level2");
 
 	//// Need physcis to scale with pixels per unit.
 	scene->SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
@@ -96,18 +94,18 @@ int main(int argc, char* args[])
 	ptrCameraEntity->SetPriority(0);
 
 	PlayerCamera playerCamera(ptrCameraEntity, ptrPlayerEntity);
-	refCameraManager.SetCurrentCamera(ptrCameraEntity);
+	engine->SetCurrentCamera(ptrCameraEntity);
 
 	scene2->Add(ptrPlayerEntity);
 
 	Engine::TileMap testMap2("TestMap2.txt", 1);
 	scene2->AddTileMap(testMap2);
 
-	refSceneManager.LoadScene("Level1");
+	engine->LoadScene("Level1");
 
-	AppManagementEventHandlers appManagementEventHandlers(ptrCameraEntity, ptrPlayerEntity, app);
+	AppManagementEventHandlers appManagementEventHandlers(ptrCameraEntity, ptrPlayerEntity);
 
-	app.Start();
+	engine->RunApp();
 	// Need to figure out how to change scenes, stop scenes, etc.
 
 	return 0;

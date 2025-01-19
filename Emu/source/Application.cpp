@@ -16,8 +16,8 @@
 
 namespace Engine
 {
-	Application::Application()
-		: m_cameraManager(), m_windowRenderer()
+	Application::Application(CameraManager& refCameraManager, WindowRenderer& refWindowRenderer, SceneManager& refSceneManager)
+		: m_cameraManager(refCameraManager), m_windowRenderer(refWindowRenderer), m_sceneManager(refSceneManager)
 	{}
 
 	void Application::Start()
@@ -84,9 +84,9 @@ namespace Engine
 
 			if (!Time::IsAppRunning())
 			{ 
-				ContactSystem::Cleanup();
+				// ContactSystem::Cleanup();
 				m_sceneManager.Cleanup();
-				ECS::Cleanup();
+				// ECS::Cleanup();
 			}
 		}
 	}
