@@ -159,8 +159,8 @@ namespace Engine
 	}
 
 	// Physics Simulation
-	PhysicsSimulation::PhysicsSimulation(const Vector2D<float> gravity)
-		: m_ptrWorldId(nullptr)
+	PhysicsSimulation::PhysicsSimulation(const Vector2D<float> gravity, ContactSystem& refContactSystem)
+		: m_ptrWorldId(nullptr), m_refContactSystem(refContactSystem)
 	{
 		ENGINE_INFO_D("Creating World!");
 
@@ -235,7 +235,7 @@ namespace Engine
 	void PhysicsSimulation::Update()
 	{
 		b2World_Step(*m_ptrWorldId, Time::GetTimeStep(), 4);
-		ContactSystem::ProcessContacts(m_ptrWorldId);
+		m_refContactSystem.ProcessContacts(m_ptrWorldId);
 	}
 
 	void PhysicsSimulation::DestroyWorld()

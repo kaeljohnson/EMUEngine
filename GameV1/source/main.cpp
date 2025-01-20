@@ -82,10 +82,10 @@ int main(int argc, char* args[])
 	TestContactListener testContactListener(ptrPlayerEntity, ptrTestEntity);
 	TestSensorListener testSensorListener(ptrPlayerEntity, ptrTestEntity);
 
-	Engine::ContactSystem::RegisterContactListener(&testContactListener);
-	Engine::ContactSystem::RegisterContactListener(&testSensorListener);
+	Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactListener(&testContactListener);
+	Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactListener(&testSensorListener);
 
-	Engine::ContactSystem::RegisterContactHandler(Engine::SingleEntityBeginContactKey(ptrTestEntity), [](Engine::Contact event)
+	Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactHandler(Engine::SingleEntityBeginContactKey(ptrTestEntity), [](Engine::Contact event)
 		{
 			CLIENT_INFO_D("TEST");
 		});

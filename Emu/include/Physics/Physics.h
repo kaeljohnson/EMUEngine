@@ -44,7 +44,7 @@ namespace Engine
 	class PhysicsSimulation
 	{
 	public:
-		PhysicsSimulation(const Vector2D<float> gravity);
+		PhysicsSimulation(const Vector2D<float> gravity, ContactSystem& refContactSystem);
 		// void CreateWorld(const Vector2D<float> gravity);
 		void UpdateGravity(const Vector2D<float> gravity);
 		void AddPhysicsBodiesToWorld();
@@ -56,5 +56,6 @@ namespace Engine
 
 	private:
 		b2WorldId* m_ptrWorldId;
+		ContactSystem& m_refContactSystem;
 	};
 }

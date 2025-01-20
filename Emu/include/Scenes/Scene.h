@@ -17,7 +17,7 @@ namespace Engine
 	class Scene
 	{
 	public:
-		EMU_API Scene(PhysicsInterface& refPhysicsInterface);
+		EMU_API Scene(PhysicsInterface& refPhysicsInterface, ContactSystem& refContactSystem);
 		EMU_API ~Scene();
 
 		EMU_API void SetPhysicsSimulation(const Vector2D<float> gravity);

@@ -5,17 +5,6 @@
 
 namespace Engine
 {
-
-	std::unordered_map<size_t, SingleEntityContactListener*> ContactSystem::m_singleEntityContactListeners;
-	std::unordered_map<size_t, MultiEntityContactListener*> ContactSystem::m_multiEntityContactListeners;
-	std::unordered_map<size_t, SingleEntitySensorListener*> ContactSystem::m_singleEntitySensorListeners;
-	std::unordered_map<size_t, MultiEntitySensorListener*> ContactSystem::m_multiEntitySensorListeners;
-
-	std::unordered_map<SingleEntityBeginContactKey, std::function<void(const Contact&)>> ContactSystem::m_beginContactHandlers;
-	std::unordered_map<SingleEntityEndContactKey, std::function<void(const Contact&)>> ContactSystem::m_endContactHandlers;
-	std::unordered_map<MultiEntityBeginContactKey, std::function<void(const Contact&)>> ContactSystem::m_multiContactHandlers;
-	std::unordered_map<MultiEntityEndContactKey, std::function<void(const Contact&)>> ContactSystem::m_multiEndContactHandlers;
-
 	void ContactSystem::ProcessContacts(void* ptrWorldId)
 	{
 		// Process ContactComponents
@@ -334,3 +323,4 @@ namespace Engine
 		m_multiEndContactHandlers.clear();
 	}
 }
+

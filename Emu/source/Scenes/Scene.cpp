@@ -13,8 +13,9 @@
 
 namespace Engine
 {
-	Scene::Scene(PhysicsInterface& refPhysicsInterface) : m_levelDimensionsInUnits(32, 32), HasTileMap(false),
-		m_tileMap(nullptr), m_physicsSimulation(Vector2D<float>(0.0f, 100.0f)),
+	Scene::Scene(PhysicsInterface& refPhysicsInterface, ContactSystem& refContactSystem)
+		: m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(nullptr), 
+		m_physicsSimulation(Vector2D<float>(0.0f, 100.0f), refContactSystem), 
 		m_refPhysicsInterface(refPhysicsInterface),
 		refTransformManager(ECS::GetComponentManager<Transform>()),
 		refPhysicsBodyManager(ECS::GetComponentManager<PhysicsBody>()),
