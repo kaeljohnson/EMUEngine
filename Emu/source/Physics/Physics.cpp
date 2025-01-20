@@ -11,32 +11,38 @@
 
 namespace Engine
 {
-	// Physics System
-	void Physics::CreateBody(Entity* ptrEntity)
+	// Physics Interface functions
+
+	PhysicsInterface::PhysicsInterface(/*ECS& refEcs*/)
+	{
+		ENGINE_INFO_D("Physics Interface created!");
+	}
+
+	void PhysicsInterface::CreateBody(Entity* ptrEntity)
 	{
 		ECS::GetComponentManager<PhysicsBody>().AddComponent(ptrEntity);
 	}
 
-	PhysicsBody* Physics::GetBody(Entity* ptrEntity)
+	PhysicsBody* PhysicsInterface::GetBody(Entity* ptrEntity)
 	{
 		return ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity);
 	}
 
-	void Physics::SetPosition(Entity* ptrEntity, Vector2D<float> position)
+	void PhysicsInterface::SetPosition(Entity* ptrEntity, Vector2D<float> position)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
 		b2Rot rotation = b2Body_GetRotation(bodyId);
 		b2Body_SetTransform(bodyId, b2Vec2(position.X, position.Y), rotation);
 	}
 
-	const Vector2D<float> Physics::GetPosition(Entity* ptrEntity)
+	const Vector2D<float> PhysicsInterface::GetPosition(Entity* ptrEntity)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
 		b2Vec2 position = b2Body_GetPosition(bodyId);
 		return Vector2D<float>(position.x, position.y);
 	}
 
-	const Vector2D<float> Physics::GetTopLeftPosition(Entity* ptrEntity)
+	const Vector2D<float> PhysicsInterface::GetTopLeftPosition(Entity* ptrEntity)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
 		b2Vec2 position = b2Body_GetPosition(bodyId);
@@ -44,20 +50,20 @@ namespace Engine
 		return Vector2D<float>(position.x - ptrPhysicsBody->m_halfDimensions.X, position.y - ptrPhysicsBody->m_halfDimensions.Y);
 	}
 
-	void Physics::ApplyForceToBody(Entity* ptrEntity, Vector2D<float> force)
+	void PhysicsInterface::ApplyForceToBody(Entity* ptrEntity, Vector2D<float> force)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
 		b2Body_ApplyForceToCenter(bodyId, b2Vec2(force.X, force.Y), true);
 	}
 
-	void Physics::ApplyImpulseToBody(Entity* ptrEntity, Vector2D<float> impulse)
+	void PhysicsInterface::ApplyImpulseToBody(Entity* ptrEntity, Vector2D<float> impulse)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
 		b2Body_ApplyLinearImpulseToCenter(bodyId, b2Vec2(impulse.X, impulse.Y), true);
 	}
 
 	// PhysicsBody2d getter and setter wrappers
-	void Physics::SetGravity(Entity* ptrEntity, bool enabled)
+	void PhysicsInterface::SetGravity(Entity* ptrEntity, bool enabled)
 	{
 		PhysicsBody* ptrPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity);
 		ptrPhysicsBody->m_gravityOn = enabled;
@@ -66,59 +72,59 @@ namespace Engine
 
 	}
 
-	void Physics::SetDeceleration(Entity* ptrEntity, const float decel)
+	void PhysicsInterface::SetDeceleration(Entity* ptrEntity, const float decel)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
 		b2Body_SetLinearDamping(bodyId, decel);
 
 	}
 
-	void Physics::SetVelocity(Entity* ptrEntity, const Vector2D<float> velocity)
+	void PhysicsInterface::SetVelocity(Entity* ptrEntity, const Vector2D<float> velocity)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
 		b2Body_SetLinearVelocity(bodyId, b2Vec2(velocity.X, velocity.Y));
 	}
 
-	void Physics::SetXVelocity(Entity* ptrEntity, const float xVel)
+	void PhysicsInterface::SetXVelocity(Entity* ptrEntity, const float xVel)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
 		b2Vec2 velocity = b2Body_GetLinearVelocity(bodyId);
 		b2Body_SetLinearVelocity(bodyId, b2Vec2(xVel, velocity.y));
 	}
 
-	void Physics::SetYVelocity(Entity* ptrEntity, const float yVel)
+	void PhysicsInterface::SetYVelocity(Entity* ptrEntity, const float yVel)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
 		b2Vec2 velocity = b2Body_GetLinearVelocity(bodyId);
 		b2Body_SetLinearVelocity(bodyId, b2Vec2(velocity.x, yVel));
 	}
 
-	const Vector2D<float> Physics::GetVelocity(Entity* ptrEntity)
+	const Vector2D<float> PhysicsInterface::GetVelocity(Entity* ptrEntity)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
 		b2Vec2 velocity = b2Body_GetLinearVelocity(bodyId);
 		return Vector2D<float>(velocity.x, velocity.y);
 	}
 
-	void Physics::SetRestitution(Entity* ptrEntity, const float restitution)
+	void PhysicsInterface::SetRestitution(Entity* ptrEntity, const float restitution)
 	{
 		b2ShapeId shapeId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_shapeId;
 		b2Shape_SetRestitution(shapeId, restitution);
 	}
 
-	void Physics::SetDensity(Entity* ptrEntity, const float density)
+	void PhysicsInterface::SetDensity(Entity* ptrEntity, const float density)
 	{
 		b2ShapeId shapeId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_shapeId;
 		b2Shape_SetDensity(shapeId, density, true);
 	}
 
-	void Physics::SetFriction(Entity* ptrEntity, const float friction)
+	void PhysicsInterface::SetFriction(Entity* ptrEntity, const float friction)
 	{
 		b2ShapeId shapeId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_shapeId;
 		b2Shape_SetFriction(shapeId, friction);
 	}
 
-	void Physics::RemoveBodyFromWorld(Entity* ptrEntity)
+	void PhysicsInterface::RemoveBodyFromWorld(Entity* ptrEntity)
 	{
 		PhysicsBody* ptrPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity);
 		if (ptrPhysicsBody->m_bodyId == nullptr) return;
@@ -129,13 +135,13 @@ namespace Engine
 		ptrPhysicsBody->m_worldId = nullptr;
 	}
 
-	void Physics::SetFixedRotation(Entity* ptrEntity, bool fixed)
+	void PhysicsInterface::SetFixedRotation(Entity* ptrEntity, bool fixed)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
 		b2Body_SetFixedRotation(bodyId, fixed);
 	}
 
-	const float Physics::GetAngleInRadians(Entity* ptrEntity)
+	const float PhysicsInterface::GetAngleInRadians(Entity* ptrEntity)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
 		b2Rot rotation = b2Body_GetRotation(bodyId);
@@ -143,7 +149,7 @@ namespace Engine
 		return angleInRadians;
 	}
 
-	const float Physics::GetAngleInDegrees(Entity* ptrEntity)
+	const float PhysicsInterface::GetAngleInDegrees(Entity* ptrEntity)
 	{
 		b2BodyId bodyId = *ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_bodyId;
 		b2Rot rotation = b2Body_GetRotation(bodyId);

@@ -10,29 +10,34 @@ struct b2WorldId;
 namespace Engine
 {
 	// Global utility physics interface
-	struct Physics
+	class PhysicsInterface
 	{
+	public:
 		// PhysicsBody2d getter and setter wrappers
-		EMU_API static void CreateBody(Entity* ptrEntity);
-		EMU_API static PhysicsBody* GetBody(Entity* ptrEntity);
-		EMU_API static void SetGravity(Entity* ptrEntity, bool enabled);
-		EMU_API static void SetPosition(Entity* ptrEntity, const Vector2D<float> position);
-		EMU_API static const Vector2D<float> GetPosition(Entity* ptrEntity);
-		EMU_API static const Vector2D<float> GetTopLeftPosition(Entity* ptrEntity);
-		EMU_API static void ApplyForceToBody(Entity* ptrEntity, Vector2D<float> force);
-		EMU_API static void ApplyImpulseToBody(Entity* ptrEntity, Vector2D<float> impulse);
-		EMU_API static void SetVelocity(Entity* ptrEntity, const Vector2D<float> velocity);
-		EMU_API static void SetXVelocity(Entity* ptrEntity, const float xVelocity);
-		EMU_API static void SetYVelocity(Entity* ptrEntity, const float yVelocity);
-		EMU_API static void SetDeceleration(Entity* ptrEntity, const float decel);
-		EMU_API static const Vector2D<float> GetVelocity(Entity* ptrEntity);
-		EMU_API static void SetRestitution(Entity* ptrEntity, const float restitution);
-		EMU_API static void SetDensity(Entity* ptrEntity, const float density);
-		EMU_API static void SetFriction(Entity* ptrEntity, const float friction);
-		EMU_API static void SetFixedRotation(Entity* ptrEntity, bool fixed);
-		EMU_API static const float GetAngleInRadians(Entity* ptrEntity);
-		EMU_API static const float GetAngleInDegrees(Entity* ptrEntity);
-		EMU_API static void RemoveBodyFromWorld(Entity* ptrEntity);
+		EMU_API void CreateBody(Entity* ptrEntity);
+		EMU_API PhysicsBody* GetBody(Entity* ptrEntity);
+		EMU_API void SetGravity(Entity* ptrEntity, bool enabled);
+		EMU_API void SetPosition(Entity* ptrEntity, const Vector2D<float> position);
+		EMU_API const Vector2D<float> GetPosition(Entity* ptrEntity);
+		EMU_API const Vector2D<float> GetTopLeftPosition(Entity* ptrEntity);
+		EMU_API void ApplyForceToBody(Entity* ptrEntity, Vector2D<float> force);
+		EMU_API void ApplyImpulseToBody(Entity* ptrEntity, Vector2D<float> impulse);
+		EMU_API void SetVelocity(Entity* ptrEntity, const Vector2D<float> velocity);
+		EMU_API void SetXVelocity(Entity* ptrEntity, const float xVelocity);
+		EMU_API void SetYVelocity(Entity* ptrEntity, const float yVelocity);
+		EMU_API void SetDeceleration(Entity* ptrEntity, const float decel);
+		EMU_API const Vector2D<float> GetVelocity(Entity* ptrEntity);
+		EMU_API void SetRestitution(Entity* ptrEntity, const float restitution);
+		EMU_API void SetDensity(Entity* ptrEntity, const float density);
+		EMU_API void SetFriction(Entity* ptrEntity, const float friction);
+		EMU_API void SetFixedRotation(Entity* ptrEntity, bool fixed);
+		EMU_API const float GetAngleInRadians(Entity* ptrEntity);
+		EMU_API const float GetAngleInDegrees(Entity* ptrEntity);
+		EMU_API void RemoveBodyFromWorld(Entity* ptrEntity);
+	public:
+		PhysicsInterface(/*ECS& refEcs*/);
+	private:
+		// ECS& m_refEcs;
 	};
 
 	// Physics simulation instantiated by scene

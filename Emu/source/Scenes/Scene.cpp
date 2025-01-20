@@ -13,8 +13,9 @@
 
 namespace Engine
 {
-	Scene::Scene() : m_levelDimensionsInUnits(32, 32), HasTileMap(false),
+	Scene::Scene(PhysicsInterface& refPhysicsInterface) : m_levelDimensionsInUnits(32, 32), HasTileMap(false),
 		m_tileMap(nullptr), m_physicsSimulation(Vector2D<float>(0.0f, 100.0f)),
+		m_refPhysicsInterface(refPhysicsInterface),
 		refTransformManager(ECS::GetComponentManager<Transform>()),
 		refPhysicsBodyManager(ECS::GetComponentManager<PhysicsBody>()),
 		refUpdatableManager(ECS::GetComponentManager<Updatable>()) {}
@@ -120,9 +121,9 @@ namespace Engine
 				Transform* ptrTransform = refTransformManager.GetComponent(ptrEntity);
 				
 				ptrTransform->PrevPosition = ptrTransform->Position;
-				ptrTransform->Position = Physics::GetTopLeftPosition(ptrEntity);
+				ptrTransform->Position = m_refPhysicsInterface.GetTopLeftPosition(ptrEntity);
 				ptrTransform->Dimensions = refPhysicsBody.m_dimensions;
-				ptrTransform->Rotation = Physics::GetAngleInDegrees(ptrEntity);
+				ptrTransform->Rotation = m_refPhysicsInterface.GetAngleInDegrees(ptrEntity);
 			}
 		}
 	};

@@ -6,7 +6,6 @@
 #include "../include/Events/IOEventSystem.h"
 #include "../include/Events/IOEvent.h"
 #include "../include/Logging/Logger.h"
-#include "../include/Scenes/SceneFactory.h"
 #include "../include/Scenes/Scene.h"
 #include "../include/Physics/BodyTypes.h"
 #include "../include/Physics/Physics.h"

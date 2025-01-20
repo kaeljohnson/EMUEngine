@@ -27,8 +27,12 @@ namespace Engine
 		// Camera Management
 		EMU_API void SetCurrentCamera(Entity* name);
 
+		EMU_API PhysicsInterface& PHYSICS() { return m_physicsInterface; }
+
 	private:
 		EMU();
+
+		PhysicsInterface m_physicsInterface;
 
 		CameraManager m_cameraManager;
 		WindowRenderer m_windowRenderer;
