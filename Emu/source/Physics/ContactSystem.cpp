@@ -5,10 +5,12 @@
 
 namespace Engine
 {
+	ContactSystem::ContactSystem(ECS& refECS) : m_refECS(refECS) {}
+
 	void ContactSystem::ProcessContacts(void* ptrWorldId)
 	{
 		// Process ContactComponents
-		for (SimpleContact& simpleContact : ECS::GetComponentManager<SimpleContact>())
+		for (SimpleContact& simpleContact : m_refECS.GetComponentManager<SimpleContact>())
 		{
 			simpleContact.m_contactAbove = false;
 			simpleContact.m_contactBelow = false;
@@ -17,7 +19,7 @@ namespace Engine
 
 			// Better way to access. Maybe can just store shapeId directly in SimpleContact component?
 			Entity* ptrEntity = simpleContact.GetEntity();
-			b2ShapeId* shapeId = ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_shapeId;
+			b2ShapeId* shapeId = m_refECS.GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_shapeId;
 
 			b2ContactData contactData[10];
 			int shapeContactCount = b2Shape_GetContactData(*shapeId, contactData, 10);

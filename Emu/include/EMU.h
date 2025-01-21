@@ -29,11 +29,12 @@ namespace Engine
 
 		EMU_API ContactSystem& CONTACT_SYSTEM() { return m_contactSystem; }
 		EMU_API PhysicsInterface& PHYSICS() { return m_physicsInterface; }
+		EMU_API ECS& IECS() { return m_ecs; }
 
 	private:
 		EMU();
 
-		// ECS m_ecs;
+		ECS m_ecs;
 		ContactSystem m_contactSystem;
 		PhysicsInterface m_physicsInterface;
 

@@ -41,6 +41,7 @@ int main(int argc, char* args[])
 {
 	Engine::Init();
 	Engine::EMU* engine = Engine::EMU::GetInstance();
+	Engine::ECS& refECS = engine->IECS();
 
 	CLIENT_INFO_D("Client Running!");
 
@@ -55,24 +56,24 @@ int main(int argc, char* args[])
 	scene->SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 	scene2->SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 
-	Engine::TileMap testMap("testMap1.txt", 1);
+	Engine::TileMap testMap(refECS, "testMap1.txt", 1);
 	scene->AddTileMap(testMap);
 
-	Engine::Entity* ptrPlayerEntity = Engine::ECS::CreateEntity();
+	Engine::Entity* ptrPlayerEntity = Engine::EMU::GetInstance()->IECS().CreateEntity();
 	ptrPlayerEntity->SetPriority(0);
 	scene->Add(ptrPlayerEntity);
 
 	Player player(ptrPlayerEntity, 6.0f, 1.0f, 0.75f, 0.75f);
 
-	Engine::Entity* ptrTestEntity = Engine::ECS::CreateEntity();
+	Engine::Entity* ptrTestEntity = Engine::EMU::GetInstance()->IECS().CreateEntity();
 	ptrTestEntity->SetPriority(1);
 	scene->Add(ptrTestEntity);
-	Engine::ECS::GetComponentManager<Engine::Transform>().AddComponent(ptrTestEntity,
+	Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Transform>().AddComponent(ptrTestEntity,
 		Engine::Vector2D(12.0f, 12.0f), Engine::Vector2D(1.0f, 1.0f), 1.0f, 1.0f, 1.0f);
 
-	Engine::ECS::GetComponentManager<Engine::PhysicsBody>().AddComponent(ptrTestEntity);
+	Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::PhysicsBody>().AddComponent(ptrTestEntity);
 	Engine::PhysicsBody* ptrPhysicsBody =
-		Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(ptrTestEntity);
+		Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::PhysicsBody>().GetComponent(ptrTestEntity);
 	ptrPhysicsBody->m_bodyType = Engine::BodyType::DYNAMIC;
 	ptrPhysicsBody->m_startingPosition = Engine::Vector2D<float>(12.0f, 12.0f);
 	ptrPhysicsBody->m_dimensions = Engine::Vector2D<float>(1.0f, 1.0f);
@@ -90,7 +91,7 @@ int main(int argc, char* args[])
 			CLIENT_INFO_D("TEST");
 		});
 
-	Engine::Entity* ptrCameraEntity = Engine::ECS::CreateEntity();
+	Engine::Entity* ptrCameraEntity = Engine::EMU::GetInstance()->IECS().CreateEntity();
 	ptrCameraEntity->SetPriority(0);
 
 	PlayerCamera playerCamera(ptrCameraEntity, ptrPlayerEntity);
@@ -98,7 +99,7 @@ int main(int argc, char* args[])
 
 	scene2->Add(ptrPlayerEntity);
 
-	Engine::TileMap testMap2("TestMap2.txt", 1);
+	Engine::TileMap testMap2(refECS, "TestMap2.txt", 1);
 	scene2->AddTileMap(testMap2);
 
 	engine->LoadScene("Level1");

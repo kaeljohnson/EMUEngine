@@ -35,16 +35,16 @@ namespace Engine
 		EMU_API const float GetAngleInDegrees(Entity* ptrEntity);
 		EMU_API void RemoveBodyFromWorld(Entity* ptrEntity);
 	public:
-		PhysicsInterface(/*ECS& refEcs*/);
+		PhysicsInterface(ECS& refEcs);
 	private:
-		// ECS& m_refEcs;
+		ECS& m_refECS;
 	};
 
 	// Physics simulation instantiated by scene
 	class PhysicsSimulation
 	{
 	public:
-		PhysicsSimulation(const Vector2D<float> gravity, ContactSystem& refContactSystem);
+		PhysicsSimulation(ECS& refECS, const Vector2D<float> gravity, ContactSystem& refContactSystem);
 		// void CreateWorld(const Vector2D<float> gravity);
 		void UpdateGravity(const Vector2D<float> gravity);
 		void AddPhysicsBodiesToWorld();
@@ -57,5 +57,6 @@ namespace Engine
 	private:
 		b2WorldId* m_ptrWorldId;
 		ContactSystem& m_refContactSystem;
+		ECS& m_refECS;
 	};
 }

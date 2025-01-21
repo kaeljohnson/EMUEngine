@@ -43,14 +43,14 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEnt
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::G_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::G_KEY_DOWN)));
-			Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(cameraEntity)->SetPixelsPerUnit(16);
+			Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(cameraEntity)->SetPixelsPerUnit(16);
 			e.Handled = true;
 		});
 
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::H_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::H_KEY_DOWN)));
-			Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(cameraEntity)->SetPixelsPerUnit(32);
+			Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(cameraEntity)->SetPixelsPerUnit(32);
 			e.Handled = true;
 		});
 	
@@ -63,12 +63,12 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEnt
 
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::O_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
-			Engine::ECS::Deactivate(playerEntity);
+			Engine::EMU::GetInstance()->IECS().Deactivate(playerEntity);
 		});
 
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::O_KEY_UP, [&](Engine::IOEvent& e)
 		{
-			Engine::ECS::Activate(playerEntity);
+			Engine::EMU::GetInstance()->IECS().Activate(playerEntity);
 		});
 	
 

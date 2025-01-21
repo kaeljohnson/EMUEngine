@@ -18,30 +18,30 @@ namespace Engine
 	}
 
 	EMU::EMU()
-		: m_cameraManager(), m_windowRenderer(), m_sceneManager(),
-		m_application(m_cameraManager, m_windowRenderer, m_sceneManager)
+		: m_ecs(), m_cameraManager(), m_windowRenderer(m_ecs), m_sceneManager(), m_contactSystem(m_ecs), 
+		m_physicsInterface(m_ecs), m_application(m_ecs, m_cameraManager, m_windowRenderer, m_sceneManager)
 	{
-		/*m_ecs.Initialize(10000);
+		m_ecs.Initialize(10000);
 
 		m_ecs.RegisterComponentManager<Updatable>();
 		m_ecs.RegisterComponentManager<PhysicsBody>();
 		m_ecs.RegisterComponentManager<Transform>();
 		m_ecs.RegisterComponentManager<Camera>();
-		m_ecs.RegisterComponentManager<SimpleContact>();*/
+		m_ecs.RegisterComponentManager<SimpleContact>();
 	}
 
 	EMU::~EMU()
 	{
 		// Temo cleanup until ECS and contact system are integrated as members.
 		// ContactSystem::Cleanup();
-		ECS::Cleanup();
+		// ECS::Cleanup();
 		delete m_instance;
 	}
 
 	// Scene management
 	std::shared_ptr<Scene> EMU::CreateScene(const std::string& name)
 	{
-		std::shared_ptr<Scene> scene = std::make_shared<Scene>(m_physicsInterface, m_contactSystem);
+		std::shared_ptr<Scene> scene = std::make_shared<Scene>(m_ecs, m_physicsInterface, m_contactSystem);
 		m_sceneManager.AddScene(name, scene);
 		return scene;
 	}

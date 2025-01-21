@@ -19,7 +19,8 @@ namespace Engine
 	Vector2D<int> Screen::SCREEN_SIZE = Vector2D<int>(0, 0);
 	Vector2D<int> Screen::VIRTUAL_SIZE = Vector2D<int>(1280, 720);
 
-	WindowRenderer::WindowRenderer() : m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr)
+	WindowRenderer::WindowRenderer(ECS& refECS) 
+		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS)
 	{
 		ENGINE_CRITICAL("Creating Renderer");
 
@@ -73,7 +74,7 @@ namespace Engine
 
 	void WindowRenderer::Render(Entity* currentCameraEntity)
 	{
-		Camera* ptrCurrentCamera = ECS::GetComponentManager<Camera>().GetComponent(currentCameraEntity);
+		Camera* ptrCurrentCamera = m_refECS.GetComponentManager<Camera>().GetComponent(currentCameraEntity);
 
 		ClearScreen();
 
@@ -97,7 +98,7 @@ namespace Engine
 		float cameraTop = ptrCurrentCamera->m_offset.Y;
 		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->GetPixelsPerUnit());
 
-		auto& transformManager = ECS::GetComponentManager<Transform>();
+		auto& transformManager = m_refECS.GetComponentManager<Transform>();
 
 		for (Transform& refTransform : transformManager)
 		{

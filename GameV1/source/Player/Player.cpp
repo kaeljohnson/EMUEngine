@@ -19,19 +19,19 @@
     {
         // Need to have them be able to set this during construction of physics body.
     	// m_physicsBody->SetStartingFriction(0.0f);
-        Engine::ECS::GetComponentManager<Engine::Transform>().AddComponent(ptrEntity,
+        Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Transform>().AddComponent(ptrEntity,
             Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f);
 
 		Engine::EMU::GetInstance()->PHYSICS().CreateBody(ptrEntity);
 
-        Engine::ECS::GetComponentManager<Engine::PhysicsBody>().AddComponent(ptrEntity);
+        Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::PhysicsBody>().AddComponent(ptrEntity);
 		Engine::PhysicsBody* ptrPhysicsBody = Engine::EMU::GetInstance()->PHYSICS().GetBody(ptrEntity);
 		ptrPhysicsBody->m_bodyType = Engine::BodyType::DYNAMIC;
         ptrPhysicsBody->m_startingPosition = Engine::Vector2D<float>(startingX, startingY);
 		ptrPhysicsBody->m_dimensions = Engine::Vector2D<float>(width, height);
 		ptrPhysicsBody->m_halfDimensions = ptrPhysicsBody->m_dimensions * 0.5f;
 
-		Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
+        Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
 
         CLIENT_CRITICAL_D("Player Entity ID: " + std::to_string(ptrEntity->GetID()));
 
@@ -39,7 +39,7 @@
         Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactListener(new PlayerSensorListener(ptrEntity));
 
 
-        Engine::ECS::GetComponentManager<Engine::SimpleContact>().AddComponent(ptrEntity);
+        Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::SimpleContact>().AddComponent(ptrEntity);
     }
 
     void Player::OnBeginContact(Engine::BeginContact beginContact) 
@@ -64,7 +64,7 @@
 
     void Player::Update()
     {
-        m_onGround = Engine::ECS::GetComponentManager<Engine::SimpleContact>().GetComponent(m_ptrEntity)->m_contactBelow;
+        m_onGround = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::SimpleContact>().GetComponent(m_ptrEntity)->m_contactBelow;
         // m_onGround = true;
 
         m_force = { 0.0f, 0.0f };
@@ -97,7 +97,7 @@
     void Player::UpdateMovement()
     {
 		Engine::Transform* transformComponent =
-			Engine::ECS::GetComponentManager<Engine::Transform>().GetComponent(m_ptrEntity);
+            Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Transform>().GetComponent(m_ptrEntity);
 
         float currentVelocityX = Engine::EMU::GetInstance()->PHYSICS().GetVelocity(m_ptrEntity).X;
 

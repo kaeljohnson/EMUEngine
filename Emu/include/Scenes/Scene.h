@@ -17,7 +17,7 @@ namespace Engine
 	class Scene
 	{
 	public:
-		EMU_API Scene(PhysicsInterface& refPhysicsInterface, ContactSystem& refContactSystem);
+		EMU_API Scene(ECS& refECS, PhysicsInterface& refPhysicsInterface, ContactSystem& refContactSystem);
 		EMU_API ~Scene();
 
 		EMU_API void SetPhysicsSimulation(const Vector2D<float> gravity);
@@ -33,6 +33,8 @@ namespace Engine
 		EMU_API void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
 
 	private:
+		ECS& m_refECS;
+
 		Vector2D<int> m_levelDimensionsInUnits;
 		TileMap* m_tileMap; 
 

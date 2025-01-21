@@ -9,17 +9,17 @@ PlayerCamera::PlayerCamera(Engine::Entity* ptrEntity, Engine::Entity* ptrPlayerE
     m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(true),
     m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(0.5f), m_lookAhead(0.0f)
 {
-	Engine::ECS::GetComponentManager<Engine::Camera>().AddComponent(ptrEntity);
-    Engine::ECS::GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
+	Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().AddComponent(ptrEntity);
+    Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
 
-	Engine::Camera* playerCamera = Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
+	Engine::Camera* playerCamera = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
     playerCamera->SetPixelsPerUnit(32);
 }
 
 void PlayerCamera::Update()
 {
-	Engine::Transform* ptrCameraTarget = Engine::ECS::GetComponentManager<Engine::Transform>().GetComponent(m_ptrCameraTargetEntity);
-	Engine::Camera* ptrCamera = Engine::ECS::GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
+	Engine::Transform* ptrCameraTarget = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Transform>().GetComponent(m_ptrCameraTargetEntity);
+	Engine::Camera* ptrCamera = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
 
     float targetX = Engine::Lerp(ptrCameraTarget->PrevPosition.X, ptrCameraTarget->Position.X, Engine::Time::GetInterpolationFactor());
     float targetY = Engine::Lerp(ptrCameraTarget->PrevPosition.Y, ptrCameraTarget->Position.Y, Engine::Time::GetInterpolationFactor());

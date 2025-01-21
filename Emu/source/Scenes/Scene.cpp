@@ -13,13 +13,13 @@
 
 namespace Engine
 {
-	Scene::Scene(PhysicsInterface& refPhysicsInterface, ContactSystem& refContactSystem)
-		: m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(nullptr), 
-		m_physicsSimulation(Vector2D<float>(0.0f, 100.0f), refContactSystem), 
+	Scene::Scene(ECS& refECS, PhysicsInterface& refPhysicsInterface, ContactSystem& refContactSystem)
+		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(nullptr), 
+		m_physicsSimulation(refECS, Vector2D<float>(0.0f, 100.0f), refContactSystem), 
 		m_refPhysicsInterface(refPhysicsInterface),
-		refTransformManager(ECS::GetComponentManager<Transform>()),
-		refPhysicsBodyManager(ECS::GetComponentManager<PhysicsBody>()),
-		refUpdatableManager(ECS::GetComponentManager<Updatable>()) {}
+		refTransformManager(refECS.GetComponentManager<Transform>()),
+		refPhysicsBodyManager(refECS.GetComponentManager<PhysicsBody>()),
+		refUpdatableManager(refECS.GetComponentManager<Updatable>()) {}
 
 	Scene::~Scene()
 	{
@@ -35,7 +35,7 @@ namespace Engine
 	{
 		// m_physicsSimulation.CreateWorld(m_gravity);
 
-		ECS::LoadEntities(m_entities);
+		m_refECS.LoadEntities(m_entities);
 
 		// Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld();
@@ -49,7 +49,7 @@ namespace Engine
 
 		m_physicsSimulation.Cleanup();
 
-		ECS::UnloadEntities();
+		m_refECS.UnloadEntities();
 	}
 
 	void Scene::AddTileMap(TileMap& tileMap)
@@ -88,7 +88,7 @@ namespace Engine
 	{
 		// Remove entity from the scene. Do not remove the entity from the ECS, just deactivate it.
 		m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), ptrEntity), m_entities.end());
-		ECS::Deactivate(ptrEntity);
+		m_refECS.Deactivate(ptrEntity);
 	}
 
 	void Scene::SetLevelDimensions(const Vector2D<int> levelDimensions)

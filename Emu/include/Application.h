@@ -11,7 +11,7 @@ namespace Engine
 	class Application
 	{
 	public:
-		EMU_API Application(CameraManager& refCameraManager, WindowRenderer& refWindowRenderer, SceneManager& refSceneManager);
+		EMU_API Application(ECS& refECS, CameraManager& refCameraManager, WindowRenderer& refWindowRenderer, SceneManager& refSceneManager);
 		EMU_API void Start();
 		EMU_API inline CameraManager& GetCameraManager() { return m_cameraManager; }
 		EMU_API inline SceneManager& GetSceneManager() { return m_sceneManager; }
@@ -26,6 +26,7 @@ namespace Engine
 		Application& operator=(Application&&) = delete;
 
 	private:
+		ECS& m_refECS;
 		CameraManager& m_cameraManager;
 		WindowRenderer& m_windowRenderer;
 		SceneManager& m_sceneManager;

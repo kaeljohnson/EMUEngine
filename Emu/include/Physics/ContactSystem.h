@@ -104,11 +104,13 @@ namespace Engine
 		EMU_API void RegisterContactHandler(MultiEntityEndContactKey key, ContactHandler handler);
 
 	public:
-		ContactSystem() = default;
+		ContactSystem(ECS& refECS);
 		void ProcessContacts(void* ptrWorldId);
 		void Cleanup();
 
 	private:
+		ECS& m_refECS;
+
 		std::unordered_map<size_t, SingleEntityContactListener*> m_singleEntityContactListeners;
 		std::unordered_map<size_t, MultiEntityContactListener*> m_multiEntityContactListeners;
 		std::unordered_map<size_t, SingleEntitySensorListener*> m_singleEntitySensorListeners;
