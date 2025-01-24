@@ -35,10 +35,6 @@
 
         CLIENT_CRITICAL_D("Player Entity ID: " + std::to_string(ptrEntity->GetID()));
 
-        Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactListener(new PlayerContactListener(ptrEntity));
-        Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactListener(new PlayerSensorListener(ptrEntity));
-
-
         Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::SimpleContact>().AddComponent(ptrEntity);
     }
 

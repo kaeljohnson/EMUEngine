@@ -5,38 +5,6 @@
 #include "../include/Player/Player.h"
 #include "../include/Camera/PlayerCamera.h"
 
-struct TestContactListener : public Engine::MultiEntityContactListener
-{
-	TestContactListener(Engine::Entity* ptrEntity1, Engine::Entity* ptrEntity2) 
-		: Engine::MultiEntityContactListener(ptrEntity1, ptrEntity2) {}
-
-	void OnContactBegin(const Engine::Contact event) override
-	{
-		CLIENT_INFO_D("Contact Begin");
-	}
-
-	void OnContactEnd(const Engine::Contact event) override
-	{
-		CLIENT_INFO_D("Contact End");
-	}
-};
-
-struct TestSensorListener : public Engine::MultiEntitySensorListener
-{
-	TestSensorListener(Engine::Entity* ptrEntity1, Engine::Entity* ptrEntity2) 
-		: Engine::MultiEntitySensorListener(ptrEntity1, ptrEntity2) {}
-
-	void OnContactBegin(const Engine::Contact event) override
-	{
-		CLIENT_INFO_D("Sensor Begin");
-	}
-
-	void OnContactEnd(const Engine::Contact event)
-	{
-		CLIENT_INFO_D("Sensor End");
-	}
-};
-
 int main(int argc, char* args[])
 {
 	Engine::Init();
@@ -44,10 +12,6 @@ int main(int argc, char* args[])
 	Engine::ECS& refECS = engine->IECS();
 
 	CLIENT_INFO_D("Client Running!");
-
-	// Engine::Application app;
-	// Engine::CameraManager& refCameraManager = app.GetCameraManager();
-	// Engine::SceneManager& refSceneManager = app.GetSceneManager();
 
 	Engine::ScenePtr scene = engine->CreateScene("Level1");
 	Engine::ScenePtr scene2 = engine->CreateScene("Level2");
@@ -74,21 +38,30 @@ int main(int argc, char* args[])
 	Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::PhysicsBody>().AddComponent(ptrTestEntity);
 	Engine::PhysicsBody* ptrPhysicsBody =
 		Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::PhysicsBody>().GetComponent(ptrTestEntity);
-	ptrPhysicsBody->m_bodyType = Engine::BodyType::DYNAMIC;
-	ptrPhysicsBody->m_startingPosition = Engine::Vector2D<float>(12.0f, 12.0f);
+	ptrPhysicsBody->m_bodyType = Engine::BodyType::SENSOR;
+	ptrPhysicsBody->m_startingPosition = Engine::Vector2D<float>(12.0f, 64.0f);
 	ptrPhysicsBody->m_dimensions = Engine::Vector2D<float>(1.0f, 1.0f);
 	ptrPhysicsBody->m_halfDimensions = ptrPhysicsBody->m_dimensions * 0.5f;
-	ptrPhysicsBody->m_bodyType = Engine::BodyType::DYNAMIC;
 
-	TestContactListener testContactListener(ptrPlayerEntity, ptrTestEntity);
-	TestSensorListener testSensorListener(ptrPlayerEntity, ptrTestEntity);
 
-	Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactListener(&testContactListener);
-	Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactListener(&testSensorListener);
-
-	Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactHandler(Engine::SingleEntityBeginContactKey(ptrTestEntity), [](Engine::Contact event)
+	Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactCallback(Engine::BEGIN_CONTACT, ptrPlayerEntity, ptrTestEntity, [](const Engine::Contact event)
 		{
-			CLIENT_INFO_D("TEST");
+			CLIENT_INFO_D("Multi Begin Contact");
+		});
+
+	Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactCallback(Engine::END_CONTACT, ptrPlayerEntity, ptrTestEntity, [](const Engine::Contact event)
+		{
+			CLIENT_INFO_D("Multi End Contact");
+		});
+
+	Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactCallback(Engine::BEGIN_SENSOR, ptrTestEntity, [](const Engine::Contact event)
+		{
+			CLIENT_INFO_D("Single Begin Sensing");
+		});
+
+	Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactCallback(Engine::END_SENSOR, ptrTestEntity, [](const Engine::Contact event)
+		{
+			CLIENT_INFO_D("Single End Sensing");
 		});
 
 	Engine::Entity* ptrCameraEntity = Engine::EMU::GetInstance()->IECS().CreateEntity();
@@ -108,6 +81,7 @@ int main(int argc, char* args[])
 
 	engine->RunApp();
 	// Need to figure out how to change scenes, stop scenes, etc.
+	 
 
 	return 0;
 }

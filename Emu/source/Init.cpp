@@ -18,14 +18,6 @@ namespace Engine
 
 		IOEventSystem::Initialize();
 
-		/*ECS::Initialize(10000);
-
-		ECS::RegisterComponentManager<Updatable>();
-		ECS::RegisterComponentManager<PhysicsBody>();
-		ECS::RegisterComponentManager<Transform>();
-		ECS::RegisterComponentManager<Camera>();
-		ECS::RegisterComponentManager<SimpleContact>();*/
-
 		if (!ISDL::ImgInit(IMG_INIT_PNG))
 			ENGINE_CRITICAL("IMG Init failed! SDL_Error: " + std::string(ISDL::GetError()));
 

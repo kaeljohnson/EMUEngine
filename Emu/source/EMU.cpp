@@ -30,11 +30,8 @@ namespace Engine
 		m_ecs.RegisterComponentManager<SimpleContact>();
 	}
 
-	EMU::~EMU()
+	EMU::~EMU() 
 	{
-		// Temo cleanup until ECS and contact system are integrated as members.
-		// ContactSystem::Cleanup();
-		// ECS::Cleanup();
 		delete m_instance;
 	}
 
@@ -55,16 +52,6 @@ namespace Engine
 	{
 		m_sceneManager.UnloadCurrentScene();
 	}
-
-	/*void EMU::RemoveScene(const std::string& name)
-	{
-
-	}
-
-	Scene* EMU::GetScene(const std::string& name)
-	{
-
-	}*/
 
 	// Camera management
 	void EMU::SetCurrentCamera(Entity* ptrCameraEntity)

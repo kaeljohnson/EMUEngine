@@ -8,6 +8,7 @@
 
 namespace Engine
 {
+	// Need to hide all dependencies from client
 	class EMU
 	{
 	public:
@@ -21,8 +22,6 @@ namespace Engine
 		EMU_API std::shared_ptr<Scene> CreateScene(const std::string& name);
 		EMU_API void LoadScene(const std::string& name);
 		EMU_API void UnloadCurrentScene();
-		// EMU_API void RemoveScene(const std::string& name);
-		// EMU_API Scene* GetScene(const std::string& name);
 
 		// Camera Management
 		EMU_API void SetCurrentCamera(Entity* name);
@@ -35,6 +34,7 @@ namespace Engine
 		EMU();
 
 		ECS m_ecs;
+		// Separate contact system into ContactsManager and ContactSystem
 		ContactSystem m_contactSystem;
 		PhysicsInterface m_physicsInterface;
 

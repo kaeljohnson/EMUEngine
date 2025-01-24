@@ -87,21 +87,22 @@ namespace Engine
 			: ContactListener(GenerateKey(entity1->GetID(), entity2->GetID())) {}
 	};
 
+	enum ContactType
+	{
+		BEGIN_CONTACT,
+		END_CONTACT,
+		BEGIN_SENSOR,
+		END_SENSOR
+	};
+
 	class ContactSystem
 	{
 	public:
-		using ContactHandler = std::function<void(const Contact&)>; 
+		using ContactCallback = std::function<void(const Contact&)>; 
 
-		// Should these be in the event system instead?
-		EMU_API void RegisterContactListener(SingleEntityContactListener*);
-		EMU_API void RegisterContactListener(MultiEntityContactListener*);
-		EMU_API void RegisterContactListener(SingleEntitySensorListener*);
-		EMU_API void RegisterContactListener(MultiEntitySensorListener*);
 
-		EMU_API void RegisterContactHandler(SingleEntityBeginContactKey key, ContactHandler handler);
-		EMU_API void RegisterContactHandler(SingleEntityEndContactKey key, ContactHandler handler);
-		EMU_API void RegisterContactHandler(MultiEntityBeginContactKey key, ContactHandler handler);
-		EMU_API void RegisterContactHandler(MultiEntityEndContactKey key, ContactHandler handler);
+		EMU_API void RegisterContactCallback(ContactType contactType, Entity* ptrEntityA, Entity* ptrEntityB, ContactCallback callback);
+		EMU_API void RegisterContactCallback(ContactType contactType, Entity* ptrEntity, ContactCallback callback);
 
 	public:
 		ContactSystem(ECS& refECS);
@@ -111,14 +112,13 @@ namespace Engine
 	private:
 		ECS& m_refECS;
 
-		std::unordered_map<size_t, SingleEntityContactListener*> m_singleEntityContactListeners;
-		std::unordered_map<size_t, MultiEntityContactListener*> m_multiEntityContactListeners;
-		std::unordered_map<size_t, SingleEntitySensorListener*> m_singleEntitySensorListeners;
-		std::unordered_map<size_t, MultiEntitySensorListener*> m_multiEntitySensorListeners;
-
-		std::unordered_map<SingleEntityBeginContactKey, ContactHandler> m_beginContactHandlers;
-		std::unordered_map<SingleEntityEndContactKey, ContactHandler> m_endContactHandlers;
-		std::unordered_map<MultiEntityBeginContactKey, ContactHandler> m_multiContactHandlers;
-		std::unordered_map<MultiEntityEndContactKey, ContactHandler> m_multiEndContactHandlers;
+		std::unordered_map<SingleEntityBeginContactKey, ContactCallback> m_beginSingleEntityContactCallbacks;
+		std::unordered_map<SingleEntityBeginContactKey, ContactCallback> m_beginSingleEntitySensingCallbacks;
+		std::unordered_map<SingleEntityEndContactKey, ContactCallback> m_endSingleEntityContactCallbacks;
+		std::unordered_map<SingleEntityEndContactKey, ContactCallback> m_endSingleEntitySensingCallbacks;
+		std::unordered_map<MultiEntityBeginContactKey, ContactCallback> m_beginMultiEntityContactCallbacks;
+		std::unordered_map<MultiEntityBeginContactKey, ContactCallback> m_beginMultiEntitySensingCallbacks;
+		std::unordered_map<MultiEntityEndContactKey, ContactCallback> m_endMultiEntityContactCallbacks;
+		std::unordered_map<MultiEntityEndContactKey, ContactCallback> m_endMultiEntitySensingCallbacks;
 	};
 }
