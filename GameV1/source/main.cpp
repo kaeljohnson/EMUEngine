@@ -32,34 +32,34 @@ int main(int argc, char* args[])
 	Engine::Entity* ptrTestEntity = Engine::EMU::GetInstance()->IECS().CreateEntity();
 	ptrTestEntity->SetPriority(1);
 	scene->Add(ptrTestEntity);
-	Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Transform>().AddComponent(ptrTestEntity,
+	refECS.AddComponent<Engine::Transform>(ptrTestEntity,
 		Engine::Vector2D(12.0f, 12.0f), Engine::Vector2D(1.0f, 1.0f), 1.0f, 1.0f, 1.0f);
 
-	Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::PhysicsBody>().AddComponent(ptrTestEntity);
+	refECS.AddComponent<Engine::PhysicsBody>(ptrTestEntity);
 	Engine::PhysicsBody* ptrPhysicsBody =
-		Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::PhysicsBody>().GetComponent(ptrTestEntity);
+		refECS.GetComponent<Engine::PhysicsBody>(ptrTestEntity);
 	ptrPhysicsBody->m_bodyType = Engine::BodyType::SENSOR;
 	ptrPhysicsBody->m_startingPosition = Engine::Vector2D<float>(12.0f, 64.0f);
 	ptrPhysicsBody->m_dimensions = Engine::Vector2D<float>(1.0f, 1.0f);
 	ptrPhysicsBody->m_halfDimensions = ptrPhysicsBody->m_dimensions * 0.5f;
 
 
-	Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactCallback(Engine::BEGIN_CONTACT, ptrPlayerEntity, ptrTestEntity, [](const Engine::Contact event)
+	scene->RegisterContactCallback(Engine::BEGIN_CONTACT, ptrPlayerEntity, ptrTestEntity, [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi Begin Contact");
 		});
 
-	Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactCallback(Engine::END_CONTACT, ptrPlayerEntity, ptrTestEntity, [](const Engine::Contact event)
+	scene->RegisterContactCallback(Engine::END_CONTACT, ptrPlayerEntity, ptrTestEntity, [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi End Contact");
 		});
 
-	Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactCallback(Engine::BEGIN_SENSOR, ptrTestEntity, [](const Engine::Contact event)
+	scene->RegisterContactCallback(Engine::BEGIN_SENSOR, ptrTestEntity, [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Single Begin Sensing");
 		});
 
-	Engine::EMU::GetInstance()->CONTACT_SYSTEM().RegisterContactCallback(Engine::END_SENSOR, ptrTestEntity, [](const Engine::Contact event)
+	scene->RegisterContactCallback(Engine::END_SENSOR, ptrTestEntity, [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Single End Sensing");
 		});

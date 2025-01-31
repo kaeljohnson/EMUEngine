@@ -26,7 +26,6 @@ namespace Engine
 		// Camera Management
 		EMU_API void SetCurrentCamera(Entity* name);
 
-		EMU_API ContactSystem& CONTACT_SYSTEM() { return m_contactSystem; }
 		EMU_API PhysicsInterface& PHYSICS() { return m_physicsInterface; }
 		EMU_API ECS& IECS() { return m_ecs; }
 
@@ -35,7 +34,6 @@ namespace Engine
 
 		ECS m_ecs;
 		// Separate contact system into ContactsManager and ContactSystem
-		ContactSystem m_contactSystem;
 		PhysicsInterface m_physicsInterface;
 
 		CameraManager m_cameraManager;

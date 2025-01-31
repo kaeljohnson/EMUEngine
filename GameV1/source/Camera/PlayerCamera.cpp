@@ -9,8 +9,8 @@ PlayerCamera::PlayerCamera(Engine::Entity* ptrEntity, Engine::Entity* ptrPlayerE
     m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(true),
     m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(0.5f), m_lookAhead(0.0f)
 {
-	Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().AddComponent(ptrEntity);
-    Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Updatable>().AddComponent(ptrEntity, [this]() { Update(); });
+	Engine::EMU::GetInstance()->IECS().AddComponent<Engine::Camera>(ptrEntity);
+    Engine::EMU::GetInstance()->IECS().AddComponent<Engine::Updatable>(ptrEntity, [this]() { Update(); });
 
 	Engine::Camera* playerCamera = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
     playerCamera->SetPixelsPerUnit(32);

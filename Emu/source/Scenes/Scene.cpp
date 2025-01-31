@@ -122,9 +122,9 @@ namespace Engine
 				Transform* ptrTransform = refTransformManager.GetComponent(ptrEntity);
 				
 				ptrTransform->PrevPosition = ptrTransform->Position;
-				ptrTransform->Position = m_refPhysicsInterface.GetTopLeftPosition(ptrEntity);
+				ptrTransform->Position = m_refPhysicsInterface.GetTopLeftPosition(&refPhysicsBody);
 				ptrTransform->Dimensions = refPhysicsBody.m_dimensions;
-				ptrTransform->Rotation = m_refPhysicsInterface.GetAngleInDegrees(ptrEntity);
+				ptrTransform->Rotation = m_refPhysicsInterface.GetAngleInDegrees(&refPhysicsBody);
 			}
 		}
 	};

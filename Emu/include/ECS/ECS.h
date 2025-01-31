@@ -60,6 +60,30 @@ namespace Engine
 			m_componentManagers[std::type_index(typeid(T))]->Allocate(m_maxID);
 		}
 
+        template <typename T, typename... Args>
+        void AddComponent(Entity* ptrEntity, Args&&... componentArgs)
+        {
+            auto it = m_componentManagers.find(std::type_index(typeid(T)));
+            if (it != m_componentManagers.end())
+            {
+                static_cast<ComponentManager<T>*>(it->second.get())->AddComponent(ptrEntity, std::forward<Args>(componentArgs)...);
+            }
+        }
+
+		template <typename T>
+		T* GetComponent (Entity* ptrEntity)
+		{
+			auto it = m_componentManagers.find(std::type_index(typeid(T)));
+			if (it != m_componentManagers.end())
+			{
+				return static_cast<ComponentManager<T>*>(it->second.get())->GetComponent(ptrEntity);
+			}
+			else
+			{
+				throw std::runtime_error("Error: Component Manager not found.");
+			}
+		}
+
 		template<typename T>
         ComponentManager<T>& GetComponentManager()
         {

@@ -20,6 +20,17 @@ namespace Engine
 		EMU_API Scene(ECS& refECS, PhysicsInterface& refPhysicsInterface, ContactSystem& refContactSystem);
 		EMU_API ~Scene();
 
+		using ContactCallback = std::function<void(const Contact&)>;
+		EMU_API inline void RegisterContactCallback(ContactType contactType, Entity* ptrEntityA, Entity* ptrEntityB, ContactCallback callback) 
+		{ 
+			m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, ptrEntityA, ptrEntityB, callback); 
+		}
+
+		EMU_API inline void RegisterContactCallback(ContactType contactType, Entity* ptrEntity, ContactCallback callback)
+		{
+			m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, ptrEntity, callback);
+		}
+
 		EMU_API void SetPhysicsSimulation(const Vector2D<float> gravity);
 	
 		EMU_API void Add(Entity* ptrEntity);
