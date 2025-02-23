@@ -23,10 +23,8 @@ namespace Engine
 		EMU_API void LoadScene(const std::string& name);
 		EMU_API void UnloadCurrentScene();
 
-		// Camera Management
-		EMU_API void SetCurrentCamera(Entity* name);
-
 		EMU_API PhysicsInterface& PHYSICS() { return m_physicsInterface; }
+		EMU_API CameraInterface& ICAMERA() { return m_cameraInterface; }
 		EMU_API ECS& IECS() { return m_ecs; }
 
 	private:
@@ -35,12 +33,9 @@ namespace Engine
 		ECS m_ecs;
 		// Separate contact system into ContactsManager and ContactSystem
 		PhysicsInterface m_physicsInterface;
-
-		CameraManager m_cameraManager;
-		WindowRenderer m_windowRenderer;
+		CameraInterface m_cameraInterface;
 		SceneManager m_sceneManager;
-
 		Application m_application;
-};
+	};
 
 } // namespace Engine

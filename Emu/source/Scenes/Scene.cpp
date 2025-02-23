@@ -6,6 +6,7 @@
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Components.h"
+#include "../../include/Camera/CameraInterface.h"
 #include "../../include/MathUtil.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Time.h"
@@ -13,10 +14,11 @@
 
 namespace Engine
 {
-	Scene::Scene(ECS& refECS, PhysicsInterface& refPhysicsInterface, ContactSystem& refContactSystem)
+	Scene::Scene(ECS& refECS, PhysicsInterface& refPhysicsInterface, CameraInterface& refCameraInterface)
 		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(nullptr), 
-		m_physicsSimulation(refECS, Vector2D<float>(0.0f, 100.0f), refContactSystem), 
+		m_physicsSimulation(refECS, Vector2D<float>(0.0f, 100.0f)), 
 		m_refPhysicsInterface(refPhysicsInterface),
+		m_refCameraInterface(refCameraInterface),
 		refTransformManager(refECS.GetComponentManager<Transform>()),
 		refPhysicsBodyManager(refECS.GetComponentManager<PhysicsBody>()),
 		refUpdatableManager(refECS.GetComponentManager<Updatable>()) {}
@@ -36,6 +38,16 @@ namespace Engine
 		// m_physicsSimulation.CreateWorld(m_gravity);
 
 		m_refECS.LoadEntities(m_entities);
+
+		// Frame the first active camera
+		for (auto& camera : m_refECS.GetComponentManager<Camera>())
+		{
+			if (camera.IsActive())
+			{
+				m_refCameraInterface.Frame(camera, Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
+				break;
+			}
+		}
 
 		// Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld();
@@ -84,6 +96,16 @@ namespace Engine
 		m_entities.push_back(ptrEntity);
 	}
 
+	void Scene::Activate(Entity* ptrEntity)
+	{
+		m_refECS.Activate(ptrEntity);
+	}
+
+	void Scene::Deactivate(Entity* ptrEntity)
+	{
+		m_refECS.Deactivate(ptrEntity);
+	}
+
 	void Scene::Remove(Entity* ptrEntity)
 	{
 		// Remove entity from the scene. Do not remove the entity from the ECS, just deactivate it.
@@ -103,6 +125,8 @@ namespace Engine
 
 	void Scene::Update()
 	{
+		// Something better like: 
+			// m_refECS.Update<Updatable>();
 		for (Updatable& refUpdatable : refUpdatableManager)
 		{
 			if (!refUpdatable.IsActive()) continue;
@@ -128,6 +152,43 @@ namespace Engine
 			}
 		}
 	};
+
+	void Scene::UpdateScripts()
+	{
+		for (Updatable& refUpdatable : refUpdatableManager)
+		{
+			if (!refUpdatable.IsActive()) continue;
+			refUpdatable.Update();
+		}
+	}
+
+	void Scene::UpdatePhysics()
+	{
+		m_physicsSimulation.Update();
+
+		for (PhysicsBody& refPhysicsBody : refPhysicsBodyManager)
+		{
+			if (!refPhysicsBody.IsActive()) continue;
+
+			Entity* ptrEntity = refPhysicsBody.GetEntity();
+
+			if (refTransformManager.HasComponent(ptrEntity))
+			{
+				Transform* ptrTransform = refTransformManager.GetComponent(ptrEntity);
+
+				ptrTransform->PrevPosition = ptrTransform->Position;
+				ptrTransform->Position = m_refPhysicsInterface.GetTopLeftPosition(&refPhysicsBody);
+				ptrTransform->Dimensions = refPhysicsBody.m_dimensions;
+				ptrTransform->Rotation = m_refPhysicsInterface.GetAngleInDegrees(&refPhysicsBody);
+			}
+		}
+	}
+
+	void Scene::UpdateVisuals()
+	{
+		
+	}
+
 	// Is this function necessary?
 	void Scene::SetPhysicsSimulation(const Vector2D<float> gravity)
 	{

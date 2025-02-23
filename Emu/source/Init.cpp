@@ -6,8 +6,8 @@
 #include "../include/ECS/ECS.h"
 #include "../include/Events/IOEventSystem.h"
 #include "../include/ECS/ComponentManager.h"
+#include "../include/Camera/CameraInterface.h"
 #include "../include/Components.h"
-#include "../include/Camera/Camera.h"
 #include "../include/EMU.h"
 
 namespace Engine

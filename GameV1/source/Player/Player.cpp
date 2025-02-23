@@ -60,6 +60,10 @@
 
     void Player::Update()
     {
+        
+
+
+		// PHYSICS UPDATES
         m_onGround = Engine::EMU::GetInstance()->IECS().GetComponent<Engine::SimpleContact>(m_ptrEntity)->m_contactBelow;
 
 		Engine::PhysicsBody* ptrPhysicsBody = Engine::EMU::GetInstance()->IECS().GetComponent<Engine::PhysicsBody>(m_ptrEntity);

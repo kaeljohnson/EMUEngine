@@ -2,7 +2,7 @@
 
 #include "../Core.h"
 #include "../ECS/Entity.h"
-#include "Camera.h"
+#include "CameraInterface.h"
 
 namespace Engine
 {

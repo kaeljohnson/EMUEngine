@@ -21,7 +21,7 @@ namespace Engine
 		WindowRenderer(ECS& refECS);
 		~WindowRenderer();
 
-		void Render(Entity* currentEntity);
+		void Render();
 		void Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Display();
 

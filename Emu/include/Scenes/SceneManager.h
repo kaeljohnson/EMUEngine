@@ -14,6 +14,7 @@ namespace Engine
 		EMU_API void UnloadCurrentScene();
 
 		EMU_API inline std::shared_ptr<Scene> GetCurrentScene() const { return m_currentScene; };
+		EMU_API inline std::shared_ptr<Scene> GetScene(const std::string& sceneName) { return m_scenes[sceneName]; }
 	public:
 		SceneManager();
 		~SceneManager() = default;

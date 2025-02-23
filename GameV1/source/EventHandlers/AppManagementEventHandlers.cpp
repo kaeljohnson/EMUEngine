@@ -5,7 +5,7 @@
 #include "../../include/EventHandlers/AppManagementEventHandlers.h"
 
 
-AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEntity, Engine::Entity* playerEntity) 
+AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* playerEntity) 
 {
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::F_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
@@ -43,14 +43,14 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* cameraEnt
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::G_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::G_KEY_DOWN)));
-			Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(cameraEntity)->SetPixelsPerUnit(16);
+			Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(*Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(playerEntity), 16);
 			e.Handled = true;
 		});
 
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::H_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::H_KEY_DOWN)));
-			Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(cameraEntity)->SetPixelsPerUnit(32);
+			Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(*Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(playerEntity), 32);
 			e.Handled = true;
 		});
 	

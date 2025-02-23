@@ -64,11 +64,12 @@ int main(int argc, char* args[])
 			CLIENT_INFO_D("Single End Sensing");
 		});
 
-	Engine::Entity* ptrCameraEntity = Engine::EMU::GetInstance()->IECS().CreateEntity();
-	ptrCameraEntity->SetPriority(0);
+	// Engine::Entity* ptrCameraEntity = Engine::EMU::GetInstance()->IECS().CreateEntity();
+	// ptrCameraEntity->SetPriority(0);
 
-	PlayerCamera playerCamera(ptrCameraEntity, ptrPlayerEntity);
-	engine->SetCurrentCamera(ptrCameraEntity);
+	PlayerCamera playerCamera(ptrPlayerEntity);
+	// engine->SetCurrentCamera(ptrCameraEntity);
+	// scene->Add(ptrCameraEntity);
 
 	scene2->Add(ptrPlayerEntity);
 
@@ -77,7 +78,7 @@ int main(int argc, char* args[])
 
 	engine->LoadScene("Level1");
 
-	AppManagementEventHandlers appManagementEventHandlers(ptrCameraEntity, ptrPlayerEntity);
+	AppManagementEventHandlers appManagementEventHandlers(ptrPlayerEntity);
 
 	engine->RunApp();
 	// Need to figure out how to change scenes, stop scenes, etc.

@@ -231,7 +231,7 @@ namespace Engine
 	void PhysicsSimulation::Update()
 	{
 		b2World_Step(*m_ptrWorldId, Time::GetTimeStep(), 4);
-		m_refContactSystem.ProcessContacts(m_ptrWorldId);
+		m_contactSystem.ProcessContacts(m_ptrWorldId);
 	}
 
 	void PhysicsSimulation::DestroyWorld()

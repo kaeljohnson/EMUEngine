@@ -4,21 +4,24 @@
 
 #include "../../include/Camera/PlayerCamera.h"
 
-PlayerCamera::PlayerCamera(Engine::Entity* ptrEntity, Engine::Entity* ptrPlayerEntity) : 
-    m_ptrEntity(ptrEntity), m_ptrCameraTargetEntity(ptrPlayerEntity), m_smoothingFactor(0.001f),
+PlayerCamera::PlayerCamera(Engine::Entity* ptrEntity) : 
+    m_ptrEntity(ptrEntity), m_smoothingFactor(0.001f),
     m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(true),
     m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(0.5f), m_lookAhead(0.0f)
 {
+    // Combine this whole class into player class.
+
 	Engine::EMU::GetInstance()->IECS().AddComponent<Engine::Camera>(ptrEntity);
-    Engine::EMU::GetInstance()->IECS().AddComponent<Engine::Updatable>(ptrEntity, [this]() { Update(); });
+    // Engine::EMU::GetInstance()->IECS().AddComponent<Engine::Updatable>(ptrEntity, [this]() { Update(); });
 
 	Engine::Camera* playerCamera = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
-    playerCamera->SetPixelsPerUnit(32);
+    // playerCamera->SetPixelsPerUnit(32);
+	Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(*playerCamera, 32);
 }
 
 void PlayerCamera::Update()
 {
-	Engine::Transform* ptrCameraTarget = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Transform>().GetComponent(m_ptrCameraTargetEntity);
+	Engine::Transform* ptrCameraTarget = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Transform>().GetComponent(m_ptrEntity);
 	Engine::Camera* ptrCamera = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
 
     float targetX = Engine::Lerp(ptrCameraTarget->PrevPosition.X, ptrCameraTarget->Position.X, Engine::Time::GetInterpolationFactor());
@@ -27,7 +30,7 @@ void PlayerCamera::Update()
 	ptrCamera->m_offset.X = targetX - (ptrCamera->m_size.X / 2.0f);
 	ptrCamera->m_offset.Y = targetY - (ptrCamera->m_size.Y / 2.0f);
 
-    if (ptrCamera->m_clampingOn) ptrCamera->Clamp();
+    // if (ptrCamera->m_clampingOn) ptrCamera->Clamp(); Engine willhandle clamping.
 
     return;
 
@@ -72,7 +75,7 @@ void PlayerCamera::Update()
         ptrCamera->m_offset.Y = desiredCameraTopLeftY;
     }
 
-    if (ptrCamera->m_clampingOn) ptrCamera->Clamp();
+    // if (ptrCamera->m_clampingOn) ptrCamera->Clamp();
 }
 
 void PlayerCamera::SetLookAheadFactor(const float lookAheadFactor)

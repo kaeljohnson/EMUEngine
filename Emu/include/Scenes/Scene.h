@@ -5,6 +5,7 @@
 #include "../ECS/Entity.h"
 #include "../Tiles/TileMap.h" 
 #include "../Physics/Physics.h"
+#include "../Camera/CameraInterface.h"
 #include "../Includes.h"
 #include "../Core.h"
 #include "../MathUtil.h"
@@ -17,7 +18,7 @@ namespace Engine
 	class Scene
 	{
 	public:
-		EMU_API Scene(ECS& refECS, PhysicsInterface& refPhysicsInterface, ContactSystem& refContactSystem);
+		EMU_API Scene(ECS& refECS, PhysicsInterface& refPhysicsInterface, CameraInterface& refCameraInterface);
 		EMU_API ~Scene();
 
 		using ContactCallback = std::function<void(const Contact&)>;
@@ -37,6 +38,9 @@ namespace Engine
 
 		// Removes entity from scene by removing entity
 		// from entities array and deactivating entity in ECS.
+		EMU_API void Activate(Entity* ptrEntity);
+		EMU_API void Deactivate(Entity* ptrEntity);
+
 		EMU_API void Remove(Entity* ptrEntity);
 		EMU_API void AddTileMap(TileMap& tileMap);
 
@@ -51,6 +55,7 @@ namespace Engine
 
 		PhysicsSimulation m_physicsSimulation;
 		PhysicsInterface& m_refPhysicsInterface;
+		CameraInterface& m_refCameraInterface;
 
 		std::vector<Entity*> m_entities;
 
@@ -67,6 +72,9 @@ namespace Engine
 
 		void CheckValid();
 		void Update();
+		void UpdateScripts();
+		void UpdatePhysics();
+		void UpdateVisuals();
 
 		bool HasTileMap;
 	}; 

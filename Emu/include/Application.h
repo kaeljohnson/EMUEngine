@@ -3,6 +3,7 @@
 #include "Scenes/Scene.h"
 #include "Scenes/SceneManager.h"
 #include "Camera/CameraManager.h"
+#include "Camera/CameraSystem.h"
 #include "Rendering/WindowRenderer.h"
 #include "Core.h"
 
@@ -11,10 +12,9 @@ namespace Engine
 	class Application
 	{
 	public:
-		EMU_API Application(ECS& refECS, CameraManager& refCameraManager, WindowRenderer& refWindowRenderer, SceneManager& refSceneManager);
+		EMU_API Application(ECS& refECS, SceneManager& refSceneManager);
 		EMU_API void Start();
-		EMU_API inline CameraManager& GetCameraManager() { return m_cameraManager; }
-		EMU_API inline SceneManager& GetSceneManager() { return m_sceneManager; }
+		// EMU_API inline SceneManager& GetSceneManager() { return m_sceneManager; }
 		EMU_API void End();
 
 		EMU_API ~Application();
@@ -27,8 +27,8 @@ namespace Engine
 
 	private:
 		ECS& m_refECS;
-		CameraManager& m_cameraManager;
-		WindowRenderer& m_windowRenderer;
+		WindowRenderer m_windowRenderer;
+		CameraSystem m_cameraSystem;
 		SceneManager& m_sceneManager;
 	};
 }

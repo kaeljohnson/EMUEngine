@@ -16,8 +16,8 @@
 
 namespace Engine
 {
-	Application::Application(ECS& refECS, CameraManager& refCameraManager, WindowRenderer& refWindowRenderer, SceneManager& refSceneManager)
-		: m_refECS(refECS), m_cameraManager(refCameraManager), m_windowRenderer(refWindowRenderer), m_sceneManager(refSceneManager)
+	Application::Application(ECS& refECS, SceneManager& refSceneManager)
+		: m_refECS(refECS), m_cameraSystem(refECS), m_windowRenderer(refECS), m_sceneManager(refSceneManager)
 	{}
 
 	void Application::Start()
@@ -51,13 +51,12 @@ namespace Engine
 			*/
 
 			if (m_sceneManager.IsNewSceneStarting())
-			{
-				// Camera frames current scene.
-				m_refECS.GetComponentManager<Camera>().GetComponent(m_cameraManager.m_ptrCurrentCameraEntity)->Frame(
-					Vector2D<int>(m_sceneManager.GetCurrentScene()->GetLevelWidth(),
-					m_sceneManager.GetCurrentScene()->GetLevelHeight()));
+			{	
 				m_sceneManager.NewSceneStarted();
 			}
+
+			IOEventSystem::HandleEvents();
+			IOEventSystem::ProcessEvents();
 
 			newTime = SDL_GetTicks() / 1000.0;
 			frameTime = newTime - currentTime;
@@ -67,26 +66,27 @@ namespace Engine
 
 			while (accumulator >= timeStep)
 			{
-				IOEventSystem::HandleEvents();
-				IOEventSystem::ProcessEvents();
-				
-				m_sceneManager.GetCurrentScene()->Update();
+				m_sceneManager.GetCurrentScene()->UpdateScripts();
+				m_sceneManager.GetCurrentScene()->UpdatePhysics();
 
 				accumulator -= timeStep;
+
+				// ENGINE_INFO_D("1");
 			}
+
+			// ENGINE_INFO_D("2");
 
 			Time::SetInterpolationFactor((float)accumulator / timeStep);
 
-			// Camera system. Change to "CameraSystem".
-			m_refECS.GetComponentManager<Updatable>().GetComponent(m_cameraManager.m_ptrCurrentCameraEntity)->Update();
+			
+			m_sceneManager.GetCurrentScene()->UpdateVisuals();
+			m_cameraSystem.Update();
 
-			m_windowRenderer.Render(m_cameraManager.m_ptrCurrentCameraEntity);
+			m_windowRenderer.Render();
 
 			if (!Time::IsAppRunning())
 			{ 
-				// ContactSystem::Cleanup();
 				m_sceneManager.Cleanup();
-				// ECS::Cleanup();
 			}
 		}
 	}

@@ -3,9 +3,9 @@
 #include "../../include/ISDL/ISDL.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Rendering/WindowRenderer.h"
+#include "../../include/Camera/CameraInterface.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Components.h"
-#include "../../include/Camera/Camera.h"
 #include "../../include/Time.h"
 
 namespace Engine
@@ -72,11 +72,27 @@ namespace Engine
 		ENGINE_CRITICAL("Renderer created.");
 	}
 
-	void WindowRenderer::Render(Entity* currentCameraEntity)
+	void WindowRenderer::Render()
 	{
-		Camera* ptrCurrentCamera = m_refECS.GetComponentManager<Camera>().GetComponent(currentCameraEntity);
-
 		ClearScreen();
+
+		Camera* ptrCurrentCamera = nullptr;
+
+		// Get the first active camera for now.
+		for (auto& camera : m_refECS.GetComponentManager<Camera>())
+		{
+			if (camera.IsActive())
+			{
+				ptrCurrentCamera = &camera;
+				break;
+			}
+		}
+
+		if (ptrCurrentCamera == nullptr)
+		{
+			ENGINE_CRITICAL("No active camera found. Returning.");
+			return;
+		}
 
 		if (Screen::WINDOW_RESIZE_REQUEST)
 		{
@@ -94,9 +110,9 @@ namespace Engine
 
 		// Calculate camera bounds
 		float cameraLeft = ptrCurrentCamera->m_offset.X;
-		float cameraRight = ptrCurrentCamera->m_offset.X + (Screen::VIEWPORT_SIZE.X / ptrCurrentCamera->GetPixelsPerUnit());
+		float cameraRight = ptrCurrentCamera->m_offset.X + (Screen::VIEWPORT_SIZE.X / ptrCurrentCamera->m_pixelsPerUnit);
 		float cameraTop = ptrCurrentCamera->m_offset.Y;
-		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->GetPixelsPerUnit());
+		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->m_pixelsPerUnit);
 
 		auto& transformManager = m_refECS.GetComponentManager<Transform>();
 
@@ -114,7 +130,7 @@ namespace Engine
 
 			if (isVisible)
 			{
-				Draw(refTransform, ptrCurrentCamera->GetPixelsPerUnit(), Vector2D<float>(cameraLeft, cameraTop));
+				Draw(refTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
 			}
 		}
 

@@ -98,4 +98,17 @@ namespace Engine
 		bool m_contactRight = false;
 		bool m_contactLeft = false;
 	};
+
+	struct Camera : public Component
+	{
+		EMU_API Camera(Entity* ptrEntity) 
+			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), Component(ptrEntity) {}
+		EMU_API ~Camera() = default;
+
+		Vector2D<float> m_offset;
+		Vector2D<float> m_size;
+		int m_pixelsPerUnit;
+		bool m_clampingOn; 
+		Vector2D<int> m_bounds;
+	};
 }

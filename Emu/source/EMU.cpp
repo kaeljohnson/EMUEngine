@@ -18,8 +18,8 @@ namespace Engine
 	}
 
 	EMU::EMU()
-		: m_ecs(), m_cameraManager(), m_windowRenderer(m_ecs), m_sceneManager(), m_contactSystem(m_ecs), 
-		m_physicsInterface(m_ecs), m_application(m_ecs, m_cameraManager, m_windowRenderer, m_sceneManager)
+		: m_ecs(), m_sceneManager(), 
+		m_physicsInterface(m_ecs), m_application(m_ecs, m_sceneManager), m_cameraInterface(m_ecs)
 	{
 		m_ecs.Initialize(10000);
 
@@ -38,7 +38,7 @@ namespace Engine
 	// Scene management
 	std::shared_ptr<Scene> EMU::CreateScene(const std::string& name)
 	{
-		std::shared_ptr<Scene> scene = std::make_shared<Scene>(m_ecs, m_physicsInterface, m_contactSystem);
+		std::shared_ptr<Scene> scene = std::make_shared<Scene>(m_ecs, m_physicsInterface, m_cameraInterface);
 		m_sceneManager.AddScene(name, scene);
 		return scene;
 	}
@@ -51,11 +51,5 @@ namespace Engine
 	void EMU::UnloadCurrentScene()
 	{
 		m_sceneManager.UnloadCurrentScene();
-	}
-
-	// Camera management
-	void EMU::SetCurrentCamera(Entity* ptrCameraEntity)
-	{
-		m_cameraManager.SetCurrentCamera(ptrCameraEntity);
 	}
 }

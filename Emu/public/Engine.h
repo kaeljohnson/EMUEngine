@@ -18,7 +18,7 @@
 #include "../include/Rendering/Screen.h"
 #include "../include/Time.h"
 
-#include "../include/Camera/Camera.h"
+#include "../include/Camera/CameraInterface.h"
 
 #include "../include/ECS/ECS.h"
 #include "../include/MathUtil.h"
