@@ -15,10 +15,10 @@ namespace Engine
 	public:
 		EMU_API CameraInterface(ECS& refECS);
 		
-		EMU_API void SetPixelsPerUnit(Camera& refCamera, const int pixelsPerUnit);
-		EMU_API void SetCameraPosition(Camera& ptrEntity, const Vector2D<float> offset);
-		EMU_API void SetClampingOn(Camera& ptrEntity, const bool clampingOn);
-		EMU_API void SetSize(Camera& ptrEntity);
+		EMU_API void SetPixelsPerUnit(Camera* refCamera, const int pixelsPerUnit);
+		EMU_API void SetCameraPosition(Camera* ptrEntity, const Vector2D<float> offset);
+		EMU_API void SetClampingOn(Camera* ptrEntity, const bool clampingOn);
+		EMU_API void SetSize(Camera* ptrEntity);
 		EMU_API inline const int GetPixelsPerUnit(Camera& refCamera) const { return refCamera.m_pixelsPerUnit; }
 
 		virtual ~CameraInterface() = default;

@@ -16,7 +16,7 @@ PlayerCamera::PlayerCamera(Engine::Entity* ptrEntity) :
 
 	Engine::Camera* playerCamera = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
     // playerCamera->SetPixelsPerUnit(32);
-	Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(*playerCamera, 32);
+	Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(playerCamera, 32);
 }
 
 void PlayerCamera::Update()
