@@ -17,7 +17,7 @@
 namespace Engine
 {
 	Application::Application(ECS& refECS, SceneManager& refSceneManager)
-		: m_refECS(refECS), m_cameraSystem(refECS), m_windowRenderer(refECS), m_sceneManager(refSceneManager)
+		: m_refECS(refECS), m_ptrCurrentScene(nullptr), m_windowRenderer(refECS), m_sceneManager(refSceneManager)
 	{}
 
 	void Application::Start()
@@ -53,6 +53,7 @@ namespace Engine
 			if (m_sceneManager.IsNewSceneStarting())
 			{	
 				m_sceneManager.NewSceneStarted();
+				m_ptrCurrentScene = m_sceneManager.GetCurrentScene();
 			}
 
 			IOEventSystem::HandleEvents();
@@ -66,8 +67,8 @@ namespace Engine
 
 			while (accumulator >= timeStep)
 			{
-				m_sceneManager.GetCurrentScene()->UpdateScripts();
-				m_sceneManager.GetCurrentScene()->UpdatePhysics();
+				m_ptrCurrentScene->UpdateScripts();
+				m_ptrCurrentScene->UpdatePhysics();
 
 				accumulator -= timeStep;
 
@@ -80,7 +81,7 @@ namespace Engine
 
 			
 			m_sceneManager.GetCurrentScene()->UpdateVisuals();
-			m_cameraSystem.Update();
+			m_ptrCurrentScene->UpdateCamera();
 
 			m_windowRenderer.Render();
 

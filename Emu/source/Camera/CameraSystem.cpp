@@ -46,4 +46,12 @@ namespace Engine
         if (refCamera.m_offset.Y < 0) { refCamera.m_offset.Y = 0; }
         if (refCamera.m_offset.Y + refCamera.m_size.Y > refCamera.m_bounds.Y) { refCamera.m_offset.Y = refCamera.m_bounds.Y - refCamera.m_size.Y; }
     }
+
+    void CameraSystem::Frame(Camera& refCamera, const Vector2D<int> mapBounds)
+    {
+        refCamera.m_bounds = mapBounds;
+        refCamera.m_size
+            = Vector2D<float>(Screen::VIEWPORT_SIZE.X / (refCamera.m_pixelsPerUnit * Screen::SCALE.X),
+                Screen::VIEWPORT_SIZE.Y / (refCamera.m_pixelsPerUnit * Screen::SCALE.Y));
+    }
 }

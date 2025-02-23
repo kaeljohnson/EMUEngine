@@ -20,7 +20,6 @@ namespace Engine
 		EMU_API void SetClampingOn(Camera& ptrEntity, const bool clampingOn);
 		EMU_API void SetSize(Camera& ptrEntity);
 		EMU_API inline const int GetPixelsPerUnit(Camera& refCamera) const { return refCamera.m_pixelsPerUnit; }
-		EMU_API void Frame(Camera& refCamera, const Vector2D<int> mapBounds);
 
 		virtual ~CameraInterface() = default;
 

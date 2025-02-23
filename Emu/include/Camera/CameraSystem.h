@@ -14,6 +14,7 @@ namespace Engine
 		~CameraSystem() = default;
 
 		void Clamp(Camera& refCamera);
+		void Frame(Camera& refCamera, const Vector2D<int> mapBounds);
 
 		void Update();
 

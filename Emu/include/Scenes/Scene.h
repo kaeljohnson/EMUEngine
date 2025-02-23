@@ -5,6 +5,7 @@
 #include "../ECS/Entity.h"
 #include "../Tiles/TileMap.h" 
 #include "../Physics/Physics.h"
+#include "../Camera/CameraSystem.h"
 #include "../Camera/CameraInterface.h"
 #include "../Includes.h"
 #include "../Core.h"
@@ -55,7 +56,7 @@ namespace Engine
 
 		PhysicsSimulation m_physicsSimulation;
 		PhysicsInterface& m_refPhysicsInterface;
-		CameraInterface& m_refCameraInterface;
+		CameraSystem m_cameraSystem;
 
 		std::vector<Entity*> m_entities;
 
@@ -74,6 +75,7 @@ namespace Engine
 		void Update();
 		void UpdateScripts();
 		void UpdatePhysics();
+		void UpdateCamera();
 		void UpdateVisuals();
 
 		bool HasTileMap;

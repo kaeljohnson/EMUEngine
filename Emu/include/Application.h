@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Includes.h"
 #include "Scenes/Scene.h"
 #include "Scenes/SceneManager.h"
 #include "Camera/CameraManager.h"
@@ -28,7 +29,7 @@ namespace Engine
 	private:
 		ECS& m_refECS;
 		WindowRenderer m_windowRenderer;
-		CameraSystem m_cameraSystem;
 		SceneManager& m_sceneManager;
+		std::shared_ptr<Scene> m_ptrCurrentScene;
 	};
 }

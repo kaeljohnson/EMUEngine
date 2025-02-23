@@ -32,10 +32,4 @@ namespace Engine
 	{
 		refCamera.m_clampingOn = clampingOn;
 	}
-
-	void CameraInterface::Frame(Camera& refCamera, const Vector2D<int> mapBounds)
-	{
-		refCamera.m_bounds = mapBounds;
-		SetSize(refCamera);
-	}
 }

@@ -17,8 +17,8 @@ namespace Engine
 	Scene::Scene(ECS& refECS, PhysicsInterface& refPhysicsInterface, CameraInterface& refCameraInterface)
 		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(nullptr), 
 		m_physicsSimulation(refECS, Vector2D<float>(0.0f, 100.0f)), 
+		m_cameraSystem(refECS),
 		m_refPhysicsInterface(refPhysicsInterface),
-		m_refCameraInterface(refCameraInterface),
 		refTransformManager(refECS.GetComponentManager<Transform>()),
 		refPhysicsBodyManager(refECS.GetComponentManager<PhysicsBody>()),
 		refUpdatableManager(refECS.GetComponentManager<Updatable>()) {}
@@ -44,7 +44,7 @@ namespace Engine
 		{
 			if (camera.IsActive())
 			{
-				m_refCameraInterface.Frame(camera, Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
+				m_cameraSystem.Frame(camera, Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
 				break;
 			}
 		}
@@ -182,6 +182,11 @@ namespace Engine
 				ptrTransform->Rotation = m_refPhysicsInterface.GetAngleInDegrees(&refPhysicsBody);
 			}
 		}
+	}
+
+	void Scene::UpdateCamera()
+	{
+		m_cameraSystem.Update();
 	}
 
 	void Scene::UpdateVisuals()
