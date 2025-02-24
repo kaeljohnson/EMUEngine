@@ -40,6 +40,11 @@ namespace Engine
 		return m_refECS.GetComponent<PhysicsBody>(ptrEntity);
 	}
 
+	SimpleContact* PhysicsInterface::GetSimpleContact(Entity* ptrEntity)
+	{
+		return m_refECS.GetComponent<SimpleContact>(ptrEntity);
+	}
+
 	void PhysicsInterface::SetStartingPosition(Entity* ptrEntity, Vector2D<float> position)
 	{
 		PhysicsBody* ptrBody = GetBody(ptrEntity);
@@ -173,6 +178,30 @@ namespace Engine
 		float angleInRadians = b2Rot_GetAngle(rotation);
 		return angleInRadians * 180.0f / 3.14159265359f;
 
+	}
+
+	const bool PhysicsInterface::HasContactBelow(Entity* ptrEntity)
+	{
+		SimpleContact* ptrBody = GetSimpleContact(ptrEntity);
+		return ptrBody->m_contactBelow;
+	}
+
+	const bool PhysicsInterface::HasContactAbove(Entity* ptrEntity)
+	{
+		SimpleContact* ptrBody = GetSimpleContact(ptrEntity);
+		return ptrBody->m_contactAbove;
+	}
+
+	const bool PhysicsInterface::HasContactLeft(Entity* ptrEntity)
+	{
+		SimpleContact* ptrBody = GetSimpleContact(ptrEntity);
+		return ptrBody->m_contactLeft;
+	}
+
+	const bool PhysicsInterface::HasContactRight(Entity* ptrEntity)
+	{
+		SimpleContact* ptrBody = GetSimpleContact(ptrEntity);
+		return ptrBody->m_contactRight;
 	}
 
 	// Physics Simulation

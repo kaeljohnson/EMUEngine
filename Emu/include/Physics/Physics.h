@@ -36,8 +36,15 @@ namespace Engine
 		EMU_API const float GetAngleInRadians(Entity* ptrEntity);
 		EMU_API const float GetAngleInDegrees(Entity* ptrEntity);
 		EMU_API void RemoveBodyFromWorld(Entity* ptrEntity);
+
+		// Contact System interface
+		EMU_API const bool HasContactBelow(Entity* ptrEntity);
+		EMU_API const bool HasContactAbove(Entity* ptrEntity);
+		EMU_API const bool HasContactLeft(Entity* ptrEntity);
+		EMU_API const bool HasContactRight(Entity* ptrEntity);
 	public:
 		PhysicsBody* GetBody(Entity* ptrEntity);
+		SimpleContact* GetSimpleContact(Entity* ptrEntity);
 		PhysicsInterface(ECS& refEcs);
 	private:
 		ECS& m_refECS;
