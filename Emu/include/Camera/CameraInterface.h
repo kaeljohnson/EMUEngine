@@ -19,6 +19,9 @@ namespace Engine
 		EMU_API void SetCameraPosition(Entity* ptrEntity, const Vector2D<float> offset);
 		EMU_API void SetClampingOn(Entity* ptrEntity, const bool clampingOn);
 		EMU_API void SetSize(Entity* ptrEntity);
+		EMU_API const Vector2D<float> GetSize(Entity* ptrEntity);
+		EMU_API void SetOffsets(Entity* ptrEntity, const Vector2D<float> offsets);
+		EMU_API const Vector2D<float> GetOffsets(Entity* ptrEntity);
 		EMU_API inline const int GetPixelsPerUnit(Entity* ptrEntity) const { return m_refECS.GetComponent<Camera>(ptrEntity)->m_pixelsPerUnit; }
 
 		virtual ~CameraInterface() = default;

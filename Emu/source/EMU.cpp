@@ -52,4 +52,9 @@ namespace Engine
 	{
 		m_sceneManager.UnloadCurrentScene();
 	}
+
+	Entity* EMU::CreateEntity()
+	{
+		return m_ecs.CreateEntity();
+	}
 }

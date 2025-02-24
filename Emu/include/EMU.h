@@ -27,6 +27,14 @@ namespace Engine
 		EMU_API CameraInterface& ICAMERA() { return m_cameraInterface; }
 		EMU_API ECS& IECS() { return m_ecs; }
 
+		// ECS Interface functions
+		EMU_API Entity* CreateEntity();
+		template <typename T, typename... Args>
+		void AddComponent(Entity* ptrEntity, Args&&... componentArgs)
+		{
+			m_ecs.AddComponent<T>(ptrEntity, std::forward<Args>(componentArgs)...);
+		}
+
 	private:
 		EMU();
 

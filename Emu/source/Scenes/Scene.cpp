@@ -125,8 +125,7 @@ namespace Engine
 
 	void Scene::Update()
 	{
-		// Something better like: 
-			// m_refECS.Update<Updatable>();
+		// UpdatableSystem.Update();
 		for (Updatable& refUpdatable : refUpdatableManager)
 		{
 			if (!refUpdatable.IsActive()) continue;

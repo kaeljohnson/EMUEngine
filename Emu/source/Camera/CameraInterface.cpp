@@ -29,6 +29,21 @@ namespace Engine
 				Screen::VIEWPORT_SIZE.Y / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.Y));
 	}
 
+	const Vector2D<float> CameraInterface::GetSize(Entity* ptrEntity)
+	{
+		return GetCamera(ptrEntity)->m_size;
+	}
+
+	void CameraInterface::SetOffsets(Entity* ptrEntity, const Vector2D<float> offsets)
+	{
+		GetCamera(ptrEntity)->m_offset = offsets;
+	}
+
+	const Vector2D<float> CameraInterface::GetOffsets(Entity* ptrEntity)
+	{
+		return GetCamera(ptrEntity)->m_offset;
+	}
+
 	void CameraInterface::SetCameraPosition(Entity* ptrEntity, const Vector2D<float> offset)
 	{
 		GetCamera(ptrEntity)->m_offset = offset;

@@ -19,23 +19,23 @@
     {
         // Need to have them be able to set this during construction of physics body.
     	// m_physicsBody->SetStartingFriction(0.0f);
-        Engine::EMU::GetInstance()->IECS().AddComponent<Engine::Transform>(ptrEntity,
+        Engine::EMU::GetInstance()->AddComponent<Engine::Transform>(ptrEntity,
             Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f);
 
-		Engine::EMU::GetInstance()->IECS().AddComponent<Engine::PhysicsBody>(ptrEntity);
+		Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsBody>(ptrEntity);
 
-        Engine::EMU::GetInstance()->IECS().AddComponent<Engine::PhysicsBody>(ptrEntity);
-		Engine::PhysicsBody* ptrPhysicsBody = Engine::EMU::GetInstance()->IECS().GetComponent<Engine::PhysicsBody>(ptrEntity);
-		ptrPhysicsBody->m_bodyType = Engine::BodyType::DYNAMIC;
-        ptrPhysicsBody->m_startingPosition = Engine::Vector2D<float>(startingX, startingY);
-		ptrPhysicsBody->m_dimensions = Engine::Vector2D<float>(width, height);
-		ptrPhysicsBody->m_halfDimensions = ptrPhysicsBody->m_dimensions * 0.5f;
+        Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsBody>(ptrEntity);
+		// Engine::PhysicsBody* ptrPhysicsBody = Engine::EMU::GetInstance()->IECS().GetComponent<Engine::PhysicsBody>(ptrEntity);
+		Engine::PhysicsInterface& refPhysicsInterface = Engine::EMU::GetInstance()->PHYSICS();
+        refPhysicsInterface.SetBodyType(ptrEntity, Engine::BodyType::DYNAMIC);
+		refPhysicsInterface.SetStartingPosition(ptrEntity, Engine::Vector2D<float>(startingX, startingY));
+		refPhysicsInterface.SetDimensions(ptrEntity, Engine::Vector2D<float>(width, height));
 
-        Engine::EMU::GetInstance()->IECS().AddComponent<Engine::Updatable>(ptrEntity, [this]() { Update(); });
+        Engine::EMU::GetInstance()->AddComponent<Engine::Updatable>(ptrEntity, [this]() { Update(); });
 
         CLIENT_CRITICAL_D("Player Entity ID: " + std::to_string(ptrEntity->GetID()));
 
-        Engine::EMU::GetInstance()->IECS().AddComponent<Engine::SimpleContact>(ptrEntity);
+        Engine::EMU::GetInstance()->AddComponent<Engine::SimpleContact>(ptrEntity);
     }
 
     void Player::OnBeginContact(Engine::BeginContact beginContact) 

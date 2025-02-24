@@ -23,13 +23,13 @@ int main(int argc, char* args[])
 	Engine::TileMap testMap(refECS, "testMap1.txt", 1);
 	scene->AddTileMap(testMap);
 
-	Engine::Entity* ptrPlayerEntity = Engine::EMU::GetInstance()->IECS().CreateEntity();
+	Engine::Entity* ptrPlayerEntity = Engine::EMU::GetInstance()->CreateEntity();
 	ptrPlayerEntity->SetPriority(0);
 	scene->Add(ptrPlayerEntity);
 
 	Player player(ptrPlayerEntity, 6.0f, 1.0f, 0.75f, 0.75f);
 
-	Engine::Entity* ptrTestEntity = Engine::EMU::GetInstance()->IECS().CreateEntity();
+	Engine::Entity* ptrTestEntity = Engine::EMU::GetInstance()->CreateEntity();
 	ptrTestEntity->SetPriority(1);
 	scene->Add(ptrTestEntity);
 	refECS.AddComponent<Engine::Transform>(ptrTestEntity,
