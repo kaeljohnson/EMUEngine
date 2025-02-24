@@ -10,26 +10,32 @@ namespace Engine
 	CameraInterface::CameraInterface(ECS& refECS) : 
 		m_refECS(refECS) {}
 
-	void CameraInterface::SetPixelsPerUnit(Camera* ptrCamera, const int pixelsPerUnit)
+	Camera* CameraInterface::GetCamera(Entity* ptrEntity)
 	{
-		ptrCamera->m_pixelsPerUnit = pixelsPerUnit;
-		SetSize(ptrCamera);
+		return m_refECS.GetComponent<Camera>(ptrEntity);
 	}
 
-	void CameraInterface::SetSize(Camera* ptrCamera)
+	void CameraInterface::SetPixelsPerUnit(Entity* ptrEntity, const int pixelsPerUnit)
 	{
+		GetCamera(ptrEntity)->m_pixelsPerUnit = pixelsPerUnit;
+		SetSize(ptrEntity);
+	}
+
+	void CameraInterface::SetSize(Entity* ptrEntity)
+	{
+		Camera* ptrCamera = GetCamera(ptrEntity);
 		ptrCamera->m_size
 			= Vector2D<float>(Screen::VIEWPORT_SIZE.X / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.X), 
 				Screen::VIEWPORT_SIZE.Y / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.Y));
 	}
 
-	void CameraInterface::SetCameraPosition(Camera* ptrCamera, const Vector2D<float> offset)
+	void CameraInterface::SetCameraPosition(Entity* ptrEntity, const Vector2D<float> offset)
 	{
-		ptrCamera->m_offset = offset;
+		GetCamera(ptrEntity)->m_offset = offset;
 	}
 
-	void CameraInterface::SetClampingOn(Camera* ptrCamera, const bool clampingOn)
+	void CameraInterface::SetClampingOn(Entity* ptrEntity, const bool clampingOn)
 	{
-		ptrCamera->m_clampingOn = clampingOn;
+		GetCamera(ptrEntity)->m_clampingOn = clampingOn;
 	}
 }

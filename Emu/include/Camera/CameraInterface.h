@@ -13,15 +13,19 @@ namespace Engine
 	class CameraInterface
 	{
 	public:
-		EMU_API CameraInterface(ECS& refECS);
 		
-		EMU_API void SetPixelsPerUnit(Camera* refCamera, const int pixelsPerUnit);
-		EMU_API void SetCameraPosition(Camera* ptrEntity, const Vector2D<float> offset);
-		EMU_API void SetClampingOn(Camera* ptrEntity, const bool clampingOn);
-		EMU_API void SetSize(Camera* ptrEntity);
-		EMU_API inline const int GetPixelsPerUnit(Camera& refCamera) const { return refCamera.m_pixelsPerUnit; }
+		
+		EMU_API void SetPixelsPerUnit(Entity* ptrEntity, const int pixelsPerUnit);
+		EMU_API void SetCameraPosition(Entity* ptrEntity, const Vector2D<float> offset);
+		EMU_API void SetClampingOn(Entity* ptrEntity, const bool clampingOn);
+		EMU_API void SetSize(Entity* ptrEntity);
+		EMU_API inline const int GetPixelsPerUnit(Entity* ptrEntity) const { return m_refECS.GetComponent<Camera>(ptrEntity)->m_pixelsPerUnit; }
 
 		virtual ~CameraInterface() = default;
+	
+	public:
+		CameraInterface(ECS& refECS);
+		Camera* GetCamera(Entity* ptrEntity);
 
 	private:
 		ECS& m_refECS;

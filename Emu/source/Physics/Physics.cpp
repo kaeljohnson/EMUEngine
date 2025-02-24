@@ -23,106 +23,127 @@ namespace Engine
 		m_refECS.AddComponent<PhysicsBody>(ptrEntity);
 	}
 
+	void PhysicsInterface::SetBodyType(Entity* ptrEntity, const BodyType type)
+	{
+		GetBody(ptrEntity)->m_bodyType = type;
+	}
+
+	void PhysicsInterface::SetDimensions(Entity* ptrEntity, const Vector2D<float> dimensions)
+	{
+		PhysicsBody* ptrBody = GetBody(ptrEntity);
+		ptrBody->m_dimensions = dimensions;
+		ptrBody->m_halfDimensions = dimensions / 2.0f;
+	}
+
 	PhysicsBody* PhysicsInterface::GetBody(Entity* ptrEntity)
 	{
 		return m_refECS.GetComponent<PhysicsBody>(ptrEntity);
 	}
 
-	void PhysicsInterface::SetPosition(PhysicsBody* ptrBody, Vector2D<float> position)
+	void PhysicsInterface::SetStartingPosition(Entity* ptrEntity, Vector2D<float> position)
 	{
-		b2BodyId bodyId = *ptrBody->m_bodyId;
+		PhysicsBody* ptrBody = GetBody(ptrEntity);
+		ptrBody->m_startingPosition = position;
+	}
+
+	void PhysicsInterface::SetPosition(Entity* ptrEntity, Vector2D<float> position)
+	{
+		b2BodyId bodyId = *GetBody(ptrEntity)->m_bodyId;
 		b2Rot rotation = b2Body_GetRotation(bodyId);
 		b2Body_SetTransform(bodyId, b2Vec2(position.X, position.Y), rotation);
 	}
 
-	const Vector2D<float> PhysicsInterface::GetPosition(PhysicsBody* ptrBody)
+	const Vector2D<float> PhysicsInterface::GetPosition(Entity* ptrEntity)
 	{
-		b2BodyId bodyId = *ptrBody->m_bodyId;
+		b2BodyId bodyId = *GetBody(ptrEntity)->m_bodyId;
 		b2Vec2 position = b2Body_GetPosition(bodyId);
 		return Vector2D<float>(position.x, position.y);
 	}
 
-	const Vector2D<float> PhysicsInterface::GetTopLeftPosition(PhysicsBody* ptrBody)
+	const Vector2D<float> PhysicsInterface::GetTopLeftPosition(Entity* ptrEntity)
 	{
+		PhysicsBody* ptrBody = GetBody(ptrEntity);
 		b2Vec2 position = b2Body_GetPosition(*ptrBody->m_bodyId);
 		return Vector2D<float>(position.x - ptrBody->m_halfDimensions.X, position.y - ptrBody->m_halfDimensions.Y);
 	}
 
-	void PhysicsInterface::ApplyForceToBody(PhysicsBody* ptrBody, Vector2D<float> force)
+	void PhysicsInterface::ApplyForceToBody(Entity* ptrEntity, Vector2D<float> force)
 	{
-		b2BodyId bodyId = *ptrBody->m_bodyId;
+		b2BodyId bodyId = *GetBody(ptrEntity)->m_bodyId;
 		b2Body_ApplyForceToCenter(bodyId, b2Vec2(force.X, force.Y), true);
 	}
 
-	void PhysicsInterface::ApplyImpulseToBody(PhysicsBody* ptrBody, Vector2D<float> impulse)
+	void PhysicsInterface::ApplyImpulseToBody(Entity* ptrEntity, Vector2D<float> impulse)
 	{
-		b2BodyId bodyId = *ptrBody->m_bodyId;
+		b2BodyId bodyId = *GetBody(ptrEntity)->m_bodyId;
 		b2Body_ApplyLinearImpulseToCenter(bodyId, b2Vec2(impulse.X, impulse.Y), true);
 	}
 
 	// PhysicsBody2d getter and setter wrappers
-	void PhysicsInterface::SetGravity(PhysicsBody* ptrBody, bool enabled)
+	void PhysicsInterface::SetGravity(Entity* ptrEntity, bool enabled)
 	{
+		PhysicsBody* ptrBody = GetBody(ptrEntity);
 		ptrBody->m_gravityOn = enabled;
 		b2BodyId bodyId = *ptrBody->m_bodyId;
 		b2Body_SetGravityScale(bodyId, enabled ? 1.0f : 0.0f);
 
 	}
 
-	void PhysicsInterface::SetDeceleration(PhysicsBody* ptrBody, const float decel)
+	void PhysicsInterface::SetDeceleration(Entity* ptrEntity, const float decel)
 	{
-		b2BodyId bodyId = *ptrBody->m_bodyId;
+		b2BodyId bodyId = *GetBody(ptrEntity)->m_bodyId;
 		b2Body_SetLinearDamping(bodyId, decel);
 
 	}
 
-	void PhysicsInterface::SetVelocity(PhysicsBody* ptrBody, const Vector2D<float> velocity)
+	void PhysicsInterface::SetVelocity(Entity* ptrEntity, const Vector2D<float> velocity)
 	{
-		b2BodyId bodyId = *ptrBody->m_bodyId;
+		b2BodyId bodyId = *GetBody(ptrEntity)->m_bodyId;
 		b2Body_SetLinearVelocity(bodyId, b2Vec2(velocity.X, velocity.Y));
 	}
 
-	void PhysicsInterface::SetXVelocity(PhysicsBody* ptrBody, const float xVel)
+	void PhysicsInterface::SetXVelocity(Entity* ptrEntity, const float xVel)
 	{
-		b2BodyId bodyId = *ptrBody->m_bodyId;
+		b2BodyId bodyId = *GetBody(ptrEntity)->m_bodyId;
 		b2Vec2 velocity = b2Body_GetLinearVelocity(bodyId);
 		b2Body_SetLinearVelocity(bodyId, b2Vec2(xVel, velocity.y));
 	}
 
-	void PhysicsInterface::SetYVelocity(PhysicsBody* ptrBody, const float yVel)
+	void PhysicsInterface::SetYVelocity(Entity* ptrEntity, const float yVel)
 	{
-		b2BodyId bodyId = *ptrBody->m_bodyId;
+		b2BodyId bodyId = *GetBody(ptrEntity)->m_bodyId;
 		b2Vec2 velocity = b2Body_GetLinearVelocity(bodyId);
 		b2Body_SetLinearVelocity(bodyId, b2Vec2(velocity.x, yVel));
 	}
 
-	const Vector2D<float> PhysicsInterface::GetVelocity(PhysicsBody* ptrBody)
+	const Vector2D<float> PhysicsInterface::GetVelocity(Entity* ptrEntity)
 	{
-		b2BodyId bodyId = *ptrBody->m_bodyId;
+		b2BodyId bodyId = *GetBody(ptrEntity)->m_bodyId;
 		b2Vec2 velocity = b2Body_GetLinearVelocity(bodyId);
 		return Vector2D<float>(velocity.x, velocity.y);
 	}
 
-	void PhysicsInterface::SetRestitution(PhysicsBody* ptrBody, const float restitution)
+	void PhysicsInterface::SetRestitution(Entity* ptrEntity, const float restitution)
 	{
-		b2ShapeId shapeId = *ptrBody->m_shapeId;
+		b2ShapeId shapeId = *GetBody(ptrEntity)->m_shapeId;
 		b2Shape_SetRestitution(shapeId, restitution);
 	}
 
-	void PhysicsInterface::SetDensity(PhysicsBody* ptrBody, const float density)
+	void PhysicsInterface::SetDensity(Entity* ptrEntity, const float density)
 	{
-		b2ShapeId shapeId = *ptrBody->m_shapeId;
+		b2ShapeId shapeId = *GetBody(ptrEntity)->m_shapeId;
 		b2Shape_SetDensity(shapeId, density, true);
 	}
 
-	void PhysicsInterface::SetFriction(PhysicsBody* ptrBody, const float friction)
+	void PhysicsInterface::SetFriction(Entity* ptrEntity, const float friction)
 	{
-		b2ShapeId shapeId = *ptrBody->m_shapeId;
+		b2ShapeId shapeId = *GetBody(ptrEntity)->m_shapeId;
 		b2Shape_SetFriction(shapeId, friction);
 	}
 
-	void PhysicsInterface::RemoveBodyFromWorld(PhysicsBody* ptrBody)
+	void PhysicsInterface::RemoveBodyFromWorld(Entity* ptrEntity)
 	{
+		PhysicsBody* ptrBody = GetBody(ptrEntity);
 		if (ptrBody->m_bodyId == nullptr) return;
 
 		b2DestroyBody(*ptrBody->m_bodyId);
@@ -131,23 +152,23 @@ namespace Engine
 		ptrBody->m_worldId = nullptr;
 	}
 
-	void PhysicsInterface::SetFixedRotation(PhysicsBody* ptrBody, bool fixed)
+	void PhysicsInterface::SetFixedRotation(Entity* ptrEntity, bool fixed)
 	{
-		b2BodyId bodyId = *ptrBody->m_bodyId;
+		b2BodyId bodyId = *GetBody(ptrEntity)->m_bodyId;
 		b2Body_SetFixedRotation(bodyId, fixed);
 	}
 
-	const float PhysicsInterface::GetAngleInRadians(PhysicsBody* ptrBody)
+	const float PhysicsInterface::GetAngleInRadians(Entity* ptrEntity)
 	{
-		b2BodyId bodyId = *ptrBody->m_bodyId;
+		b2BodyId bodyId = *GetBody(ptrEntity)->m_bodyId;
 		b2Rot rotation = b2Body_GetRotation(bodyId);
 		float angleInRadians = b2Rot_GetAngle(rotation);
 		return angleInRadians;
 	}
 
-	const float PhysicsInterface::GetAngleInDegrees(PhysicsBody* ptrBody)
+	const float PhysicsInterface::GetAngleInDegrees(Entity* ptrEntity)
 	{
-		b2BodyId bodyId = *ptrBody->m_bodyId;
+		b2BodyId bodyId = *GetBody(ptrEntity)->m_bodyId;
 		b2Rot rotation = b2Body_GetRotation(bodyId);
 		float angleInRadians = b2Rot_GetAngle(rotation);
 		return angleInRadians * 180.0f / 3.14159265359f;
