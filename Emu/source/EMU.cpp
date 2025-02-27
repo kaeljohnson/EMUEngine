@@ -19,7 +19,8 @@ namespace Engine
 
 	EMU::EMU()
 		: m_ecs(), m_sceneManager(), 
-		m_physicsInterface(m_ecs), m_application(m_ecs, m_sceneManager), m_cameraInterface(m_ecs)
+		m_physicsInterface(m_ecs), m_transformInterface(m_ecs), m_updatableInterface(m_ecs), 
+		m_application(m_ecs, m_sceneManager), m_cameraInterface(m_ecs)
 	{
 		m_ecs.Initialize(10000);
 

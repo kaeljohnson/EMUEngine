@@ -18,6 +18,7 @@ namespace Engine
 		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(nullptr), 
 		m_physicsSimulation(refECS, Vector2D<float>(0.0f, 100.0f)), 
 		m_cameraSystem(refECS),
+		m_updateSystem(refECS),
 		m_refPhysicsInterface(refPhysicsInterface),
 		refTransformManager(refECS.GetComponentManager<Transform>()),
 		refPhysicsBodyManager(refECS.GetComponentManager<PhysicsBody>()),
@@ -125,12 +126,7 @@ namespace Engine
 
 	void Scene::Update()
 	{
-		// UpdatableSystem.Update();
-		for (Updatable& refUpdatable : refUpdatableManager)
-		{
-			if (!refUpdatable.IsActive()) continue;
-			refUpdatable.Update();
-		}
+		m_updateSystem.Update();
 
 		m_physicsSimulation.Update();
 

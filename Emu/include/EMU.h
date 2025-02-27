@@ -5,6 +5,9 @@
 #include "Camera/CameraManager.h"
 #include "Rendering/WindowRenderer.h"
 #include "Scenes/SceneManager.h"
+#include "Physics/Physics.h"
+#include "TransformInterface.h"
+#include "UpdatableInterface.h"
 
 namespace Engine
 {
@@ -25,6 +28,7 @@ namespace Engine
 
 		EMU_API PhysicsInterface& PHYSICS() { return m_physicsInterface; }
 		EMU_API CameraInterface& ICAMERA() { return m_cameraInterface; }
+		EMU_API TransformInterface& ITRANSFORMS() { return m_transformInterface; }
 		EMU_API ECS& IECS() { return m_ecs; }
 
 		// ECS Interface functions
@@ -42,6 +46,8 @@ namespace Engine
 		// Separate contact system into ContactsManager and ContactSystem
 		PhysicsInterface m_physicsInterface;
 		CameraInterface m_cameraInterface;
+		TransformInterface m_transformInterface;
+		UpdatableInterface m_updatableInterface; // This may not be necessary.
 		SceneManager m_sceneManager;
 		Application m_application;
 	};

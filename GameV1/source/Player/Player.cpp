@@ -25,11 +25,10 @@
 		Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsBody>(ptrEntity);
 
         Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsBody>(ptrEntity);
-		// Engine::PhysicsBody* ptrPhysicsBody = Engine::EMU::GetInstance()->IECS().GetComponent<Engine::PhysicsBody>(ptrEntity);
 		Engine::PhysicsInterface& refPhysicsInterface = Engine::EMU::GetInstance()->PHYSICS();
         refPhysicsInterface.SetBodyType(ptrEntity, Engine::BodyType::DYNAMIC);
 		refPhysicsInterface.SetStartingPosition(ptrEntity, Engine::Vector2D<float>(startingX, startingY));
-		refPhysicsInterface.SetDimensions(ptrEntity, Engine::Vector2D<float>(width, height));
+		refPhysicsInterface.SetDimensions(ptrEntity, Engine::Vector2D<float>(width, height)); 
 
         Engine::EMU::GetInstance()->AddComponent<Engine::Updatable>(ptrEntity, [this]() { Update(); });
 
@@ -94,13 +93,12 @@
 
     void Player::UpdateMovement()
     {
-		Engine::Transform* transformComponent =
-            Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Transform>().GetComponent(m_ptrEntity);
-
         float currentVelocityX = Engine::EMU::GetInstance()->PHYSICS().GetVelocity(m_ptrEntity).X;
 
-        if (m_currentDirection == PlayerDirection::Right) transformComponent->DirectionFacing = 1;
-		else transformComponent->DirectionFacing = -1;
+		Engine::TransformInterface* transformInterface = &Engine::EMU::GetInstance()->ITRANSFORMS();
+
+		if (m_currentDirection == PlayerDirection::Right) transformInterface->SetDirectionFacing(m_ptrEntity, 1);
+		else transformInterface->SetDirectionFacing(m_ptrEntity, -1);
 
         switch (m_currentState)
         {

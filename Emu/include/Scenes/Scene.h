@@ -11,6 +11,7 @@
 #include "../Core.h"
 #include "../MathUtil.h"
 #include "../Components.h"
+#include "../UpdateSystem.h"
 
 struct b2WorldId;
 
@@ -57,6 +58,8 @@ namespace Engine
 		PhysicsSimulation m_physicsSimulation;
 		PhysicsInterface& m_refPhysicsInterface;
 		CameraSystem m_cameraSystem;
+		UpdateSystem m_updateSystem;
+
 
 		std::vector<Entity*> m_entities;
 
