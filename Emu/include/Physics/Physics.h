@@ -15,8 +15,10 @@ namespace Engine
 	public:
 		// PhysicsBody2d getter and setter wrappers
 		EMU_API void CreateBody(Entity* ptrEntity);
+		EMU_API const bool HasBody(Entity* ptrEntity);
 		EMU_API void SetBodyType(Entity* ptrEntity, const BodyType type);
 		EMU_API void SetDimensions(Entity* ptrEntity, const Vector2D<float> dimensions);
+		EMU_API const Vector2D<float> GetDimensions(Entity* ptrEntity);
 		EMU_API void SetGravity(Entity* ptrEntity, bool enabled);
 		EMU_API void SetStartingPosition(Entity* ptrEntity, const Vector2D<float> position);
 		EMU_API void SetPosition(Entity* ptrEntity, const Vector2D<float> position);

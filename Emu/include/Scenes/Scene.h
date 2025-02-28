@@ -60,12 +60,7 @@ namespace Engine
 		CameraSystem m_cameraSystem;
 		UpdateSystem m_updateSystem;
 
-
 		std::vector<Entity*> m_entities;
-
-		ComponentManager<Transform>& refTransformManager;
-		ComponentManager<PhysicsBody>& refPhysicsBodyManager;
-		ComponentManager<Updatable>& refUpdatableManager;
 
 	public:
 		inline const int GetLevelWidth() const { return m_levelDimensionsInUnits.X; }
@@ -75,7 +70,6 @@ namespace Engine
 		void OnSceneEnd();
 
 		void CheckValid();
-		void Update();
 		void UpdateScripts();
 		void UpdatePhysics();
 		void UpdateCamera();

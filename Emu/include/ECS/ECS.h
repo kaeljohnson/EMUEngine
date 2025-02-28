@@ -84,6 +84,17 @@ namespace Engine
 			}
 		}
 
+        template<typename T>
+		bool HasComponent(Entity* ptrEntity)
+		{
+			auto it = m_componentManagers.find(std::type_index(typeid(T)));
+			if (it != m_componentManagers.end())
+			{
+				return static_cast<ComponentManager<T>*>(it->second.get())->HasComponent(ptrEntity);
+			}
+			return false;
+		}
+
 		template<typename T>
         ComponentManager<T>& GetComponentManager()
         {

@@ -19,10 +19,7 @@ namespace Engine
 		m_physicsSimulation(refECS, Vector2D<float>(0.0f, 100.0f)), 
 		m_cameraSystem(refECS),
 		m_updateSystem(refECS),
-		m_refPhysicsInterface(refPhysicsInterface),
-		refTransformManager(refECS.GetComponentManager<Transform>()),
-		refPhysicsBodyManager(refECS.GetComponentManager<PhysicsBody>()),
-		refUpdatableManager(refECS.GetComponentManager<Updatable>()) {}
+		m_refPhysicsInterface(refPhysicsInterface) {}
 
 	Scene::~Scene()
 	{
@@ -124,59 +121,14 @@ namespace Engine
 		m_levelDimensionsInUnits = levelDimensions;
 	}
 
-	void Scene::Update()
-	{
-		m_updateSystem.Update();
-
-		m_physicsSimulation.Update();
-
-		for (PhysicsBody& refPhysicsBody : refPhysicsBodyManager)
-		{
-			if (!refPhysicsBody.IsActive()) continue;
-
-			Entity* ptrEntity = refPhysicsBody.GetEntity();
-
-			if (refTransformManager.HasComponent(ptrEntity))
-			{
-				Transform* ptrTransform = refTransformManager.GetComponent(ptrEntity);
-				
-				ptrTransform->PrevPosition = ptrTransform->Position;
-				ptrTransform->Position = m_refPhysicsInterface.GetTopLeftPosition(ptrEntity);
-				ptrTransform->Dimensions = refPhysicsBody.m_dimensions;
-				ptrTransform->Rotation = m_refPhysicsInterface.GetAngleInDegrees(ptrEntity);
-			}
-		}
-	};
-
 	void Scene::UpdateScripts()
 	{
-		for (Updatable& refUpdatable : refUpdatableManager)
-		{
-			if (!refUpdatable.IsActive()) continue;
-			refUpdatable.Update();
-		}
+		m_updateSystem.Update();
 	}
 
 	void Scene::UpdatePhysics()
 	{
 		m_physicsSimulation.Update();
-
-		for (PhysicsBody& refPhysicsBody : refPhysicsBodyManager)
-		{
-			if (!refPhysicsBody.IsActive()) continue;
-
-			Entity* ptrEntity = refPhysicsBody.GetEntity();
-
-			if (refTransformManager.HasComponent(ptrEntity))
-			{
-				Transform* ptrTransform = refTransformManager.GetComponent(ptrEntity);
-
-				ptrTransform->PrevPosition = ptrTransform->Position;
-				ptrTransform->Position = m_refPhysicsInterface.GetTopLeftPosition(ptrEntity);
-				ptrTransform->Dimensions = refPhysicsBody.m_dimensions;
-				ptrTransform->Rotation = m_refPhysicsInterface.GetAngleInDegrees(ptrEntity);
-			}
-		}
 	}
 
 	void Scene::UpdateCamera()

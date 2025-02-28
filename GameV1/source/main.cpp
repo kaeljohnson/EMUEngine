@@ -36,9 +36,9 @@ int main(int argc, char* args[])
 		Engine::Vector2D(12.0f, 12.0f), Engine::Vector2D(1.0f, 1.0f), 1.0f, 1.0f, 1.0f);
 
 	refECS.AddComponent<Engine::PhysicsBody>(ptrTestEntity);
-	Engine::EMU::GetInstance()->PHYSICS().SetBodyType(ptrTestEntity, Engine::BodyType::SENSOR);
-	Engine::EMU::GetInstance()->PHYSICS().SetStartingPosition(ptrTestEntity, Engine::Vector2D<float>(12.0f, 64.0f));
-	Engine::EMU::GetInstance()->PHYSICS().SetDimensions(ptrTestEntity, Engine::Vector2D<float>(1.0f, 1.0f));
+	Engine::EMU::GetInstance()->IPHYSICS().SetBodyType(ptrTestEntity, Engine::BodyType::SENSOR);
+	Engine::EMU::GetInstance()->IPHYSICS().SetStartingPosition(ptrTestEntity, Engine::Vector2D<float>(12.0f, 64.0f));
+	Engine::EMU::GetInstance()->IPHYSICS().SetDimensions(ptrTestEntity, Engine::Vector2D<float>(1.0f, 1.0f));
 
 
 	scene->RegisterContactCallback(Engine::BEGIN_CONTACT, ptrPlayerEntity, ptrTestEntity, [](const Engine::Contact event)

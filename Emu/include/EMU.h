@@ -26,7 +26,7 @@ namespace Engine
 		EMU_API void LoadScene(const std::string& name);
 		EMU_API void UnloadCurrentScene();
 
-		EMU_API PhysicsInterface& PHYSICS() { return m_physicsInterface; }
+		EMU_API PhysicsInterface& IPHYSICS() { return m_physicsInterface; }
 		EMU_API CameraInterface& ICAMERA() { return m_cameraInterface; }
 		EMU_API TransformInterface& ITRANSFORMS() { return m_transformInterface; }
 		EMU_API ECS& IECS() { return m_ecs; }

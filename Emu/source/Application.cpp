@@ -80,7 +80,7 @@ namespace Engine
 			Time::SetInterpolationFactor((float)accumulator / timeStep);
 
 			
-			m_sceneManager.GetCurrentScene()->UpdateVisuals();
+			m_ptrCurrentScene->UpdateVisuals();
 			m_ptrCurrentScene->UpdateCamera();
 
 			m_windowRenderer.Render();

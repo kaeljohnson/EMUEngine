@@ -42,6 +42,7 @@ namespace Engine
 			m_bodyId(nullptr), m_shapeId(nullptr), m_worldId(nullptr),
 			m_bodyType(STATIC), m_dimensions(Vector2D<float>(1.0f, 1.0f)),
 			m_halfDimensions(Vector2D<float>(0.5f, 0.5f)), m_startingPosition(Vector2D<float>(1.0f, 1.0f)),
+			m_position(Vector2D<float>(0.0f, 0.0f)), m_rotation(0.0f),
 			m_gravityOn(true), Component(ptrEntity) {}
 
 		EMU_API ~PhysicsBody() = default;
@@ -55,7 +56,9 @@ namespace Engine
 		Vector2D<float> m_dimensions;
 		Vector2D<float> m_halfDimensions;
 		Vector2D<float> m_startingPosition;
+		Vector2D<float> m_position;
 
+		float m_rotation;
 		bool m_gravityOn;
 
 		// Temp

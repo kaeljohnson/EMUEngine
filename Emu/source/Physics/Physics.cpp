@@ -23,6 +23,11 @@ namespace Engine
 		m_refECS.AddComponent<PhysicsBody>(ptrEntity);
 	}
 
+	const bool PhysicsInterface::HasBody(Entity* ptrEntity)
+	{
+		return m_refECS.HasComponent<PhysicsBody>(ptrEntity);
+	}
+
 	void PhysicsInterface::SetBodyType(Entity* ptrEntity, const BodyType type)
 	{
 		GetBody(ptrEntity)->m_bodyType = type;
@@ -33,6 +38,11 @@ namespace Engine
 		PhysicsBody* ptrBody = GetBody(ptrEntity);
 		ptrBody->m_dimensions = dimensions;
 		ptrBody->m_halfDimensions = dimensions / 2.0f;
+	}
+
+	const Vector2D<float> PhysicsInterface::GetDimensions(Entity* ptrEntity)
+	{
+		return GetBody(ptrEntity)->m_dimensions;
 	}
 
 	PhysicsBody* PhysicsInterface::GetBody(Entity* ptrEntity)
@@ -60,9 +70,7 @@ namespace Engine
 
 	const Vector2D<float> PhysicsInterface::GetPosition(Entity* ptrEntity)
 	{
-		b2BodyId bodyId = *GetBody(ptrEntity)->m_bodyId;
-		b2Vec2 position = b2Body_GetPosition(bodyId);
-		return Vector2D<float>(position.x, position.y);
+		return GetBody(ptrEntity)->m_position;
 	}
 
 	const Vector2D<float> PhysicsInterface::GetTopLeftPosition(Entity* ptrEntity)
@@ -282,6 +290,29 @@ namespace Engine
 	{
 		b2World_Step(*m_ptrWorldId, Time::GetTimeStep(), 4);
 		m_contactSystem.ProcessContacts(m_ptrWorldId);
+
+		for (PhysicsBody& refPhysicsBody : m_refECS.GetComponentManager<PhysicsBody>())
+		{
+			if (!refPhysicsBody.IsActive()) continue;
+
+			Entity* ptrEntity = refPhysicsBody.GetEntity();
+
+			b2Vec2 position = b2Body_GetPosition(*refPhysicsBody.m_bodyId);
+			refPhysicsBody.m_position = Vector2D<float>(position.x - refPhysicsBody.m_halfDimensions.X, position.y - refPhysicsBody.m_halfDimensions.Y);
+
+			b2Rot rotation = b2Body_GetRotation(*refPhysicsBody.m_bodyId);
+			refPhysicsBody.m_rotation = b2Rot_GetAngle(rotation) * 180.0f / 3.14159265359f;
+
+			if (m_refECS.GetComponentManager<Transform>().HasComponent(ptrEntity))
+			{
+				Transform* ptrTransform = m_refECS.GetComponentManager<Transform>().GetComponent(ptrEntity);
+
+				ptrTransform->PrevPosition = ptrTransform->Position;
+				ptrTransform->Dimensions = refPhysicsBody.m_dimensions;
+				ptrTransform->Position = refPhysicsBody.m_position;
+				ptrTransform->Rotation = refPhysicsBody.m_rotation;
+			}
+		}
 	}
 
 	void PhysicsSimulation::DestroyWorld()
