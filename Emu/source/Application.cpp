@@ -8,8 +8,9 @@
 
 namespace Engine
 {
-	Application::Application(ECS& refECS, SceneManager& refSceneManager)
-		: m_refECS(refECS), m_ptrCurrentScene(nullptr), m_windowRenderer(refECS), m_sceneManager(refSceneManager)
+	Application::Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem)
+		: m_refECS(refECS), m_ptrCurrentScene(nullptr), m_windowRenderer(refECS), 
+		m_sceneManager(refSceneManager), m_refIOEventSystem(refIOEventSystem)
 	{}
 
 	void Application::Start()
@@ -36,8 +37,8 @@ namespace Engine
 				m_ptrCurrentScene = m_sceneManager.GetCurrentScene();
 			}
 
-			IOEventSystem::HandleEvents();
-			IOEventSystem::ProcessEvents();
+			m_refIOEventSystem.HandleEvents();
+			m_refIOEventSystem.ProcessEvents();
 
 			newTime = SDL_GetTicks() / 1000.0;
 			frameTime = newTime - currentTime;

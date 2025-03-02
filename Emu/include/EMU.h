@@ -4,6 +4,7 @@
 #include "Application.h"
 #include "Rendering/WindowRenderer.h"
 #include "Scenes/SceneManager.h"
+#include "Events/IOEventSystem.h"
 #include "Physics/Physics.h"
 #include "Camera/CameraInterface.h"
 #include "TransformInterface.h"
@@ -38,6 +39,9 @@ namespace Engine
 			m_ecs.AddComponent<T>(ptrEntity, std::forward<Args>(componentArgs)...);
 		}
 
+		// Event IO System Interface functions
+		EMU_API void RegisterIOEventListener(IOEventType type, IOEventHandler handler);
+
 	public:
 		static void Init();
 		~EMU();
@@ -50,6 +54,7 @@ namespace Engine
 		CameraInterface m_cameraInterface;
 		TransformInterface m_transformInterface;
 		UpdatableInterface m_updatableInterface; // This may not be necessary.
+		IOEventSystem m_ioEventSystem;
 		SceneManager m_sceneManager;
 		Application m_application;
 	};

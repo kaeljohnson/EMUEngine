@@ -16,8 +16,6 @@ namespace Engine
 	{
 		ENGINE_TRACE_D("Logger initialized!");
 
-		IOEventSystem::Initialize();
-
 		if (!ISDL::ImgInit(IMG_INIT_PNG))
 			ENGINE_CRITICAL("IMG Init failed! SDL_Error: " + std::string(ISDL::GetError()));
 

@@ -4,6 +4,7 @@
 #include "Scenes/Scene.h"
 #include "Scenes/SceneManager.h"
 #include "Rendering/WindowRenderer.h"
+#include "Events/IOEventSystem.h"
 #include "Core.h"
 
 namespace Engine
@@ -11,7 +12,7 @@ namespace Engine
 	class Application
 	{
 	public:
-		EMU_API Application(ECS& refECS, SceneManager& refSceneManager);
+		EMU_API Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem);
 		EMU_API void Start();
 		EMU_API void End();
 
@@ -29,5 +30,6 @@ namespace Engine
 		
 		SceneManager& m_sceneManager;
 		std::shared_ptr<Scene> m_ptrCurrentScene;
+		IOEventSystem& m_refIOEventSystem;
 	};
 }

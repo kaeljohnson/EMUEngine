@@ -19,8 +19,9 @@ namespace Engine
 
 	EMU::EMU()
 		: m_ecs(), m_sceneManager(), 
-		m_physicsInterface(m_ecs), m_transformInterface(m_ecs), m_updatableInterface(m_ecs), 
-		m_application(m_ecs, m_sceneManager), m_cameraInterface(m_ecs)
+		m_physicsInterface(m_ecs), m_transformInterface(m_ecs), 
+		m_updatableInterface(m_ecs), m_ioEventSystem(),
+		m_application(m_ecs, m_sceneManager, m_ioEventSystem), m_cameraInterface(m_ecs)
 	{
 		m_ecs.Initialize(10000);
 
@@ -29,6 +30,8 @@ namespace Engine
 		m_ecs.RegisterComponentManager<Transform>();
 		m_ecs.RegisterComponentManager<Camera>();
 		m_ecs.RegisterComponentManager<SimpleContact>();
+
+		m_ioEventSystem.Initialize();
 	}
 
 	EMU::~EMU() 
@@ -67,5 +70,10 @@ namespace Engine
 	void EMU::Deactivate(Entity* ptrEntity)
 	{
 		m_ecs.Deactivate(ptrEntity);
+	}
+
+	void EMU::RegisterIOEventListener(IOEventType type, IOEventHandler handler)
+	{
+		m_ioEventSystem.RegisterIOEventListener(type, handler);
 	}
 }
