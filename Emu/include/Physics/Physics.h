@@ -57,7 +57,6 @@ namespace Engine
 	{
 	public:
 		PhysicsSimulation(ECS& refECS, const Vector2D<float> gravity);
-		// void CreateWorld(const Vector2D<float> gravity);
 		void UpdateGravity(const Vector2D<float> gravity);
 		void AddPhysicsBodiesToWorld();
 

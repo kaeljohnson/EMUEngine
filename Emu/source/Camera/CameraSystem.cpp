@@ -19,9 +19,6 @@ namespace Engine
             {
                 // CAMERA UPDATES
                 Engine::Transform* ptrCameraTarget = m_refECS.GetComponentManager<Transform>().GetComponent(camera.GetEntity());
-                // Engine::Camera* ptrCamera = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
-
-                // CLIENT_INFO_D("Interpolation Factor: " + std::to_string(Engine::Time::GetInterpolationFactor()));
 
                 const float interpFactor = Engine::Time::GetInterpolationFactor();
 
@@ -30,8 +27,6 @@ namespace Engine
 
                 camera.m_offset.X = targetX - (camera.m_size.X / 2.0f);
                 camera.m_offset.Y = targetY - (camera.m_size.Y / 2.0f);
-
-                // CLIENT_INFO_D("Camera Offset: " + std::to_string(camera.m_offset.X) + ", " + std::to_string(ptrCamera->m_offset.Y));
 
                 if (camera.m_clampingOn) Clamp(camera);
             }

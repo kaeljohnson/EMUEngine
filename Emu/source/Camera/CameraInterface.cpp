@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../include/Camera/CameraInterface.h"
-#include "../../include/Logging/Logger.h"
 #include "../../include/Rendering/Screen.h"
 #include "../../include/Components.h"
 
@@ -19,6 +18,11 @@ namespace Engine
 	{
 		GetCamera(ptrEntity)->m_pixelsPerUnit = pixelsPerUnit;
 		SetSize(ptrEntity);
+	}
+
+	const int CameraInterface::GetPixelsPerUnit(Entity* ptrEntity)
+	{
+		return GetCamera(ptrEntity)->m_pixelsPerUnit;
 	}
 
 	void CameraInterface::SetSize(Entity* ptrEntity)
@@ -39,18 +43,23 @@ namespace Engine
 		GetCamera(ptrEntity)->m_offset = offsets;
 	}
 
-	const Vector2D<float> CameraInterface::GetOffsets(Entity* ptrEntity)
-	{
-		return GetCamera(ptrEntity)->m_offset;
-	}
-
-	void CameraInterface::SetCameraPosition(Entity* ptrEntity, const Vector2D<float> offset)
+	void CameraInterface::SetOffset(Entity* ptrEntity, const Vector2D<float> offset)
 	{
 		GetCamera(ptrEntity)->m_offset = offset;
+	}
+
+	const Vector2D<float> CameraInterface::GetOffset(Entity* ptrEntity)
+	{
+		return GetCamera(ptrEntity)->m_offset;
 	}
 
 	void CameraInterface::SetClampingOn(Entity* ptrEntity, const bool clampingOn)
 	{
 		GetCamera(ptrEntity)->m_clampingOn = clampingOn;
+	}
+
+	const bool CameraInterface::GetClampingOn(Entity* ptrEntity)
+	{
+		return GetCamera(ptrEntity)->m_clampingOn;
 	}
 }

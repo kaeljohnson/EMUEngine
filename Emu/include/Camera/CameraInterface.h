@@ -8,21 +8,19 @@
 
 namespace Engine
 {
-
 	// Any camera component functions that have to do with setting camera values should be in this class.
 	class CameraInterface
 	{
 	public:
-		
-		
 		EMU_API void SetPixelsPerUnit(Entity* ptrEntity, const int pixelsPerUnit);
-		EMU_API void SetCameraPosition(Entity* ptrEntity, const Vector2D<float> offset);
+		EMU_API const int GetPixelsPerUnit(Entity* ptrEntity);
+		EMU_API void SetOffset(Entity* ptrEntity, const Vector2D<float> offset);
+		EMU_API const Vector2D<float> GetOffset(Entity* ptrEntity);
 		EMU_API void SetClampingOn(Entity* ptrEntity, const bool clampingOn);
+		EMU_API const bool GetClampingOn(Entity* ptrEntity);
 		EMU_API void SetSize(Entity* ptrEntity);
 		EMU_API const Vector2D<float> GetSize(Entity* ptrEntity);
 		EMU_API void SetOffsets(Entity* ptrEntity, const Vector2D<float> offsets);
-		EMU_API const Vector2D<float> GetOffsets(Entity* ptrEntity);
-		EMU_API inline const int GetPixelsPerUnit(Entity* ptrEntity) const { return m_refECS.GetComponent<Camera>(ptrEntity)->m_pixelsPerUnit; }
 
 		virtual ~CameraInterface() = default;
 	

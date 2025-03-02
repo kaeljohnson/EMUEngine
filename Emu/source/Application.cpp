@@ -1,17 +1,9 @@
 #pragma once
 
 #include "../include/Logging/Logger.h"
-#include "../include/Events/IOEvent.h"
 #include "../include/Events/IOEventSystem.h"
-#include "../include/Events/IOEventDispatcher.h"
-#include "../include/Scenes/Scene.h"
-#include "../include/Rendering/WindowRenderer.h"
-#include "../include/ECS/ECS.h"
-#include "../include/Components.h"
-#include "../include/Includes.h"
+#include "../include/ISDL/ISDL.h"
 #include "../include/Time.h"
-#include "../include/Physics/Physics.h"
-#include "../include/Physics/ContactSystem.h"
 #include "../include/Application.h"
 
 namespace Engine
@@ -22,9 +14,6 @@ namespace Engine
 
 	void Application::Start()
 	{
-		// Once sceme manager exists, this function will be a generic run funcion that queries the scene manager for the current scene.
-		// Will need to add more functionality in here to handle scene switching.
-
 		Time::SetAppRunning(true);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -41,15 +30,6 @@ namespace Engine
 		// Application loop.
 		while (Time::IsAppRunning())
 		{
-			/*
-			Each game loop iteration should:
-				1. Handle events.
-				2. Process actions.
-				3. Clear the screen.
-				4. Render scene.
-				5. Display the rendered scene.
-			*/
-
 			if (m_sceneManager.IsNewSceneStarting())
 			{	
 				m_sceneManager.NewSceneStarted();
@@ -79,7 +59,6 @@ namespace Engine
 
 			Time::SetInterpolationFactor((float)accumulator / timeStep);
 
-			
 			m_ptrCurrentScene->UpdateVisuals();
 			m_ptrCurrentScene->UpdateCamera();
 

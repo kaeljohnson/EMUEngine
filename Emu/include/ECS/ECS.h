@@ -2,8 +2,8 @@
 
 #include "../Core.h"
 #include "../Includes.h"
-#include "ComponentManager.h"
 #include "Entity.h"
+#include "ComponentManager.h"
 
 namespace Engine
 {

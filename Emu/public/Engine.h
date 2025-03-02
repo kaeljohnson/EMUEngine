@@ -1,27 +1,29 @@
 #pragma once
 
-#include "../include/Core.h"
-#include "../include/Init.h"
-#include "../include/EMU.h"
-#include "../include/Events/IOEventSystem.h"
-#include "../include/Events/IOEvent.h"
-#include "../include/Logging/Logger.h"
-#include "../include/Scenes/Scene.h"
-#include "../include/Physics/BodyTypes.h"
-#include "../include/Physics/Physics.h"
-#include "../include/Components.h"
-#include "../include/Tiles/TileMap.h"
-
-#include "../include/Events/KeyStates.h"
-#include "../include/Events/MouseStates.h"
-
-#include "../include/Rendering/Screen.h"
+//#include "../include/Core.h"
+//#include "../include/Init.h"
+//
+//#include "../include/Events/IOEventSystem.h"
+//#include "../include/Events/IOEvent.h"
+//#include "../include/Logging/Logger.h"
+//#include "../include/Scenes/Scene.h"
+//#include "../include/Physics/BodyTypes.h"
+//#include "../include/Physics/Physics.h"
+//#include "../include/Components.h"
+//#include "../include/Tiles/TileMap.h"
+//
+//#include "../include/Events/KeyStates.h"
+//#include "../include/Events/MouseStates.h"
+//
+//#include "../include/Rendering/Screen.h"
 #include "../include/Time.h"
+//
+//#include "../include/Camera/CameraInterface.h"
+//
+//#include "../include/ECS/ECS.h"
+//#include "../include/MathUtil.h"
 
-#include "../include/Camera/CameraInterface.h"
-
-#include "../include/ECS/ECS.h"
-#include "../include/MathUtil.h"
+#include "../include/EMU.h"
 
 namespace Engine
 {

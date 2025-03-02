@@ -9,7 +9,6 @@ int main(int argc, char* args[])
 {
 	Engine::Init();
 	Engine::EMU* engine = Engine::EMU::GetInstance();
-	Engine::ECS& refECS = engine->IECS();
 
 	CLIENT_INFO_D("Client Running!");
 
@@ -20,8 +19,8 @@ int main(int argc, char* args[])
 	scene->SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 	scene2->SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 
-	Engine::TileMap testMap(refECS, "testMap1.txt", 1);
-	scene->AddTileMap(testMap);
+	// Engine::TileMap testMap(refECS, "testMap1.txt", 1);
+	scene->AddTileMap("testMap1.txt", 1);
 
 	Engine::Entity* ptrPlayerEntity = Engine::EMU::GetInstance()->CreateEntity();
 	ptrPlayerEntity->SetPriority(0);
@@ -32,10 +31,10 @@ int main(int argc, char* args[])
 	Engine::Entity* ptrTestEntity = Engine::EMU::GetInstance()->CreateEntity();
 	ptrTestEntity->SetPriority(1);
 	scene->Add(ptrTestEntity);
-	refECS.AddComponent<Engine::Transform>(ptrTestEntity,
+	engine->AddComponent<Engine::Transform>(ptrTestEntity,
 		Engine::Vector2D(12.0f, 12.0f), Engine::Vector2D(1.0f, 1.0f), 1.0f, 1.0f, 1.0f);
 
-	refECS.AddComponent<Engine::PhysicsBody>(ptrTestEntity);
+	engine->AddComponent<Engine::PhysicsBody>(ptrTestEntity);
 	Engine::EMU::GetInstance()->IPHYSICS().SetBodyType(ptrTestEntity, Engine::BodyType::SENSOR);
 	Engine::EMU::GetInstance()->IPHYSICS().SetStartingPosition(ptrTestEntity, Engine::Vector2D<float>(12.0f, 64.0f));
 	Engine::EMU::GetInstance()->IPHYSICS().SetDimensions(ptrTestEntity, Engine::Vector2D<float>(1.0f, 1.0f));
@@ -70,8 +69,7 @@ int main(int argc, char* args[])
 
 	scene2->Add(ptrPlayerEntity);
 
-	Engine::TileMap testMap2(refECS, "TestMap2.txt", 1);
-	scene2->AddTileMap(testMap2);
+	scene2->AddTileMap("TestMap2.txt", 1);
 
 	engine->LoadScene("Level1");
 

@@ -63,12 +63,12 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* playerEnt
 
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::O_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
-			Engine::EMU::GetInstance()->IECS().Deactivate(playerEntity);
+			Engine::EMU::GetInstance()->Deactivate(playerEntity);
 		});
 
 	Engine::IOEventSystem::RegisterIOEventListener(Engine::O_KEY_UP, [&](Engine::IOEvent& e)
 		{
-			Engine::EMU::GetInstance()->IECS().Activate(playerEntity);
+			Engine::EMU::GetInstance()->Activate(playerEntity);
 		});
 	
 

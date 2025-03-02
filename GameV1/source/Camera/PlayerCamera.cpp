@@ -20,11 +20,14 @@ PlayerCamera::PlayerCamera(Engine::Entity* ptrEntity) :
 
 void PlayerCamera::Update()
 {
-	Engine::Transform* ptrCameraTarget = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Transform>().GetComponent(m_ptrEntity);
+	// Engine::Transform* ptrCameraTarget = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Transform>().GetComponent(m_ptrEntity);
+	Engine::TransformInterface& refTransformInterface = Engine::EMU::GetInstance()->ITRANSFORMS();
 	// Engine::Camera* ptrCamera = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
 
-    float targetX = Engine::Lerp(ptrCameraTarget->PrevPosition.X, ptrCameraTarget->Position.X, Engine::Time::GetInterpolationFactor());
-    float targetY = Engine::Lerp(ptrCameraTarget->PrevPosition.Y, ptrCameraTarget->Position.Y, Engine::Time::GetInterpolationFactor());
+	Engine::Vector2D<float> targetPrevPosition = refTransformInterface.GetPrevPosition(m_ptrEntity);
+	Engine::Vector2D<float> targetPosition = refTransformInterface.GetPosition(m_ptrEntity);
+    float targetX = Engine::Lerp(targetPrevPosition.X, targetPosition.X, Engine::Time::GetInterpolationFactor());
+    float targetY = Engine::Lerp(targetPrevPosition.Y, targetPosition.Y, Engine::Time::GetInterpolationFactor());
 
 	Engine::CameraInterface& refCameraInterface = Engine::EMU::GetInstance()->ICAMERA();
     const Engine::Vector2D<float> cameraSize = refCameraInterface.GetSize(m_ptrEntity);
@@ -37,7 +40,7 @@ void PlayerCamera::Update()
 
     // DEAD CODE FOR NOW
 
-    float desiredLookAhead = ptrCameraTarget->DirectionFacing * m_lookAheadFactor;
+    float desiredLookAhead = refTransformInterface.GetDirectionFacing(m_ptrEntity) * m_lookAheadFactor;
 
     // Calculate the difference between the current and desired look-ahead
     float lookAheadDifference = desiredLookAhead - m_lookAhead;
@@ -57,7 +60,7 @@ void PlayerCamera::Update()
     float desiredCameraTopLeftX = targetX - (cameraSize.X / 2.0f);
     float desiredCameraTopLeftY = targetY - (cameraSize.Y / 2.0f);
 
-    const Engine::Vector2D<float> cameraOffset = refCameraInterface.GetOffsets(m_ptrEntity);
+    const Engine::Vector2D<float> cameraOffset = refCameraInterface.GetOffset(m_ptrEntity);
 
 	refCameraInterface.SetOffsets(m_ptrEntity, Engine::Vector2D<float>(desiredCameraTopLeftX - cameraOffset.X, cameraOffset.Y));
 

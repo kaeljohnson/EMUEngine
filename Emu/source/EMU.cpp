@@ -39,7 +39,7 @@ namespace Engine
 	// Scene management
 	std::shared_ptr<Scene> EMU::CreateScene(const std::string& name)
 	{
-		std::shared_ptr<Scene> scene = std::make_shared<Scene>(m_ecs, m_physicsInterface, m_cameraInterface);
+		std::shared_ptr<Scene> scene = std::make_shared<Scene>(m_ecs);
 		m_sceneManager.AddScene(name, scene);
 		return scene;
 	}
@@ -57,5 +57,15 @@ namespace Engine
 	Entity* EMU::CreateEntity()
 	{
 		return m_ecs.CreateEntity();
+	}
+
+	void EMU::Activate(Entity* ptrEntity)
+	{
+		m_ecs.Activate(ptrEntity);
+	}
+
+	void EMU::Deactivate(Entity* ptrEntity)
+	{
+		m_ecs.Deactivate(ptrEntity);
 	}
 }

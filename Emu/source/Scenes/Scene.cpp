@@ -5,8 +5,6 @@
 #include "../../include/Physics/Physics.h"
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/Components.h"
-#include "../../include/Camera/CameraInterface.h"
 #include "../../include/MathUtil.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Time.h"
@@ -14,21 +12,25 @@
 
 namespace Engine
 {
-	Scene::Scene(ECS& refECS, PhysicsInterface& refPhysicsInterface, CameraInterface& refCameraInterface)
+	Scene::Scene(ECS& refECS)
 		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(nullptr), 
 		m_physicsSimulation(refECS, Vector2D<float>(0.0f, 100.0f)), 
 		m_cameraSystem(refECS),
-		m_updateSystem(refECS),
-		m_refPhysicsInterface(refPhysicsInterface) {}
+		m_updateSystem(refECS) {}
 
 	Scene::~Scene()
 	{
 		m_physicsSimulation.Cleanup();
 	}
-
-	void Scene::CheckValid()
+	
+	void Scene::RegisterContactCallback(ContactType contactType, Entity* ptrEntityA, Entity* ptrEntityB, ContactCallback callback)
 	{
-		// (m_worldID == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
+		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, ptrEntityA, ptrEntityB, callback);
+	}
+
+	void Scene::RegisterContactCallback(ContactType contactType, Entity* ptrEntity, ContactCallback callback)
+	{
+		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, ptrEntity, callback);
 	}
 
 	void Scene::OnScenePlay()
@@ -62,8 +64,11 @@ namespace Engine
 		m_refECS.UnloadEntities();
 	}
 
-	void Scene::AddTileMap(TileMap& tileMap)
+	void Scene::AddTileMap(std::string mapFileName, const int numMetersPerTile)
 	{
+		// Temporary until tilemap system is refactored and tilemaps become components.
+		TileMap tileMap(m_refECS, "testMap1.txt", 1);
+
 		// Get a temp vector or tile IDs from the tile map. Both the transforms and the physics bodies.
 		std::vector<Entity*> tileMapEntities = tileMap.LoadMap();
 		std::vector<Entity*> mapCollisionBodies = tileMap.CreateCollisionBodies();
