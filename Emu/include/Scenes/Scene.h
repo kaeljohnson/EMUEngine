@@ -5,10 +5,11 @@
 #include "../ECS/Entity.h"
 #include "../Tiles/TileMap.h" 
 #include "../Physics/Physics.h"
+#include "../Camera/CameraSystem.h"
 #include "../Includes.h"
 #include "../Core.h"
 #include "../MathUtil.h"
-#include "../Components.h"
+#include "../UpdateSystem.h"
 
 struct b2WorldId;
 
@@ -17,8 +18,12 @@ namespace Engine
 	class Scene
 	{
 	public:
-		EMU_API Scene();
+		EMU_API Scene(ECS& refECS);
 		EMU_API ~Scene();
+
+		using ContactCallback = std::function<void(const Contact&)>;
+		EMU_API void RegisterContactCallback(ContactType contactType, Entity* ptrEntityA, Entity* ptrEntityB, ContactCallback callback);
+		EMU_API void RegisterContactCallback(ContactType contactType, Entity* ptrEntity, ContactCallback callback);
 
 		EMU_API void SetPhysicsSimulation(const Vector2D<float> gravity);
 	
@@ -26,23 +31,26 @@ namespace Engine
 
 		// Removes entity from scene by removing entity
 		// from entities array and deactivating entity in ECS.
+		EMU_API void Activate(Entity* ptrEntity);
+		EMU_API void Deactivate(Entity* ptrEntity);
+
 		EMU_API void Remove(Entity* ptrEntity);
-		EMU_API void AddTileMap(TileMap& tileMap);
+		EMU_API void AddTileMap(std::string mapFileName, const int numMetersPerTile);
 
 		// IF theres no map in the level, client will decided the dimensions manually.
 		EMU_API void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
 
 	private:
+		ECS& m_refECS;
+
 		Vector2D<int> m_levelDimensionsInUnits;
 		TileMap* m_tileMap; 
 
 		PhysicsSimulation m_physicsSimulation;
+		CameraSystem m_cameraSystem;
+		UpdateSystem m_updateSystem;
 
 		std::vector<Entity*> m_entities;
-
-		ComponentManager<Transform>& refTransformManager;
-		ComponentManager<PhysicsBody>& refPhysicsBodyManager;
-		ComponentManager<Updatable>& refUpdatableManager;
 
 	public:
 		inline const int GetLevelWidth() const { return m_levelDimensionsInUnits.X; }
@@ -51,8 +59,10 @@ namespace Engine
 		void OnScenePlay();
 		void OnSceneEnd();
 
-		void CheckValid();
-		void Update();
+		void UpdateScripts();
+		void UpdatePhysics();
+		void UpdateCamera();
+		void UpdateVisuals();
 
 		bool HasTileMap;
 	}; 

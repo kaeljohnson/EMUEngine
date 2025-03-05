@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../ECS/Entity.h"
+#include "../ECS/ECS.h"
 #include "../Includes.h"
 #include "../Core.h"
 #include "../MathUtil.h"
@@ -14,7 +15,8 @@ namespace Engine
 		// Client should probably decide this.
 		static const int MAX_SIZE = 20000;
 
-		EMU_API TileMap(const std::string mapFile, const int numUnitsPerTile);
+		// Tilemap should not take ECS reference. Tilemap system needs major refactoring.
+		EMU_API TileMap(ECS& refECS, const std::string mapFile, const int numUnitsPerTile);
 		EMU_API const char GetTile(int x, int y) const;
 		
 		EMU_API inline int GetWidth() const { return m_mapDimensions.X; }
@@ -34,5 +36,7 @@ namespace Engine
 		Vector2D<size_t> m_sceneObjectIDs;
 
 		int m_numUnitsPerTile;
+	private:
+		ECS& m_refECS;
 	};
 }

@@ -5,110 +5,79 @@
 #include "../include/Player/Player.h"
 #include "../include/Camera/PlayerCamera.h"
 
-struct TestContactListener : public Engine::MultiEntityContactListener
-{
-	TestContactListener(Engine::Entity* ptrEntity1, Engine::Entity* ptrEntity2) 
-		: Engine::MultiEntityContactListener(ptrEntity1, ptrEntity2) {}
-
-	void OnContactBegin(const Engine::Contact event) override
-	{
-		CLIENT_INFO_D("Contact Begin");
-	}
-
-	void OnContactEnd(const Engine::Contact event) override
-	{
-		CLIENT_INFO_D("Contact End");
-	}
-};
-
-struct TestSensorListener : public Engine::MultiEntitySensorListener
-{
-	TestSensorListener(Engine::Entity* ptrEntity1, Engine::Entity* ptrEntity2) 
-		: Engine::MultiEntitySensorListener(ptrEntity1, ptrEntity2) {}
-
-	void OnContactBegin(const Engine::Contact event) override
-	{
-		CLIENT_INFO_D("Sensor Begin");
-	}
-
-	void OnContactEnd(const Engine::Contact event)
-	{
-		CLIENT_INFO_D("Sensor End");
-	}
-};
-
 int main(int argc, char* args[])
 {
 	Engine::Init();
+	Engine::EMU* engine = Engine::EMU::GetInstance();
 
 	CLIENT_INFO_D("Client Running!");
 
-	Engine::Application app;
-	Engine::CameraManager& refCameraManager = app.GetCameraManager();
-	Engine::SceneManager& refSceneManager = app.GetSceneManager();
-
-	Engine::ScenePtr scene = Engine::CreateScene();
-	Engine::ScenePtr scene2 = Engine::CreateScene();
-
-	refSceneManager.AddScene("Level1", scene);
-	refSceneManager.AddScene("Level2", scene2);
+	Engine::ScenePtr scene = engine->CreateScene("Level1");
+	Engine::ScenePtr scene2 = engine->CreateScene("Level2");
 
 	//// Need physcis to scale with pixels per unit.
 	scene->SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 	scene2->SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 
-	Engine::TileMap testMap("testMap1.txt", 1);
-	scene->AddTileMap(testMap);
+	// Engine::TileMap testMap(refECS, "testMap1.txt", 1);
+	scene->AddTileMap("testMap1.txt", 1);
 
-	Engine::Entity* ptrPlayerEntity = Engine::ECS::CreateEntity();
+	Engine::Entity* ptrPlayerEntity = Engine::EMU::GetInstance()->CreateEntity();
 	ptrPlayerEntity->SetPriority(0);
 	scene->Add(ptrPlayerEntity);
 
 	Player player(ptrPlayerEntity, 6.0f, 1.0f, 0.75f, 0.75f);
 
-	Engine::Entity* ptrTestEntity = Engine::ECS::CreateEntity();
+	Engine::Entity* ptrTestEntity = Engine::EMU::GetInstance()->CreateEntity();
 	ptrTestEntity->SetPriority(1);
 	scene->Add(ptrTestEntity);
-	Engine::ECS::GetComponentManager<Engine::Transform>().AddComponent(ptrTestEntity,
+	engine->AddComponent<Engine::Transform>(ptrTestEntity,
 		Engine::Vector2D(12.0f, 12.0f), Engine::Vector2D(1.0f, 1.0f), 1.0f, 1.0f, 1.0f);
 
-	Engine::ECS::GetComponentManager<Engine::PhysicsBody>().AddComponent(ptrTestEntity);
-	Engine::PhysicsBody* ptrPhysicsBody =
-		Engine::ECS::GetComponentManager<Engine::PhysicsBody>().GetComponent(ptrTestEntity);
-	ptrPhysicsBody->m_bodyType = Engine::BodyType::DYNAMIC;
-	ptrPhysicsBody->m_startingPosition = Engine::Vector2D<float>(12.0f, 12.0f);
-	ptrPhysicsBody->m_dimensions = Engine::Vector2D<float>(1.0f, 1.0f);
-	ptrPhysicsBody->m_halfDimensions = ptrPhysicsBody->m_dimensions * 0.5f;
-	ptrPhysicsBody->m_bodyType = Engine::BodyType::DYNAMIC;
+	engine->AddComponent<Engine::PhysicsBody>(ptrTestEntity);
+	Engine::EMU::GetInstance()->IPHYSICS().SetBodyType(ptrTestEntity, Engine::BodyType::SENSOR);
+	Engine::EMU::GetInstance()->IPHYSICS().SetStartingPosition(ptrTestEntity, Engine::Vector2D<float>(12.0f, 64.0f));
+	Engine::EMU::GetInstance()->IPHYSICS().SetDimensions(ptrTestEntity, Engine::Vector2D<float>(1.0f, 1.0f));
 
-	TestContactListener testContactListener(ptrPlayerEntity, ptrTestEntity);
-	TestSensorListener testSensorListener(ptrPlayerEntity, ptrTestEntity);
 
-	Engine::ContactSystem::RegisterContactListener(&testContactListener);
-	Engine::ContactSystem::RegisterContactListener(&testSensorListener);
-
-	Engine::ContactSystem::RegisterContactHandler(Engine::SingleEntityBeginContactKey(ptrTestEntity), [](Engine::Contact event)
+	scene->RegisterContactCallback(Engine::BEGIN_CONTACT, ptrPlayerEntity, ptrTestEntity, [](const Engine::Contact event)
 		{
-			CLIENT_INFO_D("TEST");
+			CLIENT_INFO_D("Multi Begin Contact");
 		});
 
-	Engine::Entity* ptrCameraEntity = Engine::ECS::CreateEntity();
-	ptrCameraEntity->SetPriority(0);
+	scene->RegisterContactCallback(Engine::END_CONTACT, ptrPlayerEntity, ptrTestEntity, [](const Engine::Contact event)
+		{
+			CLIENT_INFO_D("Multi End Contact");
+		});
 
-	PlayerCamera playerCamera(ptrCameraEntity, ptrPlayerEntity);
-	refCameraManager.SetCurrentCamera(ptrCameraEntity);
+	scene->RegisterContactCallback(Engine::BEGIN_SENSOR, ptrTestEntity, [](const Engine::Contact event)
+		{
+			CLIENT_INFO_D("Single Begin Sensing");
+		});
+
+	scene->RegisterContactCallback(Engine::END_SENSOR, ptrTestEntity, [](const Engine::Contact event)
+		{
+			CLIENT_INFO_D("Single End Sensing");
+		});
+
+	// Engine::Entity* ptrCameraEntity = Engine::EMU::GetInstance()->IECS().CreateEntity();
+	// ptrCameraEntity->SetPriority(0);
+
+	PlayerCamera playerCamera(ptrPlayerEntity);
+	// engine->SetCurrentCamera(ptrCameraEntity);
+	// scene->Add(ptrCameraEntity);
 
 	scene2->Add(ptrPlayerEntity);
 
-	Engine::TileMap testMap2("TestMap2.txt", 1);
-	scene2->AddTileMap(testMap2);
+	scene2->AddTileMap("TestMap2.txt", 1);
 
-	refSceneManager.LoadScene("Level1");
+	engine->LoadScene("Level1");
 
-	AppManagementEventHandlers appManagementEventHandlers(ptrCameraEntity, ptrPlayerEntity, app);
+	AppManagementEventHandlers appManagementEventHandlers(ptrPlayerEntity);
 
-	app.Start();
+	engine->RunApp();
 	// Need to figure out how to change scenes, stop scenes, etc.
+	 
 
 	return 0;
 }

@@ -2,8 +2,8 @@
 
 #include "../Core.h"
 #include "../Includes.h"
-#include "ComponentManager.h"
 #include "Entity.h"
+#include "ComponentManager.h"
 
 namespace Engine
 {
@@ -12,23 +12,23 @@ namespace Engine
     class ECS
     {
     public:
-        static void Initialize(size_t maxID) 
+        void Initialize(size_t maxID) 
         {
-            ECS::maxID = maxID;
+            m_maxID = maxID;
         }
         
-        static Entity* CreateEntity() 
+        Entity* CreateEntity() 
         {
-            if (usedIDs.size() >= maxID + 1) 
+            if (m_usedIDs.size() >= m_maxID + 1) 
             {
                 throw std::runtime_error("Error: All IDs are taken.");
             }
 
-            for (size_t id = 0; id <= maxID; ++id) 
+            for (size_t id = 0; id <= m_maxID; ++id) 
             {
-                if (usedIDs.find(id) == usedIDs.end()) 
+                if (m_usedIDs.find(id) == m_usedIDs.end()) 
                 {
-                    usedIDs.insert(id);
+                    m_usedIDs.insert(id);
                     Entity* ptrEntity = new Entity(id);
                     return ptrEntity;
                 }
@@ -38,10 +38,10 @@ namespace Engine
             throw std::runtime_error("Error: Unable to generate a new ID.");
         }
 
-        static void DestroyEntity(Entity* ptrEntity) 
+        void DestroyEntity(Entity* ptrEntity) 
         {
             // Ensure the entity is active
-            if (usedIDs.find(ptrEntity->GetID()) != usedIDs.end()) 
+            if (m_usedIDs.find(ptrEntity->GetID()) != m_usedIDs.end()) 
             {
                 // Recycle the entity ID
                 releaseID(ptrEntity->GetID());
@@ -54,14 +54,49 @@ namespace Engine
         }
 
 		template <typename T>
-		static void RegisterComponentManager()
+		void RegisterComponentManager()
 		{
             m_componentManagers[std::type_index(typeid(T))] = std::make_unique<ComponentManager<T>>();
-			m_componentManagers[std::type_index(typeid(T))]->Allocate(maxID);
+			m_componentManagers[std::type_index(typeid(T))]->Allocate(m_maxID);
+		}
+
+        template <typename T, typename... Args>
+        void AddComponent(Entity* ptrEntity, Args&&... componentArgs)
+        {
+            auto it = m_componentManagers.find(std::type_index(typeid(T)));
+            if (it != m_componentManagers.end())
+            {
+                static_cast<ComponentManager<T>*>(it->second.get())->AddComponent(ptrEntity, std::forward<Args>(componentArgs)...);
+            }
+        }
+
+		template <typename T>
+		T* GetComponent (Entity* ptrEntity)
+		{
+			auto it = m_componentManagers.find(std::type_index(typeid(T)));
+			if (it != m_componentManagers.end())
+			{
+				return static_cast<ComponentManager<T>*>(it->second.get())->GetComponent(ptrEntity);
+			}
+			else
+			{
+				throw std::runtime_error("Error: Component Manager not found.");
+			}
+		}
+
+        template<typename T>
+		bool HasComponent(Entity* ptrEntity)
+		{
+			auto it = m_componentManagers.find(std::type_index(typeid(T)));
+			if (it != m_componentManagers.end())
+			{
+				return static_cast<ComponentManager<T>*>(it->second.get())->HasComponent(ptrEntity);
+			}
+			return false;
 		}
 
 		template<typename T>
-        static ComponentManager<T>& GetComponentManager()
+        ComponentManager<T>& GetComponentManager()
         {
             auto it = m_componentManagers.find(std::type_index(typeid(T)));
             if (it != m_componentManagers.end())
@@ -74,7 +109,7 @@ namespace Engine
 			}
         }
         
-		static void LoadEntities(std::vector<Entity*>& entities)
+		void LoadEntities(std::vector<Entity*>& entities)
 		{
 			for (auto& manager : m_componentManagers)
 			{
@@ -82,7 +117,7 @@ namespace Engine
 			}
 		}
 
-        static void UnloadEntities()
+        void UnloadEntities()
         {
             for (auto& manager : m_componentManagers)
             {
@@ -90,7 +125,7 @@ namespace Engine
             }
         }
 
-		static void ActivateEntities()
+		void ActivateEntities()
 		{
 			for (auto& manager : m_componentManagers)
 			{
@@ -98,7 +133,7 @@ namespace Engine
 			}
 		}
 
-		static void Activate(Entity* entity)
+		void Activate(Entity* entity)
 		{
 			for (auto& manager : m_componentManagers)
 			{
@@ -106,7 +141,7 @@ namespace Engine
 			}
 		}
 
-		static void Deactivate(Entity* entity)
+		void Deactivate(Entity* entity)
 		{
 			for (auto& manager : m_componentManagers)
 			{
@@ -114,7 +149,7 @@ namespace Engine
 			}
 		}
 
-        static void DeactivateEntities()
+        void DeactivateEntities()
 		{
 			for (auto& manager : m_componentManagers)
 			{
@@ -123,7 +158,7 @@ namespace Engine
 		}
 
 		template <typename T>
-        static void RemoveEntity(Entity* ptrEntity)
+        void RemoveEntity(Entity* ptrEntity)
         {
             auto it = m_componentManagers.find(std::type_index(typeid(T)));
             if (it != m_componentManagers.end())
@@ -132,20 +167,20 @@ namespace Engine
             }
         }
 
-		static void Cleanup()
+		void Cleanup()
 		{
 			m_componentManagers.clear();
         }
 
     private:
         // These must be exposed through API so the client app shares the same objects.
-        EMU_API static EntityID maxID;
-        EMU_API static std::unordered_set<size_t> usedIDs;
-        EMU_API static std::unordered_map<std::type_index, std::unique_ptr<ComponentManagerBase>> m_componentManagers;
+        EntityID m_maxID;
+        std::unordered_set<size_t> m_usedIDs;
+        std::unordered_map<std::type_index, std::unique_ptr<ComponentManagerBase>> m_componentManagers;
 
-        static void releaseID(size_t id)
+        void releaseID(size_t id)
         {
-            usedIDs.erase(id);
+            m_usedIDs.erase(id);
         }
     };
 }

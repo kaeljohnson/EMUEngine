@@ -7,53 +7,10 @@
 #include "../Components.h"
 #include "../MathUtil.h"
 
+#include "ContactKeyHashes.h"
+
 namespace Engine
 {
-	static size_t GenerateKey(size_t id1, size_t id2)
-	{
-		if (id1 > id2) std::swap(id1, id2); // Ensure consistent order
-
-		// Combine the two IDs into a unique key
-		return std::hash<size_t>()(id1) ^ (std::hash<size_t>()(id2) << 1);
-	}
-
-	// Contact key for contact event handling
-	struct ContactKey
-	{
-		ContactKey(const size_t key) : m_key(key) {}
-
-		bool operator==(const ContactKey& other) const
-		{
-			return m_key == other.m_key;
-		}
-
-		size_t m_key; // The unique key
-	};
-
-	struct SingleEntityBeginContactKey : public ContactKey
-	{
-		SingleEntityBeginContactKey(const Entity* entity) 
-			: ContactKey(entity->GetID()) {}
-	};
-
-	struct MultiEntityBeginContactKey : public ContactKey
-	{
-		MultiEntityBeginContactKey(const Entity* entity1, const Entity* entity2)
-			: ContactKey(GenerateKey(entity1->GetID(), entity2->GetID())) {}
-	};
-
-	struct SingleEntityEndContactKey : public ContactKey
-	{
-		SingleEntityEndContactKey(const Entity* entity)
-			: ContactKey(entity->GetID()) {}
-	};
-
-	struct MultiEntityEndContactKey : public ContactKey
-	{
-		MultiEntityEndContactKey(const Entity* entity1, const Entity* entity2)
-			: ContactKey(GenerateKey(entity1->GetID(), entity2->GetID())) {}
-	};
-
 	// Contact wrapper objects
 	struct Contact
 	{
@@ -130,74 +87,38 @@ namespace Engine
 			: ContactListener(GenerateKey(entity1->GetID(), entity2->GetID())) {}
 	};
 
+	enum ContactType
+	{
+		BEGIN_CONTACT,
+		END_CONTACT,
+		BEGIN_SENSOR,
+		END_SENSOR
+	};
+
 	class ContactSystem
 	{
 	public:
-		using ContactHandler = std::function<void(const Contact&)>;
+		using ContactCallback = std::function<void(const Contact&)>; 
 
-		static void ProcessContacts(void* ptrWorldId);
 
-		// Should these be in the event system instead?
-		EMU_API static void RegisterContactListener(SingleEntityContactListener*);
-		EMU_API static void RegisterContactListener(MultiEntityContactListener*);
-		EMU_API static void RegisterContactListener(SingleEntitySensorListener*);
-		EMU_API static void RegisterContactListener(MultiEntitySensorListener*);
+		EMU_API void RegisterContactCallback(ContactType contactType, Entity* ptrEntityA, Entity* ptrEntityB, ContactCallback callback);
+		EMU_API void RegisterContactCallback(ContactType contactType, Entity* ptrEntity, ContactCallback callback);
 
-		EMU_API static void RegisterContactHandler(SingleEntityBeginContactKey key, ContactHandler handler);
-		EMU_API static void RegisterContactHandler(SingleEntityEndContactKey key, ContactHandler handler);
-		EMU_API static void RegisterContactHandler(MultiEntityBeginContactKey key, ContactHandler handler);
-		EMU_API static void RegisterContactHandler(MultiEntityEndContactKey key, ContactHandler handler);
-
-		static void Cleanup();
+	public:
+		ContactSystem(ECS& refECS);
+		void ProcessContacts(void* ptrWorldId);
+		void Cleanup();
 
 	private:
-		static std::unordered_map<size_t, SingleEntityContactListener*> m_singleEntityContactListeners;
-		static std::unordered_map<size_t, MultiEntityContactListener*> m_multiEntityContactListeners;
-		static std::unordered_map<size_t, SingleEntitySensorListener*> m_singleEntitySensorListeners;
-		static std::unordered_map<size_t, MultiEntitySensorListener*> m_multiEntitySensorListeners;
+		ECS& m_refECS;
 
-		static std::unordered_map<SingleEntityBeginContactKey, ContactHandler> m_beginContactHandlers;
-		static std::unordered_map<SingleEntityEndContactKey, ContactHandler> m_endContactHandlers;
-		static std::unordered_map<MultiEntityBeginContactKey, ContactHandler> m_multiContactHandlers;
-		static std::unordered_map<MultiEntityEndContactKey, ContactHandler> m_multiEndContactHandlers;
-	};
-}
-
-namespace std
-{
-	template<>
-	struct hash<Engine::SingleEntityBeginContactKey>
-	{
-		std::size_t operator()(const Engine::SingleEntityBeginContactKey& key) const
-		{
-			return key.m_key;
-		}
-	};
-
-	template<>
-	struct hash<Engine::MultiEntityBeginContactKey>
-	{
-		std::size_t operator()(const Engine::MultiEntityBeginContactKey& key) const
-		{
-			return key.m_key;
-		}
-	};
-
-	template<>
-	struct hash<Engine::SingleEntityEndContactKey>
-	{
-		std::size_t operator()(const Engine::SingleEntityEndContactKey& key) const
-		{
-			return key.m_key;
-		}
-	};
-
-	template<>
-	struct hash<Engine::MultiEntityEndContactKey>
-	{
-		std::size_t operator()(const Engine::MultiEntityEndContactKey& key) const
-		{
-			return key.m_key;
-		}
+		std::unordered_map<SingleEntityBeginContactKey, ContactCallback> m_beginSingleEntityContactCallbacks;
+		std::unordered_map<SingleEntityBeginContactKey, ContactCallback> m_beginSingleEntitySensingCallbacks;
+		std::unordered_map<SingleEntityEndContactKey, ContactCallback> m_endSingleEntityContactCallbacks;
+		std::unordered_map<SingleEntityEndContactKey, ContactCallback> m_endSingleEntitySensingCallbacks;
+		std::unordered_map<MultiEntityBeginContactKey, ContactCallback> m_beginMultiEntityContactCallbacks;
+		std::unordered_map<MultiEntityBeginContactKey, ContactCallback> m_beginMultiEntitySensingCallbacks;
+		std::unordered_map<MultiEntityEndContactKey, ContactCallback> m_endMultiEntityContactCallbacks;
+		std::unordered_map<MultiEntityEndContactKey, ContactCallback> m_endMultiEntitySensingCallbacks;
 	};
 }

@@ -1,9 +1,10 @@
 #pragma once
 
+#include "Includes.h"
 #include "Scenes/Scene.h"
 #include "Scenes/SceneManager.h"
-#include "Camera/CameraManager.h"
 #include "Rendering/WindowRenderer.h"
+#include "Events/IOEventSystem.h"
 #include "Core.h"
 
 namespace Engine
@@ -11,10 +12,8 @@ namespace Engine
 	class Application
 	{
 	public:
-		EMU_API Application();
+		EMU_API Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem);
 		EMU_API void Start();
-		EMU_API inline CameraManager& GetCameraManager() { return m_cameraManager; }
-		EMU_API inline SceneManager& GetSceneManager() { return m_sceneManager; }
 		EMU_API void End();
 
 		EMU_API ~Application();
@@ -26,8 +25,11 @@ namespace Engine
 		Application& operator=(Application&&) = delete;
 
 	private:
-		CameraManager m_cameraManager;
+		ECS& m_refECS;
 		WindowRenderer m_windowRenderer;
-		SceneManager m_sceneManager;
+		
+		SceneManager& m_sceneManager;
+		std::shared_ptr<Scene> m_ptrCurrentScene;
+		IOEventSystem& m_refIOEventSystem;
 	};
 }

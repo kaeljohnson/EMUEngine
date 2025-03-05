@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ECS/Component.h"
 #include "ECS/Entity.h"
+#include "ECS/Component.h"
 #include "Physics/BodyTypes.h"
 #include "GameState.h"
 #include "Includes.h"
@@ -42,6 +42,7 @@ namespace Engine
 			m_bodyId(nullptr), m_shapeId(nullptr), m_worldId(nullptr),
 			m_bodyType(STATIC), m_dimensions(Vector2D<float>(1.0f, 1.0f)),
 			m_halfDimensions(Vector2D<float>(0.5f, 0.5f)), m_startingPosition(Vector2D<float>(1.0f, 1.0f)),
+			m_position(Vector2D<float>(0.0f, 0.0f)), m_rotation(0.0f),
 			m_gravityOn(true), Component(ptrEntity) {}
 
 		EMU_API ~PhysicsBody() = default;
@@ -55,7 +56,9 @@ namespace Engine
 		Vector2D<float> m_dimensions;
 		Vector2D<float> m_halfDimensions;
 		Vector2D<float> m_startingPosition;
+		Vector2D<float> m_position;
 
+		float m_rotation;
 		bool m_gravityOn;
 
 		// Temp
@@ -97,5 +100,18 @@ namespace Engine
 		bool m_contactBelow = false;
 		bool m_contactRight = false;
 		bool m_contactLeft = false;
+	};
+
+	struct Camera : public Component
+	{
+		EMU_API Camera(Entity* ptrEntity) 
+			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), Component(ptrEntity) {}
+		EMU_API ~Camera() = default;
+
+		Vector2D<float> m_offset;
+		Vector2D<float> m_size;
+		int m_pixelsPerUnit;
+		bool m_clampingOn; 
+		Vector2D<int> m_bounds;
 	};
 }

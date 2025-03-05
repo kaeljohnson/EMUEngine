@@ -6,8 +6,9 @@
 #include "../include/ECS/ECS.h"
 #include "../include/Events/IOEventSystem.h"
 #include "../include/ECS/ComponentManager.h"
+#include "../include/Camera/CameraInterface.h"
 #include "../include/Components.h"
-#include "../include/Camera/Camera.h"
+#include "../include/EMU.h"
 
 namespace Engine
 {
@@ -15,20 +16,12 @@ namespace Engine
 	{
 		ENGINE_TRACE_D("Logger initialized!");
 
-		IOEventSystem::Initialize();
-
-		ECS::Initialize(10000);
-
-		ECS::RegisterComponentManager<Updatable>();
-		ECS::RegisterComponentManager<PhysicsBody>();
-		ECS::RegisterComponentManager<Transform>();
-		ECS::RegisterComponentManager<Camera>();
-		ECS::RegisterComponentManager<SimpleContact>();
-
 		if (!ISDL::ImgInit(IMG_INIT_PNG))
 			ENGINE_CRITICAL("IMG Init failed! SDL_Error: " + std::string(ISDL::GetError()));
 
 		if (ISDL::Init() < 0)
 			ENGINE_CRITICAL("SDL Init failed! SDL_Error: " + std::string(ISDL::GetError()));
+
+		EMU::Init();
 	}
 }

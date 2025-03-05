@@ -171,21 +171,10 @@ namespace Engine
         // Check if entity has a component attached.
         bool HasComponent(Entity* ptrEntity)
         {
-			size_t id = ptrEntity->GetID();
-            auto it = m_hotIdToIndex.find(id);
-            if (it != m_hotIdToIndex.end())
-            {
-                return true;
-            }
-
-            it = m_idToIndex.find(id);
-            if (it != m_idToIndex.end())
-            {
-                return true;
-            }
-
-            return false;
+            size_t id = ptrEntity->GetID();
+            return m_hotIdToIndex.contains(id) || m_idToIndex.contains(id);
         }
+
 
         // Activate component in hot component array.
 		void ActivateComponent(Entity* ptrEntity) override

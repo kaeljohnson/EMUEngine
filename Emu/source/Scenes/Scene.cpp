@@ -5,7 +5,6 @@
 #include "../../include/Physics/Physics.h"
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/Components.h"
 #include "../../include/MathUtil.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Time.h"
@@ -13,27 +12,42 @@
 
 namespace Engine
 {
-	Scene::Scene() : m_levelDimensionsInUnits(32, 32), HasTileMap(false),
-		m_tileMap(nullptr), m_physicsSimulation(Vector2D<float>(0.0f, 100.0f)),
-		refTransformManager(ECS::GetComponentManager<Transform>()),
-		refPhysicsBodyManager(ECS::GetComponentManager<PhysicsBody>()),
-		refUpdatableManager(ECS::GetComponentManager<Updatable>()) {}
+	Scene::Scene(ECS& refECS)
+		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(nullptr), 
+		m_physicsSimulation(refECS, Vector2D<float>(0.0f, 100.0f)), 
+		m_cameraSystem(refECS),
+		m_updateSystem(refECS) {}
 
 	Scene::~Scene()
 	{
 		m_physicsSimulation.Cleanup();
 	}
-
-	void Scene::CheckValid()
+	
+	void Scene::RegisterContactCallback(ContactType contactType, Entity* ptrEntityA, Entity* ptrEntityB, ContactCallback callback)
 	{
-		// (m_worldID == nullptr) ? ENGINE_CRITICAL_D("World is nullptr.") : ENGINE_INFO_D("World is valid.");
+		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, ptrEntityA, ptrEntityB, callback);
+	}
+
+	void Scene::RegisterContactCallback(ContactType contactType, Entity* ptrEntity, ContactCallback callback)
+	{
+		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, ptrEntity, callback);
 	}
 
 	void Scene::OnScenePlay()
 	{
 		// m_physicsSimulation.CreateWorld(m_gravity);
 
-		ECS::LoadEntities(m_entities);
+		m_refECS.LoadEntities(m_entities);
+
+		// Frame the first active camera
+		for (auto& camera : m_refECS.GetComponentManager<Camera>())
+		{
+			if (camera.IsActive())
+			{
+				m_cameraSystem.Frame(camera, Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
+				break;
+			}
+		}
 
 		// Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld();
@@ -47,11 +61,14 @@ namespace Engine
 
 		m_physicsSimulation.Cleanup();
 
-		ECS::UnloadEntities();
+		m_refECS.UnloadEntities();
 	}
 
-	void Scene::AddTileMap(TileMap& tileMap)
+	void Scene::AddTileMap(std::string mapFileName, const int numMetersPerTile)
 	{
+		// Temporary until tilemap system is refactored and tilemaps become components.
+		TileMap tileMap(m_refECS, "testMap1.txt", 1);
+
 		// Get a temp vector or tile IDs from the tile map. Both the transforms and the physics bodies.
 		std::vector<Entity*> tileMapEntities = tileMap.LoadMap();
 		std::vector<Entity*> mapCollisionBodies = tileMap.CreateCollisionBodies();
@@ -82,11 +99,21 @@ namespace Engine
 		m_entities.push_back(ptrEntity);
 	}
 
+	void Scene::Activate(Entity* ptrEntity)
+	{
+		m_refECS.Activate(ptrEntity);
+	}
+
+	void Scene::Deactivate(Entity* ptrEntity)
+	{
+		m_refECS.Deactivate(ptrEntity);
+	}
+
 	void Scene::Remove(Entity* ptrEntity)
 	{
 		// Remove entity from the scene. Do not remove the entity from the ECS, just deactivate it.
 		m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), ptrEntity), m_entities.end());
-		ECS::Deactivate(ptrEntity);
+		m_refECS.Deactivate(ptrEntity);
 	}
 
 	void Scene::SetLevelDimensions(const Vector2D<int> levelDimensions)
@@ -99,33 +126,26 @@ namespace Engine
 		m_levelDimensionsInUnits = levelDimensions;
 	}
 
-	void Scene::Update()
+	void Scene::UpdateScripts()
 	{
-		for (Updatable& refUpdatable : refUpdatableManager)
-		{
-			if (!refUpdatable.IsActive()) continue;
-			refUpdatable.Update();
-		}
+		m_updateSystem.Update();
+	}
 
+	void Scene::UpdatePhysics()
+	{
 		m_physicsSimulation.Update();
+	}
 
-		for (PhysicsBody& refPhysicsBody : refPhysicsBodyManager)
-		{
-			if (!refPhysicsBody.IsActive()) continue;
+	void Scene::UpdateCamera()
+	{
+		m_cameraSystem.Update();
+	}
 
-			Entity* ptrEntity = refPhysicsBody.GetEntity();
+	void Scene::UpdateVisuals()
+	{
+		
+	}
 
-			if (refTransformManager.HasComponent(ptrEntity))
-			{
-				Transform* ptrTransform = refTransformManager.GetComponent(ptrEntity);
-				
-				ptrTransform->PrevPosition = ptrTransform->Position;
-				ptrTransform->Position = Physics::GetTopLeftPosition(ptrEntity);
-				ptrTransform->Dimensions = refPhysicsBody.m_dimensions;
-				ptrTransform->Rotation = Physics::GetAngleInDegrees(ptrEntity);
-			}
-		}
-	};
 	// Is this function necessary?
 	void Scene::SetPhysicsSimulation(const Vector2D<float> gravity)
 	{

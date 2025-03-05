@@ -1,30 +1,20 @@
 #pragma once
 
 #include "../include/Logging/Logger.h"
-#include "../include/Events/IOEvent.h"
 #include "../include/Events/IOEventSystem.h"
-#include "../include/Events/IOEventDispatcher.h"
-#include "../include/Scenes/Scene.h"
-#include "../include/Rendering/WindowRenderer.h"
-#include "../include/ECS/ECS.h"
-#include "../include/Components.h"
-#include "../include/Includes.h"
+#include "../include/ISDL/ISDL.h"
 #include "../include/Time.h"
-#include "../include/Physics/Physics.h"
-#include "../include/Physics/ContactSystem.h"
 #include "../include/Application.h"
 
 namespace Engine
 {
-	Application::Application()
-		: m_cameraManager(), m_windowRenderer()
+	Application::Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem)
+		: m_refECS(refECS), m_ptrCurrentScene(nullptr), m_windowRenderer(refECS), 
+		m_sceneManager(refSceneManager), m_refIOEventSystem(refIOEventSystem)
 	{}
 
 	void Application::Start()
 	{
-		// Once sceme manager exists, this function will be a generic run funcion that queries the scene manager for the current scene.
-		// Will need to add more functionality in here to handle scene switching.
-
 		Time::SetAppRunning(true);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -41,23 +31,14 @@ namespace Engine
 		// Application loop.
 		while (Time::IsAppRunning())
 		{
-			/*
-			Each game loop iteration should:
-				1. Handle events.
-				2. Process actions.
-				3. Clear the screen.
-				4. Render scene.
-				5. Display the rendered scene.
-			*/
-
 			if (m_sceneManager.IsNewSceneStarting())
-			{
-				// Camera frames current scene.
-				ECS::GetComponentManager<Camera>().GetComponent(m_cameraManager.m_ptrCurrentCameraEntity)->Frame(
-					Vector2D<int>(m_sceneManager.GetCurrentScene()->GetLevelWidth(),
-					m_sceneManager.GetCurrentScene()->GetLevelHeight()));
+			{	
 				m_sceneManager.NewSceneStarted();
+				m_ptrCurrentScene = m_sceneManager.GetCurrentScene();
 			}
+
+			m_refIOEventSystem.HandleEvents();
+			m_refIOEventSystem.ProcessEvents();
 
 			newTime = SDL_GetTicks() / 1000.0;
 			frameTime = newTime - currentTime;
@@ -67,26 +48,26 @@ namespace Engine
 
 			while (accumulator >= timeStep)
 			{
-				IOEventSystem::HandleEvents();
-				IOEventSystem::ProcessEvents();
-				
-				m_sceneManager.GetCurrentScene()->Update();
+				m_ptrCurrentScene->UpdateScripts();
+				m_ptrCurrentScene->UpdatePhysics();
 
 				accumulator -= timeStep;
+
+				// ENGINE_INFO_D("1");
 			}
+
+			// ENGINE_INFO_D("2");
 
 			Time::SetInterpolationFactor((float)accumulator / timeStep);
 
-			// Camera system. Change to "CameraSystem".
-			ECS::GetComponentManager<Updatable>().GetComponent(m_cameraManager.m_ptrCurrentCameraEntity)->Update();
+			m_ptrCurrentScene->UpdateVisuals();
+			m_ptrCurrentScene->UpdateCamera();
 
-			m_windowRenderer.Render(m_cameraManager.m_ptrCurrentCameraEntity);
+			m_windowRenderer.Render();
 
 			if (!Time::IsAppRunning())
 			{ 
-				ContactSystem::Cleanup();
 				m_sceneManager.Cleanup();
-				ECS::Cleanup();
 			}
 		}
 	}

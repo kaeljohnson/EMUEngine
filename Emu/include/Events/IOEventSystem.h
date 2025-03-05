@@ -7,7 +7,7 @@
 
 namespace Engine
 {
-    class IOEventDispatcher;
+    // class IOEventDispatcher;
 
     using IOEventQueue = std::queue<IOEvent>;
     using IOEventHandler = std::function<void(IOEvent&)>;
@@ -17,21 +17,21 @@ namespace Engine
     class IOEventSystem
     {
     public:
-        EMU_API static void RegisterIOEventListener(IOEventType type, IOEventHandler handler);
+        EMU_API void RegisterIOEventListener(IOEventType type, IOEventHandler handler);
         
     public:
 
-		static void Initialize();
+		IOEventSystem();
 
-        static void HandleEvents();
-        static void ProcessEvents();
+		void Initialize();
+
+        void HandleEvents();
+        void ProcessEvents();
 
     private:
-        static IOEventQueue m_eventQ;
+        IOEventQueue m_eventQ;
 
 		// move to Event listener class
-        static IOEventHandlerMap m_ioEventListenerMap;
-
-        static std::unique_ptr<IOEventDispatcher> m_eventDispatcher;
+        IOEventHandlerMap m_ioEventListenerMap;
     };
 }
