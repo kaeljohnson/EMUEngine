@@ -14,7 +14,7 @@ namespace Engine
 {
 	Scene::Scene(ECS& refECS)
 		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(nullptr), 
-		m_physicsSimulation(refECS, Vector2D<float>(0.0f, 100.0f)), 
+		m_physicsSimulation(refECS), 
 		m_cameraSystem(refECS),
 		m_updateSystem(refECS) {}
 
@@ -35,7 +35,8 @@ namespace Engine
 
 	void Scene::OnScenePlay()
 	{
-		// m_physicsSimulation.CreateWorld(m_gravity);
+		// gravity should be set by client.
+		m_physicsSimulation.CreateWorld(Vector2D<float>(0.0f, 100.0f));
 
 		m_refECS.LoadEntities(m_entities);
 

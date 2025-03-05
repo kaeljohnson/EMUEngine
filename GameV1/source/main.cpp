@@ -19,7 +19,6 @@ int main(int argc, char* args[])
 	scene->SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 	scene2->SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 
-	// Engine::TileMap testMap(refECS, "testMap1.txt", 1);
 	scene->AddTileMap("testMap1.txt", 1);
 
 	Engine::Entity* ptrPlayerEntity = Engine::EMU::GetInstance()->CreateEntity();
@@ -60,17 +59,10 @@ int main(int argc, char* args[])
 			CLIENT_INFO_D("Single End Sensing");
 		});
 
-	// Engine::Entity* ptrCameraEntity = Engine::EMU::GetInstance()->IECS().CreateEntity();
-	// ptrCameraEntity->SetPriority(0);
-
 	PlayerCamera playerCamera(ptrPlayerEntity);
-	// engine->SetCurrentCamera(ptrCameraEntity);
-	// scene->Add(ptrCameraEntity);
 
 	scene2->Add(ptrPlayerEntity);
-
 	scene2->AddTileMap("TestMap2.txt", 1);
-
 	engine->LoadScene("Level1");
 
 	AppManagementEventHandlers appManagementEventHandlers(ptrPlayerEntity);

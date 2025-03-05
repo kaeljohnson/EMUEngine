@@ -6,7 +6,7 @@
 namespace Engine
 {
     IOEventDispatcher::IOEventDispatcher()
-        : refKeyStates(KeyStates::m_keyStates), refMouseButtonStates(MouseStates::m_mouseStates), 
+        : ptrEventQ(nullptr), refKeyStates(KeyStates::m_keyStates), refMouseButtonStates(MouseStates::m_mouseStates), 
         refMousePosition(MouseStates::m_mousePosition), refScrollDirection(MouseStates::m_scrollDirection)
     {}
 

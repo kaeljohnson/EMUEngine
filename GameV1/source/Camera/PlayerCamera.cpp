@@ -12,17 +12,12 @@ PlayerCamera::PlayerCamera(Engine::Entity* ptrEntity) :
     // Combine this whole class into player class.
 
 	Engine::EMU::GetInstance()->AddComponent<Engine::Camera>(ptrEntity);
-    // Engine::EMU::GetInstance()->IECS().AddComponent<Engine::Updatable>(ptrEntity, [this]() { Update(); });
-
-    // playerCamera->SetPixelsPerUnit(32);
 	Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(m_ptrEntity, 32);
 }
 
 void PlayerCamera::Update()
 {
-	// Engine::Transform* ptrCameraTarget = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Transform>().GetComponent(m_ptrEntity);
 	Engine::TransformInterface& refTransformInterface = Engine::EMU::GetInstance()->ITRANSFORMS();
-	// Engine::Camera* ptrCamera = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(m_ptrEntity);
 
 	Engine::Vector2D<float> targetPrevPosition = refTransformInterface.GetPrevPosition(m_ptrEntity);
 	Engine::Vector2D<float> targetPosition = refTransformInterface.GetPosition(m_ptrEntity);

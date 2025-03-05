@@ -56,8 +56,11 @@ namespace Engine
 	class PhysicsSimulation
 	{
 	public:
-		PhysicsSimulation(ECS& refECS, const Vector2D<float> gravity);
+		PhysicsSimulation(ECS& refECS);
+
+		void CreateWorld(const Vector2D<float> gravity);
 		void UpdateGravity(const Vector2D<float> gravity);
+		  
 		void AddPhysicsBodiesToWorld();
 
 		void Update();

@@ -213,8 +213,13 @@ namespace Engine
 	}
 
 	// Physics Simulation
-	PhysicsSimulation::PhysicsSimulation(ECS& refECS, const Vector2D<float> gravity)
+	PhysicsSimulation::PhysicsSimulation(ECS& refECS)
 		: m_refECS(refECS), m_ptrWorldId(nullptr), m_contactSystem(refECS)
+	{
+		
+	}
+
+	void PhysicsSimulation::CreateWorld(const Vector2D<float> gravity)
 	{
 		ENGINE_INFO_D("Creating World!");
 
@@ -227,6 +232,7 @@ namespace Engine
 
 	void PhysicsSimulation::UpdateGravity(const Vector2D<float> gravity)
 	{
+		if (!GameState::IN_SCENE) return;
 		b2WorldDef worldDef = b2DefaultWorldDef();
 		worldDef.gravity = { gravity.X, gravity.Y };
 		b2World_SetGravity(*m_ptrWorldId, worldDef.gravity);
