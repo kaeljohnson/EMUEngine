@@ -9,14 +9,11 @@
 
 namespace Engine
 {
-    using IOEventQueue = std::queue<IOEvent>;
-
 	class IOEventDispatcher
 	{
     public:
-        IOEventDispatcher();
+        IOEventDispatcher(std::queue<IOEvent>& eventQ);
         void PollEvents();
-		void SetEventQueue(IOEventQueue* eventQ);
     private:
         void dispatchQuitEvent();   
         void dispatchWindowEvent(SDL_WindowEvent& windowEvent);
@@ -27,7 +24,7 @@ namespace Engine
         void dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent);
         void dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent);
 
-        IOEventQueue* ptrEventQ;
+        std::queue<IOEvent>& refEventQ;
         std::unordered_map<IOEventType, bool>& refKeyStates;
         std::unordered_map<IOEventType, bool>& refMouseButtonStates;
         Vector2D<int>& refMousePosition;

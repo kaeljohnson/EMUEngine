@@ -8,8 +8,8 @@
 
 namespace Engine
 {
-	TileMap::TileMap(ECS& refECS, const std::string mapFile, const int numMetersPerTile)
-        : m_refECS(refECS), m_mapDimensions(0, 0), m_numUnitsPerTile(numMetersPerTile)
+	TileMap::TileMap(const std::string mapFile, const int numMetersPerTile)
+        : m_mapDimensions(0, 0), m_numUnitsPerTile(numMetersPerTile)
 	{
         m_map.reserve(MAX_SIZE);
         
@@ -63,17 +63,17 @@ namespace Engine
                 if (GetTile(x, y) != '-')
                 {
                     // Might need to add this to an array?
-                    Entity* ptrTile = m_refECS.CreateEntity();
+                    Entity* ptrTile = ECS::CreateEntity();
 					ptrTile->SetPriority(1);
 
                     // Create "Tiles"
-                    m_refECS.AddComponent<Transform>(ptrTile,
+                    ECS::GetComponentManager<Transform>().AddComponent(ptrTile,
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)), 
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
                         1.0f, 1.0f, 1.0f);
 
-                    m_refECS.AddComponent<PhysicsBody>(ptrTile);
-                    PhysicsBody* ptrPhysicsBody = m_refECS.GetComponent<PhysicsBody>(ptrTile);
+                    ECS::GetComponentManager<PhysicsBody>().AddComponent(ptrTile);
+					PhysicsBody* ptrPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrTile);
                     ptrPhysicsBody->m_bodyType = SENSOR;
                     ptrPhysicsBody->m_dimensions = 
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile));
@@ -151,11 +151,11 @@ namespace Engine
                         }
                     }
 
-					Entity* ptrTile = m_refECS.CreateEntity();
+					Entity* ptrTile = ECS::CreateEntity();
 					ptrTile->SetPriority(1);
 
-                    m_refECS.AddComponent<PhysicsBody>(ptrTile);
-                    PhysicsBody* ptrPhysicsBody = m_refECS.GetComponentManager<PhysicsBody>().GetComponent(ptrTile);
+                    ECS::GetComponentManager<PhysicsBody>().AddComponent(ptrTile);
+                    PhysicsBody* ptrPhysicsBody = ECS::GetComponentManager<PhysicsBody>().GetComponent(ptrTile);
                     ptrPhysicsBody->m_bodyType = STATIC;
                     ptrPhysicsBody->m_dimensions =
                         Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile));

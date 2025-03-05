@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../ECS/Entity.h"
-#include "../ECS/ECS.h"
 #include "../Includes.h"
 #include "../MathUtil.h"
 #include "../Components.h"
@@ -18,10 +17,10 @@ namespace Engine
 		void ToggleFullscreen();
 
 	public: 
-		WindowRenderer(ECS& refECS);
+		WindowRenderer();
 		~WindowRenderer();
 
-		void Render();
+		void Render(Entity* currentEntity);
 		void Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Display();
 
@@ -34,7 +33,5 @@ namespace Engine
 		void* m_ptrRenderer;
 
 		bool m_rendererCreated;
-
-		ECS& m_refECS;
 	};
 }

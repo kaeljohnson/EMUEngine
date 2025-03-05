@@ -3,9 +3,9 @@
 #include "../../include/ISDL/ISDL.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/Rendering/WindowRenderer.h"
-#include "../../include/Camera/CameraInterface.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Components.h"
+#include "../../include/Camera/Camera.h"
 #include "../../include/Time.h"
 
 namespace Engine
@@ -19,8 +19,7 @@ namespace Engine
 	Vector2D<int> Screen::SCREEN_SIZE = Vector2D<int>(0, 0);
 	Vector2D<int> Screen::VIRTUAL_SIZE = Vector2D<int>(1280, 720);
 
-	WindowRenderer::WindowRenderer(ECS& refECS) 
-		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS)
+	WindowRenderer::WindowRenderer() : m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr)
 	{
 		ENGINE_CRITICAL("Creating Renderer");
 
@@ -72,27 +71,11 @@ namespace Engine
 		ENGINE_CRITICAL("Renderer created.");
 	}
 
-	void WindowRenderer::Render()
+	void WindowRenderer::Render(Entity* currentCameraEntity)
 	{
+		Camera* ptrCurrentCamera = ECS::GetComponentManager<Camera>().GetComponent(currentCameraEntity);
+
 		ClearScreen();
-
-		Camera* ptrCurrentCamera = nullptr;
-
-		// Get the first active camera for now.
-		for (auto& camera : m_refECS.GetComponentManager<Camera>())
-		{
-			if (camera.IsActive())
-			{
-				ptrCurrentCamera = &camera;
-				break;
-			}
-		}
-
-		if (ptrCurrentCamera == nullptr)
-		{
-			ENGINE_CRITICAL("No active camera found. Returning.");
-			return;
-		}
 
 		if (Screen::WINDOW_RESIZE_REQUEST)
 		{
@@ -110,11 +93,11 @@ namespace Engine
 
 		// Calculate camera bounds
 		float cameraLeft = ptrCurrentCamera->m_offset.X;
-		float cameraRight = ptrCurrentCamera->m_offset.X + (Screen::VIEWPORT_SIZE.X / ptrCurrentCamera->m_pixelsPerUnit);
+		float cameraRight = ptrCurrentCamera->m_offset.X + (Screen::VIEWPORT_SIZE.X / ptrCurrentCamera->GetPixelsPerUnit());
 		float cameraTop = ptrCurrentCamera->m_offset.Y;
-		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->m_pixelsPerUnit);
+		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->GetPixelsPerUnit());
 
-		auto& transformManager = m_refECS.GetComponentManager<Transform>();
+		auto& transformManager = ECS::GetComponentManager<Transform>();
 
 		for (Transform& refTransform : transformManager)
 		{
@@ -130,7 +113,7 @@ namespace Engine
 
 			if (isVisible)
 			{
-				Draw(refTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
+				Draw(refTransform, ptrCurrentCamera->GetPixelsPerUnit(), Vector2D<float>(cameraLeft, cameraTop));
 			}
 		}
 

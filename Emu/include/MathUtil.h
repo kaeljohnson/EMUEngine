@@ -4,7 +4,7 @@ namespace Engine
 {
 	inline static float Lerp(float a, float b, float f)
 	{
-		return a + (b - a) * f;
+		return (a * (1.0f - f)) + (b * f);
 	}
 
 	template <typename T>

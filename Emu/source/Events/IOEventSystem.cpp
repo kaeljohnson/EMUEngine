@@ -16,17 +16,17 @@ namespace Engine
     Vector2D<int> MouseStates::m_mousePosition;
 	Vector2D<int> MouseStates::m_scrollDirection;
 
-    static IOEventDispatcher m_eventDispatcher;
+     IOEventQueue IOEventSystem::m_eventQ;
 
-	IOEventSystem::IOEventSystem()
-	{
-        m_eventDispatcher.SetEventQueue(&m_eventQ);
+    // move to Event listener class
+    IOEventHandlerMap IOEventSystem::m_ioEventListenerMap;
 
-		Initialize();
-	}
+    std::unique_ptr<IOEventDispatcher> IOEventSystem::m_eventDispatcher;
 
     void IOEventSystem::Initialize()
     {
+		m_eventDispatcher = std::make_unique<IOEventDispatcher>(m_eventQ);
+
         // Initialize all key down states to false
         KeyStates::m_keyStates[ESCAPE_KEY_DOWN] = false;
         KeyStates::m_keyStates[EQUALS_KEY_DOWN] = false;
@@ -160,7 +160,7 @@ namespace Engine
 			before it starts repeating when key is held, making it hard to handle.
 		*/
 
-        m_eventDispatcher.PollEvents();
+        m_eventDispatcher->PollEvents();
 	}
 
     void IOEventSystem::ProcessEvents()

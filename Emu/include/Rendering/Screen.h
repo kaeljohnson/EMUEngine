@@ -35,7 +35,6 @@ namespace Engine
 		static Vector2D<int> VIEWPORT_POSITION;
 
 		friend class WindowRenderer;
-		friend class CameraInterface;
-		friend class CameraSystem;
+		friend class Camera;
 	};
 }
