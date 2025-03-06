@@ -23,7 +23,7 @@ namespace Engine
 		m_updatableInterface(m_ecs), m_ioEventSystem(),
 		m_application(m_ecs, m_sceneManager, m_ioEventSystem), m_cameraInterface(m_ecs)
 	{
-		m_ecs.Initialize(10000);
+		m_ecs.Initialize(m_numEntities);
 
 		m_ecs.RegisterComponentManager<Updatable>();
 		m_ecs.RegisterComponentManager<PhysicsBody>();

@@ -45,11 +45,15 @@ namespace Engine
 	public:
 		static void Init();
 		~EMU();
+
+		void InitializeECS(size_t numEntities) { m_numEntities = numEntities; } 
 		
 	private:
 		EMU();
 
 		ECS m_ecs;
+		size_t m_numEntities;
+
 		PhysicsInterface m_physicsInterface;
 		CameraInterface m_cameraInterface;
 		TransformInterface m_transformInterface;
