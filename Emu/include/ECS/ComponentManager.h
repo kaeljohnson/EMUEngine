@@ -2,6 +2,7 @@
 
 #include "../Includes.h"
 #include "Entity.h"
+#include "../Logging/Logger.h"
 
 namespace Engine
 {
@@ -51,7 +52,6 @@ namespace Engine
 
                     // Move component to m_hotComponents
                     m_hotComponents.push_back(std::move(m_components[index]));
-					m_hotComponents.back().SetActive(true);
 
                     m_hotIdToIndex[id] = m_hotComponents.size() - 1;
 
@@ -69,8 +69,6 @@ namespace Engine
                     m_idToIndex.erase(it);
                 }
             }
-
-            SortHotComponentsByPriority();
         }
 
         // Unloads components, moving them from hot component array back to component array.
@@ -79,7 +77,6 @@ namespace Engine
             for (T& component : m_hotComponents)
             {
                 size_t id = component.GetEntity()->GetID();
-				component.SetActive(false);
 
 				// Move the component back to m_components in any order.
                 m_components.push_back(std::move(component));
@@ -88,23 +85,6 @@ namespace Engine
 
             m_hotComponents.clear();
             m_hotIdToIndex.clear();
-        }
-
-        // Sort hot components by priority
-        void SortHotComponentsByPriority()
-        {
-            std::sort(m_hotComponents.begin(), m_hotComponents.end(),
-                [this](const T& a, const T& b)
-                {
-                    return a.GetEntity()->GetPriority() > b.GetEntity()->GetPriority();
-                });
-
-            // Update the m_hotIdToIndex map to reflect the new order.
-            for (size_t i = 0; i < m_hotComponents.size(); ++i)
-            {
-                size_t id = m_hotComponents[i].GetEntity()->GetID();
-                m_hotIdToIndex[id] = i;
-            }
         }
 
         // Adds to or updates a component in the components array.
@@ -126,23 +106,43 @@ namespace Engine
 		// Finds component by entity ID and destroys it.
         void DestroyComponent(Entity* ptrEntity) override
         {
-			size_t id = ptrEntity->GetID();
-            auto it = m_idToIndex.find(id);
-            if (it != m_idToIndex.end())
-            {
-                m_components.erase(m_components.begin() + it->second);
-                m_idToIndex.erase(it);
-                return;
-            }
+            size_t id = ptrEntity->GetID();
 
-            it = m_hotIdToIndex.find(id);
+            auto it = m_hotIdToIndex.find(id);
             if (it != m_hotIdToIndex.end())
             {
-                m_hotComponents.erase(m_hotComponents.begin() + it->second);
+                size_t index = it->second;
+                size_t lastIndex = m_hotComponents.size() - 1;
+
+                if (index != lastIndex)
+                {
+                    std::swap(m_hotComponents[index], m_hotComponents[lastIndex]);
+                    m_hotIdToIndex[m_hotComponents[index].GetEntity()->GetID()] = index;
+                }
+
+                m_hotComponents.pop_back();
                 m_hotIdToIndex.erase(it);
                 return;
             }
+
+            it = m_idToIndex.find(id);
+            if (it != m_idToIndex.end())
+            {
+                size_t index = it->second;
+                size_t lastIndex = m_components.size() - 1;
+
+                if (index != lastIndex) // If it's not the last element, swap with the last one
+                {
+                    std::swap(m_components[index], m_components[lastIndex]);
+                    m_idToIndex[m_components[index].GetEntity()->GetID()] = index; // Update swapped entity index
+                }
+
+                m_components.pop_back();
+                m_idToIndex.erase(it);
+                return;
+            }
         }
+
 
 		// Returns a component by entity pointer. Throw exception if component does not exist.
 		T* GetComponent(Entity* ptrEntity)
@@ -174,58 +174,91 @@ namespace Engine
             return m_hotIdToIndex.contains(id) || m_idToIndex.contains(id);
         }
 
+        void ActivateComponent(Entity* ptrEntity) override
+        {
+            size_t id = ptrEntity->GetID();
+            auto it = m_idToIndex.find(id);
 
-        // Activate component in hot component array.
-		void ActivateComponent(Entity* ptrEntity) override
-		{
-			auto id = ptrEntity->GetID();
-            auto it = m_hotIdToIndex.find(id);
-            if (it == m_hotIdToIndex.end())
+            if (it == m_idToIndex.end())
             {
-                return;
+                return; // Component doesn't exist in m_components
             }
 
             size_t index = it->second;
 
-			m_hotComponents[index].SetActive(true);
+            // Move component to hot array
+            m_hotComponents.push_back(std::move(m_components[index]));
+            m_hotIdToIndex[id] = m_hotComponents.size() - 1; // Update hot index mapping
+
+            // If it's not the last component, swap with the last one to keep m_components dense
+            size_t lastIndex = m_components.size() - 1;
+            if (index != lastIndex)
+            {
+                std::swap(m_components[index], m_components[lastIndex]);
+                m_idToIndex[m_components[index].GetEntity()->GetID()] = index; // Update the swapped index
+            }
+
+            m_components.pop_back();  // Remove last element after swap
+            m_idToIndex.erase(it);    // Remove from the id map
+
+			m_hotComponents.back().OnActivate();
         }
 
 		// Activate components in hot component array.
         void ActivateComponents() override
         {
-            for (T& component : m_hotComponents)
+            for (T& component : m_components)
             {
 				ActivateComponent(component.GetEntity());
             }
         }
 
-        // Deactivate component by removing it from m_hotComponents.
         void DeactivateComponent(Entity* entity) override
         {
             auto id = entity->GetID();
             auto it = m_hotIdToIndex.find(id);
             if (it == m_hotIdToIndex.end())
             {
-                return;
+                return; // If the component is not in the hot array, there's nothing to deactivate
             }
 
             size_t index = it->second;
 
-            m_hotComponents[index].SetActive(false);
+            // Move the component back to the main array
+            m_components.push_back(std::move(m_hotComponents[index]));
+
+            // Update the index mappings for hot and main arrays
+            m_idToIndex[id] = m_components.size() - 1;  // The component has been added to the main array
+            m_hotIdToIndex.erase(it);  // Remove it from the hot array
+
+            // Swap the component to the last position in the hot array and pop it
+            size_t lastIndex = m_hotComponents.size() - 1;
+            if (index != lastIndex)  // If the component isn't the last one
+            {
+                std::swap(m_hotComponents[index], m_hotComponents[lastIndex]);  // Swap the component with the last one
+                m_hotIdToIndex[m_hotComponents[index].GetEntity()->GetID()] = index;
+            }
+
+            // Pop the last component in the hot array, as it's now deactivated
+            m_hotComponents.pop_back();
+
+			m_components.back().OnDeactivate();
         }
+
 
 		// Deactivate all components in hot component array.
         void DeactivateComponents() override
         {
 			for (auto& component : m_hotComponents)
             {
-				component.SetActive(false);
+				DeactivateComponent(component.GetEntity());
             }
         }
 
 		// Allocate memory for components and hot components array.
         void Allocate(size_t size) override
 		{
+            ENGINE_CRITICAL_D("Allocating " + std::to_string(size));
 			m_components.reserve(size);
 			m_hotComponents.reserve(size);
 		}

@@ -15,21 +15,18 @@ namespace Engine
     {
         for (auto& camera : m_refECS.GetComponentManager<Camera>())
         {
-            if (camera.IsActive())
-            {
-                // CAMERA UPDATES
-                Engine::Transform* ptrCameraTarget = m_refECS.GetComponentManager<Transform>().GetComponent(camera.GetEntity());
+            // CAMERA UPDATES
+            Engine::Transform* ptrCameraTarget = m_refECS.GetComponentManager<Transform>().GetComponent(camera.GetEntity());
 
-                const float interpFactor = Engine::Time::GetInterpolationFactor();
+            const float interpFactor = Engine::Time::GetInterpolationFactor();
 
-                float targetX = Engine::Lerp(ptrCameraTarget->PrevPosition.X, ptrCameraTarget->Position.X, interpFactor);
-                float targetY = Engine::Lerp(ptrCameraTarget->PrevPosition.Y, ptrCameraTarget->Position.Y, interpFactor);
+            float targetX = Engine::Lerp(ptrCameraTarget->PrevPosition.X, ptrCameraTarget->Position.X, interpFactor);
+            float targetY = Engine::Lerp(ptrCameraTarget->PrevPosition.Y, ptrCameraTarget->Position.Y, interpFactor);
 
-                camera.m_offset.X = targetX - (camera.m_size.X / 2.0f);
-                camera.m_offset.Y = targetY - (camera.m_size.Y / 2.0f);
+            camera.m_offset.X = targetX - (camera.m_size.X / 2.0f);
+            camera.m_offset.Y = targetY - (camera.m_size.Y / 2.0f);
 
-                if (camera.m_clampingOn) Clamp(camera);
-            }
+            if (camera.m_clampingOn) Clamp(camera);
         }
     }
 

@@ -43,17 +43,13 @@ namespace Engine
 		EMU_API void RegisterIOEventListener(IOEventType type, IOEventHandler handler);
 
 	public:
-		static void Init();
+		static void Init(const size_t numEntities);
 		~EMU();
-
-		void InitializeECS(size_t numEntities) { m_numEntities = numEntities; } 
 		
 	private:
-		EMU();
+		EMU(const size_t numEntities);
 
 		ECS m_ecs;
-		size_t m_numEntities;
-
 		PhysicsInterface m_physicsInterface;
 		CameraInterface m_cameraInterface;
 		TransformInterface m_transformInterface;

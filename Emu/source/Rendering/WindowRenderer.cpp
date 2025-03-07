@@ -81,11 +81,8 @@ namespace Engine
 		// Get the first active camera for now.
 		for (auto& camera : m_refECS.GetComponentManager<Camera>())
 		{
-			if (camera.IsActive())
-			{
-				ptrCurrentCamera = &camera;
-				break;
-			}
+			ptrCurrentCamera = &camera;
+			break;
 		}
 
 		if (ptrCurrentCamera == nullptr)
@@ -118,8 +115,6 @@ namespace Engine
 
 		for (Transform& refTransform : transformManager)
 		{
-			if (!refTransform.IsActive()) continue;
-
 			float objectLeft = refTransform.Position.X;
 			float objectRight = objectLeft + refTransform.Dimensions.X;
 			float objectTop = refTransform.Position.Y;

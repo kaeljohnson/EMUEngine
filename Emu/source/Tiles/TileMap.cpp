@@ -64,7 +64,6 @@ namespace Engine
                 {
                     // Might need to add this to an array?
                     Entity* ptrTile = m_refECS.CreateEntity();
-					ptrTile->SetPriority(1);
 
                     // Create "Tiles"
                     m_refECS.AddComponent<Transform>(ptrTile,
@@ -152,7 +151,6 @@ namespace Engine
                     }
 
 					Entity* ptrTile = m_refECS.CreateEntity();
-					ptrTile->SetPriority(1);
 
                     m_refECS.AddComponent<PhysicsBody>(ptrTile);
                     PhysicsBody* ptrPhysicsBody = m_refECS.GetComponentManager<PhysicsBody>().GetComponent(ptrTile);

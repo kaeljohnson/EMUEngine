@@ -12,7 +12,6 @@ namespace Engine
 		// Update all updatable components
 		for (auto& refUpdatable : m_refUpdatableManager)
 		{
-			if (!refUpdatable.IsActive()) continue;
 			refUpdatable.Update();
 		}
 	}

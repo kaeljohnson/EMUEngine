@@ -6,10 +6,10 @@ namespace Engine
 {
 	static EMU* m_instance;
 
-	void EMU::Init()
+	void EMU::Init(const size_t numEntities)
 	{
 		if (!m_instance)
-			m_instance = new EMU();
+			m_instance = new EMU(numEntities);
 	}
 
 	EMU* EMU::GetInstance()
@@ -17,13 +17,13 @@ namespace Engine
 		return m_instance;
 	}
 
-	EMU::EMU()
+	EMU::EMU(const size_t numEntities)
 		: m_ecs(), m_sceneManager(), 
 		m_physicsInterface(m_ecs), m_transformInterface(m_ecs), 
 		m_updatableInterface(m_ecs), m_ioEventSystem(),
 		m_application(m_ecs, m_sceneManager, m_ioEventSystem), m_cameraInterface(m_ecs)
 	{
-		m_ecs.Initialize(m_numEntities);
+		m_ecs.Initialize(numEntities);
 
 		m_ecs.RegisterComponentManager<Updatable>();
 		m_ecs.RegisterComponentManager<PhysicsBody>();

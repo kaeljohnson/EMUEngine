@@ -14,7 +14,7 @@ namespace Engine
 {
 	Scene::Scene(ECS& refECS)
 		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(nullptr), 
-		m_physicsSimulation(refECS, Vector2D<float>(0.0f, 100.0f)), 
+		m_physicsSimulation(refECS), 
 		m_cameraSystem(refECS),
 		m_updateSystem(refECS) {}
 
@@ -35,18 +35,15 @@ namespace Engine
 
 	void Scene::OnScenePlay()
 	{
-		// m_physicsSimulation.CreateWorld(m_gravity);
+		m_physicsSimulation.CreateWorld(Vector2D<float>(0.0f, 100.0f)); //TODO: Client sets gravity.
 
 		m_refECS.LoadEntities(m_entities);
 
 		// Frame the first active camera
 		for (auto& camera : m_refECS.GetComponentManager<Camera>())
 		{
-			if (camera.IsActive())
-			{
-				m_cameraSystem.Frame(camera, Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
-				break;
-			}
+			m_cameraSystem.Frame(camera, Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
+			break;
 		}
 
 		// Physics bodies need to be added to the world after they are activated and pooled.
@@ -57,6 +54,7 @@ namespace Engine
 
 	void Scene::OnSceneEnd()
 	{
+		// Could be problematic if this is called mid frame.
 		GameState::IN_SCENE = false;
 
 		m_physicsSimulation.Cleanup();

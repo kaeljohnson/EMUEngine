@@ -213,8 +213,11 @@ namespace Engine
 	}
 
 	// Physics Simulation
-	PhysicsSimulation::PhysicsSimulation(ECS& refECS, const Vector2D<float> gravity)
+	PhysicsSimulation::PhysicsSimulation(ECS& refECS)
 		: m_refECS(refECS), m_ptrWorldId(nullptr), m_contactSystem(refECS)
+	{}
+
+	void PhysicsSimulation::CreateWorld(const Vector2D<float> gravity)
 	{
 		ENGINE_INFO_D("Creating World!");
 
@@ -227,9 +230,16 @@ namespace Engine
 
 	void PhysicsSimulation::UpdateGravity(const Vector2D<float> gravity)
 	{
-		b2WorldDef worldDef = b2DefaultWorldDef();
-		worldDef.gravity = { gravity.X, gravity.Y };
-		b2World_SetGravity(*m_ptrWorldId, worldDef.gravity);
+		if (GameState::IN_SCENE)
+		{
+			b2WorldDef worldDef = b2DefaultWorldDef();
+			worldDef.gravity = { gravity.X, gravity.Y };
+			b2World_SetGravity(*m_ptrWorldId, worldDef.gravity);
+		}
+		else
+		{
+			// set m_gravity or something.
+		}
 	}
 
 	void PhysicsSimulation::AddPhysicsBodiesToWorld()
@@ -237,8 +247,6 @@ namespace Engine
 		ComponentManager<PhysicsBody>& physicsBodyManager = m_refECS.GetComponentManager<PhysicsBody>();
 		for (PhysicsBody& refPhysicsBody : physicsBodyManager)
 		{
-			if (!refPhysicsBody.IsActive()) continue;
-
 			b2BodyDef bodyDef = b2DefaultBodyDef();
 			b2ShapeDef shapeDef = b2DefaultShapeDef();
 
@@ -286,6 +294,69 @@ namespace Engine
 		}
 	}
 
+	//void PhysicsSimulation::AddPhysicsBodiesToWorld()
+	//{
+	//	ComponentManager<PhysicsBody>& physicsBodyManager = m_refECS.GetComponentManager<PhysicsBody>();
+
+	//	b2BodyDef bodyDef;
+	//	b2ShapeDef shapeDef;
+
+	//	auto CreateBody = [&](PhysicsBody& physicsBody)
+	//		{
+	//			bodyDef = b2DefaultBodyDef();
+	//			shapeDef = b2DefaultShapeDef();
+
+	//			switch (physicsBody.m_bodyType)
+	//			{
+	//			case STATIC:    bodyDef.type = b2_staticBody; break;
+	//			case DYNAMIC:   bodyDef.type = b2_dynamicBody; break;
+	//			case KINEMATIC: bodyDef.type = b2_kinematicBody; break;
+	//			case SENSOR:
+	//				bodyDef.type = b2_kinematicBody;
+	//				shapeDef.isSensor = true;
+	//				break;
+	//			default:
+	//				bodyDef.type = b2_staticBody;
+	//				break;
+	//			}
+
+	//			bodyDef.position = {
+	//				physicsBody.m_startingPosition.X + physicsBody.m_halfDimensions.X,
+	//				physicsBody.m_startingPosition.Y + physicsBody.m_halfDimensions.Y
+	//			};
+
+	//			bodyDef.fixedRotation = true;
+	//			bodyDef.userData = physicsBody.GetEntity();
+
+	//			b2BodyId bodyId = b2CreateBody(*m_ptrWorldId, &bodyDef);
+
+	//			shapeDef.density = 1.0f;
+	//			shapeDef.friction = 0.0f;
+	//			shapeDef.restitution = 0.0f;
+
+	//			b2Polygon box = b2MakeBox(physicsBody.m_halfDimensions.X, physicsBody.m_halfDimensions.Y);
+	//			b2ShapeId shapeId = b2CreatePolygonShape(bodyId, &shapeDef, &box);
+
+	//			physicsBody.m_bodyId = new b2BodyId(bodyId);
+	//			physicsBody.m_shapeId = new b2ShapeId(shapeId);
+	//			physicsBody.m_worldId = m_ptrWorldId;
+	//		};
+
+
+	//	// Avoid Box2d bug when static bodies are created before dynamic. Maybe unnecessary. 
+	//	for (PhysicsBody& physicsBody : physicsBodyManager)
+	//	{
+	//		if (physicsBody.IsActive() && physicsBody.m_bodyType == DYNAMIC)
+	//			CreateBody(physicsBody);
+	//	}
+
+	//	for (PhysicsBody& physicsBody : physicsBodyManager)
+	//	{
+	//		if (physicsBody.IsActive() && physicsBody.m_bodyType != DYNAMIC)
+	//			CreateBody(physicsBody);
+	//	}
+	//}
+
 	void PhysicsSimulation::Update()
 	{
 		b2World_Step(*m_ptrWorldId, Time::GetTimeStep(), 4);
@@ -293,8 +364,6 @@ namespace Engine
 
 		for (PhysicsBody& refPhysicsBody : m_refECS.GetComponentManager<PhysicsBody>())
 		{
-			if (!refPhysicsBody.IsActive()) continue;
-
 			Entity* ptrEntity = refPhysicsBody.GetEntity();
 
 			b2Vec2 position = b2Body_GetPosition(*refPhysicsBody.m_bodyId);

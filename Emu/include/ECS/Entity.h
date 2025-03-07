@@ -7,13 +7,10 @@ namespace Engine
 	struct Entity
 	{
 	public:
-		Entity(EntityID id) : ID(id), Priority(0) {}
-		void SetPriority(size_t priority) { Priority = priority; }
-		size_t GetPriority() const { return Priority; }
+		Entity(EntityID id) : ID(id) {}
 		EntityID GetID() const { return ID; }
 
 	private:
 		EntityID ID;
-		size_t Priority;
 	};
 }

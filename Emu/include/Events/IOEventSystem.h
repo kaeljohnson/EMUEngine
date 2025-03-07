@@ -7,8 +7,6 @@
 
 namespace Engine
 {
-    // class IOEventDispatcher;
-
     using IOEventQueue = std::queue<IOEvent>;
     using IOEventHandler = std::function<void(IOEvent&)>;
     using IOEventHandlerMap = std::unordered_map<IOEventType, IOEventHandler>;
