@@ -416,16 +416,27 @@ namespace Engine
 		}
 	}
 
-	// Temp
-	void PhysicsBody::OnDeactivate()
+	void PhysicsInterface::DeactivateBody(Entity* ptrEntity)
 	{
 		if (GameState::IN_SCENE)
-			b2Body_SetAwake(*m_bodyId, false);
+		{
+			if (HasBody(ptrEntity))
+			{
+				PhysicsBody* ptrBody = GetBody(ptrEntity);
+				b2Body_SetAwake(*ptrBody->m_bodyId, false);
+			}
+		}
 	}
 
-	void PhysicsBody::OnActivate()
+	void PhysicsInterface::ActivateBody(Entity* ptrEntity)
 	{
 		if (GameState::IN_SCENE)
-			b2Body_SetAwake(*m_bodyId, true);
+		{
+			if (HasBody(ptrEntity))
+			{
+				PhysicsBody* ptrBody = GetBody(ptrEntity);
+				b2Body_SetAwake(*ptrBody->m_bodyId, true);
+			}
+		}
 	}
 }

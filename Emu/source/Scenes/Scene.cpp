@@ -37,7 +37,7 @@ namespace Engine
 	{
 		m_physicsSimulation.CreateWorld(Vector2D<float>(0.0f, 100.0f)); //TODO: Client sets gravity.
 
-		m_refECS.LoadEntities(m_entities);
+		m_refECS.ActivateEntities(m_entities);
 
 		// Frame the first active camera
 		for (auto& camera : m_refECS.GetComponentManager<Camera>())
@@ -59,7 +59,7 @@ namespace Engine
 
 		m_physicsSimulation.Cleanup();
 
-		m_refECS.UnloadEntities();
+		m_refECS.DeactivateEntities();
 	}
 
 	void Scene::AddTileMap(std::string mapFileName, const int numMetersPerTile)

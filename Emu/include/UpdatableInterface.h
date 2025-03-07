@@ -10,6 +10,8 @@ namespace Engine
 	{
 	public:
 		// EMU_API void AddUpdatable(Entity* ptrEntity);
+		EMU_API void Activate(Entity* ptrEntity);
+		EMU_API void Deactivate(Entity* ptrEntity);
 
 	public:
 		UpdatableInterface(ECS& refECS);

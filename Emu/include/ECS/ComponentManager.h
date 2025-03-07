@@ -11,10 +11,8 @@ namespace Engine
     public:
         virtual ~ComponentManagerBase() = default;
         virtual void Allocate(size_t size) = 0;
-		virtual void LoadComponents(std::vector<Entity*>& entities) = 0;
-		virtual void UnloadComponents() = 0;
-		virtual void ActivateComponents() = 0;
-		virtual void ActivateComponent(Entity* ptrEntity) = 0;
+		virtual void ActivateComponents(std::vector<Entity*>& entities) = 0;
+        virtual void ActivateComponent(Entity* ptrEntity) = 0;
 		virtual void DeactivateComponents() = 0;
 		virtual void DeactivateComponent(Entity* ptrEntity) = 0;
 		virtual void DestroyComponent(Entity* ptrEntity) = 0;
@@ -32,7 +30,7 @@ namespace Engine
         auto end() { return m_hotComponents.end(); }
         auto begin() const { return m_hotComponents.begin(); }
         auto end() const { return m_hotComponents.end(); }
-
+        
         // Iterator for all components (from begin to end)
         auto all_components_begin() { return m_components.begin(); }
         auto all_components_end() { return m_components.end(); }
@@ -40,7 +38,7 @@ namespace Engine
         auto all_components_end() const { return m_components.end(); }
 
         // Loads components into hot array, ordering them by priority.
-        void LoadComponents(std::vector<Entity*>& entities)
+        void ActivateComponents(std::vector<Entity*>& entities)
         {
             for (Entity* entity : entities)
             {
@@ -71,8 +69,7 @@ namespace Engine
             }
         }
 
-        // Unloads components, moving them from hot component array back to component array.
-        void UnloadComponents()
+        void DeactivateComponents()
         {
             for (T& component : m_hotComponents)
             {
@@ -200,17 +197,6 @@ namespace Engine
 
             m_components.pop_back();  // Remove last element after swap
             m_idToIndex.erase(it);    // Remove from the id map
-
-			m_hotComponents.back().OnActivate();
-        }
-
-		// Activate components in hot component array.
-        void ActivateComponents() override
-        {
-            for (T& component : m_components)
-            {
-				ActivateComponent(component.GetEntity());
-            }
         }
 
         void DeactivateComponent(Entity* entity) override
@@ -229,7 +215,7 @@ namespace Engine
 
             // Update the index mappings for hot and main arrays
             m_idToIndex[id] = m_components.size() - 1;  // The component has been added to the main array
-            m_hotIdToIndex.erase(it);  // Remove it from the hot array
+            m_hotIdToIndex.erase(it);  // Remove from the hot id map
 
             // Swap the component to the last position in the hot array and pop it
             size_t lastIndex = m_hotComponents.size() - 1;
@@ -241,18 +227,6 @@ namespace Engine
 
             // Pop the last component in the hot array, as it's now deactivated
             m_hotComponents.pop_back();
-
-			m_components.back().OnDeactivate();
-        }
-
-
-		// Deactivate all components in hot component array.
-        void DeactivateComponents() override
-        {
-			for (auto& component : m_hotComponents)
-            {
-				DeactivateComponent(component.GetEntity());
-            }
         }
 
 		// Allocate memory for components and hot components array.

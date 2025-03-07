@@ -4,6 +4,16 @@
 
 namespace Engine
 {
+	void TransformInterface::Activate(Entity* ptrEntity)
+	{
+		// Nothing to do.
+	}
+
+	void TransformInterface::Deactivate(Entity* ptrEntity)
+	{
+		// Nothing to do.
+	}
+
 	void TransformInterface::SetPrevPosition(Entity* ptrEntity, const Vector2D<float> position)
 	{
 		Transform* ptrTransform = GetTransform(ptrEntity);

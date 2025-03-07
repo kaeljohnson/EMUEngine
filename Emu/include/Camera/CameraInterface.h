@@ -12,6 +12,8 @@ namespace Engine
 	class CameraInterface
 	{
 	public:
+		EMU_API void Activate(Entity* ptrEntity);
+		EMU_API void Deactivate(Entity* ptrEntity);
 		EMU_API void SetPixelsPerUnit(Entity* ptrEntity, const int pixelsPerUnit);
 		EMU_API const int GetPixelsPerUnit(Entity* ptrEntity);
 		EMU_API void SetOffset(Entity* ptrEntity, const Vector2D<float> offset);

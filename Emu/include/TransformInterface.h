@@ -15,6 +15,9 @@ namespace Engine
 		EMU_API void SetPrevPosition(Entity* ptrEntity, const Vector2D<float> position);
 		EMU_API const Vector2D<float> GetPrevPosition(Entity* ptrEntity);
 
+		EMU_API void Activate(Entity* ptrEntity);
+		EMU_API void Deactivate(Entity* ptrEntity);
+
 		// Calling this on a transform that is connected to a physics component is meaningless.
 		EMU_API void SetPosition(Entity* ptrEntity, const Vector2D<float> position);
 		EMU_API const Vector2D<float> GetPosition(Entity* ptrEntity);

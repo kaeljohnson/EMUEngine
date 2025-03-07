@@ -7,6 +7,16 @@ namespace Engine
 	UpdatableInterface::UpdatableInterface(ECS& refECS)
 		: m_refECS(refECS) {}
 
+	void UpdatableInterface::Activate(Entity* ptrEntity)
+	{
+		// Nothing to do.
+	}
+
+	void UpdatableInterface::Deactivate(Entity* ptrEntity)
+	{
+		// Nothing to do.
+	}
+
 	/*void UpdatableInterface::AddUpdatable(Entity* ptrEntity)
 	{
 		m_refECS.AddComponent<Updatable>(ptrEntity);

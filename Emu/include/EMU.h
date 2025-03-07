@@ -54,6 +54,7 @@ namespace Engine
 		CameraInterface m_cameraInterface;
 		TransformInterface m_transformInterface;
 		UpdatableInterface m_updatableInterface; // This may not be necessary.
+
 		IOEventSystem m_ioEventSystem;
 		SceneManager m_sceneManager;
 		Application m_application;

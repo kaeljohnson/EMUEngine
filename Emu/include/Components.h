@@ -60,10 +60,6 @@ namespace Engine
 
 		float m_rotation;
 		bool m_gravityOn;
-
-		// Temp
-		EMU_API void OnDeactivate() override;
-		EMU_API void OnActivate() override;
 	};
 
     struct Updatable : public Component

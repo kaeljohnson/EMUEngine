@@ -6,6 +6,16 @@
 
 namespace Engine
 {
+	void CameraInterface::Activate(Entity* ptrEntity)
+	{
+		// Deactivate all other cameras
+	}
+
+	void CameraInterface::Deactivate(Entity* ptrEntity)
+	{
+		// Deactivate camera.
+	}
+
 	CameraInterface::CameraInterface(ECS& refECS) : 
 		m_refECS(refECS) {}
 

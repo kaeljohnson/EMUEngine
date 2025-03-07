@@ -43,14 +43,17 @@ namespace Engine
             // Ensure the entity is active
             if (m_usedIDs.find(ptrEntity->GetID()) != m_usedIDs.end()) 
             {
-                // Recycle the entity ID
-                releaseID(ptrEntity->GetID());
-
 				for (auto& manager : m_componentManagers)
 				{
 					manager.second->DestroyComponent(ptrEntity);
 				}
+
+                // Recycle the entity ID
+                releaseID(ptrEntity->GetID());
             }
+
+			delete ptrEntity;
+			ptrEntity = nullptr;
         }
 
 		template <typename T>
@@ -109,37 +112,29 @@ namespace Engine
 			}
         }
         
-		void LoadEntities(std::vector<Entity*>& entities)
+		void ActivateEntities(std::vector<Entity*>& entities)
 		{
 			for (auto& manager : m_componentManagers)
 			{
-				manager.second->LoadComponents(entities);
+				manager.second->ActivateComponents(entities);
 			}
 		}
 
-        void UnloadEntities()
+        void Activate(Entity* entity)
         {
             for (auto& manager : m_componentManagers)
             {
-                manager.second->UnloadComponents();
+                manager.second->ActivateComponent(entity);
             }
         }
 
-		void ActivateEntities()
-		{
-			for (auto& manager : m_componentManagers)
-			{
-				manager.second->ActivateComponents();
-			}
-		}
-
-		void Activate(Entity* entity)
-		{
-			for (auto& manager : m_componentManagers)
-			{
-				manager.second->ActivateComponent(entity);
-			}
-		}
+        void DeactivateEntities()
+        {
+            for (auto& manager : m_componentManagers)
+            {
+                manager.second->DeactivateComponents();
+            }
+        }
 
 		void Deactivate(Entity* entity)
 		{
@@ -148,24 +143,6 @@ namespace Engine
 				manager.second->DeactivateComponent(entity);
 			}
 		}
-
-        void DeactivateEntities()
-		{
-			for (auto& manager : m_componentManagers)
-			{
-				manager.second->DeactivateComponents();
-			}
-		}
-
-		template <typename T>
-        void RemoveEntity(Entity* ptrEntity)
-        {
-            auto it = m_componentManagers.find(std::type_index(typeid(T)));
-            if (it != m_componentManagers.end())
-            {
-                static_cast<ComponentManager<T>*>(it->second.get())->RemoveComponent(ptrEntity);
-            }
-        }
 
 		void Cleanup()
 		{

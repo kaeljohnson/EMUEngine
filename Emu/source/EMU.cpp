@@ -65,11 +65,19 @@ namespace Engine
 	void EMU::Activate(Entity* ptrEntity)
 	{
 		m_ecs.Activate(ptrEntity);
+		m_physicsInterface.ActivateBody(ptrEntity);
+		m_transformInterface.Activate(ptrEntity);
+		m_cameraInterface.Activate(ptrEntity);
+		m_updatableInterface.Activate(ptrEntity);
 	}
 
 	void EMU::Deactivate(Entity* ptrEntity)
 	{
 		m_ecs.Deactivate(ptrEntity);
+		m_physicsInterface.DeactivateBody(ptrEntity);
+		m_transformInterface.Deactivate(ptrEntity);
+		m_cameraInterface.Deactivate(ptrEntity);
+		m_updatableInterface.Deactivate(ptrEntity);
 	}
 
 	void EMU::RegisterIOEventListener(IOEventType type, IOEventHandler handler)
