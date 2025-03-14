@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Core.h"
 #include "../Includes.h"
 #include "Entity.h"
 #include "ComponentManager.h"
@@ -63,6 +62,7 @@ namespace Engine
 			m_componentManagers[std::type_index(typeid(T))]->Allocate(m_maxID);
 		}
 
+		// Should engine allow adding components directly to hot component arrays?
         template <typename T, typename... Args>
         void AddComponent(Entity* ptrEntity, Args&&... componentArgs)
         {

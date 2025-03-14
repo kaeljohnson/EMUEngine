@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <functional>
 #include <vector>
+#include <array>
 #include <algorithm>
 #include <stdexcept>
 #include <typeindex>
