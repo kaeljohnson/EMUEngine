@@ -31,12 +31,6 @@ namespace Engine
         auto end() { return m_hotComponents.end(); }
         auto begin() const { return m_hotComponents.begin(); }
         auto end() const { return m_hotComponents.end(); }
-        
-        // Iterator for all components (from begin to end)
-        auto all_components_begin() { return m_components.begin(); }
-        auto all_components_end() { return m_components.end(); }
-        auto all_components_begin() const { return m_components.begin(); }
-        auto all_components_end() const { return m_components.end(); }
 
         // Adds to, or updates a component in, the components array.
         template<typename... Args>
@@ -52,8 +46,8 @@ namespace Engine
 
             // m_components[entity] = T(std::forward<Args>(args)...);
 
-            T t(std::forward<Args>(args)...); // Construct the Transform object
-            m_components.emplace(entity, std::move(t)); // Move it into the map
+            // T t(std::forward<Args>(args)...); // Construct the Transform object
+            m_components.emplace(entity, T(std::forward<Args>(args)...)); // Move it into the map
 
         }
 
@@ -122,7 +116,7 @@ namespace Engine
 
             m_hotComponents.clear();
 			m_hotEntities.clear();
-			m_hotIndices.fill(INVALID_INDEX);
+			m_hotIndices.assign(m_maxComponents, INVALID_INDEX);
         }
 
         void DeactivateComponent(Entity entity) override
@@ -179,25 +173,27 @@ namespace Engine
         }
 
 		// Allocate memory for components and hot components array.
-        void Allocate(size_t size) override
+        void Allocate(size_t maxComponents) override
 		{
-            ENGINE_CRITICAL_D("Allocating " + std::to_string(size));
-			m_hotComponents.reserve(size);
-			m_hotIndices.fill(INVALID_INDEX);
+            ENGINE_CRITICAL_D("Allocating " + std::to_string(maxComponents));
+			m_hotComponents.reserve(maxComponents);
+			m_hotEntities.reserve(maxComponents);
+            m_hotIndices.assign(maxComponents, INVALID_INDEX);
+
+			m_maxComponents = maxComponents;
 		}
 
     private:
 		std::unordered_map<size_t, T> m_components;             // Holds all components
 
 		const int INVALID_INDEX = -1;                           // Invalid index for hot indices
+		size_t m_maxComponents = 0;
 
         // Temp for now, client needs to set size.
-		std::array<size_t, 10000> m_hotIndices;                 // Maps entity entity to index in m_hotComponents. The "sparse set" array.
+		std::vector<size_t> m_hotIndices;                       // Maps entity entity to index in m_hotComponents. The "sparse set" array.
 		
 		std::vector<size_t> m_hotEntities;                      // Maps hot index to entity entity. The entity entity of each hot component in same order as hot component array.
 		std::vector<T> m_hotComponents;                         // Hot components. The "dense set" array.
-
-
     };
 
 
