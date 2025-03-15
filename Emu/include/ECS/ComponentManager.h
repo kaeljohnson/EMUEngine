@@ -44,11 +44,7 @@ namespace Engine
                 return; // Component already exists. 
             }
 
-            // m_components[entity] = T(std::forward<Args>(args)...);
-
-            // T t(std::forward<Args>(args)...); // Construct the Transform object
             m_components.emplace(entity, T(std::forward<Args>(args)...)); // Move it into the map
-
         }
 
         // Finds component by entity and destroy it.
