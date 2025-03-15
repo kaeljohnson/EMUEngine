@@ -2,7 +2,7 @@
 
 namespace Engine
 {
-	using EntityID = size_t;
+	/*using EntityID = size_t;
 
 	struct Entity
 	{
@@ -12,5 +12,5 @@ namespace Engine
 
 	private:
 		EntityID ID;
-	};
+	};*/
 }

@@ -6,12 +6,12 @@
 
 namespace Engine
 {
-	void CameraInterface::Activate(Entity* ptrEntity)
+	void CameraInterface::Activate(Entity entity)
 	{
 		// Deactivate all other cameras
 	}
 
-	void CameraInterface::Deactivate(Entity* ptrEntity)
+	void CameraInterface::Deactivate(Entity entity)
 	{
 		// Deactivate camera.
 	}
@@ -19,57 +19,57 @@ namespace Engine
 	CameraInterface::CameraInterface(ECS& refECS) : 
 		m_refECS(refECS) {}
 
-	Camera* CameraInterface::GetCamera(Entity* ptrEntity)
+	Camera* CameraInterface::GetCamera(Entity entity)
 	{
-		return m_refECS.GetComponent<Camera>(ptrEntity);
+		return m_refECS.GetComponent<Camera>(entity);
 	}
 
-	void CameraInterface::SetPixelsPerUnit(Entity* ptrEntity, const int pixelsPerUnit)
+	void CameraInterface::SetPixelsPerUnit(Entity entity, const int pixelsPerUnit)
 	{
-		GetCamera(ptrEntity)->m_pixelsPerUnit = pixelsPerUnit;
-		SetSize(ptrEntity);
+		GetCamera(entity)->m_pixelsPerUnit = pixelsPerUnit;
+		SetSize(entity);
 	}
 
-	const int CameraInterface::GetPixelsPerUnit(Entity* ptrEntity)
+	const int CameraInterface::GetPixelsPerUnit(Entity entity)
 	{
-		return GetCamera(ptrEntity)->m_pixelsPerUnit;
+		return GetCamera(entity)->m_pixelsPerUnit;
 	}
 
-	void CameraInterface::SetSize(Entity* ptrEntity)
+	void CameraInterface::SetSize(Entity entity)
 	{
-		Camera* ptrCamera = GetCamera(ptrEntity);
+		Camera* ptrCamera = GetCamera(entity);
 		ptrCamera->m_size
 			= Vector2D<float>(Screen::VIEWPORT_SIZE.X / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.X), 
 				Screen::VIEWPORT_SIZE.Y / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.Y));
 	}
 
-	const Vector2D<float> CameraInterface::GetSize(Entity* ptrEntity)
+	const Vector2D<float> CameraInterface::GetSize(Entity entity)
 	{
-		return GetCamera(ptrEntity)->m_size;
+		return GetCamera(entity)->m_size;
 	}
 
-	void CameraInterface::SetOffsets(Entity* ptrEntity, const Vector2D<float> offsets)
+	void CameraInterface::SetOffsets(Entity entity, const Vector2D<float> offsets)
 	{
-		GetCamera(ptrEntity)->m_offset = offsets;
+		GetCamera(entity)->m_offset = offsets;
 	}
 
-	void CameraInterface::SetOffset(Entity* ptrEntity, const Vector2D<float> offset)
+	void CameraInterface::SetOffset(Entity entity, const Vector2D<float> offset)
 	{
-		GetCamera(ptrEntity)->m_offset = offset;
+		GetCamera(entity)->m_offset = offset;
 	}
 
-	const Vector2D<float> CameraInterface::GetOffset(Entity* ptrEntity)
+	const Vector2D<float> CameraInterface::GetOffset(Entity entity)
 	{
-		return GetCamera(ptrEntity)->m_offset;
+		return GetCamera(entity)->m_offset;
 	}
 
-	void CameraInterface::SetClampingOn(Entity* ptrEntity, const bool clampingOn)
+	void CameraInterface::SetClampingOn(Entity entity, const bool clampingOn)
 	{
-		GetCamera(ptrEntity)->m_clampingOn = clampingOn;
+		GetCamera(entity)->m_clampingOn = clampingOn;
 	}
 
-	const bool CameraInterface::GetClampingOn(Entity* ptrEntity)
+	const bool CameraInterface::GetClampingOn(Entity entity)
 	{
-		return GetCamera(ptrEntity)->m_clampingOn;
+		return GetCamera(entity)->m_clampingOn;
 	}
 }

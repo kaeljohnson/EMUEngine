@@ -22,19 +22,19 @@ namespace Engine
 		EMU_API ~Scene();
 
 		using ContactCallback = std::function<void(const Contact&)>;
-		EMU_API void RegisterContactCallback(ContactType contactType, Entity* ptrEntityA, Entity* ptrEntityB, ContactCallback callback);
-		EMU_API void RegisterContactCallback(ContactType contactType, Entity* ptrEntity, ContactCallback callback);
+		EMU_API void RegisterContactCallback(ContactType contactType, Entity entityA, Entity entityB, ContactCallback callback);
+		EMU_API void RegisterContactCallback(ContactType contactType, Entity entity, ContactCallback callback);
 
 		EMU_API void SetPhysicsSimulation(const Vector2D<float> gravity);
 	
-		EMU_API void Add(Entity* ptrEntity);
+		EMU_API void Add(Entity entity);
 
 		// Removes entity from scene by removing entity
 		// from entities array and deactivating entity in ECS.
-		EMU_API void Activate(Entity* ptrEntity);
-		EMU_API void Deactivate(Entity* ptrEntity);
+		EMU_API void Activate(Entity entity);
+		EMU_API void Deactivate(Entity entity);
 
-		EMU_API void Remove(Entity* ptrEntity);
+		EMU_API void Remove(Entity entity);
 		EMU_API void AddTileMap(std::string mapFileName, const int numMetersPerTile);
 
 		// IF theres no map in the level, client will decided the dimensions manually.
@@ -50,7 +50,7 @@ namespace Engine
 		CameraSystem m_cameraSystem;
 		UpdateSystem m_updateSystem;
 
-		std::vector<Entity*> m_entities;
+		std::vector<Entity> m_entities;
 
 	public:
 		inline const int GetLevelWidth() const { return m_levelDimensionsInUnits.X; }

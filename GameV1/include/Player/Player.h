@@ -7,8 +7,8 @@
 
 struct PlayerContactListener : public Engine::SingleEntityContactListener
 {
-	PlayerContactListener(Engine::Entity* ptrPlayerEntity)
-		: Engine::SingleEntityContactListener(ptrPlayerEntity) {}
+	PlayerContactListener(Engine::Entity playerEntity)
+		: Engine::SingleEntityContactListener(playerEntity) {}
 
 	void OnContactBegin(const Engine::Contact event) override
 	{
@@ -23,8 +23,8 @@ struct PlayerContactListener : public Engine::SingleEntityContactListener
 
 struct PlayerSensorListener : public Engine::SingleEntitySensorListener
 {
-	PlayerSensorListener(Engine::Entity* ptrPlayerEntity)
-		: Engine::SingleEntitySensorListener(ptrPlayerEntity) {}
+	PlayerSensorListener(Engine::Entity playerEntity)
+		: Engine::SingleEntitySensorListener(playerEntity) {}
 
 	void OnContactBegin(const Engine::Contact event) override
 	{
@@ -54,7 +54,7 @@ enum PlayerDirection
 class Player
 {
 public:
-	Player(Engine::Entity* entity, const float startingX, const float startingY,
+	Player(Engine::Entity entity, const float startingX, const float startingY,
 		const float width, const float height);
 	~Player() = default;
 	void Update();
@@ -67,7 +67,7 @@ public:
 	PlayerDirection m_currentDirection;
 
 private:
-	Engine::Entity* m_ptrEntity;
+	Engine::Entity m_entity;
 
 	bool m_canJump;
 	float m_jumpCharge;

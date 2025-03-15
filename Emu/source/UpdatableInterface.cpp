@@ -7,12 +7,12 @@ namespace Engine
 	UpdatableInterface::UpdatableInterface(ECS& refECS)
 		: m_refECS(refECS) {}
 
-	void UpdatableInterface::Activate(Entity* ptrEntity)
+	void UpdatableInterface::Activate(Entity entity)
 	{
 		// Nothing to do.
 	}
 
-	void UpdatableInterface::Deactivate(Entity* ptrEntity)
+	void UpdatableInterface::Deactivate(Entity entity)
 	{
 		// Nothing to do.
 	}

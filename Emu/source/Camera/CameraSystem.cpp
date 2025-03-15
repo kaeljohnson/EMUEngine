@@ -16,7 +16,7 @@ namespace Engine
         for (auto& camera : m_refECS.GetComponentManager<Camera>())
         {
             // CAMERA UPDATES
-            Engine::Transform* ptrCameraTarget = m_refECS.GetComponentManager<Transform>().GetComponent(camera.GetEntity());
+            Engine::Transform* ptrCameraTarget = m_refECS.GetComponentManager<Transform>().GetComponent(camera.m_entity);
 
             const float interpFactor = Engine::Time::GetInterpolationFactor();
 

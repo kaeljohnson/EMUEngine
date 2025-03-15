@@ -52,9 +52,9 @@ namespace Engine
         }
 	}
 
-    std::vector<Entity*> TileMap::LoadMap()
+    std::vector<Entity> TileMap::LoadMap()
     {
-		std::vector<Entity*> ptrTiles;
+		std::vector<Entity> tiles;
 
         for (int y = 0; y < GetHeight(); ++y)
         {
@@ -63,16 +63,16 @@ namespace Engine
                 if (GetTile(x, y) != '-')
                 {
                     // Might need to add this to an array?
-                    Entity* ptrTile = m_refECS.CreateEntity();
+                    Entity tile = m_refECS.CreateEntity();
 
                     // Create "Tiles"
-                    m_refECS.AddComponent<Transform>(ptrTile,
+                    m_refECS.AddComponent<Transform>(tile,
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)), 
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
                         1.0f, 1.0f, 1.0f);
 
-                    m_refECS.AddComponent<PhysicsBody>(ptrTile);
-                    PhysicsBody* ptrPhysicsBody = m_refECS.GetComponent<PhysicsBody>(ptrTile);
+                    m_refECS.AddComponent<PhysicsBody>(tile);
+                    PhysicsBody* ptrPhysicsBody = m_refECS.GetComponent<PhysicsBody>(tile);
                     ptrPhysicsBody->m_bodyType = SENSOR;
                     ptrPhysicsBody->m_dimensions = 
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile));
@@ -81,18 +81,18 @@ namespace Engine
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), 
                             static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile));
 
-					ptrTiles.push_back(ptrTile);
+					tiles.push_back(tile);
 				}
 			}
 		}
 
-		return ptrTiles;
+		return tiles;
 	}
 
     // Collision bodies should just be physics bodies, not tiles.
-    std::vector<Entity*> TileMap::CreateCollisionBodies()
+    std::vector<Entity> TileMap::CreateCollisionBodies()
     {
-		std::vector<Entity*> collisionBodyIDs;
+		std::vector<Entity> collisionBodyIDs;
 
         // Creates collision bodies for the map. This creates a collision body for each block of tiles.
         // 
@@ -150,10 +150,10 @@ namespace Engine
                         }
                     }
 
-					Entity* ptrTile = m_refECS.CreateEntity();
+					Entity tile = m_refECS.CreateEntity();
 
-                    m_refECS.AddComponent<PhysicsBody>(ptrTile);
-                    PhysicsBody* ptrPhysicsBody = m_refECS.GetComponentManager<PhysicsBody>().GetComponent(ptrTile);
+                    m_refECS.AddComponent<PhysicsBody>(tile);
+                    PhysicsBody* ptrPhysicsBody = m_refECS.GetComponentManager<PhysicsBody>().GetComponent(tile);
                     ptrPhysicsBody->m_bodyType = STATIC;
                     ptrPhysicsBody->m_dimensions =
                         Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile));
@@ -161,7 +161,7 @@ namespace Engine
                     ptrPhysicsBody->m_startingPosition = 
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile));
 
-					collisionBodyIDs.push_back(ptrTile);
+					collisionBodyIDs.push_back(tile);
                 }
             }
         }

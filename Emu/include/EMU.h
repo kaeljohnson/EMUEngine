@@ -30,13 +30,13 @@ namespace Engine
 		EMU_API TransformInterface& ITRANSFORMS() { return m_transformInterface; }
 
 		// ECS Interface functions
-		EMU_API Entity* CreateEntity();
-		EMU_API void Activate(Entity* ptrEntity);
-		EMU_API void Deactivate(Entity* ptrEntity);
+		EMU_API Entity CreateEntity();
+		EMU_API void Activate(Entity entity);
+		EMU_API void Deactivate(Entity entity);
 		template <typename T, typename... Args>
-		void AddComponent(Entity* ptrEntity, Args&&... componentArgs)
+		void AddComponent(Entity entity, Args&&... componentArgs)
 		{
-			m_ecs.AddComponent<T>(ptrEntity, std::forward<Args>(componentArgs)...);
+			m_ecs.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
 		}
 
 		// Event IO System Interface functions

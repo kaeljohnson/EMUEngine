@@ -57,27 +57,27 @@ namespace Engine
 		m_sceneManager.UnloadCurrentScene();
 	}
 
-	Entity* EMU::CreateEntity()
+	Entity EMU::CreateEntity()
 	{
 		return m_ecs.CreateEntity();
 	}
 
-	void EMU::Activate(Entity* ptrEntity)
+	void EMU::Activate(Entity entity)
 	{
-		m_ecs.Activate(ptrEntity);
-		m_physicsInterface.ActivateBody(ptrEntity);
-		m_transformInterface.Activate(ptrEntity);
-		m_cameraInterface.Activate(ptrEntity);
-		m_updatableInterface.Activate(ptrEntity);
+		m_ecs.Activate(entity);
+		m_physicsInterface.ActivateBody(entity);
+		m_transformInterface.Activate(entity);
+		m_cameraInterface.Activate(entity);
+		m_updatableInterface.Activate(entity);
 	}
 
-	void EMU::Deactivate(Entity* ptrEntity)
+	void EMU::Deactivate(Entity entity)
 	{
-		m_ecs.Deactivate(ptrEntity);
-		m_physicsInterface.DeactivateBody(ptrEntity);
-		m_transformInterface.Deactivate(ptrEntity);
-		m_cameraInterface.Deactivate(ptrEntity);
-		m_updatableInterface.Deactivate(ptrEntity);
+		m_ecs.Deactivate(entity);
+		m_physicsInterface.DeactivateBody(entity);
+		m_transformInterface.Deactivate(entity);
+		m_cameraInterface.Deactivate(entity);
+		m_updatableInterface.Deactivate(entity);
 	}
 
 	void EMU::RegisterIOEventListener(IOEventType type, IOEventHandler handler)

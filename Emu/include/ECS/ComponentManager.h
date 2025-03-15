@@ -1,21 +1,22 @@
 #pragma once
 
 #include "../Includes.h"
-#include "Entity.h"
 #include "../Logging/Logger.h"
 
 namespace Engine
 {
+    using Entity = size_t;
+
     class ComponentManagerBase 
     {
     public:
         virtual ~ComponentManagerBase() = default;
         virtual void Allocate(size_t size) = 0;
-		virtual void ActivateComponents(std::vector<Entity*>& entities) = 0;
-        virtual void ActivateComponent(Entity* ptrEntity) = 0;
+		virtual void ActivateComponents(std::vector<Entity>& entities) = 0;
+        virtual void ActivateComponent(Entity entity) = 0;
 		virtual void DeactivateComponents() = 0;
-		virtual void DeactivateComponent(Entity* ptrEntity) = 0;
-		virtual void DestroyComponent(Entity* ptrEntity) = 0;
+		virtual void DeactivateComponent(Entity entity) = 0;
+		virtual void DestroyComponent(Entity entity) = 0;
     };
 
     template <typename T>
@@ -38,50 +39,51 @@ namespace Engine
         auto all_components_end() const { return m_components.end(); }
 
         // Loads components into hot array, ordering them by priority.
-		void ActivateComponents(std::vector<Entity*>& entities) override
+		void ActivateComponents(std::vector<Entity>& entities) override
         {
-            for (Entity* entity : entities)
+            for (Entity entity : entities)
             {
-				size_t id = entity->GetID();
-                auto it = m_idToIndex.find(id);
-                if (it != m_idToIndex.end())
+				// size_t entity = entity->GetID();
+                auto it = m_entityToIndex.find(entity);
+                if (it != m_entityToIndex.end())
                 {
                     size_t index = it->second;
 
                     // Move component to m_hotComponents
                     m_hotComponents.push_back(std::move(m_components[index]));
-                    m_hotEntityIDs.push_back(id);
-					m_hotIndices[id] = m_hotComponents.size() - 1;
+                    m_hotEntities.push_back(entity);
+					m_hotIndices[entity] = m_hotComponents.size() - 1;
 
                     // If index is not the last element, move the last element to fill its place.
                     if (index != m_components.size() - 1)
                     {
                         m_components[index] = std::move(m_components.back());
 
-                        // Update the index of the moved component in idToIndex map.
-                        size_t movedId = m_components[index].GetEntity()->GetID();
-                        m_idToIndex[movedId] = index;
+                        // Update the index of the moved component in entityToIndex map.
+                        size_t movedId = m_components[index].m_entity;
+                        m_entityToIndex[movedId] = index;
                     }
 
                     m_components.pop_back();
-                    m_idToIndex.erase(it);
+                    m_entityToIndex.erase(it);
                 }
             }
         }
 
+        // Should just iterate through sparse set here to deactive components.
 		void DeactivateComponents() override
         {
             for (T& component : m_hotComponents)
             {
-                size_t id = component.GetEntity()->GetID();
+                size_t entity = component.m_entity;
 
 				// Move the component back to m_components in any order.
                 m_components.push_back(std::move(component));
-                m_idToIndex[id] = m_components.size() - 1;
+                m_entityToIndex[entity] = m_components.size() - 1;
             }
 
             m_hotComponents.clear();
-			m_hotEntityIDs.clear();
+			m_hotEntities.clear();
 			m_hotIndices.fill(INVALID_INDEX);
             // m_hotIdToIndex.clear();
         }
@@ -91,44 +93,44 @@ namespace Engine
         void AddComponent(Args&&... args)
         {
             auto argsTuple = std::make_tuple(std::forward<Args>(args)...);
-            auto id = std::get<0>(argsTuple)->GetID();
+            auto entity = std::get<0>(argsTuple);
 
-            // if (m_idToIndex.count(id) || m_hotIdToIndex.count(id))
-			if (m_idToIndex.count(id) || m_hotIndices[id] != INVALID_INDEX)
+            // if (m_entityToIndex.count(entity) || m_hotIdToIndex.count(entity))
+			if (m_entityToIndex.count(entity) || m_hotIndices[entity] != INVALID_INDEX)
 			{
 				return; // Component already exists 
 			}
 
             m_components.emplace_back(std::forward<Args>(args)...);
-            m_idToIndex[id] = m_components.size() - 1;
+            m_entityToIndex[entity] = m_components.size() - 1;
         }
 
-		// Finds component by entity ID and destroys it.
-        void DestroyComponent(Entity* ptrEntity) override
+		// Finds component by entity entity and destroys it.
+        void DestroyComponent(Entity entity) override
         {
-            size_t id = ptrEntity->GetID();
+            // size_t entity = ptrEntity->GetID();
 
-			if (m_hotIndices[id] != INVALID_INDEX)
+			if (m_hotIndices[entity] != INVALID_INDEX)
 			{
-				size_t index = m_hotIndices[id];
+				size_t index = m_hotIndices[entity];
 				size_t lastIndex = m_hotComponents.size() - 1;
 
 				if (index != lastIndex)
 				{
 					std::swap(m_hotComponents[index], m_hotComponents[lastIndex]);
-					m_hotEntityIDs[index] = m_hotEntityIDs[lastIndex]; // Swap the entity ID with the last one. No need to change last entity, as it will be popped.
-					m_hotIndices[m_hotEntityIDs[index]] = index;
+					m_hotEntities[index] = m_hotEntities[lastIndex]; // Swap the entity entity with the last one. No need to change last entity, as it will be popped.
+					m_hotIndices[m_hotEntities[index]] = index;
 					
 				}
 
 				m_hotComponents.pop_back();
-				m_hotEntityIDs.pop_back();
-				m_hotIndices[id] = INVALID_INDEX;
+				m_hotEntities.pop_back();
+				m_hotIndices[entity] = INVALID_INDEX;
                 return;
 			}
         
-            auto it = m_idToIndex.find(ptrEntity->GetID());
-            if (it != m_idToIndex.end())
+            auto it = m_entityToIndex.find(entity);
+            if (it != m_entityToIndex.end())
             {
                 size_t index = it->second;
                 size_t lastIndex = m_components.size() - 1;
@@ -136,19 +138,19 @@ namespace Engine
                 if (index != lastIndex) // If it's not the last element, swap with the last one
                 {
                     std::swap(m_components[index], m_components[lastIndex]);
-                    m_idToIndex[m_components[index].GetEntity()->GetID()] = index; // Update swapped entity index
+                    m_entityToIndex[m_components[index].m_entity] = index; // Update swapped entity index
                 }
 
                 m_components.pop_back();
-                m_idToIndex.erase(it);
+                m_entityToIndex.erase(it);
                 return;
             }
         }
 
 		// Returns a component by entity pointer.
-        T* GetComponent(Entity* ptrEntity)
+        T* GetComponent(Entity entity)
         {
-			size_t hotIndex = m_hotIndices[ptrEntity->GetID()];
+			size_t hotIndex = m_hotIndices[entity];
 
             if (hotIndex != INVALID_INDEX)
             {
@@ -156,8 +158,8 @@ namespace Engine
             }
 
 		
-            auto it = m_idToIndex.find(ptrEntity->GetID());
-            if (it != m_idToIndex.end())
+            auto it = m_entityToIndex.find(entity);
+            if (it != m_entityToIndex.end())
             {
                 return &m_components[it->second];
             }
@@ -166,18 +168,16 @@ namespace Engine
 		}
 
         // Check if entity has a component attached.
-        bool HasComponent(Entity* ptrEntity)
+        bool HasComponent(Entity entity)
         {
-            size_t id = ptrEntity->GetID();
-            return m_hotIndices[id] != INVALID_INDEX || m_idToIndex.contains(id);
+            return m_hotIndices[entity] != INVALID_INDEX || m_entityToIndex.contains(entity);
         }
 
-        void ActivateComponent(Entity* ptrEntity) override
+        void ActivateComponent(Entity entity) override
         {
-            size_t id = ptrEntity->GetID();
-            auto it = m_idToIndex.find(id);
+            auto it = m_entityToIndex.find(entity);
 
-            if (it == m_idToIndex.end())
+            if (it == m_entityToIndex.end())
             {
                 return; // Component doesn't exist in m_components
             }
@@ -186,27 +186,26 @@ namespace Engine
 
             // Move component to hot array
             m_hotComponents.push_back(std::move(m_components[index]));
-			m_hotEntityIDs.push_back(id);
-            m_hotIndices[id] = m_hotComponents.size() - 1; // Update hot index mapping
+			m_hotEntities.push_back(entity);
+            m_hotIndices[entity] = m_hotComponents.size() - 1; // Update hot index mapping
 
             // If it's not the last component, swap with the last one to keep m_components dense
             size_t lastIndex = m_components.size() - 1;
             if (index != lastIndex)
             {
                 std::swap(m_components[index], m_components[lastIndex]);
-                m_idToIndex[m_components[index].GetEntity()->GetID()] = index; // Update the swapped index
+                m_entityToIndex[m_components[index].m_entity] = index; // Update the swapped index
             }
 
             m_components.pop_back();  // Remove last element after swap
-            m_idToIndex.erase(it);    // Remove from the id map
+            m_entityToIndex.erase(it);    // Remove from the entity map
         }
 
-        void DeactivateComponent(Entity* entity) override
+        void DeactivateComponent(Entity entity) override
         {
-            auto id = entity->GetID();
-            // auto it = m_hotIdToIndex.find(id);
+            // auto it = m_hotIdToIndex.find(entity);
             // if (it == m_hotIdToIndex.end())
-			size_t index = m_hotIndices[id];
+			size_t index = m_hotIndices[entity];
 			if (index == INVALID_INDEX)
             {
                 return; // If the component is not in the hot array, there's nothing to deactivate
@@ -216,22 +215,22 @@ namespace Engine
             m_components.push_back(std::move(m_hotComponents[index]));
 
             // Update the index mappings for hot and main arrays
-            m_idToIndex[id] = m_components.size() - 1;  // The component has been added to the main array
-            // m_hotIdToIndex.erase(it);  // Remove from the hot id map
-			m_hotIndices[id] = INVALID_INDEX;
+            m_entityToIndex[entity] = m_components.size() - 1;  // The component has been added to the main array
+            // m_hotIdToIndex.erase(it);  // Remove from the hot entity map
+			m_hotIndices[entity] = INVALID_INDEX;
 
             // Swap the component to the last position in the hot array and pop it
             size_t lastIndex = m_hotComponents.size() - 1;
             if (index != lastIndex)  // If the component isn't the last one
             {
                 std::swap(m_hotComponents[index], m_hotComponents[lastIndex]);  // Swap the component with the last one
-				m_hotEntityIDs[index] = m_hotEntityIDs[lastIndex];  // Swap the entity ID with the last one. No need to change last entity, as it will be popped.
-                m_hotIdToIndex[m_hotEntityIDs[index]] = index;
+				m_hotEntities[index] = m_hotEntities[lastIndex];  // Swap the entity entity with the last one. No need to change last entity, as it will be popped.
+                m_hotEntityToIndex[m_hotEntities[index]] = index;
             }
 
             // Pop the last component in the hot array, as it's now deactivated
             m_hotComponents.pop_back();
-			m_hotEntityIDs.pop_back();
+			m_hotEntities.pop_back();
         }
 
 		// Allocate memory for components and hot components array.
@@ -244,8 +243,8 @@ namespace Engine
 		}
 
     private:
-        std::unordered_map<size_t, size_t> m_idToIndex;          // Maps entity ID to index in m_components
-        std::unordered_map<size_t, size_t> m_hotIdToIndex;       // Maps entity ID to index in m_hotComponents
+        std::unordered_map<size_t, size_t> m_entityToIndex;          // Maps entity entity to index in m_components
+        std::unordered_map<size_t, size_t> m_hotEntityToIndex;       // Maps entity entity to index in m_hotComponents
 
         std::vector<T> m_components;                             // Holds all components
         // std::vector<T> m_hotComponents;                       // Holds hot components
@@ -254,9 +253,9 @@ namespace Engine
 		const int INVALID_INDEX = -1;                          // Invalid index for hot indices
 
         // Temp for now, client needs to set size.
-		std::array<size_t, 10000> m_hotIndices;                // Maps entity ID to index in m_hotComponents. The "sparse set" array.
+		std::array<size_t, 10000> m_hotIndices;                // Maps entity entity to index in m_hotComponents. The "sparse set" array.
 		
-		std::vector<size_t> m_hotEntityIDs;                    // Maps hot index to entity ID. The entity ID of each hot component in same order as hot component array.
+		std::vector<size_t> m_hotEntities;                    // Maps hot index to entity entity. The entity entity of each hot component in same order as hot component array.
 		std::vector<T> m_hotComponents;                        // Hot components. The "dense set" array.
 
 

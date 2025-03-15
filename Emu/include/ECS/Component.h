@@ -1,18 +1,15 @@
 #pragma once
 
-#include "Entity.h"
-
 namespace Engine
 {
+	using Entity = size_t;
+
 	class Component
 	{
 	public:
-		Component(Entity* ptrEntity) : m_ptrEntity(ptrEntity) {}
+		Component(Entity entity) : m_entity(entity) {}
 		virtual ~Component() = default;
 
-		inline Entity* GetEntity() const { return m_ptrEntity; }
-
-	private:
-		Entity* m_ptrEntity;
+		Entity m_entity;
 	};
 }

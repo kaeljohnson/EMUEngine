@@ -14,37 +14,37 @@ namespace Engine
 	// Contact wrapper objects
 	struct Contact
 	{
-		Contact(Entity* ptrEntityA, Entity* ptrEntityB)
-			: m_ptrEntityA(ptrEntityA), m_ptrEntityB(ptrEntityB) {}
+		Contact(Entity entityA, Entity entityB)
+			: m_ptrEntityA(entityA), m_ptrEntityB(entityB) {}
 
-		Entity* m_ptrEntityA;
-		Entity* m_ptrEntityB;
+		Entity m_ptrEntityA;
+		Entity m_ptrEntityB;
 	};
 
 	struct BeginContact : public Contact
 	{
-		BeginContact(Entity* ptrEntityA, Entity* ptrEntityB, Vector2D<float> normalVec)
-			: m_normalVec(normalVec), Contact(ptrEntityA, ptrEntityB) {}
+		BeginContact(Entity entityA, Entity entityB, Vector2D<float> normalVec)
+			: m_normalVec(normalVec), Contact(entityA, entityB) {}
 
 		Vector2D<float> m_normalVec;
 	};
 
 	struct EndContact : public Contact
 	{
-		EndContact(Entity* ptrEntityA, Entity* ptrEntityB)
-			: Contact(ptrEntityA, ptrEntityB) {}
+		EndContact(Entity entityA, Entity entityB)
+			: Contact(entityA, entityB) {}
 	};
 
 	struct BeginSensing : public Contact
 	{
-		BeginSensing(Entity* ptrEntityA, Entity* ptrEntityB)
-			: Contact(ptrEntityA, ptrEntityB) {}
+		BeginSensing(Entity entityA, Entity entityB)
+			: Contact(entityA, entityB) {}
 	};
 
 	struct EndSensing : public Contact
 	{
-		EndSensing(Entity* ptrEntityA, Entity* ptrEntityB)
-			: Contact(ptrEntityA, ptrEntityB) {}
+		EndSensing(Entity entityA, Entity entityB)
+			: Contact(entityA, entityB) {}
 	};
 
 	struct ContactListener
@@ -65,26 +65,26 @@ namespace Engine
 	// Default contact listeners
 	struct SingleEntityContactListener : public ContactListener
 	{
-		SingleEntityContactListener(Entity* entity)
-			: ContactListener(entity->GetID()) {}
+		SingleEntityContactListener(Entity entity)
+			: ContactListener(entity) {}
 	};
 
 	struct MultiEntityContactListener : public ContactListener
 	{
-		MultiEntityContactListener(Entity* entity1, Entity* entity2)
-			: ContactListener(GenerateKey(entity1->GetID(), entity2->GetID())) {}
+		MultiEntityContactListener(Entity entity1, Entity entity2)
+			: ContactListener(GenerateKey(entity1, entity2)) {}
 	};
 
 	struct SingleEntitySensorListener : public ContactListener
 	{
-		SingleEntitySensorListener(Entity* entity)
-			: ContactListener(entity->GetID()) {}
+		SingleEntitySensorListener(Entity entity)
+			: ContactListener(entity) {}
 	};
 
 	struct MultiEntitySensorListener : public ContactListener
 	{
-		MultiEntitySensorListener(Entity* entity1, Entity* entity2)
-			: ContactListener(GenerateKey(entity1->GetID(), entity2->GetID())) {}
+		MultiEntitySensorListener(Entity entity1, Entity entity2)
+			: ContactListener(GenerateKey(entity1, entity2)) {}
 	};
 
 	enum ContactType
@@ -101,8 +101,8 @@ namespace Engine
 		using ContactCallback = std::function<void(const Contact&)>; 
 
 
-		EMU_API void RegisterContactCallback(ContactType contactType, Entity* ptrEntityA, Entity* ptrEntityB, ContactCallback callback);
-		EMU_API void RegisterContactCallback(ContactType contactType, Entity* ptrEntity, ContactCallback callback);
+		EMU_API void RegisterContactCallback(ContactType contactType, Entity entityA, Entity entityB, ContactCallback callback);
+		EMU_API void RegisterContactCallback(ContactType contactType, Entity entity, ContactCallback callback);
 
 	public:
 		ContactSystem(ECS& refECS);

@@ -12,23 +12,23 @@ namespace Engine
 	class CameraInterface
 	{
 	public:
-		EMU_API void Activate(Entity* ptrEntity);
-		EMU_API void Deactivate(Entity* ptrEntity);
-		EMU_API void SetPixelsPerUnit(Entity* ptrEntity, const int pixelsPerUnit);
-		EMU_API const int GetPixelsPerUnit(Entity* ptrEntity);
-		EMU_API void SetOffset(Entity* ptrEntity, const Vector2D<float> offset);
-		EMU_API const Vector2D<float> GetOffset(Entity* ptrEntity);
-		EMU_API void SetClampingOn(Entity* ptrEntity, const bool clampingOn);
-		EMU_API const bool GetClampingOn(Entity* ptrEntity);
-		EMU_API void SetSize(Entity* ptrEntity);
-		EMU_API const Vector2D<float> GetSize(Entity* ptrEntity);
-		EMU_API void SetOffsets(Entity* ptrEntity, const Vector2D<float> offsets);
+		EMU_API void Activate(Entity entity);
+		EMU_API void Deactivate(Entity entity);
+		EMU_API void SetPixelsPerUnit(Entity entity, const int pixelsPerUnit);
+		EMU_API const int GetPixelsPerUnit(Entity entity);
+		EMU_API void SetOffset(Entity entity, const Vector2D<float> offset);
+		EMU_API const Vector2D<float> GetOffset(Entity entity);
+		EMU_API void SetClampingOn(Entity entity, const bool clampingOn);
+		EMU_API const bool GetClampingOn(Entity entity);
+		EMU_API void SetSize(Entity entity);
+		EMU_API const Vector2D<float> GetSize(Entity entity);
+		EMU_API void SetOffsets(Entity entity, const Vector2D<float> offsets);
 
 		virtual ~CameraInterface() = default;
 	
 	public:
 		CameraInterface(ECS& refECS);
-		Camera* GetCamera(Entity* ptrEntity);
+		Camera* GetCamera(Entity entity);
 
 	private:
 		ECS& m_refECS;

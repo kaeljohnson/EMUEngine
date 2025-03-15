@@ -25,8 +25,8 @@ namespace Engine
 	public:
 		inline std::vector<PhysicsBody>& GetCollisionBodies() { return m_collisionBodies; }
 
-		std::vector<Entity*> LoadMap();
-		std::vector<Entity*> CreateCollisionBodies();
+		std::vector<Entity> LoadMap();
+		std::vector<Entity> CreateCollisionBodies();
 		void UnloadMap();
 
 	public:

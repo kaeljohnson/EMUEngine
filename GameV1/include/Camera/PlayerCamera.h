@@ -5,7 +5,7 @@
 class PlayerCamera
 {
 public:
-	PlayerCamera(Engine::Entity* ptrEntity);
+	PlayerCamera(Engine::Entity entity);
 	~PlayerCamera() = default;
 
 	void SetTargetSmoothingFactor(const float smoothingFactor);
@@ -20,7 +20,7 @@ public:
 
 
 private:
-	Engine::Entity* m_ptrEntity;
+	Engine::Entity m_entity;
 
 	bool m_smoothingOn;
 	float m_lookAhead;
