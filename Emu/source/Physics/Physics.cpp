@@ -299,7 +299,10 @@ namespace Engine
 		b2World_Step(*m_ptrWorldId, Time::GetTimeStep(), 4);
 		m_contactSystem.ProcessContacts(m_ptrWorldId);
 
-		for (PhysicsBody& refPhysicsBody : m_refECS.GetComponentManager<PhysicsBody>())
+		auto& physicsBodyManager = m_refECS.GetComponentManager<PhysicsBody>();
+		auto& transformManager = m_refECS.GetComponentManager<Transform>();
+
+		for (PhysicsBody& refPhysicsBody : physicsBodyManager) // Update physics bodies first since all bodies need updating but not all entities with bodies have transforms.
 		{
 			Entity* ptrEntity = refPhysicsBody.GetEntity();
 
@@ -309,9 +312,8 @@ namespace Engine
 			b2Rot rotation = b2Body_GetRotation(*refPhysicsBody.m_bodyId);
 			refPhysicsBody.m_rotation = b2Rot_GetAngle(rotation) * 180.0f / 3.14159265359f;
 
-			if (m_refECS.GetComponentManager<Transform>().HasComponent(ptrEntity))
+			if (Transform* ptrTransform = transformManager.GetComponent(ptrEntity)) // Don't worry about transform being inactive as we already know its corresponding physics body is active.
 			{
-				Transform* ptrTransform = m_refECS.GetComponentManager<Transform>().GetComponent(ptrEntity);
 
 				ptrTransform->PrevPosition = ptrTransform->Position;
 				ptrTransform->Dimensions = refPhysicsBody.m_dimensions;
