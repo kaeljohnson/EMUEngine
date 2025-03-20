@@ -78,6 +78,7 @@ TEST(ECS, TooManyEntities)
 TEST(ECS, ComponentManagerRegistration)
 {
 	EXPECT_FALSE(smallECS.HasComponentManager<TestComponent>());
+	EXPECT_FALSE(tenEntityECS.HasComponentManager<TestComponent>());
 	EXPECT_FALSE(mediumECS.HasComponentManager<TestComponent>());
 	EXPECT_FALSE(largeECS.HasComponentManager<TestComponent>());
 
@@ -87,6 +88,7 @@ TEST(ECS, ComponentManagerRegistration)
 	largeECS.RegisterComponentManager<TestComponent>();
 
 	EXPECT_TRUE(smallECS.HasComponentManager<TestComponent>());
+	EXPECT_TRUE(tenEntityECS.HasComponentManager<TestComponent>());
 	EXPECT_TRUE(mediumECS.HasComponentManager<TestComponent>());
 	EXPECT_TRUE(largeECS.HasComponentManager<TestComponent>());
 }
@@ -113,19 +115,48 @@ TEST(ECS, AddComponent)
 	EXPECT_TRUE(smallECS.HasComponent<TestComponent>(0));
 }
 
+TEST(ECS, AddTwoComponentsToSameEntity)
+{
+	try
+	{
+		smallECS.AddComponent<TestComponent>(0, 42);
+	}
+	catch (const std::runtime_error& e)
+	{
+		EXPECT_STREQ(e.what(), "Error: Component already exists.");
+	}
+}
+
+TEST(ECS, ComponentActivationAndDeactivation)
+{
+
+	auto start = std::chrono::high_resolution_clock::now();
+	smallECS.Activate<TestComponent>(0);
+	auto end = std::chrono::high_resolution_clock::now();
+	std::cout << "Activation: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
+
+	EXPECT_TRUE(smallECS.IsActive<TestComponent>(0));
+
+	start = std::chrono::high_resolution_clock::now();
+	smallECS.Deactivate<TestComponent>(0);
+	end = std::chrono::high_resolution_clock::now();
+	std::cout << "Deactivation: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
+	EXPECT_FALSE(smallECS.IsActive<TestComponent>(0));
+}
+
 TEST(ECS, TestComponentRetrieval)
 {
 	EXPECT_EQ(smallECS.GetComponent<TestComponent>(0)->m_value, 42);
 }
 
-TEST(ECS, FillAllComponentManagers)
+TEST(ECS, TestComponentDestruction)
 {
-	for (size_t i = 0; i < 1000; ++i)
-	{
-		// Entities created in earlier test.
-		mediumECS.AddComponent<TestComponent>(i, i);
-	}
+	smallECS.DestroyComponent<TestComponent>(0);
+	EXPECT_FALSE(smallECS.HasComponent<TestComponent>(0));
+}
 
+TEST(ECS, TestSparseArrayIteration)
+{
 	for (size_t i = 0; i < 10000; ++i)
 	{
 		largeECS.CreateEntity();
@@ -135,26 +166,7 @@ TEST(ECS, FillAllComponentManagers)
 	}
 
 	EXPECT_EQ(largeECS.GetNumActiveComponents<TestComponent>(), 10000);
-}
 
-TEST(ECS, TestComponentDestruction)
-{
-	smallECS.DestroyComponent<TestComponent>(0);
-	EXPECT_FALSE(smallECS.HasComponent<TestComponent>(0));
-}
-
-TEST(ECSTest, TestComponentActivationAndDeactivation)
-{
-	smallECS.Activate<TestComponent>(0);
-
-	EXPECT_TRUE(smallECS.IsActive<TestComponent>(0));
-
-	smallECS.Deactivate<TestComponent>(0);
-	EXPECT_FALSE(smallECS.IsActive<TestComponent>(0));
-}
-
-TEST(ECS, TestSparseArrayIteration)
-{
 	auto start = std::chrono::high_resolution_clock::now();
 	for (Engine::Entity& entity : entitiesForSparseSet)
 	{
@@ -253,6 +265,11 @@ TEST(ECS, ComponentManagerNotFound)
 
 TEST(ECS, EntityActivation)
 {
+	for (size_t i = 0; i < 1000; ++i)
+	{
+		mediumECS.AddComponent<TestComponent>(i, i);
+	}
+
 	EXPECT_EQ(mediumECS.GetNumEntities(), 1000);
 	EXPECT_EQ(mediumECS.GetNumActiveComponents<TestComponent>(), 0);
 
@@ -282,18 +299,6 @@ TEST(ECS, EntityActivation)
 		// Check sparse set.
 		EXPECT_EQ(mediumECS.GetComponent<TestComponent>(activeEntities[i])->m_value, activeEntities[i]); // Should still work.
 
-	}
-}
-
-TEST(ECS, AddTwoComponentsToSameEntity)
-{
-	try
-	{
-		smallECS.AddComponent<TestComponent>(0, 42);
-	}
-	catch (const std::runtime_error& e)
-	{
-		EXPECT_STREQ(e.what(), "Error: Component already exists.");
 	}
 }
 

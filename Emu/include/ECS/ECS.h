@@ -269,7 +269,7 @@ namespace Engine
         }
 
     private:
-        Entity m_numEntities;
+        Entity m_numEntities = 0;
         std::unordered_set<size_t> m_usedIDs;
         std::unordered_map<std::type_index, std::unique_ptr<ComponentManagerBase>> m_componentManagers;
 

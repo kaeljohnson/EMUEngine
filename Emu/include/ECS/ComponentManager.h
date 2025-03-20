@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Includes.h"
-#include "../Logging/Logger.h"
 
 namespace Engine
 {
@@ -27,9 +26,6 @@ namespace Engine
     {
     public:
 
-        // Adds to, or updates a component in, the components array. 
-        // If entities stay as being just size_t, this can't be called on any entity, must be 
-        // called on the ECS side so the ECS can verify the entity exists.
         template<typename... Args>
         void AddComponent(Args&&... args)
         {
@@ -73,7 +69,6 @@ namespace Engine
             }
         }
 
-        // Loads components into hot array, ordering them by priority.
 		void ActivateComponents(std::vector<Entity>& entities) override
         {
             for (Entity entity : entities)
@@ -174,7 +169,6 @@ namespace Engine
 		// Allocate memory for components and hot components array.
         void Allocate(size_t maxComponents) override
 		{
-            // ENGINE_CRITICAL_D("Allocating " + std::to_string(maxComponents));
 			m_hotComponents.reserve(maxComponents);
 			m_hotEntities.reserve(maxComponents);
             m_hotIndices.assign(maxComponents, INVALID_INDEX);
@@ -191,7 +185,6 @@ namespace Engine
 		const int INVALID_INDEX = -1;                           // Invalid index for hot indices
 		size_t m_maxComponents = 0;
 
-        // Temp for now, client needs to set size.
 		std::vector<size_t> m_hotIndices;                       // Maps entity entity to index in m_hotComponents. The "sparse set" array.
 		std::vector<size_t> m_hotEntities;                      // Maps hot index to entity entity. The entity entity of each hot component in same order as hot component array.
 		std::vector<T> m_hotComponents;                         // Hot components. The "dense set" array.
