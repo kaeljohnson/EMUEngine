@@ -4,93 +4,103 @@
 
 namespace Engine
 {
-	void TransformInterface::SetPrevPosition(Entity* ptrEntity, const Vector2D<float> position)
+	void TransformInterface::Activate(Entity entity)
 	{
-		Transform* ptrTransform = GetTransform(ptrEntity);
+		// Nothing to do.
+	}
+
+	void TransformInterface::Deactivate(Entity entity)
+	{
+		// Nothing to do.
+	}
+
+	void TransformInterface::SetPrevPosition(Entity entity, const Vector2D<float> position)
+	{
+		Transform* ptrTransform = GetTransform(entity);
 		ptrTransform->PrevPosition = position;
 	}
 
-	const Vector2D<float> TransformInterface::GetPrevPosition(Entity* ptrEntity)
+	const Vector2D<float> TransformInterface::GetPrevPosition(Entity entity)
 	{
-		Transform* ptrTransform = GetTransform(ptrEntity);
+		Transform* ptrTransform = GetTransform(entity);
 		return ptrTransform->PrevPosition;
 	}
 
-	void TransformInterface::SetPosition(Entity* ptrEntity, const Vector2D<float> position)
+	void TransformInterface::SetPosition(Entity entity, const Vector2D<float> position)
 	{
-		Transform* ptrTransform = GetTransform(ptrEntity);
+		Transform* ptrTransform = GetTransform(entity);
 		ptrTransform->Position = position;
 	}
 
-	const Vector2D<float> TransformInterface::GetPosition(Entity* ptrEntity)
+	const Vector2D<float> TransformInterface::GetPosition(Entity entity)
 	{
-		Transform* ptrTransform = GetTransform(ptrEntity);
+		Transform* ptrTransform = GetTransform(entity);
 		return ptrTransform->Position;
 	}
 
-	void TransformInterface::SetDimensions(Entity* ptrEntity, const Vector2D<float> dimensions)
+	void TransformInterface::SetDimensions(Entity entity, const Vector2D<float> dimensions)
 	{
-		Transform* ptrTransform = GetTransform(ptrEntity);
+		Transform* ptrTransform = GetTransform(entity);
 		ptrTransform->Dimensions = dimensions;
 	}
 
-	const Vector2D<float> TransformInterface::GetDimensions(Entity* ptrEntity)
+	const Vector2D<float> TransformInterface::GetDimensions(Entity entity)
 	{
-		Transform* ptrTransform = GetTransform(ptrEntity);
+		Transform* ptrTransform = GetTransform(entity);
 		return ptrTransform->Dimensions;
 	}
 
-	void TransformInterface::SetZIndex(Entity* ptrEntity, const int zIndex)
+	void TransformInterface::SetZIndex(Entity entity, const int zIndex)
 	{
-		Transform* ptrTransform = GetTransform(ptrEntity);
+		Transform* ptrTransform = GetTransform(entity);
 		ptrTransform->ZIndex = zIndex;
 	}
 
-	const int TransformInterface::GetZIndex(Entity* ptrEntity)
+	const int TransformInterface::GetZIndex(Entity entity)
 	{
-		Transform* ptrTransform = GetTransform(ptrEntity);
+		Transform* ptrTransform = GetTransform(entity);
 		return ptrTransform->ZIndex;
 	}
 
-	void TransformInterface::SetRotation(Entity* ptrEntity, const float rotation)
+	void TransformInterface::SetRotation(Entity entity, const float rotation)
 	{
-		Transform* ptrTransform = GetTransform(ptrEntity);
+		Transform* ptrTransform = GetTransform(entity);
 		ptrTransform->Rotation = rotation;
 	}
 
-	const float TransformInterface::GetRotation(Entity* ptrEntity)
+	const float TransformInterface::GetRotation(Entity entity)
 	{
-		Transform* ptrTransform = GetTransform(ptrEntity);
+		Transform* ptrTransform = GetTransform(entity);
 		return ptrTransform->Rotation;
 	}
 
-	void TransformInterface::SetScale(Entity* ptrEntity, const float scale)
+	void TransformInterface::SetScale(Entity entity, const float scale)
 	{
-		Transform* ptrTransform = GetTransform(ptrEntity);
+		Transform* ptrTransform = GetTransform(entity);
 		ptrTransform->Scale = scale;
 	}
 
-	const float TransformInterface::GetScale(Entity* ptrEntity)
+	const float TransformInterface::GetScale(Entity entity)
 	{
-		Transform* ptrTransform = GetTransform(ptrEntity);
+		Transform* ptrTransform = GetTransform(entity);
 		return ptrTransform->Scale;
 	}
 
-	void TransformInterface::SetDirectionFacing(Entity* ptrEntity, const int direction)
+	void TransformInterface::SetDirectionFacing(Entity entity, const int direction)
 	{
-		Transform* ptrTransform = GetTransform(ptrEntity);
+		Transform* ptrTransform = GetTransform(entity);
 		ptrTransform->DirectionFacing = direction;
 	}
 
-	const int TransformInterface::GetDirectionFacing(Entity* ptrEntity)
+	const int TransformInterface::GetDirectionFacing(Entity entity)
 	{
-		Transform* ptrTransform = GetTransform(ptrEntity);
+		Transform* ptrTransform = GetTransform(entity);
 		return ptrTransform->DirectionFacing;
 	}
 
-	Transform* TransformInterface::GetTransform(Entity* ptrEntity)
+	Transform* TransformInterface::GetTransform(Entity entity)
 	{
-		return m_refECS.GetComponent<Transform>(ptrEntity);
+		return m_refECS.GetComponent<Transform>(entity);
 	}
 
 	TransformInterface::TransformInterface(ECS& refEcs) : m_refECS(refEcs)

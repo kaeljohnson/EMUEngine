@@ -5,7 +5,7 @@
 #include "../../include/EventHandlers/AppManagementEventHandlers.h"
 
 
-AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity* playerEntity) 
+AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity playerEntity) 
 {
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::F_KEY_DOWN, [&](Engine::IOEvent& e)
 		{

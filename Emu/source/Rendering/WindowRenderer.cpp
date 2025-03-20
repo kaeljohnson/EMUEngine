@@ -79,13 +79,10 @@ namespace Engine
 		Camera* ptrCurrentCamera = nullptr;
 
 		// Get the first active camera for now.
-		for (auto& camera : m_refECS.GetComponentManager<Camera>())
+		for (auto& camera : m_refECS.GetHotComponents<Camera>())
 		{
-			if (camera.IsActive())
-			{
-				ptrCurrentCamera = &camera;
-				break;
-			}
+			ptrCurrentCamera = &camera;
+			break;
 		}
 
 		if (ptrCurrentCamera == nullptr)
@@ -114,12 +111,10 @@ namespace Engine
 		float cameraTop = ptrCurrentCamera->m_offset.Y;
 		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->m_pixelsPerUnit);
 
-		auto& transformManager = m_refECS.GetComponentManager<Transform>();
+		auto& transformManager = m_refECS.GetHotComponents<Transform>();
 
 		for (Transform& refTransform : transformManager)
 		{
-			if (!refTransform.IsActive()) continue;
-
 			float objectLeft = refTransform.Position.X;
 			float objectRight = objectLeft + refTransform.Dimensions.X;
 			float objectTop = refTransform.Position.Y;

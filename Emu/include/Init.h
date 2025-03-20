@@ -9,6 +9,6 @@ namespace Engine
 	{
 	public:
 		// Init constructor.
-		Init();
+		Init(size_t numEntitiesNeeded);
 	};
 }

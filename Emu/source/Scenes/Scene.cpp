@@ -14,7 +14,7 @@ namespace Engine
 {
 	Scene::Scene(ECS& refECS)
 		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(nullptr), 
-		m_physicsSimulation(refECS, Vector2D<float>(0.0f, 100.0f)), 
+		m_physicsSimulation(refECS), 
 		m_cameraSystem(refECS),
 		m_updateSystem(refECS) {}
 
@@ -23,30 +23,27 @@ namespace Engine
 		m_physicsSimulation.Cleanup();
 	}
 	
-	void Scene::RegisterContactCallback(ContactType contactType, Entity* ptrEntityA, Entity* ptrEntityB, ContactCallback callback)
+	void Scene::RegisterContactCallback(ContactType contactType, Entity entityA, Entity entityB, ContactCallback callback)
 	{
-		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, ptrEntityA, ptrEntityB, callback);
+		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entityA, entityB, callback);
 	}
 
-	void Scene::RegisterContactCallback(ContactType contactType, Entity* ptrEntity, ContactCallback callback)
+	void Scene::RegisterContactCallback(ContactType contactType, Entity entity, ContactCallback callback)
 	{
-		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, ptrEntity, callback);
+		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entity, callback);
 	}
 
 	void Scene::OnScenePlay()
 	{
-		// m_physicsSimulation.CreateWorld(m_gravity);
+		m_physicsSimulation.CreateWorld(Vector2D<float>(0.0f, 100.0f)); //TODO: Client sets gravity.
 
-		m_refECS.LoadEntities(m_entities);
+		m_refECS.ActivateEntities(m_entities);
 
 		// Frame the first active camera
-		for (auto& camera : m_refECS.GetComponentManager<Camera>())
+		for (auto& camera : m_refECS.GetHotComponents<Camera>())
 		{
-			if (camera.IsActive())
-			{
-				m_cameraSystem.Frame(camera, Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
-				break;
-			}
+			m_cameraSystem.Frame(camera, Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
+			break;
 		}
 
 		// Physics bodies need to be added to the world after they are activated and pooled.
@@ -57,11 +54,12 @@ namespace Engine
 
 	void Scene::OnSceneEnd()
 	{
+		// Could be problematic if this is called mid frame.
 		GameState::IN_SCENE = false;
 
 		m_physicsSimulation.Cleanup();
 
-		m_refECS.UnloadEntities();
+		m_refECS.DeactivateEntities();
 	}
 
 	void Scene::AddTileMap(std::string mapFileName, const int numMetersPerTile)
@@ -70,8 +68,8 @@ namespace Engine
 		TileMap tileMap(m_refECS, "testMap1.txt", 1);
 
 		// Get a temp vector or tile IDs from the tile map. Both the transforms and the physics bodies.
-		std::vector<Entity*> tileMapEntities = tileMap.LoadMap();
-		std::vector<Entity*> mapCollisionBodies = tileMap.CreateCollisionBodies();
+		std::vector<Entity> tileMapEntities = tileMap.LoadMap();
+		std::vector<Entity> mapCollisionBodies = tileMap.CreateCollisionBodies();
 
 		ENGINE_INFO_D("Tile map text file size: " + std::to_string(tileMap.m_map.size()));
 		ENGINE_INFO_D("Tile map collision bodies size: " + std::to_string(tileMap.m_collisionBodies.size()));
@@ -94,26 +92,26 @@ namespace Engine
 		}
 	}
 
-	void Scene::Add(Entity* ptrEntity)
+	void Scene::Add(Entity entity)
 	{
-		m_entities.push_back(ptrEntity);
+		m_entities.push_back(entity);
 	}
 
-	void Scene::Activate(Entity* ptrEntity)
+	void Scene::Activate(Entity entity)
 	{
-		m_refECS.Activate(ptrEntity);
+		m_refECS.Activate(entity);
 	}
 
-	void Scene::Deactivate(Entity* ptrEntity)
+	void Scene::Deactivate(Entity entity)
 	{
-		m_refECS.Deactivate(ptrEntity);
+		m_refECS.Deactivate(entity);
 	}
 
-	void Scene::Remove(Entity* ptrEntity)
+	void Scene::Remove(Entity entity)
 	{
 		// Remove entity from the scene. Do not remove the entity from the ECS, just deactivate it.
-		m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), ptrEntity), m_entities.end());
-		m_refECS.Deactivate(ptrEntity);
+		m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());
+		m_refECS.Deactivate(entity);
 	}
 
 	void Scene::SetLevelDimensions(const Vector2D<int> levelDimensions)

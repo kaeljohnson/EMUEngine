@@ -12,7 +12,7 @@
 
 namespace Engine
 {
-	Init::Init()
+	Init::Init(const size_t numEntitiesNeeded)
 	{
 		ENGINE_TRACE_D("Logger initialized!");
 
@@ -22,6 +22,7 @@ namespace Engine
 		if (ISDL::Init() < 0)
 			ENGINE_CRITICAL("SDL Init failed! SDL_Error: " + std::string(ISDL::GetError()));
 
-		EMU::Init();
+		ENGINE_CRITICAL_D("Allocating " + std::to_string(numEntitiesNeeded) + " entities.");
+		EMU::Init(numEntitiesNeeded);
 	}
 }

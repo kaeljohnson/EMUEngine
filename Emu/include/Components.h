@@ -26,10 +26,10 @@ namespace Engine
 		float Scale;
 		int DirectionFacing;
 
-		EMU_API Transform(Entity* entity) : PrevPosition(0.0f, 0.0f), Position(0.0f, 0.0f),
+		EMU_API Transform(Entity entity) : PrevPosition(0.0f, 0.0f), Position(0.0f, 0.0f),
 			Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1), ZIndex(0), Component(entity) {}
 
-		EMU_API Transform(Entity* entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction) :
+		EMU_API Transform(Entity entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction) :
 			PrevPosition(position), Position(position),
 			Dimensions(dimensions), Rotation(rotation), Scale(scale), DirectionFacing(direction), ZIndex(0), Component(entity) {}
 
@@ -38,12 +38,12 @@ namespace Engine
 
 	struct PhysicsBody : public Component
 	{
-		EMU_API PhysicsBody(Entity* ptrEntity) :
+		EMU_API PhysicsBody(Entity entity) :
 			m_bodyId(nullptr), m_shapeId(nullptr), m_worldId(nullptr),
 			m_bodyType(STATIC), m_dimensions(Vector2D<float>(1.0f, 1.0f)),
 			m_halfDimensions(Vector2D<float>(0.5f, 0.5f)), m_startingPosition(Vector2D<float>(1.0f, 1.0f)),
 			m_position(Vector2D<float>(0.0f, 0.0f)), m_rotation(0.0f),
-			m_gravityOn(true), Component(ptrEntity) {}
+			m_gravityOn(true), Component(entity) {}
 
 		EMU_API ~PhysicsBody() = default;
 
@@ -60,17 +60,13 @@ namespace Engine
 
 		float m_rotation;
 		bool m_gravityOn;
-
-		// Temp
-		EMU_API void OnDeactivate() override;
-		EMU_API void OnActivate() override;
 	};
 
     struct Updatable : public Component
     {
         using UpdateCallback = std::function<void()>;
 
-		EMU_API Updatable(Entity* entity, UpdateCallback callback) : m_callback(callback), Component(entity) {}
+		EMU_API Updatable(Entity entity, UpdateCallback callback) : m_callback(callback), Component(entity) {}
 		EMU_API ~Updatable() = default;
 
         UpdateCallback m_callback;
@@ -94,18 +90,18 @@ namespace Engine
 
 	struct SimpleContact : public Component
 	{
-		SimpleContact(Entity* ptrEntity) : Component(ptrEntity) {}
+		SimpleContact(Entity entity) : Component(entity) {}
 
 		bool m_contactAbove = false;
 		bool m_contactBelow = false;
 		bool m_contactRight = false;
 		bool m_contactLeft = false;
 	};
-
+	
 	struct Camera : public Component
 	{
-		EMU_API Camera(Entity* ptrEntity) 
-			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), Component(ptrEntity) {}
+		EMU_API Camera(Entity entity) 
+			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), Component(entity) {}
 		EMU_API ~Camera() = default;
 
 		Vector2D<float> m_offset;

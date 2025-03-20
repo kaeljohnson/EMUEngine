@@ -5,14 +5,13 @@
 namespace Engine
 {
 	UpdateSystem::UpdateSystem(ECS& refECS)
-		: m_refECS(refECS), m_refUpdatableManager(m_refECS.GetComponentManager<Updatable>()) {}
+		: m_refECS(refECS) {}
 
 	void UpdateSystem::Update()
 	{
 		// Update all updatable components
-		for (auto& refUpdatable : m_refUpdatableManager)
+		for (auto& refUpdatable : m_refECS.GetHotComponents<Updatable>())
 		{
-			if (!refUpdatable.IsActive()) continue;
 			refUpdatable.Update();
 		}
 	}

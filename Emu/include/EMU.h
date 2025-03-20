@@ -30,30 +30,31 @@ namespace Engine
 		EMU_API TransformInterface& ITRANSFORMS() { return m_transformInterface; }
 
 		// ECS Interface functions
-		EMU_API Entity* CreateEntity();
-		EMU_API void Activate(Entity* ptrEntity);
-		EMU_API void Deactivate(Entity* ptrEntity);
+		EMU_API Entity CreateEntity();
+		EMU_API void Activate(Entity entity);
+		EMU_API void Deactivate(Entity entity);
 		template <typename T, typename... Args>
-		void AddComponent(Entity* ptrEntity, Args&&... componentArgs)
+		void AddComponent(Entity entity, Args&&... componentArgs)
 		{
-			m_ecs.AddComponent<T>(ptrEntity, std::forward<Args>(componentArgs)...);
+			m_ecs.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
 		}
 
 		// Event IO System Interface functions
 		EMU_API void RegisterIOEventListener(IOEventType type, IOEventHandler handler);
 
 	public:
-		static void Init();
+		static void Init(const size_t numEntities);
 		~EMU();
 		
 	private:
-		EMU();
+		EMU(const size_t numEntities);
 
 		ECS m_ecs;
 		PhysicsInterface m_physicsInterface;
 		CameraInterface m_cameraInterface;
 		TransformInterface m_transformInterface;
 		UpdatableInterface m_updatableInterface; // This may not be necessary.
+
 		IOEventSystem m_ioEventSystem;
 		SceneManager m_sceneManager;
 		Application m_application;

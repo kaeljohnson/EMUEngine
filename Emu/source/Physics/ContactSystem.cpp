@@ -11,7 +11,7 @@ namespace Engine
 	void ContactSystem::ProcessContacts(void* ptrWorldId)
 	{
 		// Process ContactComponents
-		for (SimpleContact& simpleContact : m_refECS.GetComponentManager<SimpleContact>())
+		for (SimpleContact& simpleContact : m_refECS.GetHotComponents<SimpleContact>())
 		{
 			simpleContact.m_contactAbove = false;
 			simpleContact.m_contactBelow = false;
@@ -19,8 +19,8 @@ namespace Engine
 			simpleContact.m_contactRight = false;
 
 			// Better way to access. Maybe can just store shapeId directly in SimpleContact component?
-			Entity* ptrEntity = simpleContact.GetEntity();
-			b2ShapeId* shapeId = m_refECS.GetComponentManager<PhysicsBody>().GetComponent(ptrEntity)->m_shapeId;
+			Entity entity = simpleContact.m_entity;
+			b2ShapeId* shapeId = m_refECS.GetComponent<PhysicsBody>(entity)->m_shapeId;
 
 			b2ContactData contactData[10];
 			int shapeContactCount = b2Shape_GetContactData(*shapeId, contactData, 10);
@@ -31,7 +31,7 @@ namespace Engine
 
 				float normalDirection = 1.0f;
 
-				if ((Entity*)b2Body_GetUserData(b2Shape_GetBody(contact->shapeIdB)) == ptrEntity)
+				if ((Entity)b2Body_GetUserData(b2Shape_GetBody(contact->shapeIdB)) == entity)
 				{
 					normalDirection = -1.0f;
 				}
@@ -73,8 +73,8 @@ namespace Engine
 			b2ShapeId shapeIdA = beginEvent->shapeIdA;
 			b2ShapeId shapeIdB = beginEvent->shapeIdB;
 
-			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
-			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
+			Entity entityA = (Entity)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+			Entity entityB = (Entity)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
 			// normal points from A to B
 			Vector2D<float> normal = Vector2D(beginEvent->manifold.normal.x, beginEvent->manifold.normal.y);
@@ -106,8 +106,8 @@ namespace Engine
 			b2ShapeId shapeIdA = endEvent->shapeIdA;
 			b2ShapeId shapeIdB = endEvent->shapeIdB;
 
-			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
-			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
+			Entity entityA = (Entity)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+			Entity entityB = (Entity)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
 			// Process handlers
 			auto singleContactEventHandlerA = m_endSingleEntityContactCallbacks.find(SingleEntityEndContactKey(entityA));
@@ -138,8 +138,8 @@ namespace Engine
 			b2ShapeId shapeIdA = beginEvent->visitorShapeId;
 			b2ShapeId shapeIdB = beginEvent->sensorShapeId;
 
-			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
-			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
+			Entity entityA = (Entity)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+			Entity entityB = (Entity)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
 			// Process Event Handlers
 			auto singleSensorEventHandlerA = m_beginSingleEntitySensingCallbacks.find(SingleEntityBeginContactKey(entityA));
@@ -168,8 +168,8 @@ namespace Engine
 			b2ShapeId shapeIdA = endEvent->visitorShapeId;
 			b2ShapeId shapeIdB = endEvent->sensorShapeId;
 
-			Entity* entityA = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
-			Entity* entityB = (Entity*)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
+			Entity entityA = (Entity)b2Body_GetUserData(b2Shape_GetBody(shapeIdA));
+			Entity entityB = (Entity)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
 
 			// Process Event Handlers
@@ -193,9 +193,9 @@ namespace Engine
 		}
 	}
 
-	void ContactSystem::RegisterContactCallback(ContactType contactType, Entity* ptrEntityA, ContactCallback callback)
+	void ContactSystem::RegisterContactCallback(ContactType contactType, Entity entityA, ContactCallback callback)
 	{
-		PhysicsBody* ptrPhysicsBody = m_refECS.GetComponentManager<PhysicsBody>().GetComponent(ptrEntityA);
+		PhysicsBody* ptrPhysicsBody = m_refECS.GetComponent<PhysicsBody>(entityA);
 		if (ptrPhysicsBody == nullptr)
 		{
 			ENGINE_CRITICAL_D("Entity does not have a PhysicsBody component. Cannot register contact callback.");
@@ -217,24 +217,24 @@ namespace Engine
 		switch (contactType)
 		{
 		case BEGIN_CONTACT:
-			m_beginSingleEntityContactCallbacks.emplace(SingleEntityBeginContactKey(ptrEntityA), callback);
+			m_beginSingleEntityContactCallbacks.emplace(SingleEntityBeginContactKey(entityA), callback);
 			break;
 		case END_CONTACT:
-			m_endSingleEntityContactCallbacks.emplace(SingleEntityEndContactKey(ptrEntityA), callback);
+			m_endSingleEntityContactCallbacks.emplace(SingleEntityEndContactKey(entityA), callback);
 			break;
 		case BEGIN_SENSOR:
-			m_beginSingleEntitySensingCallbacks.emplace(SingleEntityBeginContactKey(ptrEntityA), callback);
+			m_beginSingleEntitySensingCallbacks.emplace(SingleEntityBeginContactKey(entityA), callback);
 			break;
 		case END_SENSOR:
-			m_endSingleEntitySensingCallbacks.emplace(SingleEntityEndContactKey(ptrEntityA), callback);
+			m_endSingleEntitySensingCallbacks.emplace(SingleEntityEndContactKey(entityA), callback);
 			break;
 		}
 	}
 
-	void ContactSystem::RegisterContactCallback(ContactType contactType, Entity* ptrEntityA, Entity* ptrEntityB, ContactCallback callback)
+	void ContactSystem::RegisterContactCallback(ContactType contactType, Entity entityA, Entity entityB, ContactCallback callback)
 	{
-		PhysicsBody* ptrPhysicsBodyA = m_refECS.GetComponentManager<PhysicsBody>().GetComponent(ptrEntityA);
-		PhysicsBody* ptrPhysicsBodyB = m_refECS.GetComponentManager<PhysicsBody>().GetComponent(ptrEntityB);
+		PhysicsBody* ptrPhysicsBodyA = m_refECS.GetComponent<PhysicsBody>(entityA);
+		PhysicsBody* ptrPhysicsBodyB = m_refECS.GetComponent<PhysicsBody>(entityB);
 		if (ptrPhysicsBodyA == nullptr || ptrPhysicsBodyB == nullptr)
 		{
 			ENGINE_CRITICAL_D("One or both entities do not have a PhysicsBody component. Cannot register contact callback.");
@@ -256,16 +256,16 @@ namespace Engine
 		switch (contactType)
 		{
 		case BEGIN_CONTACT:
-			m_beginMultiEntityContactCallbacks.emplace(MultiEntityBeginContactKey(ptrEntityA, ptrEntityB), callback);
+			m_beginMultiEntityContactCallbacks.emplace(MultiEntityBeginContactKey(entityA, entityB), callback);
 			break;
 		case END_CONTACT:
-			m_endMultiEntityContactCallbacks.emplace(MultiEntityEndContactKey(ptrEntityA, ptrEntityB), callback);
+			m_endMultiEntityContactCallbacks.emplace(MultiEntityEndContactKey(entityA, entityB), callback);
 			break;
 		case BEGIN_SENSOR:
-			m_beginMultiEntitySensingCallbacks.emplace(MultiEntityBeginContactKey(ptrEntityA, ptrEntityB), callback);
+			m_beginMultiEntitySensingCallbacks.emplace(MultiEntityBeginContactKey(entityA, entityB), callback);
 			break;
 		case END_SENSOR:
-			m_endMultiEntitySensingCallbacks.emplace(MultiEntityEndContactKey(ptrEntityA, ptrEntityB), callback);
+			m_endMultiEntitySensingCallbacks.emplace(MultiEntityEndContactKey(entityA, entityB), callback);
 			break;
 		}
 	}
@@ -283,4 +283,3 @@ namespace Engine
 		m_endMultiEntitySensingCallbacks.clear();
 	}
 }
-

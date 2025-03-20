@@ -1,82 +1,121 @@
 #pragma once
 
-#include "../Core.h"
 #include "../Includes.h"
-#include "Entity.h"
 #include "ComponentManager.h"
 
 namespace Engine
 {
-	using EntityID = size_t;
+	using Entity = size_t;
 
     class ECS
     {
     public:
-        void Initialize(size_t maxID) 
+        void Initialize(size_t numEntities) 
         {
-            m_maxID = maxID;
+			m_numEntities = numEntities;
         }
         
-        Entity* CreateEntity() 
+        Entity CreateEntity() 
         {
-            if (m_usedIDs.size() >= m_maxID + 1) 
+            if (m_usedIDs.size() >= m_numEntities) 
             {
                 throw std::runtime_error("Error: All IDs are taken.");
             }
 
-            for (size_t id = 0; id <= m_maxID; ++id) 
+            for (size_t id = 0; id < m_numEntities; ++id) 
             {
                 if (m_usedIDs.find(id) == m_usedIDs.end()) 
                 {
                     m_usedIDs.insert(id);
-                    Entity* ptrEntity = new Entity(id);
-                    return ptrEntity;
+                    return id;
                 }
             }
-
-            // This point should never be reached due to the earlier check
-            throw std::runtime_error("Error: Unable to generate a new ID.");
         }
 
-        void DestroyEntity(Entity* ptrEntity) 
-        {
-            // Ensure the entity is active
-            if (m_usedIDs.find(ptrEntity->GetID()) != m_usedIDs.end()) 
-            {
-                // Recycle the entity ID
-                releaseID(ptrEntity->GetID());
+		bool HasEntity(Entity entity)
+		{
+			return m_usedIDs.find(entity) != m_usedIDs.end();
+		}
 
-				for (auto& manager : m_componentManagers)
-				{
-					manager.second->DestroyComponent(ptrEntity);
-				}
-            }
-        }
+		template <typename T>
+		bool IsActive(Entity entity)
+		{
+			auto it = m_componentManagers.find(std::type_index(typeid(T)));
+			if (it != m_componentManagers.end())
+			{
+				return static_cast<ComponentManager<T>*>(it->second.get())->IsActive(entity);
+			}
+			return false;
+		}
 
 		template <typename T>
 		void RegisterComponentManager()
 		{
             m_componentManagers[std::type_index(typeid(T))] = std::make_unique<ComponentManager<T>>();
-			m_componentManagers[std::type_index(typeid(T))]->Allocate(m_maxID);
+			m_componentManagers[std::type_index(typeid(T))]->Allocate(m_numEntities);
+		}
+
+        template <typename T>
+		bool HasComponentManager()
+		{
+			return m_componentManagers.find(std::type_index(typeid(T))) != m_componentManagers.end();
+		}
+
+		template <typename T, typename... Args>
+		void AddComponent(Entity entity, Args&&... componentArgs)
+		{
+			if (m_usedIDs.find(entity) == m_usedIDs.end())
+				throw std::runtime_error("Error: Entity does not exist.");
+
+			static_cast<ComponentManager<T>*>(m_componentManagers[std::type_index(typeid(T))].get())->AddComponent(entity, std::forward<Args>(componentArgs)...);
 		}
 
         template <typename T, typename... Args>
-        void AddComponent(Entity* ptrEntity, Args&&... componentArgs)
+        void AddComponentSafe(Entity entity, Args&&... componentArgs)
         {
+			if (m_usedIDs.find(entity) == m_usedIDs.end())
+				throw std::runtime_error("Error: Entity does not exist.");
+
             auto it = m_componentManagers.find(std::type_index(typeid(T)));
             if (it != m_componentManagers.end())
             {
-                static_cast<ComponentManager<T>*>(it->second.get())->AddComponent(ptrEntity, std::forward<Args>(componentArgs)...);
+                static_cast<ComponentManager<T>*>(it->second.get())->AddComponent(entity, std::forward<Args>(componentArgs)...);
             }
+			else
+			{
+				throw std::runtime_error("Error: Component Manager not found.");
+			}
         }
 
 		template <typename T>
-		T* GetComponent (Entity* ptrEntity)
+		void DestroyComponent(Entity entity)
+		{
+			m_componentManagers[std::type_index(typeid(T))]->DestroyComponent(entity);
+		}
+
+        template <typename T>
+		void DestroyComponentSafe(Entity entity)
 		{
 			auto it = m_componentManagers.find(std::type_index(typeid(T)));
 			if (it != m_componentManagers.end())
 			{
-				return static_cast<ComponentManager<T>*>(it->second.get())->GetComponent(ptrEntity);
+				m_componentManagers[it]->DestroyComponent(entity);
+			}
+		}
+
+		template <typename T>
+		T* GetComponent(Entity entity)
+		{
+			return static_cast<ComponentManager<T>*>(m_componentManagers[std::type_index(typeid(T))].get())->GetComponent(entity);
+		}
+
+		template <typename T>
+		std::vector<T>& GetComponentSafe(Entity entity)
+		{
+			auto it = m_componentManagers.find(std::type_index(typeid(T)));
+			if (it != m_componentManagers.end())
+			{
+				return static_cast<ComponentManager<T>*>(it->second.get())->GetComponent(entity);
 			}
 			else
 			{
@@ -84,64 +123,114 @@ namespace Engine
 			}
 		}
 
-        template<typename T>
-		bool HasComponent(Entity* ptrEntity)
+		template<typename T>
+		bool HasComponent(Entity entity)
 		{
+			if (entity >= m_numEntities) // Component manager "HasComponent" will check an invalid index if entity too big.
+				throw std::runtime_error("Error: Entity does not exist.");
+
+			return m_componentManagers[std::type_index(typeid(T))]->HasComponent(entity);
+		}
+
+        template<typename T>
+		bool HasComponentSafe(Entity entity)
+		{
+			if (entity >= m_numEntities) // Component manager "HasComponent" will check an invalid index if entity too big.
+				throw std::runtime_error("Error: Entity does not exist.");
+
 			auto it = m_componentManagers.find(std::type_index(typeid(T)));
 			if (it != m_componentManagers.end())
 			{
-				return static_cast<ComponentManager<T>*>(it->second.get())->HasComponent(ptrEntity);
+				return m_componentManagers[it]->HasComponent(entity);
 			}
 			return false;
 		}
 
 		template<typename T>
-        ComponentManager<T>& GetComponentManager()
-        {
-            auto it = m_componentManagers.find(std::type_index(typeid(T)));
-            if (it != m_componentManagers.end())
-            {
-                return *static_cast<ComponentManager<T>*>(it->second.get());
+		std::vector<T>& GetHotComponents()
+		{
+			return static_cast<ComponentManager<T>*>(m_componentManagers[std::type_index(typeid(T))].get())->GetHotComponents();
+		}
+
+		template<typename T>
+		std::vector<T>& GetHotComponentsSafe()
+		{
+			auto it = m_componentManagers.find(std::type_index(typeid(T)));
+			if (it != m_componentManagers.end())
+			{
+				return static_cast<ComponentManager<T>*>(it->second.get())->GetHotComponents();
+			} 
+			else
+			{
+				throw std::runtime_error("Error: Component Manager not found.");
+			}
+		}
+
+		template<typename T>
+		size_t GetNumActiveComponents()
+		{
+			return m_componentManagers[std::type_index(typeid(T))]->GetNumActiveComponents();
+		}
+
+		template<typename T>
+		size_t GetNumActiveComponentsSafe()
+		{
+			auto it = m_componentManagers.find(std::type_index(typeid(T)));
+			if (it != m_componentManagers.end())
+			{
+				return m_componentManagers[it]->GetNumActiveComponents();
 			}
 			else
 			{
 				throw std::runtime_error("Error: Component Manager not found.");
 			}
-        }
+		}
         
-		void LoadEntities(std::vector<Entity*>& entities)
+		void ActivateEntities(std::vector<Entity>& entities)
 		{
 			for (auto& manager : m_componentManagers)
 			{
-				manager.second->LoadComponents(entities);
+				manager.second->ActivateComponents(entities);
 			}
 		}
 
-        void UnloadEntities()
+        void Activate(Entity entity)
         {
             for (auto& manager : m_componentManagers)
             {
-                manager.second->UnloadComponents();
+                manager.second->ActivateComponent(entity);
             }
         }
 
-		void ActivateEntities()
+		template<typename T>
+		void Activate(Entity entity)
 		{
-			for (auto& manager : m_componentManagers)
+			return m_componentManagers[std::type_index(typeid(T))]->ActivateComponent(entity);
+		}
+
+		template<typename T>
+		void ActivateSafe(Entity entity)
+		{
+			auto it = m_componentManagers.find(std::type_index(typeid(T)));
+			if (it != m_componentManagers.end())
 			{
-				manager.second->ActivateComponents();
+				m_componentManagers[it]->ActivateComponent(entity);
+			}
+			else
+			{
+				throw std::runtime_error("Error: Component Manager not found.");
 			}
 		}
 
-		void Activate(Entity* entity)
-		{
-			for (auto& manager : m_componentManagers)
-			{
-				manager.second->ActivateComponent(entity);
-			}
-		}
+        void DeactivateEntities()
+        {
+            for (auto& manager : m_componentManagers)
+            {
+                manager.second->DeactivateComponents();
+            }
+        }
 
-		void Deactivate(Entity* entity)
+		void Deactivate(Entity entity)
 		{
 			for (auto& manager : m_componentManagers)
 			{
@@ -149,23 +238,30 @@ namespace Engine
 			}
 		}
 
-        void DeactivateEntities()
+		template<typename T>
+		void Deactivate(Entity entity)
 		{
-			for (auto& manager : m_componentManagers)
+			return m_componentManagers[std::type_index(typeid(T))]->DeactivateComponent(entity);
+		}
+
+		template<typename T>
+		void DeactivateSafe(Entity entity)
+		{
+			auto it = m_componentManagers.find(std::type_index(typeid(T)));
+			if (it != m_componentManagers.end())
 			{
-				manager.second->DeactivateComponents();
+				m_componentManagers[it]->DeactivateComponent(entity);
+			}
+			else
+			{
+				throw std::runtime_error("Error: Component Manager not found.");
 			}
 		}
 
-		template <typename T>
-        void RemoveEntity(Entity* ptrEntity)
-        {
-            auto it = m_componentManagers.find(std::type_index(typeid(T)));
-            if (it != m_componentManagers.end())
-            {
-                static_cast<ComponentManager<T>*>(it->second.get())->RemoveComponent(ptrEntity);
-            }
-        }
+		size_t GetNumEntities() const
+		{
+			return m_usedIDs.size();
+		}
 
 		void Cleanup()
 		{
@@ -173,8 +269,7 @@ namespace Engine
         }
 
     private:
-        // These must be exposed through API so the client app shares the same objects.
-        EntityID m_maxID;
+        Entity m_numEntities = 0;
         std::unordered_set<size_t> m_usedIDs;
         std::unordered_map<std::type_index, std::unique_ptr<ComponentManagerBase>> m_componentManagers;
 

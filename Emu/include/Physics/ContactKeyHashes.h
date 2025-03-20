@@ -27,26 +27,26 @@ namespace Engine
 
 	struct SingleEntityBeginContactKey : public ContactKey
 	{
-		SingleEntityBeginContactKey(const Entity* entity)
-			: ContactKey(entity->GetID()) {}
+		SingleEntityBeginContactKey(const Entity entity)
+			: ContactKey(entity) {}
 	};
 
 	struct MultiEntityBeginContactKey : public ContactKey
 	{
-		MultiEntityBeginContactKey(const Entity* entity1, const Entity* entity2)
-			: ContactKey(GenerateKey(entity1->GetID(), entity2->GetID())) {}
+		MultiEntityBeginContactKey(const Entity entity1, const Entity entity2)
+			: ContactKey(GenerateKey(entity1, entity2)) {}
 	};
 
 	struct SingleEntityEndContactKey : public ContactKey
 	{
-		SingleEntityEndContactKey(const Entity* entity)
-			: ContactKey(entity->GetID()) {}
+		SingleEntityEndContactKey(const Entity entity)
+			: ContactKey(entity) {}
 	};
 
 	struct MultiEntityEndContactKey : public ContactKey
 	{
-		MultiEntityEndContactKey(const Entity* entity1, const Entity* entity2)
-			: ContactKey(GenerateKey(entity1->GetID(), entity2->GetID())) {}
+		MultiEntityEndContactKey(const Entity entity1, const Entity entity2)
+			: ContactKey(GenerateKey(entity1, entity2)) {}
 	};
 }
 namespace std
