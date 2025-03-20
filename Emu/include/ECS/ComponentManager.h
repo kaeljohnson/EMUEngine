@@ -17,22 +17,19 @@ namespace Engine
 		virtual void DeactivateComponents() = 0;
 		virtual void DeactivateComponent(Entity entity) = 0;
 		virtual void DestroyComponent(Entity entity) = 0;
+		virtual const size_t GetNumActiveComponents() const = 0;
+		virtual bool HasComponent(Entity entity) = 0;
+		virtual bool IsActive(Entity entity) = 0;
     };
 
     template <typename T>
     class ComponentManager : public ComponentManagerBase 
     {
     public:
-        using iterator = typename std::vector<T>::iterator;
-        using const_iterator = typename std::vector<T>::const_iterator;
 
-        // Iterator for hot components (begin to end)
-        auto begin() { return m_hotComponents.begin(); }
-        auto end() { return m_hotComponents.end(); }
-        auto begin() const { return m_hotComponents.begin(); }
-        auto end() const { return m_hotComponents.end(); }
-
-        // Adds to, or updates a component in, the components array.
+        // Adds to, or updates a component in, the components array. 
+        // If entities stay as being just size_t, this can't be called on any entity, must be 
+        // called on the ECS side so the ECS can verify the entity exists.
         template<typename... Args>
         void AddComponent(Args&&... args)
         {
@@ -41,7 +38,7 @@ namespace Engine
 
             if (m_components.count(entity) || m_hotIndices[entity] != INVALID_INDEX)
             {
-                return; // Component already exists. 
+				throw std::runtime_error("Error: Component already exists.");
             }
 
             m_components.emplace(entity, T(std::forward<Args>(args)...)); // Move it into the map
@@ -136,6 +133,7 @@ namespace Engine
             {
                 std::swap(m_hotComponents[index], m_hotComponents[lastIndex]);
                 m_hotEntities[index] = m_hotEntities[lastIndex];  // Swap the entity entity with the last one. No need to change last entity, as it will be popped.
+				m_hotIndices[m_hotEntities[index]] = index;
             }
 
             // Pop the last component in the hot array, as it's now deactivated
@@ -168,16 +166,24 @@ namespace Engine
             return m_hotIndices[entity] != INVALID_INDEX || m_components.contains(entity);
         }
 
+		bool IsActive(Entity entity) override
+		{
+			return m_hotIndices[entity] != INVALID_INDEX;
+		}
+
 		// Allocate memory for components and hot components array.
         void Allocate(size_t maxComponents) override
 		{
-            ENGINE_CRITICAL_D("Allocating " + std::to_string(maxComponents));
+            // ENGINE_CRITICAL_D("Allocating " + std::to_string(maxComponents));
 			m_hotComponents.reserve(maxComponents);
 			m_hotEntities.reserve(maxComponents);
             m_hotIndices.assign(maxComponents, INVALID_INDEX);
 
 			m_maxComponents = maxComponents;
 		}
+
+		const size_t GetNumActiveComponents() const override { return m_hotComponents.size(); }
+		std::vector<T>& GetHotComponents() { return m_hotComponents; }
 
     private:
 		std::unordered_map<size_t, T> m_components;             // Holds all components
@@ -187,7 +193,6 @@ namespace Engine
 
         // Temp for now, client needs to set size.
 		std::vector<size_t> m_hotIndices;                       // Maps entity entity to index in m_hotComponents. The "sparse set" array.
-		
 		std::vector<size_t> m_hotEntities;                      // Maps hot index to entity entity. The entity entity of each hot component in same order as hot component array.
 		std::vector<T> m_hotComponents;                         // Hot components. The "dense set" array.
     };

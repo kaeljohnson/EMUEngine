@@ -244,8 +244,8 @@ namespace Engine
 
 	void PhysicsSimulation::AddPhysicsBodiesToWorld()
 	{
-		ComponentManager<PhysicsBody>& physicsBodyManager = m_refECS.GetComponentManager<PhysicsBody>();
-		for (PhysicsBody& refPhysicsBody : physicsBodyManager)
+		std::vector<PhysicsBody>& hotPhysicsBodies = m_refECS.GetHotComponents<PhysicsBody>();
+		for (PhysicsBody& refPhysicsBody : hotPhysicsBodies)
 		{
 			b2BodyDef bodyDef = b2DefaultBodyDef();
 			b2ShapeDef shapeDef = b2DefaultShapeDef();
@@ -299,10 +299,9 @@ namespace Engine
 		b2World_Step(*m_ptrWorldId, Time::GetTimeStep(), 4);
 		m_contactSystem.ProcessContacts(m_ptrWorldId);
 
-		auto& physicsBodyManager = m_refECS.GetComponentManager<PhysicsBody>();
-		auto& transformManager = m_refECS.GetComponentManager<Transform>();
+		auto& hotPhysicsBodies = m_refECS.GetHotComponents<PhysicsBody>(); // Worth storing a ref to these at beginning of scene?
 
-		for (PhysicsBody& refPhysicsBody : physicsBodyManager) // Update physics bodies first since all bodies need updating but not all entities with bodies have transforms.
+		for (PhysicsBody& refPhysicsBody : hotPhysicsBodies) // Update physics bodies first since all bodies need updating but not all entities with bodies have transforms.
 		{
 			b2Vec2 position = b2Body_GetPosition(*refPhysicsBody.m_bodyId);
 			refPhysicsBody.m_position = Vector2D<float>(position.x - refPhysicsBody.m_halfDimensions.X, position.y - refPhysicsBody.m_halfDimensions.Y);
@@ -310,7 +309,7 @@ namespace Engine
 			b2Rot rotation = b2Body_GetRotation(*refPhysicsBody.m_bodyId);
 			refPhysicsBody.m_rotation = b2Rot_GetAngle(rotation) * 180.0f / 3.14159265359f;
 
-			if (Transform* ptrTransform = transformManager.GetComponent(refPhysicsBody.m_entity)) // Don't worry about transform being inactive as we already know its corresponding physics body is active.
+			if (Transform* ptrTransform = m_refECS.GetComponent<Transform>(refPhysicsBody.m_entity)) // Don't worry about transform being inactive as we already know its corresponding physics body is active.
 			{
 				ptrTransform->PrevPosition = ptrTransform->Position;
 				ptrTransform->Dimensions = refPhysicsBody.m_dimensions;
@@ -332,7 +331,7 @@ namespace Engine
 
 		b2DestroyWorld(*m_ptrWorldId);
 
-		for (PhysicsBody& refPhysicsBody : m_refECS.GetComponentManager<PhysicsBody>())
+		for (PhysicsBody& refPhysicsBody : m_refECS.GetHotComponents<PhysicsBody>())
 		{
 			refPhysicsBody.m_bodyId = nullptr;
 			refPhysicsBody.m_shapeId = nullptr;

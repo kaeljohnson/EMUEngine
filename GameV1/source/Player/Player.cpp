@@ -21,11 +21,11 @@
     	// m_physicsBody->SetStartingFriction(0.0f);
         Engine::EMU::GetInstance()->AddComponent<Engine::Transform>(entity,
             Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f);
-
-		Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsBody>(entity);
-
+        
+        
         Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsBody>(entity);
-		Engine::PhysicsInterface& refPhysicsInterface = Engine::EMU::GetInstance()->IPHYSICS();
+		
+        Engine::PhysicsInterface& refPhysicsInterface = Engine::EMU::GetInstance()->IPHYSICS();
         refPhysicsInterface.SetBodyType(entity, Engine::BodyType::DYNAMIC);
 		refPhysicsInterface.SetStartingPosition(entity, Engine::Vector2D<float>(startingX, startingY));
 		refPhysicsInterface.SetDimensions(entity, Engine::Vector2D<float>(width, height)); 

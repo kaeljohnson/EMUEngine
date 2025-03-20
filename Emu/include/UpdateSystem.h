@@ -15,7 +15,5 @@ namespace Engine
 		void Update();
 	private:
 		ECS& m_refECS;
-
-		ComponentManager<Updatable>& m_refUpdatableManager;
 	};
 }

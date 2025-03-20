@@ -110,3 +110,53 @@ project "GameV1"
     filter "configurations:Dist"
         optimize "On"
         defines { "NDEBUG" }
+
+
+project "EmuTests"
+    location "EmuTests"
+    kind "ConsoleApp"
+    language "C++"
+    staticruntime "off"
+
+    targetdir ("bin/" .. outputDirectory .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputDirectory .. "/%{prj.name}")
+
+    files
+    {
+        "%{prj.name}/**.h",
+        "%{prj.name}/**.cpp"
+    }
+
+    includedirs
+    {
+        "Emu/public",
+        "Emu/external/vcpkg/installed/x64-windows/include",
+    }
+
+    libdirs
+    {
+        "Emu/external/vcpkg/installed/x64-windows/lib",
+    }
+
+    links
+    {
+        "Emu",
+        "gtest",
+        "gtest_main"
+    }
+
+    filter "system:windows"
+        cppdialect "C++20"
+        systemversion "latest"
+
+    filter "configurations:Debug"
+        symbols "On"
+        defines { "DEBUG" }
+
+    filter "configurations:Release"
+        optimize "On"
+        defines { "NDEBUG" }
+
+    filter "configurations:Dist"
+        optimize "On"
+        defines { "NDEBUG" }

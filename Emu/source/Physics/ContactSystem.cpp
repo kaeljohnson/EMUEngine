@@ -11,7 +11,7 @@ namespace Engine
 	void ContactSystem::ProcessContacts(void* ptrWorldId)
 	{
 		// Process ContactComponents
-		for (SimpleContact& simpleContact : m_refECS.GetComponentManager<SimpleContact>())
+		for (SimpleContact& simpleContact : m_refECS.GetHotComponents<SimpleContact>())
 		{
 			simpleContact.m_contactAbove = false;
 			simpleContact.m_contactBelow = false;
@@ -20,7 +20,7 @@ namespace Engine
 
 			// Better way to access. Maybe can just store shapeId directly in SimpleContact component?
 			Entity entity = simpleContact.m_entity;
-			b2ShapeId* shapeId = m_refECS.GetComponentManager<PhysicsBody>().GetComponent(entity)->m_shapeId;
+			b2ShapeId* shapeId = m_refECS.GetComponent<PhysicsBody>(entity)->m_shapeId;
 
 			b2ContactData contactData[10];
 			int shapeContactCount = b2Shape_GetContactData(*shapeId, contactData, 10);
@@ -195,7 +195,7 @@ namespace Engine
 
 	void ContactSystem::RegisterContactCallback(ContactType contactType, Entity entityA, ContactCallback callback)
 	{
-		PhysicsBody* ptrPhysicsBody = m_refECS.GetComponentManager<PhysicsBody>().GetComponent(entityA);
+		PhysicsBody* ptrPhysicsBody = m_refECS.GetComponent<PhysicsBody>(entityA);
 		if (ptrPhysicsBody == nullptr)
 		{
 			ENGINE_CRITICAL_D("Entity does not have a PhysicsBody component. Cannot register contact callback.");
@@ -233,8 +233,8 @@ namespace Engine
 
 	void ContactSystem::RegisterContactCallback(ContactType contactType, Entity entityA, Entity entityB, ContactCallback callback)
 	{
-		PhysicsBody* ptrPhysicsBodyA = m_refECS.GetComponentManager<PhysicsBody>().GetComponent(entityA);
-		PhysicsBody* ptrPhysicsBodyB = m_refECS.GetComponentManager<PhysicsBody>().GetComponent(entityB);
+		PhysicsBody* ptrPhysicsBodyA = m_refECS.GetComponent<PhysicsBody>(entityA);
+		PhysicsBody* ptrPhysicsBodyB = m_refECS.GetComponent<PhysicsBody>(entityB);
 		if (ptrPhysicsBodyA == nullptr || ptrPhysicsBodyB == nullptr)
 		{
 			ENGINE_CRITICAL_D("One or both entities do not have a PhysicsBody component. Cannot register contact callback.");

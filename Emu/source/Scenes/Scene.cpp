@@ -40,7 +40,7 @@ namespace Engine
 		m_refECS.ActivateEntities(m_entities);
 
 		// Frame the first active camera
-		for (auto& camera : m_refECS.GetComponentManager<Camera>())
+		for (auto& camera : m_refECS.GetHotComponents<Camera>())
 		{
 			m_cameraSystem.Frame(camera, Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
 			break;

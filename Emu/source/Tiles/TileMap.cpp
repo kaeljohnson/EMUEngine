@@ -153,7 +153,7 @@ namespace Engine
 					Entity tile = m_refECS.CreateEntity();
 
                     m_refECS.AddComponent<PhysicsBody>(tile);
-                    PhysicsBody* ptrPhysicsBody = m_refECS.GetComponentManager<PhysicsBody>().GetComponent(tile);
+                    PhysicsBody* ptrPhysicsBody = m_refECS.GetComponent<PhysicsBody>(tile);
                     ptrPhysicsBody->m_bodyType = STATIC;
                     ptrPhysicsBody->m_dimensions =
                         Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile));
