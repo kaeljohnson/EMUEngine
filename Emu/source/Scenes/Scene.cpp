@@ -8,7 +8,7 @@
 #include "../../include/MathUtil.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Time.h"
-#include "../../include/GameState.h"
+#include "../../include/AppState.h"
 
 namespace Engine
 {
@@ -49,13 +49,13 @@ namespace Engine
 		// Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld();
 
-		GameState::IN_SCENE = true;
+		AppState::IN_SCENE = true;
 	}
 
 	void Scene::OnSceneEnd()
 	{
 		// Could be problematic if this is called mid frame.
-		GameState::IN_SCENE = false;
+		AppState::IN_SCENE = false;
 
 		m_physicsSimulation.Cleanup();
 

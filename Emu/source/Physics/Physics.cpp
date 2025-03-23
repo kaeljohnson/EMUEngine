@@ -230,7 +230,7 @@ namespace Engine
 
 	void PhysicsSimulation::UpdateGravity(const Vector2D<float> gravity)
 	{
-		if (GameState::IN_SCENE)
+		if (AppState::IN_SCENE)
 		{
 			b2WorldDef worldDef = b2DefaultWorldDef();
 			worldDef.gravity = { gravity.X, gravity.Y };
@@ -353,7 +353,7 @@ namespace Engine
 
 	void PhysicsInterface::DeactivateBody(Entity entity)
 	{
-		if (GameState::IN_SCENE)
+		if (AppState::IN_SCENE)
 		{
 			if (HasBody(entity))
 			{
@@ -365,7 +365,7 @@ namespace Engine
 
 	void PhysicsInterface::ActivateBody(Entity entity)
 	{
-		if (GameState::IN_SCENE)
+		if (AppState::IN_SCENE)
 		{
 			if (HasBody(entity))
 			{
