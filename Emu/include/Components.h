@@ -2,7 +2,7 @@
 
 #include "ECS/Component.h"
 #include "Physics/BodyTypes.h"
-#include "GameState.h"
+#include "AppState.h"
 #include "Includes.h"
 #include "MathUtil.h"
 #include "Core.h"

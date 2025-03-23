@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	SceneManager::SceneManager() : m_newSceneStarting(true), m_currentScene(nullptr)
+	SceneManager::SceneManager() : m_newSceneStarting(true), m_currentScene(nullptr), m_queuedSceneName(""), m_scenes()
 	{
 	}
 
@@ -32,7 +32,6 @@ namespace Engine
 		if (m_currentScene) { m_currentScene->OnSceneEnd(); }
 		m_currentScene = scene;
 		m_currentScene->OnScenePlay();
-		m_newSceneStarting = true;
 	}
 
 	void SceneManager::UnloadCurrentScene()
