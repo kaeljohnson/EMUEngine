@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ECS/Entity.h"
 #include "ECS/Component.h"
 #include "Physics/BodyTypes.h"
 #include "GameState.h"

@@ -2,11 +2,6 @@
 
 namespace Engine
 {
-	inline static float Lerp(float a, float b, float f)
-	{
-		return a + (b - a) * f;
-	}
-
 	template <typename T>
 	struct Vector2D
 	{
@@ -73,5 +68,15 @@ namespace Engine
 			return !(*this == other);
 		}
 	};
+
+	inline static float Lerp(float a, float b, float f)
+	{
+		return a + (b - a) * f;
+	}
+
+	inline static Vector2D<float> Lerp(Vector2D<float> a, Vector2D<float> b, float f)
+	{
+		return Vector2D<float>(Lerp(a.X, b.X, f), Lerp(a.Y, b.Y, f));
+	}
 
 }

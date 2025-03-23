@@ -3,7 +3,6 @@
 #include "../Core.h"
 #include "../MathUtil.h"
 #include "../ECS/ECS.h"
-#include "../ECS/Entity.h"
 #include "../Components.h"
 
 namespace Engine
