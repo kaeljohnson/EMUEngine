@@ -33,6 +33,7 @@ namespace Engine
 		{
 			if (m_sceneManager.IsNewSceneStarting())
 			{	
+				m_sceneManager.LoadQueuedScene();
 				m_sceneManager.NewSceneStarted();
 				m_ptrCurrentScene = m_sceneManager.GetCurrentScene();
 			}

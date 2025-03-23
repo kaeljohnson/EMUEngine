@@ -20,6 +20,8 @@ namespace Engine
 		~SceneManager() = default;
 
 		const bool IsNewSceneStarting() const { return m_newSceneStarting; }
+		void QueueNewScene(const std::string name) { m_newSceneStarting = true; m_queuedSceneName = name; }
+		void LoadQueuedScene() { LoadScene(m_queuedSceneName); }
 		void NewSceneStarted() { m_newSceneStarting = false; }
 		void Cleanup();
 
@@ -30,6 +32,7 @@ namespace Engine
 
 	private:
 		std::unordered_map<std::string, std::shared_ptr<Scene>> m_scenes;
+		std::string m_queuedSceneName;
 		std::shared_ptr<Scene> m_currentScene;
 		bool m_newSceneStarting;
 	};
