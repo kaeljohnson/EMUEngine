@@ -20,11 +20,10 @@ namespace Engine
 
             const float interpFactor = Engine::Time::GetInterpolationFactor();
 
-            float targetX = Engine::Lerp(ptrCameraTarget->PrevPosition.X, ptrCameraTarget->Position.X, interpFactor);
-            float targetY = Engine::Lerp(ptrCameraTarget->PrevPosition.Y, ptrCameraTarget->Position.Y, interpFactor);
+			Vector2D<float> target = Lerp(ptrCameraTarget->PrevPosition, ptrCameraTarget->Position, interpFactor);
 
-            camera.m_offset.X = targetX - (camera.m_size.X / 2.0f);
-            camera.m_offset.Y = targetY - (camera.m_size.Y / 2.0f);
+            camera.m_offset.X = target.X - (camera.m_size.X / 2.0f);
+            camera.m_offset.Y = target.Y - (camera.m_size.Y / 2.0f);
 
             if (camera.m_clampingOn) Clamp(camera);
         }
