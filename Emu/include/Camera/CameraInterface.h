@@ -12,7 +12,6 @@ namespace Engine
 	{
 	public:
 		EMU_API void Activate(Entity entity);
-		EMU_API void Deactivate(Entity entity);
 		EMU_API void SetPixelsPerUnit(Entity entity, const int pixelsPerUnit);
 		EMU_API const int GetPixelsPerUnit(Entity entity);
 		EMU_API void SetOffset(Entity entity, const Vector2D<float> offset);
@@ -31,5 +30,7 @@ namespace Engine
 
 	private:
 		ECS& m_refECS;
+
+		size_t m_activeCameraEntity;
 	};
 }

@@ -9,15 +9,16 @@ namespace Engine
 	void CameraInterface::Activate(Entity entity)
 	{
 		// Deactivate all other cameras
-	}
-
-	void CameraInterface::Deactivate(Entity entity)
-	{
-		// Deactivate camera.
+		if (m_activeCameraEntity != -1)
+		{
+			m_refECS.Deactivate(m_activeCameraEntity);
+		}
+		m_refECS.Activate(entity);
+		m_activeCameraEntity = entity;
 	}
 
 	CameraInterface::CameraInterface(ECS& refECS) : 
-		m_refECS(refECS) {}
+		m_refECS(refECS), m_activeCameraEntity(-1) {}
 
 	Camera* CameraInterface::GetCamera(Entity entity)
 	{
