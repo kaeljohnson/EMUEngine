@@ -70,6 +70,8 @@ namespace Engine
 		m_transformInterface.Activate(entity);
 		m_cameraInterface.Activate(entity);
 		m_updatableInterface.Activate(entity);
+
+		m_application.Activate(entity);
 	}
 
 	void EMU::Deactivate(Entity entity)
@@ -78,6 +80,8 @@ namespace Engine
 		m_physicsInterface.DeactivateBody(entity);
 		m_transformInterface.Deactivate(entity);
 		m_updatableInterface.Deactivate(entity);
+
+		m_application.Deactivate(entity);
 	}
 
 	void EMU::RegisterIOEventListener(IOEventType type, IOEventHandler handler)

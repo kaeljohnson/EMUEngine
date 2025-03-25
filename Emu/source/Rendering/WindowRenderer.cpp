@@ -72,6 +72,61 @@ namespace Engine
 		ENGINE_CRITICAL("Renderer created.");
 	}
 
+	void WindowRenderer::Initialize()
+	{
+		// Is there a better data structure than a vector for this?
+		m_sortedEntitiesToRender.clear();
+
+		// Get active transform components
+		auto& activeTransforms = m_refECS.GetHotComponents<Transform>();
+
+		// Reserve space to avoid unnecessary allocations
+		m_sortedEntitiesToRender.reserve(activeTransforms.size());
+
+		// Store entity IDs
+		for (const auto& transform : activeTransforms)
+		{
+			m_sortedEntitiesToRender.push_back(transform.m_entity);
+		}
+
+		// Sort entity IDs based on their Z-index in descending order
+		std::sort(m_sortedEntitiesToRender.begin(), m_sortedEntitiesToRender.end(),
+			[&](size_t entityA, size_t entityB)
+			{
+				const Transform* transformA = m_refECS.GetComponent<Transform>(entityA);
+				const Transform* transformB = m_refECS.GetComponent<Transform>(entityB);
+				return transformA->ZIndex > transformB->ZIndex; // Highest Z first
+			});
+	}
+
+	void WindowRenderer::Activate(Entity entity)
+	{
+		// Find the correct position using binary search
+		auto insertPos = std::lower_bound(
+			m_sortedEntitiesToRender.begin(), m_sortedEntitiesToRender.end(),
+			entity,
+			[&](size_t existingEntity, size_t newEntity)
+			{
+				return m_refECS.GetComponent<Transform>(existingEntity)->ZIndex >
+					m_refECS.GetComponent<Transform>(newEntity)->ZIndex;
+			});
+
+		// Insert the entity at the correct position
+		m_sortedEntitiesToRender.insert(insertPos, entity);
+	}
+
+	void WindowRenderer::Deactivate(Entity entity)
+	{
+		// Find the entity in the sorted list
+		auto it = std::find(m_sortedEntitiesToRender.begin(), m_sortedEntitiesToRender.end(), entity);
+
+		// Remove the entity from the sorted list
+		if (it != m_sortedEntitiesToRender.end())
+		{
+			m_sortedEntitiesToRender.erase(it);
+		}
+	}
+
 	void WindowRenderer::Render()
 	{
 		ClearScreen();
@@ -111,28 +166,45 @@ namespace Engine
 		float cameraTop = ptrCurrentCamera->m_offset.Y;
 		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->m_pixelsPerUnit);
 
-		auto& transformManager = m_refECS.GetHotComponents<Transform>();
+		// auto& transformManager = m_refECS.GetHotComponents<Transform>();
 
-		for (Transform& refTransform : transformManager)
+		for (Entity& entity : m_sortedEntitiesToRender)
 		{
-			float objectLeft = refTransform.Position.X;
-			float objectRight = objectLeft + refTransform.Dimensions.X;
-			float objectTop = refTransform.Position.Y;
-			float objectBottom = objectTop + refTransform.Dimensions.Y;
+			Transform* ptrTransform = m_refECS.GetComponent<Transform>(entity);
+
+			float objectLeft = ptrTransform->Position.X;
+			float objectRight = objectLeft + ptrTransform->Dimensions.X;
+			float objectTop = ptrTransform->Position.Y;
+			float objectBottom = objectTop + ptrTransform->Dimensions.Y;
 
 			bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
 				objectBottom >= cameraTop && objectTop <= cameraBottom;
 
 			if (isVisible)
 			{
-				Draw(refTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
+				Draw(*ptrTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
 			}
+
+			/*for (Transform& refTransform : transformManager)
+			{
+				float objectLeft = refTransform.Position.X;
+				float objectRight = objectLeft + refTransform.Dimensions.X;
+				float objectTop = refTransform.Position.Y;
+				float objectBottom = objectTop + refTransform.Dimensions.Y;
+
+				bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
+					objectBottom >= cameraTop && objectTop <= cameraBottom;
+
+				if (isVisible)
+				{
+					Draw(refTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
+				}
+			}*/
 		}
 
 		Display();
 	}
 
-	// Definition of render function for the RendererManager class. Takes a SDL_Rect reference which will be rendered.
 	void WindowRenderer::Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset)
 	{
 		const float interpolation = Time::GetInterpolationFactor();
