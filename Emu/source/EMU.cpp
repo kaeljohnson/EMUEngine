@@ -77,7 +77,6 @@ namespace Engine
 		m_ecs.Deactivate(entity);
 		m_physicsInterface.DeactivateBody(entity);
 		m_transformInterface.Deactivate(entity);
-		m_cameraInterface.Deactivate(entity);
 		m_updatableInterface.Deactivate(entity);
 	}
 
