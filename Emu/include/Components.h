@@ -28,9 +28,9 @@ namespace Engine
 		EMU_API Transform(Entity entity) : PrevPosition(0.0f, 0.0f), Position(0.0f, 0.0f),
 			Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1), ZIndex(0), Component(entity) {}
 
-		EMU_API Transform(Entity entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction) :
+		EMU_API Transform(Entity entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction, int zIndex) :
 			PrevPosition(position), Position(position),
-			Dimensions(dimensions), Rotation(rotation), Scale(scale), DirectionFacing(direction), ZIndex(0), Component(entity) {}
+			Dimensions(dimensions), Rotation(rotation), Scale(scale), DirectionFacing(direction), ZIndex(zIndex), Component(entity) {}
 
 		EMU_API ~Transform() = default;
 	};

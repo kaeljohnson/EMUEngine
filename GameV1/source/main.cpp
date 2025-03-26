@@ -26,7 +26,7 @@ int main(int argc, char* args[])
 	// ptrTestEntity->SetPriority(1);
 	scene->Add(testEntity);
 	engine->AddComponent<Engine::Transform>(testEntity,
-		Engine::Vector2D(12.0f, 12.0f), Engine::Vector2D(1.0f, 1.0f), 1.0f, 1.0f, 1.0f);
+		Engine::Vector2D(12.0f, 12.0f), Engine::Vector2D(1.0f, 1.0f), 1.0f, 1.0f, 1.0f, 2);
 
 	engine->AddComponent<Engine::PhysicsBody>(testEntity);
 	Engine::EMU::GetInstance()->IPHYSICS().SetBodyType(testEntity, Engine::BodyType::SENSOR);

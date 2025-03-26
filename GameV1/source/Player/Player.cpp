@@ -20,7 +20,7 @@
         // Need to have them be able to set this during construction of physics body.
     	// m_physicsBody->SetStartingFriction(0.0f);
         Engine::EMU::GetInstance()->AddComponent<Engine::Transform>(entity,
-            Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f);
+            Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f, 3);
         
         
         Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsBody>(entity);

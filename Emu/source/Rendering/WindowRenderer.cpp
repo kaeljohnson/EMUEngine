@@ -72,6 +72,8 @@ namespace Engine
 		ENGINE_CRITICAL("Renderer created.");
 	}
 
+	// The renderer being responbible for sorting the etities to render is not a modular design.
+	// Ideally, they are submitted to a render pipeline in the correct order but this will do for now.
 	void WindowRenderer::Initialize()
 	{
 		// Is there a better data structure than a vector for this?
