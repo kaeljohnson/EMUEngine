@@ -74,7 +74,7 @@ int main(int argc, char* args[])
 
 	engine->LoadScene("Level1");
 
-	AppManagementEventHandlers appManagementEventHandlers(playerEntity);
+	AppManagementEventHandlers appManagementEventHandlers(playerEntity, testEntity);
 
 	engine->RunApp();
 	// Need to figure out how to change scenes, stop scenes, etc.

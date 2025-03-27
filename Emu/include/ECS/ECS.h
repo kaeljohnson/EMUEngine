@@ -40,12 +40,7 @@ namespace Engine
 		template <typename T>
 		bool IsActive(Entity entity)
 		{
-			auto it = m_componentManagers.find(std::type_index(typeid(T)));
-			if (it != m_componentManagers.end())
-			{
-				return static_cast<ComponentManager<T>*>(it->second.get())->IsActive(entity);
-			}
-			return false;
+			return static_cast<ComponentManager<T>*>(m_componentManagers[std::type_index(typeid(T))].get())->IsActive(entity);
 		}
 
 		template <typename T>

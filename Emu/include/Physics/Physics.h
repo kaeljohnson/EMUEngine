@@ -8,6 +8,13 @@ struct b2WorldId;
 
 namespace Engine
 {
+	enum ContactFilters
+	{
+		NONE = 0x00000000, // No collision
+		ALL = 0x00000001,  // Collide with everything
+		PLAYER = 0x00000002,
+	};
+
 	// Global utility physics interface
 	class PhysicsInterface
 	{

@@ -285,6 +285,10 @@ namespace Engine
 			shapeDef.friction = 0.0f;
 			shapeDef.restitution = 0.0f;
 
+			// Set collision filters. Default to all for now.
+			shapeDef.filter.categoryBits = ALL;
+			shapeDef.filter.maskBits = ALL;
+
 			b2Polygon box = b2MakeBox(refPhysicsBody.m_halfDimensions.X, refPhysicsBody.m_halfDimensions.Y);
 			b2ShapeId shapeId = b2CreatePolygonShape(bodyId, &shapeDef, &box);
 
@@ -359,6 +363,12 @@ namespace Engine
 			{
 				PhysicsBody* ptrBody = GetBody(entity);
 				b2Body_SetAwake(*ptrBody->m_bodyId, false);
+
+				// Temp. Expensive
+				b2ShapeId shapeId = *ptrBody->m_shapeId;
+				b2Filter filter = b2Shape_GetFilter(shapeId);
+				filter.maskBits = 0;
+				b2Shape_SetFilter(shapeId, filter);
 			}
 		}
 	}
@@ -371,6 +381,12 @@ namespace Engine
 			{
 				PhysicsBody* ptrBody = GetBody(entity);
 				b2Body_SetAwake(*ptrBody->m_bodyId, true);
+
+				// Temp. Expensive
+				b2ShapeId shapeId = *ptrBody->m_shapeId;
+				b2Filter filter = b2Shape_GetFilter(shapeId);
+				filter.maskBits = ALL;
+				b2Shape_SetFilter(shapeId, filter);
 			}
 		}
 	}
