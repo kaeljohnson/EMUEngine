@@ -11,14 +11,16 @@ namespace Engine
 	class WindowRenderer
 	{
 	public:
-		// Client interface for now
+		WindowRenderer(ECS& refECS);
+		~WindowRenderer();
+
+		void Initialize();
+		void Activate(Entity entity);
+		void Deactivate(Entity entity);
+
 		void SetViewport();
 		void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
 		void ToggleFullscreen();
-
-	public: 
-		WindowRenderer(ECS& refECS);
-		~WindowRenderer();
 
 		void Render();
 		void Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset);
@@ -35,5 +37,7 @@ namespace Engine
 		bool m_rendererCreated;
 
 		ECS& m_refECS;
+
+		std::vector<Entity> m_sortedEntitiesToRender;
 	};
 }

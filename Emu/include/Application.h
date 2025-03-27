@@ -12,11 +12,14 @@ namespace Engine
 	class Application
 	{
 	public:
-		EMU_API Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem);
-		EMU_API void Start();
-		EMU_API void End();
+		Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem);
+		void Start();
+		void End();
 
-		EMU_API ~Application();
+		void Activate(Entity entity);
+		void Deactivate(Entity entity);
+
+		~Application();
 
 		// Deleted functions to ensure our app instance cannot be copied or moved.
 		Application(const Application&) = delete;
@@ -26,6 +29,8 @@ namespace Engine
 
 	private:
 		ECS& m_refECS;
+
+		// Engine should probably own this.
 		WindowRenderer m_windowRenderer;
 		
 		SceneManager& m_sceneManager;

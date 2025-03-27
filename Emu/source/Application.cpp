@@ -13,6 +13,16 @@ namespace Engine
 		m_sceneManager(refSceneManager), m_refIOEventSystem(refIOEventSystem)
 	{}
 
+	void Application::Activate(Entity entity)
+	{
+		m_windowRenderer.Activate(entity);
+	}
+
+	void Application::Deactivate(Entity entity)
+	{
+		m_windowRenderer.Deactivate(entity);
+	}
+
 	void Application::Start()
 	{
 		Time::SetAppRunning(true);
@@ -36,6 +46,7 @@ namespace Engine
 				m_sceneManager.LoadQueuedScene();
 				m_sceneManager.NewSceneStarted();
 				m_ptrCurrentScene = m_sceneManager.GetCurrentScene();
+				m_windowRenderer.Initialize();
 			}
 
 			m_refIOEventSystem.HandleEvents();

@@ -2,7 +2,6 @@
 
 #include "Core.h"
 #include "Application.h"
-#include "Rendering/WindowRenderer.h"
 #include "Scenes/SceneManager.h"
 #include "Events/IOEventSystem.h"
 #include "Physics/Physics.h"

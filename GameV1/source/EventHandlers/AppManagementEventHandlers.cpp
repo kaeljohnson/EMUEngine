@@ -5,7 +5,7 @@
 #include "../../include/EventHandlers/AppManagementEventHandlers.h"
 
 
-AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity playerEntity) 
+AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity playerEntity, Engine::Entity testEntity) 
 {
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::F_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
@@ -63,12 +63,12 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity playerEnti
 
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
-			Engine::EMU::GetInstance()->Deactivate(playerEntity);
+			Engine::EMU::GetInstance()->Deactivate(testEntity);
 		});
 
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_UP, [&](Engine::IOEvent& e)
 		{
-			Engine::EMU::GetInstance()->Activate(playerEntity);
+			Engine::EMU::GetInstance()->Activate(testEntity);
 		});
 	
 

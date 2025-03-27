@@ -69,7 +69,7 @@ namespace Engine
                     m_refECS.AddComponent<Transform>(tile,
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)), 
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
-                        1.0f, 1.0f, 1);
+                        1.0f, 1.0f, 1, 1);
 
                     m_refECS.AddComponent<PhysicsBody>(tile);
                     PhysicsBody* ptrPhysicsBody = m_refECS.GetComponent<PhysicsBody>(tile);
