@@ -8,6 +8,8 @@
 #include "../../include/Components.h"
 #include "../../include/Time.h"
 
+#include <chrono>
+
 namespace Engine
 {
 	bool Screen::WINDOW_RESIZE_REQUEST = false;
@@ -168,9 +170,11 @@ namespace Engine
 		float cameraTop = ptrCurrentCamera->m_offset.Y;
 		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->m_pixelsPerUnit);
 
-		// auto& transformManager = m_refECS.GetHotComponents<Transform>();
+		
+		auto start = std::chrono::high_resolution_clock::now();
 
-		for (Entity& entity : m_sortedEntitiesToRender)
+		// This is half as fast as below loop. Ordered by z index
+		/*for (Entity& entity : m_sortedEntitiesToRender)
 		{
 			Transform* ptrTransform = m_refECS.GetComponent<Transform>(entity);
 
@@ -186,23 +190,27 @@ namespace Engine
 			{
 				Draw(*ptrTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
 			}
+		}*/
 
-			/*for (Transform& refTransform : transformManager)
+		// This is twice as fast as above loop. Not ordered
+		auto& transformManager = m_refECS.GetHotComponents<Transform>();
+		for (Transform& refTransform : transformManager)
+		{
+			float objectLeft = refTransform.Position.X;
+			float objectRight = objectLeft + refTransform.Dimensions.X;
+			float objectTop = refTransform.Position.Y;
+			float objectBottom = objectTop + refTransform.Dimensions.Y;
+
+			bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
+				objectBottom >= cameraTop && objectTop <= cameraBottom;
+
+			if (isVisible)
 			{
-				float objectLeft = refTransform.Position.X;
-				float objectRight = objectLeft + refTransform.Dimensions.X;
-				float objectTop = refTransform.Position.Y;
-				float objectBottom = objectTop + refTransform.Dimensions.Y;
-
-				bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
-					objectBottom >= cameraTop && objectTop <= cameraBottom;
-
-				if (isVisible)
-				{
-					Draw(refTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
-				}
-			}*/
+				Draw(refTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
+			}
 		}
+		auto end = std::chrono::high_resolution_clock::now();
+		std::cout << "Rendering: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
 
 		Display();
 	}
