@@ -40,11 +40,10 @@ namespace Engine
 	}
 
 	// Scene management
-	std::shared_ptr<Scene> EMU::CreateScene(const std::string& name)
+	Scene& EMU::CreateScene(const std::string& name)
 	{
-		std::shared_ptr<Scene> scene = std::make_shared<Scene>(m_ecs);
-		m_sceneManager.AddScene(name, scene);
-		return scene;
+		m_sceneManager.AddScene(name, m_ecs);
+		return m_sceneManager.GetScene(name);
 	}
 
 	void EMU::LoadScene(const std::string& name)

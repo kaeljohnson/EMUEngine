@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Includes.h"
+#include "../ECS/ECS.h"
 #include "Scene.h"
 
 namespace Engine
@@ -8,13 +9,13 @@ namespace Engine
 	class SceneManager
 	{
 	public:
-		EMU_API void AddScene(std::string sceneName, std::shared_ptr<Scene> scene);
-		EMU_API void LoadScene(std::string sceneName);
-		EMU_API void LoadScene(std::shared_ptr<Scene> scene);
-		EMU_API void UnloadCurrentScene();
+		void AddScene(std::string sceneName, ECS& refECS);
+		void LoadScene(std::string sceneName);
+		void LoadScene(Scene& refScene);
+		void UnloadCurrentScene();
 
-		EMU_API inline std::shared_ptr<Scene> GetCurrentScene() const { return m_currentScene; };
-		EMU_API inline std::shared_ptr<Scene> GetScene(const std::string& sceneName) { return m_scenes[sceneName]; }
+		inline Scene* GetCurrentScene() const { return m_ptrCurrentScene; };
+		inline Scene& GetScene(const std::string& sceneName) { return m_scenes.at(sceneName); }
 	public:
 		SceneManager();
 		~SceneManager() = default;
@@ -31,9 +32,9 @@ namespace Engine
 		SceneManager& operator=(SceneManager&&) = delete;
 
 	private:
-		std::unordered_map<std::string, std::shared_ptr<Scene>> m_scenes;
+		std::unordered_map<std::string, Scene> m_scenes;
 		std::string m_queuedSceneName;
-		std::shared_ptr<Scene> m_currentScene;
+		Scene* m_ptrCurrentScene;
 		bool m_newSceneStarting;
 	};
 }

@@ -22,6 +22,8 @@ namespace Engine
 		void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
 		void ToggleFullscreen();
 
+		const float GetMonitorRefreshRate();
+
 		void Render();
 		void Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Display();

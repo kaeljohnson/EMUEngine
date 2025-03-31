@@ -24,7 +24,7 @@ namespace Engine
 	WindowRenderer::WindowRenderer(ECS& refECS) 
 		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS)
 	{
-		ENGINE_CRITICAL("Creating Renderer");
+		ENGINE_INFO_D("Creating Renderer");
 
 		if (m_rendererCreated)
 		{
@@ -43,12 +43,14 @@ namespace Engine
 			ENGINE_CRITICAL("Window not created! SDL_Error: " + std::string(ISDL::GetError()));
 		}
 
+		ENGINE_INFO_D("Window created!");
+
 		// Gotta be an easier way?
 		// Is there a way to get the full screen size without toggling fullscreen by default?
 		SDLDisplayMode displayMode;
 		if (ISDL::GetDesktopDisplayMode(0, &displayMode) != 0)
 		{
-			ENGINE_CRITICAL_D("Get desktop display mode failed: " + std::string(ISDL::GetError()));
+			ENGINE_CRITICAL("Get desktop display mode failed: " + std::string(ISDL::GetError()));
 		}
 
 		Screen::SCREEN_SIZE.X = displayMode.w;
@@ -57,7 +59,7 @@ namespace Engine
 
 		// Create renderer
 
-		// renderer = SDL_CREATE_RENDERER(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // rendering driver?
+		// m_ptrRenderer = SDL_CREATE_RENDERER(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // rendering driver?
 		m_ptrRenderer = ISDL::CreateRenderer((SDLWindow*)m_ptrWindow, -1, SDL_RENDERER_ACCELERATED);
 		if (m_ptrRenderer == nullptr)
 		{
@@ -171,7 +173,7 @@ namespace Engine
 		float cameraBottom = ptrCurrentCamera->m_offset.Y + (Screen::VIEWPORT_SIZE.Y / ptrCurrentCamera->m_pixelsPerUnit);
 
 		
-		auto start = std::chrono::high_resolution_clock::now();
+		// auto start = std::chrono::high_resolution_clock::now();
 
 		// This is half as fast as below loop. Ordered by z index
 		/*for (Entity& entity : m_sortedEntitiesToRender)
@@ -209,8 +211,8 @@ namespace Engine
 				Draw(refTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
 			}
 		}
-		auto end = std::chrono::high_resolution_clock::now();
-		std::cout << "Rendering: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
+		// auto end = std::chrono::high_resolution_clock::now();
+		// std::cout << "Rendering: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
 
 		Display();
 	}
@@ -222,24 +224,43 @@ namespace Engine
 		// The x, y, height, and width of the portion of the texture we want to render.
 		SDLRect src = { 0, 0, 0, 0 };
 
+		float lerpedX = Lerp(transform.PrevPosition.X, transform.Position.X, interpolation);
+		float lerpedY = Lerp(transform.PrevPosition.Y, transform.Position.Y, interpolation);
+
 		SDLRect dst
 		{
-			static_cast<int>(round((Lerp(transform.PrevPosition.X, transform.Position.X, 
-				interpolation) - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round((Lerp(transform.PrevPosition.Y, transform.Position.Y, 
-				interpolation) - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-
+			static_cast<int>(round((lerpedX - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((lerpedY - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 			static_cast<int>(round(transform.Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 			static_cast<int>(round(transform.Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
+			
 		};
+
+		/*SDL_Rect dst = 
+		{
+			static_cast<int>((transform.Position.X - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT),
+			static_cast<int>((transform.Position.Y - offset.Y)* pixelsPerUnit* Screen::SCALE_CONSTANT),
+			static_cast<int>(round(transform.Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round(transform.Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
+		};*/
+
+		/*SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, 255);
+		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &prevRect);*/
+
+
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 255, 255, 255);
+		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
+		// SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
 
 		ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
 
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
+
+		
+
 		// This should show the boundary of the physics body, not the texture.
 
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, 255);
-		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
+		
 	}
 
 	// Wrapper for SDL_RenderPresent. Talks to the actual hardwares renderer to display the renderer.
@@ -318,6 +339,20 @@ namespace Engine
 			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, Screen::SCREEN_SIZE.X / 2, Screen::SCREEN_SIZE.Y / 2);
 			ISDL::SetWindowPosition((SDLWindow*)m_ptrWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
+	}
+
+	const float WindowRenderer::GetMonitorRefreshRate()
+	{
+		// Get the current display mode of the window to find out the refresh rate.
+		SDLDisplayMode displayMode;
+		if (ISDL::GetDesktopDisplayMode(0, &displayMode) != 0)
+		{
+			ENGINE_ERROR("Could not get display mode: " + std::string(ISDL::GetError()));
+			return 60.0f; // Default to 60 if we can't get the refresh rate
+		}
+
+		// Return the refresh rate of the monitor
+		return static_cast<float>(displayMode.refresh_rate);
 	}
 
 	void WindowRenderer::free()

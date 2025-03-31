@@ -42,7 +42,13 @@ namespace Engine
 			m_bodyType(STATIC), m_dimensions(Vector2D<float>(1.0f, 1.0f)),
 			m_halfDimensions(Vector2D<float>(0.5f, 0.5f)), m_startingPosition(Vector2D<float>(1.0f, 1.0f)),
 			m_position(Vector2D<float>(0.0f, 0.0f)), m_rotation(0.0f),
-			m_gravityOn(true), Component(entity) {}
+			m_gravityOn(true), m_category(ALL), m_mask(ALL), Component(entity) {}
+
+		EMU_API PhysicsBody(Entity entity, Filter category, Filter mask) : m_bodyId(nullptr), m_shapeId(nullptr), m_worldId(nullptr),
+			m_bodyType(STATIC), m_dimensions(Vector2D<float>(1.0f, 1.0f)),
+			m_halfDimensions(Vector2D<float>(0.5f, 0.5f)), m_startingPosition(Vector2D<float>(1.0f, 1.0f)),
+			m_position(Vector2D<float>(0.0f, 0.0f)), m_rotation(0.0f),
+			m_gravityOn(true), m_category(category), m_mask(mask), Component(entity) {}
 
 		EMU_API ~PhysicsBody() = default;
 
@@ -51,6 +57,8 @@ namespace Engine
 		b2WorldId* m_worldId;
 
 		BodyType m_bodyType;
+		Filter m_category;
+		Filter m_mask;
 
 		Vector2D<float> m_dimensions;
 		Vector2D<float> m_halfDimensions;

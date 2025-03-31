@@ -66,7 +66,7 @@ namespace Engine
             return SDL_RenderCopy(renderer, texture, src, dest);
         }
 
-        static int RenderCopyEx(SDLRenderer* renderer, SDLTexture* texture, const SDLRect* src, const SDLRect* dest, double angle, const SDL_Point* center, SDL_RendererFlip flip) {
+        static int RenderCopyEx(SDLRenderer* renderer, SDLTexture* texture, const SDL_Rect* src, const SDL_Rect* dest, double angle, const SDL_Point* center, SDL_RendererFlip flip) {
             return SDL_RenderCopyEx(renderer, texture, src, dest, angle, center, flip);
         }
 

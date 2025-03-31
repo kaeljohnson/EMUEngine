@@ -23,7 +23,7 @@
             Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f, 3);
         
         
-        Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsBody>(entity);
+        Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsBody>(entity, Engine::PLAYER, Engine::ALL);
 		
         Engine::PhysicsInterface& refPhysicsInterface = Engine::EMU::GetInstance()->IPHYSICS();
         refPhysicsInterface.SetBodyType(entity, Engine::BodyType::DYNAMIC);

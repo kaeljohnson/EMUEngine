@@ -1,14 +1,9 @@
 #pragma once
 
 #include "../include/ISDL/ISDL.h"
-#include "../include/Init.h"
 #include "../include/Logging/Logger.h"
-#include "../include/ECS/ECS.h"
-#include "../include/Events/IOEventSystem.h"
-#include "../include/ECS/ComponentManager.h"
-#include "../include/Camera/CameraInterface.h"
-#include "../include/Components.h"
 #include "../include/EMU.h"
+#include "../include/Init.h"
 
 namespace Engine
 {

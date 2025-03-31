@@ -8,6 +8,7 @@ namespace Engine
 {
 	ContactSystem::ContactSystem(ECS& refECS) : m_refECS(refECS) {}
 
+	// This function is allocating memory dynamically. Why?
 	void ContactSystem::ProcessContacts(void* ptrWorldId)
 	{
 		// Process ContactComponents
