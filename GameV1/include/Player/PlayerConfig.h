@@ -3,7 +3,7 @@ const float X_DECELERATION = 15.0f;
 const float Y_DECELERATION = 0.0f;
 const float X_ACCELERATION = 50.0f;
 const float Y_ACCELERATION = 60.0f;
-const float X_MAX_VELOCITY = 10.0f;
+const float X_MAX_VELOCITY = 7.0f;
 const float Y_MAX_VELOCITY = 0.0f;
 
 const float MAX_JUMP_CHARGE = 11.0f;

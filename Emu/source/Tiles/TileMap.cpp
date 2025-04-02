@@ -71,16 +71,6 @@ namespace Engine
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
                         1.0f, 1.0f, 1, 1);
 
-                    m_refECS.AddComponent<PhysicsBody>(tile);
-                    PhysicsBody* ptrPhysicsBody = m_refECS.GetComponent<PhysicsBody>(tile);
-                    ptrPhysicsBody->m_bodyType = SENSOR;
-                    ptrPhysicsBody->m_dimensions = 
-                        Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile));
-					ptrPhysicsBody->m_halfDimensions = ptrPhysicsBody->m_dimensions * 0.5f;
-                    ptrPhysicsBody->m_startingPosition = 
-                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), 
-                            static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile));
-
 					tiles.push_back(tile);
 				}
 			}
@@ -152,14 +142,10 @@ namespace Engine
 
 					Entity tile = m_refECS.CreateEntity();
 
-                    m_refECS.AddComponent<PhysicsBody>(tile);
-                    PhysicsBody* ptrPhysicsBody = m_refECS.GetComponent<PhysicsBody>(tile);
-                    ptrPhysicsBody->m_bodyType = STATIC;
-                    ptrPhysicsBody->m_dimensions =
-                        Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile));
-                    ptrPhysicsBody->m_halfDimensions = ptrPhysicsBody->m_dimensions * 0.5f;
-                    ptrPhysicsBody->m_startingPosition = 
-                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile));
+                    m_refECS.AddComponent<PhysicsBody>(tile, STATIC, MAP, PLAYER, 
+                        Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)), 
+                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
+                        0.0f, true);
 
 					collisionBodyIDs.push_back(tile);
                 }

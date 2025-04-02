@@ -7,6 +7,8 @@
 #include "../../include/ECS/ECS.h"
 #include "../../include/Components.h"
 
+#include "../../include/Logging/Logger.h"
+
 namespace Engine
 {
     CameraSystem::CameraSystem(ECS& refECS) : m_refECS(refECS) {}
@@ -19,7 +21,7 @@ namespace Engine
             Engine::Transform* ptrCameraTarget = m_refECS.GetComponent<Transform>(camera.m_entity);
 
             const float interpFactor = Engine::Time::GetInterpolationFactor();
-
+            
 			Vector2D<float> target = Lerp(ptrCameraTarget->PrevPosition, ptrCameraTarget->Position, interpFactor);
 
             camera.m_offset.X = target.X - (camera.m_size.X / 2.0f);

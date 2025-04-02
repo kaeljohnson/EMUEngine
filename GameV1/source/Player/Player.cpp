@@ -23,12 +23,8 @@
             Engine::Vector2D(startingX, startingY), Engine::Vector2D(width, height), 1.0f, 1.0f, 1.0f, 3);
         
         
-        Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsBody>(entity);
-		
-        Engine::PhysicsInterface& refPhysicsInterface = Engine::EMU::GetInstance()->IPHYSICS();
-        refPhysicsInterface.SetBodyType(entity, Engine::BodyType::DYNAMIC);
-		refPhysicsInterface.SetStartingPosition(entity, Engine::Vector2D<float>(startingX, startingY));
-		refPhysicsInterface.SetDimensions(entity, Engine::Vector2D<float>(width, height)); 
+        Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsBody>(entity, Engine::BodyType::DYNAMIC, Engine::PLAYER, Engine::ALL,
+			Engine::Vector2D<float>(width, height), Engine::Vector2D<float>(startingX, startingY), 0.0f, true);
 
         Engine::EMU::GetInstance()->AddComponent<Engine::Updatable>(entity, [this]() { Update(); });
 

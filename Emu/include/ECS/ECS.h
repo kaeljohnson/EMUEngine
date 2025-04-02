@@ -30,6 +30,8 @@ namespace Engine
                     return id;
                 }
             }
+
+			return -1;
         }
 
 		bool HasEntity(Entity entity)

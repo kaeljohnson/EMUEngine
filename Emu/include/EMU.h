@@ -20,7 +20,8 @@ namespace Engine
 		EMU_API inline void EndApp() { m_application.End(); }
 
 		// Scene Management
-		EMU_API std::shared_ptr<Scene> CreateScene(const std::string& name);
+		EMU_API Scene& CreateScene(const std::string& name);
+		EMU_API Scene& GetScene(const std::string& name) { return m_sceneManager.GetScene(name); }
 		EMU_API void LoadScene(const std::string& name);
 		EMU_API void UnloadCurrentScene();
 

@@ -33,8 +33,8 @@ namespace Engine
 		// Engine should probably own this.
 		WindowRenderer m_windowRenderer;
 		
-		SceneManager& m_sceneManager;
-		std::shared_ptr<Scene> m_ptrCurrentScene;
+		SceneManager& m_refSceneManager;
+		Scene* m_ptrCurrentScene;
 		IOEventSystem& m_refIOEventSystem;
 	};
 }

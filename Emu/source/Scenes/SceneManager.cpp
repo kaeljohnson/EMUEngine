@@ -6,32 +6,31 @@
 
 namespace Engine
 {
-	SceneManager::SceneManager() : m_newSceneStarting(true), m_currentScene(nullptr), m_queuedSceneName(""), m_scenes()
+	SceneManager::SceneManager() : m_newSceneStarting(true), m_ptrCurrentScene(nullptr), m_queuedSceneName(""), m_scenes()
 	{
+		m_scenes.reserve(200);
 	}
 
-	void SceneManager::AddScene(std::string sceneName, std::shared_ptr<Scene> scene)
+	void SceneManager::AddScene(std::string sceneName, ECS& refECS)
 	{
-		m_scenes[sceneName] = scene;
+		m_scenes.emplace(std::piecewise_construct,
+			std::forward_as_tuple(sceneName),
+			std::forward_as_tuple(refECS));
 	}
 
 	void SceneManager::LoadScene(std::string sceneName)
 	{
-		if (m_scenes.find(sceneName) != m_scenes.end())
+		auto it = m_scenes.find(sceneName);
+		if (it != m_scenes.end())
 		{
-			LoadScene(m_scenes[sceneName]);
+			if (m_ptrCurrentScene) { m_ptrCurrentScene->OnSceneEnd(); }
+			m_ptrCurrentScene = &it->second;
+			m_ptrCurrentScene->OnScenePlay();
 		}
 		else
 		{
 			ENGINE_CRITICAL_D("Scene not found in SceneManager");
 		}
-	}
-
-	void SceneManager::LoadScene(std::shared_ptr<Scene> scene)
-	{
-		if (m_currentScene) { m_currentScene->OnSceneEnd(); }
-		m_currentScene = scene;
-		m_currentScene->OnScenePlay();
 	}
 
 	void SceneManager::UnloadCurrentScene()
@@ -46,7 +45,7 @@ namespace Engine
 	{
 		for (auto& scene : m_scenes)
 		{
-			scene.second->OnSceneEnd();
+			scene.second.OnSceneEnd();
 		}
 		m_scenes.clear();
 	}

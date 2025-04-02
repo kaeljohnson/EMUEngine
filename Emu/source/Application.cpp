@@ -8,9 +8,10 @@
 
 namespace Engine
 {
+
 	Application::Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem)
 		: m_refECS(refECS), m_ptrCurrentScene(nullptr), m_windowRenderer(refECS), 
-		m_sceneManager(refSceneManager), m_refIOEventSystem(refIOEventSystem)
+		m_refSceneManager(refSceneManager), m_refIOEventSystem(refIOEventSystem)
 	{}
 
 	void Application::Activate(Entity entity)
@@ -22,55 +23,51 @@ namespace Engine
 	{
 		m_windowRenderer.Deactivate(entity);
 	}
-
 	void Application::Start()
 	{
 		Time::SetAppRunning(true);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-		const float timeStep = Time::GetTimeStep();
+		const float timeStep = Time::GetTimeStep();       // How much time to simulate each frame (in seconds)
 
-		double currentTime = SDL_GetTicks() / 1000.0;
-		double accumulator = 0.0;
+		double currentTime = SDL_GetTicks64() / 1000.0;   // Get the current time in seconds
+		double accumulator = 0.0;                         // How much time has passed since the last update
 
 		double newTime = 0.0;
-		double frameTime = 0.0;
-		float interpolation = 0.0;
+		double frameTime = 0.0;                           // How much time has passed since the last frame. How fast the game is running.
+		float interpolation = 0.0;                        // How far between the last and current frame we are.
 
 		// Application loop.
 		while (Time::IsAppRunning())
 		{
-			if (m_sceneManager.IsNewSceneStarting())
+			if (m_refSceneManager.IsNewSceneStarting())
 			{	
-				m_sceneManager.LoadQueuedScene();
-				m_sceneManager.NewSceneStarted();
-				m_ptrCurrentScene = m_sceneManager.GetCurrentScene();
+				m_refSceneManager.LoadQueuedScene();
+				m_refSceneManager.NewSceneStarted();
+				m_ptrCurrentScene = m_refSceneManager.GetCurrentScene();
 				m_windowRenderer.Initialize();
 			}
 
 			m_refIOEventSystem.HandleEvents();
 			m_refIOEventSystem.ProcessEvents();
 
-			newTime = SDL_GetTicks() / 1000.0;
+			newTime = SDL_GetTicks64() / 1000.0;
 			frameTime = newTime - currentTime;
+
 			currentTime = newTime;
 
 			accumulator += frameTime;
 
 			while (accumulator >= timeStep)
 			{
-				m_ptrCurrentScene->UpdateScripts();
 				m_ptrCurrentScene->UpdatePhysics();
+				m_ptrCurrentScene->UpdateScripts();
 
 				accumulator -= timeStep;
-
-				// ENGINE_INFO_D("1");
 			}
 
-			// ENGINE_INFO_D("2");
-
-			Time::SetInterpolationFactor((float)accumulator / timeStep);
+			Time::SetInterpolationFactor(((float)accumulator / timeStep));
 
 			m_ptrCurrentScene->UpdateVisuals();
 			m_ptrCurrentScene->UpdateCamera();
@@ -79,7 +76,7 @@ namespace Engine
 
 			if (!Time::IsAppRunning())
 			{ 
-				m_sceneManager.Cleanup();
+				m_refSceneManager.Cleanup();
 			}
 		}
 	}
