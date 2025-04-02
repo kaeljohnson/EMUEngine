@@ -48,7 +48,6 @@ namespace Engine
 
 	void EMU::LoadScene(const std::string& name)
 	{
-		// m_sceneManager.LoadScene(name);
 		m_sceneManager.QueueNewScene(name);
 	}
 

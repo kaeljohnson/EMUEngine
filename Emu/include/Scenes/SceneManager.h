@@ -11,7 +11,6 @@ namespace Engine
 	public:
 		void AddScene(std::string sceneName, ECS& refECS);
 		void LoadScene(std::string sceneName);
-		void LoadScene(Scene& refScene);
 		void UnloadCurrentScene();
 
 		inline Scene* GetCurrentScene() const { return m_ptrCurrentScene; };

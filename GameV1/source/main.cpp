@@ -17,18 +17,13 @@ void* operator new(size_t size) {
 	void* ptr = malloc(size);
 	totalAllocated += size;
 	std::lock_guard<std::mutex> lock(allocMutex);
-	// allocationMap[ptr] = size;
-	std::cout << "Allocated " << size << "\n";// << " bytes at " << ptr << std::endl;
+	std::cout << "Allocated " << size << "\n";
 	return ptr;
 }
 
 void operator delete(void* ptr) noexcept {
 	std::lock_guard<std::mutex> lock(allocMutex);
-	// auto it = allocationMap.find(ptr);
-	//if (it != allocationMap.end()) {
 	std::cout << "Freed bytes from " << ptr << "\n";
-		// allocationMap.erase(it);
-	//}
 	free(ptr);
 }
 

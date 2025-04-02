@@ -29,18 +29,16 @@ namespace Engine
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-		const float timeStep = Time::GetTimeStep();		  // How much time to simulate each frame (in seconds)
+		const float timeStep = Time::GetTimeStep();       // How much time to simulate each frame (in seconds)
 
 		double currentTime = SDL_GetTicks64() / 1000.0;   // Get the current time in seconds
-		double accumulator = 0.0;						  // How much time has passed since the last update
+		double accumulator = 0.0;                         // How much time has passed since the last update
 
 		double newTime = 0.0;
 		double frameTime = 0.0;                           // How much time has passed since the last frame. How fast the game is running.
 		float interpolation = 0.0;                        // How far between the last and current frame we are.
 
 		// Application loop.
-		bool physicsUpdated = false; // Tracks whether physics was updated in this frame
-
 		while (Time::IsAppRunning())
 		{
 			if (m_refSceneManager.IsNewSceneStarting())
@@ -61,31 +59,16 @@ namespace Engine
 
 			accumulator += frameTime;
 
-			physicsUpdated = false; // Reset at the start of the loop
-
 			while (accumulator >= timeStep)
 			{
 				m_ptrCurrentScene->UpdatePhysics();
 				m_ptrCurrentScene->UpdateScripts();
 
 				accumulator -= timeStep;
-		
-				physicsUpdated = true; // Mark that physics was updated
-				// ENGINE_INFO_D("Physics updated!");
 			}
-			// ENGINE_INFO_D("Rendering");
-
-			// If physics was NOT updated and render is being called again, log a warning
-			static bool lastFramePhysicsUpdated = true;
-			if (!physicsUpdated && !lastFramePhysicsUpdated)
-			{
-				// ENGINE_WARN_D("Render called twice without a physics update!");
-			}
-			lastFramePhysicsUpdated = physicsUpdated;
 
 			Time::SetInterpolationFactor(((float)accumulator / timeStep));
 
-			// ENGINE_INFO_D("Interpolation Factor: " + std::to_string(Time::GetInterpolationFactor()));
 			m_ptrCurrentScene->UpdateVisuals();
 			m_ptrCurrentScene->UpdateCamera();
 
@@ -95,8 +78,6 @@ namespace Engine
 			{ 
 				m_refSceneManager.Cleanup();
 			}
-
-			// ENGINE_INFO_D("FPS: " + std::to_string(frameTime));
 		}
 	}
 

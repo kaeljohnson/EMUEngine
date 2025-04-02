@@ -236,21 +236,9 @@ namespace Engine
 			
 		};
 
-		/*SDL_Rect dst = 
-		{
-			static_cast<int>((transform.Position.X - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT),
-			static_cast<int>((transform.Position.Y - offset.Y)* pixelsPerUnit* Screen::SCALE_CONSTANT),
-			static_cast<int>(round(transform.Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round(transform.Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
-		};*/
-
-		/*SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, 255);
-		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &prevRect);*/
-
-
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 255, 255, 255);
-		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
-		// SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
+		// SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
+		SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
 
 		ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
 
