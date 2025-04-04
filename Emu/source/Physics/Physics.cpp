@@ -33,6 +33,11 @@ namespace Engine
 		GetBody(entity)->m_bodyType = type;
 	}
 
+	void PhysicsInterface::SetBodyType(PhysicsBody& body, const BodyType type)
+	{
+		body.m_bodyType = type;
+	}
+
 	void PhysicsInterface::SetDimensions(Entity entity, const Vector2D<float> dimensions)
 	{
 		PhysicsBody* ptrBody = GetBody(entity);
@@ -40,9 +45,20 @@ namespace Engine
 		ptrBody->m_halfDimensions = dimensions / 2.0f;
 	}
 
+	void PhysicsInterface::SetDimensions(PhysicsBody& body, const Vector2D<float> dimensions)
+	{
+		body.m_dimensions = dimensions;
+		body.m_halfDimensions = dimensions / 2.0f;
+	}
+
 	const Vector2D<float> PhysicsInterface::GetDimensions(Entity entity)
 	{
 		return GetBody(entity)->m_dimensions;
+	}
+
+	const Vector2D<float> PhysicsInterface::GetDimensions(PhysicsBody& body)
+	{
+		return body.m_dimensions;
 	}
 
 	PhysicsBody* PhysicsInterface::GetBody(Entity entity)
@@ -50,15 +66,20 @@ namespace Engine
 		return m_refECS.GetComponent<PhysicsBody>(entity);
 	}
 
-	SimpleContact* PhysicsInterface::GetSimpleContact(Entity entity)
+	/*SimpleContact* PhysicsInterface::GetSimpleContact(Entity entity)
 	{
 		return m_refECS.GetComponent<SimpleContact>(entity);
-	}
+	}*/
 
 	void PhysicsInterface::SetStartingPosition(Entity entity, Vector2D<float> position)
 	{
 		PhysicsBody* ptrBody = GetBody(entity);
 		ptrBody->m_startingPosition = position;
+	}
+
+	void PhysicsInterface::SetStartingPosition(PhysicsBody& body, Vector2D<float> position)
+	{
+		body.m_startingPosition = position;
 	}
 
 	void PhysicsInterface::SetPosition(Entity entity, Vector2D<float> position)
@@ -68,9 +89,21 @@ namespace Engine
 		b2Body_SetTransform(bodyId, b2Vec2(position.X, position.Y), rotation);
 	}
 
+	void PhysicsInterface::SetPosition(PhysicsBody& body, Vector2D<float> position)
+	{
+		b2BodyId bodyId = *body.m_bodyId;
+		b2Rot rotation = b2Body_GetRotation(bodyId);
+		b2Body_SetTransform(bodyId, b2Vec2(position.X, position.Y), rotation);
+	}
+
 	const Vector2D<float> PhysicsInterface::GetPosition(Entity entity)
 	{
 		return GetBody(entity)->m_position;
+	}
+
+	const Vector2D<float> PhysicsInterface::GetPosition(PhysicsBody& body)
+	{
+		return body.m_position;
 	}
 
 	const Vector2D<float> PhysicsInterface::GetTopLeftPosition(Entity entity)
@@ -80,15 +113,33 @@ namespace Engine
 		return Vector2D<float>(position.x - ptrBody->m_halfDimensions.X, position.y - ptrBody->m_halfDimensions.Y);
 	}
 
+	const Vector2D<float> PhysicsInterface::GetTopLeftPosition(PhysicsBody& body)
+	{
+		b2Vec2 position = b2Body_GetPosition(*body.m_bodyId);
+		return Vector2D<float>(position.x - body.m_halfDimensions.X, position.y - body.m_halfDimensions.Y);
+	}
+
 	void PhysicsInterface::ApplyForceToBody(Entity entity, Vector2D<float> force)
 	{
 		b2BodyId bodyId = *GetBody(entity)->m_bodyId;
 		b2Body_ApplyForceToCenter(bodyId, b2Vec2(force.X, force.Y), true);
 	}
 
+	void PhysicsInterface::ApplyForceToBody(PhysicsBody& refPhysicsBody, Vector2D<float> force)
+	{
+		b2BodyId bodyId = *refPhysicsBody.m_bodyId;
+		b2Body_ApplyForceToCenter(bodyId, b2Vec2(force.X, force.Y), true);
+	}
+
 	void PhysicsInterface::ApplyImpulseToBody(Entity entity, Vector2D<float> impulse)
 	{
 		b2BodyId bodyId = *GetBody(entity)->m_bodyId;
+		b2Body_ApplyLinearImpulseToCenter(bodyId, b2Vec2(impulse.X, impulse.Y), true);
+	}
+
+	void PhysicsInterface::ApplyImpulseToBody(PhysicsBody& body, Vector2D<float> impulse)
+	{
+		b2BodyId bodyId = *body.m_bodyId;
 		b2Body_ApplyLinearImpulseToCenter(bodyId, b2Vec2(impulse.X, impulse.Y), true);
 	}
 
@@ -102,11 +153,24 @@ namespace Engine
 
 	}
 
+	void PhysicsInterface::SetGravity(PhysicsBody& body, bool enabled)
+	{
+		body.m_gravityOn = enabled;
+		b2BodyId bodyId = *body.m_bodyId;
+		b2Body_SetGravityScale(bodyId, enabled ? 1.0f : 0.0f);
+	}
+
 	void PhysicsInterface::SetDeceleration(Entity entity, const float decel)
 	{
 		b2BodyId bodyId = *GetBody(entity)->m_bodyId;
 		b2Body_SetLinearDamping(bodyId, decel);
 
+	}
+
+	void PhysicsInterface::SetDeceleration(PhysicsBody& body, const float decel)
+	{
+		b2BodyId bodyId = *body.m_bodyId;
+		b2Body_SetLinearDamping(bodyId, decel);
 	}
 
 	void PhysicsInterface::SetVelocity(Entity entity, const Vector2D<float> velocity)
@@ -115,9 +179,22 @@ namespace Engine
 		b2Body_SetLinearVelocity(bodyId, b2Vec2(velocity.X, velocity.Y));
 	}
 
+	void PhysicsInterface::SetVelocity(PhysicsBody& body, const Vector2D<float> velocity)
+	{
+		b2BodyId bodyId = *body.m_bodyId;
+		b2Body_SetLinearVelocity(bodyId, b2Vec2(velocity.X, velocity.Y));
+	}
+
 	void PhysicsInterface::SetXVelocity(Entity entity, const float xVel)
 	{
 		b2BodyId bodyId = *GetBody(entity)->m_bodyId;
+		b2Vec2 velocity = b2Body_GetLinearVelocity(bodyId);
+		b2Body_SetLinearVelocity(bodyId, b2Vec2(xVel, velocity.y));
+	}
+
+	void PhysicsInterface::SetXVelocity(PhysicsBody& body, const float xVel)
+	{
+		b2BodyId bodyId = *body.m_bodyId;
 		b2Vec2 velocity = b2Body_GetLinearVelocity(bodyId);
 		b2Body_SetLinearVelocity(bodyId, b2Vec2(xVel, velocity.y));
 	}
@@ -129,9 +206,23 @@ namespace Engine
 		b2Body_SetLinearVelocity(bodyId, b2Vec2(velocity.x, yVel));
 	}
 
+	void PhysicsInterface::SetYVelocity(PhysicsBody& body, const float yVel)
+	{
+		b2BodyId bodyId = *body.m_bodyId;
+		b2Vec2 velocity = b2Body_GetLinearVelocity(bodyId);
+		b2Body_SetLinearVelocity(bodyId, b2Vec2(velocity.x, yVel));
+	}
+
 	const Vector2D<float> PhysicsInterface::GetVelocity(Entity entity)
 	{
 		b2BodyId bodyId = *GetBody(entity)->m_bodyId;
+		b2Vec2 velocity = b2Body_GetLinearVelocity(bodyId);
+		return Vector2D<float>(velocity.x, velocity.y);
+	}
+
+	const Vector2D<float> PhysicsInterface::GetVelocity(PhysicsBody& body)
+	{
+		b2BodyId bodyId = *body.m_bodyId;
 		b2Vec2 velocity = b2Body_GetLinearVelocity(bodyId);
 		return Vector2D<float>(velocity.x, velocity.y);
 	}
@@ -142,15 +233,33 @@ namespace Engine
 		b2Shape_SetRestitution(shapeId, restitution);
 	}
 
+	void PhysicsInterface::SetRestitution(PhysicsBody& body, const float restitution)
+	{
+		b2ShapeId shapeId = *body.m_shapeId;
+		b2Shape_SetRestitution(shapeId, restitution);
+	}
+
 	void PhysicsInterface::SetDensity(Entity entity, const float density)
 	{
 		b2ShapeId shapeId = *GetBody(entity)->m_shapeId;
 		b2Shape_SetDensity(shapeId, density, true);
 	}
 
+	void PhysicsInterface::SetDensity(PhysicsBody& body, const float density)
+	{
+		b2ShapeId shapeId = *body.m_shapeId;
+		b2Shape_SetDensity(shapeId, density, true);
+	}
+
 	void PhysicsInterface::SetFriction(Entity entity, const float friction)
 	{
 		b2ShapeId shapeId = *GetBody(entity)->m_shapeId;
+		b2Shape_SetFriction(shapeId, friction);
+	}
+
+	void PhysicsInterface::SetFriction(PhysicsBody& body, const float friction)
+	{
+		b2ShapeId shapeId = *body.m_shapeId;
 		b2Shape_SetFriction(shapeId, friction);
 	}
 
@@ -165,15 +274,39 @@ namespace Engine
 		ptrBody->m_worldId = nullptr;
 	}
 
+	void PhysicsInterface::RemoveBodyFromWorld(PhysicsBody& body)
+	{
+		if (body.m_bodyId == nullptr) return;
+
+		b2DestroyBody(*body.m_bodyId);
+		body.m_bodyId = nullptr;
+		body.m_shapeId = nullptr;
+		body.m_worldId = nullptr;
+	}
+
 	void PhysicsInterface::SetFixedRotation(Entity entity, bool fixed)
 	{
 		b2BodyId bodyId = *GetBody(entity)->m_bodyId;
 		b2Body_SetFixedRotation(bodyId, fixed);
 	}
 
+	void PhysicsInterface::SetFixedRotation(PhysicsBody& body, bool fixed)
+	{
+		b2BodyId bodyId = *body.m_bodyId;
+		b2Body_SetFixedRotation(bodyId, fixed);
+	}
+
 	const float PhysicsInterface::GetAngleInRadians(Entity entity)
 	{
 		b2BodyId bodyId = *GetBody(entity)->m_bodyId;
+		b2Rot rotation = b2Body_GetRotation(bodyId);
+		float angleInRadians = b2Rot_GetAngle(rotation);
+		return angleInRadians;
+	}
+
+	const float PhysicsInterface::GetAngleInRadians(PhysicsBody& body)
+	{
+		b2BodyId bodyId = *body.m_bodyId;
 		b2Rot rotation = b2Body_GetRotation(bodyId);
 		float angleInRadians = b2Rot_GetAngle(rotation);
 		return angleInRadians;
@@ -188,28 +321,56 @@ namespace Engine
 
 	}
 
+	const float PhysicsInterface::GetAngleInDegrees(PhysicsBody& body)
+	{
+		b2BodyId bodyId = *body.m_bodyId;
+		b2Rot rotation = b2Body_GetRotation(bodyId);
+		float angleInRadians = b2Rot_GetAngle(rotation);
+		return angleInRadians * 180.0f / 3.14159265359f;
+	}
+
 	const bool PhysicsInterface::HasContactBelow(Entity entity)
 	{
-		SimpleContact* ptrBody = GetSimpleContact(entity);
+		PhysicsBody* ptrBody = GetBody(entity);
 		return ptrBody->m_contactBelow;
+	}
+
+	const bool PhysicsInterface::HasContactBelow(PhysicsBody& body)
+	{
+		return body.m_contactBelow;
 	}
 
 	const bool PhysicsInterface::HasContactAbove(Entity entity)
 	{
-		SimpleContact* ptrBody = GetSimpleContact(entity);
+		PhysicsBody* ptrBody = GetBody(entity);
 		return ptrBody->m_contactAbove;
+	}
+
+	const bool PhysicsInterface::HasContactAbove(PhysicsBody& body)
+	{
+		return body.m_contactAbove;
 	}
 
 	const bool PhysicsInterface::HasContactLeft(Entity entity)
 	{
-		SimpleContact* ptrBody = GetSimpleContact(entity);
+		PhysicsBody* ptrBody = GetBody(entity);
 		return ptrBody->m_contactLeft;
+	}
+
+	const bool PhysicsInterface::HasContactLeft(PhysicsBody& body)
+	{
+		return body.m_contactLeft;
 	}
 
 	const bool PhysicsInterface::HasContactRight(Entity entity)
 	{
-		SimpleContact* ptrBody = GetSimpleContact(entity);
+		PhysicsBody* ptrBody = GetBody(entity);
 		return ptrBody->m_contactRight;
+	}
+
+	const bool PhysicsInterface::HasContactRight(PhysicsBody& body)
+	{
+		return body.m_contactRight;
 	}
 
 	// Physics Simulation
@@ -298,6 +459,57 @@ namespace Engine
 		}
 	}
 
+	void PhysicsSimulation::ProcessSimpleContacts(PhysicsBody& refPhysicsBody)
+	{
+		refPhysicsBody.m_contactAbove = false;
+		refPhysicsBody.m_contactBelow = false;
+		refPhysicsBody.m_contactLeft = false;
+		refPhysicsBody.m_contactRight = false;
+
+		// Better way to access. Maybe can just store shapeId directly in SimpleContact component?
+		Entity entity = refPhysicsBody.m_entity;
+		b2ShapeId* shapeId = m_refECS.GetComponent<PhysicsBody>(entity)->m_shapeId;
+
+		b2ContactData contactData[10];
+		int shapeContactCount = b2Shape_GetContactData(*shapeId, contactData, 10);
+
+		for (int i = 0; i < shapeContactCount; ++i)
+		{
+			b2ContactData* contact = contactData + i;
+
+			float normalDirection = 1.0f;
+
+			if ((Entity)b2Body_GetUserData(b2Shape_GetBody(contact->shapeIdB)) == entity)
+			{
+				normalDirection = -1.0f;
+			}
+
+			b2Vec2 normal = contact->manifold.normal * normalDirection;
+
+			if (normal.y < -0.5) // Collision from above `this`
+			{
+				// ENGINE_CRITICAL_D("Contact Above!");
+				refPhysicsBody.m_contactAbove = true;
+			}
+			else if (normal.y > 0.5) // Collision from below `this`
+			{
+				// ENGINE_CRITICAL_D("Contact Below!");
+				refPhysicsBody.m_contactBelow = true;
+			}
+			
+			if (normal.x > 0.5) // Collision from the Right of `this`
+			{
+				// ENGINE_CRITICAL_D("Contact Right!");
+				refPhysicsBody.m_contactRight = true;
+			}
+			else if (normal.x < -0.5) // Collision from the Left of `this`
+			{
+				// ENGINE_CRITICAL_D("Contact Left!");
+				refPhysicsBody.m_contactLeft = true;
+			}
+		}
+	}
+
 	void PhysicsSimulation::Update()
 	{
 		b2World_Step(*m_ptrWorldId, Time::GetTimeStep(), 4);
@@ -307,6 +519,8 @@ namespace Engine
 
 		for (PhysicsBody& refPhysicsBody : hotPhysicsBodies) // Update physics bodies first since all bodies need updating but not all entities with bodies have transforms.
 		{
+			if (refPhysicsBody.m_checkSimpleContacts) ProcessSimpleContacts(refPhysicsBody);
+
 			b2Vec2 position = b2Body_GetPosition(*refPhysicsBody.m_bodyId);
 			refPhysicsBody.m_position = Vector2D<float>(position.x - refPhysicsBody.m_halfDimensions.X, position.y - refPhysicsBody.m_halfDimensions.Y);
 
@@ -320,6 +534,11 @@ namespace Engine
 				ptrTransform->Position = refPhysicsBody.m_position;
 				ptrTransform->Rotation = refPhysicsBody.m_rotation;
 			}
+
+			// Is this the best place for this?
+			PhysicsUpdater* ptrPhysicsUpdater = m_refECS.GetComponent<PhysicsUpdater>(refPhysicsBody.m_entity);
+			if (ptrPhysicsUpdater)
+				ptrPhysicsUpdater->Update(refPhysicsBody);
 		}
 	}
 

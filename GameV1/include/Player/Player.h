@@ -57,7 +57,7 @@ public:
 	Player(Engine::Entity entity, const float startingX, const float startingY,
 		const float width, const float height);
 	~Player() = default;
-	void Update();
+	void Update(Engine::PhysicsBody& refPhysicsBody);
 	void OnBeginContact(Engine::BeginContact beginContact);
 	void OnEndContact(Engine::EndContact ptrEntity);
 	void OnBeginSensing(Engine::BeginSensing beginSensing);
@@ -86,8 +86,8 @@ private:
 	Engine::IOEventType m_moveRightKeyUp;
 
 private:
-	void UpdateMovement();
-	void TransitionToState(PlayerState newState);
+	void UpdateMovement(Engine::PhysicsBody& refPhysicsBody);
+	void TransitionToState(Engine::PhysicsBody& refPhysicsBody, PlayerState newState);
 
 	void beginIdle();
 	void updateIdle();

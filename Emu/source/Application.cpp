@@ -41,6 +41,7 @@ namespace Engine
 		// Application loop.
 		while (Time::IsAppRunning())
 		{
+			// auto start = std::chrono::high_resolution_clock::now();
 			if (m_refSceneManager.IsNewSceneStarting())
 			{	
 				m_refSceneManager.LoadQueuedScene();
@@ -62,7 +63,6 @@ namespace Engine
 			while (accumulator >= timeStep)
 			{
 				m_ptrCurrentScene->UpdatePhysics();
-				m_ptrCurrentScene->UpdateScripts();
 
 				accumulator -= timeStep;
 			}
@@ -78,6 +78,9 @@ namespace Engine
 			{ 
 				m_refSceneManager.Cleanup();
 			}
+			// auto end = std::chrono::high_resolution_clock::now();
+			// std::chrono::duration<double, std::milli> elapsed = end - start;
+			// std::cout << "Frame time: " << elapsed.count() << " ms\n";
 		}
 	}
 

@@ -25,11 +25,11 @@ namespace Engine
 	{
 		m_ecs.Initialize(numEntities);
 
-		m_ecs.RegisterComponentManager<Updatable>();
+		m_ecs.RegisterComponentManager<PhysicsUpdater>();
+		m_ecs.RegisterComponentManager<CameraUpdater>();
 		m_ecs.RegisterComponentManager<PhysicsBody>();
 		m_ecs.RegisterComponentManager<Transform>();
 		m_ecs.RegisterComponentManager<Camera>();
-		m_ecs.RegisterComponentManager<SimpleContact>();
 
 		m_ioEventSystem.Initialize();
 	}

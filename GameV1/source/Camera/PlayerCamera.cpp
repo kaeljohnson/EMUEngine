@@ -12,76 +12,89 @@ PlayerCamera::PlayerCamera(Engine::Entity entity) :
     // Combine this whole class into player class.
 
 	Engine::EMU::GetInstance()->AddComponent<Engine::Camera>(m_entity);
-    // Engine::EMU::GetInstance()->IECS().AddComponent<Engine::Updatable>(ptrEntity, [this]() { Update(); });
+    Engine::EMU::GetInstance()->AddComponent<Engine::CameraUpdater>(m_entity, [this](Engine::Camera& refCamera) { Update(refCamera); });
 
     // playerCamera->SetPixelsPerUnit(32);
 	Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(m_entity, 32);
 }
 
-void PlayerCamera::Update()
+void PlayerCamera::Update(Engine::Camera& refCamera)
 {
-	// Engine::Transform* ptrCameraTarget = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Transform>().GetComponent(m_entity);
-	Engine::TransformInterface& refTransformInterface = Engine::EMU::GetInstance()->ITRANSFORMS();
-	// Engine::Camera* ptrCamera = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(m_entity);
+    // CAMERA UPDATES
+    Engine::TransformInterface& refTransformInterface = Engine::EMU::GetInstance()->ITRANSFORMS();
 
-	Engine::Vector2D<float> targetPrevPosition = refTransformInterface.GetPrevPosition(m_entity);
-	Engine::Vector2D<float> targetPosition = refTransformInterface.GetPosition(m_entity);
-    Engine::Vector2D<float> target = Engine::Lerp(targetPrevPosition, targetPosition, Engine::Time::GetInterpolationFactor());
+    const float interpFactor = Engine::Time::GetInterpolationFactor();
 
+	const Engine::Vector2D<float> targetPrevPosition = refTransformInterface.GetPrevPosition(refCamera.m_entity);
+	const Engine::Vector2D<float> targetPosition = refTransformInterface.GetPosition(refCamera.m_entity);
 
-	Engine::CameraInterface& refCameraInterface = Engine::EMU::GetInstance()->ICAMERA();
-    const Engine::Vector2D<float> cameraSize = refCameraInterface.GetSize(m_entity);
-	Engine::EMU::GetInstance()->ICAMERA().SetOffsets(m_entity, 
-        Engine::Vector2D<float>(target.X - (cameraSize.X / 2.0f), target.Y - (cameraSize.Y / 2.0f)));
+    Engine::Vector2D<float> target = Engine::Lerp(targetPrevPosition, targetPosition, interpFactor);
 
-    // if (ptrCamera->m_clampingOn) ptrCamera->Clamp(); Engine willhandle clamping.
+    refCamera.m_offset.X = target.X - (refCamera.m_size.X / 2.0f);
+    refCamera.m_offset.Y = target.Y - (refCamera.m_size.Y / 2.0f);
 
     return;
 
     // DEAD CODE FOR NOW
 
-    float desiredLookAhead = refTransformInterface.GetDirectionFacing(m_entity) * m_lookAheadFactor;
+	// Engine::Transform* ptrCameraTarget = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Transform>().GetComponent(m_entity);
+	// Engine::TransformInterface& refTransformInterface = Engine::EMU::GetInstance()->ITRANSFORMS();
+	// Engine::Camera* ptrCamera = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(m_entity);
 
-    // Calculate the difference between the current and desired look-ahead
-    float lookAheadDifference = desiredLookAhead - m_lookAhead;
+	//Engine::Vector2D<float> targetPrevPosition = refTransformInterface.GetPrevPosition(m_entity);
+	//Engine::Vector2D<float> targetPosition = refTransformInterface.GetPosition(m_entity);
+ //   Engine::Vector2D<float> target = Engine::Lerp(targetPrevPosition, targetPosition, Engine::Time::GetInterpolationFactor());
 
-    // Calculate the step to move towards the desired look-ahead, ensuring we don't overshoot
-    m_lookAheadChangeSpeed = 0.005f / Engine::Screen::GetScale().X;
 
-    float lookAheadStep = std::min(std::abs(lookAheadDifference), m_lookAheadChangeSpeed * Engine::Time::GetInterpolationFactor());
-    lookAheadStep *= (lookAheadDifference > 0) ? 1 : -1; // Ensure the step has the correct direction
+	//Engine::CameraInterface& refCameraInterface = Engine::EMU::GetInstance()->ICAMERA();
+ //   const Engine::Vector2D<float> cameraSize = refCameraInterface.GetSize(m_entity);
+	//Engine::EMU::GetInstance()->ICAMERA().SetOffsets(m_entity, 
+ //       Engine::Vector2D<float>(target.X - (cameraSize.X / 2.0f), target.Y - (cameraSize.Y / 2.0f)));
 
-    // Update the look-ahead
-    m_lookAhead += lookAheadStep;
+ //   // if (ptrCamera->m_clampingOn) ptrCamera->Clamp(); Engine willhandle clamping.
 
-    target.X += m_lookAhead;
+ //   float desiredLookAhead = refTransformInterface.GetDirectionFacing(m_entity) * m_lookAheadFactor;
 
-    // Desired camera position based on the target's position
-    float desiredCameraTopLeftX = target.X - (cameraSize.X / 2.0f);
-    float desiredCameraTopLeftY = target.Y - (cameraSize.Y / 2.0f);
+ //   // Calculate the difference between the current and desired look-ahead
+ //   float lookAheadDifference = desiredLookAhead - m_lookAhead;
 
-    const Engine::Vector2D<float> cameraOffset = refCameraInterface.GetOffset(m_entity);
+ //   // Calculate the step to move towards the desired look-ahead, ensuring we don't overshoot
+ //   m_lookAheadChangeSpeed = 0.005f / Engine::Screen::GetScale().X;
 
-	refCameraInterface.SetOffsets(m_entity, Engine::Vector2D<float>(desiredCameraTopLeftX - cameraOffset.X, cameraOffset.Y));
+ //   float lookAheadStep = std::min(std::abs(lookAheadDifference), m_lookAheadChangeSpeed * Engine::Time::GetInterpolationFactor());
+ //   lookAheadStep *= (lookAheadDifference > 0) ? 1 : -1; // Ensure the step has the correct direction
 
-    if (target.Y > cameraOffset.Y + ((cameraSize.Y) * m_bottomTargetScreenBound))
-    {
-		refCameraInterface.SetOffsets(m_entity, Engine::Vector2D<float>(cameraOffset.X, target.Y - ((cameraSize.Y) * m_bottomTargetScreenBound)));
-    }
-    else if (target.Y < cameraOffset.Y + ((cameraSize.Y)*m_topTargetScreenBound))
-    {
-		refCameraInterface.SetOffsets(m_entity, Engine::Vector2D<float>(cameraOffset.X, target.Y - ((cameraSize.Y) * m_topTargetScreenBound)));
-    }
-    else if (m_smoothingOn)
-    {
-		// Smoothly move the camera towards the desired position
-        refCameraInterface.SetOffsets(m_entity, 
-            Engine::Vector2D<float>(cameraOffset.X, (desiredCameraTopLeftY - cameraOffset.Y) * (m_smoothingFactor / Engine::Screen::GetScale().Y)));
-    }
-    else
-    {
-		refCameraInterface.SetOffsets(m_entity, Engine::Vector2D<float>(cameraOffset.X, desiredCameraTopLeftY));
-    }
+ //   // Update the look-ahead
+ //   m_lookAhead += lookAheadStep;
+
+ //   target.X += m_lookAhead;
+
+ //   // Desired camera position based on the target's position
+ //   float desiredCameraTopLeftX = target.X - (cameraSize.X / 2.0f);
+ //   float desiredCameraTopLeftY = target.Y - (cameraSize.Y / 2.0f);
+
+ //   const Engine::Vector2D<float> cameraOffset = refCameraInterface.GetOffset(m_entity);
+
+	//refCameraInterface.SetOffsets(m_entity, Engine::Vector2D<float>(desiredCameraTopLeftX - cameraOffset.X, cameraOffset.Y));
+
+ //   if (target.Y > cameraOffset.Y + ((cameraSize.Y) * m_bottomTargetScreenBound))
+ //   {
+	//	refCameraInterface.SetOffsets(m_entity, Engine::Vector2D<float>(cameraOffset.X, target.Y - ((cameraSize.Y) * m_bottomTargetScreenBound)));
+ //   }
+ //   else if (target.Y < cameraOffset.Y + ((cameraSize.Y)*m_topTargetScreenBound))
+ //   {
+	//	refCameraInterface.SetOffsets(m_entity, Engine::Vector2D<float>(cameraOffset.X, target.Y - ((cameraSize.Y) * m_topTargetScreenBound)));
+ //   }
+ //   else if (m_smoothingOn)
+ //   {
+	//	// Smoothly move the camera towards the desired position
+ //       refCameraInterface.SetOffsets(m_entity, 
+ //           Engine::Vector2D<float>(cameraOffset.X, (desiredCameraTopLeftY - cameraOffset.Y) * (m_smoothingFactor / Engine::Screen::GetScale().Y)));
+ //   }
+ //   else
+ //   {
+	//	refCameraInterface.SetOffsets(m_entity, Engine::Vector2D<float>(cameraOffset.X, desiredCameraTopLeftY));
+ //   }
 
     // if (ptrCamera->m_clampingOn) ptrCamera->Clamp();
 }
