@@ -26,6 +26,11 @@ namespace Engine
 		return ptrTransform->PrevPosition;
 	}
 
+	const Vector2D<float> TransformInterface::GetPrevPosition(Transform& transform)
+	{
+		return transform.PrevPosition;
+	}
+
 	void TransformInterface::SetPosition(Entity entity, const Vector2D<float> position)
 	{
 		Transform* ptrTransform = GetTransform(entity);

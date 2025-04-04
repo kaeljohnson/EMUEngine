@@ -45,14 +45,14 @@ namespace Engine
 		return GetBody(entity)->m_dimensions;
 	}
 
+	const Vector2D<float> PhysicsInterface::GetDimensions(PhysicsBody& body)
+	{
+		return body.m_dimensions;
+	}
+
 	PhysicsBody* PhysicsInterface::GetBody(Entity entity)
 	{
 		return m_refECS.GetComponent<PhysicsBody>(entity);
-	}
-
-	SimpleContact* PhysicsInterface::GetSimpleContact(Entity entity)
-	{
-		return m_refECS.GetComponent<SimpleContact>(entity);
 	}
 
 	void PhysicsInterface::SetStartingPosition(Entity entity, Vector2D<float> position)
@@ -190,25 +190,25 @@ namespace Engine
 
 	const bool PhysicsInterface::HasContactBelow(Entity entity)
 	{
-		SimpleContact* ptrBody = GetSimpleContact(entity);
+		PhysicsBody* ptrBody = GetBody(entity);
 		return ptrBody->m_contactBelow;
 	}
 
 	const bool PhysicsInterface::HasContactAbove(Entity entity)
 	{
-		SimpleContact* ptrBody = GetSimpleContact(entity);
+		PhysicsBody* ptrBody = GetBody(entity);
 		return ptrBody->m_contactAbove;
 	}
 
 	const bool PhysicsInterface::HasContactLeft(Entity entity)
 	{
-		SimpleContact* ptrBody = GetSimpleContact(entity);
+		PhysicsBody* ptrBody = GetBody(entity);
 		return ptrBody->m_contactLeft;
 	}
 
 	const bool PhysicsInterface::HasContactRight(Entity entity)
 	{
-		SimpleContact* ptrBody = GetSimpleContact(entity);
+		PhysicsBody* ptrBody = GetBody(entity);
 		return ptrBody->m_contactRight;
 	}
 
@@ -298,6 +298,57 @@ namespace Engine
 		}
 	}
 
+	void PhysicsSimulation::ProcessSimpleContacts(PhysicsBody& refPhysicsBody)
+	{
+		refPhysicsBody.m_contactAbove = false;
+		refPhysicsBody.m_contactBelow = false;
+		refPhysicsBody.m_contactLeft = false;
+		refPhysicsBody.m_contactRight = false;
+
+		// Better way to access. Maybe can just store shapeId directly in SimpleContact component?
+		Entity entity = refPhysicsBody.m_entity;
+		b2ShapeId* shapeId = m_refECS.GetComponent<PhysicsBody>(entity)->m_shapeId;
+
+		b2ContactData contactData[10];
+		int shapeContactCount = b2Shape_GetContactData(*shapeId, contactData, 10);
+
+		for (int i = 0; i < shapeContactCount; ++i)
+		{
+			b2ContactData* contact = contactData + i;
+
+			float normalDirection = 1.0f;
+
+			if ((Entity)b2Body_GetUserData(b2Shape_GetBody(contact->shapeIdB)) == entity)
+			{
+				normalDirection = -1.0f;
+			}
+
+			b2Vec2 normal = contact->manifold.normal * normalDirection;
+
+			if (normal.y < -0.5) // Collision from above `this`
+			{
+				// ENGINE_CRITICAL_D("Contact Above!");
+				refPhysicsBody.m_contactAbove = true;
+			}
+			else if (normal.y > 0.5) // Collision from below `this`
+			{
+				// ENGINE_CRITICAL_D("Contact Below!");
+				refPhysicsBody.m_contactBelow = true;
+			}
+			
+			if (normal.x > 0.5) // Collision from the Right of `this`
+			{
+				// ENGINE_CRITICAL_D("Contact Right!");
+				refPhysicsBody.m_contactRight = true;
+			}
+			else if (normal.x < -0.5) // Collision from the Left of `this`
+			{
+				// ENGINE_CRITICAL_D("Contact Left!");
+				refPhysicsBody.m_contactLeft = true;
+			}
+		}
+	}
+
 	void PhysicsSimulation::Update()
 	{
 		b2World_Step(*m_ptrWorldId, Time::GetTimeStep(), 4);
@@ -307,6 +358,8 @@ namespace Engine
 
 		for (PhysicsBody& refPhysicsBody : hotPhysicsBodies) // Update physics bodies first since all bodies need updating but not all entities with bodies have transforms.
 		{
+			if (refPhysicsBody.m_checkSimpleContacts) ProcessSimpleContacts(refPhysicsBody);
+
 			b2Vec2 position = b2Body_GetPosition(*refPhysicsBody.m_bodyId);
 			refPhysicsBody.m_position = Vector2D<float>(position.x - refPhysicsBody.m_halfDimensions.X, position.y - refPhysicsBody.m_halfDimensions.Y);
 
@@ -320,6 +373,11 @@ namespace Engine
 				ptrTransform->Position = refPhysicsBody.m_position;
 				ptrTransform->Rotation = refPhysicsBody.m_rotation;
 			}
+
+			// Is this the best place for this?
+			PhysicsUpdater* ptrPhysicsUpdater = m_refECS.GetComponent<PhysicsUpdater>(refPhysicsBody.m_entity);
+			if (ptrPhysicsUpdater)
+				ptrPhysicsUpdater->Update();
 		}
 	}
 

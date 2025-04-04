@@ -15,7 +15,9 @@
         m_jumpKeyDown(Engine::SPACE_KEY_DOWN), m_jumpKeyUp(Engine::SPACE_KEY_UP),
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
-        m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right)
+        m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right),
+		m_refPhysicsInterface(Engine::EMU::GetInstance()->IPHYSICS()), 
+		m_refTransformInterface(Engine::EMU::GetInstance()->ITRANSFORMS())
     {
         // Need to have them be able to set this during construction of physics body.
     	// m_physicsBody->SetStartingFriction(0.0f);
@@ -24,13 +26,12 @@
         
         
         Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsBody>(entity, Engine::BodyType::DYNAMIC, Engine::PLAYER, Engine::ALL,
-			Engine::Vector2D<float>(width, height), Engine::Vector2D<float>(startingX, startingY), 0.0f, true);
+			Engine::Vector2D<float>(width, height), Engine::Vector2D<float>(startingX, startingY), 0.0f, true, true);
 
-        Engine::EMU::GetInstance()->AddComponent<Engine::Updatable>(entity, [this]() { Update(); });
+        Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsUpdater>(entity, 
+            [this]() { Update(); });
 
         CLIENT_CRITICAL_D("Player Entity ID: " + std::to_string(entity));
-
-        Engine::EMU::GetInstance()->AddComponent<Engine::SimpleContact>(entity);
     }
 
     void Player::OnBeginContact(Engine::BeginContact beginContact) 
@@ -56,7 +57,7 @@
     void Player::Update()
     {
 		// PHYSICS UPDATES
-        m_onGround = Engine::EMU::GetInstance()->IPHYSICS().HasContactBelow(m_entity);
+        m_onGround = m_refPhysicsInterface.HasContactBelow(m_entity);
 
         // m_onGround = true;
 
@@ -64,34 +65,36 @@
 
         UpdateMovement();
 
-        Engine::EMU::GetInstance()->IPHYSICS().ApplyForceToBody(m_entity, m_force);
+        // Could remove argument or add physics interface that takes a physics body ref.
+
+        m_refPhysicsInterface.ApplyForceToBody(m_entity, m_force);
 
         // Check if the current velocity is below the threshold and set it to zero
-        if (std::abs(Engine::EMU::GetInstance()->IPHYSICS().GetVelocity(m_entity).X) < MIN_VELOCITY_THRESHOLD)
+        if (std::abs(m_refPhysicsInterface.GetVelocity(m_entity).X) < MIN_VELOCITY_THRESHOLD)
         {
-            Engine::EMU::GetInstance()->IPHYSICS().SetXVelocity(m_entity, 0.0f);
+            m_refPhysicsInterface.SetXVelocity(m_entity, 0.0f);
         }
         else
         {
             // Limit the velocity
-            if (Engine::EMU::GetInstance()->IPHYSICS().GetVelocity(m_entity).X >= X_MAX_VELOCITY)
+            if (m_refPhysicsInterface.GetVelocity(m_entity).X >= X_MAX_VELOCITY)
             {
-                Engine::EMU::GetInstance()->IPHYSICS().SetXVelocity(m_entity, X_MAX_VELOCITY);
+                m_refPhysicsInterface.SetXVelocity(m_entity, X_MAX_VELOCITY);
 
             }
 
-            if (Engine::EMU::GetInstance()->IPHYSICS().GetVelocity(m_entity).X <= -X_MAX_VELOCITY)
+            if (m_refPhysicsInterface.GetVelocity(m_entity).X <= -X_MAX_VELOCITY)
             {
-                Engine::EMU::GetInstance()->IPHYSICS().SetXVelocity(m_entity, -X_MAX_VELOCITY);
+                m_refPhysicsInterface.SetXVelocity(m_entity, -X_MAX_VELOCITY);
             }
         }
     }
 
     void Player::UpdateMovement()
     {
-        float currentVelocityX = Engine::EMU::GetInstance()->IPHYSICS().GetVelocity(m_entity).X;
+        float currentVelocityX = m_refPhysicsInterface.GetVelocity(m_entity).X;
 
-		Engine::TransformInterface* transformInterface = &Engine::EMU::GetInstance()->ITRANSFORMS();
+		Engine::TransformInterface* transformInterface = &m_refTransformInterface;
 
 		if (m_currentDirection == PlayerDirection::Right) transformInterface->SetDirectionFacing(m_entity, 1);
 		else transformInterface->SetDirectionFacing(m_entity, -1);
@@ -178,7 +181,7 @@
                 endHorizontalMove();
             }
 
-            if (refKeyStates.at(m_jumpKeyUp) || Engine::EMU::GetInstance()->IPHYSICS().GetVelocity(m_entity).Y > 0 || false/*collision above*/)
+            if (refKeyStates.at(m_jumpKeyUp) || m_refPhysicsInterface.GetVelocity(m_entity).Y > 0 || false/*collision above*/)
             {
                 TransitionToState(PlayerState::Falling);
             }
@@ -257,7 +260,7 @@
         {
         case PlayerState::Idle:
             m_jumpCharge = 0.0f;
-            Engine::EMU::GetInstance()->IPHYSICS().SetXVelocity(m_entity, 0.0f);
+            m_refPhysicsInterface.SetXVelocity(m_entity, 0.0f);
             break;
 
         case PlayerState::HorizontalMovement:
@@ -265,15 +268,15 @@
 
         case PlayerState::Jumping:
             m_canJump = false;
-            Engine::EMU::GetInstance()->IPHYSICS().SetYVelocity(m_entity, 0.0f);
-            Engine::EMU::GetInstance()->IPHYSICS().ApplyImpulseToBody(m_entity, { 0.0f, -MIN_JUMP_FORCE });
+            m_refPhysicsInterface.SetYVelocity(m_entity, 0.0f);
+            m_refPhysicsInterface.ApplyImpulseToBody(m_entity, { 0.0f, -MIN_JUMP_FORCE });
             break;
 
         case PlayerState::Falling:
             m_jumpCharge = 0.0f;
-            if (Engine::EMU::GetInstance()->IPHYSICS().GetVelocity(m_entity).Y < 0)
+            if (m_refPhysicsInterface.GetVelocity(m_entity).Y < 0)
             {
-                Engine::EMU::GetInstance()->IPHYSICS().SetYVelocity(m_entity, 0.0f);
+                m_refPhysicsInterface.SetYVelocity(m_entity, 0.0f);
 
             }
             break;
@@ -303,5 +306,5 @@
 
     void Player::endHorizontalMove()
     {
-		m_force.X = -Engine::EMU::GetInstance()->IPHYSICS().GetVelocity(m_entity).X * X_DECELERATION;
+		m_force.X = -m_refPhysicsInterface.GetVelocity(m_entity).X * X_DECELERATION;
 	}

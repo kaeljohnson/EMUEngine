@@ -145,7 +145,7 @@ namespace Engine
                     m_refECS.AddComponent<PhysicsBody>(tile, STATIC, MAP, PLAYER, 
                         Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)), 
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
-                        0.0f, true);
+                        0.0f, true, false);
 
 					collisionBodyIDs.push_back(tile);
                 }

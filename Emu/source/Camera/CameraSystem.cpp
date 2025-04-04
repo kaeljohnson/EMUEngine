@@ -17,15 +17,9 @@ namespace Engine
     {
         for (auto& camera : m_refECS.GetHotComponents<Camera>())
         {
-            // CAMERA UPDATES
-            Engine::Transform* ptrCameraTarget = m_refECS.GetComponent<Transform>(camera.m_entity);
-
-            const float interpFactor = Engine::Time::GetInterpolationFactor();
-            
-			Vector2D<float> target = Lerp(ptrCameraTarget->PrevPosition, ptrCameraTarget->Position, interpFactor);
-
-            camera.m_offset.X = target.X - (camera.m_size.X / 2.0f);
-            camera.m_offset.Y = target.Y - (camera.m_size.Y / 2.0f);
+            CameraUpdater* ptrCameraUpdater = m_refECS.GetComponent<CameraUpdater>(camera.m_entity);
+            if (ptrCameraUpdater)
+                ptrCameraUpdater->Update();
 
             if (camera.m_clampingOn) Clamp(camera);
         }

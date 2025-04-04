@@ -33,4 +33,6 @@ private:
 	float m_topTargetScreenBound;
 	float m_bottomTargetScreenBound;
 
+	Engine::TransformInterface& m_refTransformInterface;
+	Engine::CameraInterface& m_refCameraInterface;
 };

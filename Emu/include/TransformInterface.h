@@ -11,8 +11,9 @@ namespace Engine
 	{
 	public:
 		// Transform getter and setter wrappers
-		EMU_API void SetPrevPosition(Entity entity, const Vector2D<float> position);
+		
 		EMU_API const Vector2D<float> GetPrevPosition(Entity entity);
+		EMU_API const Vector2D<float> GetPrevPosition(Transform& transform);
 
 		EMU_API void Activate(Entity entity);
 		EMU_API void Deactivate(Entity entity);
@@ -34,6 +35,8 @@ namespace Engine
 	public:
 		Transform* GetTransform(Entity entity);
 		TransformInterface(ECS& refEcs);
+
+		void SetPrevPosition(Entity entity, const Vector2D<float> position);
 	private:
 		ECS& m_refECS;
 	};

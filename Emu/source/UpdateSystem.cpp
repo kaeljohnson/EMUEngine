@@ -10,9 +10,9 @@ namespace Engine
 	void UpdateSystem::Update()
 	{
 		// Update all updatable components
-		for (auto& refUpdatable : m_refECS.GetHotComponents<Updatable>())
+		/*for (auto& refUpdatable : m_refECS.GetHotComponents<Updatable>())
 		{
 			refUpdatable.Update();
-		}
+		}*/
 	}
 } // namespace Engine

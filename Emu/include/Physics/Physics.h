@@ -2,6 +2,7 @@
 
 #include "../Core.h"
 #include "../MathUtil.h"
+#include "../Components.h"
 #include "ContactSystem.h"
 
 struct b2WorldId;
@@ -20,6 +21,7 @@ namespace Engine
 		EMU_API void SetBodyType(Entity entity, const BodyType type);
 		EMU_API void SetDimensions(Entity entity, const Vector2D<float> dimensions);
 		EMU_API const Vector2D<float> GetDimensions(Entity entity);
+		EMU_API const Vector2D<float> GetDimensions(PhysicsBody& body);
 		EMU_API void SetGravity(Entity entity, bool enabled);
 		EMU_API void SetStartingPosition(Entity entity, const Vector2D<float> position);
 		EMU_API void SetPosition(Entity entity, const Vector2D<float> position);
@@ -47,7 +49,6 @@ namespace Engine
 		EMU_API const bool HasContactRight(Entity entity);
 	public:
 		PhysicsBody* GetBody(Entity entity);
-		SimpleContact* GetSimpleContact(Entity entity);
 		PhysicsInterface(ECS& refEcs);
 	private:
 		ECS& m_refECS;
@@ -63,6 +64,7 @@ namespace Engine
 		void AddPhysicsBodiesToWorld();
 
 		void Update();
+		void ProcessSimpleContacts(PhysicsBody& refPhysicsBody);
 
 		void DestroyWorld();
 		void Cleanup();

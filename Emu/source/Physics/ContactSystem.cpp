@@ -11,58 +11,6 @@ namespace Engine
 	// This function is allocating memory dynamically. Why?
 	void ContactSystem::ProcessContacts(void* ptrWorldId)
 	{
-		// Process ContactComponents
-		for (SimpleContact& simpleContact : m_refECS.GetHotComponents<SimpleContact>())
-		{
-			simpleContact.m_contactAbove = false;
-			simpleContact.m_contactBelow = false;
-			simpleContact.m_contactLeft = false;
-			simpleContact.m_contactRight = false;
-
-			// Better way to access. Maybe can just store shapeId directly in SimpleContact component?
-			Entity entity = simpleContact.m_entity;
-			b2ShapeId* shapeId = m_refECS.GetComponent<PhysicsBody>(entity)->m_shapeId;
-
-			b2ContactData contactData[10];
-			int shapeContactCount = b2Shape_GetContactData(*shapeId, contactData, 10);
-
-			for (int i = 0; i < shapeContactCount; ++i)
-			{
-				b2ContactData* contact = contactData + i;
-
-				float normalDirection = 1.0f;
-
-				if ((Entity)b2Body_GetUserData(b2Shape_GetBody(contact->shapeIdB)) == entity)
-				{
-					normalDirection = -1.0f;
-				}
-
-				b2Vec2 normal = contact->manifold.normal * normalDirection;
-
-				if (normal.y < -0.5) // Collision from above `this`
-				{
-					// ENGINE_CRITICAL_D("Contact Above!");
-					simpleContact.m_contactAbove = true;
-				}
-				else if (normal.y > 0.5) // Collision from below `this`
-				{
-					// ENGINE_CRITICAL_D("Contact Below!");
-					simpleContact.m_contactBelow = true;
-				}
-
-				if (normal.x > 0.5) // Collision from the Right of `this`
-				{
-					// ENGINE_CRITICAL_D("Contact Right!");
-					simpleContact.m_contactRight = true;
-				}
-				else if (normal.x < -0.5) // Collision from the Left of `this`
-				{
-					// ENGINE_CRITICAL_D("Contact Left!");
-					simpleContact.m_contactLeft = true;
-				}
-			}
-		}
-
 		// May need to ensure that only one contact event is created per contact. 
 		// So that we don't have multiple events for the same contact.
 		b2ContactEvents contactEvents = b2World_GetContactEvents(*(b2WorldId*)ptrWorldId);
