@@ -69,6 +69,9 @@ public:
 private:
 	Engine::Entity m_entity;
 
+	Engine::PhysicsInterface& m_refPhysicsInterface;
+	Engine::TransformInterface& m_refTransformInterface;
+
 	bool m_canJump;
 	float m_jumpCharge;
 	float m_coyoteTime;

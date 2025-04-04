@@ -87,7 +87,6 @@ namespace Engine
 
 		UpdateCallback m_callback;
 
-		// This component should be sent a pointer to the physics body by the engine, the client should not have to get the physics body.
 		void Update(PhysicsBody& refPhysicsBody)
 		{
 			if (m_callback)
@@ -135,14 +134,4 @@ namespace Engine
 		LEFT,
 		RIGHT
 	};
-
-	/*struct SimpleContact : public Component
-	{
-		SimpleContact(Entity entity) : Component(entity) {}
-
-		bool m_contactAbove = false;
-		bool m_contactBelow = false;
-		bool m_contactRight = false;
-		bool m_contactLeft = false;
-	};*/
 }
