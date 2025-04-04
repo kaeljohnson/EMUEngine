@@ -14,13 +14,13 @@ PlayerCamera::PlayerCamera(Engine::Entity entity) :
 
 	Engine::EMU::GetInstance()->AddComponent<Engine::Camera>(m_entity);
     Engine::EMU::GetInstance()->AddComponent<Engine::CameraUpdater>(m_entity, 
-		[this](Engine::Camera& refCamera) { Update(refCamera); });
+		[this]() { Update(); });
 
     // playerCamera->SetPixelsPerUnit(32);
 	Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(m_entity, 32);
 }
 
-void PlayerCamera::Update(Engine::Camera& refCamera)
+void PlayerCamera::Update()
 {
     // CAMERA UPDATES
 
@@ -30,14 +30,14 @@ void PlayerCamera::Update(Engine::Camera& refCamera)
 	const Engine::Vector2D<float> targetPosition = m_refTransformInterface.GetPosition(m_entity);
 
     Engine::Vector2D<float> targetPos = Engine::Lerp(targetPrevPosition, targetPosition, interpFactor);
-	Engine::Vector2D<float> targetSize = m_refCameraInterface.GetSize(refCamera);
+	Engine::Vector2D<float> targetSize = m_refCameraInterface.GetSize(m_entity);
 
 	// Calculate the desired camera position based on the target's position
 	float desiredCameraTopLeftX = targetPos.X - (targetSize.X / 2.0f);
 	float desiredCameraTopLeftY = targetPos.Y - (targetSize.Y / 2.0f);
 
 	// Set the camera offset to the desired position
-	m_refCameraInterface.SetOffset(refCamera, Engine::Vector2D<float>(desiredCameraTopLeftX, desiredCameraTopLeftY));
+	m_refCameraInterface.SetOffset(m_entity, Engine::Vector2D<float>(desiredCameraTopLeftX, desiredCameraTopLeftY));
 
     return;
 

@@ -16,7 +16,7 @@ public:
 	void SetLookAheadFactor(const float lookAhead);
 
 	// void Update(const double interpolation) override;
-	void Update(Engine::Camera& refCamera);
+	void Update();
 
 
 private:

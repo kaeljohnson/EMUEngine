@@ -29,7 +29,7 @@
 			Engine::Vector2D<float>(width, height), Engine::Vector2D<float>(startingX, startingY), 0.0f, true, true);
 
         Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsUpdater>(entity, 
-            [this](Engine::PhysicsBody& refPhysicsBody) { Update(refPhysicsBody); });
+            [this]() { Update(); });
 
         CLIENT_CRITICAL_D("Player Entity ID: " + std::to_string(entity));
     }
@@ -54,45 +54,45 @@
         CLIENT_CRITICAL_D("Player OnEndSensing.");
     }
 
-    void Player::Update(Engine::PhysicsBody& refPhysicsBody)
+    void Player::Update()
     {
 		// PHYSICS UPDATES
-        m_onGround = m_refPhysicsInterface.HasContactBelow(refPhysicsBody);
+        m_onGround = m_refPhysicsInterface.HasContactBelow(m_entity);
 
         // m_onGround = true;
 
         m_force = { 0.0f, 0.0f };
 
-        UpdateMovement(refPhysicsBody);
+        UpdateMovement();
 
         // Could remove argument or add physics interface that takes a physics body ref.
 
-        m_refPhysicsInterface.ApplyForceToBody(refPhysicsBody, m_force);
+        m_refPhysicsInterface.ApplyForceToBody(m_entity, m_force);
 
         // Check if the current velocity is below the threshold and set it to zero
-        if (std::abs(m_refPhysicsInterface.GetVelocity(refPhysicsBody).X) < MIN_VELOCITY_THRESHOLD)
+        if (std::abs(m_refPhysicsInterface.GetVelocity(m_entity).X) < MIN_VELOCITY_THRESHOLD)
         {
-            m_refPhysicsInterface.SetXVelocity(refPhysicsBody, 0.0f);
+            m_refPhysicsInterface.SetXVelocity(m_entity, 0.0f);
         }
         else
         {
             // Limit the velocity
-            if (m_refPhysicsInterface.GetVelocity(refPhysicsBody).X >= X_MAX_VELOCITY)
+            if (m_refPhysicsInterface.GetVelocity(m_entity).X >= X_MAX_VELOCITY)
             {
-                m_refPhysicsInterface.SetXVelocity(refPhysicsBody, X_MAX_VELOCITY);
+                m_refPhysicsInterface.SetXVelocity(m_entity, X_MAX_VELOCITY);
 
             }
 
-            if (m_refPhysicsInterface.GetVelocity(refPhysicsBody).X <= -X_MAX_VELOCITY)
+            if (m_refPhysicsInterface.GetVelocity(m_entity).X <= -X_MAX_VELOCITY)
             {
-                m_refPhysicsInterface.SetXVelocity(refPhysicsBody, -X_MAX_VELOCITY);
+                m_refPhysicsInterface.SetXVelocity(m_entity, -X_MAX_VELOCITY);
             }
         }
     }
 
-    void Player::UpdateMovement(Engine::PhysicsBody& refPhysicsBody)
+    void Player::UpdateMovement()
     {
-        float currentVelocityX = m_refPhysicsInterface.GetVelocity(refPhysicsBody).X;
+        float currentVelocityX = m_refPhysicsInterface.GetVelocity(m_entity).X;
 
 		Engine::TransformInterface* transformInterface = &m_refTransformInterface;
 
@@ -106,13 +106,13 @@
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
             {
                 m_currentDirection = PlayerDirection::Right;
-                TransitionToState(refPhysicsBody, PlayerState::HorizontalMovement);
+                TransitionToState(PlayerState::HorizontalMovement);
                 startHorizontalMove();
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
             {
                 m_currentDirection = PlayerDirection::Left;
-                TransitionToState(refPhysicsBody, PlayerState::HorizontalMovement);
+                TransitionToState(PlayerState::HorizontalMovement);
                 startHorizontalMove();
             }
             else
@@ -123,7 +123,7 @@
             // Transition to Jumping if jump key is pressed
             if (refKeyStates.at(m_jumpKeyDown) && m_canJump)
             {
-                TransitionToState(refPhysicsBody, PlayerState::Jumping);
+                TransitionToState(PlayerState::Jumping);
             }
             break;
 
@@ -147,18 +147,18 @@
                 m_force.X = -currentVelocityX * X_DECELERATION;
                 if (m_onGround && std::abs(currentVelocityX) < MIN_VELOCITY_THRESHOLD)
                 {
-                    TransitionToState(refPhysicsBody, PlayerState::Idle);
+                    TransitionToState(PlayerState::Idle);
                 }
             }
 
             // Vertical Movement
             if (refKeyStates.at(m_jumpKeyDown) && m_canJump)
             {
-                TransitionToState(refPhysicsBody, PlayerState::Jumping);
+                TransitionToState(PlayerState::Jumping);
             }
             else if (!m_onGround)
             {
-                TransitionToState(refPhysicsBody, PlayerState::Falling);
+                TransitionToState(PlayerState::Falling);
             }
             break;
 
@@ -183,7 +183,7 @@
 
             if (refKeyStates.at(m_jumpKeyUp) || m_refPhysicsInterface.GetVelocity(m_entity).Y > 0 || false/*collision above*/)
             {
-                TransitionToState(refPhysicsBody, PlayerState::Falling);
+                TransitionToState(PlayerState::Falling);
             }
             else
             {
@@ -218,22 +218,22 @@
                 endHorizontalMove();
                 if (m_onGround && std::abs(currentVelocityX) < MIN_VELOCITY_THRESHOLD)
                 {
-                    TransitionToState(refPhysicsBody, PlayerState::Idle);
+                    TransitionToState(PlayerState::Idle);
                 }
             }
 
             if (m_onGround && continueMoving)
             {
                 updateHorizontalMove();
-                TransitionToState(refPhysicsBody, PlayerState::HorizontalMovement);
+                TransitionToState(PlayerState::HorizontalMovement);
             }
             else if (m_onGround)
             {
-				TransitionToState(refPhysicsBody, PlayerState::Idle);
+				TransitionToState(PlayerState::Idle);
 			}
             else if (refKeyStates.at(m_jumpKeyDown) && m_canJump && m_coyoteTime <= COYOTE_TIME_DURATION)
             {
-				TransitionToState(refPhysicsBody, PlayerState::Jumping);
+				TransitionToState(PlayerState::Jumping);
 			}
 
             break;
@@ -254,13 +254,13 @@
         }
     }
 
-    void Player::TransitionToState(Engine::PhysicsBody& refPhysicsBody, PlayerState newState)
+    void Player::TransitionToState(PlayerState newState)
     {
         switch (newState)
         {
         case PlayerState::Idle:
             m_jumpCharge = 0.0f;
-            m_refPhysicsInterface.SetXVelocity(refPhysicsBody, 0.0f);
+            m_refPhysicsInterface.SetXVelocity(m_entity, 0.0f);
             break;
 
         case PlayerState::HorizontalMovement:
@@ -268,15 +268,15 @@
 
         case PlayerState::Jumping:
             m_canJump = false;
-            m_refPhysicsInterface.SetYVelocity(refPhysicsBody, 0.0f);
-            m_refPhysicsInterface.ApplyImpulseToBody(refPhysicsBody, { 0.0f, -MIN_JUMP_FORCE });
+            m_refPhysicsInterface.SetYVelocity(m_entity, 0.0f);
+            m_refPhysicsInterface.ApplyImpulseToBody(m_entity, { 0.0f, -MIN_JUMP_FORCE });
             break;
 
         case PlayerState::Falling:
             m_jumpCharge = 0.0f;
-            if (m_refPhysicsInterface.GetVelocity(refPhysicsBody).Y < 0)
+            if (m_refPhysicsInterface.GetVelocity(m_entity).Y < 0)
             {
-                m_refPhysicsInterface.SetYVelocity(refPhysicsBody, 0.0f);
+                m_refPhysicsInterface.SetYVelocity(m_entity, 0.0f);
 
             }
             break;
