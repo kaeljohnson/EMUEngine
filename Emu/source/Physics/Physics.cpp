@@ -300,6 +300,8 @@ namespace Engine
 
 	void PhysicsSimulation::AddLineCollidersToWorld()
 	{
+		// This function also needs to connect lines together.
+
 		for (auto& line : m_refECS.GetHotComponents<LineCollider>())
 		{
 			b2Segment segment = { b2Vec2(line.m_start.X, line.m_start.Y), b2Vec2(line.m_end.X, line.m_end.Y) };
