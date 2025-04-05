@@ -298,6 +298,37 @@ namespace Engine
 		}
 	}
 
+	void PhysicsSimulation::AddLineCollidersToWorld()
+	{
+		for (auto& line : m_refECS.GetHotComponents<LineCollider>())
+		{
+			b2Segment segment = { b2Vec2(line.m_start.X, line.m_start.Y), b2Vec2(line.m_end.X, line.m_end.Y) };
+
+			b2BodyDef bodyDef = b2DefaultBodyDef();
+			b2ShapeDef shapeDef = b2DefaultShapeDef();
+
+			bodyDef.type = b2_staticBody;
+			bodyDef.fixedRotation = true;
+			bodyDef.userData = (void*)line.m_entity;
+
+			shapeDef.density = 1.0f;
+			shapeDef.friction = 0.0f;
+			shapeDef.restitution = 0.0f;
+			shapeDef.filter.categoryBits = line.m_category;
+			shapeDef.filter.maskBits = line.m_mask;
+
+			b2BodyId bodyId = b2CreateBody(*m_ptrWorldId, &bodyDef);
+
+			b2ShapeId shapeId = b2CreateSegmentShape(bodyId, &shapeDef, &segment);
+
+			line.m_bodyId = new b2BodyId(bodyId);
+			line.m_shapeId = new b2ShapeId(shapeId);
+			line.m_worldId = m_ptrWorldId;
+
+		}
+
+	}
+
 	void PhysicsSimulation::ProcessSimpleContacts(PhysicsBody& refPhysicsBody)
 	{
 		refPhysicsBody.m_contactAbove = false;

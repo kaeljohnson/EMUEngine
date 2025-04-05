@@ -7,7 +7,7 @@
 
 AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity playerEntity, Engine::Entity testEntity) 
 {
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::F_KEY_DOWN, [&](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::F_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			// Need interface to toggle fullscreen.
 			// refApp.GetWindowRenderer().ToggleFullscreen();
@@ -17,7 +17,7 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity playerEnti
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::RESIZE_WINDOW, [&](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::RESIZE_WINDOW, [](Engine::IOEvent& e)
 		{
 			// Window Interface to call the resize function.
 			// refApp.GetWindowRenderer().ResizeWindow(e.X_POS, e.Y_POS);
@@ -26,28 +26,28 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity playerEnti
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::ESCAPE_KEY_DOWN, [&](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::ESCAPE_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::ESCAPE_KEY_DOWN)));
 			Engine::EMU::GetInstance()->EndApp();
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::QUIT, [&](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::QUIT, [](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::QUIT)));
 			Engine::EMU::GetInstance()->EndApp();
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::G_KEY_DOWN, [&](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::G_KEY_DOWN, [playerEntity](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::G_KEY_DOWN)));
 			Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(playerEntity, 16);
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::H_KEY_DOWN, [&](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::H_KEY_DOWN, [playerEntity](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::H_KEY_DOWN)));
 			Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(playerEntity, 32);
@@ -70,9 +70,6 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity playerEnti
 		{
 			Engine::EMU::GetInstance()->Activate(testEntity);
 		});
-	
-
-
 }
 
 AppManagementEventHandlers::~AppManagementEventHandlers() {}

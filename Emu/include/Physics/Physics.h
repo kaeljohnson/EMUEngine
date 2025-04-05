@@ -62,6 +62,7 @@ namespace Engine
 		void CreateWorld(const Vector2D<float> gravity);
 		void UpdateGravity(const Vector2D<float> gravity);
 		void AddPhysicsBodiesToWorld();
+		void AddLineCollidersToWorld();
 
 		void Update();
 		void ProcessSimpleContacts(PhysicsBody& refPhysicsBody);

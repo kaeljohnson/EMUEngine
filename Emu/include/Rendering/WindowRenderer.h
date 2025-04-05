@@ -26,6 +26,7 @@ namespace Engine
 
 		void Render();
 		void Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset);
+		void Draw(LineCollider& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Display();
 
 		void ClearScreen();

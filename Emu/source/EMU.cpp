@@ -30,6 +30,7 @@ namespace Engine
 		m_ecs.RegisterComponentManager<PhysicsBody>();
 		m_ecs.RegisterComponentManager<Transform>();
 		m_ecs.RegisterComponentManager<Camera>();
+		m_ecs.RegisterComponentManager<LineCollider>();
 
 		m_ioEventSystem.Initialize();
 	}
