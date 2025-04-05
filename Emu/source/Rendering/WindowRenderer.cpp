@@ -211,6 +211,23 @@ namespace Engine
 				Draw(refTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
 			}
 		}
+
+		auto& lineColliderManager = m_refECS.GetHotComponents<LineCollider>();
+		for (LineCollider& refLineCollider : lineColliderManager)
+		{
+			float objectLeft = refLineCollider.m_start.X;
+			float objectRight = refLineCollider.m_end.X;
+			float objectTop = refLineCollider.m_start.Y;
+			float objectBottom = refLineCollider.m_end.Y;
+
+			bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
+				objectBottom >= cameraTop && objectTop <= cameraBottom;
+
+			if (isVisible)
+			{
+				Draw(refLineCollider, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
+			}
+		}
 		// auto end = std::chrono::high_resolution_clock::now();
 		// std::cout << "Rendering: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
 
@@ -249,6 +266,19 @@ namespace Engine
 		// This should show the boundary of the physics body, not the texture.
 
 		
+	}
+
+	void WindowRenderer::Draw(LineCollider& lineCollider, const int pixelsPerUnit, const Vector2D<float> offset)
+	{
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+
+		SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer,
+			static_cast<int>(round((lineCollider.m_start.X - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((lineCollider.m_start.Y - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((lineCollider.m_end.X - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((lineCollider.m_end.Y - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT))
+		);
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 	}
 
 	// Wrapper for SDL_RenderPresent. Talks to the actual hardwares renderer to display the renderer.

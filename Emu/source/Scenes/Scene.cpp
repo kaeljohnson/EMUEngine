@@ -16,7 +16,10 @@ namespace Engine
 		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(nullptr), 
 		m_physicsSimulation(refECS), 
 		m_cameraSystem(refECS),
-		m_updateSystem(refECS) {}
+		m_updateSystem(refECS) 
+	{
+		m_entities.reserve(10000);
+	}
 
 	Scene::~Scene()
 	{
@@ -48,6 +51,8 @@ namespace Engine
 
 		// Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld();
+		m_physicsSimulation.AddLineCollidersToWorld();
+
 
 		AppState::IN_SCENE = true;
 	}

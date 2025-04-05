@@ -127,11 +127,20 @@ namespace Engine
 		}
 	};
 
-	enum ContactDirection
+	struct LineCollider : public Component
 	{
-		UP,
-		DOWN,
-		LEFT,
-		RIGHT
+		LineCollider(Entity entity, Filter category, Filter mask, Vector2D<float> start, Vector2D<float> end) 
+			: m_category(category), m_mask(mask), m_start(start), m_end(end), Component(entity) {}
+		~LineCollider() = default;
+
+		b2BodyId* m_bodyId;
+		b2ShapeId* m_shapeId;
+		b2WorldId* m_worldId;
+
+		Vector2D<float> m_start;
+		Vector2D<float> m_end;
+
+		Filter m_category;
+		Filter m_mask;
 	};
 }

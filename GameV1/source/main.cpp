@@ -96,8 +96,13 @@ int main(int argc, char* args[])
 
 
 	engine->LoadScene("Level1");
-
+	
 	AppManagementEventHandlers appManagementEventHandlers(playerEntity, testEntity);
+
+	Engine::Entity testEntity2 = Engine::EMU::GetInstance()->CreateEntity();
+	scene.Add(testEntity2);
+	
+	engine->AddComponent<Engine::LineCollider>(testEntity2, Engine::ALL, Engine::ALL, Engine::Vector2D<float>(6.0f, 64.0f), Engine::Vector2D<float>(11.0f, 64.0f));
 
 	engine->RunApp();
 	// Need to figure out how to change scenes, stop scenes, etc.
