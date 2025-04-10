@@ -78,9 +78,9 @@ namespace Engine
 			{ 
 				m_refSceneManager.Cleanup();
 			}
-			/*auto end = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double, std::milli> elapsed = end - start;
-			std::cout << "Frame time: " << elapsed.count() << " ms\n";*/
+			// auto end = std::chrono::high_resolution_clock::now();
+			// std::chrono::duration<double, std::milli> elapsed = end - start;
+			// std::cout << "Frame time: " << elapsed.count() << " ms\n";
 		}
 	}
 

@@ -16,7 +16,8 @@ namespace Engine
 
 		// Tilemap should not take ECS reference. Tilemap system needs major refactoring.
 		EMU_API TileMap(ECS& refECS, const std::string mapFile, const int numUnitsPerTile);
-		EMU_API const char GetTile(int x, int y) const;
+		EMU_API const char GetChar(size_t x, size_t y) const;
+		EMU_API const std::pair<Entity, char> GetTile(size_t x, size_t y) const;
 		
 		EMU_API inline int GetWidth() const { return m_mapDimensions.X; }
 		EMU_API inline int GetHeight() const { return m_mapDimensions.Y; }
@@ -24,12 +25,13 @@ namespace Engine
 	public:
 		inline std::vector<PhysicsBody>& GetCollisionBodies() { return m_collisionBodies; }
 
-		std::vector<Entity> LoadMap();
-		std::vector<Entity> CreateCollisionBodies();
+		std::vector<std::pair<Entity, char>>& LoadMap();
+		void CreateCollisionBodies();
 		void UnloadMap();
 
 	public:
 		std::vector<char> m_map;
+		std::vector<std::pair<Entity, char>> m_tiles;
 		std::vector<PhysicsBody> m_collisionBodies;
 		Vector2D<int> m_mapDimensions;
 		Vector2D<size_t> m_sceneObjectIDs;

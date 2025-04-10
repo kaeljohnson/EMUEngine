@@ -67,14 +67,14 @@ namespace Engine
 		m_refECS.DeactivateEntities();
 	}
 
-	void Scene::AddTileMap(std::string mapFileName, const int numMetersPerTile)
+	std::vector<std::pair<Entity, char>> Scene::AddTileMap(std::string mapFileName, const int numMetersPerTile)
 	{
 		// Temporary until tilemap system is refactored and tilemaps become components.
 		TileMap tileMap(m_refECS, "testMap1.txt", 1);
 
 		// Get a temp vector or tile IDs from the tile map. Both the transforms and the physics bodies.
-		std::vector<Entity> tileMapEntities = tileMap.LoadMap();
-		std::vector<Entity> mapCollisionBodies = tileMap.CreateCollisionBodies();
+		std::vector<std::pair<Entity, char>> tileMapEntities = tileMap.LoadMap();
+		tileMap.CreateCollisionBodies();
 
 		ENGINE_INFO_D("Tile map text file size: " + std::to_string(tileMap.m_map.size()));
 		ENGINE_INFO_D("Tile map collision bodies size: " + std::to_string(tileMap.m_collisionBodies.size()));
@@ -86,15 +86,12 @@ namespace Engine
 
 		HasTileMap = true;
 
-		for (auto& entity : tileMapEntities)
+		for (auto& pair: tileMapEntities)
 		{
-			Add(entity);
+			Add(pair.first);
 		}
 
-		for (auto& entity : mapCollisionBodies)
-		{
-			Add(entity);
-		}
+		return tileMapEntities;
 	}
 
 	void Scene::Add(Entity entity)

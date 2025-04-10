@@ -50,7 +50,7 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity playerEnti
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::H_KEY_DOWN, [playerEntity](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::H_KEY_DOWN)));
-			Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(playerEntity, 32);
+			Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(playerEntity, 32);   
 			e.Handled = true;
 		});
 	
@@ -61,12 +61,12 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity playerEnti
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_DOWN, [&](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_DOWN, [testEntity](Engine::IOEvent& e)
 		{
 			Engine::EMU::GetInstance()->Deactivate(testEntity);
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_UP, [&](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_UP, [testEntity](Engine::IOEvent& e)
 		{
 			Engine::EMU::GetInstance()->Activate(testEntity);
 		});

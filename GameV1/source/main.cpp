@@ -38,11 +38,11 @@ int main(int argc, char* args[])
 	Engine::Scene& scene2 = engine->CreateScene("Level2");
 
 	//// Need physcis to scale with pixels per unit.
-	scene.SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
+	scene.SetPhysicsSimulation(Engine::Vector2D(0.0f, 0.0f));
 	scene2.SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 
 	// Engine::TileMap testMap(refECS, "testMap1.txt", 1);
-	scene.AddTileMap("testMap1.txt", 1);
+	std::vector<std::pair<Engine::Entity, char>> tileMap = scene.AddTileMap("testMap1.txt", 1);
 
 	Engine::Entity testEntity = Engine::EMU::GetInstance()->CreateEntity();
 	// ptrTestEntity->SetPriority(1);
@@ -60,7 +60,7 @@ int main(int argc, char* args[])
 	// ptrPlayerEntity->SetPriority(0);
 	scene.Add(playerEntity);
 
-	Player player(playerEntity, 6.0f, 1.0f, 0.75f, 0.75f);
+	Player player(playerEntity, 1.0f, 1.0f, 0.75f, 0.75f);
 	
 
 	scene.RegisterContactCallback(Engine::BEGIN_CONTACT, playerEntity, testEntity, [](const Engine::Contact event)
@@ -100,9 +100,9 @@ int main(int argc, char* args[])
 	AppManagementEventHandlers appManagementEventHandlers(playerEntity, testEntity);
 
 	Engine::Entity testEntity2 = Engine::EMU::GetInstance()->CreateEntity();
-	scene.Add(testEntity2);
+	// scene.Add(testEntity2);
 	
-	engine->AddComponent<Engine::LineCollider>(testEntity2, Engine::ALL, Engine::ALL, Engine::Vector2D<float>(6.0f, 64.0f), Engine::Vector2D<float>(11.0f, 64.0f));
+	// engine->AddComponent<Engine::ChainCollider>(testEntity2, Engine::ALL, Engine::ALL, Engine::Vector2D<float>(6.0f, 64.0f), Engine::Vector2D<float>(11.0f, 64.0f));
 
 	engine->RunApp();
 	// Need to figure out how to change scenes, stop scenes, etc.

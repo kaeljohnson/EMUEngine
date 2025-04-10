@@ -10,6 +10,7 @@
 struct b2BodyId;
 struct b2ShapeId;
 struct b2WorldId;
+struct b2ChainId;
 
 namespace Engine
 {
@@ -127,7 +128,7 @@ namespace Engine
 		}
 	};
 
-	struct LineCollider : public Component
+	/*struct LineCollider : public Component
 	{
 		LineCollider(Entity entity, Filter category, Filter mask, Vector2D<float> start, Vector2D<float> end) 
 			: m_category(category), m_mask(mask), m_start(start), m_end(end), Component(entity) {}
@@ -142,5 +143,55 @@ namespace Engine
 
 		Filter m_category;
 		Filter m_mask;
+	};*/
+
+	struct ChainCollider : public Component
+	{
+		ChainCollider(Entity entity, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint, 
+																   Vector2D<float> thirdPoint, Vector2D<float> fourthPoint)
+			: m_category(category), m_mask(mask), Component(entity) 
+		{
+			m_points[0] = firstPoint;
+			m_points[1] = secondPoint;
+			m_points[2] = thirdPoint;
+			m_points[3] = fourthPoint;
+
+		}
+		~ChainCollider() = default;
+
+		Vector2D<float> m_points[4];
+
+		b2BodyId* m_bodyId = nullptr;
+		b2ChainId* m_chainId = nullptr;
+		b2WorldId* m_worldId = nullptr;
+
+		Filter m_category;
+		Filter m_mask;
+
+	};
+
+	struct ChainColliderLeft : public ChainCollider 
+	{
+		ChainColliderLeft(Entity entity, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
+			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint) : ChainCollider(entity, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint) {}
+		~ChainColliderLeft() = default;
+	};
+	struct ChainColliderRight : public ChainCollider 
+	{
+		ChainColliderRight(Entity entity, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
+			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint) : ChainCollider(entity, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint) {}
+		~ChainColliderRight() = default;
+	};
+	struct ChainColliderTop : public ChainCollider 
+	{
+		ChainColliderTop(Entity entity, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
+			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint) : ChainCollider(entity, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint) {}
+		~ChainColliderTop() = default;
+	};
+	struct ChainColliderBottom : public ChainCollider 
+	{
+		ChainColliderBottom(Entity entity, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
+			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint) : ChainCollider(entity, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint) {}
+		~ChainColliderBottom() = default;
 	};
 }

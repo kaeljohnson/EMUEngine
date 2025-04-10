@@ -300,35 +300,52 @@ namespace Engine
 
 	void PhysicsSimulation::AddLineCollidersToWorld()
 	{
-		// This function also needs to connect lines together.
+		// This function also needs to connect lines together that meet at the same point.
+		ENGINE_INFO_D("Hot chains size! " + std::to_string(m_refECS.GetHotComponents<ChainCollider>().size()));
 
-		for (auto& line : m_refECS.GetHotComponents<LineCollider>())
-		{
-			b2Segment segment = { b2Vec2(line.m_start.X, line.m_start.Y), b2Vec2(line.m_end.X, line.m_end.Y) };
+		auto createChains = [&](auto& components)
+			{
+				using ComponentType = std::decay_t<decltype(components[0])>; // assumes at least one component or indexable
 
-			b2BodyDef bodyDef = b2DefaultBodyDef();
-			b2ShapeDef shapeDef = b2DefaultShapeDef();
+				for (auto& chain : components)
+				{
+					b2ChainDef chainDef = b2DefaultChainDef();
+					b2BodyDef bodyDef = b2DefaultBodyDef();
 
-			bodyDef.type = b2_staticBody;
-			bodyDef.fixedRotation = true;
-			bodyDef.userData = (void*)line.m_entity;
+					chainDef.count = 4;
+					chainDef.filter.categoryBits = chain.m_category;
+					chainDef.filter.maskBits = chain.m_mask;
+					chainDef.friction = 0.0f;
+					chainDef.restitution = 0.0f;
+					chainDef.isLoop = false;
 
-			shapeDef.density = 1.0f;
-			shapeDef.friction = 0.0f;
-			shapeDef.restitution = 0.0f;
-			shapeDef.filter.categoryBits = line.m_category;
-			shapeDef.filter.maskBits = line.m_mask;
+					b2Vec2 points[4];
+					for (int i = 0; i < 4; ++i)
+					{
+						points[i].x = chain.m_points[i].X;
+						points[i].y = chain.m_points[i].Y;
+					}
 
-			b2BodyId bodyId = b2CreateBody(*m_ptrWorldId, &bodyDef);
+					chainDef.points = points;
+					chainDef.userData = (void*)chain.m_entity;
 
-			b2ShapeId shapeId = b2CreateSegmentShape(bodyId, &shapeDef, &segment);
+					bodyDef.type = b2_staticBody;
+					bodyDef.fixedRotation = true;
+					bodyDef.userData = (void*)chain.m_entity;
 
-			line.m_bodyId = new b2BodyId(bodyId);
-			line.m_shapeId = new b2ShapeId(shapeId);
-			line.m_worldId = m_ptrWorldId;
+					b2BodyId bodyId = b2CreateBody(*m_ptrWorldId, &bodyDef);
+					b2ChainId chainId = b2CreateChain(bodyId, &chainDef);
 
-		}
+					chain.m_bodyId = new b2BodyId(bodyId);
+					chain.m_chainId = new b2ChainId(chainId);
+					chain.m_worldId = m_ptrWorldId;
+				}
+			};
 
+		createChains(m_refECS.GetHotComponents<ChainColliderLeft>());
+		createChains(m_refECS.GetHotComponents<ChainColliderRight>());
+		createChains(m_refECS.GetHotComponents<ChainColliderTop>());
+		createChains(m_refECS.GetHotComponents<ChainColliderBottom>());
 	}
 
 	void PhysicsSimulation::ProcessSimpleContacts(PhysicsBody& refPhysicsBody)
@@ -450,7 +467,7 @@ namespace Engine
 	{
 		if (AppState::IN_SCENE)
 		{
-			if (HasBody(entity))
+			if (HasBody(entity) && m_refECS.IsActive<PhysicsBody>(entity))
 			{
 				PhysicsBody* ptrBody = GetBody(entity);
 				b2Body_SetAwake(*ptrBody->m_bodyId, false);
@@ -469,7 +486,8 @@ namespace Engine
 	{
 		if (AppState::IN_SCENE)
 		{
-			if (HasBody(entity))
+			// bad bug here: If it wasn't a part of the scene, it will have to be added to the world here.
+			if (HasBody(entity) && !m_refECS.IsActive<PhysicsBody>(entity))
 			{
 				PhysicsBody* ptrBody = GetBody(entity);
 				b2Body_SetAwake(*ptrBody->m_bodyId, true);

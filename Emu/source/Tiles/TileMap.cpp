@@ -52,107 +52,150 @@ namespace Engine
         }
 	}
 
-    std::vector<Entity> TileMap::LoadMap()
+    std::vector<std::pair<Entity, char>>& TileMap::LoadMap()
     {
-		std::vector<Entity> tiles;
-
+        // Created entity, character tiles.
         for (int y = 0; y < GetHeight(); ++y)
         {
             for (int x = 0; x < GetWidth(); ++x)
             {
-                if (GetTile(x, y) != '-')
-                {
-                    // Might need to add this to an array?
-                    Entity tile = m_refECS.CreateEntity();
+				const char tileChar = GetChar(x, y);
 
-                    // Create "Tiles"
-                    m_refECS.AddComponent<Transform>(tile,
-                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)), 
+                if (tileChar != '-')
+                {
+                    Entity tileEntity = m_refECS.CreateEntity();
+                    m_refECS.AddComponent<Transform>(tileEntity,
+                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
                         Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
                         1.0f, 1.0f, 1, 1);
+                    m_tiles.push_back(std::make_pair(tileEntity, tileChar));
+                }
+                else
+                {
+					m_tiles.push_back(std::make_pair(999999, tileChar));
 
-					tiles.push_back(tile);
-				}
-			}
+                }
+            }
 		}
 
-		return tiles;
+		return m_tiles;
 	}
 
-    // Collision bodies should just be physics bodies, not tiles.
-    std::vector<Entity> TileMap::CreateCollisionBodies()
+    void TileMap::CreateCollisionBodies()
     {
-		std::vector<Entity> collisionBodyIDs;
-
-        // Creates collision bodies for the map. This creates a collision body for each block of tiles.
-        // 
-        // When a tile is moved or removed, the corresponding collision body needs to be updated.
-        // 
-
-        std::vector<std::vector<bool>> processed(GetHeight(), std::vector<bool>(GetWidth(), false));
-
-        for (int y = 0; y < GetHeight(); ++y)
+        for (size_t y = 0; y < GetHeight(); ++y)
         {
-            for (int x = 0; x < GetWidth(); ++x)
+            for (size_t x = 0; x < GetWidth(); ++x)
             {
-                if (GetTile(x, y) != '-' && !processed[y][x])
+				const Entity tileEntity = GetTile(x, y).first;
+
+                if (GetTile(x, y).second != '-')
                 {
-                    // Calculate the dimensions of the current block
-                    int startX = x;
-                    int startY = y;
-                    int width = 1;
-                    int height = 1;
-
-                    // Expand horizontally to form a block
-                    while (startX + width < GetWidth() && GetTile(startX + width, y) != '-' && !processed[y][startX + width])
+                    if (GetTile(x, y - 1).second == '-' && GetTile(x, y + 1).second == '-' && GetTile(x - 1, y).second == '-' && GetTile(x + 1, y).second == '-')
                     {
-                        ++width;
+                        Entity tile = m_refECS.CreateEntity();
+						m_refECS.AddComponent<PhysicsBody>(tile, STATIC, MAP, PLAYER,
+							Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
+							Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
+							0.0f, true, false);
                     }
 
-                    // Expand vertically to form a block
-                    while (startY + height < GetHeight())
-                    {
-                        bool canMergeVertically = true;
-                        for (int subX = startX; subX < startX + width; ++subX)
-                        {
-                            if (GetTile(subX, startY + height) == '-' || processed[startY + height][subX])
-                            {
-                                canMergeVertically = false;
-                                break;
-                            }
-                        }
-                        if (canMergeVertically)
-                        {
-                            ++height;
-                        }
-                        else
-                        {
-                            break;
-                        }
+					bool hasTileAbove = (y > 0 && GetTile(x, y - 1).second != '-');
+					bool hasTileBelow = (y < GetHeight() - 1 && GetTile(x, y + 1).second != '-');
+					bool hasTileLeft = (x > 0 && GetTile(x - 1, y).second != '-');
+					bool hasTileRight = (x < GetWidth() - 1 && GetTile(x + 1, y).second != '-');
+
+					bool hasTileDiagonalLeftAbove = (x > 0 && y > 0 && GetTile(x - 1, y - 1).second != '-');
+					bool hasTileDiagonalLeftBelow = (x > 0 && y < GetHeight() - 1 && GetTile(x - 1, y + 1).second != '-');
+					bool hasTileDiagonalRightAbove = (x < GetWidth() - 1 && y > 0 && GetTile(x + 1, y - 1).second != '-');
+					bool hasTileDiagonalRightBelow = (x < GetWidth() - 1 && y < GetHeight() - 1 && GetTile(x + 1, y + 1).second != '-');
+
+                    if (!hasTileAbove)
+					{
+                        float ghostX0, ghostY0;
+                        float x1 = (float)x;
+                        float y1 = (float)y;
+                        float x2 = x + 1.0f;
+                        float y2 = (float)y;
+                        float ghostX3, ghostY3;
+
+						if (!hasTileRight) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y + 1.0f; }
+						else if (hasTileRight && hasTileDiagonalRightAbove) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y - 1.0f; }
+						else if (hasTileRight) { ghostX3 = (float)x + 2.0f; ghostY3 = (float)y; }
+
+						if (!hasTileLeft) { ghostX0 = (float)x; ghostY0 = (float)y + 1.0f; }
+						else if (hasTileLeft && hasTileDiagonalLeftAbove) { ghostX0 = (float)x; ghostY0 = (float)y - 1.0f; }
+						else if (hasTileLeft) { ghostX0 = (float)x - 1.0f; ghostY0 = (float)y; }
+
+                        m_refECS.AddComponent<ChainColliderTop>(tileEntity, MAP, PLAYER, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+                                                                                              Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
                     }
 
-                    // Mark tiles as processed
-                    for (int subY = startY; subY < startY + height; ++subY)
+                    if (!hasTileLeft)
                     {
-                        for (int subX = startX; subX < startX + width; ++subX)
-                        {
-                            processed[subY][subX] = true;
-                        }
+						float ghostX0, ghostY0;
+						float x1 = (float)x;
+						float y1 = y + 1.0f;
+						float x2 = (float)x;
+						float y2 = (float)y;
+						float ghostX3, ghostY3;
+
+						if (!hasTileAbove) { ghostX3 = x + 1.0f; ghostY3 = (float)y; }
+                        else if (hasTileAbove && hasTileDiagonalLeftAbove) { ghostX3 = (float)x - 1.0f; ghostY3 = (float)y; }
+						else if (hasTileAbove) { ghostX3 = (float)x; ghostY3 = (float)y - 1.0f; }
+
+						if (!hasTileBelow) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y + 1.0f; }
+						else if (hasTileBelow && hasTileDiagonalLeftBelow) { ghostX0 = (float)x - 1.0f; ghostY0 =(float) y + 1.0f; }
+						else if (hasTileBelow) { ghostX0 = (float)x; ghostY0 = (float)y + 2.0f; }
+
+						m_refECS.AddComponent<ChainColliderLeft>(tileEntity, MAP, PLAYER, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+							                                                                  Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
                     }
 
-					Entity tile = m_refECS.CreateEntity();
+					if (!hasTileBelow)
+                    {
+                        float ghostX0, ghostY0;
+                        float x1 = x + 1.0f;
+                        float y1 = y + 1.0f;
+                        float x2 = (float)x;
+                        float y2 = y + 1.0f;
+                        float ghostX3, ghostY3;
 
-                    m_refECS.AddComponent<PhysicsBody>(tile, STATIC, MAP, PLAYER, 
-                        Vector2D<float>(static_cast<float>(width) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(height) * static_cast<float>(m_numUnitsPerTile)), 
-                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
-                        0.0f, true, false);
+						if (!hasTileLeft) { ghostX3 = (float)x; ghostY3 = (float)y; }
+						else if (hasTileLeft && hasTileDiagonalLeftBelow) { ghostX3 = (float)x; ghostY3 = (float)y + 2.0f; }
+						else if (hasTileLeft) { ghostX3 = (float)x - 1.0f; ghostY3 = (float)y + 1.0f; }
 
-					collisionBodyIDs.push_back(tile);
+						if (!hasTileRight) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y; }
+						else if (hasTileRight && hasTileDiagonalRightBelow) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y + 2.0f; }
+						else if (hasTileRight) { ghostX0 = (float)x + 2.0f; ghostY0 = (float)y + 1.0f; }
+
+						m_refECS.AddComponent<ChainColliderBottom>(tileEntity, MAP, PLAYER, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+							                                                                  Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
+                    }
+
+                    if (!hasTileRight)
+                    {
+                        float ghostX0, ghostY0;
+                        float x1 = x + 1.0f;
+                        float y1 = (float)y;
+                        float x2 = x + 1.0f;
+                        float y2 = y + 1.0f;
+                        float ghostX3, ghostY3;
+
+                        if (!hasTileAbove) { ghostX0 = (float)x; ghostY0 = (float)y; }
+                        else if (hasTileAbove && hasTileDiagonalRightAbove) { ghostX0 = (float)x + 2.0f; ghostY0 = (float)y; }
+                        else if (hasTileAbove) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y - 1.0f; }
+
+                        if (!hasTileBelow) { ghostX3 = (float)x; ghostY3 = (float)y + 1.0f; }
+                        else if (hasTileBelow && hasTileDiagonalRightBelow) { ghostX3 = (float)x + 2.0f; ghostY3 = (float)y + 1.0f; }
+                        else if (hasTileBelow) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y + 2.0f; }
+
+                        m_refECS.AddComponent<ChainColliderRight>(tileEntity, MAP, PLAYER, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+                            Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
+                    }
                 }
             }
         }
-
-		return collisionBodyIDs;
     }
 
     // Call this sparingly.
@@ -160,12 +203,23 @@ namespace Engine
 	{
 	}
 
-    const char TileMap::GetTile(int x, int y) const
+    const char TileMap::GetChar(size_t x, size_t y) const
     {
+        if (x < 0 || x >= m_mapDimensions.X || y < 0 || y >= m_mapDimensions.Y)
+        {
+            return ' ';
+        }
+
+        return m_map[y * m_mapDimensions.X + x];
+    }
+
+    const std::pair<Entity, char> TileMap::GetTile(size_t x, size_t y) const
+    {
+        // This needs to return the associated entity as well.
 		if (x < 0 || x >= m_mapDimensions.X || y < 0 || y >= m_mapDimensions.Y) 
 		{
-			return ' ';
+			return std::make_pair(999999, ' ');
 		}
-		return m_map[y * m_mapDimensions.X + x];
+		return m_tiles[y * m_mapDimensions.X + x];
 	}
 }

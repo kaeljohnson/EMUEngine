@@ -34,7 +34,7 @@ namespace Engine
 		EMU_API void Deactivate(Entity entity);
 
 		EMU_API void Remove(Entity entity);
-		EMU_API void AddTileMap(std::string mapFileName, const int numMetersPerTile);
+		EMU_API std::vector<std::pair<Entity, char>> AddTileMap(std::string mapFileName, const int numMetersPerTile);
 
 		// IF theres no map in the level, client will decided the dimensions manually.
 		EMU_API void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
