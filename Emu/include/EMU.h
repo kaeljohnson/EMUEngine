@@ -31,12 +31,29 @@ namespace Engine
 
 		// ECS Interface functions
 		EMU_API Entity CreateEntity();
+		EMU_API Entity GetEntityByCharacter(const char c, const std::string& sceneName);
+		EMU_API Entity GetCurrentRuntimeEntity(const char c);
 		EMU_API void Activate(Entity entity);
 		EMU_API void Deactivate(Entity entity);
-		template <typename T, typename... Args>
+
+		template<typename T, typename... Args>
 		void AddComponent(Entity entity, Args&&... componentArgs)
 		{
 			m_ecs.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
+		}
+
+		template <typename T, typename... Args>
+		void AddComponent(const char c, Args&&... componentArgs)
+		{
+			std::unordered_map<std::string, Scene>& scenes = m_sceneManager.GetAllScenes();
+			for (auto& scene : scenes)
+			{
+				std::vector<Entity> entities = scene.second.GetTileMapEntities(c);
+				for (Entity entity : entities)
+				{
+					m_ecs.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
+				}
+			}
 		}
 
 		// Event IO System Interface functions

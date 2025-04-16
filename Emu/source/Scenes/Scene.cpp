@@ -13,7 +13,7 @@
 namespace Engine
 {
 	Scene::Scene(ECS& refECS)
-		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(nullptr), 
+		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(m_refECS), 
 		m_physicsSimulation(refECS), 
 		m_cameraSystem(refECS),
 		m_updateSystem(refECS) 
@@ -38,11 +38,18 @@ namespace Engine
 
 	void Scene::OnScenePlay()
 	{
+		// Order matters here.
+
+		// 1. Create the world.
 		m_physicsSimulation.CreateWorld(Vector2D<float>(0.0f, 100.0f)); //TODO: Client sets gravity.
 
+		// 2. Load the map. Adds components defined in the rules file and adds them to the ECS.
+		m_tileMap.LoadMap();
+
+		// 3. Activate the entities in the ECS. This will activate all components in the ECS.
 		m_refECS.ActivateEntities(m_entities);
 
-		// Frame the first active camera
+		// 4. Frame the first active camera
 		for (auto& camera : m_refECS.GetHotComponents<Camera>())
 		{
 			m_cameraSystem.Frame(camera, Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
@@ -52,6 +59,12 @@ namespace Engine
 		// Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld();
 		m_physicsSimulation.AddLineCollidersToWorld();
+
+		ENGINE_CRITICAL_D("Num transforms: " + std::to_string(m_refECS.GetHotComponents<Transform>().size()) + ", Num bodies: "
+			+ std::to_string(m_refECS.GetHotComponents<PhysicsBody>().size()) + ", Num line colliders: "
+			+ std::to_string(m_refECS.GetHotComponents<ChainCollider>().size()) + ", Num cameras: "
+			+ std::to_string(m_refECS.GetHotComponents<Camera>().size()) + ", Num tile map entities: "
+			+ std::to_string(m_tileMap.m_allMapEntities.size()));
 
 
 		AppState::IN_SCENE = true;
@@ -64,34 +77,31 @@ namespace Engine
 
 		m_physicsSimulation.Cleanup();
 
+		// Deactivate all entities and destroy all components.
 		m_refECS.DeactivateEntities();
+		m_refECS.DestroyComponents(m_entities);
 	}
 
-	std::vector<std::pair<Entity, char>> Scene::AddTileMap(std::string mapFileName, const int numMetersPerTile)
+	std::vector<std::pair<Entity, char>>& Scene::AddTileMap(std::string mapFileName, std::string rulesFileName)
 	{
-		// Temporary until tilemap system is refactored and tilemaps become components.
-		TileMap tileMap(m_refECS, "testMap1.txt", 1);
-
 		// Get a temp vector or tile IDs from the tile map. Both the transforms and the physics bodies.
-		std::vector<std::pair<Entity, char>> tileMapEntities = tileMap.LoadMap();
-		tileMap.CreateCollisionBodies();
+		m_tileMap.CreateMap(mapFileName, rulesFileName);
 
-		ENGINE_INFO_D("Tile map text file size: " + std::to_string(tileMap.m_map.size()));
-		ENGINE_INFO_D("Tile map collision bodies size: " + std::to_string(tileMap.m_collisionBodies.size()));
+		// ENGINE_INFO_D("Tile map text file size: " + std::to_string(m_tileMap.m_map.size()));
 
-		m_levelDimensionsInUnits = Vector2D<int>(tileMap.GetWidth(), tileMap.GetHeight());
+		m_levelDimensionsInUnits = Vector2D<int>(m_tileMap.GetWidth(), m_tileMap.GetHeight());
 
 		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_levelDimensionsInUnits.X) + ", Map height: " 
 			+ std::to_string(m_levelDimensionsInUnits.Y));
 
 		HasTileMap = true;
 
-		for (auto& pair: tileMapEntities)
-		{
+		for (auto& pair : m_tileMap.m_allMapEntities)
+		{	
 			Add(pair.first);
 		}
 
-		return tileMapEntities;
+		return m_tileMap.m_allMapEntities;
 	}
 
 	void Scene::Add(Entity entity)
@@ -167,5 +177,16 @@ namespace Engine
 		{
 			ENGINE_INFO_D("Map exists in the level. Setting level width and height to map width and height.");
 		}
+	}
+
+	Entity Scene::GetTileMapEntity(char tileChar) const
+	{
+		return m_tileMap.GetEntity(tileChar);
+	}
+
+	std::vector<Entity> Scene::GetTileMapEntities(const char tileChar) const
+	{
+		ENGINE_CRITICAL_D("Getting tile map entities for character " + std::to_string(m_tileMap.m_allMapEntities.size()));
+		return m_tileMap.GetEntities(tileChar);
 	}
 }

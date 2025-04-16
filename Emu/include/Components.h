@@ -81,18 +81,18 @@ namespace Engine
 
 	struct PhysicsUpdater : public Component
 	{
-		using UpdateCallback = std::function<void()>;
+		using UpdateCallback = std::function<void(Entity entity)>;
 
 		PhysicsUpdater(Entity entity, UpdateCallback callback) : m_callback(callback), Component(entity) {}
 		~PhysicsUpdater() = default;
 
 		UpdateCallback m_callback;
 
-		void Update()
+		void Update(Entity entity)
 		{
 			if (m_callback)
 			{
-				m_callback();
+				m_callback(entity);
 			}
 		}
 	};
@@ -101,6 +101,8 @@ namespace Engine
 	{
 		Camera(Entity entity)
 			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), Component(entity) {}
+		Camera(Entity entity, Vector2D<float> size, int pixelsPerUnit, bool clampingOn)
+			: m_size(size), m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), Component(entity) {}
 		~Camera() = default;
 
 		Vector2D<float> m_offset;
@@ -112,38 +114,21 @@ namespace Engine
 
 	struct CameraUpdater : public Component
 	{
-		using UpdateCallback = std::function<void()>;
+		using UpdateCallback = std::function<void(Entity entity)>;
 
 		CameraUpdater(Entity entity, UpdateCallback callback) : m_callback(callback), Component(entity) {} 
 		~CameraUpdater() = default;
 
 		UpdateCallback m_callback;
 
-		void Update()
+		void Update(Entity entity)
 		{
 			if (m_callback)
 			{
-				m_callback();
+				m_callback(entity);
 			}
 		}
 	};
-
-	/*struct LineCollider : public Component
-	{
-		LineCollider(Entity entity, Filter category, Filter mask, Vector2D<float> start, Vector2D<float> end) 
-			: m_category(category), m_mask(mask), m_start(start), m_end(end), Component(entity) {}
-		~LineCollider() = default;
-
-		b2BodyId* m_bodyId;
-		b2ShapeId* m_shapeId;
-		b2WorldId* m_worldId;
-
-		Vector2D<float> m_start;
-		Vector2D<float> m_end;
-
-		Filter m_category;
-		Filter m_mask;
-	};*/
 
 	struct ChainCollider : public Component
 	{

@@ -6,15 +6,77 @@
 #include "../../include/ECS/ComponentManager.h"
 #include "../../include/Components.h"
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
+static json rulesJson; // Only one rules file per game for now so this will work.
+
 namespace Engine
 {
-	TileMap::TileMap(ECS& refECS, const std::string mapFile, const int numMetersPerTile)
-        : m_refECS(refECS), m_mapDimensions(0, 0), m_numUnitsPerTile(numMetersPerTile)
+	TileMap::TileMap(ECS& refECS)
+		: m_refECS(refECS), m_mapDimensions(0, 0), m_numUnitsPerTile(0)
 	{
+		m_map.reserve(MAX_SIZE);
+		m_tiles.reserve(MAX_SIZE);
+		m_allMapEntities.reserve(MAX_SIZE);
+    }
+
+    Entity TileMap::GetEntity(char tileChar) const
+    {
+        for (const auto& tile : m_allMapEntities)
+        {
+            if (tile.second == tileChar)
+            {
+                return tile.first;
+            }
+        }
+        return m_refECS.INVALID_ENTITY;
+    }
+
+	std::vector<Entity> TileMap::GetEntities(char tileChar) const
+	{
+		std::vector<Entity> entities;
+		for (const auto& tile : m_allMapEntities)
+		{
+			if (tile.second == tileChar)
+			{
+				entities.push_back(tile.first);
+			}
+		}
+		return entities;
+	}
+
+    void TileMap::CreateMap(const std::string mapFile, const std::string rulesFile)
+    {
         m_map.reserve(MAX_SIZE);
-        
+        m_tiles.reserve(MAX_SIZE);
+
+        // Open and parse the rules file
+        std::ifstream inFile(rulesFile);
+        if (!inFile.is_open()) {
+            throw std::runtime_error("Failed to open rules file: " + rulesFile);
+        }
+
+        try {
+            inFile >> rulesJson;
+        }
+        catch (const json::parse_error& e) {
+            throw std::runtime_error("Failed to parse rules JSON: " + std::string(e.what()));
+        }
+
+        // Read the NumMetersPerTile and store it in your member variable
+        if (rulesJson.contains("NumMetersPerTile") && rulesJson["NumMetersPerTile"].is_number())
+        {
+            m_numUnitsPerTile = rulesJson["NumMetersPerTile"];
+        }
+        else
+        {
+            throw std::runtime_error("NumMetersPerTile not found or invalid in rules JSON");
+        }
+
+        // Parse file.
         std::ifstream file(mapFile);
-        if (!file) 
+        if (!file)
         {
             ENGINE_CRITICAL("Failed to open map file: " + mapFile);
             return;
@@ -22,9 +84,9 @@ namespace Engine
 
 
         std::string line;
-        while (std::getline(file, line)) 
+        while (std::getline(file, line))
         {
-            if (m_mapDimensions.Y == 0) 
+            if (m_mapDimensions.Y == 0)
             {
                 // Set the width to the length of the first line
                 m_mapDimensions.X = (int)line.length();
@@ -36,13 +98,13 @@ namespace Engine
                 return;
             }
 
-            for (char c : line) 
+            for (char c : line)
             {
-                if (m_map.size() < MAX_SIZE) 
+                if (m_map.size() < MAX_SIZE)
                 {
                     m_map.push_back(c);
                 }
-                else 
+                else
                 {
                     ENGINE_CRITICAL("Map size exceeds maximum size of " + std::to_string(MAX_SIZE));
                 }
@@ -50,65 +112,305 @@ namespace Engine
 
             m_mapDimensions.Y++;
         }
-	}
 
-    std::vector<std::pair<Entity, char>>& TileMap::LoadMap()
-    {
-        // Created entity, character tiles.
+        // Create entity, character tiles.
         for (int y = 0; y < GetHeight(); ++y)
         {
             for (int x = 0; x < GetWidth(); ++x)
             {
-				const char tileChar = GetChar(x, y);
+                const char tileChar = GetChar(x, y);
 
                 if (tileChar != '-')
                 {
                     Entity tileEntity = m_refECS.CreateEntity();
-                    m_refECS.AddComponent<Transform>(tileEntity,
-                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
-                        Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
-                        1.0f, 1.0f, 1, 1);
-                    m_tiles.push_back(std::make_pair(tileEntity, tileChar));
+
+                    m_tiles.push_back(std::make_tuple(tileEntity, tileChar, Vector2D<int>(x, y)));
+					m_allMapEntities.push_back(std::make_pair(tileEntity, tileChar));
                 }
                 else
                 {
-					m_tiles.push_back(std::make_pair(999999, tileChar));
-
+                    m_tiles.push_back(std::make_tuple(m_refECS.INVALID_ENTITY, tileChar, Vector2D<int>(x, y)));
                 }
             }
-		}
+        }
+	}
 
-		return m_tiles;
+	void TileMap::LoadMap()
+	{
+        // Read the NumMetersPerTile and store it in your member variable
+        if (rulesJson.contains("NumMetersPerTile") && rulesJson["NumMetersPerTile"].is_number())
+        {
+            m_numUnitsPerTile = rulesJson["NumMetersPerTile"];
+        }
+        else
+        {
+            throw std::runtime_error("NumMetersPerTile not found or invalid in rules JSON");
+        }
+
+
+        auto& tileRules = rulesJson["Tile Rules"];
+
+        // Create entity, character tiles.
+        for (auto& tuple : m_tiles)
+        {
+		    const char tileChar = std::get<1>(tuple);
+			const int x = std::get<2>(tuple).X;
+			const int y = std::get<2>(tuple).Y;
+
+                if (tileChar != '-')
+                {
+					Entity tileEntity = std::get<0>(tuple);
+
+                    // Convert tile char to string key ("P", "S", etc.)
+                    std::string tileKey(1, tileChar);
+
+                    if (!tileRules.contains(tileKey))
+                    {
+                        ENGINE_INFO_D("No such tile exists: " + tileKey);
+                    }
+
+                    int zIndex = 0; // Default fallback
+                    if (tileRules.contains(tileKey) &&
+                        tileRules[tileKey].contains("Transform") &&
+                        tileRules[tileKey]["Transform"].contains("ZIndex"))
+                    {
+                    	const auto& zIndexJson = tileRules[tileKey]["Transform"]["ZIndex"];
+                    	if (zIndexJson.is_number())
+                    	{
+                    		zIndex = zIndexJson.get<int>();
+                    	}
+                    	else
+                    	{
+                    		ENGINE_INFO_D("ZIndex is not a number or string");
+                    	}
+                    }
+                    // Not every entity will have a transform. Need to filter that out.
+                    m_refECS.AddComponent<Transform>(
+                        tileEntity,
+                        Vector2D<float>(x * static_cast<float>(m_numUnitsPerTile),
+                            y * static_cast<float>(m_numUnitsPerTile)),
+                        Vector2D<float>(static_cast<float>(m_numUnitsPerTile),
+                           static_cast<float>(m_numUnitsPerTile)),
+                        1.0f, 1.0f, 1, zIndex
+                    );
+
+                    // check for camera.
+					const bool hasCamera = tileRules.contains(tileKey) && tileRules[tileKey].contains("Camera");
+					if (hasCamera)
+					{
+                        Vector2D<float> size = Vector2D<float>(0.0f, 0.0f);
+						int pixelsPerUnit = 0;
+						bool clampingOn = false;
+
+						if (tileRules[tileKey]["Camera"].contains("Size"))
+						{
+							const auto& sizeJson = tileRules[tileKey]["Camera"]["Size"];
+							if (sizeJson.is_array() && sizeJson.size() == 2)
+							{
+								if (sizeJson[0].is_number() && sizeJson[1].is_number())
+								{
+									size.X = sizeJson[0].get<float>();
+									size.Y = sizeJson[1].get<float>();
+								}
+							}
+							else
+							{
+								ENGINE_ERROR_D("Camera size is not an array of two numbers");
+							}
+						}
+
+                        if (tileRules[tileKey]["Camera"].contains("PixelsPerUnit"))
+                        {
+							const auto& pixelsPerUnitJson = tileRules[tileKey]["Camera"]["PixelsPerUnit"];
+                            if (pixelsPerUnitJson.is_number())
+                            {
+								pixelsPerUnit = pixelsPerUnitJson.get<int>();
+                            }
+							else
+							{
+								ENGINE_ERROR_D("PixelsPerUnit is not a number");
+							}
+                        }
+
+						if (tileRules[tileKey]["Camera"].contains("ClampingOn"))
+						{
+							const auto& clampingOnJson = tileRules[tileKey]["Camera"]["ClampingOn"];
+							if (clampingOnJson.is_boolean())
+							{
+								clampingOn = clampingOnJson.get<bool>();
+							}
+							else
+							{
+								ENGINE_ERROR_D("ClampingOn is not a boolean");
+							}
+						}
+
+						m_refECS.AddComponent<Camera>(tileEntity, size, pixelsPerUnit, clampingOn);
+					}
+                }
+            }
+
+
+        // Create collision bodies for the tiles.
+        CreateCollisionBodies();
 	}
 
     void TileMap::CreateCollisionBodies()
     {
-        for (size_t y = 0; y < GetHeight(); ++y)
-        {
-            for (size_t x = 0; x < GetWidth(); ++x)
-            {
-				const Entity tileEntity = GetTile(x, y).first;
+        auto& tileRules = rulesJson["Tile Rules"];
 
-                if (GetTile(x, y).second != '-')
+        for (auto& tuple : m_tiles)
+        {
+                BodyType bodyType = STATIC;
+                Filter category = ALL;
+                Filter mask = ALL;
+				Vector2D<float> size = Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile));
+				bool gravityOn = false;
+				bool checkSimpleContacts = false;
+                bool useChains = false;
+
+				const int x = std::get<2>(tuple).X;
+				const int y = std::get<2>(tuple).Y;
+
+                std::string tileKey(1, std::get<1>(tuple));
+                if (tileRules.contains(tileKey) &&
+                    tileRules[tileKey].contains("Physics") &&
+                    tileRules[tileKey]["Physics"].contains("Category"))
                 {
-                    if (GetTile(x, y - 1).second == '-' && GetTile(x, y + 1).second == '-' && GetTile(x - 1, y).second == '-' && GetTile(x + 1, y).second == '-')
+					const auto& categoryJson = tileRules[tileKey]["Physics"]["Category"];
+                    std::string categoryStr = categoryJson;
+					if (categoryStr == "NONE")
+					{
+						category = NONE;
+					}
+					else if (categoryStr == "PLAYER")
+					{
+						category = PLAYER;
+					}
+					else if (categoryStr == "MAP")
+					{
+						category = MAP;
+					}
+					else if (categoryStr == "ALL")
+					{
+						category = ALL;
+					}
+                }
+                if (tileRules.contains(tileKey) &&
+                    tileRules[tileKey].contains("Physics") &&
+                    tileRules[tileKey]["Physics"].contains("Mask"))
+                {
+					const auto& maskJson = tileRules[tileKey]["Physics"]["Mask"];
+                    std::string maskStr = maskJson;
+                    if (maskStr == "NONE")
                     {
-                        Entity tile = m_refECS.CreateEntity();
-						m_refECS.AddComponent<PhysicsBody>(tile, STATIC, MAP, PLAYER,
-							Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile)),
-							Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
-							0.0f, true, false);
+                        mask = NONE;
+                    }
+					else if (maskStr == "PLAYER")
+					{
+						mask = PLAYER;
+					}
+					else if (maskStr == "MAP")
+					{
+						mask = MAP;
+					}
+					else if (maskStr == "ALL")
+					{
+						mask = ALL;
+					}
+                }
+                if (tileRules.contains(tileKey) &&
+                    tileRules[tileKey].contains("Physics") &&
+                    tileRules[tileKey]["Physics"].contains("BodyType"))
+                {
+					const auto& bodyTypeJson = tileRules[tileKey]["Physics"]["BodyType"];
+                    std::string bodyTypeStr = bodyTypeJson;
+                    if (bodyTypeStr == "STATIC")
+                    {
+                        bodyType = STATIC;
+                    }
+                    else if (bodyTypeStr == "DYNAMIC")
+                    {
+                        bodyType = DYNAMIC;
+                    }
+                    else if (bodyTypeStr == "KINEMATIC")
+                    {
+                        bodyType = KINEMATIC;
+                    }
+                    else if (bodyTypeStr == "SENSOR")
+                    {
+                        bodyType = SENSOR;
+                    }
+                }
+				if (tileRules.contains(tileKey) &&
+					tileRules[tileKey].contains("Physics") &&
+					tileRules[tileKey]["Physics"].contains("UseChains"))
+				{
+					const auto& useChainsJson = tileRules[tileKey]["Physics"]["UseChains"];
+                    bool useChainsStr = useChainsJson;
+                    if (useChainsStr == true)
+                    {   
+                        useChains = true;
+                    }
+				}
+				if (tileRules.contains(tileKey) &&
+					tileRules[tileKey].contains("Physics") &&
+					tileRules[tileKey]["Physics"].contains("GravityOn"))
+				{
+                    const auto& gravityOnJson = tileRules[tileKey]["Physics"]["GravityOn"];
+                    bool gravityOnStr = gravityOnJson;
+                    if (gravityOnStr == true)
+                    {
+                        gravityOn = true;
+                    }
+				}
+				if (tileRules.contains(tileKey) &&
+					tileRules[tileKey].contains("Physics") &&
+					tileRules[tileKey]["Physics"].contains("CheckSimpleContacts"))
+				{
+                    const auto& checkSimpleContactsJson = tileRules[tileKey]["Physics"]["CheckSimpleContacts"];
+                    bool checkSimpleContactsStr = checkSimpleContactsJson;
+                    if (checkSimpleContactsStr == true)
+                    {
+                        checkSimpleContacts = true;
                     }
 
-					bool hasTileAbove = (y > 0 && GetTile(x, y - 1).second != '-');
-					bool hasTileBelow = (y < GetHeight() - 1 && GetTile(x, y + 1).second != '-');
-					bool hasTileLeft = (x > 0 && GetTile(x - 1, y).second != '-');
-					bool hasTileRight = (x < GetWidth() - 1 && GetTile(x + 1, y).second != '-');
+				}
+                if (tileRules.contains(tileKey) &&
+                    tileRules[tileKey].contains("Physics") &&
+                    tileRules[tileKey]["Physics"].contains("Size"))
+                {
+					const auto& sizeJson = tileRules[tileKey]["Physics"]["Size"];
+                    if (sizeJson.is_array() && sizeJson.size() == 2)
+                    {
+                        
+                        if (sizeJson[0].is_number() && sizeJson[1].is_number())
+                        {
+                            size.X = sizeJson[0].get<float>();
+                            size.Y = sizeJson[1].get<float>();
+                        }
+                    }
+                }
 
-					bool hasTileDiagonalLeftAbove = (x > 0 && y > 0 && GetTile(x - 1, y - 1).second != '-');
-					bool hasTileDiagonalLeftBelow = (x > 0 && y < GetHeight() - 1 && GetTile(x - 1, y + 1).second != '-');
-					bool hasTileDiagonalRightAbove = (x < GetWidth() - 1 && y > 0 && GetTile(x + 1, y - 1).second != '-');
-					bool hasTileDiagonalRightBelow = (x < GetWidth() - 1 && y < GetHeight() - 1 && GetTile(x + 1, y + 1).second != '-');
+
+                const Entity tileEntity = std::get<0>(tuple);
+
+				if (GetChar(x, y) == '-')
+				{
+					continue;
+				}
+
+                if (useChains) // Chains are used on tiles, typically map tiles, to avoid ghose collisions on adjacent tiles.
+                {
+					bool hasTileAbove = (y > 0 && std::get<1>(GetTile(x, y - 1)) == 'w');
+					bool hasTileBelow = (y < GetHeight() - 1 && std::get<1>(GetTile(x, y + 1)) == 'w');
+					bool hasTileLeft = (x > 0 && std::get<1>(GetTile(x - 1, y)) == 'w');
+					bool hasTileRight = (x < GetWidth() - 1 && std::get<1>(GetTile(x + 1, y)) == 'w');
+
+					bool hasTileDiagonalLeftAbove = (x > 0 && y > 0 && std::get<1>(GetTile(x - 1, y - 1)) == 'w');
+					bool hasTileDiagonalLeftBelow = (x > 0 && y < GetHeight() - 1 && std::get<1>(GetTile(x - 1, y + 1)) == 'w');
+					bool hasTileDiagonalRightAbove = (x < GetWidth() - 1 && y > 0 && std::get<1>(GetTile(x + 1, y - 1)) == 'w');
+					bool hasTileDiagonalRightBelow = (x < GetWidth() - 1 && y < GetHeight() - 1 && std::get<1>(GetTile(x + 1, y + 1)) == 'w');
 
                     if (!hasTileAbove)
 					{
@@ -127,7 +429,7 @@ namespace Engine
 						else if (hasTileLeft && hasTileDiagonalLeftAbove) { ghostX0 = (float)x; ghostY0 = (float)y - 1.0f; }
 						else if (hasTileLeft) { ghostX0 = (float)x - 1.0f; ghostY0 = (float)y; }
 
-                        m_refECS.AddComponent<ChainColliderTop>(tileEntity, MAP, PLAYER, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+                        m_refECS.AddComponent<ChainColliderTop>(tileEntity, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
                                                                                               Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
                     }
 
@@ -148,7 +450,7 @@ namespace Engine
 						else if (hasTileBelow && hasTileDiagonalLeftBelow) { ghostX0 = (float)x - 1.0f; ghostY0 =(float) y + 1.0f; }
 						else if (hasTileBelow) { ghostX0 = (float)x; ghostY0 = (float)y + 2.0f; }
 
-						m_refECS.AddComponent<ChainColliderLeft>(tileEntity, MAP, PLAYER, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+						m_refECS.AddComponent<ChainColliderLeft>(tileEntity, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
 							                                                                  Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
                     }
 
@@ -169,7 +471,7 @@ namespace Engine
 						else if (hasTileRight && hasTileDiagonalRightBelow) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y + 2.0f; }
 						else if (hasTileRight) { ghostX0 = (float)x + 2.0f; ghostY0 = (float)y + 1.0f; }
 
-						m_refECS.AddComponent<ChainColliderBottom>(tileEntity, MAP, PLAYER, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+						m_refECS.AddComponent<ChainColliderBottom>(tileEntity, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
 							                                                                  Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
                     }
 
@@ -190,11 +492,20 @@ namespace Engine
                         else if (hasTileBelow && hasTileDiagonalRightBelow) { ghostX3 = (float)x + 2.0f; ghostY3 = (float)y + 1.0f; }
                         else if (hasTileBelow) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y + 2.0f; }
 
-                        m_refECS.AddComponent<ChainColliderRight>(tileEntity, MAP, PLAYER, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+                        m_refECS.AddComponent<ChainColliderRight>(tileEntity, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
                             Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
                     }
                 }
-            }
+                else // Create a regular physics body for the tiles that don't use chains.
+                {
+					// ENGINE_INFO_D("Creating physics body for tile: " + std::to_string(tileEntity) + ", " + std::to_string(GetChar(x, y)));
+                    ENGINE_CRITICAL_D("Simple contacts: " + std::to_string(checkSimpleContacts));
+					std::cout << "Creating physics body for tile: " << tileEntity << ", " << GetChar(x, y) << "\n";
+					m_refECS.AddComponent<PhysicsBody>(tileEntity, bodyType, category, mask,
+						Vector2D<float>(size.X, size.Y),
+						Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
+						0.0f, gravityOn, checkSimpleContacts);
+                }
         }
     }
 
@@ -213,12 +524,12 @@ namespace Engine
         return m_map[y * m_mapDimensions.X + x];
     }
 
-    const std::pair<Entity, char> TileMap::GetTile(size_t x, size_t y) const
+    const std::tuple<Entity, char, Vector2D<int>> TileMap::GetTile(size_t x, size_t y) const
     {
         // This needs to return the associated entity as well.
 		if (x < 0 || x >= m_mapDimensions.X || y < 0 || y >= m_mapDimensions.Y) 
 		{
-			return std::make_pair(999999, ' ');
+			return std::make_tuple(m_refECS.INVALID_ENTITY, ' ', Vector2D<int>(x, y));
 		}
 		return m_tiles[y * m_mapDimensions.X + x];
 	}

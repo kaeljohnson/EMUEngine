@@ -49,4 +49,23 @@ namespace Engine
 		}
 		m_scenes.clear();
 	}
+
+	Scene& SceneManager::GetScene(const std::string& sceneName)
+	{
+		if (sceneName.compare("Current") == 0)
+		{
+			if (m_ptrCurrentScene == nullptr)
+			{
+				ENGINE_ERROR_D("Current scene is null.");
+				return *m_ptrCurrentScene;
+			}
+			return *m_ptrCurrentScene;
+		}
+		if (m_scenes.find(sceneName) == m_scenes.end())
+		{
+			ENGINE_ERROR_D("Scene not found: " + sceneName);
+			return *m_ptrCurrentScene;
+		}
+		return m_scenes.at(sceneName);
+	}
 }

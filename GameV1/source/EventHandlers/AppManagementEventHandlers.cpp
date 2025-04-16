@@ -5,7 +5,7 @@
 #include "../../include/EventHandlers/AppManagementEventHandlers.h"
 
 
-AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity playerEntity, Engine::Entity testEntity) 
+AppManagementEventHandlers::AppManagementEventHandlers() 
 {
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::F_KEY_DOWN, [](Engine::IOEvent& e)
 		{
@@ -40,17 +40,19 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity playerEnti
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::G_KEY_DOWN, [playerEntity](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::G_KEY_DOWN, [](Engine::IOEvent& e)
 		{
+			Engine::Entity entity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('P');
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::G_KEY_DOWN)));
-			Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(playerEntity, 16);
+			Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(entity, 16);
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::H_KEY_DOWN, [playerEntity](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::H_KEY_DOWN, [](Engine::IOEvent& e)
 		{
+			Engine::Entity entity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('P');
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::H_KEY_DOWN)));
-			Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(playerEntity, 32);   
+			Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(entity, 32);
 			e.Handled = true;
 		});
 	
@@ -61,14 +63,18 @@ AppManagementEventHandlers::AppManagementEventHandlers(Engine::Entity playerEnti
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_DOWN, [testEntity](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_DOWN, [](Engine::IOEvent& e)
 		{
-			Engine::EMU::GetInstance()->Deactivate(testEntity);
+			CLIENT_TRACE_D("Handled event O KEY DOWN: " + std::to_string(static_cast<int>(Engine::O_KEY_DOWN)));
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('S');
+			Engine::EMU::GetInstance()->Activate(testEntity);
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_UP, [testEntity](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_UP, [](Engine::IOEvent& e)
 		{
-			Engine::EMU::GetInstance()->Activate(testEntity);
+			CLIENT_TRACE_D("Handled event O KEY UP: " + std::to_string(static_cast<int>(Engine::O_KEY_UP)));
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('S');
+			Engine::EMU::GetInstance()->Deactivate(testEntity);
 		});
 }
 

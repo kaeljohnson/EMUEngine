@@ -427,7 +427,7 @@ namespace Engine
 			// Is this the best place for this?
 			PhysicsUpdater* ptrPhysicsUpdater = m_refECS.GetComponent<PhysicsUpdater>(refPhysicsBody.m_entity);
 			if (ptrPhysicsUpdater)
-				ptrPhysicsUpdater->Update();
+				ptrPhysicsUpdater->Update(refPhysicsBody.m_entity);
 		}
 	}
 

@@ -66,6 +66,16 @@ namespace Engine
 		return m_ecs.CreateEntity();
 	}
 
+	Entity EMU::GetEntityByCharacter(const char c, const std::string& sceneName)
+	{
+		return GetScene(sceneName).GetTileMapEntity(c);
+	}
+
+	Entity EMU::GetCurrentRuntimeEntity(const char c)
+	{
+		return m_sceneManager.GetCurrentScene()->GetTileMapEntity(c);
+	}
+
 	void EMU::Activate(Entity entity)
 	{
 		m_ecs.Activate(entity);

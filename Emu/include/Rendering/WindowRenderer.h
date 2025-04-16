@@ -15,8 +15,6 @@ namespace Engine
 		~WindowRenderer();
 
 		void Initialize();
-		void Activate(Entity entity);
-		void Deactivate(Entity entity);
 
 		void SetViewport();
 		void ResizeWindow(const int newWindowWidth, const int newWindowHeight);

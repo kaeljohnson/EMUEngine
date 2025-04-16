@@ -16,12 +16,10 @@ namespace Engine
 
 	void Application::Activate(Entity entity)
 	{
-		m_windowRenderer.Activate(entity);
 	}
 
 	void Application::Deactivate(Entity entity)
 	{
-		m_windowRenderer.Deactivate(entity);
 	}
 	void Application::Start()
 	{
@@ -44,6 +42,7 @@ namespace Engine
 			// auto start = std::chrono::high_resolution_clock::now();
 			if (m_refSceneManager.IsNewSceneStarting())
 			{	
+				ENGINE_INFO_D("New scene starting!");
 				m_refSceneManager.LoadQueuedScene();
 				m_refSceneManager.NewSceneStarted();
 				m_ptrCurrentScene = m_refSceneManager.GetCurrentScene();

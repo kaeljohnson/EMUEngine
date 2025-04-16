@@ -32,9 +32,12 @@ namespace Engine
 		// from entities array and deactivating entity in ECS.
 		EMU_API void Activate(Entity entity);
 		EMU_API void Deactivate(Entity entity);
-
 		EMU_API void Remove(Entity entity);
-		EMU_API std::vector<std::pair<Entity, char>> AddTileMap(std::string mapFileName, const int numMetersPerTile);
+
+		EMU_API std::vector<std::pair<Entity, char>>& AddTileMap(std::string mapFileName, std::string rulesFileName);
+		std::vector<std::pair<Entity, char>> GetTileMap() const { return m_tileMap.m_allMapEntities; }
+		EMU_API Entity GetTileMapEntity(char tileChar) const;
+		EMU_API std::vector<Entity> GetTileMapEntities(const char tileChar) const;
 
 		// IF theres no map in the level, client will decided the dimensions manually.
 		EMU_API void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
@@ -43,7 +46,7 @@ namespace Engine
 		ECS& m_refECS;
 
 		Vector2D<int> m_levelDimensionsInUnits;
-		TileMap* m_tileMap; 
+		TileMap m_tileMap; 
 
 		PhysicsSimulation m_physicsSimulation;
 		CameraSystem m_cameraSystem;
