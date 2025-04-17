@@ -34,7 +34,7 @@ namespace Engine
 		EMU_API void Deactivate(Entity entity);
 		EMU_API void Remove(Entity entity);
 
-		EMU_API std::vector<std::pair<Entity, char>>& AddTileMap(std::string mapFileName, std::string rulesFileName);
+		EMU_API void AddTileMap(std::string mapFileName, std::string rulesFileName);
 		std::vector<std::pair<Entity, char>> GetTileMap() const { return m_tileMap.m_allMapEntities; }
 		EMU_API Entity GetTileMapEntity(char tileChar) const;
 		EMU_API std::vector<Entity> GetTileMapEntities(const char tileChar) const;

@@ -150,7 +150,6 @@ namespace Engine
             throw std::runtime_error("NumMetersPerTile not found or invalid in rules JSON");
         }
 
-
         auto& tileRules = rulesJson["Tile Rules"];
 
         // Create entity, character tiles.

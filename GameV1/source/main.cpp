@@ -57,7 +57,7 @@ int main(int argc, char* args[])
 	scene2.SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 
 	// Temp for now. Client will not be able to call functions directly on scene object.
-	std::vector<std::pair<Engine::Entity, char>>& tileMap = scene.AddTileMap("testMap1.txt", "Rules.json");
+	scene.AddTileMap("testMap1.txt", "Rules.json");
 	scene2.AddTileMap("TestMap2.txt", "Rules.json");
 
 	Player player;
@@ -65,6 +65,8 @@ int main(int argc, char* args[])
 	Engine::Entity playerEntityScene1 = Engine::EMU::GetInstance()->GetEntityByCharacter('P', "Level1");
 	Engine::Entity playerEntityScene2 = Engine::EMU::GetInstance()->GetEntityByCharacter('P', "Level2");
 	Engine::Entity testEntity = Engine::EMU::GetInstance()->GetEntityByCharacter('S', "Level1");
+
+	std::vector<Engine::Entity> playerEntities = engine->GetEntitiesByCharacter('w', "Level1");
 
 	scene.RegisterContactCallback(Engine::BEGIN_CONTACT, playerEntityScene1, testEntity, [](const Engine::Contact event)
 		{

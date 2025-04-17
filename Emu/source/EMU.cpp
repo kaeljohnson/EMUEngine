@@ -71,6 +71,11 @@ namespace Engine
 		return GetScene(sceneName).GetTileMapEntity(c);
 	}
 
+	std::vector<Entity> EMU::GetEntitiesByCharacter(const char c, const std::string& sceneName)
+	{
+		return GetScene(sceneName).GetTileMapEntities(c);
+	}
+
 	Entity EMU::GetCurrentRuntimeEntity(const char c)
 	{
 		return m_sceneManager.GetCurrentScene()->GetTileMapEntity(c);

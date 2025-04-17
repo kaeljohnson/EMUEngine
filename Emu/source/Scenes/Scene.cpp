@@ -82,7 +82,7 @@ namespace Engine
 		m_refECS.DestroyComponents(m_entities);
 	}
 
-	std::vector<std::pair<Entity, char>>& Scene::AddTileMap(std::string mapFileName, std::string rulesFileName)
+	void Scene::AddTileMap(std::string mapFileName, std::string rulesFileName)
 	{
 		// Get a temp vector or tile IDs from the tile map. Both the transforms and the physics bodies.
 		m_tileMap.CreateMap(mapFileName, rulesFileName);
@@ -100,8 +100,6 @@ namespace Engine
 		{	
 			Add(pair.first);
 		}
-
-		return m_tileMap.m_allMapEntities;
 	}
 
 	void Scene::Add(Entity entity)
@@ -186,7 +184,6 @@ namespace Engine
 
 	std::vector<Entity> Scene::GetTileMapEntities(const char tileChar) const
 	{
-		ENGINE_CRITICAL_D("Getting tile map entities for character " + std::to_string(m_tileMap.m_allMapEntities.size()));
 		return m_tileMap.GetEntities(tileChar);
 	}
 }
