@@ -213,8 +213,8 @@ namespace Engine
 	}
 
 	// Physics Simulation
-	PhysicsSimulation::PhysicsSimulation(ECS& refECS)
-		: m_refECS(refECS), m_ptrWorldId(nullptr), m_contactSystem(refECS)
+	PhysicsSimulation::PhysicsSimulation(ECS& refECS, CharacterTileMap& tileMap)
+		: m_refECS(refECS), m_ptrWorldId(nullptr), m_contactSystem(refECS, tileMap)
 	{}
 
 	void PhysicsSimulation::CreateWorld(const Vector2D<float> gravity)
@@ -346,6 +346,11 @@ namespace Engine
 		createChains(m_refECS.GetHotComponents<ChainColliderRight>());
 		createChains(m_refECS.GetHotComponents<ChainColliderTop>());
 		createChains(m_refECS.GetHotComponents<ChainColliderBottom>());
+	}
+
+	void PhysicsSimulation::ActivateContactCallbacks()
+	{
+		m_contactSystem.ActivateContactCallbacks();
 	}
 
 	void PhysicsSimulation::ProcessSimpleContacts(PhysicsBody& refPhysicsBody)

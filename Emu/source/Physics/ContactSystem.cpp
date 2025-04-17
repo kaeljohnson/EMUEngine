@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	ContactSystem::ContactSystem(ECS& refECS) : m_refECS(refECS) {}
+	ContactSystem::ContactSystem(ECS& refECS, CharacterTileMap& tileMap) : m_refECS(refECS), m_refTileMap(tileMap) {}
 
 	// This function is allocating memory dynamically. Why?
 	void ContactSystem::ProcessContacts(void* ptrWorldId)
@@ -142,7 +142,46 @@ namespace Engine
 		}
 	}
 
-	void ContactSystem::RegisterContactCallback(ContactType contactType, Entity entityA, ContactCallback callback)
+	void ContactSystem::ActivateContactCallbacks()
+	{
+		for (auto& tuple : m_singleEntityContactCallbacks)
+		{
+			Entity entityA = m_refTileMap.GetEntity(std::get<1>(tuple));
+			ContactType contactType = std::get<0>(tuple);
+			ContactCallback callback = std::get<2>(tuple);
+			if (entityA != m_refECS.INVALID_ENTITY)
+			{
+				ActivateContactCallback(contactType, entityA, callback);
+			}
+			else
+			{
+				ENGINE_CRITICAL_D("Entity does not exist in the ECS. Cannot register contact callback.");
+			}
+		}
+
+		for (auto& tuple : m_multiContactCallbacks)
+		{
+			Entity entityA = m_refTileMap.GetEntity(std::get<1>(tuple));
+			Entity entityB = m_refTileMap.GetEntity(std::get<2>(tuple));
+			ContactType contactType = std::get<0>(tuple);
+			ContactCallback callback = std::get<3>(tuple);
+			if (entityA != m_refECS.INVALID_ENTITY && entityB != m_refECS.INVALID_ENTITY)
+			{
+				ActivateContactCallback(contactType, entityA, entityB, callback);
+			}
+			else
+			{
+				ENGINE_CRITICAL_D("One or both entities do not exist in the ECS. Cannot register contact callback.");
+			}
+		}
+	}
+
+	void ContactSystem::RegisterContactCallback(ContactType contactType, const char A, ContactCallback callback)
+	{
+		m_singleEntityContactCallbacks.emplace_back(contactType, A, callback);
+	}
+
+	void ContactSystem::ActivateContactCallback(ContactType contactType, Entity entityA, ContactCallback callback)
 	{
 		PhysicsBody* ptrPhysicsBody = m_refECS.GetComponent<PhysicsBody>(entityA);
 		if (ptrPhysicsBody == nullptr)
@@ -180,7 +219,12 @@ namespace Engine
 		}
 	}
 
-	void ContactSystem::RegisterContactCallback(ContactType contactType, Entity entityA, Entity entityB, ContactCallback callback)
+	void ContactSystem::RegisterContactCallback(ContactType contactType, const char A, const char B, ContactCallback callback)
+	{
+		m_multiContactCallbacks.emplace_back(contactType, A, B, callback);
+	}
+
+	void ContactSystem::ActivateContactCallback(ContactType contactType, Entity entityA, Entity entityB, ContactCallback callback)
 	{
 		PhysicsBody* ptrPhysicsBodyA = m_refECS.GetComponent<PhysicsBody>(entityA);
 		PhysicsBody* ptrPhysicsBodyB = m_refECS.GetComponent<PhysicsBody>(entityB);

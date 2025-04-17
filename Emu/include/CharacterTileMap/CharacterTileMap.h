@@ -8,14 +8,14 @@
 
 namespace Engine
 {
-	class TileMap
+	class CharacterTileMap
 	{
 	public:
 		// Client should probably decide this.
 		static const int MAX_SIZE = 20000;
 
 		// Tilemap should not take ECS reference. Tilemap system needs major refactoring.
-		TileMap(ECS& refECS);
+		CharacterTileMap(ECS& refECS);
 		const char GetChar(size_t x, size_t y) const;
 		const std::tuple<Entity, char, Vector2D<int>> GetTile(size_t x, size_t y) const;
 		
@@ -30,7 +30,6 @@ namespace Engine
 	public:
 		void CreateMap(const std::string mapFile, const std::string rulesFile);
 		void LoadMap();
-		void CreateCollisionBodies();
 		void UnloadMap();
 
 	public:

@@ -3,6 +3,7 @@
 #include "../Core.h"
 #include "../MathUtil.h"
 #include "../Components.h"
+#include "../CharacterTileMap/CharacterTileMap.h" 
 #include "ContactSystem.h"
 
 struct b2WorldId;
@@ -58,11 +59,12 @@ namespace Engine
 	class PhysicsSimulation
 	{
 	public:
-		PhysicsSimulation(ECS& refECS);
+		PhysicsSimulation(ECS& refECS, CharacterTileMap& tileMap);
 		void CreateWorld(const Vector2D<float> gravity);
 		void UpdateGravity(const Vector2D<float> gravity);
 		void AddPhysicsBodiesToWorld();
 		void AddLineCollidersToWorld();
+		void ActivateContactCallbacks();
 
 		void Update();
 		void ProcessSimpleContacts(PhysicsBody& refPhysicsBody);

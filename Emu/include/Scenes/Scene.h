@@ -2,7 +2,7 @@
 
 #include "../ECS/ComponentManager.h"
 #include "../ECS/ECS.h"
-#include "../Tiles/TileMap.h" 
+#include "../CharacterTileMap/CharacterTileMap.h" 
 #include "../Physics/Physics.h"
 #include "../Camera/CameraSystem.h"
 #include "../Includes.h"
@@ -21,8 +21,9 @@ namespace Engine
 		EMU_API ~Scene();
 
 		using ContactCallback = std::function<void(const Contact&)>;
-		EMU_API void RegisterContactCallback(ContactType contactType, Entity entityA, Entity entityB, ContactCallback callback);
-		EMU_API void RegisterContactCallback(ContactType contactType, Entity entity, ContactCallback callback);
+		EMU_API void RegisterContactCallback(ContactType contactType, const char entityA, const char entityB, ContactCallback callback);
+
+		EMU_API void RegisterContactCallback(ContactType contactType, const char entity, ContactCallback callback);
 
 		EMU_API void SetPhysicsSimulation(const Vector2D<float> gravity);
 	
@@ -46,7 +47,7 @@ namespace Engine
 		ECS& m_refECS;
 
 		Vector2D<int> m_levelDimensionsInUnits;
-		TileMap m_tileMap; 
+		CharacterTileMap m_tileMap;
 
 		PhysicsSimulation m_physicsSimulation;
 		CameraSystem m_cameraSystem;

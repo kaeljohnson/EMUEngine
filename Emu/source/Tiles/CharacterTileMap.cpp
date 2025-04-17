@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../include/Tiles/TileMap.h"
+#include "../../include/CharacterTileMap/CharacterTileMap.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/ECS/ComponentManager.h"
@@ -13,7 +13,7 @@ static json rulesJson; // Only one rules file per game for now so this will work
 
 namespace Engine
 {
-	TileMap::TileMap(ECS& refECS)
+	CharacterTileMap::CharacterTileMap(ECS& refECS)
 		: m_refECS(refECS), m_mapDimensions(0, 0), m_numUnitsPerTile(0)
 	{
 		m_map.reserve(MAX_SIZE);
@@ -21,7 +21,7 @@ namespace Engine
 		m_allMapEntities.reserve(MAX_SIZE);
     }
 
-    Entity TileMap::GetEntity(char tileChar) const
+    Entity CharacterTileMap::GetEntity(char tileChar) const
     {
         for (const auto& tile : m_allMapEntities)
         {
@@ -33,7 +33,7 @@ namespace Engine
         return m_refECS.INVALID_ENTITY;
     }
 
-	std::vector<Entity> TileMap::GetEntities(char tileChar) const
+	std::vector<Entity> CharacterTileMap::GetEntities(char tileChar) const
 	{
 		std::vector<Entity> entities;
 		for (const auto& tile : m_allMapEntities)
@@ -46,7 +46,7 @@ namespace Engine
 		return entities;
 	}
 
-    void TileMap::CreateMap(const std::string mapFile, const std::string rulesFile)
+    void CharacterTileMap::CreateMap(const std::string mapFile, const std::string rulesFile)
     {
         m_map.reserve(MAX_SIZE);
         m_tiles.reserve(MAX_SIZE);
@@ -138,7 +138,7 @@ namespace Engine
         }
 	}
 
-	void TileMap::LoadMap()
+	void CharacterTileMap::LoadMap()
 	{
         // Read the NumMetersPerTile and store it in your member variable
         if (rulesJson.contains("NumMetersPerTile") && rulesJson["NumMetersPerTile"].is_number())
@@ -444,11 +444,11 @@ namespace Engine
 	}
 
     // Call this sparingly.
-    void TileMap::UnloadMap()
+    void CharacterTileMap::UnloadMap()
 	{
 	}
 
-    const char TileMap::GetChar(size_t x, size_t y) const
+    const char CharacterTileMap::GetChar(size_t x, size_t y) const
     {
         if (x < 0 || x >= m_mapDimensions.X || y < 0 || y >= m_mapDimensions.Y)
         {
@@ -458,12 +458,12 @@ namespace Engine
         return m_map[y * m_mapDimensions.X + x];
     }
 
-    const std::tuple<Entity, char, Vector2D<int>> TileMap::GetTile(size_t x, size_t y) const
+    const std::tuple<Entity, char, Vector2D<int>> CharacterTileMap::GetTile(size_t x, size_t y) const
     {
         // This needs to return the associated entity as well.
 		if (x < 0 || x >= m_mapDimensions.X || y < 0 || y >= m_mapDimensions.Y) 
 		{
-			return std::make_tuple(m_refECS.INVALID_ENTITY, ' ', Vector2D<int>(x, y));
+			return std::make_tuple(m_refECS.INVALID_ENTITY, ' ', Vector2D<int>((int)x, (int)y));
 		}
 		return m_tiles[y * m_mapDimensions.X + x];
 	}

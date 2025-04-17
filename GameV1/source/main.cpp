@@ -68,41 +68,36 @@ int main(int argc, char* args[])
 
 	std::vector<Engine::Entity> playerEntities = engine->GetEntitiesByCharacter('w', "Level1");
 
-	scene.RegisterContactCallback(Engine::BEGIN_CONTACT, playerEntityScene1, testEntity, [](const Engine::Contact event)
+	scene.RegisterContactCallback(Engine::BEGIN_CONTACT, 'P', 'S', [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi Begin Contact");
 		});
 
-	scene.RegisterContactCallback(Engine::END_CONTACT, playerEntityScene1, testEntity, [](const Engine::Contact event)
+	scene.RegisterContactCallback(Engine::END_CONTACT, 'P', 'S', [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi End Contact");
 		});
 
-	scene.RegisterContactCallback(Engine::BEGIN_SENSOR, testEntity, [](const Engine::Contact event)
+	scene.RegisterContactCallback(Engine::BEGIN_SENSOR, 'S', [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Single Begin Sensing");
 		});
 
-	scene.RegisterContactCallback(Engine::BEGIN_SENSOR, playerEntityScene1, testEntity, [](const Engine::Contact event)
+	scene.RegisterContactCallback(Engine::BEGIN_SENSOR, 'P', 'S', [](const Engine::Contact event)
 		{
-			CLIENT_INFO_D("Single Begin Sensing");
+			CLIENT_INFO_D("Multi Begin Sensing");
 		});
 
-	scene.RegisterContactCallback(Engine::END_SENSOR, testEntity, [](const Engine::Contact event)
+	scene.RegisterContactCallback(Engine::END_SENSOR, 'S', [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Single End Sensing");
 		});
-	scene.RegisterContactCallback(Engine::END_SENSOR, playerEntityScene1, testEntity, [](const Engine::Contact event)
+	scene.RegisterContactCallback(Engine::END_SENSOR, 'P', 'S', [](const Engine::Contact event)
 		{
-			CLIENT_INFO_D("Single End Sensing");
+			CLIENT_INFO_D("Multi End Sensing");
 		});
 
 	PlayerCamera playerCamera;
-	// engine->SetCurrentCamera(ptrCameraEntity);
-	// scene->Add(ptrCameraEntity);
-
-	// scene2.Add(playerEntity);
-
 
 	engine->LoadScene("Level1");
 	

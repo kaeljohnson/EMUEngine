@@ -1,7 +1,7 @@
 #pragma once
 
 #include "box2d/box2d.h"
-#include "../../include/Tiles/TileMap.h"
+#include "../../include/CharacterTileMap/CharacterTileMap.h"
 #include "../../include/Physics/Physics.h"
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Logging/Logger.h"
@@ -14,7 +14,7 @@ namespace Engine
 {
 	Scene::Scene(ECS& refECS)
 		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(m_refECS), 
-		m_physicsSimulation(refECS), 
+		m_physicsSimulation(refECS, m_tileMap), 
 		m_cameraSystem(refECS),
 		m_updateSystem(refECS) 
 	{
@@ -26,12 +26,12 @@ namespace Engine
 		m_physicsSimulation.Cleanup();
 	}
 	
-	void Scene::RegisterContactCallback(ContactType contactType, Entity entityA, Entity entityB, ContactCallback callback)
+	void Scene::RegisterContactCallback(ContactType contactType, const char entityA, const char entityB, ContactCallback callback)
 	{
 		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entityA, entityB, callback);
 	}
 
-	void Scene::RegisterContactCallback(ContactType contactType, Entity entity, ContactCallback callback)
+	void Scene::RegisterContactCallback(ContactType contactType, const char entity, ContactCallback callback)
 	{
 		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entity, callback);
 	}
@@ -56,9 +56,12 @@ namespace Engine
 			break;
 		}
 
-		// Physics bodies need to be added to the world after they are activated and pooled.
+		// 5. Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld();
 		m_physicsSimulation.AddLineCollidersToWorld();
+
+		// 6. Contact callbacks need to be activated.
+		m_physicsSimulation.ActivateContactCallbacks();
 
 		ENGINE_CRITICAL_D("Num transforms: " + std::to_string(m_refECS.GetHotComponents<Transform>().size()) + ", Num bodies: "
 			+ std::to_string(m_refECS.GetHotComponents<PhysicsBody>().size()) + ", Num line colliders: "
