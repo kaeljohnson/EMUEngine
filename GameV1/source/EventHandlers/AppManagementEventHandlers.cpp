@@ -68,6 +68,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			CLIENT_TRACE_D("Handled event O KEY DOWN: " + std::to_string(static_cast<int>(Engine::O_KEY_DOWN)));
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('S');
 			Engine::EMU::GetInstance()->Activate(testEntity);
+			CLIENT_TRACE_D("Done with O key down listener");
 		});
 
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_UP, [](Engine::IOEvent& e)
@@ -75,6 +76,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			CLIENT_TRACE_D("Handled event O KEY UP: " + std::to_string(static_cast<int>(Engine::O_KEY_UP)));
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('S');
 			Engine::EMU::GetInstance()->Deactivate(testEntity);
+			CLIENT_TRACE_D("Done with O key up listener");
 		});
 }
 

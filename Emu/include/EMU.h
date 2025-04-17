@@ -38,6 +38,8 @@ namespace Engine
 		// Returns the current runtime entity with the given character.
 		EMU_API Entity GetCurrentRuntimeEntity(const char c);
 		EMU_API void Activate(Entity entity);
+		// Cameras updated separately since there can only be one camera active.
+		EMU_API void ChangeCamera(Entity entity);
 		EMU_API void Deactivate(Entity entity);
 
 		template<typename T, typename... Args>
@@ -74,7 +76,7 @@ namespace Engine
 		PhysicsInterface m_physicsInterface;
 		CameraInterface m_cameraInterface;
 		TransformInterface m_transformInterface;
-		UpdatableInterface m_updatableInterface; // This may not be necessary.
+		UpdatableInterface m_updaterInterface; // This may not be necessary.
 
 		IOEventSystem m_ioEventSystem;
 		SceneManager m_sceneManager;

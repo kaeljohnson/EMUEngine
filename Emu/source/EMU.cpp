@@ -20,7 +20,7 @@ namespace Engine
 	EMU::EMU(const size_t numEntities)
 		: m_ecs(), m_sceneManager(), 
 		m_physicsInterface(m_ecs), m_transformInterface(m_ecs), 
-		m_updatableInterface(m_ecs), m_ioEventSystem(),
+		m_updaterInterface(m_ecs), m_ioEventSystem(),
 		m_application(m_ecs, m_sceneManager, m_ioEventSystem), m_cameraInterface(m_ecs)
 	{
 		m_ecs.Initialize(numEntities);
@@ -86,10 +86,14 @@ namespace Engine
 		m_ecs.Activate(entity);
 		m_physicsInterface.ActivateBody(entity);
 		m_transformInterface.Activate(entity);
-		m_cameraInterface.Activate(entity);
-		m_updatableInterface.Activate(entity);
+		m_updaterInterface.Activate(entity);
 
 		m_application.Activate(entity);
+	}
+
+	void EMU::ChangeCamera(Entity entity)
+	{
+		m_cameraInterface.ChangeCamera(entity);
 	}
 
 	void EMU::Deactivate(Entity entity)
@@ -97,7 +101,7 @@ namespace Engine
 		m_ecs.Deactivate(entity);
 		m_physicsInterface.DeactivateBody(entity);
 		m_transformInterface.Deactivate(entity);
-		m_updatableInterface.Deactivate(entity);
+		m_updaterInterface.Deactivate(entity);
 
 		m_application.Deactivate(entity);
 	}

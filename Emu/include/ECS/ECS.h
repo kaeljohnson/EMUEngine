@@ -230,13 +230,19 @@ namespace Engine
 			}
 		}
 
-        void Activate(Entity entity)
-        {
-            for (auto& manager : m_componentManagers)
-            {
-                manager.second->ActivateComponent(entity);
-            }
-        }
+		void Activate(Entity entity)
+		{
+			for (auto& manager : m_componentManagers)
+			{
+				manager.second->ActivateComponent(entity);
+			}
+		}
+
+		template<typename T>
+		void ActivateComponent(Entity entity)
+		{
+			m_componentManagers[std::type_index(typeid(T))]->ActivateComponent(entity);
+		}
 
 		template<typename T>
 		void Activate(Entity entity)
@@ -278,6 +284,12 @@ namespace Engine
 		void Deactivate(Entity entity)
 		{
 			return m_componentManagers[std::type_index(typeid(T))]->DeactivateComponent(entity);
+		}
+
+		template<typename T>
+		void DeactivateComponent(Entity entity)
+		{
+			m_componentManagers[std::type_index(typeid(T))]->DeactivateComponent(entity);
 		}
 
 		template<typename T>
