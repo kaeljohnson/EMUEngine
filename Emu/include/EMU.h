@@ -31,16 +31,24 @@ namespace Engine
 
 		// ECS Interface functions
 		EMU_API Entity CreateEntity();
+
 		// Returns first entity with the given character.
 		EMU_API Entity GetEntityByCharacter(const char c, const std::string& sceneName);
+
 		// Returns vector of entities with the given character.
 		EMU_API std::vector<Entity> GetEntitiesByCharacter(const char c, const std::string& sceneName);
+
 		// Returns the current runtime entity with the given character.
 		EMU_API Entity GetCurrentRuntimeEntity(const char c);
+
+		// Activate all components in entity
 		EMU_API void Activate(Entity entity);
+		
+		// Deactivate all components in entity
+		EMU_API void Deactivate(Entity entity);
+
 		// Cameras updated separately since there can only be one camera active.
 		EMU_API void ChangeCamera(Entity entity);
-		EMU_API void Deactivate(Entity entity);
 
 		template<typename T, typename... Args>
 		void AddComponent(Entity entity, Args&&... componentArgs)
