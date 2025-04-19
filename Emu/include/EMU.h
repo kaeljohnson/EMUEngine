@@ -50,6 +50,14 @@ namespace Engine
 		// Cameras updated separately since there can only be one camera active.
 		EMU_API void ChangeCamera(Entity entity);
 
+		// Activate/Deactivate specific components
+		void ActivatePhysics(Entity entity);
+		void DeactivatePhysics(Entity entity);
+
+		void ActivateTransform(Entity entity);
+		void DeactivateTransform(Entity entity);
+
+
 		template<typename T, typename... Args>
 		void AddComponent(Entity entity, Args&&... componentArgs)
 		{

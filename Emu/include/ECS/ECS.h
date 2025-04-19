@@ -49,6 +49,18 @@ namespace Engine
 			}
 		}
 
+		// Destroy all components associated with the entity.
+		void DestroyComponents(Entity entity)
+		{
+			if (m_usedIDs.find(entity) == m_usedIDs.end())
+				throw std::runtime_error("Error: Entity does not exist.");
+
+			for (auto& manager : m_componentManagers)
+			{
+				manager.second->DestroyComponent(entity);
+			}
+		}
+
 		void DestroyComponents(std::vector<Entity>& entities)
 		{
 			for (auto& entity : entities)

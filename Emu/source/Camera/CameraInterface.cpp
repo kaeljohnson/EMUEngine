@@ -12,9 +12,11 @@ namespace Engine
 		// Deactivate all other cameras
 		if (m_activeCameraEntity != -1)
 		{
-			m_refECS.DeactivateComponent<Camera>(entity);
+			m_refECS.DeactivateComponent<Camera>(m_activeCameraEntity);
+			m_refECS.DeactivateComponent<CameraUpdater>(m_activeCameraEntity);
 		}
 		m_refECS.ActivateComponent<Camera>(entity);
+		m_refECS.ActivateComponent<CameraUpdater>(entity);
 		m_activeCameraEntity = entity;
 	}
 

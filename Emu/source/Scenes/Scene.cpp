@@ -49,11 +49,10 @@ namespace Engine
 		// 3. Activate the entities in the ECS. This will activate all components in the ECS.
 		m_refECS.ActivateEntities(m_entities);
 
-		// 4. Frame the first active camera
+		// 4. Frame the first active camera, deactivate all other cameras.
 		for (auto& camera : m_refECS.GetHotComponents<Camera>())
 		{
 			m_cameraSystem.Frame(camera, Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
-			break;
 		}
 
 		// 5. Physics bodies need to be added to the world after they are activated and pooled.
@@ -62,6 +61,8 @@ namespace Engine
 
 		// 6. Contact callbacks need to be activated.
 		m_physicsSimulation.ActivateContactCallbacks();
+
+		// 7. Deactivate all components that should not be active at the start of the scene?
 
 		ENGINE_CRITICAL_D("Num transforms: " + std::to_string(m_refECS.GetHotComponents<Transform>().size()) + ", Num bodies: "
 			+ std::to_string(m_refECS.GetHotComponents<PhysicsBody>().size()) + ", Num line colliders: "
