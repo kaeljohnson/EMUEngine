@@ -247,55 +247,60 @@ namespace Engine
 		std::vector<PhysicsBody>& hotPhysicsBodies = m_refECS.GetHotComponents<PhysicsBody>();
 		for (PhysicsBody& refPhysicsBody : hotPhysicsBodies)
 		{
-			b2BodyDef bodyDef = b2DefaultBodyDef();
-			b2ShapeDef shapeDef = b2DefaultShapeDef();
-
-			switch (refPhysicsBody.m_bodyType)
-			{
-			case STATIC:
-				bodyDef.type = b2_staticBody;
-				break;
-			case DYNAMIC:
-				bodyDef.type = b2_dynamicBody;
-				break;
-			case KINEMATIC:
-				bodyDef.type = b2_kinematicBody;
-				break;
-			case SENSOR:
-				bodyDef.type = b2_kinematicBody;
-				shapeDef.isSensor = true;
-				break;
-			default:
-				bodyDef.type = b2_staticBody;
-				break;
-			}
-
-			bodyDef.position =
-			{
-				refPhysicsBody.m_startingPosition.X + refPhysicsBody.m_halfDimensions.X,
-				refPhysicsBody.m_startingPosition.Y + refPhysicsBody.m_halfDimensions.Y
-			};
-
-			bodyDef.fixedRotation = true;
-			bodyDef.userData = (void*)refPhysicsBody.m_entity; // NOTE: This is the entity of the physics body. Not a pointer to the physics body.
-
-			b2BodyId bodyId = b2CreateBody(*m_ptrWorldId, &bodyDef);
-
-			shapeDef.density = 1.0f;
-			shapeDef.friction = 0.0f;
-			shapeDef.restitution = 0.0f;
-
-			// Set collision filters. Default to all for now.
-			shapeDef.filter.categoryBits = refPhysicsBody.m_category;
-			shapeDef.filter.maskBits = refPhysicsBody.m_mask;
-
-			b2Polygon box = b2MakeBox(refPhysicsBody.m_halfDimensions.X, refPhysicsBody.m_halfDimensions.Y);
-			b2ShapeId shapeId = b2CreatePolygonShape(bodyId, &shapeDef, &box);
-
-			refPhysicsBody.m_bodyId = new b2BodyId(bodyId);
-			refPhysicsBody.m_shapeId = new b2ShapeId(shapeId);
-			refPhysicsBody.m_worldId = m_ptrWorldId;
+			AddPhysicsBodyToWorld(refPhysicsBody);
 		}
+	}
+
+	void PhysicsSimulation::AddPhysicsBodyToWorld(PhysicsBody& refPhysicsBody)
+	{
+		b2BodyDef bodyDef = b2DefaultBodyDef();
+		b2ShapeDef shapeDef = b2DefaultShapeDef();
+
+		switch (refPhysicsBody.m_bodyType)
+		{
+		case STATIC:
+			bodyDef.type = b2_staticBody;
+			break;
+		case DYNAMIC:
+			bodyDef.type = b2_dynamicBody;
+			break;
+		case KINEMATIC:
+			bodyDef.type = b2_kinematicBody;
+			break;
+		case SENSOR:
+			bodyDef.type = b2_kinematicBody;
+			shapeDef.isSensor = true;
+			break;
+		default:
+			bodyDef.type = b2_staticBody;
+			break;
+		}
+
+		bodyDef.position =
+		{
+			refPhysicsBody.m_startingPosition.X + refPhysicsBody.m_halfDimensions.X,
+			refPhysicsBody.m_startingPosition.Y + refPhysicsBody.m_halfDimensions.Y
+		};
+
+		bodyDef.fixedRotation = true;
+		bodyDef.userData = (void*)refPhysicsBody.m_entity; // NOTE: This is the entity of the physics body. Not a pointer to the physics body.
+
+		b2BodyId bodyId = b2CreateBody(*m_ptrWorldId, &bodyDef);
+
+		shapeDef.density = 1.0f;
+		shapeDef.friction = 0.0f;
+		shapeDef.restitution = 0.0f;
+
+		// Set collision filters. Default to all for now.
+		shapeDef.filter.categoryBits = refPhysicsBody.m_category;
+		shapeDef.filter.maskBits = refPhysicsBody.m_mask;
+
+		b2Polygon box = b2MakeBox(refPhysicsBody.m_halfDimensions.X, refPhysicsBody.m_halfDimensions.Y);
+		b2ShapeId shapeId = b2CreatePolygonShape(bodyId, &shapeDef, &box);
+
+		refPhysicsBody.m_bodyId = new b2BodyId(bodyId);
+		refPhysicsBody.m_shapeId = new b2ShapeId(shapeId);
+		refPhysicsBody.m_worldId = m_ptrWorldId;
 	}
 
 	void PhysicsSimulation::AddLineCollidersToWorld()
@@ -468,41 +473,41 @@ namespace Engine
 		}
 	}
 
-	void PhysicsInterface::DeactivateBody(Entity entity)
+	void PhysicsSimulation::DeactivateBody(Entity entity)
 	{
 		if (AppState::IN_SCENE)
 		{
-			if (HasBody(entity) && m_refECS.IsActive<PhysicsBody>(entity))
+			if (m_refECS.HasComponent<PhysicsBody>(entity) && m_refECS.IsActive<PhysicsBody>(entity))
 			{
-				PhysicsBody* ptrBody = GetBody(entity);
-				b2Body_SetAwake(*ptrBody->m_bodyId, false);
-
-				// Temp. Expensive
-				b2ShapeId shapeId = *ptrBody->m_shapeId;
-				b2Filter filter = b2Shape_GetFilter(shapeId);
-				filter.categoryBits = 0;
-				filter.maskBits = 0;
-				b2Shape_SetFilter(shapeId, filter);
+				// Remove the body from the world
+				PhysicsBody* ptrBody = m_refECS.GetComponent<PhysicsBody>(entity);
+				if (ptrBody->m_bodyId != nullptr)
+				{
+					b2DestroyBody(*ptrBody->m_bodyId);
+					ptrBody->m_bodyId = nullptr;
+					ptrBody->m_shapeId = nullptr;
+					ptrBody->m_worldId = nullptr;
+				}
+				else 
+				{
+					ENGINE_INFO_D("Physics body is null. Cannot remove from world.");
+					return;
+				}
+				// Deactivate the body
+				m_refECS.DeactivateComponent<PhysicsBody>(entity);
 			}
 		}
 	}
 
-	void PhysicsInterface::ActivateBody(Entity entity)
+	void PhysicsSimulation::ActivateBody(Entity entity)
 	{
 		if (AppState::IN_SCENE)
 		{
 			// bad bug here: If it wasn't a part of the scene, it will have to be added to the world here.
-			if (HasBody(entity) && !m_refECS.IsActive<PhysicsBody>(entity))
+			if (m_refECS.HasComponent<PhysicsBody>(entity) && !m_refECS.IsActive<PhysicsBody>(entity))
 			{
-				PhysicsBody* ptrBody = GetBody(entity);
-				b2Body_SetAwake(*ptrBody->m_bodyId, true);
-
-				// Temp. Expensive
-				b2ShapeId shapeId = *ptrBody->m_shapeId;
-				b2Filter filter = b2Shape_GetFilter(shapeId);
-				filter.categoryBits = ptrBody->m_category;
-				filter.maskBits = ptrBody->m_mask;
-				b2Shape_SetFilter(shapeId, filter);
+				PhysicsBody* ptrBody = m_refECS.GetComponent<PhysicsBody>(entity);
+				AddPhysicsBodyToWorld(*ptrBody);
 			}
 		}
 	}

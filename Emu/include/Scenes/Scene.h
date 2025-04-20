@@ -32,6 +32,7 @@ namespace Engine
 		// Removes entity from scene by removing entity
 		// from entities array and deactivating entity in ECS.
 		EMU_API void Activate(Entity entity);
+
 		EMU_API void Deactivate(Entity entity);
 		EMU_API void Remove(Entity entity);
 
@@ -58,6 +59,9 @@ namespace Engine
 	public:
 		inline const int GetLevelWidth() const { return m_levelDimensionsInUnits.X; }
 		inline const int GetLevelHeight() const { return m_levelDimensionsInUnits.Y; }
+
+		void ActivatePhysics(Entity entity);
+		void DeactivatePhysics(Entity entity);
 
 		void OnScenePlay();
 		void OnSceneEnd();
