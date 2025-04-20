@@ -253,6 +253,12 @@ namespace Engine
 
 	void PhysicsSimulation::AddPhysicsBodyToWorld(PhysicsBody& refPhysicsBody)
 	{
+		if (refPhysicsBody.m_bodyId != nullptr)
+		{
+			ENGINE_INFO_D("Body already exists. Not adding to world.");
+			return;
+		}
+
 		b2BodyDef bodyDef = b2DefaultBodyDef();
 		b2ShapeDef shapeDef = b2DefaultShapeDef();
 
@@ -477,7 +483,7 @@ namespace Engine
 	{
 		if (AppState::IN_SCENE)
 		{
-			if (m_refECS.HasComponent<PhysicsBody>(entity) && m_refECS.IsActive<PhysicsBody>(entity))
+			if (m_refECS.HasComponent<PhysicsBody>(entity))
 			{
 				// Remove the body from the world
 				PhysicsBody* ptrBody = m_refECS.GetComponent<PhysicsBody>(entity);
@@ -503,8 +509,9 @@ namespace Engine
 	{
 		if (AppState::IN_SCENE)
 		{
+			ENGINE_CRITICAL_D("Activating body: " + std::to_string(entity));
 			// bad bug here: If it wasn't a part of the scene, it will have to be added to the world here.
-			if (m_refECS.HasComponent<PhysicsBody>(entity) && !m_refECS.IsActive<PhysicsBody>(entity))
+			if (m_refECS.HasComponent<PhysicsBody>(entity))
 			{
 				PhysicsBody* ptrBody = m_refECS.GetComponent<PhysicsBody>(entity);
 				AddPhysicsBodyToWorld(*ptrBody);

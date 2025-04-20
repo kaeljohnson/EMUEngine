@@ -5,6 +5,7 @@
         "All": {},
         "P": 
         {
+            "ActiveOnStart": true,
             "Physics": 
             {
                 "BodyType": "DYNAMIC",
@@ -28,6 +29,7 @@
         },
         "S": 
         {
+            "ActiveOnStart": false,
             "Physics": 
             {
                 "BodyType": "SENSOR",
@@ -45,6 +47,7 @@
         },
         "w":
         {
+            "ActiveOnStart": true,
             "Physics":
             {
                 "BodyType": "STATIC",
