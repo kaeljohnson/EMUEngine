@@ -9,7 +9,6 @@ namespace Engine
 
 	void UpdatableInterface::Activate(Entity entity)
 	{
-		// Nothing to do.
 	}
 
 	void UpdatableInterface::Deactivate(Entity entity)

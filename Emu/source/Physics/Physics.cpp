@@ -288,6 +288,7 @@ namespace Engine
 			refPhysicsBody.m_startingPosition.Y + refPhysicsBody.m_halfDimensions.Y
 		};
 
+		bodyDef.isEnabled = refPhysicsBody.m_active;
 		bodyDef.fixedRotation = true;
 		bodyDef.userData = (void*)refPhysicsBody.m_entity; // NOTE: This is the entity of the physics body. Not a pointer to the physics body.
 
@@ -489,16 +490,20 @@ namespace Engine
 				PhysicsBody* ptrBody = m_refECS.GetComponent<PhysicsBody>(entity);
 				if (ptrBody->m_bodyId != nullptr)
 				{
-					b2DestroyBody(*ptrBody->m_bodyId);
-					ptrBody->m_bodyId = nullptr;
-					ptrBody->m_shapeId = nullptr;
-					ptrBody->m_worldId = nullptr;
+					b2Body_Disable(*ptrBody->m_bodyId);
 				}
 				else 
 				{
 					ENGINE_INFO_D("Physics body is null. Cannot remove from world.");
 					return;
 				}
+
+				if (m_refECS.HasComponent<PhysicsUpdater>(entity))
+				{
+					PhysicsUpdater* ptrPhysicsUpdater = m_refECS.GetComponent<PhysicsUpdater>(entity);
+					ptrPhysicsUpdater->m_active = false;
+				}
+
 				// Deactivate the body
 				m_refECS.DeactivateComponent<PhysicsBody>(entity);
 			}
@@ -514,7 +519,13 @@ namespace Engine
 			if (m_refECS.HasComponent<PhysicsBody>(entity))
 			{
 				PhysicsBody* ptrBody = m_refECS.GetComponent<PhysicsBody>(entity);
-				AddPhysicsBodyToWorld(*ptrBody);
+				b2Body_Enable(*ptrBody->m_bodyId);
+				ptrBody->m_active = true;
+			}
+			if (m_refECS.HasComponent<PhysicsUpdater>(entity))
+			{
+				PhysicsUpdater* ptrPhysicsUpdater = m_refECS.GetComponent<PhysicsUpdater>(entity);
+				ptrPhysicsUpdater->m_active = true;
 			}
 		}
 	}

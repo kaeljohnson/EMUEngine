@@ -19,7 +19,7 @@
 		m_refTransformInterface(Engine::EMU::GetInstance()->ITRANSFORMS())
     {
 
-        Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsUpdater>('P',
+		Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsUpdater>('P', true,
             [this](Engine::Entity entity) { Update(entity); });
     }
 

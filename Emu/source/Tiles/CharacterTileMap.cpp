@@ -174,6 +174,19 @@ namespace Engine
 
             json characterRulesJson = tileRules[tileKey];
 
+            // If the character is "ActiveOnStart", the component will be set to active when scene starts.
+            bool activeOnStart = true;
+            if (characterRulesJson.contains("ActiveOnStart"))
+            {
+                const auto& activeOnStartJson = characterRulesJson["ActiveOnStart"];
+                bool activeOnStartBool = activeOnStartJson;
+                if (activeOnStartBool == false)
+                {
+					ENGINE_CRITICAL_D("ActiveOnStart is false");
+                    activeOnStart = false;
+                }
+            }
+
 		    const bool hasTransform = characterRulesJson.contains("Transform");
             if (hasTransform)
             {
@@ -194,6 +207,7 @@ namespace Engine
 
                 m_refECS.AddComponent<Transform>(
                     tileEntity,
+                    activeOnStart,
                     Vector2D<float>(x * static_cast<float>(m_numUnitsPerTile),
                         y * static_cast<float>(m_numUnitsPerTile)),
                     Vector2D<float>(static_cast<float>(m_numUnitsPerTile),
@@ -253,7 +267,7 @@ namespace Engine
 					}
 				}
 
-				m_refECS.AddComponent<Camera>(tileEntity, size, pixelsPerUnit, clampingOn);
+				m_refECS.AddComponent<Camera>(tileEntity, activeOnStart, size, pixelsPerUnit, clampingOn);
 			}
 
             // Add Physics components.
@@ -367,7 +381,7 @@ namespace Engine
                         else if (hasTileLeft && hasTileDiagonalLeftAbove) { ghostX0 = (float)x; ghostY0 = (float)y - 1.0f; }
                         else if (hasTileLeft) { ghostX0 = (float)x - 1.0f; ghostY0 = (float)y; }
 
-                        m_refECS.AddComponent<ChainColliderTop>(tileEntity, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+                        m_refECS.AddComponent<ChainColliderTop>(tileEntity, activeOnStart, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
                             Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
                     }
 
@@ -388,7 +402,7 @@ namespace Engine
                         else if (hasTileBelow && hasTileDiagonalLeftBelow) { ghostX0 = (float)x - 1.0f; ghostY0 = (float)y + 1.0f; }
                         else if (hasTileBelow) { ghostX0 = (float)x; ghostY0 = (float)y + 2.0f; }
 
-                        m_refECS.AddComponent<ChainColliderLeft>(tileEntity, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+                        m_refECS.AddComponent<ChainColliderLeft>(tileEntity, activeOnStart, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
                             Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
                     }
 
@@ -409,7 +423,7 @@ namespace Engine
                         else if (hasTileRight && hasTileDiagonalRightBelow) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y + 2.0f; }
                         else if (hasTileRight) { ghostX0 = (float)x + 2.0f; ghostY0 = (float)y + 1.0f; }
 
-                        m_refECS.AddComponent<ChainColliderBottom>(tileEntity, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+                        m_refECS.AddComponent<ChainColliderBottom>(tileEntity, activeOnStart, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
                             Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
                     }
 
@@ -430,35 +444,18 @@ namespace Engine
                         else if (hasTileBelow && hasTileDiagonalRightBelow) { ghostX3 = (float)x + 2.0f; ghostY3 = (float)y + 1.0f; }
                         else if (hasTileBelow) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y + 2.0f; }
 
-                        m_refECS.AddComponent<ChainColliderRight>(tileEntity, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+                        m_refECS.AddComponent<ChainColliderRight>(tileEntity, activeOnStart, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
                             Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
                     }
                 }
                 else // Create a regular physics body for the tiles that don't use chains.
                 {
-                    m_refECS.AddComponent<PhysicsBody>(tileEntity, bodyType, category, mask,
+                    m_refECS.AddComponent<PhysicsBody>(tileEntity, activeOnStart, bodyType, category, mask,
                         Vector2D<float>(size.X, size.Y),
                         Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
                         0.0f, gravityOn, checkSimpleContacts);
                 }
             }
-
-            // If the character is "ActiveOnStart", activate it in the ECS.
-            // MUST CALL AFTER ALL COMPONENTS CREATED.
-            bool activeOnStart = true;
-			if (characterRulesJson.contains("ActiveOnStart"))
-			{
-                const auto& activeOnStartJson = characterRulesJson["ActiveOnStart"];
-                bool activeOnStartBool = activeOnStartJson;
-                if (activeOnStartBool == false)
-                {
-                    activeOnStart = false;
-                }
-			}
-			if (activeOnStart)
-			{
-				m_refECS.Activate(tileEntity);
-			}
         }
 	}
 

@@ -47,7 +47,7 @@ namespace Engine
 		m_tileMap.LoadMap();
 
 		// 3. Activate the entities in the ECS. This will activate all components in the ECS.
-		// m_refECS.ActivateEntities(m_entities);
+		m_refECS.ActivateEntities(m_entities);
 
 		// 4. Frame the first active camera, deactivate all other cameras.
 		for (auto& camera : m_refECS.GetHotComponents<Camera>())

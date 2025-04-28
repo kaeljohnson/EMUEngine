@@ -7,9 +7,10 @@ namespace Engine
 	class Component
 	{
 	public:
-		Component(Entity entity) : m_entity(entity) {}
+		Component(Entity entity, const bool active) : m_entity(entity), m_active(active) {}
 		virtual ~Component() = default;
 
 		Entity m_entity;
+		bool m_active = true;
 	};
 }

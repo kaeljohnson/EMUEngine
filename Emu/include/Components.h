@@ -27,11 +27,11 @@ namespace Engine
 		int DirectionFacing;
 
 		Transform(Entity entity) : PrevPosition(0.0f, 0.0f), Position(0.0f, 0.0f),
-			Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1), ZIndex(0), Component(entity) {}
+			Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1), ZIndex(0), Component(entity, true) {}
 
-		Transform(Entity entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction, int zIndex) :
+		Transform(Entity entity, const bool active, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction, int zIndex) :
 			PrevPosition(position), Position(position),
-			Dimensions(dimensions), Rotation(rotation), Scale(scale), DirectionFacing(direction), ZIndex(zIndex), Component(entity) {}
+			Dimensions(dimensions), Rotation(rotation), Scale(scale), DirectionFacing(direction), ZIndex(zIndex), Component(entity, active) {}
 
 		~Transform() = default;
 	};
@@ -43,15 +43,15 @@ namespace Engine
 			m_bodyType(STATIC), m_dimensions(Vector2D<float>(1.0f, 1.0f)),
 			m_halfDimensions(Vector2D<float>(0.5f, 0.5f)), m_startingPosition(Vector2D<float>(1.0f, 1.0f)),
 			m_position(Vector2D<float>(0.0f, 0.0f)), m_rotation(0.0f),
-			m_gravityOn(true), m_category(ALL), m_mask(ALL), m_checkSimpleContacts(false), Component(entity) {}
+			m_gravityOn(true), m_category(ALL), m_mask(ALL), m_checkSimpleContacts(false), Component(entity, true) {}
 
-		PhysicsBody(Entity entity, BodyType bodyType, Filter category, Filter mask, 
+		PhysicsBody(Entity entity, const bool active, BodyType bodyType, Filter category, Filter mask,
 			Vector2D<float> dimensions, Vector2D<float> startingPosition,
 			float rotation, bool gravityOn, bool checkSimpleContacts)
 			: m_bodyId(nullptr), m_shapeId(nullptr), m_worldId(nullptr),
 			m_bodyType(bodyType), m_category(category), m_mask(mask), m_dimensions(dimensions),
 			m_halfDimensions(dimensions / 2.0f), m_startingPosition(startingPosition),
-			m_rotation(rotation), m_gravityOn(gravityOn), m_checkSimpleContacts(checkSimpleContacts), Component(entity) {}
+			m_rotation(rotation), m_gravityOn(gravityOn), m_checkSimpleContacts(checkSimpleContacts), Component(entity, active) {}
 
 		~PhysicsBody() = default;
 
@@ -83,14 +83,14 @@ namespace Engine
 	{
 		using UpdateCallback = std::function<void(Entity entity)>;
 
-		PhysicsUpdater(Entity entity, UpdateCallback callback) : m_callback(callback), Component(entity) {}
+		PhysicsUpdater(Entity entity, const bool active, UpdateCallback callback) : m_callback(callback), Component(entity, active) {}
 		~PhysicsUpdater() = default;
 
 		UpdateCallback m_callback;
 
 		void Update(Entity entity)
 		{
-			if (m_callback)
+			if (m_callback && m_active)
 			{
 				m_callback(entity);
 			}
@@ -100,9 +100,9 @@ namespace Engine
 	struct Camera : public Component
 	{
 		Camera(Entity entity)
-			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), Component(entity) {}
-		Camera(Entity entity, Vector2D<float> size, int pixelsPerUnit, bool clampingOn)
-			: m_size(size), m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), Component(entity) {}
+			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), Component(entity, true) {}
+		Camera(Entity entity, const bool active, Vector2D<float> size, int pixelsPerUnit, bool clampingOn)
+			: m_size(size), m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), Component(entity, active) {}
 		~Camera() = default;
 
 		Vector2D<float> m_offset;
@@ -116,14 +116,14 @@ namespace Engine
 	{
 		using UpdateCallback = std::function<void(Entity entity)>;
 
-		CameraUpdater(Entity entity, UpdateCallback callback) : m_callback(callback), Component(entity) {} 
+		CameraUpdater(Entity entity, const bool active, UpdateCallback callback) : m_callback(callback), Component(entity, active) {}
 		~CameraUpdater() = default;
 
 		UpdateCallback m_callback;
 
 		void Update(Entity entity)
 		{
-			if (m_callback)
+			if (m_callback && m_active)
 			{
 				m_callback(entity);
 			}
@@ -132,9 +132,9 @@ namespace Engine
 
 	struct ChainCollider : public Component
 	{
-		ChainCollider(Entity entity, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint, 
+		ChainCollider(Entity entity, const bool active, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
 																   Vector2D<float> thirdPoint, Vector2D<float> fourthPoint)
-			: m_category(category), m_mask(mask), Component(entity) 
+			: m_category(category), m_mask(mask), Component(entity, active) 
 		{
 			m_points[0] = firstPoint;
 			m_points[1] = secondPoint;
@@ -157,26 +157,26 @@ namespace Engine
 
 	struct ChainColliderLeft : public ChainCollider 
 	{
-		ChainColliderLeft(Entity entity, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
-			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint) : ChainCollider(entity, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint) {}
+		ChainColliderLeft(Entity entity, const bool active, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
+			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint) : ChainCollider(entity, active, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint) {}
 		~ChainColliderLeft() = default;
 	};
 	struct ChainColliderRight : public ChainCollider 
 	{
-		ChainColliderRight(Entity entity, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
-			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint) : ChainCollider(entity, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint) {}
+		ChainColliderRight(Entity entity, const bool active, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
+			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint) : ChainCollider(entity, active, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint) {}
 		~ChainColliderRight() = default;
 	};
 	struct ChainColliderTop : public ChainCollider 
 	{
-		ChainColliderTop(Entity entity, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
-			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint) : ChainCollider(entity, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint) {}
+		ChainColliderTop(Entity entity, const bool active,  Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
+			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint) : ChainCollider(entity, active, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint) {}
 		~ChainColliderTop() = default;
 	};
 	struct ChainColliderBottom : public ChainCollider 
 	{
-		ChainColliderBottom(Entity entity, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
-			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint) : ChainCollider(entity, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint) {}
+		ChainColliderBottom(Entity entity, const bool active, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
+			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint) : ChainCollider(entity, active, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint) {}
 		~ChainColliderBottom() = default;
 	};
 }
