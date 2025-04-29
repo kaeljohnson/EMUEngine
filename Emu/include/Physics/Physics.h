@@ -60,9 +60,9 @@ namespace Engine
 		PhysicsSimulation(ECS& refECS, CharacterTileMap& tileMap);
 		void CreateWorld(const Vector2D<float> gravity);
 		void UpdateGravity(const Vector2D<float> gravity);
-		void AddPhysicsBodiesToWorld();
+		void AddPhysicsBodiesToWorld(std::vector<Entity>& entities);
 		void AddPhysicsBodyToWorld(PhysicsBody& refPhysicsBody);
-		void AddLineCollidersToWorld();
+		void AddLineCollidersToWorld(std::vector<Entity>& entities);
 		void ActivateContactCallbacks();
 
 		void ActivateBody(Entity entity);

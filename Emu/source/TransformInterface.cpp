@@ -8,18 +8,12 @@ namespace Engine
 	// For activate and deactivate, we need to check if the entity exists in the scene.
 	void TransformInterface::Activate(Entity entity)
 	{
-		if (!m_refECS.HasComponent<Transform>(entity)) return;
-
-		Transform* ptrTransform = GetTransform(entity);
-		ptrTransform->m_active = true;
+		// ECS handles entire functionality necessary for activating transform.
 	}
 
 	void TransformInterface::Deactivate(Entity entity)
 	{
-		if (!m_refECS.HasComponent<Transform>(entity)) return;
-
-		Transform* ptrTransform = GetTransform(entity);
-		ptrTransform->m_active = false;
+		// ECS handles entire functionality necessary for deactivating transform.
 	}
 
 	void TransformInterface::SetPrevPosition(Entity entity, const Vector2D<float> position)

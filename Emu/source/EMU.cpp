@@ -100,7 +100,6 @@ namespace Engine
 
 	void EMU::Deactivate(Entity entity)
 	{
-		m_ecs.Deactivate(entity);
 		m_sceneManager.GetCurrentScene()->DeactivatePhysics(entity);
 
 		// maybe the activation deactivation happens in in the system and not the interface?
@@ -108,6 +107,8 @@ namespace Engine
 		m_updaterInterface.Deactivate(entity);
 
 		m_application.Deactivate(entity);
+
+		m_ecs.Deactivate(entity);
 	}
 
 	void EMU::RegisterIOEventListener(IOEventType type, IOEventHandler handler)

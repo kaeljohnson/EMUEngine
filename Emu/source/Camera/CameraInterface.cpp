@@ -16,15 +16,9 @@ namespace Engine
 		{
 			m_refECS.DeactivateComponent<Camera>(m_activeCameraEntity);
 			m_refECS.DeactivateComponent<CameraUpdater>(m_activeCameraEntity);
-
-			Camera* ptrCamera = GetCamera(m_activeCameraEntity);
-			ptrCamera->m_active = false;
 		}
 		m_refECS.ActivateComponent<Camera>(entity);
 		m_refECS.ActivateComponent<CameraUpdater>(entity);
-
-		Camera* ptrCamera = GetCamera(entity);
-		ptrCamera->m_active = true;
 
 		m_activeCameraEntity = entity;
 	}

@@ -242,11 +242,13 @@ namespace Engine
 		}
 	}
 
-	void PhysicsSimulation::AddPhysicsBodiesToWorld()
+	void PhysicsSimulation::AddPhysicsBodiesToWorld(std::vector<Entity>& entities)
 	{
-		std::vector<PhysicsBody>& hotPhysicsBodies = m_refECS.GetHotComponents<PhysicsBody>();
-		for (PhysicsBody& refPhysicsBody : hotPhysicsBodies)
+		for (Entity& entitiy : entities)
 		{
+			if (!m_refECS.HasComponent<PhysicsBody>(entitiy)) continue;
+
+			PhysicsBody& refPhysicsBody = *m_refECS.GetComponent<PhysicsBody>(entitiy);
 			AddPhysicsBodyToWorld(refPhysicsBody);
 		}
 	}
@@ -288,7 +290,7 @@ namespace Engine
 			refPhysicsBody.m_startingPosition.Y + refPhysicsBody.m_halfDimensions.Y
 		};
 
-		bodyDef.isEnabled = refPhysicsBody.m_active;
+		bodyDef.isEnabled = refPhysicsBody.m_enabled;
 		bodyDef.fixedRotation = true;
 		bodyDef.userData = (void*)refPhysicsBody.m_entity; // NOTE: This is the entity of the physics body. Not a pointer to the physics body.
 
@@ -310,54 +312,61 @@ namespace Engine
 		refPhysicsBody.m_worldId = m_ptrWorldId;
 	}
 
-	void PhysicsSimulation::AddLineCollidersToWorld()
+	void PhysicsSimulation::AddLineCollidersToWorld(std::vector<Entity>& entities)
 	{
 		// This function also needs to connect lines together that meet at the same point.
 		ENGINE_INFO_D("Hot chains size! " + std::to_string(m_refECS.GetHotComponents<ChainCollider>().size()));
 
-		auto createChains = [&](auto& components)
+		auto createChain = [&](ChainCollider* ptrChain)
 			{
-				using ComponentType = std::decay_t<decltype(components[0])>; // assumes at least one component or indexable
+				b2ChainDef chainDef = b2DefaultChainDef();
+				b2BodyDef bodyDef = b2DefaultBodyDef();
 
-				for (auto& chain : components)
+				chainDef.count = 4;
+				chainDef.filter.categoryBits = ptrChain->m_category;
+				chainDef.filter.maskBits = ptrChain->m_mask;
+				chainDef.friction = 0.0f;
+				chainDef.restitution = 0.0f;
+				chainDef.isLoop = false;
+
+				b2Vec2 points[4];
+				for (int i = 0; i < 4; ++i)
 				{
-					b2ChainDef chainDef = b2DefaultChainDef();
-					b2BodyDef bodyDef = b2DefaultBodyDef();
-
-					chainDef.count = 4;
-					chainDef.filter.categoryBits = chain.m_category;
-					chainDef.filter.maskBits = chain.m_mask;
-					chainDef.friction = 0.0f;
-					chainDef.restitution = 0.0f;
-					chainDef.isLoop = false;
-
-					b2Vec2 points[4];
-					for (int i = 0; i < 4; ++i)
-					{
-						points[i].x = chain.m_points[i].X;
-						points[i].y = chain.m_points[i].Y;
-					}
-
-					chainDef.points = points;
-					chainDef.userData = (void*)chain.m_entity;
-
-					bodyDef.type = b2_staticBody;
-					bodyDef.fixedRotation = true;
-					bodyDef.userData = (void*)chain.m_entity;
-
-					b2BodyId bodyId = b2CreateBody(*m_ptrWorldId, &bodyDef);
-					b2ChainId chainId = b2CreateChain(bodyId, &chainDef);
-
-					chain.m_bodyId = new b2BodyId(bodyId);
-					chain.m_chainId = new b2ChainId(chainId);
-					chain.m_worldId = m_ptrWorldId;
+					points[i].x = ptrChain->m_points[i].X;
+					points[i].y = ptrChain->m_points[i].Y;
 				}
+
+				chainDef.points = points;
+				chainDef.userData = (void*)ptrChain->m_entity;
+
+				bodyDef.isEnabled = ptrChain->m_enabled;
+
+				bodyDef.type = b2_staticBody;
+				bodyDef.fixedRotation = true;
+				bodyDef.userData = (void*)ptrChain->m_entity;
+
+				b2BodyId bodyId = b2CreateBody(*m_ptrWorldId, &bodyDef);
+				b2ChainId chainId = b2CreateChain(bodyId, &chainDef);
+
+				ptrChain->m_bodyId = new b2BodyId(bodyId);
+				ptrChain->m_chainId = new b2ChainId(chainId);
+				ptrChain->m_worldId = m_ptrWorldId;
 			};
 
-		createChains(m_refECS.GetHotComponents<ChainColliderLeft>());
-		createChains(m_refECS.GetHotComponents<ChainColliderRight>());
-		createChains(m_refECS.GetHotComponents<ChainColliderTop>());
-		createChains(m_refECS.GetHotComponents<ChainColliderBottom>());
+		for (auto& entity : entities)
+		{
+			if (m_refECS.HasComponent<ChainColliderLeft>(entity))
+				createChain(m_refECS.GetComponent<ChainColliderLeft>(entity));
+
+			if (m_refECS.HasComponent<ChainColliderRight>(entity))
+				createChain(m_refECS.GetComponent<ChainColliderRight>(entity));
+
+			if (m_refECS.HasComponent<ChainColliderTop>(entity))
+				createChain(m_refECS.GetComponent<ChainColliderTop>(entity));
+
+			if (m_refECS.HasComponent<ChainColliderBottom>(entity))
+				createChain(m_refECS.GetComponent<ChainColliderBottom>(entity));
+		}
 	}
 
 	void PhysicsSimulation::ActivateContactCallbacks()
@@ -491,17 +500,12 @@ namespace Engine
 				if (ptrBody->m_bodyId != nullptr)
 				{
 					b2Body_Disable(*ptrBody->m_bodyId);
+					ptrBody->m_enabled = false;
 				}
 				else 
 				{
 					ENGINE_INFO_D("Physics body is null. Cannot remove from world.");
 					return;
-				}
-
-				if (m_refECS.HasComponent<PhysicsUpdater>(entity))
-				{
-					PhysicsUpdater* ptrPhysicsUpdater = m_refECS.GetComponent<PhysicsUpdater>(entity);
-					ptrPhysicsUpdater->m_active = false;
 				}
 
 				// Deactivate the body
@@ -520,13 +524,10 @@ namespace Engine
 			{
 				PhysicsBody* ptrBody = m_refECS.GetComponent<PhysicsBody>(entity);
 				b2Body_Enable(*ptrBody->m_bodyId);
-				ptrBody->m_active = true;
-			}
-			if (m_refECS.HasComponent<PhysicsUpdater>(entity))
-			{
-				PhysicsUpdater* ptrPhysicsUpdater = m_refECS.GetComponent<PhysicsUpdater>(entity);
-				ptrPhysicsUpdater->m_active = true;
+				ptrBody->m_enabled = true;
 			}
 		}
 	}
+
+	// Activate and deactivate chains.
 }

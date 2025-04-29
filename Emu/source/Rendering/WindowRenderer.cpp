@@ -170,12 +170,6 @@ namespace Engine
 		auto& transformManager = m_refECS.GetHotComponents<Transform>();
 		for (Transform& refTransform : transformManager)
 		{
-			// temp, in the future, sprites will be submitted for rendering no active checks in the renderer.
-			if (refTransform.m_active == false)
-			{
-				continue;
-			}
-
 			float objectLeft = refTransform.Position.X;
 			float objectRight = objectLeft + refTransform.Dimensions.X;
 			float objectTop = refTransform.Position.Y;

@@ -47,7 +47,7 @@ namespace Engine
 		m_tileMap.LoadMap();
 
 		// 3. Activate the entities in the ECS. This will activate all components in the ECS.
-		m_refECS.ActivateEntities(m_entities);
+		// m_refECS.ActivateEntities(m_entities);
 
 		// 4. Frame the first active camera, deactivate all other cameras.
 		for (auto& camera : m_refECS.GetHotComponents<Camera>())
@@ -56,8 +56,8 @@ namespace Engine
 		}
 
 		// 5. Physics bodies need to be added to the world after they are activated and pooled.
-		m_physicsSimulation.AddPhysicsBodiesToWorld();
-		m_physicsSimulation.AddLineCollidersToWorld();
+		m_physicsSimulation.AddPhysicsBodiesToWorld(m_entities);
+		m_physicsSimulation.AddLineCollidersToWorld(m_entities);
 
 		// 6. Contact callbacks need to be activated.
 		m_physicsSimulation.ActivateContactCallbacks();
