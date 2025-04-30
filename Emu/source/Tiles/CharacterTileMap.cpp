@@ -16,7 +16,6 @@ namespace Engine
 	CharacterTileMap::CharacterTileMap(ECS& refECS)
 		: m_refECS(refECS), m_mapDimensions(0, 0), m_numUnitsPerTile(0)
 	{
-		m_map.reserve(MAX_SIZE);
 		m_tiles.reserve(MAX_SIZE);
 		m_allMapEntities.reserve(MAX_SIZE);
     }
@@ -48,7 +47,6 @@ namespace Engine
 
     void CharacterTileMap::CreateMap(const std::string mapFile, const std::string rulesFile)
     {
-        m_map.reserve(MAX_SIZE);
         m_tiles.reserve(MAX_SIZE);
 
         // Open and parse the rules file
@@ -101,40 +99,31 @@ namespace Engine
                 return;
             }
 
-            for (char c : line)
+			// Add each character to the map.
+            int x = 0;
+            for (char tileChar : line)
             {
-                if (m_map.size() < MAX_SIZE)
+				if (m_allMapEntities.size() < MAX_SIZE) // Can't have more than MAX_SIZE entities.
                 {
-                    m_map.push_back(c);
+					if (tileChar == '-')
+					{
+                        m_tiles.push_back(std::make_tuple(m_refECS.INVALID_ENTITY, tileChar, Vector2D<int>(x, m_mapDimensions.Y)));
+					}
+					else
+					{
+                        Entity tileEntity = m_refECS.CreateEntity();
+                        m_tiles.push_back(std::make_tuple(tileEntity, tileChar, Vector2D<int>(x, m_mapDimensions.Y)));
+                        m_allMapEntities.push_back(std::make_pair(tileEntity, tileChar));
+					}
                 }
                 else
                 {
                     ENGINE_CRITICAL("Map size exceeds maximum size of " + std::to_string(MAX_SIZE));
                 }
+				x++;
             }
 
             m_mapDimensions.Y++;
-        }
-
-        // Create entity, character tiles.
-        for (int y = 0; y < GetHeight(); ++y)
-        {
-            for (int x = 0; x < GetWidth(); ++x)
-            {
-                const char tileChar = GetChar(x, y);
-
-                if (tileChar != '-')
-                {
-                    Entity tileEntity = m_refECS.CreateEntity();
-
-                    m_tiles.push_back(std::make_tuple(tileEntity, tileChar, Vector2D<int>(x, y)));
-					m_allMapEntities.push_back(std::make_pair(tileEntity, tileChar));
-                }
-                else
-                {
-                    m_tiles.push_back(std::make_tuple(m_refECS.INVALID_ENTITY, tileChar, Vector2D<int>(x, y)));
-                }
-            }
         }
 	}
 
@@ -311,7 +300,7 @@ namespace Engine
                     else if (bodyTypeStr == "KINEMATIC") bodyType = KINEMATIC;
                     else if (bodyTypeStr == "SENSOR") bodyType = SENSOR;
                 }
-                if (characterPhysicsRulesJson.contains("UseChains"))
+				if (characterPhysicsRulesJson.contains("UseChains") && bodyType != SENSOR) // Chains are not used for sensors.
                 {
                     const auto& useChainsJson = characterPhysicsRulesJson["UseChains"];
                     bool useChainsStr = useChainsJson;
@@ -354,6 +343,7 @@ namespace Engine
 
                 if (useChains) // Chains are used on tiles, typically map tiles, to avoid ghose collisions on adjacent tiles.
                 {
+                    // Can't use 'w' here. Need to instead determine if the tile being checked for is a sensor or has collisions.
                     bool hasTileAbove = (y > 0 && std::get<1>(GetTile(x, y - 1)) == 'w');
                     bool hasTileBelow = (y < GetHeight() - 1 && std::get<1>(GetTile(x, y + 1)) == 'w');
                     bool hasTileLeft = (x > 0 && std::get<1>(GetTile(x - 1, y)) == 'w');
@@ -479,7 +469,7 @@ namespace Engine
             return ' ';
         }
 
-        return m_map[y * m_mapDimensions.X + x];
+        return std::get<1>(m_tiles[y * m_mapDimensions.X + x]);
     }
 
     const std::tuple<Entity, char, Vector2D<int>> CharacterTileMap::GetTile(size_t x, size_t y) const

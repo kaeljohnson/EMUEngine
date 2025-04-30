@@ -84,13 +84,7 @@ namespace Engine
 	void EMU::Activate(Entity entity)
 	{
 		m_ecs.Activate(entity);
-		m_sceneManager.GetCurrentScene()->ActivatePhysics(entity);
-
-		// maybe the activation deactivation happens in in the system and not the interface?
-		m_transformInterface.Activate(entity);
-		m_updaterInterface.Activate(entity);
-
-		m_application.Activate(entity);
+		m_sceneManager.GetCurrentScene()->Activate(entity);
 	}
 
 	void EMU::ChangeCamera(Entity entity)
@@ -100,14 +94,7 @@ namespace Engine
 
 	void EMU::Deactivate(Entity entity)
 	{
-		m_sceneManager.GetCurrentScene()->DeactivatePhysics(entity);
-
-		// maybe the activation deactivation happens in in the system and not the interface?
-		m_transformInterface.Deactivate(entity);
-		m_updaterInterface.Deactivate(entity);
-
-		m_application.Deactivate(entity);
-
+		m_sceneManager.GetCurrentScene()->Deactivate(entity);
 		m_ecs.Deactivate(entity);
 	}
 

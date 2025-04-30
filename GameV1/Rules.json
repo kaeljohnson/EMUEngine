@@ -37,8 +37,25 @@
                 "Mask" : "ALL",
                 "Size": [1.0, 1.0],
                 "Rotation": 0.0,
+                "GravityOn": false
+            },
+            "Transform": 
+            {
+                "ZIndex": 1
+            }
+        },
+        "T": 
+        {
+            "ActiveOnStart": false,
+            "Physics": 
+            {
+                "BodyType": "STATIC",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
                 "GravityOn": false,
-                "IsCollidable": false
+                "UseChains": true
             },
             "Transform": 
             {

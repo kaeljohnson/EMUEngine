@@ -113,22 +113,24 @@ namespace Engine
 
 	void Scene::Activate(Entity entity)
 	{
-		m_refECS.Activate(entity);
+		ActivatePhysics(entity);
 	}
 
 	void Scene::ActivatePhysics(Entity entity)
 	{
 		m_physicsSimulation.ActivateBody(entity);
+		m_physicsSimulation.ActivateChains(entity);
 	}
 
 	void Scene::Deactivate(Entity entity)
 	{
-		m_refECS.Deactivate(entity);
+		DeactivatePhysics(entity);
 	}
 
 	void Scene::DeactivatePhysics(Entity entity)
 	{
 		m_physicsSimulation.DeactivateBody(entity);
+		m_physicsSimulation.DeactivateChains(entity);
 	}
 
 	void Scene::Remove(Entity entity)

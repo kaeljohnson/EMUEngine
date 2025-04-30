@@ -24,6 +24,7 @@ namespace Engine
 
 		// Returns first tile in the map that matches the character.
 		Entity GetEntity(char tileChar) const;
+
 		// Returns all tiles in the map that match the character.
 		std::vector<Entity> GetEntities(char tileChar) const;
 
@@ -35,7 +36,6 @@ namespace Engine
 	public:
 		std::vector<std::pair<Entity, char>> m_allMapEntities;
 	private:
-		std::vector<char> m_map;
 		std::vector<std::tuple<Entity, char, Vector2D<int>>> m_tiles;
 		Vector2D<int> m_mapDimensions;
 		int m_numUnitsPerTile;

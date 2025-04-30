@@ -66,7 +66,10 @@ namespace Engine
 		void ActivateContactCallbacks();
 
 		void ActivateBody(Entity entity);
+		void ActivateChains(Entity entity);
+
 		void DeactivateBody(Entity entity);
+		void DeactivateChains(Entity entity);
 
 		void Update();
 		void ProcessSimpleContacts(PhysicsBody& refPhysicsBody);

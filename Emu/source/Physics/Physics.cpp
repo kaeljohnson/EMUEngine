@@ -489,6 +489,7 @@ namespace Engine
 		}
 	}
 
+	// Change these next four functions to be calle "Runtime-"
 	void PhysicsSimulation::DeactivateBody(Entity entity)
 	{
 		if (AppState::IN_SCENE)
@@ -529,5 +530,65 @@ namespace Engine
 		}
 	}
 
-	// Activate and deactivate chains.
+	void PhysicsSimulation::ActivateChains(Entity entity)
+	{
+		if (AppState::IN_SCENE)
+		{
+			if (m_refECS.HasComponent<ChainColliderLeft>(entity))
+			{
+				ChainColliderLeft* ptrChainColliderLeft = m_refECS.GetComponent<ChainColliderLeft>(entity);
+				b2Body_Enable(*ptrChainColliderLeft->m_bodyId);
+				ptrChainColliderLeft->m_enabled = true;
+			}
+			if (m_refECS.HasComponent<ChainColliderRight>(entity))
+			{
+				ChainColliderRight* ptrChainColliderRight = m_refECS.GetComponent<ChainColliderRight>(entity);
+				b2Body_Enable(*ptrChainColliderRight->m_bodyId);
+				ptrChainColliderRight->m_enabled = true;
+			}
+			if (m_refECS.HasComponent<ChainColliderTop>(entity))
+			{
+				ChainColliderTop* ptrChainColliderTop = m_refECS.GetComponent<ChainColliderTop>(entity);
+				b2Body_Enable(*ptrChainColliderTop->m_bodyId);
+				ptrChainColliderTop->m_enabled = true;
+			}
+			if (m_refECS.HasComponent<ChainColliderBottom>(entity))
+			{
+				ChainColliderBottom* ptrChainColliderBottom = m_refECS.GetComponent<ChainColliderBottom>(entity);
+				b2Body_Enable(*ptrChainColliderBottom->m_bodyId);
+				ptrChainColliderBottom->m_enabled = true;
+			}
+		}
+	}
+
+	void PhysicsSimulation::DeactivateChains(Entity entity)
+	{
+		if (AppState::IN_SCENE)
+		{
+			if (m_refECS.HasComponent<ChainColliderLeft>(entity))
+			{
+				ChainColliderLeft* ptrChainColliderLeft = m_refECS.GetComponent<ChainColliderLeft>(entity);
+				b2Body_Disable(*ptrChainColliderLeft->m_bodyId);
+				ptrChainColliderLeft->m_enabled = false;
+			}
+			if (m_refECS.HasComponent<ChainColliderRight>(entity))
+			{
+				ChainColliderRight* ptrChainColliderRight = m_refECS.GetComponent<ChainColliderRight>(entity);
+				b2Body_Disable(*ptrChainColliderRight->m_bodyId);
+				ptrChainColliderRight->m_enabled = false;
+			}
+			if (m_refECS.HasComponent<ChainColliderTop>(entity))
+			{
+				ChainColliderTop* ptrChainColliderTop = m_refECS.GetComponent<ChainColliderTop>(entity);
+				b2Body_Disable(*ptrChainColliderTop->m_bodyId);
+				ptrChainColliderTop->m_enabled = false;
+			}
+			if (m_refECS.HasComponent<ChainColliderBottom>(entity))
+			{
+				ChainColliderBottom* ptrChainColliderBottom = m_refECS.GetComponent<ChainColliderBottom>(entity);
+				b2Body_Disable(*ptrChainColliderBottom->m_bodyId);
+				ptrChainColliderBottom->m_enabled = false;
+			}
+		}
+	}
 }
