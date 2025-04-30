@@ -22,27 +22,20 @@ namespace Engine
 
     Entity CharacterTileMap::GetEntity(char tileChar) const
     {
-        for (const auto& tile : m_allMapEntities)
-        {
-            if (tile.second == tileChar)
-            {
-                return tile.first;
-            }
-        }
+		if (m_sameCharEntitiesMap.find(tileChar) != m_sameCharEntitiesMap.end() && !m_sameCharEntitiesMap.at(tileChar).empty())
+		{
+			return m_sameCharEntitiesMap.at(tileChar).front(); // Return the first entity with this character.
+		}
+
         return m_refECS.INVALID_ENTITY;
     }
 
-	std::vector<Entity> CharacterTileMap::GetEntities(char tileChar) const
+	const std::vector<Entity>& CharacterTileMap::GetEntities(char tileChar) const
 	{
-		std::vector<Entity> entities;
-		for (const auto& tile : m_allMapEntities)
-		{
-			if (tile.second == tileChar)
-			{
-				entities.push_back(tile.first);
-			}
-		}
-		return entities;
+		if (m_sameCharEntitiesMap.find(tileChar) != m_sameCharEntitiesMap.end())
+            return m_sameCharEntitiesMap.at(tileChar);
+
+		return std::vector<Entity>(); // Return an empty vector if no entities found.
 	}
 
     void CharacterTileMap::CreateMap(const std::string mapFile, const std::string rulesFile)
@@ -114,6 +107,7 @@ namespace Engine
                         Entity tileEntity = m_refECS.CreateEntity();
                         m_tiles.push_back(std::make_tuple(tileEntity, tileChar, Vector2D<int>(x, m_mapDimensions.Y)));
                         m_allMapEntities.push_back(std::make_pair(tileEntity, tileChar));
+						m_sameCharEntitiesMap[tileChar].push_back(tileEntity);
 					}
                 }
                 else
@@ -457,9 +451,9 @@ namespace Engine
 
 	}
 
-    // Call this sparingly.
     void CharacterTileMap::UnloadMap()
 	{
+        // Nothing to do. Scene destroys components.
 	}
 
     const char CharacterTileMap::GetChar(size_t x, size_t y) const

@@ -67,6 +67,7 @@ namespace Engine
 			{
 				if (entity >= m_numEntities) // Entity is out of range.
 					throw std::runtime_error("Error: Entity does not exist: " + std::to_string(entity));
+
 				auto it = m_usedIDs.find(entity);
 				if (it != m_usedIDs.end())
 				{

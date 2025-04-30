@@ -14,7 +14,6 @@ namespace Engine
 		// Client should probably decide this.
 		static const int MAX_SIZE = 20000;
 
-		// Tilemap should not take ECS reference. Tilemap system needs major refactoring.
 		CharacterTileMap(ECS& refECS);
 		const char GetChar(size_t x, size_t y) const;
 		const std::tuple<Entity, char, Vector2D<int>> GetTile(size_t x, size_t y) const;
@@ -26,7 +25,7 @@ namespace Engine
 		Entity GetEntity(char tileChar) const;
 
 		// Returns all tiles in the map that match the character.
-		std::vector<Entity> GetEntities(char tileChar) const;
+		const std::vector<Entity>& GetEntities(char tileChar) const;
 
 	public:
 		void CreateMap(const std::string mapFile, const std::string rulesFile);
@@ -40,5 +39,7 @@ namespace Engine
 		Vector2D<int> m_mapDimensions;
 		int m_numUnitsPerTile;
 		ECS& m_refECS;
+
+		std::unordered_map<char, std::vector<Entity>> m_sameCharEntitiesMap;
 	};
 }
