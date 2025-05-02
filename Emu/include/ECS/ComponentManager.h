@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Includes.h"
+#include "../Logging/Logger.h"
 
 namespace Engine
 {
@@ -109,6 +110,12 @@ namespace Engine
 
         void DeactivateComponent(Entity entity) override
         {
+			if (entity > m_maxComponents || entity < 0)
+			{
+				ENGINE_ERROR_D("Trying to deactivate component for invalid entity (entity does not exist or was created improperly): " + std::to_string(entity));
+				return; // Invalid entity, nothing to deactivate.
+			}
+
             size_t index = m_hotIndices[entity];
             if (index == INVALID_INDEX)
             {

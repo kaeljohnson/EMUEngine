@@ -10,9 +10,12 @@ namespace Engine
     class ECS
     {
     public:
+		Entity INVALID_ENTITY = -1;
+
         void Initialize(size_t numEntities) 
         {
 			m_numEntities = numEntities;
+			INVALID_ENTITY = numEntities + 1;
         }
         
         Entity CreateEntity() 
@@ -33,6 +36,52 @@ namespace Engine
 
 			return -1;
         }
+
+		void DestroyEntity(Entity entity)
+		{
+			if (m_usedIDs.find(entity) == m_usedIDs.end())
+				throw std::runtime_error("Error: Entity does not exist.");
+
+			m_usedIDs.erase(entity);
+			for (auto& manager : m_componentManagers)
+			{
+				manager.second->DestroyComponent(entity);
+			}
+		}
+
+		// Destroy all components associated with the entity.
+		void DestroyComponents(Entity entity)
+		{
+			if (m_usedIDs.find(entity) == m_usedIDs.end())
+				throw std::runtime_error("Error: Entity does not exist.");
+
+			for (auto& manager : m_componentManagers)
+			{
+				manager.second->DestroyComponent(entity);
+			}
+		}
+
+		void DestroyComponents(std::vector<Entity>& entities)
+		{
+			for (auto& entity : entities)
+			{
+				if (entity >= m_numEntities) // Entity is out of range.
+					throw std::runtime_error("Error: Entity does not exist: " + std::to_string(entity));
+
+				auto it = m_usedIDs.find(entity);
+				if (it != m_usedIDs.end())
+				{
+					for (auto& manager : m_componentManagers)
+					{
+						manager.second->DestroyComponent(entity);
+					}
+				}
+				else
+				{
+					throw std::runtime_error("Error: Entity does not exist: " + std::to_string(entity));
+				}
+			}
+		}
 
 		bool HasEntity(Entity entity)
 		{
@@ -123,8 +172,11 @@ namespace Engine
 		template<typename T>
 		bool HasComponent(Entity entity)
 		{
-			if (entity >= m_numEntities) // Component manager "HasComponent" will check an invalid index if entity too big.
-				throw std::runtime_error("Error: Entity does not exist.");
+			if (entity >= m_numEntities || entity < 0) // Component manager "HasComponent" will check an invalid index if entity too big.
+			{
+				ENGINE_ERROR_D("Entity does not exist. Cannot check for has component. Returning false: " + std::to_string(entity));
+				return false;
+			}
 
 			return m_componentManagers[std::type_index(typeid(T))]->HasComponent(entity);
 		}
@@ -132,7 +184,7 @@ namespace Engine
         template<typename T>
 		bool HasComponentSafe(Entity entity)
 		{
-			if (entity >= m_numEntities) // Component manager "HasComponent" will check an invalid index if entity too big.
+			if (entity >= m_numEntities || entity < 0) // Component manager "HasComponent" will check an invalid index if entity too big.
 				throw std::runtime_error("Error: Entity does not exist.");
 
 			auto it = m_componentManagers.find(std::type_index(typeid(T)));
@@ -191,13 +243,19 @@ namespace Engine
 			}
 		}
 
-        void Activate(Entity entity)
-        {
-            for (auto& manager : m_componentManagers)
-            {
-                manager.second->ActivateComponent(entity);
-            }
-        }
+		void Activate(Entity entity)
+		{
+			for (auto& manager : m_componentManagers)
+			{
+				manager.second->ActivateComponent(entity);
+			}
+		}
+
+		template<typename T>
+		void ActivateComponent(Entity entity)
+		{
+			m_componentManagers[std::type_index(typeid(T))]->ActivateComponent(entity);
+		}
 
 		template<typename T>
 		void Activate(Entity entity)
@@ -239,6 +297,12 @@ namespace Engine
 		void Deactivate(Entity entity)
 		{
 			return m_componentManagers[std::type_index(typeid(T))]->DeactivateComponent(entity);
+		}
+
+		template<typename T>
+		void DeactivateComponent(Entity entity)
+		{
+			m_componentManagers[std::type_index(typeid(T))]->DeactivateComponent(entity);
 		}
 
 		template<typename T>

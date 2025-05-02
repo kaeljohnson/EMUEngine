@@ -3,6 +3,7 @@
 #include "../Core.h"
 #include "../MathUtil.h"
 #include "../Components.h"
+#include "../CharacterTileMap/CharacterTileMap.h" 
 #include "ContactSystem.h"
 
 struct b2WorldId;
@@ -15,8 +16,6 @@ namespace Engine
 	public:
 		// PhysicsBody2d getter and setter wrappers
 		EMU_API void CreateBody(Entity entity);
-		EMU_API void ActivateBody(Entity entity);
-		EMU_API void DeactivateBody(Entity entity);
 		EMU_API const bool HasBody(Entity entity);
 		EMU_API void SetBodyType(Entity entity, const BodyType type);
 		EMU_API void SetDimensions(Entity entity, const Vector2D<float> dimensions);
@@ -58,11 +57,19 @@ namespace Engine
 	class PhysicsSimulation
 	{
 	public:
-		PhysicsSimulation(ECS& refECS);
+		PhysicsSimulation(ECS& refECS, CharacterTileMap& tileMap);
 		void CreateWorld(const Vector2D<float> gravity);
 		void UpdateGravity(const Vector2D<float> gravity);
-		void AddPhysicsBodiesToWorld();
-		void AddLineCollidersToWorld();
+		void AddPhysicsBodiesToWorld(std::vector<Entity>& entities);
+		void AddPhysicsBodyToWorld(PhysicsBody& refPhysicsBody);
+		void AddLineCollidersToWorld(std::vector<Entity>& entities);
+		void ActivateContactCallbacks();
+
+		void ActivateBody(Entity entity);
+		void ActivateChains(Entity entity);
+
+		void DeactivateBody(Entity entity);
+		void DeactivateChains(Entity entity);
 
 		void Update();
 		void ProcessSimpleContacts(PhysicsBody& refPhysicsBody);

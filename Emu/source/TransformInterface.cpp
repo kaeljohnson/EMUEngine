@@ -4,14 +4,16 @@
 
 namespace Engine
 {
+
+	// For activate and deactivate, we need to check if the entity exists in the scene.
 	void TransformInterface::Activate(Entity entity)
 	{
-		// Nothing to do.
+		// ECS handles entire functionality necessary for activating transform.
 	}
 
 	void TransformInterface::Deactivate(Entity entity)
 	{
-		// Nothing to do.
+		// ECS handles entire functionality necessary for deactivating transform.
 	}
 
 	void TransformInterface::SetPrevPosition(Entity entity, const Vector2D<float> position)

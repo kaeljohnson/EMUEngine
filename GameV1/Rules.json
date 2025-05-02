@@ -1,0 +1,86 @@
+{
+    "NumMetersPerTile": 1,
+    "Tile Rules":
+    {
+        "All": {},
+        "P": 
+        {
+            "ActiveOnStart": true,
+            "Physics": 
+            {
+                "BodyType": "DYNAMIC",
+                "Category" : "PLAYER",
+                "Mask" : "ALL",
+                "Size": [0.75, 0.75],
+                "Rotation": 0.0,
+                "GravityOn": true,
+                "CheckSimpleContacts": true
+            },
+            "Transform": 
+            {
+                "ZIndex": 1
+            },
+            "Camera":
+            {
+                "Size": [0, 0],
+                "PixelsPerUnit": 32,
+                "ClampingOn": true
+            }
+        },
+        "S": 
+        {
+            "ActiveOnStart": false,
+            "Physics": 
+            {
+                "BodyType": "SENSOR",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false
+            },
+            "Transform": 
+            {
+                "ZIndex": 1
+            }
+        },
+        "T": 
+        {
+            "ActiveOnStart": false,
+            "Physics": 
+            {
+                "BodyType": "STATIC",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "UseChains": true
+            },
+            "Transform": 
+            {
+                "ZIndex": 1
+            }
+        },
+        "w":
+        {
+            "ActiveOnStart": true,
+            "Physics":
+            {
+                "BodyType": "STATIC",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "CheckSimpleContacts": false,
+                "UseChains": true
+            },
+            "Transform":
+            {
+                "ZIndex": 1
+            }
+        }
+    }
+}
+  

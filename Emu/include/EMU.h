@@ -7,7 +7,6 @@
 #include "Physics/Physics.h"
 #include "Camera/CameraInterface.h"
 #include "TransformInterface.h"
-#include "UpdatableInterface.h"
 
 namespace Engine
 {
@@ -31,12 +30,51 @@ namespace Engine
 
 		// ECS Interface functions
 		EMU_API Entity CreateEntity();
+
+		// Returns first entity with the given character.
+		EMU_API Entity GetEntityByCharacter(const char c, const std::string& sceneName);
+
+		// Returns vector of entities with the given character.
+		EMU_API std::vector<Entity> GetEntitiesByCharacter(const char c, const std::string& sceneName);
+
+		// Returns the current runtime entity with the given character.
+		EMU_API Entity GetCurrentRuntimeEntity(const char c);
+
+		// Activate all components in entity
 		EMU_API void Activate(Entity entity);
+		
+		// Deactivate all components in entity
 		EMU_API void Deactivate(Entity entity);
-		template <typename T, typename... Args>
+
+		// Cameras updated separately since there can only be one camera active.
+		EMU_API void ChangeCamera(Entity entity);
+
+		// Activate/Deactivate specific components
+		void ActivatePhysics(Entity entity);
+		void DeactivatePhysics(Entity entity);
+
+		void ActivateTransform(Entity entity);
+		void DeactivateTransform(Entity entity);
+
+
+		template<typename T, typename... Args>
 		void AddComponent(Entity entity, Args&&... componentArgs)
 		{
 			m_ecs.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
+		}
+
+		template <typename T, typename... Args>
+		void AddComponent(const char c, Args&&... componentArgs)
+		{
+			std::unordered_map<std::string, Scene>& scenes = m_sceneManager.GetAllScenes();
+			for (auto& scene : scenes)
+			{
+				std::vector<Entity> entities = scene.second.GetTileMapEntities(c);
+				for (Entity entity : entities)
+				{
+					m_ecs.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
+				}
+			}
 		}
 
 		// Event IO System Interface functions
@@ -53,7 +91,6 @@ namespace Engine
 		PhysicsInterface m_physicsInterface;
 		CameraInterface m_cameraInterface;
 		TransformInterface m_transformInterface;
-		UpdatableInterface m_updatableInterface; // This may not be necessary.
 
 		IOEventSystem m_ioEventSystem;
 		SceneManager m_sceneManager;

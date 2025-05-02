@@ -7,14 +7,19 @@
 
 namespace Engine
 {
-	void CameraInterface::Activate(Entity entity)
+	void CameraInterface::ChangeCamera(Entity entity)
 	{
+		if (!m_refECS.HasComponent<Camera>(entity)) return;
+
 		// Deactivate all other cameras
 		if (m_activeCameraEntity != -1)
 		{
-			m_refECS.Deactivate(m_activeCameraEntity);
+			m_refECS.DeactivateComponent<Camera>(m_activeCameraEntity);
+			m_refECS.DeactivateComponent<CameraUpdater>(m_activeCameraEntity);
 		}
-		m_refECS.Activate(entity);
+		m_refECS.ActivateComponent<Camera>(entity);
+		m_refECS.ActivateComponent<CameraUpdater>(entity);
+
 		m_activeCameraEntity = entity;
 	}
 

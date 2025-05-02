@@ -8,16 +8,31 @@
 #include <iostream>
 #include <mutex>
 
+
 static std::unordered_map<void*, size_t> allocationMap;
 static std::mutex allocMutex;
 
 static size_t totalAllocated = 0;
 
-void* operator new(size_t size) {
-	void* ptr = malloc(size);
+std::atomic<int> allocationCount = 0;
+
+void* operator new(std::size_t size) {
+	void* ptr = std::malloc(size);
 	totalAllocated += size;
-	std::lock_guard<std::mutex> lock(allocMutex);
-	std::cout << "Allocated " << size << "\n";
+
+	int count = ++allocationCount;
+
+	{
+		std::lock_guard<std::mutex> lock(allocMutex);
+		std::cout << "Allocated " << size << " bytes (count: " << count << ")\n";
+	}
+
+	if (count == 400) {
+		std::lock_guard<std::mutex> lock(allocMutex);
+		std::cout << "=== 400th allocation reached ===\n";
+		// throw std::runtime_error("400th allocation reached");
+	}
+
 	return ptr;
 }
 
@@ -38,71 +53,55 @@ int main(int argc, char* args[])
 	Engine::Scene& scene2 = engine->CreateScene("Level2");
 
 	//// Need physcis to scale with pixels per unit.
-	scene.SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
+	scene.SetPhysicsSimulation(Engine::Vector2D(0.0f, 0.0f));
 	scene2.SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
 
-	// Engine::TileMap testMap(refECS, "testMap1.txt", 1);
-	scene.AddTileMap("testMap1.txt", 1);
+	// Temp for now. Client will not be able to call functions directly on scene object.
+	scene.AddTileMap("testMap1.txt", "Rules.json");
+	scene2.AddTileMap("TestMap2.txt", "Rules.json");
 
-	Engine::Entity testEntity = Engine::EMU::GetInstance()->CreateEntity();
-	// ptrTestEntity->SetPriority(1);
-	scene.Add(testEntity);
-	engine->AddComponent<Engine::Transform>(testEntity,
-		Engine::Vector2D(12.0f, 12.0f), Engine::Vector2D(1.0f, 1.0f), 1.0f, 1.0f, 1.0f, 2);
+	Player player;
 
-	engine->AddComponent<Engine::PhysicsBody>(testEntity);
-	Engine::EMU::GetInstance()->IPHYSICS().SetBodyType(testEntity, Engine::BodyType::SENSOR);
-	Engine::EMU::GetInstance()->IPHYSICS().SetStartingPosition(testEntity, Engine::Vector2D<float>(12.0f, 64.0f));
-	Engine::EMU::GetInstance()->IPHYSICS().SetDimensions(testEntity, Engine::Vector2D<float>(1.0f, 1.0f));
+	Engine::Entity playerEntityScene1 = Engine::EMU::GetInstance()->GetEntityByCharacter('P', "Level1");
+	Engine::Entity playerEntityScene2 = Engine::EMU::GetInstance()->GetEntityByCharacter('P', "Level2");
+	Engine::Entity testEntity = Engine::EMU::GetInstance()->GetEntityByCharacter('S', "Level1");
 
-	Engine::Entity playerEntity = Engine::EMU::GetInstance()->CreateEntity();
-	CLIENT_INFO_D(std::to_string(playerEntity)); // Log the player entity ID for debugging
-	// ptrPlayerEntity->SetPriority(0);
-	scene.Add(playerEntity);
+	std::vector<Engine::Entity> playerEntities = engine->GetEntitiesByCharacter('w', "Level1");
 
-	Player player(playerEntity, 6.0f, 1.0f, 0.75f, 0.75f);
-	
-
-	scene.RegisterContactCallback(Engine::BEGIN_CONTACT, playerEntity, testEntity, [](const Engine::Contact event)
+	scene.RegisterContactCallback(Engine::BEGIN_CONTACT, 'P', 'S', [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi Begin Contact");
 		});
 
-	scene.RegisterContactCallback(Engine::END_CONTACT, playerEntity, testEntity, [](const Engine::Contact event)
+	scene.RegisterContactCallback(Engine::END_CONTACT, 'P', 'S', [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi End Contact");
 		});
 
-	scene.RegisterContactCallback(Engine::BEGIN_SENSOR, testEntity, [](const Engine::Contact event)
+	scene.RegisterContactCallback(Engine::BEGIN_SENSOR, 'S', [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Single Begin Sensing");
 		});
 
-	scene.RegisterContactCallback(Engine::END_SENSOR, testEntity, [](const Engine::Contact event)
+	scene.RegisterContactCallback(Engine::BEGIN_SENSOR, 'P', 'S', [](const Engine::Contact event)
+		{
+			CLIENT_INFO_D("Multi Begin Sensing");
+		});
+
+	scene.RegisterContactCallback(Engine::END_SENSOR, 'S', [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Single End Sensing");
 		});
+	scene.RegisterContactCallback(Engine::END_SENSOR, 'P', 'S', [](const Engine::Contact event)
+		{
+			CLIENT_INFO_D("Multi End Sensing");
+		});
 
-	// Engine::Entity* ptrCameraEntity = Engine::EMU::GetInstance()->IECS().CreateEntity();
-	// ptrCameraEntity->SetPriority(0);
-
-	PlayerCamera playerCamera(playerEntity);
-	// engine->SetCurrentCamera(ptrCameraEntity);
-	// scene->Add(ptrCameraEntity);
-
-	scene2.Add(playerEntity);
-
-	scene2.AddTileMap("TestMap2.txt", 1);
-
+	PlayerCamera playerCamera;
 
 	engine->LoadScene("Level1");
 	
-	AppManagementEventHandlers appManagementEventHandlers(playerEntity, testEntity);
-
-	Engine::Entity testEntity2 = Engine::EMU::GetInstance()->CreateEntity();
-	scene.Add(testEntity2);
-	
-	engine->AddComponent<Engine::LineCollider>(testEntity2, Engine::ALL, Engine::ALL, Engine::Vector2D<float>(6.0f, 64.0f), Engine::Vector2D<float>(11.0f, 64.0f));
+	AppManagementEventHandlers appManagementEventHandlers;
 
 	engine->RunApp();
 	// Need to figure out how to change scenes, stop scenes, etc.

@@ -19,7 +19,7 @@ namespace Engine
         {
             CameraUpdater* ptrCameraUpdater = m_refECS.GetComponent<CameraUpdater>(camera.m_entity);
             if (ptrCameraUpdater)
-                ptrCameraUpdater->Update();
+                ptrCameraUpdater->Update(camera.m_entity);
 
             if (camera.m_clampingOn) Clamp(camera);
         }

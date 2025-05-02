@@ -105,34 +105,6 @@ namespace Engine
 			});
 	}
 
-	void WindowRenderer::Activate(Entity entity)
-	{
-		// Find the correct position using binary search
-		auto insertPos = std::lower_bound(
-			m_sortedEntitiesToRender.begin(), m_sortedEntitiesToRender.end(),
-			entity,
-			[&](size_t existingEntity, size_t newEntity)
-			{
-				return m_refECS.GetComponent<Transform>(existingEntity)->ZIndex >
-					m_refECS.GetComponent<Transform>(newEntity)->ZIndex;
-			});
-
-		// Insert the entity at the correct position
-		m_sortedEntitiesToRender.insert(insertPos, entity);
-	}
-
-	void WindowRenderer::Deactivate(Entity entity)
-	{
-		// Find the entity in the sorted list
-		auto it = std::find(m_sortedEntitiesToRender.begin(), m_sortedEntitiesToRender.end(), entity);
-
-		// Remove the entity from the sorted list
-		if (it != m_sortedEntitiesToRender.end())
-		{
-			m_sortedEntitiesToRender.erase(it);
-		}
-	}
-
 	void WindowRenderer::Render()
 	{
 		ClearScreen();
@@ -148,7 +120,7 @@ namespace Engine
 
 		if (ptrCurrentCamera == nullptr)
 		{
-			ENGINE_CRITICAL("No active camera found. Returning.");
+			throw std::runtime_error("No active camera found.");
 			return;
 		}
 
@@ -212,22 +184,30 @@ namespace Engine
 			}
 		}
 
-		auto& lineColliderManager = m_refECS.GetHotComponents<LineCollider>();
-		for (LineCollider& refLineCollider : lineColliderManager)
-		{
-			float objectLeft = refLineCollider.m_start.X;
-			float objectRight = refLineCollider.m_end.X;
-			float objectTop = refLineCollider.m_start.Y;
-			float objectBottom = refLineCollider.m_end.Y;
-
-			bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
-				objectBottom >= cameraTop && objectTop <= cameraBottom;
-
-			if (isVisible)
+		auto drawVisibleChains = [&](auto& components)
 			{
-				Draw(refLineCollider, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
-			}
-		}
+				for (auto& refLineCollider : components)
+				{
+					float objectLeft = refLineCollider.m_points[1].X;
+					float objectRight = refLineCollider.m_points[2].X;
+					float objectTop = refLineCollider.m_points[1].Y;
+					float objectBottom = refLineCollider.m_points[2].Y;
+
+					bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
+						objectBottom >= cameraTop && objectTop <= cameraBottom;
+
+					if (isVisible)
+					{
+						Draw(refLineCollider, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
+					}
+				}
+			};
+
+		drawVisibleChains(m_refECS.GetHotComponents<ChainColliderLeft>());
+		drawVisibleChains(m_refECS.GetHotComponents<ChainColliderRight>());
+		drawVisibleChains(m_refECS.GetHotComponents<ChainColliderTop>());
+		drawVisibleChains(m_refECS.GetHotComponents<ChainColliderBottom>());
+
 		// auto end = std::chrono::high_resolution_clock::now();
 		// std::cout << "Rendering: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
 
@@ -268,16 +248,20 @@ namespace Engine
 		
 	}
 
-	void WindowRenderer::Draw(LineCollider& lineCollider, const int pixelsPerUnit, const Vector2D<float> offset)
+	void WindowRenderer::Draw(ChainCollider& chainCollider, const int pixelsPerUnit, const Vector2D<float> offset)
 	{
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 
-		SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer,
-			static_cast<int>(round((lineCollider.m_start.X - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round((lineCollider.m_start.Y - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round((lineCollider.m_end.X - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round((lineCollider.m_end.Y - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT))
-		);
+		for (int i = 0; i < 3; ++i)
+		{
+			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer,
+				static_cast<int>(round((chainCollider.m_points[i].X - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+				static_cast<int>(round((chainCollider.m_points[i].Y - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+				static_cast<int>(round((chainCollider.m_points[i + 1].X - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+				static_cast<int>(round((chainCollider.m_points[i + 1].Y - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT))
+			);
+		}
+
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 	}
 

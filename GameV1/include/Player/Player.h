@@ -54,10 +54,9 @@ enum PlayerDirection
 class Player
 {
 public:
-	Player(Engine::Entity entity, const float startingX, const float startingY,
-		const float width, const float height);
+	Player();
 	~Player() = default;
-	void Update();
+	void Update(Engine::Entity entity);
 	void OnBeginContact(Engine::BeginContact beginContact);
 	void OnEndContact(Engine::EndContact ptrEntity);
 	void OnBeginSensing(Engine::BeginSensing beginSensing);
@@ -67,7 +66,6 @@ public:
 	PlayerDirection m_currentDirection;
 
 private:
-	Engine::Entity m_entity;
 
 	Engine::PhysicsInterface& m_refPhysicsInterface;
 	Engine::TransformInterface& m_refTransformInterface;
@@ -89,8 +87,8 @@ private:
 	Engine::IOEventType m_moveRightKeyUp;
 
 private:
-	void UpdateMovement();
-	void TransitionToState(PlayerState newState);
+	void UpdateMovement(Engine::Entity entity);
+	void TransitionToState(Engine::Entity entity, PlayerState newState);
 
 	void beginIdle();
 	void updateIdle();
@@ -98,7 +96,7 @@ private:
 
 	void startHorizontalMove();
 	void updateHorizontalMove();
-	void endHorizontalMove();
+	void endHorizontalMove(Engine::Entity entity);
 
 
 	void beginJump();

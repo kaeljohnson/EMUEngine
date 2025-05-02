@@ -5,6 +5,7 @@
 #include "../Core.h"
 #include "../Components.h"
 #include "../MathUtil.h"
+#include "../CharacterTileMap/CharacterTileMap.h"
 
 #include "ContactKeyHashes.h"
 
@@ -100,16 +101,24 @@ namespace Engine
 		using ContactCallback = std::function<void(const Contact&)>; 
 
 
-		EMU_API void RegisterContactCallback(ContactType contactType, Entity entityA, Entity entityB, ContactCallback callback);
-		EMU_API void RegisterContactCallback(ContactType contactType, Entity entity, ContactCallback callback);
+		EMU_API void RegisterContactCallback(ContactType contactType, const char B, ContactCallback callback);
+		void ActivateContactCallback(ContactType contactType, Entity entityA, Entity entityB, ContactCallback callback);
+
+		EMU_API void RegisterContactCallback(ContactType contactType, const char A, const char B, ContactCallback callback);
+		void ActivateContactCallback(ContactType contactType, Entity entityA, ContactCallback callback);
 
 	public:
-		ContactSystem(ECS& refECS);
+		ContactSystem(ECS& refECS, CharacterTileMap& tileMap);
+		void ActivateContactCallbacks();
 		void ProcessContacts(void* ptrWorldId);
 		void Cleanup();
 
 	private:
 		ECS& m_refECS;
+		CharacterTileMap& m_refTileMap;
+
+		std::vector<std::tuple<ContactType, const char, ContactCallback>> m_singleEntityContactCallbacks;
+		std::vector<std::tuple<ContactType, const char, const char, ContactCallback>> m_multiContactCallbacks;
 
 		std::unordered_map<SingleEntityBeginContactKey, ContactCallback> m_beginSingleEntityContactCallbacks;
 		std::unordered_map<SingleEntityBeginContactKey, ContactCallback> m_beginSingleEntitySensingCallbacks;

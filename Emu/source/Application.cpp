@@ -16,12 +16,10 @@ namespace Engine
 
 	void Application::Activate(Entity entity)
 	{
-		m_windowRenderer.Activate(entity);
 	}
 
 	void Application::Deactivate(Entity entity)
 	{
-		m_windowRenderer.Deactivate(entity);
 	}
 	void Application::Start()
 	{
@@ -44,6 +42,7 @@ namespace Engine
 			// auto start = std::chrono::high_resolution_clock::now();
 			if (m_refSceneManager.IsNewSceneStarting())
 			{	
+				ENGINE_INFO_D("New scene starting!");
 				m_refSceneManager.LoadQueuedScene();
 				m_refSceneManager.NewSceneStarted();
 				m_ptrCurrentScene = m_refSceneManager.GetCurrentScene();
@@ -78,9 +77,9 @@ namespace Engine
 			{ 
 				m_refSceneManager.Cleanup();
 			}
-			/*auto end = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double, std::milli> elapsed = end - start;
-			std::cout << "Frame time: " << elapsed.count() << " ms\n";*/
+			// auto end = std::chrono::high_resolution_clock::now();
+			// std::chrono::duration<double, std::milli> elapsed = end - start;
+			// std::cout << "Frame time: " << elapsed.count() << " ms\n";
 		}
 	}
 

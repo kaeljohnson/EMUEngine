@@ -15,8 +15,6 @@ namespace Engine
 		~WindowRenderer();
 
 		void Initialize();
-		void Activate(Entity entity);
-		void Deactivate(Entity entity);
 
 		void SetViewport();
 		void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
@@ -26,7 +24,7 @@ namespace Engine
 
 		void Render();
 		void Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset);
-		void Draw(LineCollider& transform, const int pixelsPerUnit, const Vector2D<float> offset);
+		void Draw(ChainCollider& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Display();
 
 		void ClearScreen();

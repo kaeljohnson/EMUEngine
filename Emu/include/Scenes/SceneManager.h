@@ -3,6 +3,7 @@
 #include "../Includes.h"
 #include "../ECS/ECS.h"
 #include "Scene.h"
+#include "../Logging/Logger.h"
 
 namespace Engine
 {
@@ -14,7 +15,8 @@ namespace Engine
 		void UnloadCurrentScene();
 
 		inline Scene* GetCurrentScene() const { return m_ptrCurrentScene; };
-		inline Scene& GetScene(const std::string& sceneName) { return m_scenes.at(sceneName); }
+		inline std::unordered_map<std::string, Scene>& GetAllScenes() { return m_scenes; }
+		Scene& GetScene(const std::string& sceneName);
 	public:
 		SceneManager();
 		~SceneManager() = default;
