@@ -8,7 +8,6 @@
 #include "../Includes.h"
 #include "../Core.h"
 #include "../MathUtil.h"
-#include "../UpdateSystem.h"
 
 struct b2WorldId;
 
@@ -52,7 +51,6 @@ namespace Engine
 
 		PhysicsSimulation m_physicsSimulation;
 		CameraSystem m_cameraSystem;
-		UpdateSystem m_updateSystem;
 
 		std::vector<Entity> m_entities;
 

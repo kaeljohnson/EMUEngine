@@ -7,7 +7,6 @@
 #include "Physics/Physics.h"
 #include "Camera/CameraInterface.h"
 #include "TransformInterface.h"
-#include "UpdatableInterface.h"
 
 namespace Engine
 {
@@ -92,7 +91,6 @@ namespace Engine
 		PhysicsInterface m_physicsInterface;
 		CameraInterface m_cameraInterface;
 		TransformInterface m_transformInterface;
-		UpdatableInterface m_updaterInterface; // This may not be necessary.
 
 		IOEventSystem m_ioEventSystem;
 		SceneManager m_sceneManager;

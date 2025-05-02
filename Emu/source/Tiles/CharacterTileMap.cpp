@@ -40,8 +40,6 @@ namespace Engine
 
     void CharacterTileMap::CreateMap(const std::string mapFile, const std::string rulesFile)
     {
-        m_tiles.reserve(MAX_SIZE);
-
         // Open and parse the rules file
         std::ifstream inFile(rulesFile);
         if (!inFile.is_open()) 

@@ -15,8 +15,7 @@ namespace Engine
 	Scene::Scene(ECS& refECS)
 		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(m_refECS), 
 		m_physicsSimulation(refECS, m_tileMap), 
-		m_cameraSystem(refECS),
-		m_updateSystem(refECS) 
+		m_cameraSystem(refECS)
 	{
 		m_entities.reserve(10000);
 	}
@@ -152,7 +151,6 @@ namespace Engine
 
 	void Scene::UpdateScripts()
 	{
-		m_updateSystem.Update();
 	}
 
 	void Scene::UpdatePhysics()

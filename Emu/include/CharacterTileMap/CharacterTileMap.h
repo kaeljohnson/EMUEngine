@@ -2,9 +2,7 @@
 
 #include "../ECS/ECS.h"
 #include "../Includes.h"
-#include "../Core.h"
 #include "../MathUtil.h"
-#include "../Components.h"
 
 namespace Engine
 {
@@ -27,13 +25,13 @@ namespace Engine
 		// Returns all tiles in the map that match the character.
 		const std::vector<Entity>& GetEntities(char tileChar) const;
 
-	public:
 		void CreateMap(const std::string mapFile, const std::string rulesFile);
 		void LoadMap();
 		void UnloadMap();
 
 	public:
 		std::vector<std::pair<Entity, char>> m_allMapEntities;
+
 	private:
 		std::vector<std::tuple<Entity, char, Vector2D<int>>> m_tiles;
 		Vector2D<int> m_mapDimensions;
