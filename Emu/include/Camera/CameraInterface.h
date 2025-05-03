@@ -30,7 +30,5 @@ namespace Engine
 
 	private:
 		ECS& m_refECS;
-
-		size_t m_activeCameraEntity;
 	};
 }

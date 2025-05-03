@@ -62,6 +62,30 @@
                 "ZIndex": 1
             }
         },
+        "Y": 
+        {
+            "ActiveOnStart": true,
+            "Physics": 
+            {
+                "BodyType": "STATIC",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "UseChains": true
+            },
+            "Transform": 
+            {
+                "ZIndex": 1
+            },
+            "Camera":
+            {
+                "Size": [0, 0],
+                "PixelsPerUnit": 32,
+                "ClampingOn": true
+            }
+        },
         "w":
         {
             "ActiveOnStart": true,

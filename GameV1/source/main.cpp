@@ -62,10 +62,6 @@ int main(int argc, char* args[])
 
 	Player player;
 
-	Engine::Entity playerEntityScene1 = Engine::EMU::GetInstance()->GetEntityByCharacter('P', "Level1");
-	Engine::Entity playerEntityScene2 = Engine::EMU::GetInstance()->GetEntityByCharacter('P', "Level2");
-	Engine::Entity testEntity = Engine::EMU::GetInstance()->GetEntityByCharacter('S', "Level1");
-
 	std::vector<Engine::Entity> playerEntities = engine->GetEntitiesByCharacter('w', "Level1");
 
 	scene.RegisterContactCallback(Engine::BEGIN_CONTACT, 'P', 'S', [](const Engine::Contact event)

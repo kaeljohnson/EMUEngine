@@ -94,6 +94,30 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			Engine::EMU::GetInstance()->Deactivate(testEntity);
 			CLIENT_TRACE_D("Done with O key up listener");
 		});
+
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::U_KEY_DOWN, [](Engine::IOEvent& e)
+		{
+			CLIENT_TRACE_D("Handled event SPACE KEY DOWN: " + std::to_string(static_cast<int>(Engine::SPACE_KEY_DOWN)));
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('Y');
+			Engine::EMU::GetInstance()->ChangeCamera(testEntity);
+			CLIENT_TRACE_D("Done with SPACE key down listener");
+		});
+
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::U_KEY_UP, [](Engine::IOEvent& e)
+		{
+			CLIENT_TRACE_D("Handled event SPACE KEY DOWN: " + std::to_string(static_cast<int>(Engine::SPACE_KEY_DOWN)));
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('P');
+			Engine::EMU::GetInstance()->ChangeCamera(testEntity);
+			CLIENT_TRACE_D("Done with SPACE key down listener");
+		});
+
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::T_KEY_DOWN, [](Engine::IOEvent& e)
+		{
+			CLIENT_TRACE_D("Handled event SPACE KEY DOWN: " + std::to_string(static_cast<int>(Engine::SPACE_KEY_DOWN)));
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('P');
+			Engine::EMU::GetInstance()->Deactivate(testEntity);
+			CLIENT_TRACE_D("Done with SPACE key down listener");
+		});
 }
 
 AppManagementEventHandlers::~AppManagementEventHandlers() {}

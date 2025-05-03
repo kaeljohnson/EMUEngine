@@ -48,10 +48,23 @@ namespace Engine
 		// 3. Activate the entities in the ECS. This will activate all components in the ECS.
 		// m_refECS.ActivateEntities(m_entities);
 
-		// 4. Frame the first active camera, deactivate all other cameras.
-		for (auto& camera : m_refECS.GetHotComponents<Camera>())
+		// 4. Frame the cameras, deactivate all but first camera.
+		std::vector<Camera>& activeCameras = m_refECS.GetHotComponents<Camera>();
+
+		if (activeCameras.size() == 0)
 		{
-			m_cameraSystem.Frame(camera, Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
+			ENGINE_CRITICAL_D("No active cameras in the scene. Cannot frame camera.");
+			std::runtime_error("No active cameras in the scene. Cannot frame camera.");
+			return;
+		}
+		for (size_t idx = 0; idx < activeCameras.size(); idx++)
+		{
+			m_cameraSystem.Frame(activeCameras[idx], Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
+
+			if (idx != 0)
+			{
+				m_refECS.DeactivateComponent<Camera>(activeCameras[idx].m_entity);
+			}
 		}
 
 		// 5. Physics bodies need to be added to the world after they are activated and pooled.

@@ -120,6 +120,7 @@ namespace Engine
 
 		if (ptrCurrentCamera == nullptr)
 		{
+			ENGINE_CRITICAL_D("No active camera found. Remember to change camera before deactivating entity.");
 			throw std::runtime_error("No active camera found.");
 			return;
 		}

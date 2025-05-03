@@ -9,22 +9,31 @@ namespace Engine
 {
 	void CameraInterface::ChangeCamera(Entity entity)
 	{
+		// Might support multiple active cameras in the future but for now 
+		// deactivate all other cameras and activate the new one.
+
 		if (!m_refECS.HasComponent<Camera>(entity)) return;
 
 		// Deactivate all other cameras
-		if (m_activeCameraEntity != -1)
+		std::vector<Camera>& activeCameras = m_refECS.GetHotComponents<Camera>();
+
+		if (activeCameras.size() > 1)
 		{
-			m_refECS.DeactivateComponent<Camera>(m_activeCameraEntity);
-			m_refECS.DeactivateComponent<CameraUpdater>(m_activeCameraEntity);
+			ENGINE_CRITICAL_D("Two or more active cameras should be impossible!");
+			std::runtime_error("Two or more active cameras should be impossible!");
+			return;
 		}
+	
+		Entity activeCameraEntity = activeCameras[0].m_entity;
+
+		m_refECS.DeactivateComponent<Camera>(activeCameraEntity);
+		m_refECS.DeactivateComponent<CameraUpdater>(activeCameraEntity);
 		m_refECS.ActivateComponent<Camera>(entity);
 		m_refECS.ActivateComponent<CameraUpdater>(entity);
-
-		m_activeCameraEntity = entity;
 	}
 
 	CameraInterface::CameraInterface(ECS& refECS) : 
-		m_refECS(refECS), m_activeCameraEntity(-1) {}
+		m_refECS(refECS) {}
 
 	Camera* CameraInterface::GetCamera(Entity entity)
 	{
