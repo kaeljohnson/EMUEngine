@@ -38,8 +38,8 @@ namespace Engine
     {
         refCamera.m_bounds = mapBounds;
         refCamera.m_size
-            = Vector2D<float>(Screen::VIEWPORT_SIZE.X / (refCamera.m_pixelsPerUnit * Screen::SCALE.X),
-                Screen::VIEWPORT_SIZE.Y / (refCamera.m_pixelsPerUnit * Screen::SCALE.Y));
+            = Vector2D<float>((Screen::VIEWPORT_SIZE.X * refCamera.m_screenRatio.X) / (refCamera.m_pixelsPerUnit * Screen::SCALE.X),
+                (Screen::VIEWPORT_SIZE.Y * refCamera.m_screenRatio.Y) / (refCamera.m_pixelsPerUnit * Screen::SCALE.Y));
 
 		// If the entity with the camera has a transform component, center the camera on the transform position
 		if (m_refECS.HasComponent<Transform>(refCamera.m_entity))

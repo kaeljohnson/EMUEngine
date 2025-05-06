@@ -199,6 +199,8 @@ namespace Engine
 			if (hasCamera)
 			{
                 Vector2D<float> size = Vector2D<float>(0.0f, 0.0f);
+				Vector2D<float> screenRatio = Vector2D<float>(1.0f, 1.0f);
+				Vector2D<float> position = Vector2D<float>(0.0f, 0.0f);
 			    int pixelsPerUnit = 0;
 				bool clampingOn = false;
 
@@ -244,8 +246,35 @@ namespace Engine
 						ENGINE_ERROR_D("ClampingOn is not a boolean");
 					}
 				}
+				if (characterRulesJson["Camera"].contains("Window"))
+				{
+					const auto& windowJson = characterRulesJson["Camera"]["Window"];
+                    if (windowJson.contains("X") && windowJson.contains("Y"))
+                    {
+						if (windowJson["X"].is_number() && windowJson["Y"].is_number())
+						{
+							position.X = windowJson["X"].get<float>();
+							position.Y = windowJson["Y"].get<float>();
+						}
+					}
+					else
+					{
+						ENGINE_ERROR_D("Window is missing X or Y");
+                    }
 
-				m_refECS.AddComponent<Camera>(tileEntity, size, pixelsPerUnit, clampingOn);
+                    if (windowJson.contains("Width") && windowJson.contains("Height"))
+                    {
+                        if (windowJson["Width"].is_number() && windowJson["Height"].is_number())
+                        {
+                            ENGINE_INFO_D("BALLS");
+                            screenRatio.X = windowJson["Width"].get<float>();
+                            screenRatio.Y = windowJson["Height"].get<float>();
+                        }
+
+                    }
+				}
+
+				m_refECS.AddComponent<Camera>(tileEntity, size, screenRatio, position, pixelsPerUnit, clampingOn);
 			}
 
             // Add Physics components.

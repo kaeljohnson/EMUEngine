@@ -7,30 +7,30 @@
 
 namespace Engine
 {
-	void CameraInterface::ChangeCamera(Entity entity)
-	{
-		// Might support multiple active cameras in the future but for now 
-		// deactivate all other cameras and activate the new one.
+	//void CameraInterface::ChangeCamera(Entity entity)
+	//{
+	//	// Might support multiple active cameras in the future but for now 
+	//	// deactivate all other cameras and activate the new one.
 
-		if (!m_refECS.HasComponent<Camera>(entity)) return;
+	//	if (!m_refECS.HasComponent<Camera>(entity)) return;
 
-		// Deactivate all other cameras
-		std::vector<Camera>& activeCameras = m_refECS.GetHotComponents<Camera>();
+	//	// Deactivate all other cameras
+	//	std::vector<Camera>& activeCameras = m_refECS.GetHotComponents<Camera>();
 
-		if (activeCameras.size() > 1)
-		{
-			ENGINE_CRITICAL_D("Two or more active cameras should be impossible!");
-			std::runtime_error("Two or more active cameras should be impossible!");
-			return;
-		}
-	
-		Entity activeCameraEntity = activeCameras[0].m_entity;
+	//	if (activeCameras.size() > 1)
+	//	{
+	//		ENGINE_CRITICAL_D("Two or more active cameras should be impossible!");
+	//		std::runtime_error("Two or more active cameras should be impossible!");
+	//		return;
+	//	}
+	//
+	//	Entity activeCameraEntity = activeCameras[0].m_entity;
 
-		m_refECS.DeactivateComponent<Camera>(activeCameraEntity);
-		m_refECS.DeactivateComponent<CameraUpdater>(activeCameraEntity);
-		m_refECS.ActivateComponent<Camera>(entity);
-		m_refECS.ActivateComponent<CameraUpdater>(entity);
-	}
+	//	m_refECS.DeactivateComponent<Camera>(activeCameraEntity);
+	//	m_refECS.DeactivateComponent<CameraUpdater>(activeCameraEntity);
+	//	m_refECS.ActivateComponent<Camera>(entity);
+	//	m_refECS.ActivateComponent<CameraUpdater>(entity);
+	//}
 
 	CameraInterface::CameraInterface(ECS& refECS) : 
 		m_refECS(refECS) {}
@@ -55,8 +55,8 @@ namespace Engine
 	{
 		Camera* ptrCamera = GetCamera(entity);
 		ptrCamera->m_size
-			= Vector2D<float>(Screen::VIEWPORT_SIZE.X / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.X), 
-				Screen::VIEWPORT_SIZE.Y / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.Y));
+			= Vector2D<float>(Screen::VIEWPORT_SIZE.X * ptrCamera->m_screenRatio.X / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.X),
+				Screen::VIEWPORT_SIZE.Y * ptrCamera->m_screenRatio.Y / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.Y));
 	}
 
 	const Vector2D<float> CameraInterface::GetSize(Entity entity)
@@ -71,7 +71,8 @@ namespace Engine
 
 	void CameraInterface::SetOffset(Entity entity, const Vector2D<float> offset)
 	{
-		GetCamera(entity)->m_offset = offset;
+		GetCamera(entity)->m_offset.X = offset.X;
+		GetCamera(entity)->m_offset.Y = offset.Y;
 	}
 
 	const Vector2D<float> CameraInterface::GetOffset(Entity entity)

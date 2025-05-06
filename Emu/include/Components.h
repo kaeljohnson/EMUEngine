@@ -102,13 +102,20 @@ namespace Engine
 	struct Camera : public Component
 	{
 		Camera(Entity entity)
-			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), Component(entity) {}
-		Camera(Entity entity, Vector2D<float> size, int pixelsPerUnit, bool clampingOn)
-			: m_size(size), m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), Component(entity) {}
+			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_screenRatio(1.0f, 1.0f), m_position(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), Component(entity) {}
+		Camera(Entity entity, Vector2D<float> size, Vector2D<float> screenRatio, Vector2D<float> position, int pixelsPerUnit, bool clampingOn)
+			: m_size(size), m_screenRatio(screenRatio), m_position(position), m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), Component(entity) {}
 		~Camera() = default;
+
+		// Window:
+		//     Position: position of the camera on the screen.
+		//     ScreenRatio: size of the camera in percent of screen.
+		Vector2D<float> m_position;
+		Vector2D<float> m_screenRatio;
 
 		Vector2D<float> m_offset;
 		Vector2D<float> m_size;
+		
 		int m_pixelsPerUnit;
 		bool m_clampingOn;
 		Vector2D<int> m_bounds;

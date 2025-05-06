@@ -47,7 +47,7 @@ namespace Engine
 		EMU_API void Deactivate(Entity entity);
 
 		// Cameras updated separately since there can only be one camera active.
-		EMU_API void ChangeCamera(Entity entity);
+		// EMU_API void ChangeCamera(Entity entity);
 
 		// Activate/Deactivate specific components
 		void ActivatePhysics(Entity entity);

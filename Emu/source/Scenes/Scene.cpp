@@ -57,14 +57,10 @@ namespace Engine
 			std::runtime_error("No active cameras in the scene. Cannot frame camera.");
 			return;
 		}
+
 		for (size_t idx = 0; idx < activeCameras.size(); idx++)
 		{
 			m_cameraSystem.Frame(activeCameras[idx], Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
-
-			if (idx != 0)
-			{
-				m_refECS.DeactivateComponent<Camera>(activeCameras[idx].m_entity);
-			}
 		}
 
 		// 5. Physics bodies need to be added to the world after they are activated and pooled.

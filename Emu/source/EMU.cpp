@@ -86,10 +86,10 @@ namespace Engine
 		m_sceneManager.GetCurrentScene()->Activate(entity);
 	}
 
-	void EMU::ChangeCamera(Entity entity)
+	/*void EMU::ChangeCamera(Entity entity)
 	{
 		m_cameraInterface.ChangeCamera(entity);
-	}
+	}*/
 
 	void EMU::Deactivate(Entity entity)
 	{

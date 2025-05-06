@@ -22,14 +22,20 @@
             },
             "Camera":
             {
-                "Size": [0, 0],
+                "Window":
+                {
+                    "X": 0.5,
+                    "Y": 0.0,
+                    "Width": 0.5,
+                    "Height": 0.5
+                },
                 "PixelsPerUnit": 32,
                 "ClampingOn": true
             }
         },
         "S": 
         {
-            "ActiveOnStart": false,
+            "ActiveOnStart": true,
             "Physics": 
             {
                 "BodyType": "SENSOR",
@@ -42,6 +48,18 @@
             "Transform": 
             {
                 "ZIndex": 1
+            },
+            "Camera":
+            {
+                "Window":
+                {
+                    "X": 0.0,
+                    "Y": 0.5,
+                    "Width": 0.5,
+                    "Height": 0.5
+                },
+                "PixelsPerUnit": 32,
+                "ClampingOn": true
             }
         },
         "T": 
@@ -81,10 +99,17 @@
             },
             "Camera":
             {
-                "Size": [0, 0],
-                "PixelsPerUnit": 32,
+                "Window":
+                {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Width": 0.5,
+                    "Height": 0.5
+                },
+                "PixelsPerUnit": 16,
                 "ClampingOn": true
             }
+            
         },
         "w":
         {

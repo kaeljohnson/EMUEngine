@@ -94,17 +94,17 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			Engine::EMU::GetInstance()->Deactivate(testEntity);
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::U_KEY_DOWN, [](Engine::IOEvent& e)
+	/*Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::U_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('Y');
 			Engine::EMU::GetInstance()->ChangeCamera(testEntity);
-		});
+		});*/
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::U_KEY_UP, [](Engine::IOEvent& e)
+	/*Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::U_KEY_UP, [](Engine::IOEvent& e)
 		{
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('P');
 			Engine::EMU::GetInstance()->ChangeCamera(testEntity);
-		});
+		});*/
 
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::T_KEY_DOWN, [](Engine::IOEvent& e)
 		{
