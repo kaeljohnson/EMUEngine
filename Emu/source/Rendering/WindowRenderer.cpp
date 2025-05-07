@@ -162,6 +162,15 @@ namespace Engine
 			float frameWidth = rightFrame - leftFrame;
 			float frameHeight = bottomFrame - topFrame;
 
+			SDL_Rect clipRect;
+			clipRect.x = static_cast<int>(ptrCurrentCamera->m_position.X * Screen::VIEWPORT_SIZE.X);
+			clipRect.y = static_cast<int>(ptrCurrentCamera->m_position.Y * Screen::VIEWPORT_SIZE.Y);
+			clipRect.w = static_cast<int>(frameWidth * ptrCurrentCamera->m_pixelsPerUnit * Screen::SCALE.X);
+			clipRect.h = static_cast<int>(frameHeight * ptrCurrentCamera->m_pixelsPerUnit * Screen::SCALE.Y);
+
+			SDL_RenderSetClipRect((SDL_Renderer*)m_ptrRenderer, &clipRect); // m_renderer = your SDL_Renderer*
+			
+
 			/*ENGINE_INFO_D("Left Frame: " + std::to_string(leftFrame) + ", Top Frame : " + std::to_string(topFrame) + ", Right Frame : " + std::to_string(rightFrame) +
 				", Bottom Frame: " + std::to_string(bottomFrame));*/
 
@@ -200,26 +209,11 @@ namespace Engine
 
 				if (isVisible)
 				{
-					SDL_Rect clipRect;
-					clipRect.x = static_cast<int>(ptrCurrentCamera->m_position.X * Screen::VIEWPORT_SIZE.X);
-					clipRect.y = static_cast<int>(ptrCurrentCamera->m_position.Y * Screen::VIEWPORT_SIZE.Y);
-					clipRect.w = static_cast<int>(frameWidth * ptrCurrentCamera->m_pixelsPerUnit * Screen::SCALE.X); 
-					clipRect.h = static_cast<int>(frameHeight * ptrCurrentCamera->m_pixelsPerUnit * Screen::SCALE.Y);
-
 					/*ENGINE_INFO_D("Clip Rect: " + std::to_string(clipRect.x) + ", " + std::to_string(clipRect.y) + ", " +
 						std::to_string(clipRect.w) + ", " + std::to_string(clipRect.h) + ", " +
 						"Left Offset: " + std::to_string(leftOffset) + ", Top Offset: " + std::to_string(topOffset));*/
-
-					// Set the hard clip rectangle
-					SDL_RenderSetClipRect((SDL_Renderer*)m_ptrRenderer, &clipRect); // m_renderer = your SDL_Renderer*
-
+					
 					Draw(refTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
-
-					SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-					SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x + clipRect.w, clipRect.y); // top line
-					SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x, clipRect.y + clipRect.h); // left line
-					SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x + clipRect.w - 1, clipRect.y, clipRect.x + clipRect.w - 1, clipRect.y + clipRect.h); // right line
-					SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y + clipRect.h - 1, clipRect.x + clipRect.w, clipRect.y + clipRect.h - 1); // bottom line
 				}
 			}
 
@@ -247,9 +241,22 @@ namespace Engine
 			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderTop>());
 			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderBottom>());
 
+
+			// If "border on"
+			// Draw the camera frame
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+
+			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x + clipRect.w, clipRect.y); // top line
+			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x, clipRect.y + clipRect.h); // left line
+			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x + clipRect.w - 1, clipRect.y, clipRect.x + clipRect.w - 1, clipRect.y + clipRect.h); // right line
+			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y + clipRect.h - 1, clipRect.x + clipRect.w, clipRect.y + clipRect.h - 1); // bottom line
+			
+
 			// auto end = std::chrono::high_resolution_clock::now();
 			// std::cout << "Rendering: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
 		}
+
+		
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 
 		Display();
