@@ -157,7 +157,7 @@ namespace Engine
 			float topFrame = ptrCurrentCamera->m_offset.Y;
 
 			float rightFrame = ptrCurrentCamera->m_offset.X + ptrCurrentCamera->m_screenRatio.X * viewportSizeInTilesX;
-			float bottomFrame = ptrCurrentCamera->m_offset.Y + (ptrCurrentCamera->m_screenRatio.Y) * viewportSizeInTilesY;
+			float bottomFrame = ptrCurrentCamera->m_offset.Y + ptrCurrentCamera->m_screenRatio.Y * viewportSizeInTilesY;
 
 			float frameWidth = rightFrame - leftFrame;
 			float frameHeight = bottomFrame - topFrame;
