@@ -209,10 +209,6 @@ namespace Engine
 
 				if (isVisible)
 				{
-					/*ENGINE_INFO_D("Clip Rect: " + std::to_string(clipRect.x) + ", " + std::to_string(clipRect.y) + ", " +
-						std::to_string(clipRect.w) + ", " + std::to_string(clipRect.h) + ", " +
-						"Left Offset: " + std::to_string(leftOffset) + ", Top Offset: " + std::to_string(topOffset));*/
-					
 					Draw(refTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
 				}
 			}
