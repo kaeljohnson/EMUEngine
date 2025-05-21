@@ -190,4 +190,16 @@ namespace Engine
 			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint) : ChainCollider(entity, enabled, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint) {}
 		~ChainColliderBottom() = default;
 	};
+
+	struct Sprite : public Component
+	{
+		Sprite(Entity entity, const int textureId, int size, int currentFrame, int frameDuration)
+			: m_textureId(textureId), m_size(size), m_currentFrame(currentFrame), m_currentFrameDuration(frameDuration), Component(entity) {}
+
+		const size_t m_textureId; // Used to get texture from the asset manager.
+		std::string m_currentAnimation;
+		int m_currentFrame;
+		int m_size;
+		int m_currentFrameDuration;
+	};
 }
