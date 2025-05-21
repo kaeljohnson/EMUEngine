@@ -4,6 +4,7 @@
 #include "Scenes/Scene.h"
 #include "Scenes/SceneManager.h"
 #include "Rendering/WindowRenderer.h"
+#include "AssetManager.h"
 #include "Events/IOEventSystem.h"
 #include "Core.h"
 
@@ -32,6 +33,7 @@ namespace Engine
 
 		// Engine should probably own this.
 		WindowRenderer m_windowRenderer;
+		AssetManager m_assetManager;
 		
 		SceneManager& m_refSceneManager;
 		Scene* m_ptrCurrentScene;
