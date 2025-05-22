@@ -21,8 +21,8 @@ namespace Engine
 	Vector2D<int> Screen::SCREEN_SIZE = Vector2D<int>(0, 0);
 	Vector2D<int> Screen::VIRTUAL_SIZE = Vector2D<int>(1280, 720);
 
-	WindowRenderer::WindowRenderer(ECS& refECS) 
-		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS)
+	WindowRenderer::WindowRenderer(ECS& refECS, AssetManager& refAssetManager) 
+		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS), m_refAssetManager(refAssetManager)
 	{
 		ENGINE_INFO_D("Creating Renderer");
 
@@ -72,6 +72,9 @@ namespace Engine
 
 		// Renderer only supports one window.
 		m_rendererCreated = true;
+
+		// Give renderer pointer to asset manager so it can load textures.
+		m_refAssetManager.GiveRenderer(m_ptrRenderer);
 
 		ENGINE_CRITICAL("Renderer created.");
 	}
@@ -209,7 +212,11 @@ namespace Engine
 
 				if (isVisible)
 				{
-					Draw(refTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
+					// Draw the Sprite
+					Draw(refTransform, m_refECS.GetComponent<Sprite>(refTransform.m_entity), ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
+
+					// If in debug, draw the transform
+					//Draw(refTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
 				}
 			}
 
@@ -257,6 +264,86 @@ namespace Engine
 
 		Display();
 	}
+
+	void WindowRenderer::Draw(Transform& transform, Sprite* sprite, const int pixelsPerUnit, const Vector2D<float> offset)
+	{
+		const float interpolation = Time::GetInterpolationFactor();
+
+		float lerpedX = Lerp(transform.PrevPosition.X, transform.Position.X, interpolation);
+		float lerpedY = Lerp(transform.PrevPosition.Y, transform.Position.Y, interpolation);
+
+		const float scale = pixelsPerUnit * Screen::SCALE_CONSTANT;
+
+		int width, height;
+		if (sprite)
+		{
+			width = static_cast<int>(round(sprite->m_size.X * scale));
+			height = static_cast<int>(round(sprite->m_size.Y * scale));
+		}
+		else
+		{
+			width = static_cast<int>(round(transform.Dimensions.X * scale));
+			height = static_cast<int>(round(transform.Dimensions.Y * scale));
+		}
+
+		SDLRect dst
+		{
+			static_cast<int>(round((lerpedX - offset.X) * scale)),
+			static_cast<int>(round((lerpedY - offset.Y) * scale)),
+			width,
+			height
+		};
+
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
+		SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
+
+		if (sprite)
+		{
+			SDLTexture* spriteTexture = (SDLTexture*)m_refAssetManager.GetTexture(sprite->m_entity);
+			if (spriteTexture != nullptr)
+			{
+				SDLRect src
+				{ 
+					sprite->m_currentFrame * sprite->m_size.X, // x position in pixels
+					0, // y position in pixels.
+					static_cast<int>(sprite->m_size.X), 
+					static_cast<int>(sprite->m_size.Y) 
+				};
+
+				ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, spriteTexture, &src, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
+			}
+		}
+		else
+		{
+			ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
+		}
+	}
+
+
+	/*void WindowRenderer::Draw(Transform& refTransform, Sprite& refSprite, const int pixelsPerUnit, const Vector2D<float> offset)
+	{
+		const float interpolation = Time::GetInterpolationFactor();
+
+		float lerpedX = Lerp(refTransform.PrevPosition.X, refTransform.Position.X, interpolation);
+		float lerpedY = Lerp(refTransform.PrevPosition.Y, refTransform.Position.Y, interpolation);
+
+		SDLRect dst
+		{
+			static_cast<int>(round((lerpedX - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((lerpedY - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round(refSprite.m_size * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round(refSprite.m_size * pixelsPerUnit * Screen::SCALE_CONSTANT))
+		};
+
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
+		SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
+
+		SDLTexture* spriteTexture = (SDLTexture*)m_refAssetManager.GetTexture(refSprite.m_entity);
+		if (spriteTexture != nullptr)
+		{
+			ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, spriteTexture, nullptr, &dst, refTransform.Rotation, nullptr, SDL_FLIP_NONE);
+		}
+	}*/
 
 	void WindowRenderer::Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset)
 	{

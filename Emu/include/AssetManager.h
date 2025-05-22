@@ -9,9 +9,10 @@ namespace Engine
 	class AssetManager
 	{
 	public:
-		AssetManager(void* ptrRenderer);
+		AssetManager();
 		~AssetManager() = default;
 
+		void GiveRenderer(void* ptrRenderer);
 		void Shutdown();
 
 		void LoadTexture(Entity entity, const std::string& filePath);

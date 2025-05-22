@@ -6,9 +6,13 @@
 
 namespace Engine
 {
-	AssetManager::AssetManager(void* ptrRenderer)
-		: m_ptrRenderer(ptrRenderer)
+	AssetManager::AssetManager() : m_ptrRenderer(nullptr)
 	{
+	}
+
+	void AssetManager::GiveRenderer(void* ptrRenderer)
+	{
+		m_ptrRenderer = ptrRenderer;
 	}
 
 	void AssetManager::Shutdown()
@@ -22,6 +26,12 @@ namespace Engine
 		auto it = m_textures.find(entity);
 		if (it != m_textures.end())
 			ENGINE_INFO("Overwriting texture for entity " + std::to_string(entity));
+
+		// Check if renderer is valid
+		if (!m_ptrRenderer) {
+			ENGINE_CRITICAL("Renderer is not initialized.");
+			return;
+		}
 
 		// Load texture
 		SDLTexture* ptrTexture = IMG_LoadTexture((SDL_Renderer*)m_ptrRenderer, filePath.c_str());

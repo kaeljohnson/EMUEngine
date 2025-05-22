@@ -193,12 +193,12 @@ namespace Engine
 
 	struct Sprite : public Component
 	{
-		Sprite(Entity entity, const int textureId, int size, int currentFrame, int frameDuration)
+		Sprite(Entity entity, const int textureId, Vector2D<int> size, int currentFrame, int frameDuration)
 			: m_size(size), m_currentFrame(currentFrame), m_currentFrameDuration(frameDuration), Component(entity) {}
 
 		std::string m_currentAnimation;
 		int m_currentFrame;
-		int m_size;
+		Vector2D<int> m_size;
 		int m_currentFrameDuration;
 	};
 }
