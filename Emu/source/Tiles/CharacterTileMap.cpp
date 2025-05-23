@@ -468,6 +468,45 @@ namespace Engine
                 }
             }
 
+			// Add sprite component.
+			if (characterRulesJson.contains("SpriteSheet") && characterRulesJson.contains("Animations"))
+			{
+				const auto& spriteSheetJson = characterRulesJson["SpriteSheet"];
+				const auto& animationsJson = characterRulesJson["Animations"];
+
+                std::string spriteSheetPath;
+                if (!spriteSheetJson.contains("Path"))
+                {
+                    ENGINE_CRITICAL("No path for sprite sheet found.");
+					spriteSheetPath = "default.png"; // Default sprite sheet path.
+                    continue;
+                }
+
+				spriteSheetPath = spriteSheetJson["Path"];
+                Vector2D<float> frameSize = { 1.0f, 1.0f }; // size of sprite in tiles.
+                if (!spriteSheetJson.contains("Size"))
+                {
+                    ENGINE_CRITICAL("No size for sprite sheet found. Defaulting to 32, 32");
+                }
+				else
+				{
+					const auto& sizeJson = spriteSheetJson["Size"];
+					if (sizeJson.is_array() && sizeJson.size() == 2)
+					{
+						ENGINE_INFO_D("Found size for sprite sheet");
+						if (sizeJson[0].is_number() && sizeJson[1].is_number())
+						{
+							frameSize.X = sizeJson[0].get<float>();
+							frameSize.Y = sizeJson[1].get<float>();
+						}
+					}
+				}
+
+				// TODO: Get animation data from the JSON file.
+
+				m_refECS.AddComponent<Sprite>(tileEntity, spriteSheetPath, frameSize, 0, 100);
+			}
+
             // If the character is "ActiveOnStart", activate it in the ECS.
             // MUST CALL AFTER ALL COMPONENTS CREATED.
             if (activeOnStart)

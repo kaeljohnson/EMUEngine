@@ -304,8 +304,8 @@ namespace Engine
 			{
 				SDLRect src
 				{ 
-					sprite->m_currentFrame * sprite->m_size.X, // x position in pixels
-					0, // y position in pixels.
+					static_cast<int>(sprite->m_currentFrame * sprite->m_size.X), // x position in tiles.
+					0, // y position in tiles.
 					static_cast<int>(sprite->m_size.X), 
 					static_cast<int>(sprite->m_size.Y) 
 				};
