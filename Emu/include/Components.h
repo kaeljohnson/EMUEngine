@@ -193,13 +193,15 @@ namespace Engine
 
 	struct Sprite : public Component
 	{
-		Sprite(Entity entity, std::string& pathToSpriteSheet, Vector2D<float> size, int currentFrame, int frameDuration)
-			: m_size(size), m_currentFrame(currentFrame), m_currentFrameDuration(frameDuration), Component(entity) {}
+		Sprite(Entity entity, std::string& pathToSpriteSheet, Vector2D<float> size, Vector2D<int> pixelsPerFrame, Vector2D<float> offsetFromTransform, int currentFrame, int frameDuration)
+			: m_size(size), m_pixelsPerFrame(pixelsPerFrame), m_offsetFromTransform(offsetFromTransform), m_currentFrame(currentFrame), m_currentFrameDuration(frameDuration), Component(entity) {}
 
 		std::string m_pathToSpriteSheet;
 		std::string m_currentAnimation;
 		int m_currentFrame;
 		Vector2D<float> m_size;
+		Vector2D<int> m_pixelsPerFrame;
+		Vector2D<float> m_offsetFromTransform;
 		int m_currentFrameDuration;
 	};
 }

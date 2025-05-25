@@ -509,14 +509,14 @@ namespace Engine
 
 
 
-                Vector2D<float> frameSize = { 1.0f, 1.0f }; // size of sprite in tiles.
-                if (!spriteSheetJson.contains("Size"))
+                Vector2D<float> frameSize = { 1.0f, 1.0f }; // size of sprite in units.
+                if (!spriteSheetJson.contains("SizeInUnits"))
                 {
                     ENGINE_CRITICAL("No size for sprite sheet found. Defaulting to 1, 1");
                 }
 				else
 				{
-					const auto& sizeJson = spriteSheetJson["Size"];
+					const auto& sizeJson = spriteSheetJson["SizeInUnits"];
 					if (sizeJson.is_array() && sizeJson.size() == 2)
 					{
 						ENGINE_INFO_D("Found size for sprite sheet");
@@ -528,9 +528,45 @@ namespace Engine
 					}
 				}
 
+				Vector2D<int> pixelsPerFrame = { 32, 32 }; // size of sprite frame in pixels.
+				if (!spriteSheetJson.contains("PixelsPerFrame"))
+				{
+					ENGINE_CRITICAL("No size for sprite sheet found. Defaulting to 32, 32");
+				}
+				else
+				{
+					const auto& pixelsPerFrameJson = spriteSheetJson["PixelsPerFrame"];
+					if (pixelsPerFrameJson.is_array() && pixelsPerFrameJson.size() == 2)
+					{
+						if (pixelsPerFrameJson[0].is_number() && pixelsPerFrameJson[1].is_number())
+						{
+							pixelsPerFrame.X = pixelsPerFrameJson[0].get<int>();
+							pixelsPerFrame.Y = pixelsPerFrameJson[1].get<int>();
+						}
+					}
+				}
+
+				Vector2D<float> offsetFromTransform = { 0.0f, 0.0f };
+                if (!spriteSheetJson.contains("OffsetFromTransform"))
+                {
+					ENGINE_INFO_D("No offset for sprite sheet found. Defaulting to 0, 0");
+                }
+                else
+				{
+					const auto& offsetJson = spriteSheetJson["OffsetFromTransform"];
+					if (offsetJson.is_array() && offsetJson.size() == 2)
+					{
+						if (offsetJson[0].is_number() && offsetJson[1].is_number())
+						{
+							offsetFromTransform.X = offsetJson[0].get<float>();
+							offsetFromTransform.Y = offsetJson[1].get<float>();
+						}
+					}
+				}
+
 				// TODO: Get animation data from the JSON file.
 
-				m_refECS.AddComponent<Sprite>(tileEntity, spriteSheetPath, frameSize, 0, 100);
+				m_refECS.AddComponent<Sprite>(tileEntity, spriteSheetPath, frameSize, pixelsPerFrame, offsetFromTransform, 0, 100);
 			}
 
             // If the character is "ActiveOnStart", activate it in the ECS.

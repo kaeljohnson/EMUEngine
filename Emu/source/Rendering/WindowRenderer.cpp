@@ -265,7 +265,7 @@ namespace Engine
 		Display();
 	}
 
-	void WindowRenderer::Draw(Transform& transform, Sprite* sprite, const int pixelsPerUnit, const Vector2D<float> offset)
+	void WindowRenderer::Draw(Transform& transform, Sprite* sprite, const int pixelsPerUnit, const Vector2D<float> cameraOffset)
 	{
 		const float interpolation = Time::GetInterpolationFactor();
 
@@ -276,12 +276,16 @@ namespace Engine
 		const float scaleY = pixelsPerUnit * Screen::SCALE.Y;
 
 		int width, height;
-		/*if (sprite)
+		float offsetFromTransformX = 0.0f;
+		float offsetFromTransformY = 0.0f;
+		if (sprite)
 		{
-			width = static_cast<int>(round(sprite->m_size.X * Screen::SCALE.X));
-			height = static_cast<int>(round(sprite->m_size.Y * Screen::SCALE.Y));
+			width = static_cast<int>(round(sprite->m_size.X * scaleX));
+			height = static_cast<int>(round(sprite->m_size.Y * scaleY));
+			offsetFromTransformX = sprite->m_offsetFromTransform.X;
+			offsetFromTransformY = sprite->m_offsetFromTransform.Y;
 		}
-		else*/
+		else
 		{
 			width = static_cast<int>(round(transform.Dimensions.X * scaleX));
 			height = static_cast<int>(round(transform.Dimensions.Y * scaleY));
@@ -289,8 +293,8 @@ namespace Engine
 
 		SDLRect dst
 		{
-			static_cast<int>(round((lerpedX - offset.X) * scaleX)),
-			static_cast<int>(round((lerpedY - offset.Y) * scaleY)),
+			static_cast<int>(round((lerpedX - cameraOffset.X + offsetFromTransformX) * scaleX)),
+			static_cast<int>(round((lerpedY - cameraOffset.Y + offsetFromTransformY) * scaleY)),
 			width,
 			height
 		};
@@ -307,10 +311,10 @@ namespace Engine
 				{ 
 					// What to muiltiple these by to get the correct size on the sprite sheet for any viewport?
 					// Size is set by client per unit. 
-					static_cast<int>(sprite->m_currentFrame * sprite->m_size.X),
+					static_cast<int>(sprite->m_currentFrame * sprite->m_pixelsPerFrame.X),
 					0,
-					static_cast<int>(sprite->m_size.X), 
-					static_cast<int>(sprite->m_size.Y) 
+					static_cast<int>(sprite->m_pixelsPerFrame.X), 
+					static_cast<int>(sprite->m_pixelsPerFrame.Y) 
 				};
 
 				ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, spriteTexture, &src, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
