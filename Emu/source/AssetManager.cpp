@@ -41,6 +41,7 @@ namespace Engine
 		}
 
 		// Store texture and return new ID
+		ENGINE_INFO("Texture loaded: " + filePath);
 		m_textures[entity] = ptrTexture;
 	}
 

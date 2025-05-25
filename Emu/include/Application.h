@@ -4,16 +4,16 @@
 #include "Scenes/Scene.h"
 #include "Scenes/SceneManager.h"
 #include "Rendering/WindowRenderer.h"
-#include "AssetManager.h"
 #include "Events/IOEventSystem.h"
 #include "Core.h"
+#include "AssetManager.h"
 
 namespace Engine
 {
 	class Application
 	{
 	public:
-		Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem);
+		Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, AssetManager& refAssetManager);
 		void Start();
 		void End();
 
@@ -33,7 +33,6 @@ namespace Engine
 
 		// Engine should probably own this.
 		WindowRenderer m_windowRenderer;
-		AssetManager m_assetManager;
 		
 		SceneManager& m_refSceneManager;
 		Scene* m_ptrCurrentScene;

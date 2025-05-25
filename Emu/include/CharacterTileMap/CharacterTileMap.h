@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../ECS/ECS.h"
+#include "../AssetManager.h"
 #include "../Includes.h"
 #include "../MathUtil.h"
 
@@ -12,7 +13,7 @@ namespace Engine
 		// Client should probably decide this.
 		static const int MAX_SIZE = 20000;
 
-		CharacterTileMap(ECS& refECS);
+		CharacterTileMap(ECS& refECS, AssetManager& refAssetManager);
 		const char GetChar(size_t x, size_t y) const;
 		const std::tuple<Entity, char, Vector2D<int>> GetTile(size_t x, size_t y) const;
 		
@@ -37,6 +38,7 @@ namespace Engine
 		Vector2D<int> m_mapDimensions;
 		int m_numUnitsPerTile;
 		ECS& m_refECS;
+		AssetManager& m_refAssetManager;
 
 		std::unordered_map<char, std::vector<Entity>> m_sameCharEntitiesMap;
 	};

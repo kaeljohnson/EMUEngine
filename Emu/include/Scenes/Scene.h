@@ -3,6 +3,7 @@
 #include "../ECS/ComponentManager.h"
 #include "../ECS/ECS.h"
 #include "../CharacterTileMap/CharacterTileMap.h" 
+#include "../AssetManager.h"
 #include "../Physics/Physics.h"
 #include "../Camera/CameraSystem.h"
 #include "../Includes.h"
@@ -16,7 +17,7 @@ namespace Engine
 	class Scene
 	{
 	public:
-		EMU_API Scene(ECS& refECS);
+		EMU_API Scene(ECS& refECS, AssetManager& refAssetManager);
 		EMU_API ~Scene();
 
 		using ContactCallback = std::function<void(const Contact&)>;

@@ -11,11 +11,11 @@ namespace Engine
 		m_scenes.reserve(200);
 	}
 
-	void SceneManager::AddScene(std::string sceneName, ECS& refECS)
+	void SceneManager::AddScene(std::string sceneName, ECS& refECS, AssetManager& refAssetManager)
 	{
 		m_scenes.emplace(std::piecewise_construct,
 			std::forward_as_tuple(sceneName),
-			std::forward_as_tuple(refECS));
+			std::forward_as_tuple(refECS, refAssetManager));
 	}
 
 	void SceneManager::LoadScene(std::string sceneName)

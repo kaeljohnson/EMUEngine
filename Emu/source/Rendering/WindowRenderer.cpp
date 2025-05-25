@@ -272,29 +272,30 @@ namespace Engine
 		float lerpedX = Lerp(transform.PrevPosition.X, transform.Position.X, interpolation);
 		float lerpedY = Lerp(transform.PrevPosition.Y, transform.Position.Y, interpolation);
 
-		const float scale = pixelsPerUnit * Screen::SCALE_CONSTANT;
+		const float scaleX = pixelsPerUnit * Screen::SCALE.X;
+		const float scaleY = pixelsPerUnit * Screen::SCALE.Y;
 
 		int width, height;
-		if (sprite)
+		/*if (sprite)
 		{
-			width = static_cast<int>(round(sprite->m_size.X * scale));
-			height = static_cast<int>(round(sprite->m_size.Y * scale));
+			width = static_cast<int>(round(sprite->m_size.X * Screen::SCALE.X));
+			height = static_cast<int>(round(sprite->m_size.Y * Screen::SCALE.Y));
 		}
-		else
+		else*/
 		{
-			width = static_cast<int>(round(transform.Dimensions.X * scale));
-			height = static_cast<int>(round(transform.Dimensions.Y * scale));
+			width = static_cast<int>(round(transform.Dimensions.X * scaleX));
+			height = static_cast<int>(round(transform.Dimensions.Y * scaleY));
 		}
 
 		SDLRect dst
 		{
-			static_cast<int>(round((lerpedX - offset.X) * scale)),
-			static_cast<int>(round((lerpedY - offset.Y) * scale)),
+			static_cast<int>(round((lerpedX - offset.X) * scaleX)),
+			static_cast<int>(round((lerpedY - offset.Y) * scaleY)),
 			width,
 			height
 		};
 
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0); 
 		SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
 
 		if (sprite)
@@ -304,8 +305,10 @@ namespace Engine
 			{
 				SDLRect src
 				{ 
-					static_cast<int>(sprite->m_currentFrame * sprite->m_size.X), // x position in tiles.
-					0, // y position in tiles.
+					// What to muiltiple these by to get the correct size on the sprite sheet for any viewport?
+					// Size is set by client per unit. 
+					static_cast<int>(sprite->m_currentFrame * sprite->m_size.X),
+					0,
 					static_cast<int>(sprite->m_size.X), 
 					static_cast<int>(sprite->m_size.Y) 
 				};

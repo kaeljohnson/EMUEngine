@@ -12,7 +12,7 @@
                 "BodyType": "DYNAMIC",
                 "Category" : "PLAYER",
                 "Mask" : "ALL",
-                "Size": [0.75, 0.75],
+                "Size": [1.0 , 1.0],
                 "Rotation": 0.0,
                 "GravityOn": true,
                 "CheckSimpleContacts": true
@@ -35,8 +35,8 @@
             },
             "SpriteSheet": 
             {
-                "Path": "Player.png",
-                "Size": [0.75, 0.75]
+                "Path": "FirstDraftZombieGameGuy.png",
+                "Size": [32, 32]
             },
             "Animations":
             {

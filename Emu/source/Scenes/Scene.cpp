@@ -12,8 +12,8 @@
 
 namespace Engine
 {
-	Scene::Scene(ECS& refECS)
-		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(m_refECS), 
+	Scene::Scene(ECS& refECS, AssetManager& refAssetManager)
+		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(m_refECS, refAssetManager), 
 		m_physicsSimulation(refECS, m_tileMap), 
 		m_cameraSystem(refECS)
 	{

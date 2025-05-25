@@ -13,8 +13,8 @@ static json rulesJson; // Only one rules file per game for now so this will work
 
 namespace Engine
 {
-	CharacterTileMap::CharacterTileMap(ECS& refECS)
-		: m_refECS(refECS), m_mapDimensions(0, 0), m_numUnitsPerTile(0)
+	CharacterTileMap::CharacterTileMap(ECS& refECS, AssetManager& refAssetManager)
+		: m_refECS(refECS), m_refAssetManager(refAssetManager), m_mapDimensions(0, 0), m_numUnitsPerTile(0)
 	{
 		m_tiles.reserve(MAX_SIZE);
 		m_allMapEntities.reserve(MAX_SIZE);
@@ -132,6 +132,27 @@ namespace Engine
         }
 
         auto& tileRules = rulesJson["Tile Rules"];
+
+		// Check if the rules file contains a "SpriteSheetsPath" key
+		if (!rulesJson.contains("PathToSpriteSheets"))
+		{
+			ENGINE_CRITICAL("No sprite sheets path found in rules file. Add path to folder with sprite pngs.");
+            // Need to crash app here.
+			return;
+		}
+
+		// Get the sprite sheets path.
+		const auto& spriteSheetsPathJson = rulesJson["PathToSpriteSheets"];
+		std::string spriteSheetsPath = spriteSheetsPathJson;
+		ENGINE_INFO_D("Sprite sheets path: " + spriteSheetsPath);
+
+        // Check if app has sprite folder.
+		if (!std::filesystem::exists(spriteSheetsPath))
+		{
+			ENGINE_CRITICAL("Sprite sheets path does not exist: " + spriteSheetsPath);
+			return;
+		}
+
 
         // Create entity, character tiles.
         for (auto& tuple : m_tiles)
@@ -266,7 +287,6 @@ namespace Engine
                     {
                         if (windowJson["Width"].is_number() && windowJson["Height"].is_number())
                         {
-                            ENGINE_INFO_D("BALLS");
                             screenRatio.X = windowJson["Width"].get<float>();
                             screenRatio.Y = windowJson["Height"].get<float>();
                         }
@@ -483,10 +503,16 @@ namespace Engine
                 }
 
 				spriteSheetPath = spriteSheetJson["Path"];
+
+				ENGINE_INFO_D("Loading texture from: " + spriteSheetPath);
+				m_refAssetManager.LoadTexture(tileEntity, spriteSheetsPath + spriteSheetPath); // Should this be called on scene play?
+
+
+
                 Vector2D<float> frameSize = { 1.0f, 1.0f }; // size of sprite in tiles.
                 if (!spriteSheetJson.contains("Size"))
                 {
-                    ENGINE_CRITICAL("No size for sprite sheet found. Defaulting to 32, 32");
+                    ENGINE_CRITICAL("No size for sprite sheet found. Defaulting to 1, 1");
                 }
 				else
 				{
