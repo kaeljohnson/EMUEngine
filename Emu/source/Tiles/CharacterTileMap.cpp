@@ -369,9 +369,9 @@ namespace Engine
                     }
 
                 }
-                if (characterPhysicsRulesJson.contains("Size"))
+                if (characterPhysicsRulesJson.contains("DefaultPhysicsBodySize"))
                 {
-                    const auto& sizeJson = characterPhysicsRulesJson["Size"];
+                    const auto& sizeJson = characterPhysicsRulesJson["DefaultPhysicsBodySize"];
                     if (sizeJson.is_array() && sizeJson.size() == 2)
                     {
                         if (sizeJson[0].is_number() && sizeJson[1].is_number())

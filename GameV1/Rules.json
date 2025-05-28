@@ -12,7 +12,7 @@
                 "BodyType": "DYNAMIC",
                 "Category" : "PLAYER",
                 "Mask" : "ALL",
-                "Size": [0.5, 0.95],
+                "DefaultPhysicsBodySize": [0.5, 0.95],
                 "Rotation": 0.0,
                 "GravityOn": true,
                 "CheckSimpleContacts": true

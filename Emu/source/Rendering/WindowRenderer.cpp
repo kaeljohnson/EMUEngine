@@ -214,9 +214,6 @@ namespace Engine
 				{
 					// Draw the Sprite
 					Draw(refTransform, m_refECS.GetComponent<Sprite>(refTransform.m_entity), ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
-
-					// If in debug, draw the transform
-					//Draw(refTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
 				}
 			}
 
@@ -239,11 +236,12 @@ namespace Engine
 					}
 				};
 
+#ifndef NDEBUG
 			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderLeft>());
 			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderRight>());
 			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderTop>());
 			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderBottom>());
-
+#endif
 
 			// If "border on"
 			// Draw the camera frame
@@ -263,7 +261,7 @@ namespace Engine
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 
 		Display();
-	}
+	}	
 
 	void WindowRenderer::Draw(Transform& transform, Sprite* sprite, const int pixelsPerUnit, const Vector2D<float> cameraOffset)
 	{
@@ -299,9 +297,6 @@ namespace Engine
 			height
 		};
 
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0); 
-		SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
-
 		if (sprite)
 		{
 			SDLTexture* spriteTexture = (SDLTexture*)m_refAssetManager.GetTexture(sprite->m_entity);
@@ -312,7 +307,7 @@ namespace Engine
 					// What to muiltiple these by to get the correct size on the sprite sheet for any viewport?
 					// Size is set by client per unit. 
 					static_cast<int>(sprite->m_currentFrame * sprite->m_pixelsPerFrame.X),
-					0,
+					static_cast<int>(sprite->m_currentFrame * sprite->m_pixelsPerFrame.Y),
 					static_cast<int>(sprite->m_pixelsPerFrame.X), 
 					static_cast<int>(sprite->m_pixelsPerFrame.Y) 
 				};
@@ -322,62 +317,29 @@ namespace Engine
 		}
 		else
 		{
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
+			SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
 			ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
 		}
-	}
 
+#ifndef NDEBUG
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 
-	/*void WindowRenderer::Draw(Transform& refTransform, Sprite& refSprite, const int pixelsPerUnit, const Vector2D<float> offset)
-	{
-		const float interpolation = Time::GetInterpolationFactor();
-
-		float lerpedX = Lerp(refTransform.PrevPosition.X, refTransform.Position.X, interpolation);
-		float lerpedY = Lerp(refTransform.PrevPosition.Y, refTransform.Position.Y, interpolation);
-
-		SDLRect dst
+		// draw the transform rectangle border
+		SDLRect transformRect
 		{
-			static_cast<int>(round((lerpedX - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round((lerpedY - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round(refSprite.m_size * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round(refSprite.m_size * pixelsPerUnit * Screen::SCALE_CONSTANT))
-		};
-
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
-		SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
-
-		SDLTexture* spriteTexture = (SDLTexture*)m_refAssetManager.GetTexture(refSprite.m_entity);
-		if (spriteTexture != nullptr)
-		{
-			ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, spriteTexture, nullptr, &dst, refTransform.Rotation, nullptr, SDL_FLIP_NONE);
-		}
-	}*/
-
-	void WindowRenderer::Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset)
-	{
-		const float interpolation = Time::GetInterpolationFactor();
-
-		// The x, y, height, and width of the portion of the texture we want to render.
-		SDLRect src = { 0, 0, 0, 0 };
-
-		float lerpedX = Lerp(transform.PrevPosition.X, transform.Position.X, interpolation);
-		float lerpedY = Lerp(transform.PrevPosition.Y, transform.Position.Y, interpolation);
-
-		SDLRect dst
-		{
-			static_cast<int>(round((lerpedX - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round((lerpedY - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((lerpedX - cameraOffset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((lerpedY - cameraOffset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 			static_cast<int>(round(transform.Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 			static_cast<int>(round(transform.Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
-			
+
 		};
-
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
-		// SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
-		SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
-
-		ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
-
-		// This should show the boundary of the physics body, not the texture.		
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &transformRect);
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+#endif
 	}
 
 	void WindowRenderer::Draw(ChainCollider& chainCollider, const int pixelsPerUnit, const Vector2D<float> offset)

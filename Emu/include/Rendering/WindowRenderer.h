@@ -25,7 +25,6 @@ namespace Engine
 
 		void Render();
 		void Draw(Transform& refTransform, Sprite* ptrSprite, const int pixelsPerUnit, const Vector2D<float> offset);
-		void Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Draw(ChainCollider& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Display();
 
