@@ -4,6 +4,7 @@
 #include "../Includes.h"
 #include "../MathUtil.h"
 #include "../Components.h"
+#include "../AssetManager.h"
 #include "Screen.h"
 
 namespace Engine
@@ -11,7 +12,7 @@ namespace Engine
 	class WindowRenderer
 	{
 	public:
-		WindowRenderer(ECS& refECS);
+		WindowRenderer(ECS& refECS, AssetManager& refAssetManager);
 		~WindowRenderer();
 
 		void Initialize();
@@ -23,7 +24,7 @@ namespace Engine
 		const float GetMonitorRefreshRate();
 
 		void Render();
-		void Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset);
+		void Draw(Transform& refTransform, Sprite* ptrSprite, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Draw(ChainCollider& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Display();
 
@@ -38,6 +39,7 @@ namespace Engine
 		bool m_rendererCreated;
 
 		ECS& m_refECS;
+		AssetManager& m_refAssetManager;
 
 		std::vector<Entity> m_sortedEntitiesToRender;
 	};

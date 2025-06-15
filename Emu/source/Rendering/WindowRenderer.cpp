@@ -21,8 +21,8 @@ namespace Engine
 	Vector2D<int> Screen::SCREEN_SIZE = Vector2D<int>(0, 0);
 	Vector2D<int> Screen::VIRTUAL_SIZE = Vector2D<int>(1280, 720);
 
-	WindowRenderer::WindowRenderer(ECS& refECS) 
-		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS)
+	WindowRenderer::WindowRenderer(ECS& refECS, AssetManager& refAssetManager) 
+		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS), m_refAssetManager(refAssetManager)
 	{
 		ENGINE_INFO_D("Creating Renderer");
 
@@ -72,6 +72,9 @@ namespace Engine
 
 		// Renderer only supports one window.
 		m_rendererCreated = true;
+
+		// Give renderer pointer to asset manager so it can load textures.
+		m_refAssetManager.GiveRenderer(m_ptrRenderer);
 
 		ENGINE_CRITICAL("Renderer created.");
 	}
@@ -209,7 +212,8 @@ namespace Engine
 
 				if (isVisible)
 				{
-					Draw(refTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
+					// Draw the Sprite
+					Draw(refTransform, m_refECS.GetComponent<Sprite>(refTransform.m_entity), ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
 				}
 			}
 
@@ -232,11 +236,12 @@ namespace Engine
 					}
 				};
 
+#ifndef NDEBUG
 			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderLeft>());
 			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderRight>());
 			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderTop>());
 			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderBottom>());
-
+#endif
 
 			// If "border on"
 			// Draw the camera frame
@@ -256,34 +261,85 @@ namespace Engine
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 
 		Display();
-	}
+	}	
 
-	void WindowRenderer::Draw(Transform& transform, const int pixelsPerUnit, const Vector2D<float> offset)
+	void WindowRenderer::Draw(Transform& transform, Sprite* sprite, const int pixelsPerUnit, const Vector2D<float> cameraOffset)
 	{
 		const float interpolation = Time::GetInterpolationFactor();
-
-		// The x, y, height, and width of the portion of the texture we want to render.
-		SDLRect src = { 0, 0, 0, 0 };
 
 		float lerpedX = Lerp(transform.PrevPosition.X, transform.Position.X, interpolation);
 		float lerpedY = Lerp(transform.PrevPosition.Y, transform.Position.Y, interpolation);
 
+		const float scaleX = pixelsPerUnit * Screen::SCALE.X;
+		const float scaleY = pixelsPerUnit * Screen::SCALE.Y;
+
+		int width, height;
+		float offsetFromTransformX = 0.0f;
+		float offsetFromTransformY = 0.0f;
+		if (sprite)
+		{
+			width = static_cast<int>(round(sprite->m_size.X * scaleX));
+			height = static_cast<int>(round(sprite->m_size.Y * scaleY));
+			offsetFromTransformX = sprite->m_offsetFromTransform.X;
+			offsetFromTransformY = sprite->m_offsetFromTransform.Y;
+		}
+		else
+		{
+			width = static_cast<int>(round(transform.Dimensions.X * scaleX));
+			height = static_cast<int>(round(transform.Dimensions.Y * scaleY));
+		}
+
 		SDLRect dst
 		{
-			static_cast<int>(round((lerpedX - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round((lerpedY - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round(transform.Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round(transform.Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
-			
+			static_cast<int>(round((lerpedX - cameraOffset.X + offsetFromTransformX) * scaleX)),
+			static_cast<int>(round((lerpedY - cameraOffset.Y + offsetFromTransformY) * scaleY)),
+			width,
+			height
 		};
 
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
-		// SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
-		SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
+		if (sprite)
+		{
+			SDLTexture* spriteTexture = (SDLTexture*)m_refAssetManager.GetTexture(sprite->m_entity);
+			if (spriteTexture != nullptr)
+			{
+				SDLRect src
+				{ 
+					// What to muiltiple these by to get the correct size on the sprite sheet for any viewport?
+					// Size is set by client per unit. 
+					static_cast<int>(sprite->m_currentFrame * sprite->m_pixelsPerFrame.X),
+					static_cast<int>(sprite->m_currentFrame * sprite->m_pixelsPerFrame.Y),
+					static_cast<int>(sprite->m_pixelsPerFrame.X), 
+					static_cast<int>(sprite->m_pixelsPerFrame.Y) 
+				};
 
-		ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
+				ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, spriteTexture, &src, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
+			}
+		}
+		else
+		{
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
+			SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
+			ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
+		}
 
-		// This should show the boundary of the physics body, not the texture.		
+#ifndef NDEBUG
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+
+		// draw the transform rectangle border
+		SDLRect transformRect
+		{
+			static_cast<int>(round((lerpedX - cameraOffset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((lerpedY - cameraOffset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round(transform.Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round(transform.Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
+
+		};
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &transformRect);
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+#endif
 	}
 
 	void WindowRenderer::Draw(ChainCollider& chainCollider, const int pixelsPerUnit, const Vector2D<float> offset)

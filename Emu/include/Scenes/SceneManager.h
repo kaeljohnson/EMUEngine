@@ -3,6 +3,7 @@
 #include "../Includes.h"
 #include "../ECS/ECS.h"
 #include "Scene.h"
+#include "../AssetManager.h"
 #include "../Logging/Logger.h"
 
 namespace Engine
@@ -10,7 +11,7 @@ namespace Engine
 	class SceneManager
 	{
 	public:
-		void AddScene(std::string sceneName, ECS& refECS);
+		void AddScene(std::string sceneName, ECS& refECS, AssetManager& refAssetManager);
 		void LoadScene(std::string sceneName);
 		void UnloadCurrentScene();
 

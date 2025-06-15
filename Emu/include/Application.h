@@ -6,13 +6,14 @@
 #include "Rendering/WindowRenderer.h"
 #include "Events/IOEventSystem.h"
 #include "Core.h"
+#include "AssetManager.h"
 
 namespace Engine
 {
 	class Application
 	{
 	public:
-		Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem);
+		Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, AssetManager& refAssetManager);
 		void Start();
 		void End();
 

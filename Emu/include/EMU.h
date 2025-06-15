@@ -7,6 +7,7 @@
 #include "Physics/Physics.h"
 #include "Camera/CameraInterface.h"
 #include "TransformInterface.h"
+#include "AssetManager.h"
 
 namespace Engine
 {
@@ -88,6 +89,8 @@ namespace Engine
 		EMU(const size_t numEntities);
 
 		ECS m_ecs;
+		AssetManager m_assetManager;
+
 		PhysicsInterface m_physicsInterface;
 		CameraInterface m_cameraInterface;
 		TransformInterface m_transformInterface;

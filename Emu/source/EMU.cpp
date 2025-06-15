@@ -20,7 +20,7 @@ namespace Engine
 	EMU::EMU(const size_t numEntities)
 		: m_ecs(), m_sceneManager(), 
 		m_physicsInterface(m_ecs), m_transformInterface(m_ecs), m_ioEventSystem(),
-		m_application(m_ecs, m_sceneManager, m_ioEventSystem), m_cameraInterface(m_ecs)
+		m_application(m_ecs, m_sceneManager, m_ioEventSystem, m_assetManager), m_cameraInterface(m_ecs)
 	{
 		m_ecs.Initialize(numEntities);
 
@@ -34,6 +34,7 @@ namespace Engine
 		m_ecs.RegisterComponentManager<ChainColliderLeft>();
 		m_ecs.RegisterComponentManager<ChainColliderRight>();
 		m_ecs.RegisterComponentManager<ChainColliderBottom>();
+		m_ecs.RegisterComponentManager<Sprite>();
 
 		m_ioEventSystem.Initialize();
 	}
@@ -46,7 +47,7 @@ namespace Engine
 	// Scene management
 	Scene& EMU::CreateScene(const std::string& name)
 	{
-		m_sceneManager.AddScene(name, m_ecs);
+		m_sceneManager.AddScene(name, m_ecs, m_assetManager);
 		return m_sceneManager.GetScene(name);
 	}
 

@@ -13,8 +13,8 @@ static json rulesJson; // Only one rules file per game for now so this will work
 
 namespace Engine
 {
-	CharacterTileMap::CharacterTileMap(ECS& refECS)
-		: m_refECS(refECS), m_mapDimensions(0, 0), m_numUnitsPerTile(0)
+	CharacterTileMap::CharacterTileMap(ECS& refECS, AssetManager& refAssetManager)
+		: m_refECS(refECS), m_refAssetManager(refAssetManager), m_mapDimensions(0, 0), m_numUnitsPerTile(0)
 	{
 		m_tiles.reserve(MAX_SIZE);
 		m_allMapEntities.reserve(MAX_SIZE);
@@ -132,6 +132,27 @@ namespace Engine
         }
 
         auto& tileRules = rulesJson["Tile Rules"];
+
+		// Check if the rules file contains a "SpriteSheetsPath" key
+		if (!rulesJson.contains("PathToSpriteSheets"))
+		{
+			ENGINE_CRITICAL("No sprite sheets path found in rules file. Add path to folder with sprite pngs.");
+            // Need to crash app here.
+			return;
+		}
+
+		// Get the sprite sheets path.
+		const auto& spriteSheetsPathJson = rulesJson["PathToSpriteSheets"];
+		std::string spriteSheetsPath = spriteSheetsPathJson;
+		ENGINE_INFO_D("Sprite sheets path: " + spriteSheetsPath);
+
+        // Check if app has sprite folder.
+		if (!std::filesystem::exists(spriteSheetsPath))
+		{
+			ENGINE_CRITICAL("Sprite sheets path does not exist: " + spriteSheetsPath);
+			return;
+		}
+
 
         // Create entity, character tiles.
         for (auto& tuple : m_tiles)
@@ -266,7 +287,6 @@ namespace Engine
                     {
                         if (windowJson["Width"].is_number() && windowJson["Height"].is_number())
                         {
-                            ENGINE_INFO_D("BALLS");
                             screenRatio.X = windowJson["Width"].get<float>();
                             screenRatio.Y = windowJson["Height"].get<float>();
                         }
@@ -349,9 +369,9 @@ namespace Engine
                     }
 
                 }
-                if (characterPhysicsRulesJson.contains("Size"))
+                if (characterPhysicsRulesJson.contains("DefaultPhysicsBodySize"))
                 {
-                    const auto& sizeJson = characterPhysicsRulesJson["Size"];
+                    const auto& sizeJson = characterPhysicsRulesJson["DefaultPhysicsBodySize"];
                     if (sizeJson.is_array() && sizeJson.size() == 2)
                     {
                         if (sizeJson[0].is_number() && sizeJson[1].is_number())
@@ -467,6 +487,87 @@ namespace Engine
                         0.0f, gravityOn, checkSimpleContacts);
                 }
             }
+
+			// Add sprite component.
+			if (characterRulesJson.contains("SpriteSheet") && characterRulesJson.contains("Animations"))
+			{
+				const auto& spriteSheetJson = characterRulesJson["SpriteSheet"];
+				const auto& animationsJson = characterRulesJson["Animations"];
+
+                std::string spriteSheetPath;
+                if (!spriteSheetJson.contains("Path"))
+                {
+                    ENGINE_CRITICAL("No path for sprite sheet found.");
+					spriteSheetPath = "default.png"; // Default sprite sheet path.
+                    continue;
+                }
+
+				spriteSheetPath = spriteSheetJson["Path"];
+
+				ENGINE_INFO_D("Loading texture from: " + spriteSheetPath);
+				m_refAssetManager.LoadTexture(tileEntity, spriteSheetsPath + spriteSheetPath); // Should this be called on scene play?
+
+
+
+                Vector2D<float> frameSize = { 1.0f, 1.0f }; // size of sprite in units.
+                if (!spriteSheetJson.contains("SizeInUnits"))
+                {
+                    ENGINE_CRITICAL("No size for sprite sheet found. Defaulting to 1, 1");
+                }
+				else
+				{
+					const auto& sizeJson = spriteSheetJson["SizeInUnits"];
+					if (sizeJson.is_array() && sizeJson.size() == 2)
+					{
+						ENGINE_INFO_D("Found size for sprite sheet");
+						if (sizeJson[0].is_number() && sizeJson[1].is_number())
+						{
+							frameSize.X = sizeJson[0].get<float>();
+							frameSize.Y = sizeJson[1].get<float>();
+						}
+					}
+				}
+
+				Vector2D<int> pixelsPerFrame = { 32, 32 }; // size of sprite frame in pixels.
+				if (!spriteSheetJson.contains("PixelsPerFrame"))
+				{
+					ENGINE_CRITICAL("No size for sprite sheet found. Defaulting to 32, 32");
+				}
+				else
+				{
+					const auto& pixelsPerFrameJson = spriteSheetJson["PixelsPerFrame"];
+					if (pixelsPerFrameJson.is_array() && pixelsPerFrameJson.size() == 2)
+					{
+						if (pixelsPerFrameJson[0].is_number() && pixelsPerFrameJson[1].is_number())
+						{
+							pixelsPerFrame.X = pixelsPerFrameJson[0].get<int>();
+							pixelsPerFrame.Y = pixelsPerFrameJson[1].get<int>();
+						}
+					}
+				}
+
+				Vector2D<float> offsetFromTransform = { 0.0f, 0.0f };
+                if (!spriteSheetJson.contains("OffsetFromTransform"))
+                {
+					ENGINE_INFO_D("No offset for sprite sheet found. Defaulting to 0, 0");
+                }
+                else
+				{
+					const auto& offsetJson = spriteSheetJson["OffsetFromTransform"];
+					if (offsetJson.is_array() && offsetJson.size() == 2)
+					{
+						if (offsetJson[0].is_number() && offsetJson[1].is_number())
+						{
+							offsetFromTransform.X = offsetJson[0].get<float>();
+							offsetFromTransform.Y = offsetJson[1].get<float>();
+						}
+					}
+				}
+
+				// TODO: Get animation data from the JSON file.
+
+				m_refECS.AddComponent<Sprite>(tileEntity, spriteSheetPath, frameSize, pixelsPerFrame, offsetFromTransform, 0, 100);
+			}
 
             // If the character is "ActiveOnStart", activate it in the ECS.
             // MUST CALL AFTER ALL COMPONENTS CREATED.

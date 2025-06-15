@@ -9,8 +9,8 @@
 namespace Engine
 {
 
-	Application::Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem)
-		: m_refECS(refECS), m_ptrCurrentScene(nullptr), m_windowRenderer(refECS), 
+	Application::Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, AssetManager& refAssetManager)
+		: m_refECS(refECS), m_ptrCurrentScene(nullptr), m_windowRenderer(refECS, refAssetManager),
 		m_refSceneManager(refSceneManager), m_refIOEventSystem(refIOEventSystem)
 	{}
 
