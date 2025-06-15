@@ -40,7 +40,7 @@ namespace Engine
 			return;
 		}
 
-		// Store texture and return new ID
+		// Store texture
 		ENGINE_INFO("Texture loaded: " + filePath);
 		m_textures[entity] = ptrTexture;
 	}
