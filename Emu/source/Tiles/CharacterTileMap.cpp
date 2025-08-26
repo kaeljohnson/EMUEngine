@@ -119,6 +119,20 @@ namespace Engine
         }
 	}
 
+    Animation makeAnimation(const std::string& name, const json& jAnim)
+    {
+        Animation a;
+        a. m_name = name;
+        a.m_frames = jAnim.at("Frames").get<std::vector<int>>();
+		a.m_numFrames = a.m_frames.size();
+        a.m_frameDuration = jAnim.at("FrameTime").get<int>();
+        a.m_loop = jAnim.at("Loop").get<bool>();
+
+		// ENGINE_CRITICAL_D("Animation created: " + a.m_name + " with " + std::to_string(a.m_frames.size()) + " frames and duration " + std::to_string(a.m_frameDuration));
+
+        return a;
+    }
+
 	void CharacterTileMap::LoadMap()
 	{
         // Read the NumMetersPerTile and store it in your member variable
@@ -564,9 +578,31 @@ namespace Engine
 					}
 				}
 
-				// TODO: Get animation data from the JSON file.
+				Vector2D<size_t> dimensions = { 1, 1 }; // Default dimensions.
+				if (spriteSheetJson.contains("Width") && spriteSheetJson.contains("Height"))
+				{
+					const auto& widthJson = spriteSheetJson["Width"];
+					const auto& heightJson = spriteSheetJson["Height"];
+					if (widthJson.is_number() && heightJson.is_number())
+					{
+						dimensions.X = widthJson.get<size_t>();
+						dimensions.Y = heightJson.get<size_t>();
+					}
+				}
 
-				m_refECS.AddComponent<Sprite>(tileEntity, spriteSheetPath, frameSize, pixelsPerFrame, offsetFromTransform, 0, 100);
+				// TODO: Get animation data from the JSON file.
+				std::unordered_map<std::string, Animation> animations;
+				json j = json::parse(characterRulesJson["Animations"].dump());
+
+                ENGINE_CRITICAL_D("Animations: " + j.dump(4));
+
+                for (auto& [name, value] : j.items())
+                {
+                    animations.emplace(name, makeAnimation(name, value));
+                }
+
+
+				m_refECS.AddComponent<Sprite>(tileEntity, spriteSheetPath, frameSize, pixelsPerFrame, offsetFromTransform, animations, dimensions);
 			}
 
             // If the character is "ActiveOnStart", activate it in the ECS.

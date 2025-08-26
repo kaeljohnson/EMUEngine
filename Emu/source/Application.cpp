@@ -9,9 +9,9 @@
 namespace Engine
 {
 
-	Application::Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, AssetManager& refAssetManager)
+	Application::Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, AssetManager& refAssetManager, AnimationSystem& refAnimationSystem)
 		: m_refECS(refECS), m_ptrCurrentScene(nullptr), m_windowRenderer(refECS, refAssetManager),
-		m_refSceneManager(refSceneManager), m_refIOEventSystem(refIOEventSystem)
+		m_refSceneManager(refSceneManager), m_refIOEventSystem(refIOEventSystem), m_refAnimationSystem(refAnimationSystem)
 	{}
 
 	void Application::Activate(Entity entity)
@@ -62,6 +62,7 @@ namespace Engine
 			while (accumulator >= timeStep)
 			{
 				m_ptrCurrentScene->UpdatePhysics();
+				m_refAnimationSystem.Update(timeStep);
 
 				accumulator -= timeStep;
 			}

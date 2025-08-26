@@ -17,7 +17,7 @@ namespace Engine
 		if (ISDL::Init() < 0)
 			ENGINE_CRITICAL("SDL Init failed! SDL_Error: " + std::string(ISDL::GetError()));
 
-		ENGINE_CRITICAL_D("Allocating " + std::to_string(numEntitiesNeeded) + " entities.");
+		ENGINE_INFO_D("Initializing EMU with " + std::to_string(numEntitiesNeeded) + " entities.");
 		EMU::Init(numEntitiesNeeded);
 	}
 }

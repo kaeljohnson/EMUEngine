@@ -45,6 +45,7 @@ void operator delete(void* ptr) noexcept {
 int main(int argc, char* args[])
 {
 	Engine::Init(10000);
+
 	Engine::EMU* engine = Engine::EMU::GetInstance();
 
 	CLIENT_INFO_D("Client Running!");

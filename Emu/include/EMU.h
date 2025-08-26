@@ -8,6 +8,7 @@
 #include "Camera/CameraInterface.h"
 #include "TransformInterface.h"
 #include "AssetManager.h"
+#include "Animations/AnimationSystem.h"
 
 namespace Engine
 {
@@ -90,6 +91,7 @@ namespace Engine
 
 		ECS m_ecs;
 		AssetManager m_assetManager;
+		AnimationSystem m_animationSystem;
 
 		PhysicsInterface m_physicsInterface;
 		CameraInterface m_cameraInterface;

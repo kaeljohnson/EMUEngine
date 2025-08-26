@@ -6,6 +6,7 @@
 #include "Includes.h"
 #include "MathUtil.h"
 #include "Core.h"
+#include "Logging/Logger.h"
 
 struct b2BodyId;
 struct b2ShapeId;
@@ -191,17 +192,47 @@ namespace Engine
 		~ChainColliderBottom() = default;
 	};
 
+	struct Animation
+	{
+		Animation() = default;
+		Animation(std::string name, std::vector<int> frames, int frameDuration, bool loop)
+			: m_name(name), m_frames(frames), m_numFrames(frames.size()), m_frameTime(0), m_frameDuration(frameDuration), m_loop(loop)
+		{
+		};
+		
+		std::string m_name;
+		size_t m_numFrames;
+		std::vector<int> m_frames;
+		size_t m_frameTime = 0;
+		size_t m_frameDuration;
+		bool m_loop;
+	};
+
 	struct Sprite : public Component
 	{
-		Sprite(Entity entity, std::string& pathToSpriteSheet, Vector2D<float> size, Vector2D<int> pixelsPerFrame, Vector2D<float> offsetFromTransform, int currentFrame, int frameDuration)
-			: m_size(size), m_pixelsPerFrame(pixelsPerFrame), m_offsetFromTransform(offsetFromTransform), m_currentFrame(currentFrame), m_currentFrameDuration(frameDuration), Component(entity) {}
+		Sprite(Entity entity, std::string& pathToSpriteSheet, Vector2D<float> size, Vector2D<int> pixelsPerFrame, 
+			Vector2D<float> offsetFromTransform, std::unordered_map<std::string, Animation> animations, Vector2D<size_t> dimensions)
+			: m_size(size), m_pixelsPerFrame(pixelsPerFrame), 
+			m_offsetFromTransform(offsetFromTransform), 
+			m_animations(animations), 
+			// m_currentAnimation("None"), // None, display deafault frame
+			m_currentAnimation("Idle"), // Idle for now, need a animation interface for client to set animation in a state machine.
+			m_dimensions(dimensions),
+			Component(entity) 
+		{}
+
+		std::unordered_map<std::string, Animation> m_animations; // All animations for this sprite
 
 		std::string m_pathToSpriteSheet;
-		std::string m_currentAnimation;
-		int m_currentFrame;
+		
+		Vector2D<size_t> m_dimensions; // Dimensions of the sprite sheet in frames (width, height)
+
 		Vector2D<float> m_size;
 		Vector2D<int> m_pixelsPerFrame;
 		Vector2D<float> m_offsetFromTransform;
-		int m_currentFrameDuration;
+
+		std::string m_currentAnimation;  // Name of the current animation being played
+		int m_currentFrame = 0;          // current frame in the current animation
+		size_t m_frameCounter = 0;       // tracks the number of frames passed since the last frame change
 	};
 }

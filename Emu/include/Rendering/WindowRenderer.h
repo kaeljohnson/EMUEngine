@@ -18,7 +18,6 @@ namespace Engine
 		void Initialize();
 
 		void SetViewport();
-		void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
 		void ToggleFullscreen();
 
 		const float GetMonitorRefreshRate();

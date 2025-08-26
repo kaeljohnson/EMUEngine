@@ -18,8 +18,8 @@ namespace Engine
 	Vector2D<int> Screen::VIEWPORT_POSITION = Vector2D<int>(0, 0);
 	Vector2D<float> Screen::SCALE = Vector2D<float>(0.0f, 0.0f);
 	float Screen::SCALE_CONSTANT = 0.0f;
-	Vector2D<int> Screen::SCREEN_SIZE = Vector2D<int>(0, 0);
-	Vector2D<int> Screen::VIRTUAL_SIZE = Vector2D<int>(1280, 720);
+	Vector2D<int> Screen::DISPLAY_RESOLUTION = Vector2D<int>(0, 0);
+	Vector2D<int> Screen::VIRTUAL_SIZE = Vector2D<int>(0, 0);
 
 	WindowRenderer::WindowRenderer(ECS& refECS, AssetManager& refAssetManager) 
 		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS), m_refAssetManager(refAssetManager)
@@ -53,9 +53,12 @@ namespace Engine
 			ENGINE_CRITICAL("Get desktop display mode failed: " + std::string(ISDL::GetError()));
 		}
 
-		Screen::SCREEN_SIZE.X = displayMode.w;
-		Screen::SCREEN_SIZE.Y = displayMode.h;
+		Screen::DISPLAY_RESOLUTION.X = displayMode.w;
+		Screen::DISPLAY_RESOLUTION.Y = displayMode.h;
 
+		ENGINE_INFO_D("Display resolution: " + std::to_string(displayMode.w) + ", " + std::to_string(displayMode.h));
+
+		SDL_SetWindowMinimumSize((SDL_Window*)m_ptrWindow, Screen::DISPLAY_RESOLUTION.X / 2, Screen::DISPLAY_RESOLUTION.Y / 2); // User should not be able to resize smaller than half the display resolution.
 
 		// Create renderer
 
@@ -127,7 +130,7 @@ namespace Engine
 			ptrCurrentCamera = &camera;
 
 			if (ptrCurrentCamera == nullptr)
-			{
+			{ 
 				ENGINE_CRITICAL_D("No active camera found. Remember to change camera before deactivating entity.");
 				throw std::runtime_error("No active camera found.");
 				return;
@@ -135,7 +138,6 @@ namespace Engine
 
 			if (Screen::WINDOW_RESIZE_REQUEST)
 			{
-				ResizeWindow(Screen::SCREEN_SIZE.X, Screen::SCREEN_SIZE.Y);
 				SetViewport();
 				Screen::WINDOW_RESIZE_REQUEST = false;
 			}
@@ -302,27 +304,34 @@ namespace Engine
 			SDLTexture* spriteTexture = (SDLTexture*)m_refAssetManager.GetTexture(sprite->m_entity);
 			if (spriteTexture != nullptr)
 			{
+				int x = static_cast<int>(sprite->m_currentFrame % sprite->m_dimensions.X * sprite->m_pixelsPerFrame.X);
+				int y = static_cast<int>(floor(sprite->m_currentFrame / sprite->m_dimensions.X) * sprite->m_pixelsPerFrame.Y);
+
 				SDLRect src
 				{ 
 					// What to muiltiple these by to get the correct size on the sprite sheet for any viewport?
 					// Size is set by client per unit. 
-					static_cast<int>(sprite->m_currentFrame * sprite->m_pixelsPerFrame.X),
-					static_cast<int>(sprite->m_currentFrame * sprite->m_pixelsPerFrame.Y),
+					x, 
+					y,
 					static_cast<int>(sprite->m_pixelsPerFrame.X), 
 					static_cast<int>(sprite->m_pixelsPerFrame.Y) 
 				};
 
+				// Draw the sprite
 				ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, spriteTexture, &src, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
 			}
 		}
 		else
 		{
+			// black rectangle for entities without sprites
 			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
 			SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
 			ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
 		}
 
-#ifndef NDEBUG
+#ifndef NDEBUG 
+
+		// green boxes
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
@@ -330,12 +339,15 @@ namespace Engine
 		// draw the transform rectangle border
 		SDLRect transformRect
 		{
-			static_cast<int>(round((lerpedX - cameraOffset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round((lerpedY - cameraOffset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			// static_cast<int>(round((lerpedX - cameraOffset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((lerpedX - cameraOffset.X) * scaleX)),
+			// static_cast<int>(round((lerpedY - cameraOffset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+			static_cast<int>(round((lerpedY - cameraOffset.Y) * scaleY)),
 			static_cast<int>(round(transform.Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 			static_cast<int>(round(transform.Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
 
 		};
+		// Red boxes
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &transformRect);
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
@@ -344,7 +356,11 @@ namespace Engine
 
 	void WindowRenderer::Draw(ChainCollider& chainCollider, const int pixelsPerUnit, const Vector2D<float> offset)
 	{
+		// Draw the chain collider as a series of lines in red.
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+
+		const float scaleX = pixelsPerUnit * Screen::SCALE.X;
+		const float scaleY = pixelsPerUnit * Screen::SCALE.Y;
 
 		for (int i = 0; i < 3; ++i)
 		{
@@ -369,43 +385,37 @@ namespace Engine
 		ISDL::RenderClear((SDLRenderer*)m_ptrRenderer);
 	}
 
-	void WindowRenderer::ResizeWindow(const int newWindowWidth, const int newWindowHeight)
-	{
-		ENGINE_TRACE_D(std::to_string(newWindowWidth) + ", " + std::to_string(newWindowHeight));
-
-		if (newWindowWidth < Screen::SCREEN_SIZE.X / 2 && newWindowHeight < Screen::SCREEN_SIZE.Y / 2)
-		{
-			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, Screen::SCREEN_SIZE.X / 2, Screen::SCREEN_SIZE.Y / 2);
-		}
-		else if (newWindowWidth < Screen::SCREEN_SIZE.X / 2)
-		{
-			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, Screen::SCREEN_SIZE.X / 2, newWindowHeight);
-		}
-		else if (newWindowHeight < Screen::SCREEN_SIZE.Y / 2)
-		{
-			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, newWindowWidth, Screen::SCREEN_SIZE.Y / 2);
-		}
-		else
-		{
-			// Let OS handle resize.
-		}
-	}
-
 	void WindowRenderer::SetViewport()
 	{
-		int windowWidth, windowHeight;
-		ISDL::GetWindowSize((SDLWindow*)m_ptrWindow, &windowWidth, &windowHeight);
+		int windowWidthInPixels, windowHeightInPixels;
+		SDL_GetRendererOutputSize((SDLRenderer*)m_ptrRenderer, &windowWidthInPixels, &windowHeightInPixels);
 
-		Screen::SCALE = Vector2D<float>(static_cast<float>(windowWidth) / Screen::VIRTUAL_SIZE.X, 
-			static_cast<float>(windowHeight) / Screen::VIRTUAL_SIZE.Y);
+		ENGINE_INFO_D("Window size in pixels: " + std::to_string(windowWidthInPixels) + ", " + std::to_string(windowHeightInPixels));
 
-		Screen::SCALE_CONSTANT = std::min(Screen::SCALE.X, Screen::SCALE.Y);
+		float aspectRatio = (float)windowWidthInPixels / (float)windowHeightInPixels;   
 
-		Screen::VIEWPORT_SIZE = Vector2D<int>(Screen::VIRTUAL_SIZE.X * (int)Screen::SCALE_CONSTANT, 
-			Screen::VIRTUAL_SIZE.Y * (int)Screen::SCALE_CONSTANT);
+		ENGINE_INFO_D("Aspect Ratio: " + std::to_string(aspectRatio));
 
-		Screen::VIEWPORT_POSITION.X = (windowWidth - Screen::VIEWPORT_SIZE.X) / 2;
-		Screen::VIEWPORT_POSITION.Y = (windowHeight - Screen::VIEWPORT_SIZE.Y) / 2;
+		Screen::VIRTUAL_SIZE.Y = 720; // Fixed virtual height in units for consistent rendering.
+
+		Screen::VIRTUAL_SIZE.X = Screen::VIRTUAL_SIZE.Y * aspectRatio; // Need the virtual width to be based on the fixed units of height. Otherwise will get weird stretching.
+
+		const float scaleX = static_cast<float>(windowWidthInPixels) / Screen::VIRTUAL_SIZE.X;
+		const float scaleY = static_cast<float>(windowHeightInPixels) / Screen::VIRTUAL_SIZE.Y;
+
+		ENGINE_INFO_D("Scale X: " + std::to_string(scaleX) + ", Scale Y: " + std::to_string(scaleY));
+
+		Screen::SCALE = Vector2D<float>(scaleX, scaleY);
+
+		Screen::SCALE_CONSTANT = scaleY; // Use height as fixed scale factor since most monitors are wider than they are tall. This also allows for variable display width with no distortion.
+
+		const int viewportWidth = static_cast<int>(Screen::VIRTUAL_SIZE.X * Screen::SCALE_CONSTANT);
+		const int viewportHeight = static_cast<int>(Screen::VIRTUAL_SIZE.Y * Screen::SCALE_CONSTANT);
+
+		Screen::VIEWPORT_SIZE = Vector2D<int>(viewportWidth, viewportHeight);
+
+		Screen::VIEWPORT_POSITION.X = (windowWidthInPixels - Screen::VIEWPORT_SIZE.X) / 2;
+		Screen::VIEWPORT_POSITION.Y = (windowHeightInPixels - Screen::VIEWPORT_SIZE.Y) / 2;
 
 		SDLRect viewport = { Screen::VIEWPORT_POSITION.X, Screen::VIEWPORT_POSITION.Y, Screen::VIEWPORT_SIZE.X, Screen::VIEWPORT_SIZE.Y };
 		ISDL::RenderSetViewport((SDLRenderer*)m_ptrRenderer, &viewport);
@@ -430,7 +440,7 @@ namespace Engine
 		{
 			// Default behavior for now will be to toggle fullscreen on for client.
 			// When the screen is toggled to windowed, the size will be half of the width and height.
-			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, Screen::SCREEN_SIZE.X / 2, Screen::SCREEN_SIZE.Y / 2);
+			ISDL::SetWindowSize((SDLWindow*)m_ptrWindow, Screen::DISPLAY_RESOLUTION.X / 2, Screen::DISPLAY_RESOLUTION.Y / 2);
 			ISDL::SetWindowPosition((SDLWindow*)m_ptrWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
 	}
