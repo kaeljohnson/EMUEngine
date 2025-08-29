@@ -18,13 +18,12 @@ namespace Engine
 		void Initialize();
 
 		void SetViewport();
-		void ResizeWindow(const int newWindowWidth, const int newWindowHeight);
 		void ToggleFullscreen();
 
 		const float GetMonitorRefreshRate();
 
 		void Render();
-		void Draw(Transform& refTransform, Sprite* ptrSprite, const int pixelsPerUnit, const Vector2D<float> offset);
+		void Draw(Transform& refTransform, Animations* ptrAnimations, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Draw(ChainCollider& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Display();
 

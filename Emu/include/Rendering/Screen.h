@@ -10,7 +10,7 @@ namespace Engine
 	// Should this class be un-staticified and given a pointer to the window?
 	struct Screen
 	{
-		EMU_API inline static const Vector2D<int> GetScreenSize() { return SCREEN_SIZE; }
+		EMU_API inline static const Vector2D<int> GetScreenSize() { return DISPLAY_RESOLUTION; }
 		EMU_API inline static const Vector2D<int> GetVirtualSize() { return VIRTUAL_SIZE; }
 		EMU_API inline static const Vector2D<float> GetScale() { return SCALE; }
 		EMU_API inline static const float GetScaleConstant() { return SCALE_CONSTANT; }
@@ -18,7 +18,7 @@ namespace Engine
 		EMU_API inline static const Vector2D<int> GetViewportSize() { return VIEWPORT_SIZE; }
 		EMU_API inline static const Vector2D<int> GetViewportPosition() { return VIEWPORT_POSITION; }
 
-		EMU_API inline static void SetWindowSize(const Vector2D<int>& size) { SCREEN_SIZE = size; WINDOW_RESIZE_REQUEST = true; }
+		EMU_API inline static void SetWindowSize(const Vector2D<int>& size) { VIEWPORT_SIZE = size; WINDOW_RESIZE_REQUEST = true; }
 		EMU_API inline static void SetFullscreen() { TOGGLE_FULLSCREEN_REQUEST = true; }
 
 	private:
@@ -26,7 +26,7 @@ namespace Engine
 		static bool WINDOW_RESIZE_REQUEST;
 		static bool TOGGLE_FULLSCREEN_REQUEST;
 
-		static Vector2D<int> SCREEN_SIZE;
+		static Vector2D<int> DISPLAY_RESOLUTION;
 		static Vector2D<int> VIRTUAL_SIZE;
 		static Vector2D<float> SCALE;
 		static float SCALE_CONSTANT;

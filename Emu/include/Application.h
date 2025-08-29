@@ -7,13 +7,14 @@
 #include "Events/IOEventSystem.h"
 #include "Core.h"
 #include "AssetManager.h"
+#include "Animations/AnimationSystem.h"
 
 namespace Engine
 {
 	class Application
 	{
 	public:
-		Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, AssetManager& refAssetManager);
+		Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, AssetManager& refAssetManager, AnimationSystem& refAnimationSystem);
 		void Start();
 		void End();
 
@@ -37,5 +38,6 @@ namespace Engine
 		SceneManager& m_refSceneManager;
 		Scene* m_ptrCurrentScene;
 		IOEventSystem& m_refIOEventSystem;
+		AnimationSystem& m_refAnimationSystem;
 	};
 }

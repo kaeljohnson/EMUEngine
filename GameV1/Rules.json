@@ -38,32 +38,34 @@
                 "Path": "FirstDraftZombieGameGuy.png",
                 "PixelsPerFrame": [32, 32],
                 "SizeInUnits": [1.0, 1.0],
-                "OffsetFromTransform": [-0.25, -0.05]
+                "OffsetFromTransform": [-0.25, -0.05],
+                "Height": 3,
+                "Width": 4
             },
             "Animations":
             {
                 "Idle": 
                 {
                     "Frames": [0, 1, 2, 3],
-                    "FrameTime": 100,
+                    "FrameTime": 20,
                     "Loop": true
                 },
                 "WalkRight": 
                 {
-                    "Frames": [4, 5, 6, 7],
-                    "FrameTime": 100,
+                    "Frames": [4, 5, 6, 7, 8, 9, 10, 11],
+                    "FrameTime": 10,
                     "Loop": true
                 },
                 "WalkLeft": 
                 {
-                    "Frames": [8, 9, 10, 11],
-                    "FrameTime": 100,
+                    "Frames": [12, 13, 14, 15],
+                    "FrameTime": 10,
                     "Loop": true
                 },
                 "Jump": 
                 {
                     "Frames": [0],
-                    "FrameTime": 100,
+                    "FrameTime": 10,
                     "Loop": false
                 }
             }

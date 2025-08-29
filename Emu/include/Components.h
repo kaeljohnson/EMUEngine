@@ -6,6 +6,7 @@
 #include "Includes.h"
 #include "MathUtil.h"
 #include "Core.h"
+#include "Logging/Logger.h"
 
 struct b2BodyId;
 struct b2ShapeId;
@@ -191,17 +192,44 @@ namespace Engine
 		~ChainColliderBottom() = default;
 	};
 
-	struct Sprite : public Component
+	struct Animation
 	{
-		Sprite(Entity entity, std::string& pathToSpriteSheet, Vector2D<float> size, Vector2D<int> pixelsPerFrame, Vector2D<float> offsetFromTransform, int currentFrame, int frameDuration)
-			: m_size(size), m_pixelsPerFrame(pixelsPerFrame), m_offsetFromTransform(offsetFromTransform), m_currentFrame(currentFrame), m_currentFrameDuration(frameDuration), Component(entity) {}
-
-		std::string m_pathToSpriteSheet;
-		std::string m_currentAnimation;
-		int m_currentFrame;
-		Vector2D<float> m_size;
+		Animation() = default;
+		Animation(std::string name, std::vector<int> frames, int frameDuration, 
+			Vector2D<int> pixelsPerFrame, Vector2D<float> offsetFromTransform, 
+			Vector2D<size_t> dimensions, bool loop, Vector2D<float> size)
+			: m_name(name), m_frames(frames), m_numFrames(frames.size()), m_frameTime(0), 
+			m_frameDuration(frameDuration), m_pixelsPerFrame(pixelsPerFrame), 
+			m_dimensions(dimensions), m_loop(loop), m_size(size)
+		{
+		};
+		
+		std::string m_name;
+		std::vector<int> m_frames;
+		size_t m_numFrames;
+		size_t m_frameTime = 0;
+		size_t m_frameDuration;
+		int m_currentFrame = 0;          // current frame in the current animation
+		size_t m_frameCounter = 0;       // tracks the number of frames passed since the last frame change
 		Vector2D<int> m_pixelsPerFrame;
+		Vector2D<size_t> m_dimensions;	 // Dimensions of the sprite sheet in frames (width, height)
+		Vector2D<float> m_size;
+		
 		Vector2D<float> m_offsetFromTransform;
-		int m_currentFrameDuration;
+		bool m_loop;
+	};
+
+	struct Animations : public Component
+	{
+		Animations(Entity entity, std::unordered_map<std::string, Animation> animations)
+			:
+			m_animations(animations), 
+			m_currentAnimation("Idle"), // Idle for now, need a animation interface for client to set animation in a state machine.
+			Component(entity) 
+		{}
+
+		std::unordered_map<std::string, Animation> m_animations; // All animations for this sprite
+		std::string m_currentAnimation;  // Name of the current animation being played
+		
 	};
 }
