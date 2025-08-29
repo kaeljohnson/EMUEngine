@@ -228,7 +228,7 @@ namespace Engine
 			Component(entity) 
 		{}
 
-		std::unordered_map<std::string, Animation> m_animations; // All animations for this sprit
+		std::unordered_map<std::string, Animation> m_animations; // All animations for this sprite
 		std::string m_currentAnimation;  // Name of the current animation being played
 		
 	};

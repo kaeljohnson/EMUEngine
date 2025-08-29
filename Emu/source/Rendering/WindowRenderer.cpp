@@ -343,9 +343,7 @@ namespace Engine
 		// draw the transform rectangle border
 		SDLRect transformRect
 		{
-			// static_cast<int>(round((lerpedX - cameraOffset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 			static_cast<int>(round((lerpedX - cameraOffset.X) * scaleX)),
-			// static_cast<int>(round((lerpedY - cameraOffset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 			static_cast<int>(round((lerpedY - cameraOffset.Y) * scaleY)),
 			static_cast<int>(round(transform.Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 			static_cast<int>(round(transform.Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
