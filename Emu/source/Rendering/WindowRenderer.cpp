@@ -215,7 +215,7 @@ namespace Engine
 				if (isVisible)
 				{
 					// Draw the Sprite
-					Draw(refTransform, m_refECS.GetComponent<Sprite>(refTransform.m_entity), ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
+					Draw(refTransform, m_refECS.GetComponent<Animations>(refTransform.m_entity), ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
 				}
 			}
 
@@ -265,7 +265,7 @@ namespace Engine
 		Display();
 	}	
 
-	void WindowRenderer::Draw(Transform& transform, Sprite* sprite, const int pixelsPerUnit, const Vector2D<float> cameraOffset)
+	void WindowRenderer::Draw(Transform& transform, Animations* animations, const int pixelsPerUnit, const Vector2D<float> cameraOffset)
 	{
 		const float interpolation = Time::GetInterpolationFactor();
 
@@ -278,12 +278,14 @@ namespace Engine
 		int width, height;
 		float offsetFromTransformX = 0.0f;
 		float offsetFromTransformY = 0.0f;
-		if (sprite)
+		if (animations)
 		{
-			width = static_cast<int>(round(sprite->m_size.X * scaleX));
-			height = static_cast<int>(round(sprite->m_size.Y * scaleY));
-			offsetFromTransformX = sprite->m_offsetFromTransform.X;
-			offsetFromTransformY = sprite->m_offsetFromTransform.Y;
+			const Animation& currentAnimation = animations->m_animations.at(animations->m_currentAnimation);
+
+			width = static_cast<int>(round(currentAnimation.m_size.X * scaleX));
+			height = static_cast<int>(round(currentAnimation.m_size.Y * scaleY));
+			offsetFromTransformX = currentAnimation.m_offsetFromTransform.X;
+			offsetFromTransformY = currentAnimation.m_offsetFromTransform.Y;
 		}
 		else
 		{
@@ -299,13 +301,15 @@ namespace Engine
 			height
 		};
 
-		if (sprite)
+		if (animations)
 		{
-			SDLTexture* spriteTexture = (SDLTexture*)m_refAssetManager.GetTexture(sprite->m_entity);
+			const Animation& currentAnimation = animations->m_animations.at(animations->m_currentAnimation);
+
+			SDLTexture* spriteTexture = (SDLTexture*)m_refAssetManager.GetTexture(animations->m_entity);
 			if (spriteTexture != nullptr)
 			{
-				int x = static_cast<int>(sprite->m_currentFrame % sprite->m_dimensions.X * sprite->m_pixelsPerFrame.X);
-				int y = static_cast<int>(floor(sprite->m_currentFrame / sprite->m_dimensions.X) * sprite->m_pixelsPerFrame.Y);
+				int x = static_cast<int>(currentAnimation.m_currentFrame % currentAnimation.m_dimensions.X * currentAnimation.m_pixelsPerFrame.X);
+				int y = static_cast<int>(floor(currentAnimation.m_currentFrame / currentAnimation.m_dimensions.X) * currentAnimation.m_pixelsPerFrame.Y);
 
 				SDLRect src
 				{ 
@@ -313,8 +317,8 @@ namespace Engine
 					// Size is set by client per unit. 
 					x, 
 					y,
-					static_cast<int>(sprite->m_pixelsPerFrame.X), 
-					static_cast<int>(sprite->m_pixelsPerFrame.Y) 
+					static_cast<int>(currentAnimation.m_pixelsPerFrame.X), 
+					static_cast<int>(currentAnimation.m_pixelsPerFrame.Y) 
 				};
 
 				// Draw the sprite

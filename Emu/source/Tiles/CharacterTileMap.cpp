@@ -119,13 +119,19 @@ namespace Engine
         }
 	}
 
-    Animation makeAnimation(const std::string& name, const json& jAnim)
+    Animation makeAnimation(const std::string& name, const json& jAnim, Vector2D<int> pixelsPerFrame, 
+        const Vector2D<float> offsetFromTransform, const Vector2D<size_t> dimensions, const Vector2D<float> frameSize) 
+        // name, value, pixelsPerFrame, offsetFromTransform, dimensions, size, value
     {
         Animation a;
-        a. m_name = name;
+        a.m_name = name;
         a.m_frames = jAnim.at("Frames").get<std::vector<int>>();
 		a.m_numFrames = a.m_frames.size();
         a.m_frameDuration = jAnim.at("FrameTime").get<int>();
+		a.m_pixelsPerFrame = pixelsPerFrame;
+		a.m_dimensions = dimensions;
+		a.m_size = frameSize;
+		a.m_offsetFromTransform = offsetFromTransform;
         a.m_loop = jAnim.at("Loop").get<bool>();
 
 		// ENGINE_CRITICAL_D("Animation created: " + a.m_name + " with " + std::to_string(a.m_frames.size()) + " frames and duration " + std::to_string(a.m_frameDuration));
@@ -598,11 +604,12 @@ namespace Engine
 
                 for (auto& [name, value] : j.items())
                 {
-                    animations.emplace(name, makeAnimation(name, value));
+                    animations.emplace(name, makeAnimation(name, value, pixelsPerFrame, offsetFromTransform,
+                        dimensions, frameSize));
                 }
 
 
-				m_refECS.AddComponent<Sprite>(tileEntity, spriteSheetPath, frameSize, pixelsPerFrame, offsetFromTransform, animations, dimensions);
+				m_refECS.AddComponent<Animations>(tileEntity, animations);
 			}
 
             // If the character is "ActiveOnStart", activate it in the ECS.
