@@ -35,7 +35,7 @@
             },
             "SpriteSheet": 
             {
-                "Path": "FirstDraftZombieGameGuy.png",
+                "Path": "FirstDraftZombieGameGuy.png",  
                 "PixelsPerFrame": [32, 32],
                 "SizeInUnits": [1.0, 1.0],
                 "OffsetFromTransform": [-0.25, -0.05],

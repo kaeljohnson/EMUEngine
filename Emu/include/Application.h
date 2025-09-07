@@ -34,6 +34,7 @@ namespace Engine
 
 		// Engine should probably own this.
 		WindowRenderer m_windowRenderer;
+		RendererSystem m_rendererSystem;
 		
 		SceneManager& m_refSceneManager;
 		Scene* m_ptrCurrentScene;
