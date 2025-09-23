@@ -25,23 +25,7 @@ namespace Engine
 				return;
 			}
 
-			// viewport size in tiles
-			float viewportSizeInTilesX = Screen::VIEWPORT_SIZE.X / (refCamera.m_pixelsPerUnit * Screen::SCALE.X);
-			float viewportSizeInTilesY = Screen::VIEWPORT_SIZE.Y / (refCamera.m_pixelsPerUnit * Screen::SCALE.Y);
 
-			// Calculate the frame and corresponding camera offset on screen.
-			float leftOffset = refCamera.m_offset.X - refCamera.m_position.X * viewportSizeInTilesX;
-			float topOffset = refCamera.m_offset.Y - refCamera.m_position.Y * viewportSizeInTilesY;
-
-			// Now the frame can be set according to the original offsets 
-			float leftFrame = refCamera.m_offset.X;
-			float topFrame = refCamera.m_offset.Y;
-
-			float rightFrame = refCamera.m_offset.X + refCamera.m_screenRatio.X * viewportSizeInTilesX;
-			float bottomFrame = refCamera.m_offset.Y + refCamera.m_screenRatio.Y * viewportSizeInTilesY;
-
-			float frameWidth = rightFrame - leftFrame;
-			float frameHeight = bottomFrame - topFrame;
 
 			for (auto& refTransform : m_refECS.GetHotComponents<Transform>())
 			{
@@ -86,23 +70,23 @@ namespace Engine
 						int sizseInPixelsOnSpriteSheetX = static_cast<int>(currentAnimation.m_pixelsPerFrame.X);
 						int sizseInPixelsOnSpriteSheetY = static_cast<int>(currentAnimation.m_pixelsPerFrame.Y);
 
-						int locationInPixelsOnScreenX = static_cast<int>(round((lerpedX - leftOffset + offsetFromTransformX) * scaleX));
-						int locationInPixelsOnScreenY = static_cast<int>(round((lerpedY - topOffset + offsetFromTransformY) * scaleY));
+						int locationInPixelsOnScreenX = static_cast<int>(round((lerpedX - refCamera.m_screenOffset.X + offsetFromTransformX) * scaleX));
+						int locationInPixelsOnScreenY = static_cast<int>(round((lerpedY - refCamera.m_screenOffset.Y + offsetFromTransformY) * scaleY));
 						int sizeInPixelsOnScreenX = width;
 						int sizeInPixelsOnScreenY = height;
 
-						ENGINE_CRITICAL_D("Location in pixels on screen: " + std::to_string(locationInPixelsOnScreenX / (refCamera.m_pixelsPerUnit * Screen::SCALE.X))
+						/*ENGINE_CRITICAL_D("Location in pixels on screen: " + std::to_string(locationInPixelsOnScreenX / (refCamera.m_pixelsPerUnit * Screen::SCALE.X))
 							+ ", " + std::to_string(locationInPixelsOnScreenY / refCamera.m_pixelsPerUnit * Screen::SCALE.Y));
 						ENGINE_CRITICAL_D("Camera Frame: " + std::to_string(leftFrame) + ", " + std::to_string(topFrame)
-							+ ", " + std::to_string(rightFrame) + ", " + std::to_string(bottomFrame));
+							+ ", " + std::to_string(rightFrame) + ", " + std::to_string(bottomFrame));*/
 
 						float objectLeft = refTransform.Position.X;
 						float objectRight = objectLeft + refTransform.Dimensions.X;
 						float objectTop = refTransform.Position.Y;
 						float objectBottom = objectTop + refTransform.Dimensions.Y;
 
-						bool isVisible = objectRight >= leftFrame && objectLeft <= rightFrame &&
-							objectBottom >= topFrame && objectTop <= bottomFrame;
+						bool isVisible = objectRight >= refCamera.m_offset.X && objectLeft <= refCamera.m_bottomRightCorner.X &&
+							objectBottom >= refCamera.m_offset.Y && objectTop <= refCamera.m_bottomRightCorner.Y;
 
 						if (isVisible)
 						{
@@ -127,8 +111,8 @@ namespace Engine
 					float objectTop = refTransform.Position.Y;
 					float objectBottom = objectTop + refTransform.Dimensions.Y;
 
-					bool isVisible = objectRight >= leftFrame && objectLeft <= rightFrame &&
-						objectBottom >= topFrame && objectTop <= bottomFrame;
+					bool isVisible = objectRight >= refCamera.m_offset.X && objectLeft <= refCamera.m_bottomRightCorner.X &&
+						objectBottom >= refCamera.m_offset.Y && objectTop <= refCamera.m_bottomRightCorner.Y;
 
 					if (isVisible)
 					{
@@ -138,8 +122,8 @@ namespace Engine
 							//{
 							refTransform.m_entity,
 							false,
-							Vector2D<int>(static_cast<int>(round((lerpedX - leftOffset + offsetFromTransformX) * scaleX)),
-								static_cast<int>(round((lerpedY - topOffset + offsetFromTransformY) * scaleY))),
+							Vector2D<int>(static_cast<int>(round((lerpedX - refCamera.m_screenOffset.X + offsetFromTransformX) * scaleX)),
+								static_cast<int>(round((lerpedY - refCamera.m_screenOffset.Y + offsetFromTransformY) * scaleY))),
 							Vector2D<int>(static_cast<int>(round(refTransform.Dimensions.X * scaleX)),
 								static_cast<int>(round(refTransform.Dimensions.Y * scaleY)))
 							//}

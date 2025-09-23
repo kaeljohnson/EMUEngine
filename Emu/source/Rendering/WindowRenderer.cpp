@@ -115,8 +115,6 @@ namespace Engine
 	{
 		ClearScreen();
 
-		Camera* ptrCurrentCamera = nullptr;
-
 		if (m_refECS.GetHotComponents<Camera>().empty())
 		{
 			ENGINE_CRITICAL_D("No active cameras found.");
@@ -138,17 +136,28 @@ namespace Engine
 		}
 
 		// Render cameras in order of array for now. Will change to render in order of Z index later.
-		for (auto& camera : m_refECS.GetHotComponents<Camera>())
+		for (auto& refCamera : m_refECS.GetHotComponents<Camera>())
 		{
 			// ENGINE_CRITICAL_D("Number of objects: " + std::to_string(m_renderBucket[1].size()));
+
+			SDL_Rect clipRect;
+			clipRect.x = static_cast<int>(refCamera.m_position.X * Screen::VIEWPORT_SIZE.X);
+			clipRect.y = static_cast<int>(refCamera.m_position.Y * Screen::VIEWPORT_SIZE.Y);
+			clipRect.w = static_cast<int>(refCamera.m_frameDimensions.X * refCamera.m_pixelsPerUnit * Screen::SCALE.X);
+			clipRect.h = static_cast<int>(refCamera.m_frameDimensions.Y * refCamera.m_pixelsPerUnit * Screen::SCALE.Y);
+
+			SDL_RenderSetClipRect((SDL_Renderer*)m_ptrRenderer, &clipRect); // m_renderer = your SDL_Renderer*
+
+			/*ENGINE_CRITICAL_D("Rect top left: (" + std::to_string(clipRect.x) + ", " + std::to_string(clipRect.y) + "), width: "
+				+ std::to_string(clipRect.w) + ", height: " + std::to_string(clipRect.h));*/
 
 			for (auto& [zIndex, renderObjects] : m_spriteRenderBucket)
 			{
 				for (auto& refRenderObject : renderObjects)
 				{
-					ENGINE_CRITICAL_D("Rendering entity: " + std::to_string(refRenderObject.m_entity));
+					//ENGINE_CRITICAL_D("Rendering entity: " + std::to_string(refRenderObject.m_entity));
 					// Draw the Render Object
-					Draw(refRenderObject, ptrCurrentCamera->m_pixelsPerUnit);
+					Draw(refRenderObject, refCamera.m_pixelsPerUnit);
 				}
 			}
 			m_spriteRenderBucket.clear();
@@ -167,7 +176,7 @@ namespace Engine
 				for (auto& refDebugRect : renderObjects)
 				{
 					// Draw the Render Object
-					DebugDraw(refDebugRect, ptrCurrentCamera->m_pixelsPerUnit);
+					DebugDraw(refDebugRect, refCamera.m_pixelsPerUnit);
 				}
 			}
 			m_debugRenderBucket.clear();

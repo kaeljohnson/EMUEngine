@@ -120,6 +120,14 @@ namespace Engine
 		int m_pixelsPerUnit;
 		bool m_clampingOn;
 		Vector2D<int> m_bounds;
+
+		// Calculate the frame and corresponding camera offset on screen.
+		Vector2D<float> m_screenOffset;
+
+		// top left corner is the offset
+		Vector2D<float> m_bottomRightCorner;
+
+		Vector2D<float> m_frameDimensions;
 	};
 
 	struct CameraUpdater : public Component

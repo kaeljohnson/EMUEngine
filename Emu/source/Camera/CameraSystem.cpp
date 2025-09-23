@@ -11,17 +11,37 @@
 
 namespace Engine
 {
-    CameraSystem::CameraSystem(ECS& refECS) : m_refECS(refECS) {}
+    CameraSystem::CameraSystem(ECS& refECS) : m_refECS(refECS), m_currentViewportSizeInTiles(0.0f, 0.0f) {}
 
     void CameraSystem::Update()
     {
-        for (auto& camera : m_refECS.GetHotComponents<Camera>())
+        for (auto& refCamera : m_refECS.GetHotComponents<Camera>())
         {
-            CameraUpdater* ptrCameraUpdater = m_refECS.GetComponent<CameraUpdater>(camera.m_entity);
+            CameraUpdater* ptrCameraUpdater = m_refECS.GetComponent<CameraUpdater>(refCamera.m_entity);
             if (ptrCameraUpdater)
-                ptrCameraUpdater->Update(camera.m_entity);
+                ptrCameraUpdater->Update(refCamera.m_entity);
 
-            if (camera.m_clampingOn) Clamp(camera);
+            if (refCamera.m_clampingOn) Clamp(refCamera);
+
+            // viewport size in tiles
+            float viewportSizeInTilesX = Screen::VIEWPORT_SIZE.X / (refCamera.m_pixelsPerUnit * Screen::SCALE.X);
+            float viewportSizeInTilesY = Screen::VIEWPORT_SIZE.Y / (refCamera.m_pixelsPerUnit * Screen::SCALE.Y);
+
+			const bool viewPortSizeChanged = m_currentViewportSizeInTiles != Vector2D<float>(viewportSizeInTilesX, viewportSizeInTilesY);
+
+            if (!viewPortSizeChanged) continue;
+
+            // Calculate the frame and corresponding camera offset on screen.
+            refCamera.m_screenOffset.X = refCamera.m_offset.X - refCamera.m_position.X * viewportSizeInTilesX;
+            refCamera.m_screenOffset.Y = refCamera.m_offset.Y - refCamera.m_position.Y * viewportSizeInTilesY;
+
+            refCamera.m_bottomRightCorner.X = refCamera.m_offset.X + refCamera.m_screenRatio.X * viewportSizeInTilesX;
+            refCamera.m_bottomRightCorner.Y = refCamera.m_offset.Y + refCamera.m_screenRatio.Y * viewportSizeInTilesY;
+
+            refCamera.m_frameDimensions.X = refCamera.m_bottomRightCorner.X - refCamera.m_offset.X;
+            refCamera.m_frameDimensions.Y = refCamera.m_bottomRightCorner.Y - refCamera.m_offset.Y;
+
+			m_currentViewportSizeInTiles = Vector2D<float>(viewportSizeInTilesX, viewportSizeInTilesY);
         }
     }
 

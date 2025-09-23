@@ -20,5 +20,7 @@ namespace Engine
 
 	private:
 		ECS& m_refECS;
+
+		Vector2D<float> m_currentViewportSizeInTiles;
 	};
 }
