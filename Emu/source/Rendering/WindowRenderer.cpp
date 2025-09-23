@@ -124,135 +124,68 @@ namespace Engine
 			return;
 		}
 
+		if (Screen::WINDOW_RESIZE_REQUEST)
+		{
+			SetViewport();
+			Screen::WINDOW_RESIZE_REQUEST = false;
+		}
+
+		if (Screen::TOGGLE_FULLSCREEN_REQUEST)
+		{
+			ToggleFullscreen();
+			SetViewport();
+			Screen::TOGGLE_FULLSCREEN_REQUEST = false;
+		}
+
 		// Render cameras in order of array for now. Will change to render in order of Z index later.
 		for (auto& camera : m_refECS.GetHotComponents<Camera>())
 		{
-			ptrCurrentCamera = &camera;
+			// ENGINE_CRITICAL_D("Number of objects: " + std::to_string(m_renderBucket[1].size()));
 
-			if (ptrCurrentCamera == nullptr)
-			{ 
-				ENGINE_CRITICAL_D("No active camera found. Remember to change camera before deactivating entity.");
-				throw std::runtime_error("No active camera found.");
-				return;
-			}
-
-			if (Screen::WINDOW_RESIZE_REQUEST)
+			for (auto& [zIndex, renderObjects] : m_spriteRenderBucket)
 			{
-				SetViewport();
-				Screen::WINDOW_RESIZE_REQUEST = false;
-			}
-
-			if (Screen::TOGGLE_FULLSCREEN_REQUEST)
-			{
-				ToggleFullscreen();
-				SetViewport();
-				Screen::TOGGLE_FULLSCREEN_REQUEST = false;
-			}
-
-			// viewport size in tiles
-			float viewportSizeInTilesX = Screen::VIEWPORT_SIZE.X / (ptrCurrentCamera->m_pixelsPerUnit * Screen::SCALE.X);
-			float viewportSizeInTilesY = Screen::VIEWPORT_SIZE.Y / (ptrCurrentCamera->m_pixelsPerUnit * Screen::SCALE.Y);
-
-			// Calculate the frame and corresponding camera offset on screen.
-			float leftOffset = ptrCurrentCamera->m_offset.X - ptrCurrentCamera->m_position.X * viewportSizeInTilesX;
-			float topOffset = ptrCurrentCamera->m_offset.Y - ptrCurrentCamera->m_position.Y * viewportSizeInTilesY;
-
-			// Now the frame can be set according to the original offsets 
-			float leftFrame = ptrCurrentCamera->m_offset.X;
-			float topFrame = ptrCurrentCamera->m_offset.Y;
-
-			float rightFrame = ptrCurrentCamera->m_offset.X + ptrCurrentCamera->m_screenRatio.X * viewportSizeInTilesX;
-			float bottomFrame = ptrCurrentCamera->m_offset.Y + ptrCurrentCamera->m_screenRatio.Y * viewportSizeInTilesY;
-
-			float frameWidth = rightFrame - leftFrame;
-			float frameHeight = bottomFrame - topFrame;
-
-			SDL_Rect clipRect;
-			clipRect.x = static_cast<int>(ptrCurrentCamera->m_position.X * Screen::VIEWPORT_SIZE.X);
-			clipRect.y = static_cast<int>(ptrCurrentCamera->m_position.Y * Screen::VIEWPORT_SIZE.Y);
-			clipRect.w = static_cast<int>(frameWidth * ptrCurrentCamera->m_pixelsPerUnit * Screen::SCALE.X);
-			clipRect.h = static_cast<int>(frameHeight * ptrCurrentCamera->m_pixelsPerUnit * Screen::SCALE.Y);
-
-			SDL_RenderSetClipRect((SDL_Renderer*)m_ptrRenderer, &clipRect); // m_renderer = your SDL_Renderer*
-			
-
-			/*ENGINE_INFO_D("Left Frame: " + std::to_string(leftFrame) + ", Top Frame : " + std::to_string(topFrame) + ", Right Frame : " + std::to_string(rightFrame) +
-				", Bottom Frame: " + std::to_string(bottomFrame));*/
-
-			// auto start = std::chrono::high_resolution_clock::now();
-
-			// This is half as fast as below loop. Ordered by z index 
-			/*for (Entity& entity : m_sortedEntitiesToRender)
-			{
-				Transform* ptrTransform = m_refECS.GetComponent<Transform>(entity);
-
-				float objectLeft = ptrTransform->Position.X; 
-				float objectRight = objectLeft + ptrTransform->Dimensions.X;
-				float objectTop = ptrTransform->Position.Y;
-				float objectBottom = objectTop + ptrTransform->Dimensions.Y;
-
-				bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
-					objectBottom >= cameraTop && objectTop <= cameraBottom;
-
-				if (isVisible)
+				for (auto& refRenderObject : renderObjects)
 				{
-					Draw(*ptrTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
-				}
-			}*/
-
-			// This is twice as fast as above loop. Not ordered
-			auto& transformManager = m_refECS.GetHotComponents<Transform>();
-			for (Transform& refTransform : transformManager)
-			{
-				float objectLeft = refTransform.Position.X;
-				float objectRight = objectLeft + refTransform.Dimensions.X;
-				float objectTop = refTransform.Position.Y;
-				float objectBottom = objectTop + refTransform.Dimensions.Y;
-
-				bool isVisible = objectRight >= leftFrame && objectLeft <= rightFrame &&
-					objectBottom >= topFrame && objectTop <= bottomFrame;
-
-				if (isVisible)
-				{
-					// Draw the Sprite
-					Draw(refTransform, m_refECS.GetComponent<Animations>(refTransform.m_entity), ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
+					ENGINE_CRITICAL_D("Rendering entity: " + std::to_string(refRenderObject.m_entity));
+					// Draw the Render Object
+					Draw(refRenderObject, ptrCurrentCamera->m_pixelsPerUnit);
 				}
 			}
+			m_spriteRenderBucket.clear();
 
-			auto drawVisibleChains = [&](auto& components)
+			/*auto drawVisibleChains = [&](auto& components)
 				{
-					for (auto& refLineCollider : components)
+					for (auto& refLineCollider : components)  
 					{
-						float objectLeft = refLineCollider.m_points[1].X;
-						float objectRight = refLineCollider.m_points[2].X;
-						float objectTop = refLineCollider.m_points[1].Y;
-						float objectBottom = refLineCollider.m_points[2].Y;
-
-						bool isVisible = objectRight >= leftFrame && objectLeft <= rightFrame &&
-							objectBottom >= topFrame && objectTop <= bottomFrame;
-
-						if (isVisible)
-						{
-							Draw(refLineCollider, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
-						}
+						Draw(refLineCollider, ptrCurrentCamera->m_pixelsPerUnit);
 					}
-				};
+				};*/
 
 #ifndef NDEBUG
-			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderLeft>());
+			for (auto& [zIndex, renderObjects] : m_debugRenderBucket)
+			{
+				for (auto& refDebugRect : renderObjects)
+				{
+					// Draw the Render Object
+					DebugDraw(refDebugRect, ptrCurrentCamera->m_pixelsPerUnit);
+				}
+			}
+			m_debugRenderBucket.clear();
+
+			/*drawVisibleChains(m_refECS.GetHotComponents<ChainColliderLeft>());
 			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderRight>());
 			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderTop>());
-			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderBottom>());
+			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderBottom>());*/
 #endif
 
 			// If "border on"
 			// Draw the camera frame
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+			//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 
-			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x + clipRect.w, clipRect.y); // top line
-			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x, clipRect.y + clipRect.h); // left line
-			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x + clipRect.w - 1, clipRect.y, clipRect.x + clipRect.w - 1, clipRect.y + clipRect.h); // right line
-			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y + clipRect.h - 1, clipRect.x + clipRect.w, clipRect.y + clipRect.h - 1); // bottom line
+			//SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x + clipRect.w, clipRect.y); // top line
+			//SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x, clipRect.y + clipRect.h); // left line
+			//SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x + clipRect.w - 1, clipRect.y, clipRect.x + clipRect.w - 1, clipRect.y + clipRect.h); // right line
+			//SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y + clipRect.h - 1, clipRect.x + clipRect.w, clipRect.y + clipRect.h - 1); // bottom line
 			
 
 			// auto end = std::chrono::high_resolution_clock::now();
@@ -265,6 +198,91 @@ namespace Engine
 		Display();
 	}	
 
+	void WindowRenderer::DebugDraw(DebugRect& rect, const int m_pixelsPerUnit)
+	{
+		SDLRect dst
+		{
+			rect.m_locationInPixelsOnScreen.X,
+			rect.m_locationInPixelsOnScreen.Y,
+			rect.m_sizeInPixelsOnScreen.X,
+			rect.m_sizeInPixelsOnScreen.Y
+		};
+
+		if (rect.m_filled)
+		{
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+			SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+		}
+		else
+		{
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+			SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+		}
+	}
+
+	void WindowRenderer::Draw(RenderObject& object, const int pixelsPerUnit)
+	{
+		SDLRect dst
+		{
+			object.m_locationInPixelsOnScreen.X,
+			object.m_locationInPixelsOnScreen.Y,
+			object.m_sizeInPixelsOnScreen.X,
+			object.m_sizeInPixelsOnScreen.Y
+		};
+
+		SDLRect src
+		{
+			object.m_locationInPixelsOnSpriteSheet.X,
+			object.m_locationInPixelsOnSpriteSheet.Y,
+			object.m_sizeInPixelsOnSpriteSheet.X,
+			object.m_sizeInPixelsOnSpriteSheet.Y
+		};
+
+		SDLTexture* spriteTexture = (SDLTexture*)m_refAssetManager.GetTexture(object.m_entity);
+		if (spriteTexture != nullptr)
+		{
+			// Draw the sprite
+			ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, spriteTexture, &src, &dst, 0.0, nullptr, SDL_FLIP_NONE);
+		}
+		else
+		{
+			// black rectangle for entities without sprites
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
+			SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
+			ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, 0.0, nullptr, SDL_FLIP_NONE);
+		}
+#ifndef NDEBUG
+		// green boxes
+		//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+		//SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
+		//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+
+		//// transform border should also be submitted to render queue since render should not need to know about components.
+		//Transform* ptrTransform = m_refECS.GetComponent<Transform>(object.m_entity);
+		//float lerpedX = Lerp(ptrTransform->PrevPosition.X, ptrTransform->Position.X, Time::GetInterpolationFactor());
+		//float lerpedY = Lerp(ptrTransform->PrevPosition.Y, ptrTransform->Position.Y, Time::GetInterpolationFactor());
+		//const float scaleX = pixelsPerUnit * Screen::SCALE.X;
+		//const float scaleY = pixelsPerUnit * Screen::SCALE.Y;
+
+		//// draw the transform rectangle border
+		//SDLRect transformRect
+		//{
+		//	static_cast<int>(round((lerpedX - cameraOffset.X) * scaleX)),
+		//	static_cast<int>(round((lerpedY - cameraOffset.Y) * scaleY)),
+		//	static_cast<int>(round(ptrTransform->Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+		//	static_cast<int>(round(ptrTransform->Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
+
+		//};
+		//// Red boxes
+		//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+		//SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &transformRect);
+		//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+#endif
+
+
+	}
 	void WindowRenderer::Draw(Transform& transform, Animations* animations, const int pixelsPerUnit, const Vector2D<float> cameraOffset)
 	{
 		const float interpolation = Time::GetInterpolationFactor();

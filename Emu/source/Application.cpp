@@ -10,7 +10,7 @@ namespace Engine
 {
 
 	Application::Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, AssetManager& refAssetManager, AnimationSystem& refAnimationSystem)
-		: m_refECS(refECS), m_ptrCurrentScene(nullptr), m_windowRenderer(refECS, refAssetManager),
+		: m_refECS(refECS), m_ptrCurrentScene(nullptr), m_cullingSystem(refECS, refAssetManager), m_windowRenderer(refECS, refAssetManager),
 		m_refSceneManager(refSceneManager), m_refIOEventSystem(refIOEventSystem), m_refAnimationSystem(refAnimationSystem)
 	{}
 
@@ -72,6 +72,9 @@ namespace Engine
 			m_ptrCurrentScene->UpdateVisuals();
 			m_ptrCurrentScene->UpdateCamera();
 
+			m_cullingSystem.Cull(m_windowRenderer.m_spriteRenderBucket, 
+								 m_windowRenderer.m_debugRenderBucket, 
+								 m_windowRenderer.m_debugLinesRenderBucket);
 			m_windowRenderer.Render();
 
 			if (!Time::IsAppRunning())

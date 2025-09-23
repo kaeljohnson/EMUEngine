@@ -174,7 +174,6 @@ namespace Engine
 
 	void Scene::UpdateVisuals()
 	{
-		
 	}
 
 	// Is this function necessary?

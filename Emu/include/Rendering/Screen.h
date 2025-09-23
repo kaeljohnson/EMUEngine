@@ -37,5 +37,6 @@ namespace Engine
 		friend class WindowRenderer;
 		friend class CameraInterface;
 		friend class CameraSystem;
+		friend class CullingSystem;
 	};
 }

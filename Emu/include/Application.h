@@ -33,6 +33,7 @@ namespace Engine
 		ECS& m_refECS;
 
 		// Engine should probably own this.
+		CullingSystem m_cullingSystem;
 		WindowRenderer m_windowRenderer;
 		
 		SceneManager& m_refSceneManager;
