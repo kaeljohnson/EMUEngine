@@ -1,0 +1,5 @@
+NumMetersPerTile: 1
+All {}
+P { Physics: { DYNAMIC, PLAYER, ALL, 0.75f, 0.75f), Engine::Vector2D<float>(startingX, startingY), 0.0f, true, true }
+    Transform: ZIndex}
+S { }

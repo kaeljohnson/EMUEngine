@@ -17,8 +17,8 @@ namespace Engine
 {
 	struct Transform : public Component
 	{
-		Vector2D<float> PrevPosition;
-		Vector2D<float> Position;
+		Vector2D<float> PrevPosition;	// Previous position of transform in world space.
+		Vector2D<float> Position;		// Current position of transform in world space.
 		Vector2D<float> Velocity;
 		Vector2D<float> Dimensions;
 
@@ -100,26 +100,63 @@ namespace Engine
 		}
 	};
 
+	struct RenderObject
+	{
+		RenderObject(size_t entity, Vector2D<int> locationInPixelsOnScreen, Vector2D<int> sizeInPixelsOnScreen, Vector2D<int> locationInPixelsOnSpriteSheet, Vector2D<int> sizeInPixelsOnSpriteSheet)
+			: m_entity(entity), m_locationInPixelsOnScreen(locationInPixelsOnScreen), m_sizeInPixelsOnScreen(sizeInPixelsOnScreen),
+			m_locationInPixelsOnSpriteSheet(locationInPixelsOnSpriteSheet), m_sizeInPixelsOnSpriteSheet(sizeInPixelsOnSpriteSheet) {}
+
+		size_t m_entity;
+		Vector2D<int> m_locationInPixelsOnScreen;
+		Vector2D<int> m_sizeInPixelsOnScreen;
+		Vector2D<int> m_locationInPixelsOnSpriteSheet;
+		Vector2D<int> m_sizeInPixelsOnSpriteSheet;
+	};
+
+	struct DebugObject
+	{
+		DebugObject(size_t entity, bool filled, Vector2D<int> locationInPixelsOnScreen, Vector2D<int> sizeInPixelsOnScreen)
+			: m_entity(entity), m_filled(filled), m_locationInPixelsOnScreen(locationInPixelsOnScreen), m_sizeInPixelsOnScreen(sizeInPixelsOnScreen) {}
+
+		size_t m_entity;
+		bool m_filled;
+		Vector2D<int> m_locationInPixelsOnScreen;
+		Vector2D<int> m_sizeInPixelsOnScreen;
+	};
+
+	using RenderBucket = std::map<size_t, std::vector<RenderObject>>;
+	using DebugRenderBucket = std::map<size_t, std::vector<DebugObject>>;
+	using LinesRenderBucket = std::map<size_t, std::vector<Vector2D<int>>>;
+
 	struct Camera : public Component
 	{
 		Camera(Entity entity)
-			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_screenRatio(1.0f, 1.0f), m_position(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), Component(entity) {}
+			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_screenRatio(1.0f, 1.0f), m_positionInFractionOfScreenSize(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), Component(entity) {}
 		Camera(Entity entity, Vector2D<float> size, Vector2D<float> screenRatio, Vector2D<float> position, int pixelsPerUnit, bool clampingOn)
-			: m_size(size), m_screenRatio(screenRatio), m_position(position), m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), Component(entity) {}
-		~Camera() = default;
+			: m_size(size), m_screenRatio(screenRatio), m_positionInFractionOfScreenSize(position), m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), Component(entity) {}
+		
 
 		// Window:
 		//     Position: position of the camera on the screen.
 		//     ScreenRatio: size of the camera in percent of screen.
-		Vector2D<float> m_position;
+		Vector2D<float> m_positionInFractionOfScreenSize;
 		Vector2D<float> m_screenRatio;
 
-		Vector2D<float> m_offset;
-		Vector2D<float> m_size;
+		Vector2D<float> m_offset;		// Top left position of the camera in world space.
+		Vector2D<float> m_size;			// Size of the camera in world units.
 		
 		int m_pixelsPerUnit;
 		bool m_clampingOn;
 		Vector2D<int> m_bounds;
+
+		int m_clipRectX;
+		int m_clipRectY;
+		int m_clipRectW;
+		int m_clipRectH;
+
+		RenderBucket m_renderBucket;				// Map of zIndex to vector of RenderObjects.
+		DebugRenderBucket m_debugRenderBucket;		// Map of zIndex to vector of DebugObjects.
+		LinesRenderBucket m_debugLinesRenderBucket;	// Map of zIndex to vector of lines (2 points per line).
 	};
 
 	struct CameraUpdater : public Component

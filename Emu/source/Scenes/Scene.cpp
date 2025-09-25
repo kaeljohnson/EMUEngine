@@ -167,9 +167,9 @@ namespace Engine
 		m_physicsSimulation.Update();
 	}
 
-	void Scene::UpdateCamera()
+	void Scene::UpdateCamera(AssetManager& refAssetManager)
 	{
-		m_cameraSystem.Update();
+		m_cameraSystem.Update(refAssetManager);
 	}
 
 	void Scene::UpdateVisuals()

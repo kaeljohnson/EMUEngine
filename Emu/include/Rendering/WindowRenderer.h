@@ -25,6 +25,10 @@ namespace Engine
 		void Render();
 		void Draw(Transform& refTransform, Animations* ptrAnimations, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Draw(ChainCollider& transform, const int pixelsPerUnit, const Vector2D<float> offset);
+		void Draw(RenderObject& object);
+		// void Draw(DebugObject& object);
+		// void Draw(Vector2D<int>& line);
+
 		void Display();
 
 		void ClearScreen();

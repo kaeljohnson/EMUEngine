@@ -115,109 +115,59 @@ namespace Engine
 	{
 		ClearScreen();
 
-		Camera* ptrCurrentCamera = nullptr;
-
-		if (m_refECS.GetHotComponents<Camera>().empty())
+		if (Screen::WINDOW_RESIZE_REQUEST)
 		{
-			ENGINE_CRITICAL_D("No active cameras found.");
-			throw std::runtime_error("No active cameras found.");
-			return;
+			SetViewport();
+			Screen::WINDOW_RESIZE_REQUEST = false;
 		}
 
-		// Render cameras in order of array for now. Will change to render in order of Z index later.
-		for (auto& camera : m_refECS.GetHotComponents<Camera>())
+		if (Screen::TOGGLE_FULLSCREEN_REQUEST)
 		{
-			ptrCurrentCamera = &camera;
+			ToggleFullscreen();
+			SetViewport();
+			Screen::TOGGLE_FULLSCREEN_REQUEST = false;
+		}
 
-			if (ptrCurrentCamera == nullptr)
-			{ 
-				ENGINE_CRITICAL_D("No active camera found. Remember to change camera before deactivating entity.");
-				throw std::runtime_error("No active camera found.");
-				return;
-			}
-
-			if (Screen::WINDOW_RESIZE_REQUEST)
-			{
-				SetViewport();
-				Screen::WINDOW_RESIZE_REQUEST = false;
-			}
-
-			if (Screen::TOGGLE_FULLSCREEN_REQUEST)
-			{
-				ToggleFullscreen();
-				SetViewport();
-				Screen::TOGGLE_FULLSCREEN_REQUEST = false;
-			}
-
+		for (auto& refCamera : m_refECS.GetHotComponents<Camera>())
+		{
 			// viewport size in tiles
-			float viewportSizeInTilesX = Screen::VIEWPORT_SIZE.X / (ptrCurrentCamera->m_pixelsPerUnit * Screen::SCALE.X);
-			float viewportSizeInTilesY = Screen::VIEWPORT_SIZE.Y / (ptrCurrentCamera->m_pixelsPerUnit * Screen::SCALE.Y);
+			const Vector2D<float> viewportSizeInTiles = Vector2D<float>(Screen::VIEWPORT_SIZE.X / (refCamera.m_pixelsPerUnit * Screen::SCALE.X),
+				Screen::VIEWPORT_SIZE.Y / (refCamera.m_pixelsPerUnit * Screen::SCALE.Y));
 
-			// Calculate the frame and corresponding camera offset on screen.
-			float leftOffset = ptrCurrentCamera->m_offset.X - ptrCurrentCamera->m_position.X * viewportSizeInTilesX;
-			float topOffset = ptrCurrentCamera->m_offset.Y - ptrCurrentCamera->m_position.Y * viewportSizeInTilesY;
+			// Calculate "adjusted offset". This is the offset that takes
+			// into account the position of the camera on the screen.
+			Vector2D<float> cameraAdjustedOffset{ refCamera.m_offset.X - refCamera.m_positionInFractionOfScreenSize.X * viewportSizeInTiles.X,
+				refCamera.m_offset.Y - refCamera.m_positionInFractionOfScreenSize.Y * viewportSizeInTiles.Y };
 
-			// Now the frame can be set according to the original offsets 
-			float leftFrame = ptrCurrentCamera->m_offset.X;
-			float topFrame = ptrCurrentCamera->m_offset.Y;
+			// Bounds of what to render in world space. For each camera, 
+			// user sees the left side of the camera's world coordinates
+			// offset all the way to the width of the camera in world 
+			// coordinates. Same for height.
+			float leftRenderBound = refCamera.m_offset.X;
+			float topRenderBound = refCamera.m_offset.Y;
+			float rightRenderBound = leftRenderBound + refCamera.m_screenRatio.X * viewportSizeInTiles.X;
+			float bottomRenderBound = topRenderBound + refCamera.m_screenRatio.Y * viewportSizeInTiles.Y;
 
-			float rightFrame = ptrCurrentCamera->m_offset.X + ptrCurrentCamera->m_screenRatio.X * viewportSizeInTilesX;
-			float bottomFrame = ptrCurrentCamera->m_offset.Y + ptrCurrentCamera->m_screenRatio.Y * viewportSizeInTilesY;
-
-			float frameWidth = rightFrame - leftFrame;
-			float frameHeight = bottomFrame - topFrame;
+			float renderAreaWidth = rightRenderBound - leftRenderBound;
+			float renderAreaHeight = bottomRenderBound - topRenderBound;
 
 			SDL_Rect clipRect;
-			clipRect.x = static_cast<int>(ptrCurrentCamera->m_position.X * Screen::VIEWPORT_SIZE.X);
-			clipRect.y = static_cast<int>(ptrCurrentCamera->m_position.Y * Screen::VIEWPORT_SIZE.Y);
-			clipRect.w = static_cast<int>(frameWidth * ptrCurrentCamera->m_pixelsPerUnit * Screen::SCALE.X);
-			clipRect.h = static_cast<int>(frameHeight * ptrCurrentCamera->m_pixelsPerUnit * Screen::SCALE.Y);
+			clipRect.x = refCamera.m_clipRectX;
+			clipRect.y = refCamera.m_clipRectY;
+			clipRect.w = refCamera.m_clipRectW;
+			clipRect.h = refCamera.m_clipRectY;
 
-			SDL_RenderSetClipRect((SDL_Renderer*)m_ptrRenderer, &clipRect); // m_renderer = your SDL_Renderer*
-			
+			// SDL_RenderSetClipRect((SDL_Renderer*)m_ptrRenderer, &clipRect);
 
-			/*ENGINE_INFO_D("Left Frame: " + std::to_string(leftFrame) + ", Top Frame : " + std::to_string(topFrame) + ", Right Frame : " + std::to_string(rightFrame) +
-				", Bottom Frame: " + std::to_string(bottomFrame));*/
-
-			// auto start = std::chrono::high_resolution_clock::now();
-
-			// This is half as fast as below loop. Ordered by z index 
-			/*for (Entity& entity : m_sortedEntitiesToRender)
-			{
-				Transform* ptrTransform = m_refECS.GetComponent<Transform>(entity);
-
-				float objectLeft = ptrTransform->Position.X; 
-				float objectRight = objectLeft + ptrTransform->Dimensions.X;
-				float objectTop = ptrTransform->Position.Y;
-				float objectBottom = objectTop + ptrTransform->Dimensions.Y;
-
-				bool isVisible = objectRight >= cameraLeft && objectLeft <= cameraRight &&
-					objectBottom >= cameraTop && objectTop <= cameraBottom;
-
-				if (isVisible)
+			for (auto& [key, vec] : refCamera.m_renderBucket) 
+			{					
+				for (auto& value : vec) 
 				{
-					Draw(*ptrTransform, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(cameraLeft, cameraTop));
-				}
-			}*/
-
-			// This is twice as fast as above loop. Not ordered
-			auto& transformManager = m_refECS.GetHotComponents<Transform>();
-			for (Transform& refTransform : transformManager)
-			{
-				float objectLeft = refTransform.Position.X;
-				float objectRight = objectLeft + refTransform.Dimensions.X;
-				float objectTop = refTransform.Position.Y;
-				float objectBottom = objectTop + refTransform.Dimensions.Y;
-
-				bool isVisible = objectRight >= leftFrame && objectLeft <= rightFrame &&
-					objectBottom >= topFrame && objectTop <= bottomFrame;
-
-				if (isVisible)
-				{
-					// Draw the Sprite
-					Draw(refTransform, m_refECS.GetComponent<Animations>(refTransform.m_entity), ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
+					Draw(value);
 				}
 			}
+			refCamera.m_renderBucket.clear(); // CLEAR MAP EACH FRAME.
+
 
 			auto drawVisibleChains = [&](auto& components)
 				{
@@ -228,12 +178,12 @@ namespace Engine
 						float objectTop = refLineCollider.m_points[1].Y;
 						float objectBottom = refLineCollider.m_points[2].Y;
 
-						bool isVisible = objectRight >= leftFrame && objectLeft <= rightFrame &&
-							objectBottom >= topFrame && objectTop <= bottomFrame;
+						bool isVisible = objectRight >= leftRenderBound && objectLeft <= rightRenderBound &&
+							objectBottom >= topRenderBound && objectTop <= bottomRenderBound;
 
 						if (isVisible)
 						{
-							Draw(refLineCollider, ptrCurrentCamera->m_pixelsPerUnit, Vector2D<float>(leftOffset, topOffset));
+							Draw(refLineCollider, refCamera.m_pixelsPerUnit, cameraAdjustedOffset);
 						}
 					}
 				};
@@ -258,14 +208,80 @@ namespace Engine
 			// auto end = std::chrono::high_resolution_clock::now();
 			// std::cout << "Rendering: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
 		}
-
 		
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 
 		Display();
 	}	
+	
 
-	void WindowRenderer::Draw(Transform& transform, Animations* animations, const int pixelsPerUnit, const Vector2D<float> cameraOffset)
+
+	void WindowRenderer::Draw(RenderObject& object)
+	{
+		SDLRect dst
+		{
+			object.m_locationInPixelsOnScreen.X,
+			object.m_locationInPixelsOnScreen.Y,
+			object.m_sizeInPixelsOnScreen.X,
+			object.m_sizeInPixelsOnScreen.Y
+		};
+
+		SDLRect src
+		{
+			object.m_locationInPixelsOnSpriteSheet.X,
+			object.m_locationInPixelsOnSpriteSheet.Y,
+			object.m_sizeInPixelsOnSpriteSheet.X,
+			object.m_sizeInPixelsOnSpriteSheet.Y
+		};
+
+		//ENGINE_CRITICAL_D("Drawing entity " + std::to_string(object.m_entity)
+//			+ " at (" + std::to_string(dst.x) + ", " + std::to_string(dst.y) + ") with size (" + std::to_string(dst.w) + ", " + std::to_string(dst.h) + ")");
+
+		SDLTexture* spriteTexture = (SDLTexture*)m_refAssetManager.GetTexture(object.m_entity);
+		if (spriteTexture != nullptr)
+		{
+			// Draw the sprite
+			ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, spriteTexture, &src, &dst, 0.0, nullptr, SDL_FLIP_NONE);
+		}
+		else
+		{
+			// black rectangle for entities without sprites
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
+			SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
+			ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, 0.0, nullptr, SDL_FLIP_NONE);
+		}
+#ifndef NDEBUG
+		// green boxes
+		//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+		//SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
+		//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+
+		//// transform border should also be submitted to render queue since render should not need to know about components.
+		//Transform* ptrTransform = m_refECS.GetComponent<Transform>(object.m_entity);
+		//float lerpedX = Lerp(ptrTransform->PrevPosition.X, ptrTransform->Position.X, Time::GetInterpolationFactor());
+		//float lerpedY = Lerp(ptrTransform->PrevPosition.Y, ptrTransform->Position.Y, Time::GetInterpolationFactor());
+		//const float scaleX = pixelsPerUnit * Screen::SCALE.X;
+		//const float scaleY = pixelsPerUnit * Screen::SCALE.Y;
+
+		//// draw the transform rectangle border
+		//SDLRect transformRect
+		//{
+		//	static_cast<int>(round((lerpedX - cameraOffset.X) * scaleX)),
+		//	static_cast<int>(round((lerpedY - cameraOffset.Y) * scaleY)),
+		//	static_cast<int>(round(ptrTransform->Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
+		//	static_cast<int>(round(ptrTransform->Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
+
+		//};
+		//// Red boxes
+		//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+		//SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &transformRect);
+		//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+#endif
+
+
+	}
+
+	void WindowRenderer::Draw(Transform& transform, Animations* animations, const int pixelsPerUnit, const Vector2D<float> cameraAdjustedOffset)
 	{
 		const float interpolation = Time::GetInterpolationFactor();
 
@@ -295,8 +311,8 @@ namespace Engine
 
 		SDLRect dst
 		{
-			static_cast<int>(round((lerpedX - cameraOffset.X + offsetFromTransformX) * scaleX)),
-			static_cast<int>(round((lerpedY - cameraOffset.Y + offsetFromTransformY) * scaleY)),
+			static_cast<int>(round((lerpedX - cameraAdjustedOffset.X + offsetFromTransformX) * scaleX)),
+			static_cast<int>(round((lerpedY - cameraAdjustedOffset.Y + offsetFromTransformY) * scaleY)),
 			width,
 			height
 		};
@@ -343,8 +359,8 @@ namespace Engine
 		// draw the transform rectangle border
 		SDLRect transformRect
 		{
-			static_cast<int>(round((lerpedX - cameraOffset.X) * scaleX)),
-			static_cast<int>(round((lerpedY - cameraOffset.Y) * scaleY)),
+			static_cast<int>(round((lerpedX - cameraAdjustedOffset.X) * scaleX)),
+			static_cast<int>(round((lerpedY - cameraAdjustedOffset.Y) * scaleY)),
 			static_cast<int>(round(transform.Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
 			static_cast<int>(round(transform.Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
 
