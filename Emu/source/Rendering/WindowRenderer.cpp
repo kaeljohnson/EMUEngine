@@ -82,35 +82,6 @@ namespace Engine
 		ENGINE_CRITICAL("Renderer created.");
 	}
 
-	// The renderer being responbible for sorting the etities to render is not a modular design.
-	// Ideally, they are submitted to a render pipeline in the correct order but this will do for now.
-	void WindowRenderer::Initialize()
-	{
-		// Is there a better data structure than a vector for this?
-		m_sortedEntitiesToRender.clear();
-
-		// Get active transform components
-		auto& activeTransforms = m_refECS.GetHotComponents<Transform>();
-
-		// Reserve space to avoid unnecessary allocations
-		m_sortedEntitiesToRender.reserve(activeTransforms.size());
-
-		// Store entity IDs
-		for (const auto& transform : activeTransforms)
-		{
-			m_sortedEntitiesToRender.push_back(transform.m_entity);
-		}
-
-		// Sort entity IDs based on their Z-index in descending order
-		std::sort(m_sortedEntitiesToRender.begin(), m_sortedEntitiesToRender.end(),
-			[&](size_t entityA, size_t entityB)
-			{
-				const Transform* transformA = m_refECS.GetComponent<Transform>(entityA);
-				const Transform* transformB = m_refECS.GetComponent<Transform>(entityB);
-				return transformA->ZIndex > transformB->ZIndex; // Highest Z first
-			});
-	}
-
 	void WindowRenderer::Render()
 	{
 		ClearScreen();
@@ -155,9 +126,9 @@ namespace Engine
 			clipRect.x = refCamera.m_clipRectX;
 			clipRect.y = refCamera.m_clipRectY;
 			clipRect.w = refCamera.m_clipRectW;
-			clipRect.h = refCamera.m_clipRectY;
+			clipRect.h = refCamera.m_clipRectH;
 
-			// SDL_RenderSetClipRect((SDL_Renderer*)m_ptrRenderer, &clipRect);
+			SDL_RenderSetClipRect((SDL_Renderer*)m_ptrRenderer, &clipRect);
 
 			for (auto& [key, vec] : refCamera.m_renderBucket) 
 			{					

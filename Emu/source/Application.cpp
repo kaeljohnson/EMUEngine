@@ -47,7 +47,6 @@ namespace Engine
 				m_refSceneManager.LoadQueuedScene();
 				m_refSceneManager.NewSceneStarted();
 				m_ptrCurrentScene = m_refSceneManager.GetCurrentScene();
-				m_windowRenderer.Initialize();
 
 				// Critical checks before scene starts.
 				if (m_refECS.GetHotComponents<Camera>().empty())
