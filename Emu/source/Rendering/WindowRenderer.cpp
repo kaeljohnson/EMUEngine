@@ -139,31 +139,24 @@ namespace Engine
 			}
 			refCamera.m_renderBucket.clear(); // CLEAR MAP EACH FRAME.
 
-
-			auto drawVisibleChains = [&](auto& components)
+#ifndef NDEBUG // DO NOT ADD DEBUG OBJECTS WHEN NOT IN DEBUG AS THE QUEUES WILL GROW INDEFINITELY.
+			for (auto& [key, vec] : refCamera.m_debugRenderBucket)
+			{
+				for (auto& value : vec)
 				{
-					for (auto& refLineCollider : components)
-					{
-						float objectLeft = refLineCollider.m_points[1].X;
-						float objectRight = refLineCollider.m_points[2].X;
-						float objectTop = refLineCollider.m_points[1].Y;
-						float objectBottom = refLineCollider.m_points[2].Y;
+					Draw(value);
+				}
+			}
+			refCamera.m_debugRenderBucket.clear(); // CLEAR MAP EACH FRAME.
 
-						bool isVisible = objectRight >= leftRenderBound && objectLeft <= rightRenderBound &&
-							objectBottom >= topRenderBound && objectTop <= bottomRenderBound;
-
-						if (isVisible)
-						{
-							Draw(refLineCollider, refCamera.m_pixelsPerUnit, cameraAdjustedOffset);
-						}
-					}
-				};
-
-#ifndef NDEBUG
-			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderLeft>());
-			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderRight>());
-			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderTop>());
-			drawVisibleChains(m_refECS.GetHotComponents<ChainColliderBottom>());
+			for (auto& [key, vec] : refCamera.m_debugLinesRenderBucket)
+			{
+				for (auto& value : vec)
+				{
+					Draw(value);
+				}
+			}
+			refCamera.m_debugLinesRenderBucket.clear(); // CLEAR MAP EACH FRAME.
 #endif
 
 			// If "border on"
@@ -205,10 +198,11 @@ namespace Engine
 			object.m_sizeInPixelsOnSpriteSheet.Y
 		};
 
-		//ENGINE_CRITICAL_D("Drawing entity " + std::to_string(object.m_entity)
-//			+ " at (" + std::to_string(dst.x) + ", " + std::to_string(dst.y) + ") with size (" + std::to_string(dst.w) + ", " + std::to_string(dst.h) + ")");
+
 
 		SDLTexture* spriteTexture = (SDLTexture*)m_refAssetManager.GetTexture(object.m_entity);
+
+		// Maybe don't need the check here even though its safe?
 		if (spriteTexture != nullptr)
 		{
 			// Draw the sprite
@@ -216,11 +210,35 @@ namespace Engine
 		}
 		else
 		{
-			// black rectangle for entities without sprites
+			throw std::runtime_error("Entity with no texture in wrong queue. " + std::to_string(object.m_entity));
+		}
+	}
+
+	void WindowRenderer::Draw(DebugObject& object)
+	{
+		SDLRect dst
+		{
+			object.m_locationInPixelsOnScreen.X,
+			object.m_locationInPixelsOnScreen.Y,
+			object.m_sizeInPixelsOnScreen.X,
+			object.m_sizeInPixelsOnScreen.Y
+		};
+
+		if (object.m_filled)
+		{
+			// Draw a black rectangle for debug objects
 			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
 			SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
 			ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, 0.0, nullptr, SDL_FLIP_NONE);
 		}
+		else
+		{
+			// Green boxes
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+			SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+		}
+
 #ifndef NDEBUG
 		// green boxes
 		//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
@@ -248,8 +266,16 @@ namespace Engine
 		//SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &transformRect);
 		//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 #endif
+	}
 
+	void WindowRenderer::Draw(LineObject& lineObject)
+	{
+		// Draw the chain collider as a series of lines in red.
+		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE); // Should client decide color?
 
+		SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, lineObject.m_endPointInPixelsOnScreen.X, lineObject.m_endPointInPixelsOnScreen.Y,
+			lineObject.m_startPointInPixelsOnScreen.X, lineObject.m_startPointInPixelsOnScreen.Y);
+		
 	}
 
 	void WindowRenderer::Draw(Transform& transform, Animations* animations, const int pixelsPerUnit, const Vector2D<float> cameraAdjustedOffset)

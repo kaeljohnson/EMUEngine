@@ -92,6 +92,7 @@ namespace Engine
 			float offsetFromTransformX = 0.0f;
 			float offsetFromTransformY = 0.0f;
 
+			// 3. Render object construction & submission
 			Animations* animations = m_refECS.GetComponent<Animations>(refTransform.m_entity);
 			if (animations)
 			{
@@ -100,12 +101,6 @@ namespace Engine
 				height = static_cast<int>(round(currentAnimation.m_size.Y * scaleY));
 				offsetFromTransformX = currentAnimation.m_offsetFromTransform.X;
 				offsetFromTransformY = currentAnimation.m_offsetFromTransform.Y;
-			}
-
-			// 3. Render object construction & submission
-			if (animations)
-			{
-				const Animation& currentAnimation = animations->m_animations.at(animations->m_currentAnimation);
 
 				SDLTexture* spriteTexture = (SDLTexture*)refAssetManager.GetTexture(animations->m_entity);
 				if (spriteTexture == nullptr)
@@ -137,6 +132,60 @@ namespace Engine
 					Vector2D<int>(locationInPixelsOnSpriteSheetX, locationInPixelsOnSpriteSheetY),
 					Vector2D<int>(sizseInPixelsOnSpriteSheetX, sizseInPixelsOnSpriteSheetY)
 				);
+			}
+			else
+			{
+#ifndef NDEBUG
+				//// draw the transform rectangle border
+				auto& debugBucket = refCamera.m_debugRenderBucket.try_emplace(refTransform.ZIndex).first->second;
+				debugBucket.emplace_back(
+					refTransform.m_entity,
+					true,
+					Vector2D<int>(
+						static_cast<int>(round((lerpedX - cameraAdjustedOffset.X) * scaleX)),
+						static_cast<int>(round((lerpedY - cameraAdjustedOffset.Y) * scaleY))
+					),
+					Vector2D<int>(width, height)
+				);
+
+				auto submitChainsForRendering = [&](auto& ptrChainCollider)
+					{
+						auto& debugLinesBucket = refCamera.m_debugLinesRenderBucket.try_emplace(refTransform.ZIndex).first->second;
+						debugLinesBucket.emplace_back(
+							ptrChainCollider->m_entity,
+							Vector2D<int>(
+								static_cast<int>(round((ptrChainCollider->m_points[1].X - cameraAdjustedOffset.X) * scaleX)),
+								static_cast<int>(round((ptrChainCollider->m_points[1].Y - cameraAdjustedOffset.Y) * scaleY))
+							),
+							Vector2D<int>(
+								static_cast<int>(round((ptrChainCollider->m_points[2].X - cameraAdjustedOffset.X) * scaleX)),
+								static_cast<int>(round((ptrChainCollider->m_points[2].Y - cameraAdjustedOffset.Y) * scaleY))
+							)
+						);
+					};
+
+				ChainColliderLeft* ptrChainColliderLeft = m_refECS.GetComponent<ChainColliderLeft>(refTransform.m_entity);
+				ChainColliderRight* ptrChainColliderRight = m_refECS.GetComponent<ChainColliderRight>(refTransform.m_entity);
+				ChainColliderTop* ptrChainColliderTop = m_refECS.GetComponent<ChainColliderTop>(refTransform.m_entity);
+				ChainColliderBottom* ptrChainColliderBottom = m_refECS.GetComponent<ChainColliderBottom>(refTransform.m_entity);
+
+				if (ptrChainColliderLeft)
+				{
+					submitChainsForRendering(ptrChainColliderLeft);
+				}
+				if (ptrChainColliderRight)
+				{
+					submitChainsForRendering(ptrChainColliderRight);
+				}
+				if (ptrChainColliderTop)
+				{
+					submitChainsForRendering(ptrChainColliderTop);
+				}
+				if (ptrChainColliderBottom)
+				{
+					submitChainsForRendering(ptrChainColliderBottom);
+				}
+#endif
 			}
 		}
 	}

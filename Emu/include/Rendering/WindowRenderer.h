@@ -25,7 +25,7 @@ namespace Engine
 		void Draw(ChainCollider& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Draw(RenderObject& object);
 		void Draw(DebugObject& object);
-		void Draw(Vector2D<int>& line);
+		void Draw(LineObject& line);
 
 		void Display();
 

@@ -124,16 +124,32 @@ namespace Engine
 		Vector2D<int> m_sizeInPixelsOnScreen;
 	};
 
+	struct LineObject
+	{
+		LineObject(size_t entity, Vector2D<int> startPointInPixelsOnScreen, Vector2D<int> endPointInPixelsOnScreen)
+			: m_entity(entity), m_startPointInPixelsOnScreen(startPointInPixelsOnScreen), m_endPointInPixelsOnScreen(endPointInPixelsOnScreen) {}
+
+		size_t m_entity;
+		Vector2D<int> m_startPointInPixelsOnScreen;
+		Vector2D<int> m_endPointInPixelsOnScreen;
+	};
+
 	using RenderBucket = std::map<size_t, std::vector<RenderObject>>;
 	using DebugRenderBucket = std::map<size_t, std::vector<DebugObject>>;
-	using LinesRenderBucket = std::map<size_t, std::vector<Vector2D<int>>>;
+	using LinesRenderBucket = std::map<size_t, std::vector<LineObject>>;
 
 	struct Camera : public Component
 	{
 		Camera(Entity entity)
-			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_screenRatio(1.0f, 1.0f), m_positionInFractionOfScreenSize(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), Component(entity) {}
+			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_screenRatio(1.0f, 1.0f), 
+			m_positionInFractionOfScreenSize(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), 
+			m_bounds(0, 0), m_clipRectX(0), m_clipRectY(0), m_clipRectW(0), m_clipRectH(0),
+			Component(entity) {}
 		Camera(Entity entity, Vector2D<float> size, Vector2D<float> screenRatio, Vector2D<float> position, int pixelsPerUnit, bool clampingOn)
-			: m_size(size), m_screenRatio(screenRatio), m_positionInFractionOfScreenSize(position), m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), Component(entity) {}
+			: m_size(size), m_screenRatio(screenRatio), m_positionInFractionOfScreenSize(position), 
+			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0),
+			m_clipRectX(0), m_clipRectY(0), m_clipRectW(0), m_clipRectH(0), 
+			Component(entity) {}
 		
 
 		// Window:
