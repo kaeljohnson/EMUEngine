@@ -225,13 +225,23 @@ namespace Engine
 					}
 				}
 
+                bool drawDebug = false;
+				if (characterRulesJson["Transform"].contains("DrawDebug"))
+				{
+					const auto& drawDebugJson = characterRulesJson["Transform"]["DrawDebug"];
+					if (drawDebugJson.is_boolean())
+					{
+						drawDebug = drawDebugJson.get<bool>();
+					}
+				}
+
                 m_refECS.AddComponent<Transform>(
                     tileEntity,
                     Vector2D<float>(x * static_cast<float>(m_numUnitsPerTile),
                         y * static_cast<float>(m_numUnitsPerTile)),
                     Vector2D<float>(static_cast<float>(m_numUnitsPerTile),
                         static_cast<float>(m_numUnitsPerTile)),
-                    1.0f, 1.0f, 1, zIndex
+					1.0f, 1.0f, 1, zIndex, drawDebug
                 );
             }
 

@@ -58,10 +58,10 @@ namespace Engine
 		const float renderAreaHeight = bottomRenderBound - topRenderBound;
 
 		// Set the render zone.
-		refCamera.m_clipRectX = static_cast<int>(refCamera.m_positionInFractionOfScreenSize.X * Screen::VIEWPORT_SIZE.X);
-		refCamera.m_clipRectY = static_cast<int>(refCamera.m_positionInFractionOfScreenSize.Y * Screen::VIEWPORT_SIZE.Y);
-		refCamera.m_clipRectW = static_cast<int>(renderAreaWidth * refCamera.m_pixelsPerUnit * Screen::SCALE.X);
-		refCamera.m_clipRectH = static_cast<int>(renderAreaHeight * refCamera.m_pixelsPerUnit * Screen::SCALE.Y);
+		refCamera.m_clipRectPosition.X = static_cast<int>(refCamera.m_positionInFractionOfScreenSize.X * Screen::VIEWPORT_SIZE.X);
+		refCamera.m_clipRectPosition.Y = static_cast<int>(refCamera.m_positionInFractionOfScreenSize.Y * Screen::VIEWPORT_SIZE.Y);
+		refCamera.m_clipRectSize.X = static_cast<int>(renderAreaWidth * refCamera.m_pixelsPerUnit * Screen::SCALE.X);
+		refCamera.m_clipRectSize.Y = static_cast<int>(renderAreaHeight * refCamera.m_pixelsPerUnit * Screen::SCALE.Y);
 
 		auto& transformManager = m_refECS.GetHotComponents<Transform>();
 		for (Transform& refTransform : transformManager)
@@ -132,11 +132,32 @@ namespace Engine
 					Vector2D<int>(locationInPixelsOnSpriteSheetX, locationInPixelsOnSpriteSheetY),
 					Vector2D<int>(sizseInPixelsOnSpriteSheetX, sizseInPixelsOnSpriteSheetY)
 				);
+#ifndef NDEBUG
+				// submit green border if client sets entity to render
+				// debug objects when in debug mode.
+				if (refTransform.m_drawDebug)
+				{
+					auto& debugBucket = refCamera.m_debugRenderBucket.try_emplace(refTransform.ZIndex).first->second;
+					debugBucket.emplace_back(
+						refTransform.m_entity,
+						false,
+						Vector2D<int>(
+							static_cast<int>(round((lerpedX - cameraAdjustedOffset.X) * scaleX)),
+							static_cast<int>(round((lerpedY - cameraAdjustedOffset.Y) * scaleY))
+						),
+						Vector2D<int>(
+							static_cast<int>(round(refTransform.Dimensions.X * scaleX)), // Need transform dimensions, not animation dimensions
+							static_cast<int>(round(refTransform.Dimensions.Y * scaleY))
+						)
+					);
+				}
+#endif
 			}
 			else
 			{
 #ifndef NDEBUG
-				//// draw the transform rectangle border
+				// if there is no animation at all,
+				// draw the transform rectangle when in debug.
 				auto& debugBucket = refCamera.m_debugRenderBucket.try_emplace(refTransform.ZIndex).first->second;
 				debugBucket.emplace_back(
 					refTransform.m_entity,

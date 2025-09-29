@@ -19,14 +19,12 @@ namespace Engine
 		void ToggleFullscreen();
 
 		const float GetMonitorRefreshRate();
+		void CheckForWindowResizeRequest();
 
 		void Render();
-		void Draw(Transform& refTransform, Animations* ptrAnimations, const int pixelsPerUnit, const Vector2D<float> offset);
-		void Draw(ChainCollider& transform, const int pixelsPerUnit, const Vector2D<float> offset);
 		void Draw(RenderObject& object);
 		void Draw(DebugObject& object);
 		void Draw(LineObject& line);
-
 		void Display();
 
 		void ClearScreen();

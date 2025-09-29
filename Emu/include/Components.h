@@ -26,13 +26,16 @@ namespace Engine
 		float Rotation;
 		float Scale;
 		int DirectionFacing;
+		bool m_drawDebug;
 
 		Transform(Entity entity) : PrevPosition(0.0f, 0.0f), Position(0.0f, 0.0f),
-			Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1), ZIndex(0), Component(entity) {}
+			Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1), ZIndex(0), m_drawDebug(false), Component(entity) {}
 
-		Transform(Entity entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction, int zIndex) :
+		Transform(Entity entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction, int zIndex, const bool drawDebug) :
 			PrevPosition(position), Position(position),
-			Dimensions(dimensions), Rotation(rotation), Scale(scale), DirectionFacing(direction), ZIndex(zIndex), Component(entity) {}
+			Dimensions(dimensions), Rotation(rotation), Scale(scale), 
+			DirectionFacing(direction), ZIndex(zIndex), m_drawDebug(drawDebug),
+			Component(entity) {}
 
 		~Transform() = default;
 	};
@@ -143,12 +146,12 @@ namespace Engine
 		Camera(Entity entity)
 			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_screenRatio(1.0f, 1.0f), 
 			m_positionInFractionOfScreenSize(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), 
-			m_bounds(0, 0), m_clipRectX(0), m_clipRectY(0), m_clipRectW(0), m_clipRectH(0),
+			m_bounds(0, 0), m_clipRectPosition(0, 0), m_clipRectSize(0, 0),
 			Component(entity) {}
 		Camera(Entity entity, Vector2D<float> size, Vector2D<float> screenRatio, Vector2D<float> position, int pixelsPerUnit, bool clampingOn)
 			: m_size(size), m_screenRatio(screenRatio), m_positionInFractionOfScreenSize(position), 
 			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0),
-			m_clipRectX(0), m_clipRectY(0), m_clipRectW(0), m_clipRectH(0), 
+			m_clipRectPosition(0, 0), m_clipRectSize(0, 0), 
 			Component(entity) {}
 		
 
@@ -165,10 +168,8 @@ namespace Engine
 		bool m_clampingOn;
 		Vector2D<int> m_bounds;
 
-		int m_clipRectX;
-		int m_clipRectY;
-		int m_clipRectW;
-		int m_clipRectH;
+		Vector2D<int> m_clipRectPosition;
+		Vector2D<int> m_clipRectSize;
 
 		RenderBucket m_renderBucket;				// Map of zIndex to vector of RenderObjects.
 		DebugRenderBucket m_debugRenderBucket;		// Map of zIndex to vector of DebugObjects.

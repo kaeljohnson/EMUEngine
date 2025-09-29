@@ -82,10 +82,8 @@ namespace Engine
 		ENGINE_CRITICAL("Renderer created.");
 	}
 
-	void WindowRenderer::Render()
+	void WindowRenderer::CheckForWindowResizeRequest()
 	{
-		ClearScreen();
-
 		if (Screen::WINDOW_RESIZE_REQUEST)
 		{
 			SetViewport();
@@ -98,6 +96,11 @@ namespace Engine
 			SetViewport();
 			Screen::TOGGLE_FULLSCREEN_REQUEST = false;
 		}
+	}
+
+	void WindowRenderer::Render()
+	{
+		ClearScreen();
 
 		for (auto& refCamera : m_refECS.GetHotComponents<Camera>())
 		{
@@ -123,10 +126,10 @@ namespace Engine
 			float renderAreaHeight = bottomRenderBound - topRenderBound;
 
 			SDL_Rect clipRect;
-			clipRect.x = refCamera.m_clipRectX;
-			clipRect.y = refCamera.m_clipRectY;
-			clipRect.w = refCamera.m_clipRectW;
-			clipRect.h = refCamera.m_clipRectH;
+			clipRect.x = refCamera.m_clipRectPosition.X;
+			clipRect.y = refCamera.m_clipRectPosition.Y;
+			clipRect.w = refCamera.m_clipRectSize.X;
+			clipRect.h = refCamera.m_clipRectSize.Y;
 
 			SDL_RenderSetClipRect((SDL_Renderer*)m_ptrRenderer, &clipRect);
 
@@ -177,8 +180,6 @@ namespace Engine
 
 		Display();
 	}	
-	
-
 
 	void WindowRenderer::Draw(RenderObject& object)
 	{
@@ -234,38 +235,10 @@ namespace Engine
 		else
 		{
 			// Green boxes
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 			SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
 			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 		}
-
-#ifndef NDEBUG
-		// green boxes
-		//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
-		//SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
-		//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-
-		//// transform border should also be submitted to render queue since render should not need to know about components.
-		//Transform* ptrTransform = m_refECS.GetComponent<Transform>(object.m_entity);
-		//float lerpedX = Lerp(ptrTransform->PrevPosition.X, ptrTransform->Position.X, Time::GetInterpolationFactor());
-		//float lerpedY = Lerp(ptrTransform->PrevPosition.Y, ptrTransform->Position.Y, Time::GetInterpolationFactor());
-		//const float scaleX = pixelsPerUnit * Screen::SCALE.X;
-		//const float scaleY = pixelsPerUnit * Screen::SCALE.Y;
-
-		//// draw the transform rectangle border
-		//SDLRect transformRect
-		//{
-		//	static_cast<int>(round((lerpedX - cameraOffset.X) * scaleX)),
-		//	static_cast<int>(round((lerpedY - cameraOffset.Y) * scaleY)),
-		//	static_cast<int>(round(ptrTransform->Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-		//	static_cast<int>(round(ptrTransform->Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
-
-		//};
-		//// Red boxes
-		//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-		//SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &transformRect);
-		//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-#endif
 	}
 
 	void WindowRenderer::Draw(LineObject& lineObject)
@@ -276,116 +249,6 @@ namespace Engine
 		SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, lineObject.m_endPointInPixelsOnScreen.X, lineObject.m_endPointInPixelsOnScreen.Y,
 			lineObject.m_startPointInPixelsOnScreen.X, lineObject.m_startPointInPixelsOnScreen.Y);
 		
-	}
-
-	void WindowRenderer::Draw(Transform& transform, Animations* animations, const int pixelsPerUnit, const Vector2D<float> cameraAdjustedOffset)
-	{
-		const float interpolation = Time::GetInterpolationFactor();
-
-		float lerpedX = Lerp(transform.PrevPosition.X, transform.Position.X, interpolation);
-		float lerpedY = Lerp(transform.PrevPosition.Y, transform.Position.Y, interpolation);
-
-		const float scaleX = pixelsPerUnit * Screen::SCALE.X;
-		const float scaleY = pixelsPerUnit * Screen::SCALE.Y;
-
-		int width, height;
-		float offsetFromTransformX = 0.0f;
-		float offsetFromTransformY = 0.0f;
-		if (animations)
-		{
-			const Animation& currentAnimation = animations->m_animations.at(animations->m_currentAnimation);
-
-			width = static_cast<int>(round(currentAnimation.m_size.X * scaleX));
-			height = static_cast<int>(round(currentAnimation.m_size.Y * scaleY));
-			offsetFromTransformX = currentAnimation.m_offsetFromTransform.X;
-			offsetFromTransformY = currentAnimation.m_offsetFromTransform.Y;
-		}
-		else
-		{
-			width = static_cast<int>(round(transform.Dimensions.X * scaleX));
-			height = static_cast<int>(round(transform.Dimensions.Y * scaleY));
-		}
-
-		SDLRect dst
-		{
-			static_cast<int>(round((lerpedX - cameraAdjustedOffset.X + offsetFromTransformX) * scaleX)),
-			static_cast<int>(round((lerpedY - cameraAdjustedOffset.Y + offsetFromTransformY) * scaleY)),
-			width,
-			height
-		};
-
-		if (animations)
-		{
-			const Animation& currentAnimation = animations->m_animations.at(animations->m_currentAnimation);
-
-			SDLTexture* spriteTexture = (SDLTexture*)m_refAssetManager.GetTexture(animations->m_entity);
-			if (spriteTexture != nullptr)
-			{
-				int x = static_cast<int>(currentAnimation.m_currentFrame % currentAnimation.m_dimensions.X * currentAnimation.m_pixelsPerFrame.X);
-				int y = static_cast<int>(floor(currentAnimation.m_currentFrame / currentAnimation.m_dimensions.X) * currentAnimation.m_pixelsPerFrame.Y);
-
-				SDLRect src
-				{ 
-					// What to muiltiple these by to get the correct size on the sprite sheet for any viewport?
-					// Size is set by client per unit. 
-					x, 
-					y,
-					static_cast<int>(currentAnimation.m_pixelsPerFrame.X), 
-					static_cast<int>(currentAnimation.m_pixelsPerFrame.Y) 
-				};
-
-				// Draw the sprite
-				ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, spriteTexture, &src, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
-			}
-		}
-		else
-		{
-			// black rectangle for entities without sprites
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
-			SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
-			ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, transform.Rotation, nullptr, SDL_FLIP_NONE);
-		}
-
-#ifndef NDEBUG 
-
-		// green boxes
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
-		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-
-		// draw the transform rectangle border
-		SDLRect transformRect
-		{
-			static_cast<int>(round((lerpedX - cameraAdjustedOffset.X) * scaleX)),
-			static_cast<int>(round((lerpedY - cameraAdjustedOffset.Y) * scaleY)),
-			static_cast<int>(round(transform.Dimensions.X * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-			static_cast<int>(round(transform.Dimensions.Y * pixelsPerUnit * Screen::SCALE_CONSTANT))
-
-		};
-		// Red boxes
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-		SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &transformRect);
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-#endif
-	}
-
-	void WindowRenderer::Draw(ChainCollider& chainCollider, const int pixelsPerUnit, const Vector2D<float> offset)
-	{
-		// Draw the chain collider as a series of lines in red.
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-
-		const float scaleX = pixelsPerUnit * Screen::SCALE.X;
-		const float scaleY = pixelsPerUnit * Screen::SCALE.Y;
-
-		for (int i = 0; i < 3; ++i)
-		{
-			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer,
-				static_cast<int>(round((chainCollider.m_points[i].X - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-				static_cast<int>(round((chainCollider.m_points[i].Y - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-				static_cast<int>(round((chainCollider.m_points[i + 1].X - offset.X) * pixelsPerUnit * Screen::SCALE_CONSTANT)),
-				static_cast<int>(round((chainCollider.m_points[i + 1].Y - offset.Y) * pixelsPerUnit * Screen::SCALE_CONSTANT))
-			);
-		}
 	}
 
 	// Wrapper for SDL_RenderPresent. Talks to the actual hardwares renderer to display the renderer.

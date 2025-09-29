@@ -80,6 +80,7 @@ namespace Engine
 			m_ptrCurrentScene->UpdateVisuals();
 			m_ptrCurrentScene->UpdateCamera(m_refAssetManager);
 
+			m_windowRenderer.CheckForWindowResizeRequest();
 			m_windowRenderer.Render();
 
 			if (!Time::IsAppRunning())
