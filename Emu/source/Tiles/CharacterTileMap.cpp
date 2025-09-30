@@ -225,23 +225,13 @@ namespace Engine
 					}
 				}
 
-                bool drawDebug = false;
-				if (characterRulesJson["Transform"].contains("DrawDebug"))
-				{
-					const auto& drawDebugJson = characterRulesJson["Transform"]["DrawDebug"];
-					if (drawDebugJson.is_boolean())
-					{
-						drawDebug = drawDebugJson.get<bool>();
-					}
-				}
-
                 m_refECS.AddComponent<Transform>(
                     tileEntity,
                     Vector2D<float>(x * static_cast<float>(m_numUnitsPerTile),
                         y * static_cast<float>(m_numUnitsPerTile)),
                     Vector2D<float>(static_cast<float>(m_numUnitsPerTile),
                         static_cast<float>(m_numUnitsPerTile)),
-					1.0f, 1.0f, 1, zIndex, drawDebug
+                    1.0f, 1.0f, 1, zIndex
                 );
             }
 
@@ -251,7 +241,7 @@ namespace Engine
 			{
                 Vector2D<float> size = Vector2D<float>(0.0f, 0.0f);
 				Vector2D<float> screenRatio = Vector2D<float>(1.0f, 1.0f);
-				Vector2D<float> positionInFractionOfScreenSize = Vector2D<float>(0.0f, 0.0f);
+				Vector2D<float> position = Vector2D<float>(0.0f, 0.0f);
 			    int pixelsPerUnit = 0;
 				bool clampingOn = false;
 
@@ -304,8 +294,8 @@ namespace Engine
                     {
 						if (windowJson["X"].is_number() && windowJson["Y"].is_number())
 						{
-							positionInFractionOfScreenSize.X = windowJson["X"].get<float>();
-							positionInFractionOfScreenSize.Y = windowJson["Y"].get<float>();
+							position.X = windowJson["X"].get<float>();
+							position.Y = windowJson["Y"].get<float>();
 						}
 					}
 					else
@@ -324,7 +314,7 @@ namespace Engine
                     }
 				}
 
-				m_refECS.AddComponent<Camera>(tileEntity, size, screenRatio, positionInFractionOfScreenSize, pixelsPerUnit, clampingOn);
+				m_refECS.AddComponent<Camera>(tileEntity, size, screenRatio, position, pixelsPerUnit, clampingOn);
 			}
 
             // Add Physics components.

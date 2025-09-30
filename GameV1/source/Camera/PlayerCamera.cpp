@@ -26,11 +26,11 @@ void PlayerCamera::Update(Engine::Entity entity)
 	const Engine::Vector2D<float> targetPosition = m_refTransformInterface.GetPosition(entity);
 
     Engine::Vector2D<float> targetPos = Engine::Lerp(targetPrevPosition, targetPosition, interpFactor);
-	Engine::Vector2D<float> cameraSize = m_refCameraInterface.GetSize(entity);
+	Engine::Vector2D<float> targetSize = m_refCameraInterface.GetSize(entity);
 
 	// Calculate the desired camera position based on the target's position
-	float desiredCameraTopLeftX = targetPos.X - (cameraSize.X / 2.0f);
-	float desiredCameraTopLeftY = targetPos.Y - (cameraSize.Y / 2.0f);
+	float desiredCameraTopLeftX = targetPos.X - (targetSize.X / 2.0f);
+	float desiredCameraTopLeftY = targetPos.Y - (targetSize.Y / 2.0f);
 
 	// Set the camera offset to the desired position
 	m_refCameraInterface.SetOffset(entity, Engine::Vector2D<float>(desiredCameraTopLeftX, desiredCameraTopLeftY));

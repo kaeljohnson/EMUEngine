@@ -19,9 +19,7 @@
             },
             "Transform": 
             {
-                "ZIndex": 1,
-                "DrawDebug": true
-                
+                "ZIndex": 1
             },
             "Camera":
             {

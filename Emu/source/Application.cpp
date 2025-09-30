@@ -10,7 +10,7 @@ namespace Engine
 {
 
 	Application::Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, AssetManager& refAssetManager, AnimationSystem& refAnimationSystem)
-		: m_refECS(refECS), m_refAssetManager(refAssetManager), m_ptrCurrentScene(nullptr), m_windowRenderer(refECS, refAssetManager),
+		: m_refECS(refECS), m_ptrCurrentScene(nullptr), m_windowRenderer(refECS, refAssetManager),
 		m_refSceneManager(refSceneManager), m_refIOEventSystem(refIOEventSystem), m_refAnimationSystem(refAnimationSystem)
 	{}
 
@@ -36,7 +36,6 @@ namespace Engine
 		double frameTime = 0.0;                           // How much time has passed since the last frame. How fast the game is running.
 		float interpolation = 0.0;                        // How far between the last and current frame we are.
 
-
 		// Application loop.
 		while (Time::IsAppRunning())
 		{
@@ -47,14 +46,7 @@ namespace Engine
 				m_refSceneManager.LoadQueuedScene();
 				m_refSceneManager.NewSceneStarted();
 				m_ptrCurrentScene = m_refSceneManager.GetCurrentScene();
-
-				// Critical checks before scene starts.
-				if (m_refECS.GetHotComponents<Camera>().empty())
-				{
-					ENGINE_CRITICAL_D("No active cameras found.");
-					throw std::runtime_error("No active cameras found.");
-					return;
-				}
+				m_windowRenderer.Initialize();
 			}
 
 			m_refIOEventSystem.HandleEvents();
@@ -78,9 +70,8 @@ namespace Engine
 			Time::SetInterpolationFactor(((float)accumulator / timeStep));
 
 			m_ptrCurrentScene->UpdateVisuals();
-			m_ptrCurrentScene->UpdateCamera(m_refAssetManager);
+			m_ptrCurrentScene->UpdateCamera();
 
-			m_windowRenderer.CheckForWindowResizeRequest();
 			m_windowRenderer.Render();
 
 			if (!Time::IsAppRunning())
