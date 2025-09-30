@@ -8,6 +8,7 @@
 #include "Core.h"
 #include "AssetManager.h"
 #include "Animations/AnimationSystem.h"
+#include "AssetManager.h"
 
 namespace Engine
 {
@@ -39,5 +40,6 @@ namespace Engine
 		Scene* m_ptrCurrentScene;
 		IOEventSystem& m_refIOEventSystem;
 		AnimationSystem& m_refAnimationSystem;
+		AssetManager& m_refAssetManager;
 	};
 }

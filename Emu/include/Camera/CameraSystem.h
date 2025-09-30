@@ -2,6 +2,7 @@
 
 #include "../Components.h"
 #include "../ECS/ECS.h"
+#include "../AssetManager.h"
 
 namespace Engine
 {
@@ -16,7 +17,8 @@ namespace Engine
 		void Clamp(Camera& refCamera);
 		void Frame(Camera& refCamera, const Vector2D<int> mapBounds);
 
-		void Update();
+		void Update(AssetManager& refAssetManager);
+		void PrepareForRendering(Camera& refCamera, AssetManager& refAssetManager);
 
 	private:
 		ECS& m_refECS;

@@ -15,16 +15,16 @@ namespace Engine
 		WindowRenderer(ECS& refECS, AssetManager& refAssetManager);
 		~WindowRenderer();
 
-		void Initialize();
-
 		void SetViewport();
 		void ToggleFullscreen();
 
 		const float GetMonitorRefreshRate();
+		void CheckForWindowResizeRequest();
 
 		void Render();
-		void Draw(Transform& refTransform, Animations* ptrAnimations, const int pixelsPerUnit, const Vector2D<float> offset);
-		void Draw(ChainCollider& transform, const int pixelsPerUnit, const Vector2D<float> offset);
+		void Draw(RenderObject& object);
+		void Draw(DebugObject& object);
+		void Draw(LineObject& line);
 		void Display();
 
 		void ClearScreen();
@@ -39,7 +39,5 @@ namespace Engine
 
 		ECS& m_refECS;
 		AssetManager& m_refAssetManager;
-
-		std::vector<Entity> m_sortedEntitiesToRender;
 	};
 }

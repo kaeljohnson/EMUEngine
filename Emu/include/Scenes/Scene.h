@@ -67,7 +67,7 @@ namespace Engine
 
 		void UpdateScripts();
 		void UpdatePhysics();
-		void UpdateCamera();
+		void UpdateCamera(AssetManager& refAssetManager);
 		void UpdateVisuals();
 
 		bool HasTileMap;
