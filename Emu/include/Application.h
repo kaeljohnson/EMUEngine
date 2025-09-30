@@ -3,7 +3,7 @@
 #include "Includes.h"
 #include "Scenes/Scene.h"
 #include "Scenes/SceneManager.h"
-#include "Rendering/WindowRenderer.h"
+#include "Rendering/IRenderer.h"
 #include "Events/IOEventSystem.h"
 #include "Core.h"
 #include "AssetManager.h"
@@ -33,8 +33,7 @@ namespace Engine
 	private:
 		ECS& m_refECS;
 
-		// Engine should probably own this.
-		WindowRenderer m_windowRenderer;
+		IRenderer m_IRenderer;
 		
 		SceneManager& m_refSceneManager;
 		Scene* m_ptrCurrentScene;

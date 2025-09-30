@@ -2,18 +2,17 @@
 
 #include "../ECS/ECS.h"
 #include "../Includes.h"
-#include "../MathUtil.h"
 #include "../Components.h"
 #include "../AssetManager.h"
 #include "Screen.h"
 
 namespace Engine
 {
-	class WindowRenderer
+	class IRenderer
 	{
 	public:
-		WindowRenderer(ECS& refECS, AssetManager& refAssetManager);
-		~WindowRenderer();
+		IRenderer(ECS& refECS, AssetManager& refAssetManager);
+		~IRenderer();
 
 		void SetViewport();
 		void ToggleFullscreen();
@@ -22,16 +21,17 @@ namespace Engine
 		void CheckForWindowResizeRequest();
 
 		void Render();
-		void Draw(RenderObject& object);
-		void Draw(DebugObject& object);
-		void Draw(LineObject& line);
-		void Display();
+		
+	private:
+		void draw(RenderObject& object);
+		void draw(DebugObject& object);
+		void draw(LineObject& line);
+		void display();
 
-		void ClearScreen();
+		void clearScreen();
 
 		void free();
 
-	public:
 		void* m_ptrWindow;
 		void* m_ptrRenderer;
 

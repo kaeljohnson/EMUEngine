@@ -155,6 +155,24 @@
             "Transform":
             {
                 "ZIndex": 1
+            },
+            "SpriteSheet": 
+            {
+                "Path": "DetailedGrasstilemap.png",
+                "PixelsPerFrame": [32, 32],
+                "SizeInUnits": [1.0, 1.0],
+                "OffsetFromTransform": [0.0, 0.0],
+                "Height": 3,
+                "Width": 4
+            },
+            "Animations":
+            {
+                "Idle": 
+                {
+                    "Frames": [1],
+                    "FrameTime": 20,
+                    "Loop": true
+                }
             }
         }
     }

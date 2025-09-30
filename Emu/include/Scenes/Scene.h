@@ -65,10 +65,8 @@ namespace Engine
 		void OnScenePlay();
 		void OnSceneEnd();
 
-		void UpdateScripts();
 		void UpdatePhysics();
 		void UpdateCamera(AssetManager& refAssetManager);
-		void UpdateVisuals();
 
 		bool HasTileMap;
 	}; 

@@ -10,7 +10,6 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::F_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			// Need interface to toggle fullscreen.
-			// refApp.GetWindowRenderer().ToggleFullscreen();
 			Engine::Screen::SetFullscreen();
 			// Could add a setter for handled state and put the trace in there.
 			CLIENT_TRACE_D("Handled event:" + std::to_string(static_cast<int>(Engine::F_KEY_DOWN)));
