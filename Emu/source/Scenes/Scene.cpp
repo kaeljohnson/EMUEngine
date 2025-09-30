@@ -158,10 +158,6 @@ namespace Engine
 		m_levelDimensionsInUnits = levelDimensions;
 	}
 
-	void Scene::UpdateScripts()
-	{
-	}
-
 	void Scene::UpdatePhysics()
 	{
 		m_physicsSimulation.Update();
@@ -170,11 +166,6 @@ namespace Engine
 	void Scene::UpdateCamera(AssetManager& refAssetManager)
 	{
 		m_cameraSystem.Update(refAssetManager);
-	}
-
-	void Scene::UpdateVisuals()
-	{
-		
 	}
 
 	// Is this function necessary?

@@ -10,7 +10,7 @@ namespace Engine
 {
 
 	Application::Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, AssetManager& refAssetManager, AnimationSystem& refAnimationSystem)
-		: m_refECS(refECS), m_refAssetManager(refAssetManager), m_ptrCurrentScene(nullptr), m_windowRenderer(refECS, refAssetManager),
+		: m_refECS(refECS), m_refAssetManager(refAssetManager), m_ptrCurrentScene(nullptr), m_IRenderer(refECS, refAssetManager),
 		m_refSceneManager(refSceneManager), m_refIOEventSystem(refIOEventSystem), m_refAnimationSystem(refAnimationSystem)
 	{}
 
@@ -77,11 +77,10 @@ namespace Engine
 
 			Time::SetInterpolationFactor(((float)accumulator / timeStep));
 
-			m_ptrCurrentScene->UpdateVisuals();
 			m_ptrCurrentScene->UpdateCamera(m_refAssetManager);
 
-			m_windowRenderer.CheckForWindowResizeRequest();
-			m_windowRenderer.Render();
+			m_IRenderer.CheckForWindowResizeRequest();
+			m_IRenderer.Render();
 
 			if (!Time::IsAppRunning())
 			{ 

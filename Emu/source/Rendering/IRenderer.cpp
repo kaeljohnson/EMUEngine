@@ -2,7 +2,7 @@
 
 #include "../../include/ISDL/ISDL.h"
 #include "../../include/Logging/Logger.h"
-#include "../../include/Rendering/WindowRenderer.h"
+#include "../../include/Rendering/IRenderer.h"
 #include "../../include/Camera/CameraInterface.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Components.h"
@@ -21,7 +21,7 @@ namespace Engine
 	Vector2D<int> Screen::DISPLAY_RESOLUTION = Vector2D<int>(0, 0);
 	Vector2D<int> Screen::VIRTUAL_SIZE = Vector2D<int>(0, 0);
 
-	WindowRenderer::WindowRenderer(ECS& refECS, AssetManager& refAssetManager) 
+	IRenderer::IRenderer(ECS& refECS, AssetManager& refAssetManager) 
 		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS), m_refAssetManager(refAssetManager)
 	{
 		ENGINE_INFO_D("Creating Renderer");
@@ -82,7 +82,7 @@ namespace Engine
 		ENGINE_CRITICAL("Renderer created.");
 	}
 
-	void WindowRenderer::CheckForWindowResizeRequest()
+	void IRenderer::CheckForWindowResizeRequest()
 	{
 		if (Screen::WINDOW_RESIZE_REQUEST)
 		{
@@ -98,33 +98,12 @@ namespace Engine
 		}
 	}
 
-	void WindowRenderer::Render()
+	void IRenderer::Render()
 	{
-		ClearScreen();
+		clearScreen();
 
 		for (auto& refCamera : m_refECS.GetHotComponents<Camera>())
 		{
-			// viewport size in tiles
-			const Vector2D<float> viewportSizeInTiles = Vector2D<float>(Screen::VIEWPORT_SIZE.X / (refCamera.m_pixelsPerUnit * Screen::SCALE.X),
-				Screen::VIEWPORT_SIZE.Y / (refCamera.m_pixelsPerUnit * Screen::SCALE.Y));
-
-			// Calculate "adjusted offset". This is the offset that takes
-			// into account the position of the camera on the screen.
-			Vector2D<float> cameraAdjustedOffset{ refCamera.m_offset.X - refCamera.m_positionInFractionOfScreenSize.X * viewportSizeInTiles.X,
-				refCamera.m_offset.Y - refCamera.m_positionInFractionOfScreenSize.Y * viewportSizeInTiles.Y };
-
-			// Bounds of what to render in world space. For each camera, 
-			// user sees the left side of the camera's world coordinates
-			// offset all the way to the width of the camera in world 
-			// coordinates. Same for height.
-			float leftRenderBound = refCamera.m_offset.X;
-			float topRenderBound = refCamera.m_offset.Y;
-			float rightRenderBound = leftRenderBound + refCamera.m_screenRatio.X * viewportSizeInTiles.X;
-			float bottomRenderBound = topRenderBound + refCamera.m_screenRatio.Y * viewportSizeInTiles.Y;
-
-			float renderAreaWidth = rightRenderBound - leftRenderBound;
-			float renderAreaHeight = bottomRenderBound - topRenderBound;
-
 			SDL_Rect clipRect;
 			clipRect.x = refCamera.m_clipRectPosition.X;
 			clipRect.y = refCamera.m_clipRectPosition.Y;
@@ -137,7 +116,7 @@ namespace Engine
 			{					
 				for (auto& value : vec) 
 				{
-					Draw(value);
+					draw(value);
 				}
 			}
 			refCamera.m_renderBucket.clear(); // CLEAR MAP EACH FRAME.
@@ -147,7 +126,7 @@ namespace Engine
 			{
 				for (auto& value : vec)
 				{
-					Draw(value);
+					draw(value);
 				}
 			}
 			refCamera.m_debugRenderBucket.clear(); // CLEAR MAP EACH FRAME.
@@ -156,7 +135,7 @@ namespace Engine
 			{
 				for (auto& value : vec)
 				{
-					Draw(value);
+					draw(value);
 				}
 			}
 			refCamera.m_debugLinesRenderBucket.clear(); // CLEAR MAP EACH FRAME.
@@ -170,18 +149,14 @@ namespace Engine
 			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x, clipRect.y + clipRect.h); // left line
 			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x + clipRect.w - 1, clipRect.y, clipRect.x + clipRect.w - 1, clipRect.y + clipRect.h); // right line
 			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y + clipRect.h - 1, clipRect.x + clipRect.w, clipRect.y + clipRect.h - 1); // bottom line
-			
-
-			// auto end = std::chrono::high_resolution_clock::now();
-			// std::cout << "Rendering: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
 		}
 		
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 
-		Display();
+		display();
 	}	
 
-	void WindowRenderer::Draw(RenderObject& object)
+	void IRenderer::draw(RenderObject& object)
 	{
 		SDLRect dst
 		{
@@ -200,7 +175,6 @@ namespace Engine
 		};
 
 
-
 		SDLTexture* spriteTexture = (SDLTexture*)m_refAssetManager.GetTexture(object.m_entity);
 
 		// Maybe don't need the check here even though its safe?
@@ -215,7 +189,7 @@ namespace Engine
 		}
 	}
 
-	void WindowRenderer::Draw(DebugObject& object)
+	void IRenderer::draw(DebugObject& object)
 	{
 		SDLRect dst
 		{
@@ -241,7 +215,7 @@ namespace Engine
 		}
 	}
 
-	void WindowRenderer::Draw(LineObject& lineObject)
+	void IRenderer::draw(LineObject& lineObject)
 	{
 		// Draw the chain collider as a series of lines in red.
 		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE); // Should client decide color?
@@ -252,18 +226,18 @@ namespace Engine
 	}
 
 	// Wrapper for SDL_RenderPresent. Talks to the actual hardwares renderer to display the renderer.
-	void WindowRenderer::Display()
+	void IRenderer::display()
 	{
 		ISDL::RenderPresent((SDLRenderer*)m_ptrRenderer);
 	}
 
 	// Wrapper for SDL_RenderClear. Clears the screen.
-	void WindowRenderer::ClearScreen()
+	void IRenderer::clearScreen()
 	{
 		ISDL::RenderClear((SDLRenderer*)m_ptrRenderer);
 	}
 
-	void WindowRenderer::SetViewport()
+	void IRenderer::SetViewport()
 	{
 		int windowWidthInPixels, windowHeightInPixels;
 		SDL_GetRendererOutputSize((SDLRenderer*)m_ptrRenderer, &windowWidthInPixels, &windowHeightInPixels);
@@ -299,7 +273,7 @@ namespace Engine
 		ISDL::RenderSetViewport((SDLRenderer*)m_ptrRenderer, &viewport);
 	}
 
-	void WindowRenderer::ToggleFullscreen()
+	void IRenderer::ToggleFullscreen()
 	{
 		// Bug here: Figure out why "SDL_WINDOW_FULLSCREEN" does not work.
 		// Incompatibility with native video mode?
@@ -312,7 +286,6 @@ namespace Engine
 		if (ISDL::SetWindowFullscreen((SDLWindow*)m_ptrWindow, isFullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)
 		{
 			ENGINE_ERROR("Fullscreen failed! SDL_Error: " + std::string(ISDL::GetError()));
-
 		}
 		else
 		{
@@ -323,7 +296,7 @@ namespace Engine
 		}
 	}
 
-	const float WindowRenderer::GetMonitorRefreshRate()
+	const float IRenderer::GetMonitorRefreshRate()
 	{
 		// Get the current display mode of the window to find out the refresh rate.
 		SDLDisplayMode displayMode;
@@ -337,7 +310,7 @@ namespace Engine
 		return static_cast<float>(displayMode.refresh_rate);
 	}
 
-	void WindowRenderer::free()
+	void IRenderer::free()
 	{
 		ENGINE_INFO("Freeing Renderer.");
 		ISDL::DestroyRenderer((SDLRenderer*)m_ptrRenderer);
@@ -348,7 +321,7 @@ namespace Engine
 		m_ptrWindow = nullptr;
 	}
 
-	WindowRenderer::~WindowRenderer()
+	IRenderer::~IRenderer()
 	{
 	}
 }

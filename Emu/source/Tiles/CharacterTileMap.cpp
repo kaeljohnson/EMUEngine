@@ -535,6 +535,9 @@ namespace Engine
 				spriteSheetPath = spriteSheetJson["Path"];
 
 				ENGINE_INFO_D("Loading texture from: " + spriteSheetPath);
+                // The following must only be called once per scene.
+                // Currently, it is called for every character that has a animation or sprite from
+                // the texture. That takes way too long and wastes resources!!!
 				m_refAssetManager.LoadTexture(tileEntity, spriteSheetsPath + spriteSheetPath); // Should this be called on scene play?
 
 
