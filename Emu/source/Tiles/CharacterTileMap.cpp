@@ -143,6 +143,8 @@ namespace Engine
 
 	void CharacterTileMap::LoadMap()
 	{
+        std::unordered_set<char> isSolid;
+
         // Read the NumMetersPerTile and store it in your member variable
         if (rulesJson.contains("NumMetersPerTile") && rulesJson["NumMetersPerTile"].is_number())
         {
@@ -343,7 +345,6 @@ namespace Engine
 
             if (characterRulesJson.contains("Physics"))
             {
-
                 json characterPhysicsRulesJson = characterRulesJson["Physics"];
 
                 // Physics library needs to know if the body is enabled or not.
@@ -376,15 +377,25 @@ namespace Engine
                     else if (bodyTypeStr == "KINEMATIC") bodyType = KINEMATIC;
                     else if (bodyTypeStr == "SENSOR") bodyType = SENSOR;
                 }
-				if (characterPhysicsRulesJson.contains("UseChains") && bodyType != SENSOR) // Chains are not used for sensors.
+
+                if (bodyType != SENSOR)
                 {
-                    const auto& useChainsJson = characterPhysicsRulesJson["UseChains"];
-                    bool useChainsStr = useChainsJson;
-                    if (useChainsStr == true)
+					// If body is not a sensor, it is solid and collides with other bodies.
+                    // This information is needed for the chain system to know which tiles to link to.
+                    // Not the best design but will work for now.
+                    isSolid.emplace(tileChar);
+
+                    if (characterPhysicsRulesJson.contains("UseChains")) // Chains are not used for sensors.
                     {
-                        useChains = true;
+                        const auto& useChainsJson = characterPhysicsRulesJson["UseChains"];
+                        bool useChainsStr = useChainsJson;
+                        if (useChainsStr == true)
+                        {
+                            useChains = true;
+                        }
                     }
                 }
+
                 if (characterPhysicsRulesJson.contains("GravityOn"))
                 {
                     const auto& gravityOnJson = characterPhysicsRulesJson["GravityOn"];
@@ -419,16 +430,15 @@ namespace Engine
 
                 if (useChains) // Chains are used on tiles, typically map tiles, to avoid ghose collisions on adjacent tiles.
                 {
-                    // Can't use 'w' here. Need to instead determine if the tile being checked for is a sensor or has collisions.
-                    bool hasTileAbove = (y > 0 && std::get<1>(GetTile(x, y - 1)) == 'w');
-                    bool hasTileBelow = (y < GetHeight() - 1 && std::get<1>(GetTile(x, y + 1)) == 'w');
-                    bool hasTileLeft = (x > 0 && std::get<1>(GetTile(x - 1, y)) == 'w');
-                    bool hasTileRight = (x < GetWidth() - 1 && std::get<1>(GetTile(x + 1, y)) == 'w');
+					bool hasTileAbove = (y > 0 && isSolid.find(std::get<1>(GetTile(x, y - 1))) != isSolid.end());
+					bool hasTileBelow = (y < GetHeight() - 1 && isSolid.find(std::get<1>(GetTile(x, y + 1))) != isSolid.end());
+                    bool hasTileLeft = (x > 0 && isSolid.find(std::get<1>(GetTile(x - 1, y))) != isSolid.end());
+					bool hasTileRight = (x < GetWidth() - 1 && isSolid.find(std::get<1>(GetTile(x + 1, y))) != isSolid.end());
 
-                    bool hasTileDiagonalLeftAbove = (x > 0 && y > 0 && std::get<1>(GetTile(x - 1, y - 1)) == 'w');
-                    bool hasTileDiagonalLeftBelow = (x > 0 && y < GetHeight() - 1 && std::get<1>(GetTile(x - 1, y + 1)) == 'w');
-                    bool hasTileDiagonalRightAbove = (x < GetWidth() - 1 && y > 0 && std::get<1>(GetTile(x + 1, y - 1)) == 'w');
-                    bool hasTileDiagonalRightBelow = (x < GetWidth() - 1 && y < GetHeight() - 1 && std::get<1>(GetTile(x + 1, y + 1)) == 'w');
+                    bool hasTileDiagonalLeftAbove = (x > 0 && y > 0 && isSolid.find(std::get<1>(GetTile(x - 1, y - 1))) != isSolid.end());
+                    bool hasTileDiagonalLeftBelow = (x > 0 && y < GetHeight() - 1 && isSolid.find(std::get<1>(GetTile(x - 1, y + 1))) != isSolid.end());
+                    bool hasTileDiagonalRightAbove = (x < GetWidth() - 1 && y > 0 && isSolid.find(std::get<1>(GetTile(x + 1, y - 1))) != isSolid.end());
+                    bool hasTileDiagonalRightBelow = (x < GetWidth() - 1 && y < GetHeight() - 1 && isSolid.find(std::get<1>(GetTile(x + 1, y + 1))) != isSolid.end());
 
                     if (!hasTileAbove)
                     {
