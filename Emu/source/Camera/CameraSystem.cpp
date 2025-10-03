@@ -148,7 +148,19 @@ namespace Engine
 						Vector2D<int>(
 							static_cast<int>(round(refTransform.Dimensions.X * scaleX)), // Need transform dimensions, not animation dimensions
 							static_cast<int>(round(refTransform.Dimensions.Y * scaleY))
-						)
+						),
+						refTransform.m_debugColor
+					);
+				}
+				if (currentAnimation.m_drawDebug)
+				{
+					auto& debugBucket = refCamera.m_debugRenderBucket.try_emplace(refTransform.ZIndex).first->second;
+					debugBucket.emplace_back(
+						refTransform.m_entity,
+						false,
+						Vector2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
+						Vector2D<int>(width, height),
+						currentAnimation.m_debugColor
 					);
 				}
 #endif
@@ -166,7 +178,8 @@ namespace Engine
 						static_cast<int>(round((lerpedX - cameraAdjustedOffset.X) * scaleX)),
 						static_cast<int>(round((lerpedY - cameraAdjustedOffset.Y) * scaleY))
 					),
-					Vector2D<int>(width, height)
+					Vector2D<int>(width, height),
+					refTransform.m_debugColor
 				);
 
 				auto submitChainsForRendering = [&](auto& ptrChainCollider)

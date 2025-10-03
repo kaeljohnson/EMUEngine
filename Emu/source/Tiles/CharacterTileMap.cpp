@@ -120,7 +120,7 @@ namespace Engine
 	}
 
     Animation makeAnimation(const std::string& name, const json& jAnim, Vector2D<int> pixelsPerFrame, 
-        const Vector2D<float> offsetFromTransform, const Vector2D<size_t> dimensions, const Vector2D<float> frameSize) 
+        const Vector2D<float> offsetFromTransform, const Vector2D<size_t> dimensions, const Vector2D<float> frameSize, const bool drawDebug, const std::string& debugColor) 
         // name, value, pixelsPerFrame, offsetFromTransform, dimensions, size, value
     {
         Animation a;
@@ -133,6 +133,8 @@ namespace Engine
 		a.m_size = frameSize;
 		a.m_offsetFromTransform = offsetFromTransform;
         a.m_loop = jAnim.at("Loop").get<bool>();
+		a.m_drawDebug = drawDebug;
+		a.m_debugColor = debugColor;
 
 		// ENGINE_CRITICAL_D("Animation created: " + a.m_name + " with " + std::to_string(a.m_frames.size()) + " frames and duration " + std::to_string(a.m_frameDuration));
 
@@ -226,14 +228,17 @@ namespace Engine
 				}
 
                 bool drawDebug = false;
-				if (characterRulesJson["Transform"].contains("DrawDebug"))
-				{
-					const auto& drawDebugJson = characterRulesJson["Transform"]["DrawDebug"];
-					if (drawDebugJson.is_boolean())
-					{
-						drawDebug = drawDebugJson.get<bool>();
-					}
-				}
+                std::string debugColor = "red";
+                if (characterRulesJson["Transform"].contains("DrawDebug"))
+                {
+                    drawDebug = true;
+
+                    const auto& drawDebugJson = characterRulesJson["Transform"]["DrawDebug"];
+                    if (drawDebugJson.is_string())
+                    {
+                        debugColor = drawDebugJson;
+                    }
+                }
 
                 m_refECS.AddComponent<Transform>(
                     tileEntity,
@@ -241,7 +246,7 @@ namespace Engine
                         y * static_cast<float>(m_numUnitsPerTile)),
                     Vector2D<float>(static_cast<float>(m_numUnitsPerTile),
                         static_cast<float>(m_numUnitsPerTile)),
-					1.0f, 1.0f, 1, zIndex, drawDebug
+					1.0f, 1.0f, 1, zIndex, drawDebug, debugColor
                 );
             }
 
@@ -609,6 +614,21 @@ namespace Engine
 					}
 				}
 
+                bool drawDebug = false;
+				std::string debugColor = "red";
+				if (characterRulesJson.contains("SpriteSheet") && characterRulesJson["SpriteSheet"].contains("DrawDebug"))
+				{
+					drawDebug = true;
+
+					const auto& drawDebugJson = characterRulesJson["SpriteSheet"]["DrawDebug"];
+					if (drawDebugJson.is_string())
+					{
+                        debugColor = drawDebugJson;
+                        ENGINE_CRITICAL_D("Debug color: " + debugColor);
+
+					}
+				}
+
 				// TODO: Get animation data from the JSON file.
 				std::unordered_map<std::string, Animation> animations;
 				json j = json::parse(characterRulesJson["Animations"].dump());
@@ -618,7 +638,7 @@ namespace Engine
                 for (auto& [name, value] : j.items())
                 {
                     animations.emplace(name, makeAnimation(name, value, pixelsPerFrame, offsetFromTransform,
-                        dimensions, frameSize));
+                        dimensions, frameSize, drawDebug, debugColor));
                 }
 
 

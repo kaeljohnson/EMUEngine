@@ -199,17 +199,21 @@ namespace Engine
 			object.m_sizeInPixelsOnScreen.Y
 		};
 
+		std::string_view debugColor = object.m_debugColor;
+
+		if (debugColor == "green") SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+		else if (debugColor == "blue") SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 255, SDL_ALPHA_OPAQUE);
+		else if (debugColor == "black") SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+		else SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE); // Default to red
+
 		if (object.m_filled)
 		{
 			// Draw a black rectangle for debug objects
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, 0);
 			SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
 			ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, 0.0, nullptr, SDL_FLIP_NONE);
 		}
 		else
 		{
-			// Green boxes
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 			SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
 			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 		}
