@@ -27,14 +27,16 @@ namespace Engine
 		float Scale;
 		int DirectionFacing;
 		bool m_drawDebug;
+		std::string m_debugColor;
 
 		Transform(Entity entity) : PrevPosition(0.0f, 0.0f), Position(0.0f, 0.0f),
-			Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1), ZIndex(0), m_drawDebug(false), Component(entity) {}
+			Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1), ZIndex(0), m_drawDebug(false), m_debugColor("red"), Component(entity) {}
 
-		Transform(Entity entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction, int zIndex, const bool drawDebug) :
+		Transform(Entity entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction, int zIndex, const bool drawDebug, std::string debugColor) :
 			PrevPosition(position), Position(position),
 			Dimensions(dimensions), Rotation(rotation), Scale(scale), 
 			DirectionFacing(direction), ZIndex(zIndex), m_drawDebug(drawDebug),
+			m_debugColor(debugColor),
 			Component(entity) {}
 
 		~Transform() = default;
@@ -118,11 +120,13 @@ namespace Engine
 
 	struct DebugObject
 	{
-		DebugObject(size_t entity, bool filled, Vector2D<int> locationInPixelsOnScreen, Vector2D<int> sizeInPixelsOnScreen)
-			: m_entity(entity), m_filled(filled), m_locationInPixelsOnScreen(locationInPixelsOnScreen), m_sizeInPixelsOnScreen(sizeInPixelsOnScreen) {}
+		DebugObject(size_t entity, bool filled, Vector2D<int> locationInPixelsOnScreen, Vector2D<int> sizeInPixelsOnScreen, std::string debugColor)
+			: m_entity(entity), m_filled(filled), m_locationInPixelsOnScreen(locationInPixelsOnScreen), 
+			m_sizeInPixelsOnScreen(sizeInPixelsOnScreen), m_debugColor(debugColor) {}
 
 		size_t m_entity;
 		bool m_filled;
+		std::string m_debugColor;
 		Vector2D<int> m_locationInPixelsOnScreen;
 		Vector2D<int> m_sizeInPixelsOnScreen;
 	};
@@ -251,10 +255,10 @@ namespace Engine
 		Animation() = default;
 		Animation(std::string name, std::vector<int> frames, int frameDuration, 
 			Vector2D<int> pixelsPerFrame, Vector2D<float> offsetFromTransform, 
-			Vector2D<size_t> dimensions, bool loop, Vector2D<float> size)
+			Vector2D<size_t> dimensions, bool loop, Vector2D<float> size, const bool drawDebug, std::string debugColor)
 			: m_name(name), m_frames(frames), m_numFrames(frames.size()), m_frameTime(0), 
 			m_frameDuration(frameDuration), m_pixelsPerFrame(pixelsPerFrame), 
-			m_dimensions(dimensions), m_loop(loop), m_size(size)
+			m_dimensions(dimensions), m_loop(loop), m_size(size), m_drawDebug(drawDebug)
 		{
 		};
 		
@@ -268,6 +272,8 @@ namespace Engine
 		Vector2D<int> m_pixelsPerFrame;
 		Vector2D<size_t> m_dimensions;	 // Dimensions of the sprite sheet in frames (width, height)
 		Vector2D<float> m_size;
+		bool m_drawDebug;
+		std::string m_debugColor;
 		
 		Vector2D<float> m_offsetFromTransform;
 		bool m_loop;

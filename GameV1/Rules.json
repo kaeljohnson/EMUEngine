@@ -20,7 +20,7 @@
             "Transform": 
             {
                 "ZIndex": 1,
-                "DrawDebug": true
+                "DrawDebug": "red"
                 
             },
             "Camera":
@@ -42,7 +42,8 @@
                 "SizeInUnits": [1.0, 1.0],
                 "OffsetFromTransform": [-0.25, -0.05],
                 "Height": 3,
-                "Width": 4
+                "Width": 4,
+                "DrawDebug": "green"
             },
             "Animations":
             {
@@ -154,7 +155,8 @@
             },
             "Transform":
             {
-                "ZIndex": 1
+                "ZIndex": 2,
+                "DrawDebug": "red"
             },
             "SpriteSheet": 
             {
@@ -162,14 +164,288 @@
                 "PixelsPerFrame": [32, 32],
                 "SizeInUnits": [1.0, 1.0],
                 "OffsetFromTransform": [0.0, 0.0],
-                "Height": 3,
-                "Width": 4
+                "Height": 20,
+                "Width": 40,
+                "DrawDebug": "green"
             },
             "Animations":
             {
                 "Idle": 
                 {
-                    "Frames": [1],
+                    "Frames": [42],
+                    "FrameTime": 20,
+                    "Loop": true
+                }
+            }
+        },
+        "c":
+        {
+            "ActiveOnStart": true,
+            "Physics":
+            {
+                "BodyType": "STATIC",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "CheckSimpleContacts": false,
+                "UseChains": true
+            },
+            "Transform":
+            {
+                "ZIndex": 2,
+                "DrawDebug": "red"
+            },
+            "SpriteSheet": 
+            {
+                "Path": "DetailedGrasstilemap.png",
+                "PixelsPerFrame": [32, 32],
+                "SizeInUnits": [1.0, 1.0],
+                "OffsetFromTransform": [0.0, 0.0],
+                "Height": 20,
+                "Width": 40,
+                "DrawDebug": "green"
+            },
+            "Animations":
+            {
+                "Idle": 
+                {
+                    "Frames": [41],
+                    "FrameTime": 20,
+                    "Loop": true
+                }
+            }
+        },
+        "v":
+        {
+            "ActiveOnStart": true,
+            "Physics":
+            {
+                "BodyType": "STATIC",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "CheckSimpleContacts": false,
+                "UseChains": true
+            },
+            "Transform":
+            {
+                "ZIndex": 1,
+                "DrawDebug": "red"
+            },
+            "SpriteSheet": 
+            {
+                "Path": "DetailedGrasstilemap.png",
+                "PixelsPerFrame": [32, 32],
+                "SizeInUnits": [1.0, 1.0],
+                "OffsetFromTransform": [0.0, 0.0],
+                "Height": 20,
+                "Width": 40,
+                "DrawDebug": "green"
+            },
+            "Animations":
+            {
+                "Idle": 
+                {
+                    "Frames": [43],
+                    "FrameTime": 20,
+                    "Loop": true
+                }
+            }
+        },
+        "e":
+        {
+            "ActiveOnStart": true,
+            "Physics":
+            {
+                "BodyType": "STATIC",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "CheckSimpleContacts": false,
+                "UseChains": true
+            },
+            "Transform":
+            {
+                "ZIndex": 1,
+                "DrawDebug": "red"
+            },
+            "SpriteSheet": 
+            {
+                "Path": "DetailedGrasstilemap.png",
+                "PixelsPerFrame": [32, 32],
+                "SizeInUnits": [1.0, 1.0],
+                "OffsetFromTransform": [0.0, 0.0],
+                "Height": 20,
+                "Width": 40,
+                "DrawDebug": "green"
+            },
+            "Animations":
+            {
+                "Idle": 
+                {
+                    "Frames": [82],
+                    "FrameTime": 20,
+                    "Loop": true
+                }
+            }
+        },
+        "l":
+        {
+            "ActiveOnStart": true,
+            "Physics":
+            {
+                "BodyType": "STATIC",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "CheckSimpleContacts": false,
+                "UseChains": true
+            },
+            "Transform":
+            {
+                "ZIndex": 1,
+                "DrawDebug": "red"
+            },
+            "SpriteSheet": 
+            {
+                "Path": "DetailedGrasstilemap.png",
+                "PixelsPerFrame": [32, 32],
+                "SizeInUnits": [1.0, 1.0],
+                "OffsetFromTransform": [0.0, 0.0],
+                "Height": 20,
+                "Width": 40,
+                "DrawDebug": "green"
+            },
+            "Animations":
+            {
+                "Idle": 
+                {
+                    "Frames": [81],
+                    "FrameTime": 20,
+                    "Loop": true
+                }
+            }
+        },
+        "r":
+        {
+            "ActiveOnStart": true,
+            "Physics":
+            {
+                "BodyType": "STATIC",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "CheckSimpleContacts": false,
+                "UseChains": true
+            },
+            "Transform":
+            {
+                "ZIndex": 1,
+                "DrawDebug": "red"
+            },
+            "SpriteSheet": 
+            {
+                "Path": "DetailedGrasstilemap.png",
+                "PixelsPerFrame": [32, 32],
+                "SizeInUnits": [1.0, 1.0],
+                "OffsetFromTransform": [0.0, 0.0],
+                "Height": 20,
+                "Width": 40,
+                "DrawDebug": "green"
+            },
+            "Animations":
+            {
+                "Idle": 
+                {
+                    "Frames": [83],
+                    "FrameTime": 20,
+                    "Loop": true
+                }
+            }
+        },
+        "d":
+        {
+            "ActiveOnStart": true,
+            "Physics":
+            {
+                "BodyType": "STATIC",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "CheckSimpleContacts": false,
+                "UseChains": true
+            },
+            "Transform":
+            {
+                "ZIndex": 1,
+                "DrawDebug": "red"
+            },
+            "SpriteSheet": 
+            {
+                "Path": "DetailedGrasstilemap.png",
+                "PixelsPerFrame": [32, 32],
+                "SizeInUnits": [1.0, 1.0],
+                "OffsetFromTransform": [0.0, 0.0],
+                "Height": 20,
+                "Width": 40,
+                "DrawDebug": "green"
+            },
+            "Animations":
+            {
+                "Idle": 
+                {
+                    "Frames": [121],
+                    "FrameTime": 20,
+                    "Loop": true
+                }
+            }
+        },
+        "f":
+        {
+            "ActiveOnStart": true,
+            "Physics":
+            {
+                "BodyType": "STATIC",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "CheckSimpleContacts": false,
+                "UseChains": true
+            },
+            "Transform":
+            {
+                "ZIndex": 1,
+                "DrawDebug": "red"
+            },
+            "SpriteSheet": 
+            {
+                "Path": "DetailedGrasstilemap.png",
+                "PixelsPerFrame": [32, 32],
+                "SizeInUnits": [1.0, 1.0],
+                "OffsetFromTransform": [0.0, 0.0],
+                "Height": 20,
+                "Width": 40,
+                "DrawDebug": "green"
+            },
+            "Animations":
+            {
+                "Idle": 
+                {
+                    "Frames": [123],
                     "FrameTime": 20,
                     "Loop": true
                 }
