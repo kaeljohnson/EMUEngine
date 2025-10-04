@@ -112,7 +112,7 @@ namespace Engine
 
 			SDL_RenderSetClipRect((SDL_Renderer*)m_ptrRenderer, &clipRect);
 
-			for (auto& [key, vec] : refCamera.m_renderBucket) 
+			for (auto& [key, vec] : std::views::reverse(refCamera.m_renderBucket)) 
 			{					
 				for (auto& value : vec) 
 				{
@@ -122,7 +122,7 @@ namespace Engine
 			refCamera.m_renderBucket.clear(); // CLEAR MAP EACH FRAME.
 
 #ifndef NDEBUG // DO NOT ADD DEBUG OBJECTS WHEN NOT IN DEBUG AS THE QUEUES WILL GROW INDEFINITELY.
-			for (auto& [key, vec] : refCamera.m_debugRenderBucket)
+			for (auto& [key, vec] : std::views::reverse(refCamera.m_debugRenderBucket))
 			{
 				for (auto& value : vec)
 				{
@@ -131,7 +131,7 @@ namespace Engine
 			}
 			refCamera.m_debugRenderBucket.clear(); // CLEAR MAP EACH FRAME.
 
-			for (auto& [key, vec] : refCamera.m_debugLinesRenderBucket)
+			for (auto& [key, vec] : std::views::reverse(refCamera.m_debugLinesRenderBucket))
 			{
 				for (auto& value : vec)
 				{
