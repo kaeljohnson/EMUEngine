@@ -450,6 +450,45 @@
                     "Loop": true
                 }
             }
+        },
+        "j":
+        {
+            "ActiveOnStart": true,
+            "Physics":
+            {
+                "BodyType": "STATIC",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "CheckSimpleContacts": false,
+                "UseChains": true
+            },
+            "Transform":
+            {
+                "ZIndex": 1,
+                "DrawDebug": "red"
+            },
+            "SpriteSheet": 
+            {
+                "Path": "DetailedGrasstilemap.png",
+                "PixelsPerFrame": [32, 32],
+                "SizeInUnits": [1.0, 1.0],
+                "OffsetFromTransform": [0.0, 0.0],
+                "Height": 20,
+                "Width": 40,
+                "DrawDebug": "green"
+            },
+            "Animations":
+            {
+                "Idle": 
+                {
+                    "Frames": [46],
+                    "FrameTime": 20,
+                    "Loop": true
+                }
+            }
         }
     }
 }
