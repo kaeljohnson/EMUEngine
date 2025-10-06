@@ -6,6 +6,7 @@
 #include "Events/IOEventSystem.h"
 #include "Physics/Physics.h"
 #include "Camera/CameraInterface.h"
+#include "Audio/AudioSystem.h"
 #include "TransformInterface.h"
 #include "AssetManager.h"
 #include "Animations/AnimationSystem.h"
@@ -92,6 +93,9 @@ namespace Engine
 		ECS m_ecs;
 		AssetManager m_assetManager;
 		AnimationSystem m_animationSystem;
+
+		AudioSystem m_audioSystem;
+		AudioInterface m_audioInterface;
 
 		PhysicsInterface m_physicsInterface;
 		CameraInterface m_cameraInterface;
