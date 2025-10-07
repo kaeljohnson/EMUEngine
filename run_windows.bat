@@ -4,10 +4,10 @@ setlocal
 :: Default to Debug if no configuration is specified
 if "%~1"=="" (set CONFIG=Debug) else (set CONFIG=%~1)
 
-:: Convert the configuration to lowercase
+:: Convert to lowercase
 for /f %%i in ('echo %CONFIG% ^| powershell -Command "$input | ForEach-Object { $_.ToLower() }"') do set CONFIG=%%i
 
-:: Check if the configuration is valid
+:: Map "distribution" to "release"
 if "%CONFIG%"=="distribution" (
     set CONFIG=release
 ) else if not "%CONFIG%"=="debug" if not "%CONFIG%"=="release" (
@@ -17,34 +17,32 @@ if "%CONFIG%"=="distribution" (
 )
 
 :: Check if vcpkg exists
-if exist vcpkg\ (
-    echo vcpkg exists
-) else (
-    cd Emu/external
-    call git clone https://github.com/microsoft/vcpkg.git
+if not exist Emu\external\vcpkg\ (
+    echo Cloning and bootstrapping vcpkg...
+    cd Emu\external
+    git clone https://github.com/microsoft/vcpkg.git
     cd vcpkg
     call bootstrap-vcpkg.bat
     call vcpkg integrate install
-    call vcpkg install sdl2 sdl2-image gtest nlohmann-json
     cd ../../..
 )
 
-:: Build Box2D with the specified configuration
-cd Emu\external\box2d\
-echo Deleting wrong builds...
-if "%CONFIG%"=="debug" if exist build\bin\release\ (rmdir /s /q build\bin\release)
-if "%CONFIG%"=="release" if exist build\bin\debug\ (rmdir /s /q build\bin\debug)
-if not exist build\bin\%CONFIG%\ (
-    echo Building %CONFIG%...
-    if not exist build\ (mkdir build)
-    cd build
-    cmake -DBOX2D_BUILD_DOCS=ON -DCMAKE_INSTALL_PREFIX="install" ..
-    cmake --build .
-    cmake --build . --target INSTALL
-    cd ..
-)
+:: Install dependencies via vcpkg
+cd Emu\external\vcpkg
+call vcpkg install sdl2 sdl2-image sdl2-mixer gtest nlohmann-json
+cd ../../..
 
-cd ../../../
+:: Build Box2D if needed
+cd Emu\external\box2d
+if not exist build\ (mkdir build)
+cd build
+if not exist install\ (
+    echo Building Box2D (%CONFIG%)...
+    cmake -DBOX2D_BUILD_DOCS=ON -DCMAKE_INSTALL_PREFIX="install" ..
+    cmake --build . --config %CONFIG%
+    cmake --install . --config %CONFIG%
+)
+cd ../../../..
 
 :: Run premake
 call Emu\external\premake\premake5.exe vs2022
