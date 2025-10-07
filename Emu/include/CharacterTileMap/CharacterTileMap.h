@@ -30,6 +30,8 @@ namespace Engine
 		void LoadMap();
 		void UnloadMap();
 
+		void LoadAudioFiles();
+
 	public:
 		std::vector<std::pair<Entity, char>> m_allMapEntities;
 

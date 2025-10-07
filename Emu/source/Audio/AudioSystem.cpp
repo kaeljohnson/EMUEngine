@@ -1,4 +1,8 @@
 #include "../../include/Audio/AudioSystem.h"
+#include "../../include/ECS/ECS.h"
+#include "../../include/Components.h"
+#include "../../include/AssetManager.h"
+#include "../../include/ISDL/ISDL.h"
 
 namespace Engine
 {
@@ -7,9 +11,16 @@ namespace Engine
 	{
 	}
 
-	AudioSystem::AudioSystem(ECS& refECS)
-		: m_refECS(refECS)
+	AudioSystem::AudioSystem(ECS& refECS, AssetManager& refAssetManager)
+		: m_refECS(refECS), m_refAssetManager(refAssetManager)
 	{
 	}
 
+	void AudioSystem::PlaySound(const std::string& soundName, int volume)
+	{
+		Mix_Chunk* ptrSound = (Mix_Chunk*)m_refAssetManager.GetSound(soundName);
+		Mix_VolumeChunk(ptrSound, volume);
+
+		Mix_PlayChannel(-1, ptrSound, 0);
+	}
 }

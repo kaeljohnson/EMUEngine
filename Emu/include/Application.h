@@ -8,6 +8,7 @@
 #include "Core.h"
 #include "AssetManager.h"
 #include "Animations/AnimationSystem.h"
+#include "Audio/AudioSystem.h"
 #include "AssetManager.h"
 
 namespace Engine
@@ -15,7 +16,8 @@ namespace Engine
 	class Application
 	{
 	public:
-		Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, AssetManager& refAssetManager, AnimationSystem& refAnimationSystem);
+		Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, 
+			AssetManager& refAssetManager, AudioSystem& refAudioSystem, AnimationSystem& refAnimationSystem);
 		void Start();
 		void End();
 
@@ -39,6 +41,7 @@ namespace Engine
 		Scene* m_ptrCurrentScene;
 		IOEventSystem& m_refIOEventSystem;
 		AnimationSystem& m_refAnimationSystem;
+		AudioSystem& m_refAudioSystem;
 		AssetManager& m_refAssetManager;
 	};
 }

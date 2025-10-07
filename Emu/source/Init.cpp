@@ -11,8 +11,14 @@ namespace Engine
 	{
 		ENGINE_TRACE_D("Logger initialized!");
 
-		if (!ISDL::ImgInit(IMG_INIT_PNG))
+		if (ISDL::ImgInit(IMG_INIT_PNG) < 0)
 			ENGINE_CRITICAL("IMG Init failed! SDL_Error: " + std::string(ISDL::GetError()));
+
+		if (ISDL::AudioInit(SDL_INIT_AUDIO) < 0)
+			ENGINE_CRITICAL("SDL_mixer Init failed! Mix_Error: " + std::string(Mix_GetError()));
+
+		if (ISDL::MixOpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+			ENGINE_CRITICAL("SDL_mixer OpenAudio failed! Mix_Error: " + std::string(Mix_GetError()));
 
 		if (ISDL::Init() < 0)
 			ENGINE_CRITICAL("SDL Init failed! SDL_Error: " + std::string(ISDL::GetError()));

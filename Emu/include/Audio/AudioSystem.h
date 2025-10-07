@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../ECS/ECS.h"
+#include "../AssetManager.h"
 
 namespace Engine
 {
@@ -23,10 +24,11 @@ namespace Engine
 	class AudioSystem
 	{
 	public:
-		AudioSystem(ECS& refECS);
+		AudioSystem(ECS& refECS, AssetManager& refAssetManager); // temporarily takes the AssetManager as a parameter
 		~AudioSystem() = default;
 
-
+		// Plays a sound by its name once. Volume is from 0 to 128 (max).
+		void PlaySound(const std::string& soundName, int volume = 128);
 
 		// Deleted functions to ensure our AudioSystem instance cannot be copied or moved.
 		AudioSystem(const AudioSystem&) = delete;
@@ -37,5 +39,6 @@ namespace Engine
 	private:
 
 		ECS& m_refECS;
+		AssetManager& m_refAssetManager;
 	};
 }

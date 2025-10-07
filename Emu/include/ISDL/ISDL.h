@@ -27,6 +27,14 @@ namespace Engine
             return IMG_Init(flags);
         }
 
+		static int AudioInit(int flags) {
+			return Mix_Init(flags);
+		}
+
+		static int MixOpenAudio(int frequency, Uint16 format, int channels, int chunksize) {
+			return Mix_OpenAudio(frequency, format, channels, chunksize);
+		}
+
         static void Quit() {
             SDL_Quit();
         }

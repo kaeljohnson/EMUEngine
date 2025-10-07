@@ -1,6 +1,11 @@
 {
     "PathToSpriteSheets": "Assets/Sprites/",
+    "PathToAudioFiles": "Assets/Sounds/",
     "NumMetersPerTile": 1,
+    "Sounds":
+    {
+        "Boing": "boing.wav"  
+    },
     "Tile Rules":
     {
         "All": {},

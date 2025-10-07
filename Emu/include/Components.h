@@ -292,4 +292,17 @@ namespace Engine
 		std::string m_currentAnimation;  // Name of the current animation being played
 		
 	};
+
+	struct AudioSource : public Component
+	{
+		AudioSource(Entity entity, const std::string& soundName)
+			: m_enabled(false), m_loop(false), m_volume(0), m_soundName(soundName), Component(entity) {}
+
+		~AudioSource() = default;
+
+		bool m_enabled;
+		bool m_loop;
+		int m_volume; // 0 - 128
+		std::string m_soundName;
+	};
 }

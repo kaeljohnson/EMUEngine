@@ -84,21 +84,17 @@ namespace Engine
 		return m_loadedTextures.at(indexIterator->second);
 	}
 
-	void AssetManager::LoadSound(Entity entity, const std::string& filePath)
+	void AssetManager::LoadSound(const std::string& soundName, const std::string& filePath)
 	{
 		// Check if already loaded
-		auto it = m_soundIndices.find(filePath);
+		auto it = m_soundIndices.find(soundName);
 		if (it != m_soundIndices.end())
 		{
-			ENGINE_INFO("Adding entity to sound: " + std::to_string(entity));
-
-			// Sound already loaded, just map entity to existing sound
-			m_soundNames[entity] = filePath;
-			return;
+			ENGINE_INFO("Sound already exists! Skipping");
 		}
 
 		// Otherwise, load new sound
-		ENGINE_INFO("Loading new sound: " + filePath);
+		ENGINE_INFO("Loading new sound: " + soundName);
 
 		// Load sound
 		Mix_Chunk* ptrSound = Mix_LoadWAV(filePath.c_str());
@@ -109,11 +105,10 @@ namespace Engine
 		}
 
 		// Store sound
-		ENGINE_INFO("Sound loaded: " + filePath);
+		ENGINE_INFO("Sound loaded: " + soundName);
 		m_loadedSounds.push_back(ptrSound);
 		size_t index = m_loadedSounds.size() - 1;
-		m_soundNames[entity] = filePath;
-		m_soundIndices[filePath] = index;
+		m_soundIndices[soundName] = index;
 	}
 
 	void AssetManager::UnloadSounds()
@@ -127,17 +122,13 @@ namespace Engine
 		}
 		m_loadedSounds.clear();
 		m_soundIndices.clear();
-		m_soundNames.clear();
 	}
 
-	void* AssetManager::GetSound(Entity entity)
+	void* AssetManager::GetSound(const std::string& soundName)
 	{
-		auto filePathIterator = m_soundNames.find(entity);
-		if (filePathIterator == m_soundNames.end()) return nullptr;
+		auto soundIndexIterator = m_soundIndices.find(soundName);
+		if (soundIndexIterator == m_soundIndices.end()) return nullptr;
 
-		auto indexIterator = m_soundIndices.find(filePathIterator->second);
-		if (indexIterator == m_soundIndices.end()) return nullptr;
-
-		return m_loadedSounds.at(indexIterator->second);
+		return m_loadedSounds.at(soundIndexIterator->second);
 	}
 }
