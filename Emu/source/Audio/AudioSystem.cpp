@@ -16,11 +16,12 @@ namespace Engine
 	{
 	}
 
-	void AudioSystem::PlaySound(const std::string& soundName, int volume)
+	void AudioSystem::PlaySound(const std::string& soundName, int volume, const bool loop)
 	{
+		ENGINE_CRITICAL_D("Playing sound: " + soundName);
 		Mix_Chunk* ptrSound = (Mix_Chunk*)m_refAssetManager.GetSound(soundName);
 		Mix_VolumeChunk(ptrSound, volume);
 
-		Mix_PlayChannel(-1, ptrSound, 0);
+		Mix_PlayChannel(-1, ptrSound, (loop ? -1 : 0));
 	}
 }

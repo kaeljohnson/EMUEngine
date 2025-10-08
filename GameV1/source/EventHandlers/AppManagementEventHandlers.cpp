@@ -93,6 +93,13 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			Engine::EMU::GetInstance()->Deactivate(testEntity);
 		});
 
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::Y_KEY_DOWN, [](Engine::IOEvent& e)
+		{
+			CLIENT_TRACE_D("Handled event Y KEY DOWN: " + std::to_string(static_cast<int>(Engine::Y_KEY_DOWN)));
+			Engine::EMU::GetInstance()->PlaySound("TenseBackGround", 128, true);
+			CLIENT_TRACE_D("Done with Y key down listener");
+		});
+
 	/*Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::U_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('Y');

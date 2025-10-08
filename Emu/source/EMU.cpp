@@ -94,9 +94,9 @@ namespace Engine
 		m_cameraInterface.ChangeCamera(entity);
 	}*/
 
-	void EMU::PlaySound(const std::string soundName, int volume)
+	void EMU::PlaySound(const std::string soundName, int volume, const bool loop)
 	{
-		m_audioSystem.PlaySound(soundName, volume);
+		m_audioSystem.PlaySound(soundName, volume, loop);
 	}
 
 	void EMU::Deactivate(Entity entity)

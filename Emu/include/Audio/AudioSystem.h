@@ -28,7 +28,7 @@ namespace Engine
 		~AudioSystem() = default;
 
 		// Plays a sound by its name once. Volume is from 0 to 128 (max).
-		void PlaySound(const std::string& soundName, int volume = 128);
+		void PlaySound(const std::string& soundName, int volume = 128, const bool loop = false);
 
 		// Deleted functions to ensure our AudioSystem instance cannot be copied or moved.
 		AudioSystem(const AudioSystem&) = delete;
