@@ -6,11 +6,6 @@
 
 namespace Engine
 {
-	AudioInterface::AudioInterface(ECS& refECS)
-		: m_refECS(refECS)
-	{
-	}
-
 	AudioSystem::AudioSystem(ECS& refECS, AssetManager& refAssetManager)
 		: m_refECS(refECS), m_refAssetManager(refAssetManager)
 	{

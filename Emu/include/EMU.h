@@ -98,7 +98,6 @@ namespace Engine
 		AnimationSystem m_animationSystem;
 
 		AudioSystem m_audioSystem;
-		AudioInterface m_audioInterface;
 
 		PhysicsInterface m_physicsInterface;
 		CameraInterface m_cameraInterface;

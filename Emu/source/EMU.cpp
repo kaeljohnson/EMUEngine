@@ -19,8 +19,7 @@ namespace Engine
 
 	EMU::EMU(const size_t numEntities)
 		: m_ecs(), m_sceneManager(), m_assetManager(), m_animationSystem(m_ecs), 
-		m_audioInterface(m_ecs), m_audioSystem(m_ecs, m_assetManager), 
-		m_physicsInterface(m_ecs), m_transformInterface(m_ecs), m_ioEventSystem(),
+		m_audioSystem(m_ecs, m_assetManager), m_physicsInterface(m_ecs), m_transformInterface(m_ecs), m_ioEventSystem(),
 		m_application(m_ecs, m_sceneManager, m_ioEventSystem, m_assetManager, m_audioSystem, m_animationSystem), m_cameraInterface(m_ecs)
 	{
 		m_ecs.Initialize(numEntities);
