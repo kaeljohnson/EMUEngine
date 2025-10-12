@@ -50,7 +50,7 @@ namespace Engine
 		EMU_API void Deactivate(Entity entity);
 
 		// Play a sound once. Take string temporarily as they may cause dynamic allocations.
-		EMU_API void PlaySound(const std::string soundName, int volume, const bool loop = false);
+		EMU_API void PlaySound(int soundIndex, int volume, const bool loop = false);
 
 		// Cameras updated separately since there can only be one camera active.
 		// EMU_API void ChangeCamera(Entity entity);

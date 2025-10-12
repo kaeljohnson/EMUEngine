@@ -156,11 +156,14 @@ namespace Engine
 
         ENGINE_CRITICAL_D("Sounds: " + j.dump(4));
 
-        for (auto& [name, file] : j.items())
+		m_refAssetManager.PrepareSoundStorage(j.size());
+
+        for (auto& [file, idx] : j.items())
 		{
-			std::string fullPath = audioFilePath + file.get<std::string>();
-			ENGINE_INFO_D("Loading sound: " + name + " from file: " + fullPath);
-			m_refAssetManager.LoadSound(name, fullPath);
+            int idxInt = idx.get<int>();
+            std::string fullPath = audioFilePath + file;
+			ENGINE_INFO_D("Loading sound at index: " + std::to_string(idxInt) + " from file: " + fullPath);
+			m_refAssetManager.LoadSound(idxInt, fullPath);
         }
     }
 

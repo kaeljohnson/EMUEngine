@@ -257,7 +257,7 @@
         case PlayerState::Jumping:
             m_canJump = false;
             m_refPhysicsInterface.SetYVelocity(entity, 0.0f);
-            Engine::EMU::GetInstance()->PlaySound("Boing", 64); // For some reason this plays the sound multiple times if the space bar is held for even a little while.
+            Engine::EMU::GetInstance()->PlaySound(0, 64); // For some reason this plays the sound multiple times if the space bar is held for even a little while.
             m_refPhysicsInterface.ApplyImpulseToBody(entity, { 0.0f, -MIN_JUMP_FORCE });
             break;
 

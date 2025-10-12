@@ -4,8 +4,8 @@
     "NumMetersPerTile": 1,
     "Sounds":
     {
-        "Boing": "boing.wav",
-        "TenseBackGround": "TenseMusic.wav"
+        "boing.wav": 0,
+        "TenseMusic.wav": 1
     },
     "Tile Rules":
     {

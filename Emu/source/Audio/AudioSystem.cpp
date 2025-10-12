@@ -11,12 +11,21 @@ namespace Engine
 	{
 	}
 
-	void AudioSystem::PlaySound(const std::string& soundName, int volume, const bool loop)
+	void AudioSystem::PlaySound(int soundIndex, int volume, const bool loop)
 	{
-		ENGINE_CRITICAL_D("Playing sound: " + soundName);
-		Mix_Chunk* ptrSound = (Mix_Chunk*)m_refAssetManager.GetSound(soundName);
+		ENGINE_CRITICAL_D("Playing sound: " + std::to_string(soundIndex));
+		Mix_Chunk* ptrSound = (Mix_Chunk*)m_refAssetManager.GetSound(soundIndex);
+		if (!ptrSound)
+		{
+			ENGINE_CRITICAL("Sound not found: " + std::to_string(soundIndex));
+			return;
+		}
+
 		Mix_VolumeChunk(ptrSound, volume);
 
-		Mix_PlayChannel(-1, ptrSound, (loop ? -1 : 0));
+		if (Mix_PlayChannel(-1, ptrSound, (loop ? -1 : 0)) == -1)
+		{
+			ENGINE_CRITICAL("No free channel to play sound!");
+		}
 	}
 }

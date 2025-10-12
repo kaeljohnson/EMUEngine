@@ -84,19 +84,20 @@ namespace Engine
 		return m_loadedTextures.at(indexIterator->second);
 	}
 
-	void AssetManager::LoadSound(const std::string& soundName, const std::string& filePath)
+	void AssetManager::PrepareSoundStorage(const size_t numSounds)
 	{
-		// Check if already loaded
-		auto it = m_soundIndices.find(soundName);
-		if (it != m_soundIndices.end())
+		m_loadedSounds.resize(numSounds, nullptr);
+	}
+
+	// Probably should load sound by name instead of index. Temp for now.
+	void AssetManager::LoadSound(int soundIndex, const std::string& filePath)
+	{
+		if (m_loadedSounds[soundIndex] != nullptr)
 		{
 			ENGINE_INFO("Sound already exists! Skipping");
+			return;
 		}
 
-		// Otherwise, load new sound
-		ENGINE_INFO("Loading new sound: " + soundName);
-
-		// Load sound
 		Mix_Chunk* ptrSound = Mix_LoadWAV(filePath.c_str());
 		if (!ptrSound)
 		{
@@ -104,11 +105,8 @@ namespace Engine
 			return;
 		}
 
-		// Store sound
-		ENGINE_INFO("Sound loaded: " + soundName);
-		m_loadedSounds.push_back(ptrSound);
-		size_t index = m_loadedSounds.size() - 1;
-		m_soundIndices[soundName] = index;
+		ENGINE_INFO("Sound loaded: " + soundIndex);
+		m_loadedSounds[soundIndex] = ptrSound;
 	}
 
 	void AssetManager::UnloadSounds()
@@ -121,14 +119,10 @@ namespace Engine
 			}
 		}
 		m_loadedSounds.clear();
-		m_soundIndices.clear();
 	}
 
-	void* AssetManager::GetSound(const std::string& soundName)
+	void* AssetManager::GetSound(int soundIndex)
 	{
-		auto soundIndexIterator = m_soundIndices.find(soundName);
-		if (soundIndexIterator == m_soundIndices.end()) return nullptr;
-
-		return m_loadedSounds.at(soundIndexIterator->second);
+		return m_loadedSounds.at(soundIndex);
 	}
 }
