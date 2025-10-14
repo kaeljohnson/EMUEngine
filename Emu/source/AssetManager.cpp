@@ -83,4 +83,46 @@ namespace Engine
 
 		return m_loadedTextures.at(indexIterator->second);
 	}
+
+	void AssetManager::PrepareSoundStorage(const size_t numSounds)
+	{
+		m_loadedSounds.resize(numSounds, nullptr);
+	}
+
+	// Probably should load sound by name instead of index. Temp for now.
+	void AssetManager::LoadSound(int soundIndex, const std::string& filePath)
+	{
+		if (m_loadedSounds[soundIndex] != nullptr)
+		{
+			ENGINE_INFO("Sound already exists! Skipping");
+			return;
+		}
+
+		Mix_Chunk* ptrSound = Mix_LoadWAV(filePath.c_str());
+		if (!ptrSound)
+		{
+			ENGINE_CRITICAL("Failed to load sound: " + filePath + ", Mix_Error: " + std::string(Mix_GetError()));
+			return;
+		}
+
+		ENGINE_INFO("Sound loaded: " + soundIndex);
+		m_loadedSounds[soundIndex] = ptrSound;
+	}
+
+	void AssetManager::UnloadSounds()
+	{
+		for (void* sound : m_loadedSounds)
+		{
+			if (sound)
+			{
+				Mix_FreeChunk((Mix_Chunk*)sound);
+			}
+		}
+		m_loadedSounds.clear();
+	}
+
+	void* AssetManager::GetSound(int soundIndex)
+	{
+		return m_loadedSounds.at(soundIndex);
+	}
 }

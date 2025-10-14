@@ -38,6 +38,7 @@ project "Emu"
 		"SDL2",
 		"/manual-link/SDL2main",
 		"SDL2_image",
+        "SDL2_mixer",
 		"box2dd"
     }
 

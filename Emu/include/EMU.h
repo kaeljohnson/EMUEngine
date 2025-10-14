@@ -6,6 +6,7 @@
 #include "Events/IOEventSystem.h"
 #include "Physics/Physics.h"
 #include "Camera/CameraInterface.h"
+#include "Audio/AudioSystem.h"
 #include "TransformInterface.h"
 #include "AssetManager.h"
 #include "Animations/AnimationSystem.h"
@@ -47,6 +48,9 @@ namespace Engine
 		
 		// Deactivate all components in entity
 		EMU_API void Deactivate(Entity entity);
+
+		// Play a sound once. Take string temporarily as they may cause dynamic allocations.
+		EMU_API void PlaySound(int soundIndex, int volume, const bool loop = false);
 
 		// Cameras updated separately since there can only be one camera active.
 		// EMU_API void ChangeCamera(Entity entity);
@@ -92,6 +96,8 @@ namespace Engine
 		ECS m_ecs;
 		AssetManager m_assetManager;
 		AnimationSystem m_animationSystem;
+
+		AudioSystem m_audioSystem;
 
 		PhysicsInterface m_physicsInterface;
 		CameraInterface m_cameraInterface;

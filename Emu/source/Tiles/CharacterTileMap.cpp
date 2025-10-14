@@ -141,6 +141,32 @@ namespace Engine
         return a;
     }
 
+    void CharacterTileMap::LoadAudioFiles()
+    {
+        if (!rulesJson.contains("Sounds"))
+        {
+            ENGINE_INFO_D("No audio files found in rules file.");
+            return;
+        }
+
+        const auto& audioFilePathJson = rulesJson["PathToAudioFiles"];
+        std::string audioFilePath = audioFilePathJson;
+
+        json j = json::parse(rulesJson["Sounds"].dump());
+
+        ENGINE_CRITICAL_D("Sounds: " + j.dump(4));
+
+		m_refAssetManager.PrepareSoundStorage(j.size());
+
+        for (auto& [file, idx] : j.items())
+		{
+            int idxInt = idx.get<int>();
+            std::string fullPath = audioFilePath + file;
+			ENGINE_INFO_D("Loading sound at index: " + std::to_string(idxInt) + " from file: " + fullPath);
+			m_refAssetManager.LoadSound(idxInt, fullPath);
+        }
+    }
+
 	void CharacterTileMap::LoadMap()
 	{
         std::unordered_set<char> isSolid;
@@ -634,7 +660,6 @@ namespace Engine
 					if (drawDebugJson.is_string())
 					{
                         debugColor = drawDebugJson;
-                        ENGINE_CRITICAL_D("Debug color: " + debugColor);
 
 					}
 				}
@@ -642,8 +667,6 @@ namespace Engine
 				// TODO: Get animation data from the JSON file.
 				std::unordered_map<std::string, Animation> animations;
 				json j = json::parse(characterRulesJson["Animations"].dump());
-
-                ENGINE_CRITICAL_D("Animations: " + j.dump(4));
 
                 for (auto& [name, value] : j.items())
                 {
@@ -654,6 +677,16 @@ namespace Engine
 
 				m_refECS.AddComponent<Animations>(tileEntity, animations);
 			}
+
+            if (characterRulesJson.contains("AudioSource"))
+            {
+				const auto& audioJson = characterRulesJson["Audio"];
+				if (audioJson.contains("Path"))
+				{
+					std::string audioPath = audioJson["Path"];
+					m_refECS.AddComponent<AudioSource>(tileEntity, audioPath);
+				}
+            }
 
             // If the character is "ActiveOnStart", activate it in the ECS.
             // MUST CALL AFTER ALL COMPONENTS CREATED.

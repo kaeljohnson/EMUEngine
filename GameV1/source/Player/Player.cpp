@@ -180,7 +180,6 @@
                 {
                     m_jumpCharge += JUMP_CHARGE_INCREMENT;
                 }
-                m_force.Y = -JUMP_FORCE * (MAX_JUMP_CHARGE - m_jumpCharge);
             }
             break;
 
@@ -258,6 +257,7 @@
         case PlayerState::Jumping:
             m_canJump = false;
             m_refPhysicsInterface.SetYVelocity(entity, 0.0f);
+            Engine::EMU::GetInstance()->PlaySound(0, 64); // For some reason this plays the sound multiple times if the space bar is held for even a little while.
             m_refPhysicsInterface.ApplyImpulseToBody(entity, { 0.0f, -MIN_JUMP_FORCE });
             break;
 

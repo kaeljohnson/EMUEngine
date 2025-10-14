@@ -42,13 +42,16 @@ namespace Engine
 		// 1. Create the world.
 		m_physicsSimulation.CreateWorld(Vector2D<float>(0.0f, 100.0f)); //TODO: Client sets gravity.
 
-		// 2. Load the map. Adds components defined in the rules file and adds them to the ECS.
+		// 2. Load audio files for the tile map.
+		m_tileMap.LoadAudioFiles();
+
+		// 3. Load the map. Adds components defined in the rules file and adds them to the ECS.
 		m_tileMap.LoadMap();
 
-		// 3. Activate the entities in the ECS. This will activate all components in the ECS.
+		// 4. Activate the entities in the ECS. This will activate all components in the ECS.
 		// m_refECS.ActivateEntities(m_entities);
 
-		// 4. Frame the cameras, deactivate all but first camera.
+		// 5. Frame the cameras, deactivate all but first camera.
 		std::vector<Camera>& activeCameras = m_refECS.GetHotComponents<Camera>();
 
 		if (activeCameras.size() == 0)
@@ -63,14 +66,14 @@ namespace Engine
 			m_cameraSystem.Frame(activeCameras[idx], Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
 		}
 
-		// 5. Physics bodies need to be added to the world after they are activated and pooled.
+		// 6. Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld(m_entities);
 		m_physicsSimulation.AddLineCollidersToWorld(m_entities);
 
-		// 6. Contact callbacks need to be activated.
+		// 7. Contact callbacks need to be activated.
 		m_physicsSimulation.ActivateContactCallbacks();
 
-		// 7. Deactivate all components that should not be active at the start of the scene?
+		// 8. Deactivate all components that should not be active at the start of the scene?
 
 		ENGINE_CRITICAL_D("Num transforms: " + std::to_string(m_refECS.GetHotComponents<Transform>().size()) + ", Num bodies: "
 			+ std::to_string(m_refECS.GetHotComponents<PhysicsBody>().size()) + ", Num line colliders: "

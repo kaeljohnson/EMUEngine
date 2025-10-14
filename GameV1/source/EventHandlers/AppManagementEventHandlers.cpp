@@ -93,6 +93,11 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			Engine::EMU::GetInstance()->Deactivate(testEntity);
 		});
 
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::Y_KEY_DOWN, [](Engine::IOEvent& e)
+		{
+			Engine::EMU::GetInstance()->PlaySound(1, 128, true);
+		});
+
 	/*Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::U_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('Y');

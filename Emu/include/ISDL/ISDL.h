@@ -3,6 +3,7 @@
 #include "../Includes.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 
 // Wraps all SDL functions and types in case they change.
 
@@ -25,6 +26,14 @@ namespace Engine
         static int ImgInit(int flags) {
             return IMG_Init(flags);
         }
+
+		static int AudioInit(int flags) {
+			return Mix_Init(flags);
+		}
+
+		static int MixOpenAudio(int frequency, Uint16 format, int channels, int chunksize) {
+			return Mix_OpenAudio(frequency, format, channels, chunksize);
+		}
 
         static void Quit() {
             SDL_Quit();

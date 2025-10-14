@@ -1,0 +1,28 @@
+#pragma once
+
+#include "../ECS/ECS.h"
+#include "../AssetManager.h"
+
+namespace Engine
+{
+	class AudioSystem
+	{
+	public:
+		AudioSystem(ECS& refECS, AssetManager& refAssetManager); // temporarily takes the AssetManager as a parameter
+		~AudioSystem() = default;
+
+		// Plays a sound by its name once. Volume is from 0 to 128 (max).
+		void PlaySound(int soundIndex, int volume = 128, const bool loop = false);
+
+		// Deleted functions to ensure our AudioSystem instance cannot be copied or moved.
+		AudioSystem(const AudioSystem&) = delete;
+		AudioSystem& operator=(const AudioSystem&) = delete;
+		AudioSystem(AudioSystem&&) = delete;
+		AudioSystem& operator=(AudioSystem&&) = delete;
+
+	private:
+
+		ECS& m_refECS;
+		AssetManager& m_refAssetManager;
+	};
+}
