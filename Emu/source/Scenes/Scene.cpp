@@ -68,10 +68,8 @@ namespace Engine
 			return;
 		}
 
-		for (size_t idx = 0; idx < activeCameras.size(); idx++)
-		{
-			m_cameraSystem.Frame(activeCameras[idx], Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
-		}
+		m_cameraSystem.Frame(Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
+		
 
 		// 6. Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld(m_entities);
@@ -89,7 +87,7 @@ namespace Engine
 			+ std::to_string(m_tileMap.m_allMapEntities.size()));
 
 		// process items client wants to do.
-		m_clientOnScenePlay();
+		if (m_clientOnScenePlay) m_clientOnScenePlay();
 
 		AppState::IN_SCENE = true;
 	}

@@ -14,28 +14,23 @@ namespace Engine
 {
     CameraSystem::CameraSystem(ECS& refECS) : m_refECS(refECS) {}
 
-    void CameraSystem::Update(AssetManager& refAssetManager)
-    {
-        for (auto& camera : m_refECS.GetHotComponents<Camera>())
-        {
-            CameraUpdater* ptrCameraUpdater = m_refECS.GetComponent<CameraUpdater>(camera.m_entity);
-            if (ptrCameraUpdater)
-                ptrCameraUpdater->Update(camera.m_entity);
-
-            if (camera.m_clampingOn) Clamp(camera);
-
-			// Prepare this camera for rendering
-			PrepareForRendering(camera, refAssetManager);
-        }
-    }
-
-	void CameraSystem::PrepareForRendering(Camera& refCamera, AssetManager& refAssetManager)
+	static void clamp(Camera& refCamera)
 	{
-		
+		if (refCamera.m_offset.X < 0) { refCamera.m_offset.X = 0; }
+		if (refCamera.m_offset.X + refCamera.m_size.X > refCamera.m_bounds.X) { refCamera.m_offset.X = refCamera.m_bounds.X - refCamera.m_size.X; }
+
+		if (refCamera.m_offset.Y < 0) { refCamera.m_offset.Y = 0; }
+		if (refCamera.m_offset.Y + refCamera.m_size.Y > refCamera.m_bounds.Y) { refCamera.m_offset.Y = refCamera.m_bounds.Y - refCamera.m_size.Y; }
+	}
+
+	static void prepareForRendering(Camera& refCamera, AssetManager& refAssetManager, ECS& refECS,
+		const Vector2D<int> viewportSizeInPixels, const Vector2D<float> scale)
+	{
+
 		// Camera setup
 		const Vector2D<float> viewportSizeInTiles(
-			Screen::VIEWPORT_SIZE.X / (refCamera.m_pixelsPerUnit * Screen::SCALE.X),
-			Screen::VIEWPORT_SIZE.Y / (refCamera.m_pixelsPerUnit * Screen::SCALE.Y)
+			viewportSizeInPixels.X / (refCamera.m_pixelsPerUnit * scale.X),
+			viewportSizeInPixels.Y / (refCamera.m_pixelsPerUnit * scale.Y)
 		);
 
 		// Calculate "adjusted offset". This is the offset that takes
@@ -58,12 +53,12 @@ namespace Engine
 		const float renderAreaHeight = bottomRenderBound - topRenderBound;
 
 		// Set the render zone.
-		refCamera.m_clipRectPosition.X = static_cast<int>(refCamera.m_positionInFractionOfScreenSize.X * Screen::VIEWPORT_SIZE.X);
-		refCamera.m_clipRectPosition.Y = static_cast<int>(refCamera.m_positionInFractionOfScreenSize.Y * Screen::VIEWPORT_SIZE.Y);
-		refCamera.m_clipRectSize.X = static_cast<int>(renderAreaWidth * refCamera.m_pixelsPerUnit * Screen::SCALE.X);
-		refCamera.m_clipRectSize.Y = static_cast<int>(renderAreaHeight * refCamera.m_pixelsPerUnit * Screen::SCALE.Y);
+		refCamera.m_clipRectPosition.X = static_cast<int>(refCamera.m_positionInFractionOfScreenSize.X * viewportSizeInPixels.X);
+		refCamera.m_clipRectPosition.Y = static_cast<int>(refCamera.m_positionInFractionOfScreenSize.Y * viewportSizeInPixels.Y);
+		refCamera.m_clipRectSize.X = static_cast<int>(renderAreaWidth * refCamera.m_pixelsPerUnit * scale.X);
+		refCamera.m_clipRectSize.Y = static_cast<int>(renderAreaHeight * refCamera.m_pixelsPerUnit * scale.Y);
 
-		auto& transformManager = m_refECS.GetHotComponents<Transform>();
+		auto& transformManager = refECS.GetHotComponents<Transform>();
 		for (Transform& refTransform : transformManager)
 		{
 			// 1. Culling
@@ -84,8 +79,8 @@ namespace Engine
 			const float lerpedX = Lerp(refTransform.PrevPosition.X, refTransform.Position.X, interpolation);
 			const float lerpedY = Lerp(refTransform.PrevPosition.Y, refTransform.Position.Y, interpolation);
 
-			const float scaleX = refCamera.m_pixelsPerUnit * Screen::SCALE.X;
-			const float scaleY = refCamera.m_pixelsPerUnit * Screen::SCALE.Y;
+			const float scaleX = refCamera.m_pixelsPerUnit * scale.X;
+			const float scaleY = refCamera.m_pixelsPerUnit * scale.Y;
 
 			int width = static_cast<int>(round(refTransform.Dimensions.X * scaleX));
 			int height = static_cast<int>(round(refTransform.Dimensions.Y * scaleY));
@@ -93,7 +88,7 @@ namespace Engine
 			float offsetFromTransformY = 0.0f;
 
 			// 3. Render object construction & submission
-			Animations* animations = m_refECS.GetComponent<Animations>(refTransform.m_entity);
+			Animations* animations = refECS.GetComponent<Animations>(refTransform.m_entity);
 			if (animations)
 			{
 				const Animation& currentAnimation = animations->m_animations.at(animations->m_currentAnimation);
@@ -198,10 +193,10 @@ namespace Engine
 						);
 					};
 
-				ChainColliderLeft* ptrChainColliderLeft = m_refECS.GetComponent<ChainColliderLeft>(refTransform.m_entity);
-				ChainColliderRight* ptrChainColliderRight = m_refECS.GetComponent<ChainColliderRight>(refTransform.m_entity);
-				ChainColliderTop* ptrChainColliderTop = m_refECS.GetComponent<ChainColliderTop>(refTransform.m_entity);
-				ChainColliderBottom* ptrChainColliderBottom = m_refECS.GetComponent<ChainColliderBottom>(refTransform.m_entity);
+				ChainColliderLeft* ptrChainColliderLeft = refECS.GetComponent<ChainColliderLeft>(refTransform.m_entity);
+				ChainColliderRight* ptrChainColliderRight = refECS.GetComponent<ChainColliderRight>(refTransform.m_entity);
+				ChainColliderTop* ptrChainColliderTop = refECS.GetComponent<ChainColliderTop>(refTransform.m_entity);
+				ChainColliderBottom* ptrChainColliderBottom = refECS.GetComponent<ChainColliderBottom>(refTransform.m_entity);
 
 				if (ptrChainColliderLeft)
 				{
@@ -224,30 +219,39 @@ namespace Engine
 		}
 	}
 
-    void CameraSystem::Clamp(Camera& refCamera)
+    void CameraSystem::Update(AssetManager& refAssetManager)
     {
-        if (refCamera.m_offset.X < 0) { refCamera.m_offset.X = 0; }
-        if (refCamera.m_offset.X + refCamera.m_size.X > refCamera.m_bounds.X) { refCamera.m_offset.X = refCamera.m_bounds.X - refCamera.m_size.X; }
+        for (auto& camera : m_refECS.GetHotComponents<Camera>())
+        {
+            CameraUpdater* ptrCameraUpdater = m_refECS.GetComponent<CameraUpdater>(camera.m_entity);
+            if (ptrCameraUpdater)
+                ptrCameraUpdater->Update(camera.m_entity);
 
-        if (refCamera.m_offset.Y < 0) { refCamera.m_offset.Y = 0; }
-        if (refCamera.m_offset.Y + refCamera.m_size.Y > refCamera.m_bounds.Y) { refCamera.m_offset.Y = refCamera.m_bounds.Y - refCamera.m_size.Y; }
+            if (camera.m_clampingOn) clamp(camera);
+
+			// Prepare this camera for rendering
+			prepareForRendering(camera, refAssetManager, m_refECS, Screen::VIEWPORT_SIZE, Screen::SCALE);
+        }
     }
 
-    void CameraSystem::Frame(Camera& refCamera, const Vector2D<int> mapBounds)
+    void CameraSystem::Frame(const Vector2D<int> mapBounds)
     {
-        refCamera.m_bounds = mapBounds;
-        refCamera.m_size
-            = Vector2D<float>((Screen::VIEWPORT_SIZE.X * refCamera.m_screenRatio.X) / (refCamera.m_pixelsPerUnit * Screen::SCALE.X),
-                (Screen::VIEWPORT_SIZE.Y * refCamera.m_screenRatio.Y) / (refCamera.m_pixelsPerUnit * Screen::SCALE.Y));
-
-		// If the entity with the camera has a transform component, center the camera on the transform position
-		if (m_refECS.HasComponent<Transform>(refCamera.m_entity))
+		for (auto& refCamera : m_refECS.GetHotComponents<Camera>())
 		{
-			Transform* ptrTransform = m_refECS.GetComponent<Transform>(refCamera.m_entity);
-			refCamera.m_offset.X = ptrTransform->Position.X - (refCamera.m_size.X) / 2;
-			refCamera.m_offset.Y = ptrTransform->Position.Y - (refCamera.m_size.Y) / 2;
-		}
+			refCamera.m_bounds = mapBounds;
+			refCamera.m_size
+				= Vector2D<float>((Screen::VIEWPORT_SIZE.X * refCamera.m_screenRatio.X) / (refCamera.m_pixelsPerUnit * Screen::SCALE.X),
+					(Screen::VIEWPORT_SIZE.Y * refCamera.m_screenRatio.Y) / (refCamera.m_pixelsPerUnit * Screen::SCALE.Y));
 
-		Clamp(refCamera);
+			// If the entity with the camera has a transform component, center the camera on the transform position
+			if (m_refECS.HasComponent<Transform>(refCamera.m_entity))
+			{
+				Transform* ptrTransform = m_refECS.GetComponent<Transform>(refCamera.m_entity);
+				refCamera.m_offset.X = ptrTransform->Position.X - (refCamera.m_size.X) / 2;
+				refCamera.m_offset.Y = ptrTransform->Position.Y - (refCamera.m_size.Y) / 2;
+			}
+
+			clamp(refCamera);
+		}
     }
 }

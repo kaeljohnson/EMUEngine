@@ -8,7 +8,7 @@ PlayerCamera::PlayerCamera() :
     m_smoothingFactor(0.001f),
     m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(true),
     m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(0.5f), m_lookAhead(0.0f),
-	m_refCameraInterface(Engine::EMU::GetInstance()->ICAMERA()), m_refTransformInterface(Engine::EMU::GetInstance()->ITRANSFORMS())
+	m_refTransformInterface(Engine::EMU::GetInstance()->ITRANSFORMS())
 {
     // Combine this whole class into player class.
 
@@ -26,14 +26,14 @@ void PlayerCamera::Update(Engine::Entity entity)
 	const Engine::Vector2D<float> targetPosition = m_refTransformInterface.GetPosition(entity);
 
     Engine::Vector2D<float> targetPos = Engine::Lerp(targetPrevPosition, targetPosition, interpFactor);
-	Engine::Vector2D<float> cameraSize = m_refCameraInterface.GetSize(entity);
+	Engine::Vector2D<float> cameraSize = Engine::EMU::GetInstance()->Camera_GetSize(entity);
 
 	// Calculate the desired camera position based on the target's position
 	float desiredCameraTopLeftX = targetPos.X - (cameraSize.X / 2.0f);
 	float desiredCameraTopLeftY = targetPos.Y - (cameraSize.Y / 2.0f);
 
 	// Set the camera offset to the desired position
-	m_refCameraInterface.SetOffset(entity, Engine::Vector2D<float>(desiredCameraTopLeftX, desiredCameraTopLeftY));
+	Engine::EMU::GetInstance()->Camera_SetOffset(entity, Engine::Vector2D<float>(desiredCameraTopLeftX, desiredCameraTopLeftY));
 
     return;
 

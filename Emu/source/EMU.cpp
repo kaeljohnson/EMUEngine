@@ -108,4 +108,13 @@ namespace Engine
 	{
 		m_ioEventSystem.RegisterIOEventListener(type, handler);
 	}
+
+	void EMU::Camera_SetPixelsPerUnit(Entity entity, const int pixelsPerUnit) { m_cameraInterface.SetPixelsPerUnit(entity, pixelsPerUnit); }
+	const int EMU::Camera_GetPixelsPerUnit(Entity entity) { return m_cameraInterface.GetPixelsPerUnit(entity); }
+	void EMU::Camera_SetOffset(Entity entity, const Vector2D<float> offset) { m_cameraInterface.SetOffset(entity, offset); }
+	const Vector2D<float> EMU::Camera_GetOffset(Entity entity) { return m_cameraInterface.GetOffset(entity); }
+	void EMU::Camera_SetClampingOn(Entity entity, const bool clampingOn) { m_cameraInterface.SetClampingOn(entity, clampingOn); }
+	const bool EMU::Camera_GetClampingOn(Entity entity) { return m_cameraInterface.GetClampingOn(entity); }
+	const Vector2D<float> EMU::Camera_GetSize(Entity entity) { return m_cameraInterface.GetSize(entity); }
+	void EMU::Camera_SetOffsets(Entity entity, const Vector2D<float> offsets) { m_cameraInterface.SetOffsets(entity, offsets); }
 }

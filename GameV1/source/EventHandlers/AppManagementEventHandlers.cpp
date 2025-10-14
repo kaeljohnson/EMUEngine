@@ -43,7 +43,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 		{
 			Engine::Entity entity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('P');
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::G_KEY_DOWN)));
-			Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(entity, 16);
+			Engine::EMU::GetInstance()->Camera_SetPixelsPerUnit(entity, 16);
 			e.Handled = true;
 		});
 
@@ -51,7 +51,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 		{
 			Engine::Entity entity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('P');
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::H_KEY_DOWN)));
-			Engine::EMU::GetInstance()->ICAMERA().SetPixelsPerUnit(entity, 32);
+			Engine::EMU::GetInstance()->Camera_SetPixelsPerUnit(entity, 16);
 			e.Handled = true;
 		});
 	

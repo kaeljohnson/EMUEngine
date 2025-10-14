@@ -28,7 +28,6 @@ namespace Engine
 		EMU_API void UnloadCurrentScene();
 
 		EMU_API PhysicsInterface& IPHYSICS() { return m_physicsInterface; }
-		EMU_API CameraInterface& ICAMERA() { return m_cameraInterface; }
 		EMU_API TransformInterface& ITRANSFORMS() { return m_transformInterface; }
 
 		// ECS Interface functions
@@ -52,16 +51,67 @@ namespace Engine
 		// Play a sound once. Take string temporarily as they may cause dynamic allocations.
 		EMU_API void PlaySound(int soundIndex, int volume, const bool loop = false);
 
-		// Cameras updated separately since there can only be one camera active.
-		// EMU_API void ChangeCamera(Entity entity);
+		//////////// Camera Interface Functions ////////////
 
-		// Activate/Deactivate specific components
-		void ActivatePhysics(Entity entity);
-		void DeactivatePhysics(Entity entity);
+		/* 
+			Sets the pixels per unit for the camera component of the given entity.
+			This determines how many pixels correspond to one unit in the physicsl game world.
+			arg1: entity - The entity whose camera component's pixels per unit is to be set.
+			arg2: pixelsPerUnit - The number of pixels that correspond to one unit in the game world.
+		*/
+		EMU_API void Camera_SetPixelsPerUnit(Entity entity, const int pixelsPerUnit);
 
-		void ActivateTransform(Entity entity);
-		void DeactivateTransform(Entity entity);
+		/* 
+			Gets the pixels per unit for the camera component of the given entity.
+			arg1: entity - The entity whose camera component's pixels per unit is to be retrieved.
+			returns: The number of pixels that correspond to one unit in the game world.
+		*/
+		EMU_API const int Camera_GetPixelsPerUnit(Entity entity);
 
+		/*
+			Sets the offset for the camera component of the given entity in world units.
+			arg1: entity - The entity whose camera component's offset is to be set.
+			arg2: offset - The offset vector in world units.
+		*/
+		EMU_API void Camera_SetOffset(Entity entity, const Vector2D<float> offset);
+
+		/*
+			Gets the offset for the camera component of the given entity in world units.
+			arg1: entity - The entity whose camera component's offset is to be retrieved.
+			returns: The offset vector in world units.
+		*/
+		EMU_API const Vector2D<float> Camera_GetOffset(Entity entity);
+
+		/*
+			Enables or disables clamping for the camera component of the given entity.
+			With clamping enabled, the camera will not stray outside the bounds of the world.
+			arg1: entity - The entity whose camera component's clamping setting is to be modified.
+			arg2: clampingOn - A boolean indicating whether clamping should be enabled (true) or disabled (false).
+		*/
+		EMU_API void Camera_SetClampingOn(Entity entity, const bool clampingOn);
+
+		/*
+			Checks if clamping is enabled for the camera component of the given entity.
+			arg1: entity - The entity whose camera component's clamping setting is to be checked.
+			returns: A boolean indicating whether clamping is enabled (true) or disabled (false).
+		*/
+		EMU_API const bool Camera_GetClampingOn(Entity entity);
+
+		/*
+			Gets the size of camera in world units.
+			arg1: entity - The entity whose camera component's size is to be retrieved.
+			returns: The size of the camera in world units as a Vector2D<float>.
+		*/
+		EMU_API const Vector2D<float> Camera_GetSize(Entity entity);
+
+		/* 
+			Sets the offsets for the camera component of the given entity in world units.
+			arg1: entity - The entity whose camera component's offsets are to be set.
+			arg2: offsets - The offsets vector in world units.
+		*/
+		EMU_API void Camera_SetOffsets(Entity entity, const Vector2D<float> offsets);
+
+		////////////////////////////////////////////////////
 
 		template<typename T, typename... Args>
 		void AddComponent(Entity entity, Args&&... componentArgs)
