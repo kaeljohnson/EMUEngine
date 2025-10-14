@@ -6,15 +6,11 @@
 
 namespace Engine
 {
-	AnimationSystem::AnimationSystem(ECS& refECS) : m_refECS(refECS)
-	{
-		// Constructor implementation
-	}
+	AnimationSystem::AnimationSystem(ECS& refECS) : m_refECS(refECS) {}
 
 	void AnimationSystem::Update(float deltaTime)
 	{
 		// Update logic for animations
-		// This should iterate through animations not sprites...
 		for (auto& animations : m_refECS.GetHotComponents<Animations>())
 		{
 			if (animations.m_animations.empty() || animations.m_currentAnimation == "None")
@@ -36,10 +32,6 @@ namespace Engine
 			currentAnimation.m_frameTime = 0; // Reset frame time
 
 			currentAnimation.m_frameCounter++;
-
-			// ENGINE_CRITICAL_D("Number of Frames: " + std::to_string(currentAnimation.m_numFrames));
-			// ENGINE_CRITICAL_D("   Frame Counter: " + std::to_string(sprite.m_frameCounter));
-			// ENGINE_CRITICAL_D("   Current Frame: " + std::to_string(sprite.m_currentFrame));
 
 			if (currentAnimation.m_frameCounter >= currentAnimation.m_numFrames && currentAnimation.m_loop)
 			{
