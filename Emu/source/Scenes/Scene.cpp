@@ -35,6 +35,13 @@ namespace Engine
 		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entity, callback);
 	}
 
+	void Scene::RegisterOnScenePlay(std::function<void()> func)
+	{
+		// Register a function to be called when the scene starts playing.
+		// This can be used to initialize things that need to be set up when the scene starts.
+		m_clientOnScenePlay = func;
+	}
+
 	void Scene::OnScenePlay()
 	{
 		// Order matters here.
@@ -81,6 +88,8 @@ namespace Engine
 			+ std::to_string(m_refECS.GetHotComponents<Camera>().size()) + ", Num tile map entities: "
 			+ std::to_string(m_tileMap.m_allMapEntities.size()));
 
+		// process items client wants to do.
+		m_clientOnScenePlay();
 
 		AppState::IN_SCENE = true;
 	}

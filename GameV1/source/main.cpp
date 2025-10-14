@@ -97,6 +97,11 @@ int main(int argc, char* args[])
 	PlayerCamera playerCamera;
 
 	engine->LoadScene("Level1");
+
+	scene.RegisterOnScenePlay([]()
+		{
+			Engine::EMU::GetInstance()->PlaySound(1, 128, true);
+		});
 	
 	AppManagementEventHandlers appManagementEventHandlers;
 

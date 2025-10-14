@@ -20,6 +20,8 @@ namespace Engine
 		EMU_API Scene(ECS& refECS, AssetManager& refAssetManager);
 		EMU_API ~Scene();
 
+		EMU_API void RegisterOnScenePlay(std::function<void()>);
+
 		using ContactCallback = std::function<void(const Contact&)>;
 		EMU_API void RegisterContactCallback(ContactType contactType, const char entityA, const char entityB, ContactCallback callback);
 
@@ -46,6 +48,8 @@ namespace Engine
 
 	private:
 		ECS& m_refECS;
+
+		std::function<void()> m_clientOnScenePlay;
 
 		Vector2D<int> m_levelDimensionsInUnits;
 		CharacterTileMap m_tileMap;
