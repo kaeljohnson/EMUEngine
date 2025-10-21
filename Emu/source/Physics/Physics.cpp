@@ -213,7 +213,7 @@ namespace Engine
 	}
 
 	// Physics Simulation
-	PhysicsSimulation::PhysicsSimulation(ECS& refECS, CharacterTileMap& tileMap)
+	PhysicsSimulation::PhysicsSimulation(ECS& refECS, TileMap& tileMap)
 		: m_refECS(refECS), m_ptrWorldId(nullptr), m_contactSystem(refECS, tileMap)
 	{}
 

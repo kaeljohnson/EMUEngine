@@ -2,6 +2,11 @@
 #include "../../include/AssetManager.h"
 #include "../../include/ISDL/ISDL.h"
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
+static json rulesJson; // Only one rules file per game for now so this will work.
+
 namespace Engine
 {
 	AudioSystem::AudioSystem(ECS& refECS, AssetManager& refAssetManager)

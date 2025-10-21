@@ -1,7 +1,7 @@
 #pragma once
 
 #include "box2d/box2d.h"
-#include "../../include/CharacterTileMap/CharacterTileMap.h"
+#include "../../include/TileMap/TileMap.h"
 #include "../../include/Physics/Physics.h"
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Logging/Logger.h"
@@ -10,11 +10,18 @@
 #include "../../include/Time.h"
 #include "../../include/AppState.h"
 
+// Maybe have a separate json parser for rules files
+// that returns the c++ structures needed.
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
+static json rulesJson; // Only one rules file per game for now so this will work.
+
 namespace Engine
 {
 	Scene::Scene(ECS& refECS, AssetManager& refAssetManager)
 		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(m_refECS, refAssetManager), 
-		m_physicsSimulation(refECS, m_tileMap), 
+		m_physicsSimulation(refECS, m_tileMap), m_refAssetManager(refAssetManager),
 		m_cameraSystem(refECS)
 	{
 		m_entities.reserve(10000);
@@ -50,7 +57,7 @@ namespace Engine
 		m_physicsSimulation.CreateWorld(Vector2D<float>(0.0f, 100.0f)); //TODO: Client sets gravity.
 
 		// 2. Load audio files for the tile map.
-		m_tileMap.LoadAudioFiles();
+		loadAudioFiles();
 
 		// 3. Load the map. Adds components defined in the rules file and adds them to the ECS.
 		m_tileMap.LoadMap();
@@ -84,7 +91,7 @@ namespace Engine
 			+ std::to_string(m_refECS.GetHotComponents<PhysicsBody>().size()) + ", Num line colliders: "
 			+ std::to_string(m_refECS.GetHotComponents<ChainCollider>().size()) + ", Num cameras: "
 			+ std::to_string(m_refECS.GetHotComponents<Camera>().size()) + ", Num tile map entities: "
-			+ std::to_string(m_tileMap.m_allMapEntities.size()));
+			+ std::to_string(m_tileMap.GetMap().size()));
 
 		// process items client wants to do.
 		if (m_clientOnScenePlay) m_clientOnScenePlay();
@@ -106,6 +113,9 @@ namespace Engine
 
 	void Scene::AddTileMap(std::string mapFileName, std::string rulesFileName)
 	{
+		m_mapFileName = mapFileName;
+		m_rulesFileName = rulesFileName;
+
 		// Get a temp vector or tile IDs from the tile map. Both the transforms and the physics bodies.
 		m_tileMap.CreateMap(mapFileName, rulesFileName);
 
@@ -118,9 +128,9 @@ namespace Engine
 
 		HasTileMap = true;
 
-		for (auto& pair : m_tileMap.m_allMapEntities)
+		for (auto& [coords, info] : m_tileMap.GetMap())
 		{	
-			Add(pair.first);
+			Add(info.first);
 		}
 	}
 
@@ -209,5 +219,47 @@ namespace Engine
 	std::vector<Entity> Scene::GetTileMapEntities(const char tileChar) const
 	{
 		return m_tileMap.GetEntities(tileChar);
+	}
+
+	void Scene::loadAudioFiles()
+	{
+		// Open and parse the rules file
+		std::ifstream inFile(m_rulesFileName);
+		if (!inFile.is_open())
+		{
+			throw std::runtime_error("Failed to open rules file: " + m_rulesFileName);
+		}
+
+		try
+		{
+			inFile >> rulesJson;
+		}
+		catch (const json::parse_error& e)
+		{
+			throw std::runtime_error("Failed to parse rules JSON: " + std::string(e.what()));
+		}
+
+		if (!rulesJson.contains("Sounds"))
+		{
+			ENGINE_INFO_D("No audio files found in rules file.");
+			return;
+		}
+
+		const auto& audioFilePathJson = rulesJson["PathToAudioFiles"];
+		std::string audioFilePath = audioFilePathJson;
+
+		json j = json::parse(rulesJson["Sounds"].dump());
+
+		ENGINE_CRITICAL_D("Sounds: " + j.dump(4));
+
+		m_refAssetManager.PrepareSoundStorage(j.size());
+
+		for (auto& [file, idx] : j.items())
+		{
+			int idxInt = idx.get<int>();
+			std::string fullPath = audioFilePath + file;
+			ENGINE_INFO_D("Loading sound at index: " + std::to_string(idxInt) + " from file: " + fullPath);
+			m_refAssetManager.LoadSound(idxInt, fullPath);
+		}
 	}
 }

@@ -26,7 +26,7 @@ namespace Engine
 		auto it = m_textureIndices.find(filePath);
 		if (it != m_textureIndices.end())
 		{
-			ENGINE_INFO("Adding entity to texture: " + std::to_string(entity));
+			// ENGINE_INFO("Adding entity to texture: " + std::to_string(entity));
 
 			// Texture already loaded, just map entity to existing texture
 			m_textureNames[entity] = filePath;

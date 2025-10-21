@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../include/CharacterTileMap/CharacterTileMap.h"
+#include "../../include/TileMap/TileMap.h"
 #include "../../include/Logging/Logger.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/ECS/ComponentManager.h"
@@ -11,34 +11,36 @@ using json = nlohmann::json;
 
 static json rulesJson; // Only one rules file per game for now so this will work.
 
+// Max number of entities in the map allowed by engine.
+static const int MAX_SIZE = 50000;
+
 namespace Engine
 {
-	CharacterTileMap::CharacterTileMap(ECS& refECS, AssetManager& refAssetManager)
-		: m_refECS(refECS), m_refAssetManager(refAssetManager), m_mapDimensions(0, 0), m_numUnitsPerTile(0)
+	TileMap::TileMap(ECS& refECS, AssetManager& refAssetManager)
+		: m_refECS(refECS), m_refAssetManager(refAssetManager), m_mapDimensions(0, 0)
 	{
-		m_tiles.reserve(MAX_SIZE);
-		m_allMapEntities.reserve(MAX_SIZE);
+        m_tileMap.reserve(MAX_SIZE);
     }
 
-    Entity CharacterTileMap::GetEntity(char tileChar) const
+    Entity TileMap::GetEntity(char tileChar) const
     {
-		if (m_sameCharEntitiesMap.find(tileChar) != m_sameCharEntitiesMap.end() && !m_sameCharEntitiesMap.at(tileChar).empty())
+		if (m_groupedEntitiesByCharMap.find(tileChar) != m_groupedEntitiesByCharMap.end() && !m_groupedEntitiesByCharMap.at(tileChar).empty())
 		{
-			return m_sameCharEntitiesMap.at(tileChar).front(); // Return the first entity with this character.
+			return m_groupedEntitiesByCharMap.at(tileChar).front(); // Return the first entity with this character.
 		}
 
         return m_refECS.INVALID_ENTITY;
     }
 
-	const std::vector<Entity>& CharacterTileMap::GetEntities(char tileChar) const
+	const std::vector<Entity>& TileMap::GetEntities(char tileChar) const
 	{
-		if (m_sameCharEntitiesMap.find(tileChar) != m_sameCharEntitiesMap.end())
-            return m_sameCharEntitiesMap.at(tileChar);
+		if (m_groupedEntitiesByCharMap.find(tileChar) != m_groupedEntitiesByCharMap.end())
+            return m_groupedEntitiesByCharMap.at(tileChar);
 
 		return std::vector<Entity>(); // Return an empty vector if no entities found.
 	}
 
-    void CharacterTileMap::CreateMap(const std::string mapFile, const std::string rulesFile)
+    void TileMap::CreateMap(const std::string mapFile, const std::string rulesFile)
     {
         // Open and parse the rules file
         std::ifstream inFile(rulesFile);
@@ -56,16 +58,6 @@ namespace Engine
             throw std::runtime_error("Failed to parse rules JSON: " + std::string(e.what()));
         }
 
-        // Read the NumMetersPerTile and store it in your member variable
-        if (rulesJson.contains("NumMetersPerTile") && rulesJson["NumMetersPerTile"].is_number())
-        {
-            m_numUnitsPerTile = rulesJson["NumMetersPerTile"];
-        }
-        else
-        {
-            throw std::runtime_error("NumMetersPerTile not found or invalid in rules JSON");
-        }
-
         // Parse file.
         std::ifstream file(mapFile);
         if (!file)
@@ -74,6 +66,8 @@ namespace Engine
             return;
         }
 
+
+		size_t numEntities = 0;
 
         std::string line;
         while (std::getline(file, line))
@@ -87,6 +81,7 @@ namespace Engine
             {
                 // Handle error: line does not have the same length as the first line
                 ENGINE_CRITICAL("Map is not a rectangle: line " + std::to_string(m_mapDimensions.Y + 1) + " has a different length");
+				throw std::runtime_error("Map is not a rectangle: line " + std::to_string(m_mapDimensions.Y + 1) + " has a different length");
                 return;
             }
 
@@ -94,18 +89,20 @@ namespace Engine
             int x = 0;
             for (char tileChar : line)
             {
-				if (m_allMapEntities.size() < MAX_SIZE) // Can't have more than MAX_SIZE entities.
+				if (numEntities < MAX_SIZE) // Can't have more than MAX_SIZE entities.
                 {
 					if (tileChar == '-')
 					{
-                        m_tiles.push_back(std::make_tuple(m_refECS.INVALID_ENTITY, tileChar, Vector2D<int>(x, m_mapDimensions.Y)));
+						// Don't create an entity for empty tiles.
 					}
 					else
 					{
+                        
                         Entity tileEntity = m_refECS.CreateEntity();
-                        m_tiles.push_back(std::make_tuple(tileEntity, tileChar, Vector2D<int>(x, m_mapDimensions.Y)));
-                        m_allMapEntities.push_back(std::make_pair(tileEntity, tileChar));
-						m_sameCharEntitiesMap[tileChar].push_back(tileEntity);
+						m_tileMap[{x, m_mapDimensions.Y}] = std::make_pair(tileEntity, tileChar);
+                        m_groupedEntitiesByCharMap[tileChar].push_back(tileEntity);
+
+						numEntities++; // Actual entity created.
 					}
                 }
                 else
@@ -136,45 +133,18 @@ namespace Engine
 		a.m_drawDebug = drawDebug;
 		a.m_debugColor = debugColor;
 
-		// ENGINE_CRITICAL_D("Animation created: " + a.m_name + " with " + std::to_string(a.m_frames.size()) + " frames and duration " + std::to_string(a.m_frameDuration));
-
         return a;
     }
 
-    void CharacterTileMap::LoadAudioFiles()
-    {
-        if (!rulesJson.contains("Sounds"))
-        {
-            ENGINE_INFO_D("No audio files found in rules file.");
-            return;
-        }
-
-        const auto& audioFilePathJson = rulesJson["PathToAudioFiles"];
-        std::string audioFilePath = audioFilePathJson;
-
-        json j = json::parse(rulesJson["Sounds"].dump());
-
-        ENGINE_CRITICAL_D("Sounds: " + j.dump(4));
-
-		m_refAssetManager.PrepareSoundStorage(j.size());
-
-        for (auto& [file, idx] : j.items())
-		{
-            int idxInt = idx.get<int>();
-            std::string fullPath = audioFilePath + file;
-			ENGINE_INFO_D("Loading sound at index: " + std::to_string(idxInt) + " from file: " + fullPath);
-			m_refAssetManager.LoadSound(idxInt, fullPath);
-        }
-    }
-
-	void CharacterTileMap::LoadMap()
+	void TileMap::LoadMap()
 	{
         std::unordered_set<char> isSolid;
+		size_t numUnitsPerTile = 0;
 
         // Read the NumMetersPerTile and store it in your member variable
         if (rulesJson.contains("NumMetersPerTile") && rulesJson["NumMetersPerTile"].is_number())
         {
-            m_numUnitsPerTile = rulesJson["NumMetersPerTile"];
+            numUnitsPerTile = rulesJson["NumMetersPerTile"];
         }
         else
         {
@@ -187,7 +157,7 @@ namespace Engine
 		if (!rulesJson.contains("PathToSpriteSheets"))
 		{
 			ENGINE_CRITICAL("No sprite sheets path found in rules file. Add path to folder with sprite pngs.");
-            // Need to crash app here.
+			throw std::runtime_error("No sprite sheets path found in rules file. Add path to folder with sprite pngs.");
 			return;
 		}
 
@@ -205,15 +175,15 @@ namespace Engine
 
 
         // Create entity, character tiles.
-        for (auto& tuple : m_tiles)
+        for (auto& [coords, info] : m_tileMap)
         {
-		    const char tileChar = std::get<1>(tuple);
-			const int x = std::get<2>(tuple).X;
-			const int y = std::get<2>(tuple).Y;
+            const char tileChar = info.second;
+			const int x = coords.first;
+            const int y = coords.second;
 
-			if (tileChar == '-') continue; // Skip empty tiles.
+			// if (tileChar == '-') continue; // Skip empty tiles.
             
-			Entity tileEntity = std::get<0>(tuple);
+			Entity tileEntity = info.first;
 
             // Convert tile char to string key ("P", "S", etc.)
             std::string tileKey(1, tileChar);
@@ -270,10 +240,10 @@ namespace Engine
 
                 m_refECS.AddComponent<Transform>(
                     tileEntity,
-                    Vector2D<float>(x * static_cast<float>(m_numUnitsPerTile),
-                        y * static_cast<float>(m_numUnitsPerTile)),
-                    Vector2D<float>(static_cast<float>(m_numUnitsPerTile),
-                        static_cast<float>(m_numUnitsPerTile)),
+                    Vector2D<float>(x * static_cast<float>(numUnitsPerTile),
+                        y * static_cast<float>(numUnitsPerTile)),
+                    Vector2D<float>(static_cast<float>(numUnitsPerTile),
+                        static_cast<float>(numUnitsPerTile)),
 					1.0f, 1.0f, 1, zIndex, drawDebug, debugColor
                 );
             }
@@ -364,7 +334,7 @@ namespace Engine
             BodyType bodyType = STATIC;
             Filter category = ALL;
             Filter mask = ALL;
-            Vector2D<float> size = Vector2D<float>(static_cast<float>(m_numUnitsPerTile), static_cast<float>(m_numUnitsPerTile));
+            Vector2D<float> size = Vector2D<float>(static_cast<float>(numUnitsPerTile), static_cast<float>(numUnitsPerTile));
             bool gravityOn = false;
             bool checkSimpleContacts = false;
             bool useChains = false;
@@ -456,15 +426,21 @@ namespace Engine
 
                 if (useChains) // Chains are used on tiles, typically map tiles, to avoid ghose collisions on adjacent tiles.
                 {
-					bool hasTileAbove = (y > 0 && isSolid.find(std::get<1>(GetTile(x, y - 1))) != isSolid.end());
-					bool hasTileBelow = (y < GetHeight() - 1 && isSolid.find(std::get<1>(GetTile(x, y + 1))) != isSolid.end());
-                    bool hasTileLeft = (x > 0 && isSolid.find(std::get<1>(GetTile(x - 1, y))) != isSolid.end());
-					bool hasTileRight = (x < GetWidth() - 1 && isSolid.find(std::get<1>(GetTile(x + 1, y))) != isSolid.end());
+                    auto isTileSolid = [&](int x, int y) -> bool 
+                    {
+                        const auto* tile = GetTile(x, y);
+                        return tile && isSolid.find(tile->second) != isSolid.end();
+                    };
 
-                    bool hasTileDiagonalLeftAbove = (x > 0 && y > 0 && isSolid.find(std::get<1>(GetTile(x - 1, y - 1))) != isSolid.end());
-                    bool hasTileDiagonalLeftBelow = (x > 0 && y < GetHeight() - 1 && isSolid.find(std::get<1>(GetTile(x - 1, y + 1))) != isSolid.end());
-                    bool hasTileDiagonalRightAbove = (x < GetWidth() - 1 && y > 0 && isSolid.find(std::get<1>(GetTile(x + 1, y - 1))) != isSolid.end());
-                    bool hasTileDiagonalRightBelow = (x < GetWidth() - 1 && y < GetHeight() - 1 && isSolid.find(std::get<1>(GetTile(x + 1, y + 1))) != isSolid.end());
+                    bool hasTileAbove = y > 0 && isTileSolid(x, y - 1);
+                    bool hasTileBelow = y < GetHeight() - 1 && isTileSolid(x, y + 1);
+                    bool hasTileLeft = x > 0 && GetTile(x - 1, y) && isTileSolid(x - 1, y);
+                    bool hasTileRight = x < GetWidth() - 1 && isTileSolid(x + 1, y);
+
+                    bool hasTileDiagonalLeftAbove = x > 0 && y > 0 && isTileSolid(x - 1, y - 1);
+                    bool hasTileDiagonalLeftBelow = x > 0 && y < GetHeight() - 1 && isTileSolid(x - 1, y + 1);
+                    bool hasTileDiagonalRightAbove = x < GetWidth() - 1 && y > 0 && isTileSolid(x + 1, y - 1);
+                    bool hasTileDiagonalRightBelow = x < GetWidth() - 1 && y < GetHeight() - 1 && isTileSolid(x + 1, y + 1);
 
                     if (!hasTileAbove)
                     {
@@ -554,7 +530,7 @@ namespace Engine
                 {
                     m_refECS.AddComponent<PhysicsBody>(tileEntity, enabled, bodyType, category, mask,
                         Vector2D<float>(size.X, size.Y),
-                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(m_numUnitsPerTile), static_cast<float>(y) * static_cast<float>(m_numUnitsPerTile)),
+                        Vector2D<float>(static_cast<float>(x) * static_cast<float>(numUnitsPerTile), static_cast<float>(y) * static_cast<float>(numUnitsPerTile)),
                         0.0f, gravityOn, checkSimpleContacts);
                 }
             }
@@ -575,7 +551,7 @@ namespace Engine
 
 				spriteSheetPath = spriteSheetJson["Path"];
 
-				ENGINE_INFO_D("Loading texture from: " + spriteSheetPath);
+				// ENGINE_INFO_D("Loading texture from: " + spriteSheetPath);
                 // The following must only be called once per scene.
                 // Currently, it is called for every character that has a animation or sprite from
                 // the texture. That takes way too long and wastes resources!!!
@@ -593,7 +569,7 @@ namespace Engine
 					const auto& sizeJson = spriteSheetJson["SizeInUnits"];
 					if (sizeJson.is_array() && sizeJson.size() == 2)
 					{
-						ENGINE_INFO_D("Found size for sprite sheet");
+						// ENGINE_INFO_D("Found size for sprite sheet");
 						if (sizeJson[0].is_number() && sizeJson[1].is_number())
 						{
 							frameSize.X = sizeJson[0].get<float>();
@@ -698,28 +674,18 @@ namespace Engine
 
 	}
 
-    void CharacterTileMap::UnloadMap()
+    void TileMap::UnloadMap()
 	{
         // Nothing to do. Scene destroys components.
 	}
 
-    const char CharacterTileMap::GetChar(size_t x, size_t y) const
+    const std::pair<Entity, char>* TileMap::GetTile(int x, int y) const
     {
-        if (x < 0 || x >= m_mapDimensions.X || y < 0 || y >= m_mapDimensions.Y)
-        {
-            return ' ';
-        }
+		std::pair<int, int> key = std::make_pair(x, y);
+        auto it = m_tileMap.find(key);
+        if (it != m_tileMap.end())
+            return &it->second; // return pointer to value
 
-        return std::get<1>(m_tiles[y * m_mapDimensions.X + x]);
+        return nullptr;
     }
-
-    const std::tuple<Entity, char, Vector2D<int>> CharacterTileMap::GetTile(size_t x, size_t y) const
-    {
-        // This needs to return the associated entity as well.
-		if (x < 0 || x >= m_mapDimensions.X || y < 0 || y >= m_mapDimensions.Y) 
-		{
-			return std::make_tuple(m_refECS.INVALID_ENTITY, ' ', Vector2D<int>((int)x, (int)y));
-		}
-		return m_tiles[y * m_mapDimensions.X + x];
-	}
 }

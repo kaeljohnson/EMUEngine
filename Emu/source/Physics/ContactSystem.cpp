@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	ContactSystem::ContactSystem(ECS& refECS, CharacterTileMap& tileMap) : m_refECS(refECS), m_refTileMap(tileMap) {}
+	ContactSystem::ContactSystem(ECS& refECS, TileMap& tileMap) : m_refECS(refECS), m_refTileMap(tileMap) {}
 
 	// This function is allocating memory dynamically. Why?
 	void ContactSystem::ProcessContacts(void* ptrWorldId)

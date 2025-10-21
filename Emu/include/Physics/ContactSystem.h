@@ -5,7 +5,7 @@
 #include "../Core.h"
 #include "../Components.h"
 #include "../MathUtil.h"
-#include "../CharacterTileMap/CharacterTileMap.h"
+#include "../TileMap/TileMap.h"
 
 #include "ContactKeyHashes.h"
 
@@ -108,14 +108,14 @@ namespace Engine
 		void ActivateContactCallback(ContactType contactType, Entity entityA, ContactCallback callback);
 
 	public:
-		ContactSystem(ECS& refECS, CharacterTileMap& tileMap);
+		ContactSystem(ECS& refECS, TileMap& tileMap);
 		void ActivateContactCallbacks();
 		void ProcessContacts(void* ptrWorldId);
 		void Cleanup();
 
 	private:
 		ECS& m_refECS;
-		CharacterTileMap& m_refTileMap;
+		TileMap& m_refTileMap;
 
 		std::vector<std::tuple<ContactType, const char, ContactCallback>> m_singleEntityContactCallbacks;
 		std::vector<std::tuple<ContactType, const char, const char, ContactCallback>> m_multiContactCallbacks;

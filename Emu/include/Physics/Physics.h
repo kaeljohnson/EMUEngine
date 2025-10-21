@@ -3,7 +3,7 @@
 #include "../Core.h"
 #include "../MathUtil.h"
 #include "../Components.h"
-#include "../CharacterTileMap/CharacterTileMap.h" 
+#include "../TileMap/TileMap.h" 
 #include "ContactSystem.h"
 
 struct b2WorldId;
@@ -57,7 +57,7 @@ namespace Engine
 	class PhysicsSimulation
 	{
 	public:
-		PhysicsSimulation(ECS& refECS, CharacterTileMap& tileMap);
+		PhysicsSimulation(ECS& refECS, TileMap& tileMap);
 		void CreateWorld(const Vector2D<float> gravity);
 		void UpdateGravity(const Vector2D<float> gravity);
 		void AddPhysicsBodiesToWorld(std::vector<Entity>& entities);

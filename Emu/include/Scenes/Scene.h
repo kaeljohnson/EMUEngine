@@ -2,7 +2,7 @@
 
 #include "../ECS/ComponentManager.h"
 #include "../ECS/ECS.h"
-#include "../CharacterTileMap/CharacterTileMap.h" 
+#include "../TileMap/TileMap.h" 
 #include "../AssetManager.h"
 #include "../Physics/Physics.h"
 #include "../Camera/CameraSystem.h"
@@ -39,7 +39,6 @@ namespace Engine
 		EMU_API void Remove(Entity entity);
 
 		EMU_API void AddTileMap(std::string mapFileName, std::string rulesFileName);
-		std::vector<std::pair<Entity, char>> GetTileMap() const { return m_tileMap.m_allMapEntities; }
 		EMU_API Entity GetTileMapEntity(char tileChar) const;
 		EMU_API std::vector<Entity> GetTileMapEntities(const char tileChar) const;
 
@@ -48,11 +47,15 @@ namespace Engine
 
 	private:
 		ECS& m_refECS;
+		AssetManager& m_refAssetManager;
+
+		std::string m_mapFileName;
+		std::string m_rulesFileName;
 
 		std::function<void()> m_clientOnScenePlay;
 
 		Vector2D<int> m_levelDimensionsInUnits;
-		CharacterTileMap m_tileMap;
+		TileMap m_tileMap;
 
 		PhysicsSimulation m_physicsSimulation;
 		CameraSystem m_cameraSystem;
@@ -73,5 +76,7 @@ namespace Engine
 		void UpdateCamera(AssetManager& refAssetManager);
 
 		bool HasTileMap;
+	private:
+		void loadAudioFiles();
 	}; 
 }
