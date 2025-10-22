@@ -77,7 +77,15 @@ namespace Engine
 
 		bool HasTileMap;
 	private:
-		void loadSceneEntities();
+
+		/*
+			Loads all entities defined in the scene's tile map.
+		*/
+		void loadSceneEntitiesFromTileMap();
+
+		/*
+			Loads audio files required for the Level.
+		*/
 		void loadAudioFiles();
 	}; 
 }

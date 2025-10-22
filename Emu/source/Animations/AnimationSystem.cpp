@@ -8,7 +8,7 @@ namespace Engine
 {
 	AnimationSystem::AnimationSystem(ECS& refECS) : m_refECS(refECS) {}
 
-	void AnimationSystem::Update(float deltaTime)
+	void AnimationSystem::Update()
 	{
 		// Update logic for animations
 		for (auto& animations : m_refECS.GetHotComponents<Animations>())

@@ -58,7 +58,7 @@ namespace Engine
 		loadAudioFiles();
 
 		// 3. Load the map. Adds components defined in the rules file and adds them to the ECS.
-		loadSceneEntities();
+		loadSceneEntitiesFromTileMap();
 
 		// 4. Activate the entities in the ECS. This will activate all components in the ECS.
 		// m_refECS.ActivateEntities(m_entities);
@@ -252,7 +252,7 @@ namespace Engine
 		}
 	}
 
-	void Scene::loadSceneEntities()
+	void Scene::loadSceneEntitiesFromTileMap()
 	{
 		std::unordered_set<char> isSolid;
 		size_t numUnitsPerTile = 0;

@@ -71,7 +71,7 @@ namespace Engine
 			while (accumulator >= timeStep)
 			{
 				m_ptrCurrentScene->UpdatePhysics();
-				m_refAnimationSystem.Update(timeStep);
+				m_refAnimationSystem.Update();
 
 				accumulator -= timeStep;
 			}

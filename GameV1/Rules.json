@@ -56,7 +56,7 @@
                 "Idle": 
                 {
                     "Frames": [0, 1, 2, 3],
-                    "FrameTime": 20,
+                    "FrameTime": 15,
                     "Loop": true
                 },
                 "WalkRight": 

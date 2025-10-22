@@ -10,14 +10,13 @@ namespace Engine
 		AudioSystem(ECS& refECS, AssetManager& refAssetManager); // temporarily takes the AssetManager as a parameter
 		~AudioSystem() = default;
 
-		// Plays a sound by its id/index. Volume is from 0 to 128 (max).
-		void PlaySound(int soundIndex, int volume = 128, const bool loop = false);
-
-		/*
-			Loads audio files required for the Level.
-			This should be called during the initialization phase of the application.
+		/* 
+			Plays a sound by its id / index.Volume is from 0 to 128 (max).
+			arg1: soundIndex: The index of the sound to play.
+			arg2: volume: The volume at which to play the sound. Default is 128 (max).
+			arg3: loop: Whether to loop the sound or not. Default is false.
 		*/
-		void LoadAudioFiles(const std::string rulesFile);
+		void PlaySound(int soundIndex, int volume = 128, const bool loop = false);
 
 		AudioSystem(const AudioSystem&) = delete;
 		AudioSystem& operator=(const AudioSystem&) = delete;
