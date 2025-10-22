@@ -10,6 +10,11 @@ namespace Engine
 	{
 	}
 
+	AssetManager::~AssetManager()
+	{
+		Shutdown();
+	}
+
 	void AssetManager::GiveRenderer(void* ptrRenderer)
 	{
 		m_ptrRenderer = ptrRenderer;
@@ -17,7 +22,8 @@ namespace Engine
 
 	void AssetManager::Shutdown()
 	{
-		// Clean up resources
+		UnloadTextures();
+		UnloadSounds();
 	}
 
 	void AssetManager::LoadTexture(Entity entity, const std::string& filePath)
@@ -26,7 +32,7 @@ namespace Engine
 		auto it = m_textureIndices.find(filePath);
 		if (it != m_textureIndices.end())
 		{
-			// ENGINE_INFO("Adding entity to texture: " + std::to_string(entity));
+			ENGINE_INFO_D("Adding entity to texture: " + std::to_string(entity));
 
 			// Texture already loaded, just map entity to existing texture
 			m_textureNames[entity] = filePath;
@@ -123,6 +129,7 @@ namespace Engine
 
 	void* AssetManager::GetSound(int soundIndex)
 	{
-		return m_loadedSounds.at(soundIndex);
+		return (soundIndex < 0 || soundIndex >= (int)m_loadedSounds.size()) 
+			? nullptr : m_loadedSounds.at(soundIndex);
 	}
 }

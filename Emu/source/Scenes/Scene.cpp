@@ -95,6 +95,12 @@ namespace Engine
 
 		m_physicsSimulation.Cleanup();
 
+		// Should unload assets here to potentially be reloaded next scene?
+		// Or should there be a more detailed check so assets that might transfer
+		// to next scene are not unloaded? This takes awhile.
+		m_refAssetManager.UnloadTextures();
+		m_refAssetManager.UnloadSounds();
+
 		// Deactivate all entities and destroy all components.
 		m_refECS.DeactivateEntities();
 		m_refECS.DestroyComponents(m_entities);
