@@ -77,6 +77,7 @@ namespace Engine
 
 		bool HasTileMap;
 	private:
+		void loadSceneEntities();
 		void loadAudioFiles();
 	}; 
 }

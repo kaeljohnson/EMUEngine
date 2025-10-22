@@ -236,7 +236,16 @@ namespace Engine
 
     void CameraSystem::Frame(const Vector2D<int> mapBounds)
     {
-		for (auto& refCamera : m_refECS.GetHotComponents<Camera>())
+		std::vector<Camera>& activeCameras = m_refECS.GetHotComponents<Camera>();
+
+		if (activeCameras.size() == 0)
+		{
+			ENGINE_CRITICAL_D("No active cameras in the scene. Cannot frame camera.");
+			std::runtime_error("No active cameras in the scene. Cannot frame camera.");
+			return;
+		}
+
+		for (auto& refCamera : activeCameras)
 		{
 			refCamera.m_bounds = mapBounds;
 			refCamera.m_size

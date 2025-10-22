@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../ECS/ECS.h"
-#include "../AssetManager.h"
 #include "../Includes.h"
 #include "../MathUtil.h"
 
@@ -15,12 +14,10 @@ namespace Engine
 		}
 	};
 
-	//using TileMap = std::unordered_map<std::pair<int, int>, std::pair<Entity, char>, PairIntHash>;
-
 	class TileMap
 	{
 	public:
-		TileMap(ECS& refECS, AssetManager& refAssetManager);
+		TileMap(ECS& refECS);
 		~TileMap() = default;
 
 		/*
@@ -71,19 +68,8 @@ namespace Engine
 			arg1: mapFile - The path to the map file.
 			arg2: rulesFile - The path to the rules file.
 		*/
-		void CreateMap(const std::string mapFile, const std::string rulesFile);
+		 void CreateMap(const std::string mapFile, const std::string rulesFile);
 
-		/*
-			Loads the map into the ECS by creating entities and adding components.
-			This should be called in a function such as "OnScenePlay".
-		*/
-		void LoadMap();
-
-		/*
-			Unloads the map from the ECS by removing entities and their components.
-			This should be called in a function such as "OnSceneEnd".
-		*/
-		void UnloadMap();
 
 	private:
 		std::unordered_map<std::pair<int, int>, std::pair<Entity, char>, PairIntHash> m_tileMap;
@@ -91,6 +77,5 @@ namespace Engine
 
 		Vector2D<int> m_mapDimensions;
 		ECS& m_refECS;
-		AssetManager& m_refAssetManager;
 	};
 }
