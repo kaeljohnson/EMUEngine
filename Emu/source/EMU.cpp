@@ -117,4 +117,37 @@ namespace Engine
 	const bool EMU::Camera_GetClampingOn(Entity entity) { return m_cameraInterface.GetClampingOn(entity); }
 	const Vector2D<float> EMU::Camera_GetSize(Entity entity) { return m_cameraInterface.GetSize(entity); }
 	void EMU::Camera_SetOffsets(Entity entity, const Vector2D<float> offsets) { m_cameraInterface.SetOffsets(entity, offsets); }
+
+	// PhysicsBody2d getter and setter wrappers
+	void EMU::Physics_CreateBody(Entity entity) { m_physicsInterface.CreateBody(entity); }
+	const bool EMU::Physics_HasBody(Entity entity) { return m_physicsInterface.HasBody(entity); }
+	void EMU::Physics_SetBodyType(Entity entity, const BodyType type) { m_physicsInterface.SetBodyType(entity, type); }
+	void EMU::Physics_SetDimensions(Entity entity, const Vector2D<float> dimensions) { m_physicsInterface.SetDimensions(entity, dimensions); }
+	const Vector2D<float> EMU::Physics_GetDimensions(Entity entity) { return m_physicsInterface.GetDimensions(entity); }
+	const Vector2D<float> EMU::Physics_GetDimensions(PhysicsBody& body) { return m_physicsInterface.GetDimensions(body); }
+	void EMU::Physics_SetGravity(Entity entity, bool enabled) { m_physicsInterface.SetGravity(entity, enabled); }
+	void EMU::Physics_SetStartingPosition(Entity entity, const Vector2D<float> position) { m_physicsInterface.SetStartingPosition(entity, position); }
+	void EMU::Physics_SetPosition(Entity entity, const Vector2D<float> position) { m_physicsInterface.SetPosition(entity, position); }
+	const Vector2D<float> EMU::Physics_GetPosition(Entity entity) { return m_physicsInterface.GetPosition(entity); }
+	const Vector2D<float> EMU::Physics_GetTopLeftPosition(Entity entity) { return m_physicsInterface.GetTopLeftPosition(entity); }
+	void EMU::Physics_ApplyForceToBody(Entity entity, Vector2D<float> force) { m_physicsInterface.ApplyForceToBody(entity, force); }
+	void EMU::Physics_ApplyImpulseToBody(Entity entity, Vector2D<float> impulse) { m_physicsInterface.ApplyImpulseToBody(entity, impulse); }
+	void EMU::Physics_SetVelocity(Entity entity, const Vector2D<float> velocity) { m_physicsInterface.SetVelocity(entity, velocity); }
+	void EMU::Physics_SetXVelocity(Entity entity, const float xVelocity) { m_physicsInterface.SetXVelocity(entity, xVelocity); }
+	void EMU::Physics_SetYVelocity(Entity entity, const float yVelocity) { m_physicsInterface.SetYVelocity(entity, yVelocity); }
+	void EMU::Physics_SetDeceleration(Entity entity, const float decel) { m_physicsInterface.SetDeceleration(entity, decel); }
+	const Vector2D<float> EMU::Physics_GetVelocity(Entity entity) { return m_physicsInterface.GetVelocity(entity); }
+	void EMU::Physics_SetRestitution(Entity entity, const float restitution) { m_physicsInterface.SetRestitution(entity, restitution); }
+	void EMU::Physics_SetDensity(Entity entity, const float density) { m_physicsInterface.SetDensity(entity, density); }
+	void EMU::Physics_SetFriction(Entity entity, const float friction) { m_physicsInterface.SetFriction(entity, friction); }
+	void EMU::Physics_SetFixedRotation(Entity entity, bool fixed) { m_physicsInterface.SetFixedRotation(entity, fixed); }
+	const float EMU::Physics_GetAngleInRadians(Entity entity) { return m_physicsInterface.GetAngleInRadians(entity); }
+	const float EMU::Physics_GetAngleInDegrees(Entity entity) { return m_physicsInterface.GetAngleInDegrees(entity); }
+	void EMU::Physics_RemoveBodyFromWorld(Entity entity) { m_physicsInterface.RemoveBodyFromWorld(entity); }
+
+	// Contact System interface
+	const bool EMU::Physics_HasContactBelow(Entity entity) { return m_physicsInterface.HasContactBelow(entity); }
+	const bool EMU::Physics_HasContactAbove(Entity entity) { return m_physicsInterface.HasContactAbove(entity); }
+	const bool EMU::Physics_HasContactLeft(Entity entity) { return m_physicsInterface.HasContactLeft(entity); }
+	const bool EMU::Physics_HasContactRight(Entity entity) { return m_physicsInterface.HasContactRight(entity); }
 }

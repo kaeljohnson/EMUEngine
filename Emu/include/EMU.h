@@ -27,7 +27,6 @@ namespace Engine
 		EMU_API void LoadScene(const std::string& name);
 		EMU_API void UnloadCurrentScene();
 
-		EMU_API PhysicsInterface& IPHYSICS() { return m_physicsInterface; }
 		EMU_API TransformInterface& ITRANSFORMS() { return m_transformInterface; }
 
 		// ECS Interface functions
@@ -111,6 +110,211 @@ namespace Engine
 		*/
 		EMU_API void Camera_SetOffsets(Entity entity, const Vector2D<float> offsets);
 
+		////////////////////////////////////////////////////
+
+		/////////// Physics Interface Functions ////////////
+		
+		// PhysicsBody2d getter and setter wrappers
+
+		/*
+			Creates a physics body for the given entity.
+			arg1: entity - The entity for which to create the physics body.
+		*/
+		EMU_API void Physics_CreateBody(Entity entity);
+
+		/*
+			Checks if the given entity has a physics body.
+			arg1: entity - The entity to check for a physics body.
+			returns: True if the entity has a physics body, false otherwise.
+		*/
+		EMU_API const bool Physics_HasBody(Entity entity);
+
+		/*
+			Sets the body type for the physics body of the given entity.
+			arg1: entity - The entity whose physics body type is to be set.
+			arg2: type - The BodyType to set for the physics body.
+		*/
+		EMU_API void Physics_SetBodyType(Entity entity, const BodyType type);
+
+		/*
+			Sets the dimensions for the physics body of the given entity.
+			arg1: entity - The entity whose physics body dimensions are to be set.
+			arg2: dimensions - The dimensions to set for the physics body.
+		*/
+		EMU_API void Physics_SetDimensions(Entity entity, const Vector2D<float> dimensions);
+
+		/*
+			Gets the dimensions for the physics body of the given entity.
+			arg1: entity - The entity whose physics body dimensions are to be retrieved.
+			returns: The dimensions of the physics body as a Vector2D<float>.
+		*/
+		EMU_API const Vector2D<float> Physics_GetDimensions(Entity entity);
+
+		/*
+			Gets the dimensions for the given physics body.
+			arg1: body - The PhysicsBody whose dimensions are to be retrieved.
+			returns: The dimensions of the physics body as a Vector2D<float>.
+		*/
+		EMU_API const Vector2D<float> Physics_GetDimensions(PhysicsBody& body);
+
+		/*
+			Enables or disables gravity for the physics body of the given entity.
+			arg1: entity - The entity whose physics body gravity setting is to be modified.
+			arg2: enabled - A boolean indicating whether gravity should be enabled (true) or disabled (false).
+		*/
+		EMU_API void Physics_SetGravity(Entity entity, bool enabled);
+
+		/*
+			Sets the starting position for the physics body of the given entity.
+			arg1: entity - The entity whose physics body starting position is to be set.
+			arg2: position - The starting position to set for the physics body.
+		*/
+		EMU_API void Physics_SetStartingPosition(Entity entity, const Vector2D<float> position);
+
+		/*
+			Sets the position for the physics body of the given entity.
+			arg1: entity - The entity whose physics body position is to be set.
+			arg2: position - The position to set for the physics body.
+		*/
+		EMU_API void Physics_SetPosition(Entity entity, const Vector2D<float> position);
+
+		/*
+			Gets the position for the physics body of the given entity.
+			arg1: entity - The entity whose physics body position is to be retrieved.
+			returns: The position of the physics body as a Vector2D<float>.
+		*/
+		EMU_API const Vector2D<float> Physics_GetPosition(Entity entity);
+
+		/*
+			Gets the top-left position for the physics body of the given entity.
+			arg1: entity - The entity whose physics body top-left position is to be retrieved.
+			returns: The top-left position of the physics body as a Vector2D<float>.
+		*/
+		EMU_API const Vector2D<float> Physics_GetTopLeftPosition(Entity entity);
+
+		/*
+			Applies force to a physics body of the given entity.
+			arg1: entity - The entity whose physics body to apply force to.
+			arg2: force - The force vector to apply to the physics body.
+		*/
+		EMU_API void Physics_ApplyForceToBody(Entity entity, Vector2D<float> force);
+
+		/*
+			Applies impulse to a physics body of the given entity.
+			arg1: entity - The entity whose physics body to apply impulse to.
+			arg2: impulse - The impulse vector to apply to the physics body.
+		*/
+		EMU_API void Physics_ApplyImpulseToBody(Entity entity, Vector2D<float> impulse);
+
+		/*
+			Sets velocity for the physics body of the given entity.
+			arg1: entity - The entity whose physics body velocity is to be set.
+			arg2: velocity - The velocity vector to set for the physics body.
+		*/
+		EMU_API void Physics_SetVelocity(Entity entity, const Vector2D<float> velocity);
+
+		/*
+			Sets the X velocity for the physics body of the given entity.
+			arg1: entity - The entity whose physics body X velocity is to be set.
+			arg2: xVelocity - The X velocity to set for the physics body.
+		*/
+		EMU_API void Physics_SetXVelocity(Entity entity, const float xVelocity);
+
+		/*
+			Sets the Y velocity for the physics body of the given entity.
+			arg1: entity - The entity whose physics body Y velocity is to be set.
+			arg2: yVelocity - The Y velocity to set for the physics body.
+		*/
+		EMU_API void Physics_SetYVelocity(Entity entity, const float yVelocity);
+
+		/*
+			Sets the deceleration for the physics body of the given entity.
+			arg1: entity - The entity whose physics body deceleration is to be set.
+			arg2: decel - The deceleration value to set for the physics body.
+		*/
+		EMU_API void Physics_SetDeceleration(Entity entity, const float decel);
+
+		/*
+			Gets the velocity for the physics body of the given entity.
+			arg1: entity - The entity whose physics body velocity is to be retrieved.
+			returns: The velocity of the physics body as a Vector2D<float>.
+		*/
+		EMU_API const Vector2D<float> Physics_GetVelocity(Entity entity);
+
+		/*
+			Sets the restitution for the physics body of the given entity.
+			arg1: entity - The entity whose physics body restitution is to be set.
+			arg2: restitution - The restitution value to set for the physics body.
+		*/
+		EMU_API void Physics_SetRestitution(Entity entity, const float restitution);
+
+		/*
+			Sets the density for the physics body of the given entity.
+			arg1: entity - The entity whose physics body density is to be set.
+			arg2: density - The density value to set for the physics body.
+		*/
+		EMU_API void Physics_SetDensity(Entity entity, const float density);
+
+		/*
+			Sets the friction for the physics body of the given entity.
+			arg1: entity - The entity whose physics body friction is to be set.
+			arg2: friction - The friction value to set for the physics body.
+		*/
+		EMU_API void Physics_SetFriction(Entity entity, const float friction);
+
+		/*
+			Sets whether the physics body of the given entity has fixed rotation.
+			arg1: entity - The entity whose physics body fixed rotation setting is to be modified.
+			arg2: fixed - A boolean indicating whether fixed rotation should be enabled (true) or disabled (false).
+		*/
+		EMU_API void Physics_SetFixedRotation(Entity entity, bool fixed);
+
+		/*
+			Gets the angle of the physics body of the given entity in radians.
+			arg1: entity - The entity whose physics body angle is to be retrieved.
+			returns: The angle of the physics body in radians as a float.
+		*/
+		EMU_API const float Physics_GetAngleInRadians(Entity entity);
+
+		/*
+			Gets the angle of the physics body of the given entity in degrees.
+			arg1: entity - The entity whose physics body angle is to be retrieved.
+			returns: The angle of the physics body in degrees as a float.
+		*/
+		EMU_API const float Physics_GetAngleInDegrees(Entity entity);
+
+		/*
+			Removes the physics body from the world for the given entity.
+			arg1: entity - The entity whose physics body is to be removed from the world.
+		*/
+		EMU_API void Physics_RemoveBodyFromWorld(Entity entity);
+
+		// Contact System interface
+
+		/*
+			Has contact below the physics body of the given entity.
+			arg1: entity - The entity whose physics body contact below is to be checked.
+		*/
+		EMU_API const bool Physics_HasContactBelow(Entity entity);
+
+		/*
+			Has contact above the physics body of the given entity.
+			arg1: entity - The entity whose physics body contact above is to be checked.
+		*/
+		EMU_API const bool Physics_HasContactAbove(Entity entity);
+
+		/*
+			Has contact to the left of the physics body of the given entity.
+			arg1: entity - The entity whose physics body contact left is to be checked.
+		*/
+		EMU_API const bool Physics_HasContactLeft(Entity entity);
+
+		/*
+			Has contact to the right of the physics body of the given entity.
+			arg1: entity - The entity whose physics body contact right is to be checked.
+		*/
+		EMU_API const bool Physics_HasContactRight(Entity entity);
+		
 		////////////////////////////////////////////////////
 
 		template<typename T, typename... Args>

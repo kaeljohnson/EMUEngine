@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Core.h"
 #include "../MathUtil.h"
 #include "../Components.h"
 #include "../TileMap/TileMap.h" 
@@ -15,37 +14,37 @@ namespace Engine
 	{
 	public:
 		// PhysicsBody2d getter and setter wrappers
-		EMU_API void CreateBody(Entity entity);
-		EMU_API const bool HasBody(Entity entity);
-		EMU_API void SetBodyType(Entity entity, const BodyType type);
-		EMU_API void SetDimensions(Entity entity, const Vector2D<float> dimensions);
-		EMU_API const Vector2D<float> GetDimensions(Entity entity);
-		EMU_API const Vector2D<float> GetDimensions(PhysicsBody& body);
-		EMU_API void SetGravity(Entity entity, bool enabled);
-		EMU_API void SetStartingPosition(Entity entity, const Vector2D<float> position);
-		EMU_API void SetPosition(Entity entity, const Vector2D<float> position);
-		EMU_API const Vector2D<float> GetPosition(Entity entity);
-		EMU_API const Vector2D<float> GetTopLeftPosition(Entity entity);
-		EMU_API void ApplyForceToBody(Entity entity, Vector2D<float> force);
-		EMU_API void ApplyImpulseToBody(Entity entity, Vector2D<float> impulse);
-		EMU_API void SetVelocity(Entity entity, const Vector2D<float> velocity);
-		EMU_API void SetXVelocity(Entity entity, const float xVelocity);
-		EMU_API void SetYVelocity(Entity entity, const float yVelocity);
-		EMU_API void SetDeceleration(Entity entity, const float decel);
-		EMU_API const Vector2D<float> GetVelocity(Entity entity);
-		EMU_API void SetRestitution(Entity entity, const float restitution);
-		EMU_API void SetDensity(Entity entity, const float density);
-		EMU_API void SetFriction(Entity entity, const float friction);
-		EMU_API void SetFixedRotation(Entity entity, bool fixed);
-		EMU_API const float GetAngleInRadians(Entity entity);
-		EMU_API const float GetAngleInDegrees(Entity entity);
-		EMU_API void RemoveBodyFromWorld(Entity entity);
+		void CreateBody(Entity entity);
+		const bool HasBody(Entity entity);
+		void SetBodyType(Entity entity, const BodyType type);
+		void SetDimensions(Entity entity, const Vector2D<float> dimensions);
+		const Vector2D<float> GetDimensions(Entity entity);
+		const Vector2D<float> GetDimensions(PhysicsBody& body);
+		void SetGravity(Entity entity, bool enabled);
+		void SetStartingPosition(Entity entity, const Vector2D<float> position);
+		void SetPosition(Entity entity, const Vector2D<float> position);
+		const Vector2D<float> GetPosition(Entity entity);
+		const Vector2D<float> GetTopLeftPosition(Entity entity);
+		void ApplyForceToBody(Entity entity, Vector2D<float> force);
+		void ApplyImpulseToBody(Entity entity, Vector2D<float> impulse);
+		void SetVelocity(Entity entity, const Vector2D<float> velocity);
+		void SetXVelocity(Entity entity, const float xVelocity);
+		void SetYVelocity(Entity entity, const float yVelocity);
+		void SetDeceleration(Entity entity, const float decel);
+		const Vector2D<float> GetVelocity(Entity entity);
+		void SetRestitution(Entity entity, const float restitution);
+		void SetDensity(Entity entity, const float density);
+		void SetFriction(Entity entity, const float friction);
+		void SetFixedRotation(Entity entity, bool fixed);
+		const float GetAngleInRadians(Entity entity);
+		const float GetAngleInDegrees(Entity entity);
+		void RemoveBodyFromWorld(Entity entity);
 
 		// Contact System interface
-		EMU_API const bool HasContactBelow(Entity entity);
-		EMU_API const bool HasContactAbove(Entity entity);
-		EMU_API const bool HasContactLeft(Entity entity);
-		EMU_API const bool HasContactRight(Entity entity);
+		const bool HasContactBelow(Entity entity);
+		const bool HasContactAbove(Entity entity);
+		const bool HasContactLeft(Entity entity);
+		const bool HasContactRight(Entity entity);
 	public:
 		PhysicsBody* GetBody(Entity entity);
 		PhysicsInterface(ECS& refEcs);
@@ -58,23 +57,85 @@ namespace Engine
 	{
 	public:
 		PhysicsSimulation(ECS& refECS, TileMap& tileMap);
+
+		/*
+			Create box2D world with specified gravity vector.
+			arg1: gravity vector
+		*/
 		void CreateWorld(const Vector2D<float> gravity);
+
+		/*
+			Update the world's gravity vector.
+			arg1: gravity vector
+		*/
 		void UpdateGravity(const Vector2D<float> gravity);
+
+		/*
+			Add physics bodies from entities to the world.
+			arg1: vector of entities
+		*/
 		void AddPhysicsBodiesToWorld(std::vector<Entity>& entities);
+
+		/*
+			Add a single physics body to the world.
+			arg1: reference to physics body
+		*/
 		void AddPhysicsBodyToWorld(PhysicsBody& refPhysicsBody);
+
+		/*
+			Add line colliders from entities to the world.
+			arg1: vector of entities
+		*/
 		void AddLineCollidersToWorld(std::vector<Entity>& entities);
+
+		/*
+			Activate contact callbacks in contact system.
+		*/
 		void ActivateContactCallbacks();
 
+		/*
+			Activate physics bodies and chains in the world.
+			arg1: entity to activate
+		*/
 		void ActivateBody(Entity entity);
+
+		/*
+			Activate physics chains in the world.
+			arg1: entity to activate
+		*/
 		void ActivateChains(Entity entity);
 
+		/*
+			Deactivate physics bodies and chains in the world.
+			arg1: entity to deactivate
+		*/
 		void DeactivateBody(Entity entity);
+
+		/*
+			Deactivate physics chains in the world.
+			arg1: entity to deactivate
+		*/
 		void DeactivateChains(Entity entity);
 
+		/*
+			Update the physics world.
+		*/
 		void Update();
+
+		/*
+			Process simple contacts for a physics body.
+			arg1: reference to physics body
+		*/
 		void ProcessSimpleContacts(PhysicsBody& refPhysicsBody);
 
+		/*
+			Destroy the physics world.
+		*/
 		void DestroyWorld();
+
+		/*
+			Cleanup the physics simulation.
+		*/
 		void Cleanup();
 
 		ContactSystem m_contactSystem;

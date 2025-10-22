@@ -66,8 +66,6 @@ public:
 	PlayerDirection m_currentDirection;
 
 private:
-
-	Engine::PhysicsInterface& m_refPhysicsInterface;
 	Engine::TransformInterface& m_refTransformInterface;
 
 	bool m_canJump;
@@ -97,7 +95,6 @@ private:
 	void startHorizontalMove();
 	void updateHorizontalMove();
 	void endHorizontalMove(Engine::Entity entity);
-
 
 	void beginJump();
 	void updateJump();
