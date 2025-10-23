@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../include/EMU.h"
+#include "../include/Rendering/Screen.h"
 
 namespace Engine
 {
@@ -150,4 +151,14 @@ namespace Engine
 	const bool EMU::Physics_HasContactAbove(Entity entity) { return m_physicsInterface.HasContactAbove(entity); }
 	const bool EMU::Physics_HasContactLeft(Entity entity) { return m_physicsInterface.HasContactLeft(entity); }
 	const bool EMU::Physics_HasContactRight(Entity entity) { return m_physicsInterface.HasContactRight(entity); }
+
+	// Screen interface
+	const Vector2D<int> EMU::GetScreenSize() { return Screen::GetScreenSize(); }
+	const Vector2D<int> EMU::GetVirtualSize() { return Screen::GetVirtualSize(); }
+	const Vector2D<float> EMU::GetScale() { return Screen::GetScale(); }
+	const float EMU::GetScaleConstant() { return Screen::GetScaleConstant(); }
+	const Vector2D<int> EMU::GetViewportSize() { return Screen::GetViewportSize(); }
+	const Vector2D<int> EMU::GetViewportPosition() { return Screen::GetViewportPosition(); }
+	void EMU::SetWindowSize(const Vector2D<int>& size) { Screen::SetWindowSize(size); }
+	void EMU::SetFullscreen() { Screen::SetFullscreen(); }
 }

@@ -317,12 +317,68 @@ namespace Engine
 		
 		////////////////////////////////////////////////////
 
+		///////////// Screen Interface functions ///////////
+
+		/*
+			Gets the display resolution of the screen.
+		*/
+		EMU_API const Vector2D<int> GetScreenSize();
+
+		/*
+			Gets the virtual size of the screen. Based on aspect ratio of render
+			output size. Virtual size height is fixed at 720 to support a reasonable
+			aspect ratio across different display resolutions.
+		*/
+		EMU_API const Vector2D<int> GetVirtualSize();
+
+		/*
+			Gets the scale factors for the screen.
+		*/
+		EMU_API const Vector2D<float> GetScale();
+
+		/*
+			Gets the scale constant for the screen.
+		*/
+		EMU_API const float GetScaleConstant();
+
+		/*
+			Gets the current viewport size.
+		*/
+		EMU_API const Vector2D<int> GetViewportSize();
+
+		/*
+			Gets the current viewport position.
+		*/
+		EMU_API const Vector2D<int> GetViewportPosition();
+
+		/*
+			Sets the window size to the specified size.
+			arg1: size - The desired window size as a Vector2D<int>.
+		*/
+		EMU_API void SetWindowSize(const Vector2D<int>& size);
+
+		/*
+			Sets the window to fullscreen mode.
+		*/
+		EMU_API void SetFullscreen();
+
+		////////////////////////////////////////////////////
+
+		////// Templated ECS Interface functions ///////////
+
+		/*
+			Adds a component of type T to the specified entity with the provided arguments.
+		*/
 		template<typename T, typename... Args>
 		void AddComponent(Entity entity, Args&&... componentArgs)
 		{
 			m_ecs.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
 		}
 
+		/*
+			Adds a component of type T to all entities with 
+			the specified character for all scenes.
+		*/
 		template <typename T, typename... Args>
 		void AddComponent(const char c, Args&&... componentArgs)
 		{
@@ -336,6 +392,8 @@ namespace Engine
 				}
 			}
 		}
+
+		////////////////////////////////////////////////////
 
 		// Event IO System Interface functions
 		EMU_API void RegisterIOEventListener(IOEventType type, IOEventHandler handler);

@@ -10,7 +10,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::F_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			// Need interface to toggle fullscreen.
-			Engine::Screen::SetFullscreen();
+			Engine::EMU::GetInstance()->SetFullscreen();
 			// Could add a setter for handled state and put the trace in there.
 			CLIENT_TRACE_D("Handled event:" + std::to_string(static_cast<int>(Engine::F_KEY_DOWN)));
 			e.Handled = true;
@@ -20,7 +20,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 		{
 			// Window Interface to call the resize function.
 			// refApp.GetWindowRenderer().ResizeWindow(e.X_POS, e.Y_POS);
-			Engine::Screen::SetWindowSize(Engine::Vector2D<int>(e.X_POS, e.Y_POS));
+			Engine::EMU::GetInstance()->SetWindowSize(Engine::Vector2D<int>(e.X_POS, e.Y_POS));
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::RESIZE_WINDOW)));
 			e.Handled = true;
 		});

@@ -5,21 +5,20 @@
 
 namespace Engine
 {
-
 	// Interface for client to set window size and fullscreen along with other misc screen properties
 	// Should this class be un-staticified and given a pointer to the window?
 	struct Screen
 	{
-		EMU_API inline static const Vector2D<int> GetScreenSize() { return DISPLAY_RESOLUTION; }
-		EMU_API inline static const Vector2D<int> GetVirtualSize() { return VIRTUAL_SIZE; }
-		EMU_API inline static const Vector2D<float> GetScale() { return SCALE; }
-		EMU_API inline static const float GetScaleConstant() { return SCALE_CONSTANT; }
+		inline static const Vector2D<int> GetScreenSize() { return DISPLAY_RESOLUTION; }
+		inline static const Vector2D<int> GetVirtualSize() { return VIRTUAL_SIZE; }
+		inline static const Vector2D<float> GetScale() { return SCALE; }
+		inline static const float GetScaleConstant() { return SCALE_CONSTANT; }
 		
-		EMU_API inline static const Vector2D<int> GetViewportSize() { return VIEWPORT_SIZE; }
-		EMU_API inline static const Vector2D<int> GetViewportPosition() { return VIEWPORT_POSITION; }
+		inline static const Vector2D<int> GetViewportSize() { return VIEWPORT_SIZE; }
+		inline static const Vector2D<int> GetViewportPosition() { return VIEWPORT_POSITION; }
 
-		EMU_API inline static void SetWindowSize(const Vector2D<int>& size) { VIEWPORT_SIZE = size; WINDOW_RESIZE_REQUEST = true; }
-		EMU_API inline static void SetFullscreen() { TOGGLE_FULLSCREEN_REQUEST = true; }
+		inline static void SetWindowSize(const Vector2D<int>& size) { VIEWPORT_SIZE = size; WINDOW_RESIZE_REQUEST = true; }
+		inline static void SetFullscreen() { TOGGLE_FULLSCREEN_REQUEST = true; }
 
 	private:
 
