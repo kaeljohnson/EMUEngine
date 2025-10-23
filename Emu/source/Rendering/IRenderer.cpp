@@ -7,6 +7,7 @@
 #include "../../include/ECS/ECS.h"
 #include "../../include/Components.h"
 #include "../../include/Time.h"
+#include "../../include/Rendering/Screen.h"
 
 #include <chrono>
 
@@ -45,8 +46,6 @@ namespace Engine
 
 		ENGINE_INFO_D("Window created!");
 
-		// Gotta be an easier way?
-		// Is there a way to get the full screen size without toggling fullscreen by default?
 		SDLDisplayMode displayMode;
 		if (ISDL::GetDesktopDisplayMode(0, &displayMode) != 0)
 		{
@@ -61,8 +60,6 @@ namespace Engine
 		SDL_SetWindowMinimumSize((SDL_Window*)m_ptrWindow, Screen::DISPLAY_RESOLUTION.X / 2, Screen::DISPLAY_RESOLUTION.Y / 2); // User should not be able to resize smaller than half the display resolution.
 
 		// Create renderer
-
-		// m_ptrRenderer = SDL_CREATE_RENDERER(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // rendering driver?
 		m_ptrRenderer = ISDL::CreateRenderer((SDLWindow*)m_ptrWindow, -1, SDL_RENDERER_ACCELERATED);
 		if (m_ptrRenderer == nullptr)
 		{
@@ -71,7 +68,7 @@ namespace Engine
 
 		ISDL::SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 
-		SetViewport();
+		setViewport();
 
 		// Renderer only supports one window.
 		m_rendererCreated = true;
@@ -86,14 +83,14 @@ namespace Engine
 	{
 		if (Screen::WINDOW_RESIZE_REQUEST)
 		{
-			SetViewport();
+			setViewport();
 			Screen::WINDOW_RESIZE_REQUEST = false;
 		}
 
 		if (Screen::TOGGLE_FULLSCREEN_REQUEST)
 		{
 			ToggleFullscreen();
-			SetViewport();
+			setViewport();
 			Screen::TOGGLE_FULLSCREEN_REQUEST = false;
 		}
 	}
@@ -241,7 +238,7 @@ namespace Engine
 		ISDL::RenderClear((SDLRenderer*)m_ptrRenderer);
 	}
 
-	void IRenderer::SetViewport()
+	void IRenderer::setViewport()
 	{
 		int windowWidthInPixels, windowHeightInPixels;
 		SDL_GetRendererOutputSize((SDLRenderer*)m_ptrRenderer, &windowWidthInPixels, &windowHeightInPixels);
@@ -283,7 +280,7 @@ namespace Engine
 		// Incompatibility with native video mode?
 		bool isFullscreen = ISDL::GetWindowFlags((SDLWindow*)m_ptrWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP;
 
-		// Engine should not support resizing the simulation. That is, the pixels per unit should not change.
+		// Renderer should not support resizing the simulation. That is, the pixels per unit should not change.
 		// What will happen when the window size changes is that the camera will center on the player, or 
 		// whatever object the camera is locked onto, until it hits the edge of the screen.
 
