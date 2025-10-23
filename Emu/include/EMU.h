@@ -21,31 +21,141 @@ namespace Engine
 		EMU_API inline void RunApp() { m_application.Start(); }
 		EMU_API inline void EndApp() { m_application.End(); }
 
-		// Scene Management
-		EMU_API Scene& CreateScene(const std::string& name);
-		EMU_API Scene& GetScene(const std::string& name) { return m_sceneManager.GetScene(name); }
-		EMU_API void LoadScene(const std::string& name);
-		EMU_API void UnloadCurrentScene();
+		//////////// Scene Management functions ////////////
+
+		using ContactCallback = std::function<void(const Contact&)>;
+
+		/*
+			Create a new scene with the given name.
+			arg1: name - The name of the scene to be created.
+		*/
+		EMU_API void Scenes_Create(const std::string& name);
+
+		/*
+			Load the scene with the given name. Calling this ends the current scene
+			and unloads it before loading the new scene.
+			arg1: name - The name of the scene to be loaded.
+		*/
+		EMU_API void Scenes_Load(const std::string& name);
+
+		/*
+			Registers a callback function that is triggered when a new scene is played.
+			arg1: name - The name of the scene for which the callback is to be registered.
+			arg2: callback - The function to be called when the scene is played.
+		*/
+		EMU_API void Scenes_RegisterOnPlay(const std::string& name, std::function<void()>);
+
+		/*
+			Register a contact callback between two entities identified by their characters.
+			Call this function to add a behavior that should be triggered when two entities
+			come into contact.
+			arg1: name - The name of the scene where the contact callback is to be registered.
+			arg2: contactType - The type of contact event (e.g., BEGIN_CONTACT, END_CONTACT).
+			arg3: entityA - The character representing the first entity involved in the contact.
+			arg4: entityB - The character representing the second entity involved in the contact.
+		*/
+		EMU_API void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entityA, const char entityB, ContactCallback callback);
+
+		/*
+			Register a contact callback for a single entity identified by its character.
+			Call this function to add a behavior that should be triggered when the specified
+			entity comes into contact with any other entity.
+			arg1: name - The name of the scene where the contact callback is to be registered.
+			arg2: contactType - The type of contact event (e.g., BEGIN_SENSOR, END_SENSOR).
+			arg3: entity - The character representing the entity involved in the contact.
+		*/
+		EMU_API void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entity, ContactCallback callback);
+
+		/*
+			Sets the physics simulation parameters for the scene with the given name.
+			arg1: name - The name of the scene for which the physics simulation is to be set.
+			arg2: gravity - The gravity vector to be applied in the physics simulation.
+		*/
+		EMU_API void Scenes_SetPhysicsSimulation(const std::string& name, const Vector2D<float> gravity);
+
+		/*
+			Adds an entity to the scene with the given name.
+			arg1: name - The name of the scene to which the entity is to be added.
+			arg2: entity - The entity to be added to the scene.
+		*/
+		EMU_API void Scenes_Add(const std::string& name, Entity entity);
+
+		/*
+			Gets the first entity with the given character in the current scene.
+			arg1: c - The character representing the entity to be retrieved.
+		*/
+		EMU_API Entity Scenes_GetCurrentRuntimeEntity(const char c);
+
+		/*
+			Gets the first entity with the given character in the specified scene.
+			arg1: sceneName - The name of the scene from which to retrieve the entity.
+			arg2: c - The character representing the entity to be retrieved.
+		*/
+		EMU_API Entity Scenes_GetEntityByCharacter(const std::string& sceneName, const char c);
+
+		/*
+			Gets all entities with the given character in the specified scene.
+			arg1: sceneName - The name of the scene from which to retrieve the entities.
+			arg2: c - The character representing the entities to be retrieved.
+		*/
+		EMU_API std::vector<Entity> Scenes_GetEntitiesByCharacter(const std::string& sceneName, const char c);
+
+		/*
+			Activates the specified entity in the scene with the given name.
+			arg1: entity - The entity to be activated in the scene.
+		*/
+		EMU_API void Scenes_Activate(Entity entity);
+
+		/*
+			Deactivates the specified entity in the scene with the given name.
+			arg1: entity - The entity to be deactivated in the scene.
+		*/
+		EMU_API void Scenes_Deactivate(Entity entity);
+
+		/*
+			Removes the specified entity from the scene with the given name.
+			arg1: name - The name of the scene from which the entity is to be removed.
+			arg2: entity - The entity to be removed from the scene.
+		*/
+		EMU_API void Scenes_Remove(const std::string& name, Entity entity);
+
+		/*
+			Adds a tile map to the scene with the given name using the specified map and rules files.
+			arg1: name - The name of the scene to which the tile map is to be added.
+			arg2: mapFileName - The filename of the tile map.
+			arg3: rulesFileName - The filename of the rules for the tile map.
+		*/
+		EMU_API void Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName);
+
+		/*
+			Gets the first entity corresponding to the specified tile character from the tile map
+			of the scene with the given name.
+			arg1: name - The name of the scene from which to retrieve the entity.
+			arg2: tileChar - The character representing the tile for which to retrieve the entity.
+		*/
+		EMU_API const Entity Scenes_GetTileMapEntity(const std::string& name, char tileChar);
+
+		/*
+			Gets all entities corresponding to the specified tile character from the tile map
+			of the scene with the given name.
+			arg1: name - The name of the scene from which to retrieve the entities.
+			arg2: tileChar - The character representing the tile for which to retrieve the entities.
+		*/
+		EMU_API const std::vector<Entity> Scenes_GetTileMapEntities(const std::string& name, const char tileChar);
+
+		/*
+			Sets the level dimensions for a scene without a tile map.
+			arg1: name - The name of the scene for which to set the level dimensions.
+			arg2: levelWidthInUnits - The dimensions of the level in world units.
+		*/
+		EMU_API void Scenes_SetLevelDimensions(const std::string& name, const Vector2D<int> levelWidthInUnits);
+
+		////////////////////////////////////////////////////
 
 		EMU_API TransformInterface& ITRANSFORMS() { return m_transformInterface; }
 
 		// ECS Interface functions
 		EMU_API Entity CreateEntity();
-
-		// Returns first entity with the given character.
-		EMU_API Entity GetEntityByCharacter(const char c, const std::string& sceneName);
-
-		// Returns vector of entities with the given character.
-		EMU_API std::vector<Entity> GetEntitiesByCharacter(const char c, const std::string& sceneName);
-
-		// Returns the current runtime entity with the given character.
-		EMU_API Entity GetCurrentRuntimeEntity(const char c);
-
-		// Activate all components in entity
-		EMU_API void Activate(Entity entity);
-		
-		// Deactivate all components in entity
-		EMU_API void Deactivate(Entity entity);
 
 		// Play a sound once. Take string temporarily as they may cause dynamic allocations.
 		EMU_API void PlaySound(int soundIndex, int volume, const bool loop = false);
@@ -418,6 +528,8 @@ namespace Engine
 		IOEventSystem m_ioEventSystem;
 		SceneManager m_sceneManager;
 		Application m_application;
+
+		Scene& getScene(const std::string& name) { return m_sceneManager.GetScene(name); }
 	};
 
 } // namespace Engine

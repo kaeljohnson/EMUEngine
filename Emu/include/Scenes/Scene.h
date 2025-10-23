@@ -7,7 +7,6 @@
 #include "../Physics/Physics.h"
 #include "../Camera/CameraSystem.h"
 #include "../Includes.h"
-#include "../Core.h"
 #include "../MathUtil.h"
 
 struct b2WorldId;
@@ -17,33 +16,33 @@ namespace Engine
 	class Scene
 	{
 	public:
-		EMU_API Scene(ECS& refECS, AssetManager& refAssetManager);
-		EMU_API ~Scene();
+		Scene(ECS& refECS, AssetManager& refAssetManager);
+		~Scene();
 
-		EMU_API void RegisterOnScenePlay(std::function<void()>);
+		void RegisterOnScenePlay(std::function<void()>);
 
 		using ContactCallback = std::function<void(const Contact&)>;
-		EMU_API void RegisterContactCallback(ContactType contactType, const char entityA, const char entityB, ContactCallback callback);
+		void RegisterContactCallback(ContactType contactType, const char entityA, const char entityB, ContactCallback callback);
 
-		EMU_API void RegisterContactCallback(ContactType contactType, const char entity, ContactCallback callback);
+		void RegisterContactCallback(ContactType contactType, const char entity, ContactCallback callback);
 
-		EMU_API void SetPhysicsSimulation(const Vector2D<float> gravity);
+		void SetPhysicsSimulation(const Vector2D<float> gravity);
 	
-		EMU_API void Add(Entity entity);
+		void Add(Entity entity);
 
 		// Removes entity from scene by removing entity
 		// from entities array and deactivating entity in ECS.
-		EMU_API void Activate(Entity entity);
+		void Activate(Entity entity);
 
-		EMU_API void Deactivate(Entity entity);
-		EMU_API void Remove(Entity entity);
+		void Deactivate(Entity entity);
+		void Remove(Entity entity);
 
-		EMU_API void AddTileMap(std::string mapFileName, std::string rulesFileName);
-		EMU_API Entity GetTileMapEntity(char tileChar) const;
-		EMU_API std::vector<Entity> GetTileMapEntities(const char tileChar) const;
+		void AddTileMap(std::string mapFileName, std::string rulesFileName);
+		const Entity GetTileMapEntity(char tileChar) const;
+		const std::vector<Entity> GetTileMapEntities(const char tileChar) const;
 
 		// IF theres no map in the level, client will decided the dimensions manually.
-		EMU_API void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
+		void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
 
 	private:
 		ECS& m_refECS;

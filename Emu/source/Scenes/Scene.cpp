@@ -206,12 +206,12 @@ namespace Engine
 		}
 	}
 
-	Entity Scene::GetTileMapEntity(char tileChar) const
+	const Entity Scene::GetTileMapEntity(char tileChar) const
 	{
 		return m_tileMap.GetEntity(tileChar);
 	}
 
-	std::vector<Entity> Scene::GetTileMapEntities(const char tileChar) const
+	const std::vector<Entity> Scene::GetTileMapEntities(const char tileChar) const
 	{
 		return m_tileMap.GetEntities(tileChar);
 	}
