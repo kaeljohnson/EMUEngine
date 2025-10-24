@@ -83,8 +83,8 @@ namespace Engine
 		return m_sceneManager.GetCurrentScene()->GetTileMapEntity(c);
 	}
 
-	void EMU::Scenes_Activate(Entity entity) { m_ecs.Activate(entity); m_sceneManager.GetCurrentScene()->Activate(entity); }
-	void EMU::Scenes_Deactivate(Entity entity) { m_sceneManager.GetCurrentScene()->Deactivate(entity); m_ecs.Deactivate(entity); }
+	void EMU::Scenes_Activate(Entity entity) { m_sceneManager.GetCurrentScene()->Activate(entity); }
+	void EMU::Scenes_Deactivate(Entity entity) { m_sceneManager.GetCurrentScene()->Deactivate(entity); }
 	void EMU::Scenes_Create(const std::string& name) { m_sceneManager.AddScene(name, m_ecs, m_assetManager); }
 	void EMU::Scenes_Load(const std::string& name) { m_sceneManager.QueueNewScene(name); }
 	void EMU::Scenes_RegisterOnPlay(const std::string& name, std::function<void()> func) { getScene(name).RegisterOnScenePlay(func); }
@@ -96,11 +96,11 @@ namespace Engine
 		getScene(name).RegisterContactCallback(contactType, entity, callback);
 	}
 	void EMU::Scenes_SetPhysicsSimulation(const std::string& name, const Vector2D<float> gravity) { getScene(name).SetPhysicsSimulation(gravity); }
-	void EMU::Scenes_Add(const std::string& name, Entity entity) { getScene(name).Add(entity); }
-	void EMU::Scenes_Remove(const std::string& name, Entity entity) { getScene(name).Remove(entity); m_ecs.Deactivate(entity); }
+	// void EMU::Scenes_Add(const std::string& name, Entity entity) { getScene(name).Add(entity); }
+	// void EMU::Scenes_Remove(const std::string& name, Entity entity) { getScene(name).Remove(entity); m_ecs.Deactivate(entity); }
 	void EMU::Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName) { getScene(name).AddTileMap(mapFileName, rulesFileName); }
 	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const char tileChar) { return getScene(name).GetTileMapEntity(tileChar); }
-	const std::vector<Entity> EMU::Scenes_GetTileMapEntities(const std::string& name, const char tileChar) { return getScene(name).GetTileMapEntities(tileChar); }
+	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const char tileChar) { return getScene(name).GetTileMapEntities(tileChar); }
 	void EMU::Scenes_SetLevelDimensions(const std::string& name, const Vector2D<int> levelWidthInUnits) { getScene(name).SetLevelDimensions(levelWidthInUnits); }
 
 	void EMU::Camera_SetPixelsPerUnit(Entity entity, const int pixelsPerUnit) { m_cameraInterface.SetPixelsPerUnit(entity, pixelsPerUnit); }

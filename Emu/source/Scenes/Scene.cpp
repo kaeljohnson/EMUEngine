@@ -18,11 +18,11 @@ static json rulesJson; // Only one rules file per game for now so this will work
 namespace Engine
 {
 	Scene::Scene(ECS& refECS, AssetManager& refAssetManager)
-		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), HasTileMap(false), m_tileMap(m_refECS), 
+		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), m_hasTileMap(false), m_tileMap(m_refECS), 
 		m_physicsSimulation(refECS, m_tileMap), m_refAssetManager(refAssetManager),
 		m_cameraSystem(refECS)
 	{
-		m_entities.reserve(10000);
+		m_entities.reserve(50000);
 	}
 
 	Scene::~Scene()
@@ -54,19 +54,18 @@ namespace Engine
 		// 1. Create the world.
 		m_physicsSimulation.CreateWorld(Vector2D<float>(0.0f, 100.0f)); //TODO: Client sets gravity.
 
-		// 2. Load audio files for the tile map.
+		// 2. Load audio files for the scene.
 		loadAudioFiles();
 
-		// 3. Load the map. Adds components defined in the rules file and adds them to the ECS.
+		// 3. Load the entities associated with the characters in the tile map.
+		//	  Adds components defined in the rules file and adds them to the ECS.
+		//    This function also activates the entites in the ECS.
 		loadSceneEntitiesFromTileMap();
 
-		// 4. Activate the entities in the ECS. This will activate all components in the ECS.
-		// m_refECS.ActivateEntities(m_entities);
 
 		// 5. Frame the cameras
-		m_cameraSystem.Frame(Vector2D<int>(GetLevelWidth(), GetLevelHeight()));
+		m_cameraSystem.Frame(Vector2D<int>(m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y));
 		
-
 		// 6. Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld(m_entities);
 		m_physicsSimulation.AddLineCollidersToWorld(m_entities);
@@ -121,25 +120,39 @@ namespace Engine
 		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_levelDimensionsInUnits.X) + ", Map height: " 
 			+ std::to_string(m_levelDimensionsInUnits.Y));
 
-		HasTileMap = true;
+		m_hasTileMap = true;
 
 		for (auto& [coords, info] : m_tileMap.GetMap())
 		{	
-			Add(info.first);
+			add(info.first);
 		}
 	}
 
-	void Scene::Add(Entity entity)
+	void Scene::add(Entity entity)
 	{
+		if (std::find(m_entities.begin(), m_entities.end(), entity) != m_entities.end()) // SLOW. Temp for now.
+		{
+			ENGINE_INFO("Entity already exists in the scene: " + std::to_string(entity));
+			return;
+		}
+
 		m_entities.push_back(entity);
 	}
 
 	void Scene::Activate(Entity entity)
 	{
-		ActivatePhysics(entity);
+		if (std::find(m_entities.begin(), m_entities.end(), entity) == m_entities.end()) // SLOW. Temp for now.
+		{
+			ENGINE_INFO("Entity does not exist in the current scene: " + std::to_string(entity));
+			return;
+		}
+
+		m_refECS.Activate(entity);
+
+		activatePhysics(entity);
 	}
 
-	void Scene::ActivatePhysics(Entity entity)
+	void Scene::activatePhysics(Entity entity)
 	{
 		m_physicsSimulation.ActivateBody(entity);
 		m_physicsSimulation.ActivateChains(entity);
@@ -147,27 +160,36 @@ namespace Engine
 
 	void Scene::Deactivate(Entity entity)
 	{
-		DeactivatePhysics(entity);
+		if (std::find(m_entities.begin(), m_entities.end(), entity) == m_entities.end()) // SLOW. Temp for now.
+		{
+			ENGINE_INFO("Entity does not exist in the current scene: " + std::to_string(entity));
+			return;
+		}
+
+		deactivatePhysics(entity);
+
+		m_refECS.Deactivate(entity);
 	}
 
-	void Scene::DeactivatePhysics(Entity entity)
+	void Scene::deactivatePhysics(Entity entity)
 	{
 		m_physicsSimulation.DeactivateBody(entity);
 		m_physicsSimulation.DeactivateChains(entity);
 	}
 
-	void Scene::Remove(Entity entity)
-	{
-		// Remove entity from the scene. Do not remove the entity from the ECS, just deactivate it.
-		m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());
-		m_refECS.Deactivate(entity);
-	}
+	//void Scene::Remove(Entity entity)
+	//{
+	//	// Remove entity from the scene. Do not remove the entity from the ECS, just deactivate it.
+	//	m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());
+	//	m_refECS.Deactivate(entity);
+	//}
 
 	void Scene::SetLevelDimensions(const Vector2D<int> levelDimensions)
 	{
-		if (HasTileMap)
+		if (m_hasTileMap)
 		{
-			ENGINE_INFO_D("Scene already has a map. Overriding map width!");
+			ENGINE_INFO_D("Scene already has a tile map. Cannot override map dimensions!");
+			return;
 		}
 
 		m_levelDimensionsInUnits = levelDimensions;
@@ -196,7 +218,7 @@ namespace Engine
 
 		// Need a reset function for the world which resets all objects in the world.
 
-		if (!HasTileMap)
+		if (!m_hasTileMap)
 		{
 			ENGINE_INFO_D("No map in the level. Add map or set level dimensions manually.");
 		}
@@ -211,7 +233,7 @@ namespace Engine
 		return m_tileMap.GetEntity(tileChar);
 	}
 
-	const std::vector<Entity> Scene::GetTileMapEntities(const char tileChar) const
+	const std::vector<Entity>& Scene::GetTileMapEntities(const char tileChar) const
 	{
 		return m_tileMap.GetEntities(tileChar);
 	}

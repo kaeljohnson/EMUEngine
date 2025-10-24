@@ -74,11 +74,13 @@ namespace Engine
 		EMU_API void Scenes_SetPhysicsSimulation(const std::string& name, const Vector2D<float> gravity);
 
 		/*
+			TODO: Not supported for now.
 			Adds an entity to the scene with the given name.
+			If this is called during runtime, the entity must be manually activated by client.
 			arg1: name - The name of the scene to which the entity is to be added.
 			arg2: entity - The entity to be added to the scene.
 		*/
-		EMU_API void Scenes_Add(const std::string& name, Entity entity);
+		// EMU_API void Scenes_Add(const std::string& name, Entity entity);
 
 		/*
 			Gets the first entity with the given character in the current scene.
@@ -113,11 +115,12 @@ namespace Engine
 		EMU_API void Scenes_Deactivate(Entity entity);
 
 		/*
+			TODO: Not supported for now.
 			Removes the specified entity from the scene with the given name.
 			arg1: name - The name of the scene from which the entity is to be removed.
 			arg2: entity - The entity to be removed from the scene.
 		*/
-		EMU_API void Scenes_Remove(const std::string& name, Entity entity);
+		// EMU_API void Scenes_Remove(const std::string& name, Entity entity);
 
 		/*
 			Adds a tile map to the scene with the given name using the specified map and rules files.
@@ -141,7 +144,7 @@ namespace Engine
 			arg1: name - The name of the scene from which to retrieve the entities.
 			arg2: tileChar - The character representing the tile for which to retrieve the entities.
 		*/
-		EMU_API const std::vector<Entity> Scenes_GetTileMapEntities(const std::string& name, const char tileChar);
+		EMU_API const std::vector<Entity>& Scenes_GetTileMapEntities(const std::string& name, const char tileChar);
 
 		/*
 			Sets the level dimensions for a scene without a tile map.
@@ -495,7 +498,7 @@ namespace Engine
 			std::unordered_map<std::string, Scene>& scenes = m_sceneManager.GetAllScenes();
 			for (auto& scene : scenes)
 			{
-				std::vector<Entity> entities = scene.second.GetTileMapEntities(c);
+				const std::vector<Entity>& entities = Scenes_GetTileMapEntities(scene.first, c);
 				for (Entity entity : entities)
 				{
 					m_ecs.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
