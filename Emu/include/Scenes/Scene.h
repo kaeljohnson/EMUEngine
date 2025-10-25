@@ -70,8 +70,7 @@ namespace Engine
 		/*
 			Activates an entity within the scene. There are various systems that need to be notified
 			when an entity is activated so they can initialize any required data structures.
-			Physics system needs to create physics bodies, etc.
-			Note: This function does not activate the entity in the ECS.
+			Physics system needs to create physics bodies, ecs, etc.
 			arg1: entity - The Entity to be activated.
 		*/
 		void Activate(Entity entity);
@@ -79,8 +78,7 @@ namespace Engine
 		/*
 			Deactivates an entity within the scene. There are various systems that need to be notified
 			when an entity is deactivated so they can clean up any required data structures.
-			Physics system needs to destroy physics bodies, etc.
-			Note: This function does not deactivate the entity in the ECS.
+			Physics system needs to destroy physics bodies, ecs, etc.
 			arg1: entity - The Entity to be deactivated.
 		*/
 		void Deactivate(Entity entity);
