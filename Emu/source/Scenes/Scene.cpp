@@ -52,7 +52,7 @@ namespace Engine
 		// Order matters here.
 
 		// 1. Create the world.
-		m_physicsSimulation.CreateWorld(Vector2D<float>(0.0f, 100.0f)); //TODO: Client sets gravity.
+		m_physicsSimulation.CreateWorld();
 
 		// 2. Load audio files for the scene.
 		loadAudioFiles();
@@ -110,10 +110,7 @@ namespace Engine
 		m_mapFileName = mapFileName;
 		m_rulesFileName = rulesFileName;
 
-		// Get a temp vector or tile IDs from the tile map. Both the transforms and the physics bodies.
 		m_tileMap.CreateMap(mapFileName, rulesFileName);
-
-		// ENGINE_INFO_D("Tile map text file size: " + std::to_string(m_tileMap.m_map.size()));
 
 		m_levelDimensionsInUnits = Vector2D<int>(m_tileMap.GetWidth(), m_tileMap.GetHeight());
 
@@ -205,27 +202,11 @@ namespace Engine
 		m_cameraSystem.Update(refAssetManager);
 	}
 
-	// Is this function necessary?
-	void Scene::SetPhysicsSimulation(const Vector2D<float> gravity)
+	void Scene::SetGravity(const Vector2D<float> gravity)
 	{
-		// What happens if this is called multiple times for one scene? Make sure nothing bad.
-
 		ENGINE_INFO_D("Setting gravity: " + std::to_string(gravity.X) + ", " + std::to_string(gravity.Y));
 
-		// m_gravity = gravity;
-
 		m_physicsSimulation.UpdateGravity(gravity);
-
-		// Need a reset function for the world which resets all objects in the world.
-
-		if (!m_hasTileMap)
-		{
-			ENGINE_INFO_D("No map in the level. Add map or set level dimensions manually.");
-		}
-		else
-		{
-			ENGINE_INFO_D("Map exists in the level. Setting level width and height to map width and height.");
-		}
 	}
 
 	const Entity Scene::GetTileMapEntity(char tileChar) const
@@ -280,558 +261,392 @@ namespace Engine
 		}
 	}
 
+	template<typename T>
+	static Vector2D<T> ExtractVector2DFromJSON(const json& j, const std::string& key, Vector2D<T> ioVec)
+	{
+		if (!j.contains(key)) return ioVec;
+		const auto& arr = j.at(key);
+		if (!arr.is_array() || arr.size() != 2) return ioVec;
+
+		if constexpr (std::is_floating_point_v<T>)
+		{
+			if (arr[0].is_number()) ioVec.X = static_cast<T>(arr[0].get<double>());
+			if (arr[1].is_number()) ioVec.Y = static_cast<T>(arr[1].get<double>());
+		}
+		else if constexpr (std::is_integral_v<T>)
+		{
+			if (arr[0].is_number_integer()) ioVec.X = static_cast<T>(arr[0].get<long long>());
+			else if (arr[0].is_number()) ioVec.X = static_cast<T>(arr[0].get<long long>());
+			if (arr[1].is_number_integer()) ioVec.Y = static_cast<T>(arr[1].get<long long>());
+			else if (arr[1].is_number()) ioVec.Y = static_cast<T>(arr[1].get<long long>());
+		}
+		return ioVec;
+	}
+
+	size_t Scene::loadNumUnitsPerTile()
+	{
+		if (rulesJson.contains("NumMetersPerTile") && rulesJson["NumMetersPerTile"].is_number())
+			return rulesJson["NumMetersPerTile"].get<size_t>();
+
+		throw std::runtime_error("NumMetersPerTile not found or invalid in rules JSON");
+	}
+
+	std::string Scene::validateSpriteSheetPath()
+	{
+		if (!rulesJson.contains("PathToSpriteSheets"))
+			throw std::runtime_error("Missing 'PathToSpriteSheets' in rules file");
+
+		std::string spriteSheetsPath = rulesJson["PathToSpriteSheets"];
+		if (!std::filesystem::exists(spriteSheetsPath))
+			throw std::runtime_error("Sprite sheets path does not exist: " + spriteSheetsPath);
+
+		return spriteSheetsPath;
+	}
+
+	static void addTransformComponent(ECS& refECS, Entity entity, const json& characterRules, int x, int y, size_t numUnitsPerTile)
+	{
+		if (!characterRules.contains("Transform")) return;
+
+		auto& transformJson = characterRules["Transform"];
+		int zIndex = transformJson.value("ZIndex", 0);
+		bool drawDebug = transformJson.contains("DrawDebug");
+		std::string debugColor = drawDebug ? transformJson.value("DrawDebug", "red") : "red";
+
+		refECS.AddComponent<Transform>(
+			entity,
+			Vector2D<float>(x * (float)numUnitsPerTile, y * (float)numUnitsPerTile),
+			Vector2D<float>((float)numUnitsPerTile, (float)numUnitsPerTile),
+			1.0f, 1.0f, 1, zIndex, drawDebug, debugColor
+		);
+	}
+
+	static void addCameraComponent(ECS& refECS, Entity entity, const json& characterRules)
+	{
+		if (!characterRules.contains("Camera")) return;
+
+		auto& cameraJSON = characterRules["Camera"];
+		Vector2D<float> size = ExtractVector2DFromJSON<float>(cameraJSON, "Size", { 0.0f, 0.0f });
+		int pixelsPerUnit = cameraJSON.value("PixelsPerUnit", 0);
+		bool clampingOn = cameraJSON.value("ClampingOn", false);
+
+		Vector2D<float> screenRatio = { 1.0f, 1.0f };
+		Vector2D<float> position = { 0.0f, 0.0f };
+
+		if (cameraJSON.contains("Window"))
+		{
+			auto& win = cameraJSON["Window"];
+			position.X = win.value("X", 0.0f);
+			position.Y = win.value("Y", 0.0f);
+			screenRatio.X = win.value("Width", 1.0f);
+			screenRatio.Y = win.value("Height", 1.0f);
+		}
+
+		refECS.AddComponent<Camera>(entity, size, screenRatio, position, pixelsPerUnit, clampingOn);
+	}
+
+	static void addPhysicsComponent(ECS& refECS, TileMap& refTileMap, Entity tileEntity, const char tileChar, const json& characterRulesJson,
+		int x, int y, size_t numUnitsPerTile, std::unordered_set<char>& isSolid, const bool activeOnStart)
+	{
+		if (!characterRulesJson.contains("Physics")) return;
+
+		// Add Physics components.
+		BodyType bodyType = STATIC;
+		Filter category = ALL;
+		Filter mask = ALL;
+		Vector2D<float> size = Vector2D<float>(static_cast<float>(numUnitsPerTile), static_cast<float>(numUnitsPerTile));
+		bool gravityOn = false;
+		bool checkSimpleContacts = false;
+		bool useChains = false;
+
+		if (characterRulesJson.contains("Physics"))
+		{
+			json characterPhysicsRulesJson = characterRulesJson["Physics"];
+
+			// Physics library needs to know if the body is enabled or not.
+			const bool enabled = activeOnStart;
+
+			if (characterPhysicsRulesJson.contains("Category"))
+			{
+				const auto& categoryJson = characterPhysicsRulesJson["Category"];
+				std::string categoryStr = categoryJson;
+				if (categoryStr == "NONE") category = NONE;
+				else if (categoryStr == "PLAYER") category = PLAYER;
+				else if (categoryStr == "MAP") category = MAP;
+				else if (categoryStr == "ALL") category = ALL;
+			}
+			if (characterPhysicsRulesJson.contains("Mask"))
+			{
+				const auto& maskJson = characterPhysicsRulesJson["Mask"];
+				std::string maskStr = maskJson;
+				if (maskStr == "NONE") mask = NONE;
+				else if (maskStr == "PLAYER") mask = PLAYER;
+				else if (maskStr == "MAP") mask = MAP;
+				else if (maskStr == "ALL") mask = ALL;
+			}
+			if (characterPhysicsRulesJson.contains("BodyType"))
+			{
+				const auto& bodyTypeJson = characterPhysicsRulesJson["BodyType"];
+				std::string bodyTypeStr = bodyTypeJson;
+				if (bodyTypeStr == "STATIC") bodyType = STATIC;
+				else if (bodyTypeStr == "DYNAMIC") bodyType = DYNAMIC;
+				else if (bodyTypeStr == "KINEMATIC") bodyType = KINEMATIC;
+				else if (bodyTypeStr == "SENSOR") bodyType = SENSOR;
+			}
+
+			if (bodyType != SENSOR)
+			{
+				// If body is not a sensor, it is solid and collides with other bodies.
+				// This information is needed for the chain system to know which tiles to link to.
+				// Not the best design but will work for now.
+				isSolid.emplace(tileChar);
+
+				if (characterPhysicsRulesJson.contains("UseChains")) // Chains are not used for sensors.
+				{
+					const auto& useChainsJson = characterPhysicsRulesJson["UseChains"];
+					bool useChainsStr = useChainsJson;
+					if (useChainsStr == true)
+					{
+						useChains = true;
+					}
+				}
+			}
+
+			if (characterPhysicsRulesJson.contains("GravityOn"))
+			{
+				const auto& gravityOnJson = characterPhysicsRulesJson["GravityOn"];
+				bool gravityOnStr = gravityOnJson;
+				if (gravityOnStr == true)
+				{
+					gravityOn = true;
+				}
+			}
+			if (characterPhysicsRulesJson.contains("CheckSimpleContacts"))
+			{
+				const auto& checkSimpleContactsJson = characterPhysicsRulesJson["CheckSimpleContacts"];
+				bool checkSimpleContactsStr = checkSimpleContactsJson;
+				if (checkSimpleContactsStr == true)
+				{
+					checkSimpleContacts = true;
+				}
+
+			}
+			if (characterPhysicsRulesJson.contains("DefaultPhysicsBodySize"))
+			{
+				const auto& sizeJson = characterPhysicsRulesJson["DefaultPhysicsBodySize"];
+				if (sizeJson.is_array() && sizeJson.size() == 2)
+				{
+					if (sizeJson[0].is_number() && sizeJson[1].is_number())
+					{
+						size.X = sizeJson[0].get<float>();
+						size.Y = sizeJson[1].get<float>();
+					}
+				}
+			}
+
+			if (useChains) // Chains are used on tiles, typically map tiles, to avoid ghose collisions on adjacent tiles.
+			{
+				auto isTileSolid = [&](int x, int y) -> bool
+					{
+						const auto* tile = refTileMap.GetTile(x, y);
+						return tile && isSolid.find(tile->second) != isSolid.end();
+					};
+
+				bool hasTileAbove = y > 0 && isTileSolid(x, y - 1);
+				bool hasTileBelow = y < refTileMap.GetHeight() - 1 && isTileSolid(x, y + 1);
+				bool hasTileLeft = x > 0 && refTileMap.GetTile(x - 1, y) && isTileSolid(x - 1, y);
+				bool hasTileRight = x < refTileMap.GetWidth() - 1 && isTileSolid(x + 1, y);
+
+				bool hasTileDiagonalLeftAbove = x > 0 && y > 0 && isTileSolid(x - 1, y - 1);
+				bool hasTileDiagonalLeftBelow = x > 0 && y < refTileMap.GetHeight() - 1 && isTileSolid(x - 1, y + 1);
+				bool hasTileDiagonalRightAbove = x < refTileMap.GetWidth() - 1 && y > 0 && isTileSolid(x + 1, y - 1);
+				bool hasTileDiagonalRightBelow = x < refTileMap.GetWidth() - 1 && y < refTileMap.GetHeight() - 1 && isTileSolid(x + 1, y + 1);
+
+				if (!hasTileAbove)
+				{
+					float ghostX0, ghostY0;
+					float x1 = (float)x;
+					float y1 = (float)y;
+					float x2 = x + 1.0f;
+					float y2 = (float)y;
+					float ghostX3, ghostY3;
+
+					if (!hasTileRight) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y + 1.0f; }
+					else if (hasTileRight && hasTileDiagonalRightAbove) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y - 1.0f; }
+					else if (hasTileRight) { ghostX3 = (float)x + 2.0f; ghostY3 = (float)y; }
+
+					if (!hasTileLeft) { ghostX0 = (float)x; ghostY0 = (float)y + 1.0f; }
+					else if (hasTileLeft && hasTileDiagonalLeftAbove) { ghostX0 = (float)x; ghostY0 = (float)y - 1.0f; }
+					else if (hasTileLeft) { ghostX0 = (float)x - 1.0f; ghostY0 = (float)y; }
+
+					refECS.AddComponent<ChainColliderTop>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+						Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
+				}
+
+				if (!hasTileLeft)
+				{
+					float ghostX0, ghostY0;
+					float x1 = (float)x;
+					float y1 = y + 1.0f;
+					float x2 = (float)x;
+					float y2 = (float)y;
+					float ghostX3, ghostY3;
+
+					if (!hasTileAbove) { ghostX3 = x + 1.0f; ghostY3 = (float)y; }
+					else if (hasTileAbove && hasTileDiagonalLeftAbove) { ghostX3 = (float)x - 1.0f; ghostY3 = (float)y; }
+					else if (hasTileAbove) { ghostX3 = (float)x; ghostY3 = (float)y - 1.0f; }
+
+					if (!hasTileBelow) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y + 1.0f; }
+					else if (hasTileBelow && hasTileDiagonalLeftBelow) { ghostX0 = (float)x - 1.0f; ghostY0 = (float)y + 1.0f; }
+					else if (hasTileBelow) { ghostX0 = (float)x; ghostY0 = (float)y + 2.0f; }
+
+					refECS.AddComponent<ChainColliderLeft>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+						Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
+				}
+
+				if (!hasTileBelow)
+				{
+					float ghostX0, ghostY0;
+					float x1 = x + 1.0f;
+					float y1 = y + 1.0f;
+					float x2 = (float)x;
+					float y2 = y + 1.0f;
+					float ghostX3, ghostY3;
+
+					if (!hasTileLeft) { ghostX3 = (float)x; ghostY3 = (float)y; }
+					else if (hasTileLeft && hasTileDiagonalLeftBelow) { ghostX3 = (float)x; ghostY3 = (float)y + 2.0f; }
+					else if (hasTileLeft) { ghostX3 = (float)x - 1.0f; ghostY3 = (float)y + 1.0f; }
+
+					if (!hasTileRight) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y; }
+					else if (hasTileRight && hasTileDiagonalRightBelow) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y + 2.0f; }
+					else if (hasTileRight) { ghostX0 = (float)x + 2.0f; ghostY0 = (float)y + 1.0f; }
+
+					refECS.AddComponent<ChainColliderBottom>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+						Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
+				}
+
+				if (!hasTileRight)
+				{
+					float ghostX0, ghostY0;
+					float x1 = x + 1.0f;
+					float y1 = (float)y;
+					float x2 = x + 1.0f;
+					float y2 = y + 1.0f;
+					float ghostX3, ghostY3;
+
+					if (!hasTileAbove) { ghostX0 = (float)x; ghostY0 = (float)y; }
+					else if (hasTileAbove && hasTileDiagonalRightAbove) { ghostX0 = (float)x + 2.0f; ghostY0 = (float)y; }
+					else if (hasTileAbove) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y - 1.0f; }
+
+					if (!hasTileBelow) { ghostX3 = (float)x; ghostY3 = (float)y + 1.0f; }
+					else if (hasTileBelow && hasTileDiagonalRightBelow) { ghostX3 = (float)x + 2.0f; ghostY3 = (float)y + 1.0f; }
+					else if (hasTileBelow) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y + 2.0f; }
+
+					refECS.AddComponent<ChainColliderRight>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
+						Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
+				}
+			}
+			else // Create a regular physics body for the tiles that don't use chains.
+			{
+				refECS.AddComponent<PhysicsBody>(tileEntity, enabled, bodyType, category, mask,
+					Vector2D<float>(size.X, size.Y),
+					Vector2D<float>(static_cast<float>(x) * static_cast<float>(numUnitsPerTile), static_cast<float>(y) * static_cast<float>(numUnitsPerTile)),
+					0.0f, gravityOn, checkSimpleContacts);
+			}
+		}
+	}
+
+	void addSpriteComponent(ECS& refECS, AssetManager& refAssetManager, Entity entity, const json& characterRules,
+		const std::string& spriteSheetsPath, char tileChar)
+	{
+		if (!characterRules.contains("SpriteSheet") || !characterRules.contains("Animations")) return;
+
+		auto& spriteJson = characterRules["SpriteSheet"];
+		auto& animJson = characterRules["Animations"];
+
+		std::string path = spriteJson.value("Path", "");
+		if (path.empty())
+		{
+			ENGINE_CRITICAL("No path for sprite sheet found for tile: " + std::string(1, tileChar));
+			return;
+		}
+
+		refAssetManager.LoadTexture(entity, spriteSheetsPath + path);
+
+		Vector2D<float> frameSize = ExtractVector2DFromJSON<float>(spriteJson, "SizeInUnits", { 1.0f, 1.0f });
+		Vector2D<int> pixelsPerFrame = ExtractVector2DFromJSON<int>(spriteJson, "PixelsPerFrame", { 32, 32 });
+		Vector2D<float> offsetFromTransform = ExtractVector2DFromJSON<float>(spriteJson, "OffsetFromTransform", { 0.0f, 0.0f });
+		Vector2D<size_t> dimensions = { spriteJson.value("Width", (size_t)1), spriteJson.value("Height", (size_t)1) };
+
+		bool drawDebug = spriteJson.contains("DrawDebug");
+		std::string debugColor = drawDebug ? spriteJson["DrawDebug"].get<std::string>() : "red";
+
+		std::unordered_map<std::string, Animation> animations;
+		json j = json::parse(characterRules["Animations"].dump());
+
+		auto makeAnimation = [](const std::string& name, const json& jAnim, Vector2D<int> pixelsPerFrame,
+			const Vector2D<float> offsetFromTransform, const Vector2D<size_t> dimensions,
+			const Vector2D<float> frameSize, bool drawDebug, const std::string& debugColor)
+			{
+				Animation a;
+				a.m_name = name;
+				a.m_frames = jAnim.at("Frames").get<std::vector<int>>();
+				a.m_numFrames = a.m_frames.size();
+				a.m_frameDuration = jAnim.at("FrameTime").get<int>();
+				a.m_pixelsPerFrame = pixelsPerFrame;
+				a.m_dimensions = dimensions;
+				a.m_size = frameSize;
+				a.m_offsetFromTransform = offsetFromTransform;
+				a.m_loop = jAnim.at("Loop").get<bool>();
+				a.m_drawDebug = drawDebug;
+				a.m_debugColor = debugColor;
+
+				return a;
+			};
+
+
+		for (auto& [name, value] : j.items())
+		{
+			animations.emplace(name, makeAnimation(name, value, pixelsPerFrame, offsetFromTransform,
+				dimensions, frameSize, drawDebug, debugColor));
+		}
+
+		refECS.AddComponent<Animations>(entity, animations);
+	}
+
+
 	void Scene::loadSceneEntitiesFromTileMap()
 	{
-		std::unordered_set<char> isSolid;
-		size_t numUnitsPerTile = 0;
-
-		// Read the NumMetersPerTile and store it in your member variable
-		if (rulesJson.contains("NumMetersPerTile") && rulesJson["NumMetersPerTile"].is_number())
-		{
-			numUnitsPerTile = rulesJson["NumMetersPerTile"];
-		}
-		else
-		{
-			throw std::runtime_error("NumMetersPerTile not found or invalid in rules JSON");
-		}
-
+		size_t numUnitsPerTile = loadNumUnitsPerTile();
+		std::string spriteSheetsPath = validateSpriteSheetPath();
 		auto& tileRules = rulesJson["Tile Rules"];
+		std::unordered_set<char> isSolid;
 
-		// Check if the rules file contains a "SpriteSheetsPath" key
-		if (!rulesJson.contains("PathToSpriteSheets"))
-		{
-			ENGINE_CRITICAL("No sprite sheets path found in rules file. Add path to folder with sprite pngs.");
-			throw std::runtime_error("No sprite sheets path found in rules file. Add path to folder with sprite pngs.");
-			return;
-		}
-
-		// Get the sprite sheets path.
-		const auto& spriteSheetsPathJson = rulesJson["PathToSpriteSheets"];
-		std::string spriteSheetsPath = spriteSheetsPathJson;
-		ENGINE_INFO_D("Sprite sheets path: " + spriteSheetsPath);
-
-		// Check if app has sprite folder.
-		if (!std::filesystem::exists(spriteSheetsPath))
-		{
-			ENGINE_CRITICAL("Sprite sheets path does not exist: " + spriteSheetsPath);
-			return;
-		}
-
-		// Create entity, character tiles.
 		for (auto& [coords, info] : m_tileMap.GetMap())
 		{
 			const char tileChar = info.second;
 			const int x = coords.first;
 			const int y = coords.second;
-
 			Entity tileEntity = info.first;
 
-			// Convert tile char to string key ("P", "S", etc.)
 			std::string tileKey(1, tileChar);
-
 			if (!tileRules.contains(tileKey))
 			{
 				ENGINE_INFO_D("No such tile exists: " + tileKey);
 				continue;
 			}
 
-			json characterRulesJson = tileRules[tileKey];
+			json& characterRules = tileRules[tileKey];
+			bool activeOnStart = characterRules.value("ActiveOnStart", true);
 
-			bool activeOnStart = true;
-			if (characterRulesJson.contains("ActiveOnStart"))
-			{
-				const auto& activeOnStartJson = characterRulesJson["ActiveOnStart"];
-				bool activeOnStartBool = activeOnStartJson;
-				if (activeOnStartBool == false)
-				{
-					activeOnStart = false;
-				}
-			}
+			addTransformComponent(m_refECS, tileEntity, characterRules, x, y, numUnitsPerTile);
+			addCameraComponent(m_refECS, tileEntity, characterRules);
+			addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileChar, characterRules, x, y, numUnitsPerTile, isSolid, activeOnStart);
+			addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, characterRules, spriteSheetsPath, tileChar);
 
-			const bool hasTransform = characterRulesJson.contains("Transform");
-			if (hasTransform)
-			{
-				int zIndex = 0; // Default depth.
-				if (characterRulesJson["Transform"].contains("ZIndex"))
-				{
-					const auto& zIndexJson = characterRulesJson["Transform"]["ZIndex"];
-					if (zIndexJson.is_number())
-					{
-						zIndex = zIndexJson.get<int>();
-					}
-					else if (zIndexJson.is_string())
-					{
-						// Handle string case if needed
-						ENGINE_INFO_D("ZIndex is a string");
-					}
-				}
-
-				bool drawDebug = false;
-				std::string debugColor = "red";
-				if (characterRulesJson["Transform"].contains("DrawDebug"))
-				{
-					drawDebug = true;
-
-					const auto& drawDebugJson = characterRulesJson["Transform"]["DrawDebug"];
-					if (drawDebugJson.is_string())
-					{
-						debugColor = drawDebugJson;
-					}
-				}
-
-				m_refECS.AddComponent<Transform>(
-					tileEntity,
-					Vector2D<float>(x * static_cast<float>(numUnitsPerTile),
-						y * static_cast<float>(numUnitsPerTile)),
-					Vector2D<float>(static_cast<float>(numUnitsPerTile),
-						static_cast<float>(numUnitsPerTile)),
-					1.0f, 1.0f, 1, zIndex, drawDebug, debugColor
-				);
-			}
-
-			// check for camera.
-			const bool hasCamera = characterRulesJson.contains("Camera");
-			if (hasCamera)
-			{
-				Vector2D<float> size = Vector2D<float>(0.0f, 0.0f);
-				Vector2D<float> screenRatio = Vector2D<float>(1.0f, 1.0f);
-				Vector2D<float> positionInFractionOfScreenSize = Vector2D<float>(0.0f, 0.0f);
-				int pixelsPerUnit = 0;
-				bool clampingOn = false;
-
-				if (characterRulesJson["Camera"].contains("Size"))
-				{
-					const auto& sizeJson = characterRulesJson["Camera"]["Size"];
-					if (sizeJson.is_array() && sizeJson.size() == 2)
-					{
-						if (sizeJson[0].is_number() && sizeJson[1].is_number())
-						{
-							size.X = sizeJson[0].get<float>();
-							size.Y = sizeJson[1].get<float>();
-						}
-					}
-					else
-					{
-						ENGINE_ERROR_D("Camera size is not an array of two numbers");
-					}
-				}
-
-				if (characterRulesJson["Camera"].contains("PixelsPerUnit"))
-				{
-					const auto& pixelsPerUnitJson = characterRulesJson["Camera"]["PixelsPerUnit"];
-					if (pixelsPerUnitJson.is_number())
-					{
-						pixelsPerUnit = pixelsPerUnitJson.get<int>();
-					}
-					else
-					{
-						ENGINE_ERROR_D("PixelsPerUnit is not a number");
-					}
-				}
-
-				if (characterRulesJson["Camera"].contains("ClampingOn"))
-				{
-					const auto& clampingOnJson = characterRulesJson["Camera"]["ClampingOn"];
-					if (clampingOnJson.is_boolean())
-					{
-						clampingOn = clampingOnJson.get<bool>();
-					}
-					else
-					{
-						ENGINE_ERROR_D("ClampingOn is not a boolean");
-					}
-				}
-				if (characterRulesJson["Camera"].contains("Window"))
-				{
-					const auto& windowJson = characterRulesJson["Camera"]["Window"];
-					if (windowJson.contains("X") && windowJson.contains("Y"))
-					{
-						if (windowJson["X"].is_number() && windowJson["Y"].is_number())
-						{
-							positionInFractionOfScreenSize.X = windowJson["X"].get<float>();
-							positionInFractionOfScreenSize.Y = windowJson["Y"].get<float>();
-						}
-					}
-					else
-					{
-						ENGINE_ERROR_D("Window is missing X or Y");
-					}
-
-					if (windowJson.contains("Width") && windowJson.contains("Height"))
-					{
-						if (windowJson["Width"].is_number() && windowJson["Height"].is_number())
-						{
-							screenRatio.X = windowJson["Width"].get<float>();
-							screenRatio.Y = windowJson["Height"].get<float>();
-						}
-
-					}
-				}
-
-				m_refECS.AddComponent<Camera>(tileEntity, size, screenRatio, positionInFractionOfScreenSize, pixelsPerUnit, clampingOn);
-			}
-
-			// Add Physics components.
-			BodyType bodyType = STATIC;
-			Filter category = ALL;
-			Filter mask = ALL;
-			Vector2D<float> size = Vector2D<float>(static_cast<float>(numUnitsPerTile), static_cast<float>(numUnitsPerTile));
-			bool gravityOn = false;
-			bool checkSimpleContacts = false;
-			bool useChains = false;
-
-			if (characterRulesJson.contains("Physics"))
-			{
-				json characterPhysicsRulesJson = characterRulesJson["Physics"];
-
-				// Physics library needs to know if the body is enabled or not.
-				const bool enabled = activeOnStart;
-
-				if (characterPhysicsRulesJson.contains("Category"))
-				{
-					const auto& categoryJson = characterPhysicsRulesJson["Category"];
-					std::string categoryStr = categoryJson;
-					if (categoryStr == "NONE") category = NONE;
-					else if (categoryStr == "PLAYER") category = PLAYER;
-					else if (categoryStr == "MAP") category = MAP;
-					else if (categoryStr == "ALL") category = ALL;
-				}
-				if (characterPhysicsRulesJson.contains("Mask"))
-				{
-					const auto& maskJson = characterPhysicsRulesJson["Mask"];
-					std::string maskStr = maskJson;
-					if (maskStr == "NONE") mask = NONE;
-					else if (maskStr == "PLAYER") mask = PLAYER;
-					else if (maskStr == "MAP") mask = MAP;
-					else if (maskStr == "ALL") mask = ALL;
-				}
-				if (characterPhysicsRulesJson.contains("BodyType"))
-				{
-					const auto& bodyTypeJson = characterPhysicsRulesJson["BodyType"];
-					std::string bodyTypeStr = bodyTypeJson;
-					if (bodyTypeStr == "STATIC") bodyType = STATIC;
-					else if (bodyTypeStr == "DYNAMIC") bodyType = DYNAMIC;
-					else if (bodyTypeStr == "KINEMATIC") bodyType = KINEMATIC;
-					else if (bodyTypeStr == "SENSOR") bodyType = SENSOR;
-				}
-
-				if (bodyType != SENSOR)
-				{
-					// If body is not a sensor, it is solid and collides with other bodies.
-					// This information is needed for the chain system to know which tiles to link to.
-					// Not the best design but will work for now.
-					isSolid.emplace(tileChar);
-
-					if (characterPhysicsRulesJson.contains("UseChains")) // Chains are not used for sensors.
-					{
-						const auto& useChainsJson = characterPhysicsRulesJson["UseChains"];
-						bool useChainsStr = useChainsJson;
-						if (useChainsStr == true)
-						{
-							useChains = true;
-						}
-					}
-				}
-
-				if (characterPhysicsRulesJson.contains("GravityOn"))
-				{
-					const auto& gravityOnJson = characterPhysicsRulesJson["GravityOn"];
-					bool gravityOnStr = gravityOnJson;
-					if (gravityOnStr == true)
-					{
-						gravityOn = true;
-					}
-				}
-				if (characterPhysicsRulesJson.contains("CheckSimpleContacts"))
-				{
-					const auto& checkSimpleContactsJson = characterPhysicsRulesJson["CheckSimpleContacts"];
-					bool checkSimpleContactsStr = checkSimpleContactsJson;
-					if (checkSimpleContactsStr == true)
-					{
-						checkSimpleContacts = true;
-					}
-
-				}
-				if (characterPhysicsRulesJson.contains("DefaultPhysicsBodySize"))
-				{
-					const auto& sizeJson = characterPhysicsRulesJson["DefaultPhysicsBodySize"];
-					if (sizeJson.is_array() && sizeJson.size() == 2)
-					{
-						if (sizeJson[0].is_number() && sizeJson[1].is_number())
-						{
-							size.X = sizeJson[0].get<float>();
-							size.Y = sizeJson[1].get<float>();
-						}
-					}
-				}
-
-				if (useChains) // Chains are used on tiles, typically map tiles, to avoid ghose collisions on adjacent tiles.
-				{
-					auto isTileSolid = [&](int x, int y) -> bool
-						{
-							const auto* tile = m_tileMap.GetTile(x, y);
-							return tile && isSolid.find(tile->second) != isSolid.end();
-						};
-
-					bool hasTileAbove = y > 0 && isTileSolid(x, y - 1);
-					bool hasTileBelow = y < m_tileMap.GetHeight() - 1 && isTileSolid(x, y + 1);
-					bool hasTileLeft = x > 0 && m_tileMap.GetTile(x - 1, y) && isTileSolid(x - 1, y);
-					bool hasTileRight = x < m_tileMap.GetWidth() - 1 && isTileSolid(x + 1, y);
-
-					bool hasTileDiagonalLeftAbove = x > 0 && y > 0 && isTileSolid(x - 1, y - 1);
-					bool hasTileDiagonalLeftBelow = x > 0 && y < m_tileMap.GetHeight() - 1 && isTileSolid(x - 1, y + 1);
-					bool hasTileDiagonalRightAbove = x < m_tileMap.GetWidth() - 1 && y > 0 && isTileSolid(x + 1, y - 1);
-					bool hasTileDiagonalRightBelow = x < m_tileMap.GetWidth() - 1 && y < m_tileMap.GetHeight() - 1 && isTileSolid(x + 1, y + 1);
-
-					if (!hasTileAbove)
-					{
-						float ghostX0, ghostY0;
-						float x1 = (float)x;
-						float y1 = (float)y;
-						float x2 = x + 1.0f;
-						float y2 = (float)y;
-						float ghostX3, ghostY3;
-
-						if (!hasTileRight) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y + 1.0f; }
-						else if (hasTileRight && hasTileDiagonalRightAbove) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y - 1.0f; }
-						else if (hasTileRight) { ghostX3 = (float)x + 2.0f; ghostY3 = (float)y; }
-
-						if (!hasTileLeft) { ghostX0 = (float)x; ghostY0 = (float)y + 1.0f; }
-						else if (hasTileLeft && hasTileDiagonalLeftAbove) { ghostX0 = (float)x; ghostY0 = (float)y - 1.0f; }
-						else if (hasTileLeft) { ghostX0 = (float)x - 1.0f; ghostY0 = (float)y; }
-
-						m_refECS.AddComponent<ChainColliderTop>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
-							Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
-					}
-
-					if (!hasTileLeft)
-					{
-						float ghostX0, ghostY0;
-						float x1 = (float)x;
-						float y1 = y + 1.0f;
-						float x2 = (float)x;
-						float y2 = (float)y;
-						float ghostX3, ghostY3;
-
-						if (!hasTileAbove) { ghostX3 = x + 1.0f; ghostY3 = (float)y; }
-						else if (hasTileAbove && hasTileDiagonalLeftAbove) { ghostX3 = (float)x - 1.0f; ghostY3 = (float)y; }
-						else if (hasTileAbove) { ghostX3 = (float)x; ghostY3 = (float)y - 1.0f; }
-
-						if (!hasTileBelow) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y + 1.0f; }
-						else if (hasTileBelow && hasTileDiagonalLeftBelow) { ghostX0 = (float)x - 1.0f; ghostY0 = (float)y + 1.0f; }
-						else if (hasTileBelow) { ghostX0 = (float)x; ghostY0 = (float)y + 2.0f; }
-
-						m_refECS.AddComponent<ChainColliderLeft>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
-							Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
-					}
-
-					if (!hasTileBelow)
-					{
-						float ghostX0, ghostY0;
-						float x1 = x + 1.0f;
-						float y1 = y + 1.0f;
-						float x2 = (float)x;
-						float y2 = y + 1.0f;
-						float ghostX3, ghostY3;
-
-						if (!hasTileLeft) { ghostX3 = (float)x; ghostY3 = (float)y; }
-						else if (hasTileLeft && hasTileDiagonalLeftBelow) { ghostX3 = (float)x; ghostY3 = (float)y + 2.0f; }
-						else if (hasTileLeft) { ghostX3 = (float)x - 1.0f; ghostY3 = (float)y + 1.0f; }
-
-						if (!hasTileRight) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y; }
-						else if (hasTileRight && hasTileDiagonalRightBelow) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y + 2.0f; }
-						else if (hasTileRight) { ghostX0 = (float)x + 2.0f; ghostY0 = (float)y + 1.0f; }
-
-						m_refECS.AddComponent<ChainColliderBottom>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
-							Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
-					}
-
-					if (!hasTileRight)
-					{
-						float ghostX0, ghostY0;
-						float x1 = x + 1.0f;
-						float y1 = (float)y;
-						float x2 = x + 1.0f;
-						float y2 = y + 1.0f;
-						float ghostX3, ghostY3;
-
-						if (!hasTileAbove) { ghostX0 = (float)x; ghostY0 = (float)y; }
-						else if (hasTileAbove && hasTileDiagonalRightAbove) { ghostX0 = (float)x + 2.0f; ghostY0 = (float)y; }
-						else if (hasTileAbove) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y - 1.0f; }
-
-						if (!hasTileBelow) { ghostX3 = (float)x; ghostY3 = (float)y + 1.0f; }
-						else if (hasTileBelow && hasTileDiagonalRightBelow) { ghostX3 = (float)x + 2.0f; ghostY3 = (float)y + 1.0f; }
-						else if (hasTileBelow) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y + 2.0f; }
-
-						m_refECS.AddComponent<ChainColliderRight>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
-							Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
-					}
-				}
-				else // Create a regular physics body for the tiles that don't use chains.
-				{
-					m_refECS.AddComponent<PhysicsBody>(tileEntity, enabled, bodyType, category, mask,
-						Vector2D<float>(size.X, size.Y),
-						Vector2D<float>(static_cast<float>(x) * static_cast<float>(numUnitsPerTile), static_cast<float>(y) * static_cast<float>(numUnitsPerTile)),
-						0.0f, gravityOn, checkSimpleContacts);
-				}
-			}
-
-			// Add sprite component.
-			if (characterRulesJson.contains("SpriteSheet") && characterRulesJson.contains("Animations"))
-			{
-				const auto& spriteSheetJson = characterRulesJson["SpriteSheet"];
-				const auto& animationsJson = characterRulesJson["Animations"];
-
-				std::string spriteSheetPath;
-				if (!spriteSheetJson.contains("Path"))
-				{
-					ENGINE_CRITICAL("No path for sprite sheet found.");
-					spriteSheetPath = "default.png"; // Default sprite sheet path.
-					continue;
-				}
-
-				spriteSheetPath = spriteSheetJson["Path"];
-
-				// ENGINE_INFO_D("Loading texture from: " + spriteSheetPath);
-				// The following must only be called once per scene.
-				// Currently, it is called for every character that has a animation or sprite from
-				// the texture. That takes way too long and wastes resources!!!
-				m_refAssetManager.LoadTexture(tileEntity, spriteSheetsPath + spriteSheetPath); // Should this be called on scene play?
-
-
-
-				Vector2D<float> frameSize = { 1.0f, 1.0f }; // size of sprite in units.
-				if (!spriteSheetJson.contains("SizeInUnits"))
-				{
-					ENGINE_CRITICAL("No size for sprite sheet found. Defaulting to 1, 1");
-				}
-				else
-				{
-					const auto& sizeJson = spriteSheetJson["SizeInUnits"];
-					if (sizeJson.is_array() && sizeJson.size() == 2)
-					{
-						// ENGINE_INFO_D("Found size for sprite sheet");
-						if (sizeJson[0].is_number() && sizeJson[1].is_number())
-						{
-							frameSize.X = sizeJson[0].get<float>();
-							frameSize.Y = sizeJson[1].get<float>();
-						}
-					}
-				}
-
-				Vector2D<int> pixelsPerFrame = { 32, 32 }; // size of sprite frame in pixels.
-				if (!spriteSheetJson.contains("PixelsPerFrame"))
-				{
-					ENGINE_CRITICAL("No size for sprite sheet found. Defaulting to 32, 32");
-				}
-				else
-				{
-					const auto& pixelsPerFrameJson = spriteSheetJson["PixelsPerFrame"];
-					if (pixelsPerFrameJson.is_array() && pixelsPerFrameJson.size() == 2)
-					{
-						if (pixelsPerFrameJson[0].is_number() && pixelsPerFrameJson[1].is_number())
-						{
-							pixelsPerFrame.X = pixelsPerFrameJson[0].get<int>();
-							pixelsPerFrame.Y = pixelsPerFrameJson[1].get<int>();
-						}
-					}
-				}
-
-				Vector2D<float> offsetFromTransform = { 0.0f, 0.0f };
-				if (!spriteSheetJson.contains("OffsetFromTransform"))
-				{
-					ENGINE_INFO_D("No offset for sprite sheet found. Defaulting to 0, 0");
-				}
-				else
-				{
-					const auto& offsetJson = spriteSheetJson["OffsetFromTransform"];
-					if (offsetJson.is_array() && offsetJson.size() == 2)
-					{
-						if (offsetJson[0].is_number() && offsetJson[1].is_number())
-						{
-							offsetFromTransform.X = offsetJson[0].get<float>();
-							offsetFromTransform.Y = offsetJson[1].get<float>();
-						}
-					}
-				}
-
-				Vector2D<size_t> dimensions = { 1, 1 }; // Default dimensions.
-				if (spriteSheetJson.contains("Width") && spriteSheetJson.contains("Height"))
-				{
-					const auto& widthJson = spriteSheetJson["Width"];
-					const auto& heightJson = spriteSheetJson["Height"];
-					if (widthJson.is_number() && heightJson.is_number())
-					{
-						dimensions.X = widthJson.get<size_t>();
-						dimensions.Y = heightJson.get<size_t>();
-					}
-				}
-
-				bool drawDebug = false;
-				std::string debugColor = "red";
-				if (characterRulesJson.contains("SpriteSheet") && characterRulesJson["SpriteSheet"].contains("DrawDebug"))
-				{
-					drawDebug = true;
-
-					const auto& drawDebugJson = characterRulesJson["SpriteSheet"]["DrawDebug"];
-					if (drawDebugJson.is_string())
-					{
-						debugColor = drawDebugJson;
-
-					}
-				}
-
-				// TODO: Get animation data from the JSON file.
-				std::unordered_map<std::string, Animation> animations;
-				json j = json::parse(characterRulesJson["Animations"].dump());
-
-				auto makeAnimation = [](const std::string& name, const json& jAnim, Vector2D<int> pixelsPerFrame,
-					const Vector2D<float> offsetFromTransform, const Vector2D<size_t> dimensions,
-					const Vector2D<float> frameSize, bool drawDebug, const std::string& debugColor)
-					{
-						Animation a;
-						a.m_name = name;
-						a.m_frames = jAnim.at("Frames").get<std::vector<int>>();
-						a.m_numFrames = a.m_frames.size();
-						a.m_frameDuration = jAnim.at("FrameTime").get<int>();
-						a.m_pixelsPerFrame = pixelsPerFrame;
-						a.m_dimensions = dimensions;
-						a.m_size = frameSize;
-						a.m_offsetFromTransform = offsetFromTransform;
-						a.m_loop = jAnim.at("Loop").get<bool>();
-						a.m_drawDebug = drawDebug;
-						a.m_debugColor = debugColor;
-
-						return a;
-					};
-
-
-				for (auto& [name, value] : j.items())
-				{
-					animations.emplace(name, makeAnimation(name, value, pixelsPerFrame, offsetFromTransform,
-						dimensions, frameSize, drawDebug, debugColor));
-				}
-
-
-				m_refECS.AddComponent<Animations>(tileEntity, animations);
-			}
-
-			if (characterRulesJson.contains("AudioSource"))
-			{
-				const auto& audioJson = characterRulesJson["Audio"];
-				if (audioJson.contains("Path"))
-				{
-					std::string audioPath = audioJson["Path"];
-					m_refECS.AddComponent<AudioSource>(tileEntity, audioPath);
-				}
-			}
-
-			// If the character is "ActiveOnStart", activate it in the ECS.
-			// MUST CALL AFTER ALL COMPONENTS CREATED.
+			// ACTIVATE IN ECS AFTER ALL COMPONENTS CREATED.
 			if (activeOnStart)
-			{
 				m_refECS.Activate(tileEntity);
-			}
 		}
 	}
+
 }

@@ -95,7 +95,7 @@ namespace Engine
 	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entity, ContactCallback callback) {
 		getScene(name).RegisterContactCallback(contactType, entity, callback);
 	}
-	void EMU::Scenes_SetPhysicsSimulation(const std::string& name, const Vector2D<float> gravity) { getScene(name).SetPhysicsSimulation(gravity); }
+	void EMU::Scenes_SetGravity(const std::string& name, const Vector2D<float> gravity) { getScene(name).SetGravity(gravity); }
 	// void EMU::Scenes_Add(const std::string& name, Entity entity) { getScene(name).Add(entity); }
 	// void EMU::Scenes_Remove(const std::string& name, Entity entity) { getScene(name).Remove(entity); m_ecs.Deactivate(entity); }
 	void EMU::Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName) { getScene(name).AddTileMap(mapFileName, rulesFileName); }

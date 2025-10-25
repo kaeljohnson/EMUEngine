@@ -54,8 +54,8 @@ int main(int argc, char* args[])
 	engine->Scenes_Create("Level2");
 
 	//// Need physcis to scale with pixels per unit.
-	engine->Scenes_SetPhysicsSimulation("Level1", Engine::Vector2D(0.0f, 0.0f));
-	engine->Scenes_SetPhysicsSimulation("Level2", Engine::Vector2D(0.0f, 100.0f));
+	engine->Scenes_SetGravity("Level1", Engine::Vector2D(0.0f, 100.0f));
+	engine->Scenes_SetGravity("Level2", Engine::Vector2D(0.0f, 100.0f));
 
 	// Temp for now. Client will not be able to call functions directly on scene object.
 	engine->Scenes_AddTileMap("Level1", "testMap1.txt", "Rules.json");

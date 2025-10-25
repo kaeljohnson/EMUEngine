@@ -71,7 +71,7 @@ namespace Engine
 			arg1: name - The name of the scene for which the physics simulation is to be set.
 			arg2: gravity - The gravity vector to be applied in the physics simulation.
 		*/
-		EMU_API void Scenes_SetPhysicsSimulation(const std::string& name, const Vector2D<float> gravity);
+		EMU_API void Scenes_SetGravity(const std::string& name, const Vector2D<float> gravity);
 
 		/*
 			TODO: Not supported for now.

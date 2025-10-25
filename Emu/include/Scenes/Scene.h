@@ -63,7 +63,7 @@ namespace Engine
 			Sets the physics simulation parameters for the scene.
 			arg1: gravity - A Vector2D<float> representing the gravity vector for the physics simulation.
 		*/
-		void SetPhysicsSimulation(const Vector2D<float> gravity);
+		void SetGravity(const Vector2D<float> gravity);
 		// void Add(Entity entity); // No support for manually adding entities to scene for now. All entities must be added via tile map prior to runtime.
 		// void Remove(Entity entity); // No support for manually removing entities from scene for now. All entities will be removed when scene ends.
 
@@ -110,7 +110,7 @@ namespace Engine
 			Sets the level dimensions in units when there is no tile map.
 			arg1: levelWidthInUnits - A Vector2D<int> representing the width and height of the level in units.
 		*/
-		void SetLevelDimensions(const Vector2D<int> levelWidthInUnits);
+		void SetLevelDimensions(const Vector2D<int> levelDimInUnits);
 
 		/*
 			Updates the physics simulation for the scene.
@@ -153,6 +153,17 @@ namespace Engine
 			and removing it from the physics simulation.
 		*/
 		void deactivatePhysics(Entity entity);
+
+		/*
+			Loads the number of units per tile from the asset manager.
+		*/
+		size_t loadNumUnitsPerTile();
+
+		/*
+			Validates the sprite sheet path from the asset manager.
+			returns: The validated sprite sheet path as a string.
+		*/
+		std::string validateSpriteSheetPath();
 
 		/*
 			Loads all entities defined in the scene's tile map.
