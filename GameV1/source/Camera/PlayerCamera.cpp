@@ -12,7 +12,10 @@ PlayerCamera::PlayerCamera() :
 {
     // Combine this whole class into player class.
 
-    Engine::EMU::GetInstance()->AddComponent<Engine::CameraUpdater>('P',
+    Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::CameraUpdater>("Level1", 'P',
+		[this](Engine::Entity entity) { Update(entity); });
+
+	Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::CameraUpdater>("Level2", 'P',
 		[this](Engine::Entity entity) { Update(entity); });
 }
 

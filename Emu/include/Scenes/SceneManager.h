@@ -11,21 +11,45 @@ namespace Engine
 	class SceneManager
 	{
 	public:
-		void AddScene(std::string sceneName, ECS& refECS, AssetManager& refAssetManager);
-		void LoadScene(std::string sceneName);
-		void UnloadCurrentScene();
+		void AddScene(std::string sceneName, AssetManager& refAssetManager);
 
 		inline Scene* GetCurrentScene() const { return m_ptrCurrentScene; };
-		inline std::unordered_map<std::string, Scene>& GetAllScenes() { return m_scenes; }
-		Scene& GetScene(const std::string& sceneName);
+
+		const std::vector<Entity>& GetTileMapEntities(const std::string& sceneName, const char tileChar) const;
+		const Entity GetEntity(const std::string& sceneName, const char tileChar);
+		const std::vector<Entity>& GetEntities(const std::string& sceneName, const char tileChar);
+
+		void RegisterOnScenePlay(const std::string& sceneName, std::function<void()> func);
+		void RegisterContactCallback(const std::string& sceneName, ContactType contactType, const char entityA, const char entityB, Scene::ContactCallback callback);
+		void RegisterContactCallback(const std::string& sceneName, ContactType contactType, const char entity, Scene::ContactCallback callback);
+		void SetGravity(const std::string& sceneName, const Vector2D<float> gravity);
+		void AddTileMap(const std::string& sceneName, const std::string& mapFileName, const std::string& rulesFileName);
+		void SetLevelDimensions(const std::string& sceneName, const Vector2D<int> dimensions);
+
+		template <typename T, typename... Args>
+		void AddComponent(const std::string sceneName, const char c, Args&&... componentArgs)
+		{
+			auto it = m_scenes.find(sceneName);
+			if (it == m_scenes.end())
+			{
+				ENGINE_CRITICAL_D("Scene not found in SceneManager");
+				return;
+			}
+
+			const std::vector<Entity>& entities = it->second.GetTileMapEntities(c);
+			for (Entity entity : entities)
+			{
+				m_refECS.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
+			}
+		}
 	public:
-		SceneManager();
+		SceneManager(ECS& refECS);
 		~SceneManager() = default;
 
-		const bool IsNewSceneStarting() const { return m_newSceneStarting; }
-		void QueueNewScene(const std::string name) { m_newSceneStarting = true; m_queuedSceneName = name; }
-		void LoadQueuedScene() { LoadScene(m_queuedSceneName); }
-		void NewSceneStarted() { m_newSceneStarting = false; }
+		void CheckForSceneChange();
+		void QueueNewScene(const std::string name) { m_queuedSceneName = name; }
+		void LoadQueuedScene();
+		void UnloadCurrentScene();
 		void Cleanup();
 
 		SceneManager(const SceneManager&) = delete;
@@ -34,9 +58,9 @@ namespace Engine
 		SceneManager& operator=(SceneManager&&) = delete;
 
 	private:
+		ECS& m_refECS;
 		std::unordered_map<std::string, Scene> m_scenes;
 		std::string m_queuedSceneName;
 		Scene* m_ptrCurrentScene;
-		bool m_newSceneStarting;
 	};
 }

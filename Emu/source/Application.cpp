@@ -11,17 +11,9 @@ namespace Engine
 
 	Application::Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, 
 		AssetManager& refAssetManager, AudioSystem& refAudioSystem, AnimationSystem& refAnimationSystem)
-		: m_refECS(refECS), m_refAssetManager(refAssetManager), m_refAudioSystem(refAudioSystem), m_ptrCurrentScene(nullptr), 
+		: m_refECS(refECS), m_refAssetManager(refAssetManager), m_refAudioSystem(refAudioSystem),
 		m_IRenderer(refECS, refAssetManager), m_refSceneManager(refSceneManager), m_refIOEventSystem(refIOEventSystem), m_refAnimationSystem(refAnimationSystem)
 	{}
-
-	void Application::Activate(Entity entity)
-	{
-	}
-
-	void Application::Deactivate(Entity entity)
-	{
-	}
 	void Application::Start()
 	{
 		Time::SetAppRunning(true);
@@ -42,21 +34,7 @@ namespace Engine
 		while (Time::IsAppRunning())
 		{
 			// auto start = std::chrono::high_resolution_clock::now();
-			if (m_refSceneManager.IsNewSceneStarting())
-			{	
-				ENGINE_INFO_D("New scene starting!");
-				m_refSceneManager.LoadQueuedScene();
-				m_refSceneManager.NewSceneStarted();
-				m_ptrCurrentScene = m_refSceneManager.GetCurrentScene();
-
-				// Critical checks before scene starts.
-				if (m_refECS.GetHotComponents<Camera>().empty())
-				{
-					ENGINE_CRITICAL_D("No active cameras found.");
-					throw std::runtime_error("No active cameras found.");
-					return;
-				}
-			}
+			m_refSceneManager.CheckForSceneChange();
 
 			m_refIOEventSystem.HandleEvents();
 			m_refIOEventSystem.ProcessEvents();
@@ -70,7 +48,7 @@ namespace Engine
 
 			while (accumulator >= timeStep)
 			{
-				m_ptrCurrentScene->UpdatePhysics();
+				m_refSceneManager.GetCurrentScene()->UpdatePhysics();
 				m_refAnimationSystem.Update();
 
 				accumulator -= timeStep;
@@ -78,7 +56,7 @@ namespace Engine
 
 			Time::SetInterpolationFactor(((float)accumulator / timeStep));
 
-			m_ptrCurrentScene->UpdateCamera(m_refAssetManager);
+			m_refSceneManager.GetCurrentScene()->UpdateCamera(m_refAssetManager);
 			// m_refAudioSystem.PlayQueuedSound();
 
 			m_IRenderer.CheckForWindowResizeRequest();

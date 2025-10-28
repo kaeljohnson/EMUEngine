@@ -62,7 +62,7 @@ namespace Engine
 			Create box2D world with specified gravity vector.
 			arg1: gravity vector
 		*/
-		void CreateWorld(const Vector2D<float> gravity);
+		void CreateWorld();
 
 		/*
 			Update the world's gravity vector.
@@ -144,5 +144,7 @@ namespace Engine
 		b2WorldId* m_ptrWorldId;
 		
 		ECS& m_refECS;
+
+		Vector2D<float> m_gravity;
 	};
 }

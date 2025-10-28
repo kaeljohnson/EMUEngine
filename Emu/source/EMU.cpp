@@ -19,7 +19,7 @@ namespace Engine
 	}
 
 	EMU::EMU(const size_t numEntities)
-		: m_ecs(), m_sceneManager(), m_assetManager(), m_animationSystem(m_ecs), 
+		: m_ecs(), m_sceneManager(m_ecs), m_assetManager(), m_animationSystem(m_ecs), 
 		m_audioSystem(m_ecs, m_assetManager), m_physicsInterface(m_ecs), m_transformInterface(m_ecs), m_ioEventSystem(),
 		m_application(m_ecs, m_sceneManager, m_ioEventSystem, m_assetManager, m_audioSystem, m_animationSystem), m_cameraInterface(m_ecs)
 	{
@@ -46,69 +46,62 @@ namespace Engine
 		delete m_instance;
 	}
 
-	// Scene management
-	Scene& EMU::CreateScene(const std::string& name)
-	{
-		m_sceneManager.AddScene(name, m_ecs, m_assetManager);
-		return m_sceneManager.GetScene(name);
-	}
-
-	void EMU::LoadScene(const std::string& name)
-	{
-		m_sceneManager.QueueNewScene(name);
-	}
-
-	void EMU::UnloadCurrentScene()
-	{
-		m_sceneManager.UnloadCurrentScene();
-	}
-
 	Entity EMU::CreateEntity()
 	{
 		return m_ecs.CreateEntity();
 	}
 
-	Entity EMU::GetEntityByCharacter(const char c, const std::string& sceneName)
-	{
-		return GetScene(sceneName).GetTileMapEntity(c);
-	}
-
-	std::vector<Entity> EMU::GetEntitiesByCharacter(const char c, const std::string& sceneName)
-	{
-		return GetScene(sceneName).GetTileMapEntities(c);
-	}
-
-	Entity EMU::GetCurrentRuntimeEntity(const char c)
-	{
-		return m_sceneManager.GetCurrentScene()->GetTileMapEntity(c);
-	}
-
-	void EMU::Activate(Entity entity)
-	{
-		m_ecs.Activate(entity);
-		m_sceneManager.GetCurrentScene()->Activate(entity);
-	}
+	
 
 	/*void EMU::ChangeCamera(Entity entity)
 	{
 		m_cameraInterface.ChangeCamera(entity);
 	}*/
 
-	void EMU::PlaySound(int soundIndex, int volume, const bool loop)
-	{
-		m_audioSystem.PlaySound(soundIndex, volume, loop);
-	}
+	void EMU::PlaySound(int soundIndex, int volume, const bool loop) { m_audioSystem.PlaySound(soundIndex, volume, loop); }
 
-	void EMU::Deactivate(Entity entity)
-	{
-		m_sceneManager.GetCurrentScene()->Deactivate(entity);
-		m_ecs.Deactivate(entity);
-	}
 
 	void EMU::RegisterIOEventListener(IOEventType type, IOEventHandler handler)
 	{
 		m_ioEventSystem.RegisterIOEventListener(type, handler);
 	}
+
+	// Scene management
+
+	Entity EMU::Scenes_GetEntityByCharacter(const std::string& sceneName, const char c)
+	{
+		return m_sceneManager.GetEntity(sceneName, c);
+	}
+
+	std::vector<Entity> EMU::Scenes_GetEntitiesByCharacter(const std::string& sceneName, const char c)
+	{
+		return m_sceneManager.GetEntities(sceneName, c);
+	}
+
+	Entity EMU::Scenes_GetCurrentRuntimeEntity(const char c)
+	{
+		return m_sceneManager.GetCurrentScene()->GetTileMapEntity(c);
+	}
+
+	void EMU::Scenes_Activate(Entity entity) { m_sceneManager.GetCurrentScene()->Activate(entity); }
+	void EMU::Scenes_Deactivate(Entity entity) { m_sceneManager.GetCurrentScene()->Deactivate(entity); }
+	void EMU::Scenes_Create(const std::string& name) { m_sceneManager.AddScene(name, m_assetManager); }
+	void EMU::Scenes_Load(const std::string& name) { m_sceneManager.QueueNewScene(name); }
+	void EMU::Scenes_RegisterOnPlay(const std::string& name, std::function<void()> func) { m_sceneManager.RegisterOnScenePlay(name, func); }
+	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entityA, const char entityB, ContactCallback callback)
+	{ 
+		m_sceneManager.RegisterContactCallback(name, contactType, entityA, entityB, callback); 
+	}
+	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entity, ContactCallback callback) {
+		m_sceneManager.RegisterContactCallback(name, contactType, entity, callback);
+	}
+	void EMU::Scenes_SetGravity(const std::string& name, const Vector2D<float> gravity) { m_sceneManager.SetGravity(name, gravity); }
+	// void EMU::Scenes_Add(const std::string& name, Entity entity) { getScene(name).Add(entity); }
+	// void EMU::Scenes_Remove(const std::string& name, Entity entity) { getScene(name).Remove(entity); m_ecs.Deactivate(entity); }
+	void EMU::Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName) { m_sceneManager.AddTileMap(name, mapFileName, rulesFileName); }
+	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const char tileChar) { return m_sceneManager.GetEntity(name, tileChar); }
+	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const char tileChar) { return m_sceneManager.GetTileMapEntities(name, tileChar); }
+	void EMU::Scenes_SetLevelDimensions(const std::string& name, const Vector2D<int> levelWidthInUnits) { m_sceneManager.SetLevelDimensions(name, levelWidthInUnits); }
 
 	void EMU::Camera_SetPixelsPerUnit(Entity entity, const int pixelsPerUnit) { m_cameraInterface.SetPixelsPerUnit(entity, pixelsPerUnit); }
 	const int EMU::Camera_GetPixelsPerUnit(Entity entity) { return m_cameraInterface.GetPixelsPerUnit(entity); }

@@ -50,55 +50,53 @@ int main(int argc, char* args[])
 
 	CLIENT_INFO_D("Client Running!");
 
-	Engine::Scene& scene = engine->CreateScene("Level1");
-	Engine::Scene& scene2 = engine->CreateScene("Level2");
+	engine->Scenes_Create("Level1");
+	engine->Scenes_Create("Level2");
 
 	//// Need physcis to scale with pixels per unit.
-	scene.SetPhysicsSimulation(Engine::Vector2D(0.0f, 0.0f));
-	scene2.SetPhysicsSimulation(Engine::Vector2D(0.0f, 100.0f));
+	engine->Scenes_SetGravity("Level1", Engine::Vector2D(0.0f, 100.0f));
+	engine->Scenes_SetGravity("Level2", Engine::Vector2D(0.0f, 100.0f));
 
 	// Temp for now. Client will not be able to call functions directly on scene object.
-	scene.AddTileMap("testMap1.txt", "Rules.json");
-	scene2.AddTileMap("TestMap2.txt", "Rules.json");
+	engine->Scenes_AddTileMap("Level1", "testMap1.txt", "Rules.json");
+	engine->Scenes_AddTileMap("Level2", "TestMap2.txt", "Rules.json");
 
 	Player player;
 
-	std::vector<Engine::Entity> playerEntities = engine->GetEntitiesByCharacter('w', "Level1");
-
-	scene.RegisterContactCallback(Engine::BEGIN_CONTACT, 'P', 'S', [](const Engine::Contact event)
+	engine->Scenes_RegisterContactCallback("Level1", Engine::BEGIN_CONTACT, 'P', 'S', [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi Begin Contact");
 		});
 
-	scene.RegisterContactCallback(Engine::END_CONTACT, 'P', 'S', [](const Engine::Contact event)
+	engine->Scenes_RegisterContactCallback("Level1", Engine::END_CONTACT, 'P', 'S', [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi End Contact");
 		});
 
-	scene.RegisterContactCallback(Engine::BEGIN_SENSOR, 'S', [](const Engine::Contact event)
+	engine->Scenes_RegisterContactCallback("Level1", Engine::BEGIN_SENSOR, 'S', [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Single Begin Sensing");
 		});
 
-	scene.RegisterContactCallback(Engine::BEGIN_SENSOR, 'P', 'S', [](const Engine::Contact event)
+	engine->Scenes_RegisterContactCallback("Level1", Engine::BEGIN_SENSOR, 'P', 'S', [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi Begin Sensing");
 		});
 
-	scene.RegisterContactCallback(Engine::END_SENSOR, 'S', [](const Engine::Contact event)
+	engine->Scenes_RegisterContactCallback("Level1", Engine::END_SENSOR, 'S', [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Single End Sensing");
 		});
-	scene.RegisterContactCallback(Engine::END_SENSOR, 'P', 'S', [](const Engine::Contact event)
+	engine->Scenes_RegisterContactCallback("Level1", Engine::END_SENSOR, 'P', 'S', [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi End Sensing");
 		});
 
 	PlayerCamera playerCamera;
 
-	engine->LoadScene("Level1");
+	engine->Scenes_Load("Level1");
 
-	scene.RegisterOnScenePlay([]()
+	engine->Scenes_RegisterOnPlay("Level1", []()
 		{
 			Engine::EMU::GetInstance()->PlaySound(1, 128, true);
 		});

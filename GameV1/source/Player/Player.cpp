@@ -18,8 +18,11 @@
 		m_refTransformInterface(Engine::EMU::GetInstance()->ITRANSFORMS())
     {
 
-		Engine::EMU::GetInstance()->AddComponent<Engine::PhysicsUpdater>('P',
+		Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::PhysicsUpdater>("Level1", 'P',
             [this](Engine::Entity entity) { Update(entity); });
+
+		Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::PhysicsUpdater>("Level2", 'P',
+			[this](Engine::Entity entity) { Update(entity); });
     }
 
     void Player::OnBeginContact(Engine::BeginContact beginContact) 

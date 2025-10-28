@@ -214,15 +214,15 @@ namespace Engine
 
 	// Physics Simulation
 	PhysicsSimulation::PhysicsSimulation(ECS& refECS, TileMap& tileMap)
-		: m_refECS(refECS), m_ptrWorldId(nullptr), m_contactSystem(refECS, tileMap)
+		: m_refECS(refECS), m_ptrWorldId(nullptr), m_contactSystem(refECS, tileMap), m_gravity(0.0f, 9.81f)
 	{}
 
-	void PhysicsSimulation::CreateWorld(const Vector2D<float> gravity)
+	void PhysicsSimulation::CreateWorld()
 	{
 		ENGINE_INFO_D("Creating World!");
 
 		b2WorldDef worldDef = b2DefaultWorldDef();
-		worldDef.gravity = { gravity.X, gravity.Y };
+		worldDef.gravity = { m_gravity.X, m_gravity.Y };
 		m_ptrWorldId = new b2WorldId(b2CreateWorld(&worldDef));
 
 		ENGINE_INFO_D("World created!");
@@ -238,7 +238,7 @@ namespace Engine
 		}
 		else
 		{
-			// set m_gravity or something.
+			m_gravity = gravity;
 		}
 	}
 
@@ -520,7 +520,7 @@ namespace Engine
 		if (AppState::IN_SCENE)
 		{
 			ENGINE_CRITICAL_D("Activating body: " + std::to_string(entity));
-			// bad bug here: If it wasn't a part of the scene, it will have to be added to the world here.
+			// bug here: If it wasn't a part of the scene, it will have to be added to the world here.
 			if (m_refECS.HasComponent<PhysicsBody>(entity))
 			{
 				PhysicsBody* ptrBody = m_refECS.GetComponent<PhysicsBody>(entity);
