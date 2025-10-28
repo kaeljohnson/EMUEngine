@@ -103,7 +103,10 @@ namespace Engine
 			arg1: tileChar - The character representing the entities in the tile map.
 			returns: A vector of Entities associated with the specified character.
 		*/
-		const std::vector<Entity>& GetTileMapEntities(const char tileChar) const;
+		inline const std::vector<Entity>& GetTileMapEntities(const char tileChar) const
+		{
+			return m_tileMap.GetEntities(tileChar);
+		}
 
 		/*
 			Not really supported right now since tile map is required.

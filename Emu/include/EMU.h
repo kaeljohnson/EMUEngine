@@ -480,30 +480,26 @@ namespace Engine
 		////// Templated ECS Interface functions ///////////
 
 		/*
+			TODO: Not supported for now. Client must add components via the rules files.
 			Adds a component of type T to the specified entity with the provided arguments.
 		*/
-		template<typename T, typename... Args>
+		/*template<typename T, typename... Args>
 		void AddComponent(Entity entity, Args&&... componentArgs)
 		{
 			m_ecs.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
-		}
+		}*/
 
 		/*
+			TEMP: This is only exposed for the scripting components.
+			Once there is a way to register scripting components via rules files,
+			this will not be exposed.
 			Adds a component of type T to all entities with 
 			the specified character for all scenes.
 		*/
 		template <typename T, typename... Args>
-		void AddComponent(const char c, Args&&... componentArgs)
+		void Scenes_AddComponent(const std::string sceneName, const char c, Args&&... componentArgs)
 		{
-			std::unordered_map<std::string, Scene>& scenes = m_sceneManager.GetAllScenes();
-			for (auto& scene : scenes)
-			{
-				const std::vector<Entity>& entities = Scenes_GetTileMapEntities(scene.first, c);
-				for (Entity entity : entities)
-				{
-					m_ecs.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
-				}
-			}
+			m_sceneManager.AddComponent<T>(sceneName, c, std::forward<Args>(componentArgs)...);
 		}
 
 		////////////////////////////////////////////////////
@@ -531,8 +527,6 @@ namespace Engine
 		IOEventSystem m_ioEventSystem;
 		SceneManager m_sceneManager;
 		Application m_application;
-
-		Scene& getScene(const std::string& name) { return m_sceneManager.GetScene(name); }
 	};
 
 } // namespace Engine

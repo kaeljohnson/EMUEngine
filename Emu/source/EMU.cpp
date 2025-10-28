@@ -19,7 +19,7 @@ namespace Engine
 	}
 
 	EMU::EMU(const size_t numEntities)
-		: m_ecs(), m_sceneManager(), m_assetManager(), m_animationSystem(m_ecs), 
+		: m_ecs(), m_sceneManager(m_ecs), m_assetManager(), m_animationSystem(m_ecs), 
 		m_audioSystem(m_ecs, m_assetManager), m_physicsInterface(m_ecs), m_transformInterface(m_ecs), m_ioEventSystem(),
 		m_application(m_ecs, m_sceneManager, m_ioEventSystem, m_assetManager, m_audioSystem, m_animationSystem), m_cameraInterface(m_ecs)
 	{
@@ -70,12 +70,12 @@ namespace Engine
 
 	Entity EMU::Scenes_GetEntityByCharacter(const std::string& sceneName, const char c)
 	{
-		return getScene(sceneName).GetTileMapEntity(c);
+		return m_sceneManager.GetEntity(sceneName, c);
 	}
 
 	std::vector<Entity> EMU::Scenes_GetEntitiesByCharacter(const std::string& sceneName, const char c)
 	{
-		return getScene(sceneName).GetTileMapEntities(c);
+		return m_sceneManager.GetEntities(sceneName, c);
 	}
 
 	Entity EMU::Scenes_GetCurrentRuntimeEntity(const char c)
@@ -85,23 +85,23 @@ namespace Engine
 
 	void EMU::Scenes_Activate(Entity entity) { m_sceneManager.GetCurrentScene()->Activate(entity); }
 	void EMU::Scenes_Deactivate(Entity entity) { m_sceneManager.GetCurrentScene()->Deactivate(entity); }
-	void EMU::Scenes_Create(const std::string& name) { m_sceneManager.AddScene(name, m_ecs, m_assetManager); }
+	void EMU::Scenes_Create(const std::string& name) { m_sceneManager.AddScene(name, m_assetManager); }
 	void EMU::Scenes_Load(const std::string& name) { m_sceneManager.QueueNewScene(name); }
-	void EMU::Scenes_RegisterOnPlay(const std::string& name, std::function<void()> func) { getScene(name).RegisterOnScenePlay(func); }
+	void EMU::Scenes_RegisterOnPlay(const std::string& name, std::function<void()> func) { m_sceneManager.RegisterOnScenePlay(name, func); }
 	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entityA, const char entityB, ContactCallback callback)
 	{ 
-		getScene(name).RegisterContactCallback(contactType, entityA, entityB, callback); 
+		m_sceneManager.RegisterContactCallback(name, contactType, entityA, entityB, callback); 
 	}
 	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entity, ContactCallback callback) {
-		getScene(name).RegisterContactCallback(contactType, entity, callback);
+		m_sceneManager.RegisterContactCallback(name, contactType, entity, callback);
 	}
-	void EMU::Scenes_SetGravity(const std::string& name, const Vector2D<float> gravity) { getScene(name).SetGravity(gravity); }
+	void EMU::Scenes_SetGravity(const std::string& name, const Vector2D<float> gravity) { m_sceneManager.SetGravity(name, gravity); }
 	// void EMU::Scenes_Add(const std::string& name, Entity entity) { getScene(name).Add(entity); }
 	// void EMU::Scenes_Remove(const std::string& name, Entity entity) { getScene(name).Remove(entity); m_ecs.Deactivate(entity); }
-	void EMU::Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName) { getScene(name).AddTileMap(mapFileName, rulesFileName); }
-	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const char tileChar) { return getScene(name).GetTileMapEntity(tileChar); }
-	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const char tileChar) { return getScene(name).GetTileMapEntities(tileChar); }
-	void EMU::Scenes_SetLevelDimensions(const std::string& name, const Vector2D<int> levelWidthInUnits) { getScene(name).SetLevelDimensions(levelWidthInUnits); }
+	void EMU::Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName) { m_sceneManager.AddTileMap(name, mapFileName, rulesFileName); }
+	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const char tileChar) { return m_sceneManager.GetEntity(name, tileChar); }
+	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const char tileChar) { return m_sceneManager.GetTileMapEntities(name, tileChar); }
+	void EMU::Scenes_SetLevelDimensions(const std::string& name, const Vector2D<int> levelWidthInUnits) { m_sceneManager.SetLevelDimensions(name, levelWidthInUnits); }
 
 	void EMU::Camera_SetPixelsPerUnit(Entity entity, const int pixelsPerUnit) { m_cameraInterface.SetPixelsPerUnit(entity, pixelsPerUnit); }
 	const int EMU::Camera_GetPixelsPerUnit(Entity entity) { return m_cameraInterface.GetPixelsPerUnit(entity); }

@@ -6,24 +6,33 @@
 
 namespace Engine
 {
-	SceneManager::SceneManager() : m_newSceneStarting(true), m_ptrCurrentScene(nullptr), m_queuedSceneName(""), m_scenes()
+	SceneManager::SceneManager(ECS& refECS) : m_refECS(refECS), m_ptrCurrentScene(nullptr), m_queuedSceneName(""), m_scenes()
 	{
 		m_scenes.reserve(200);
 	}
 
-	void SceneManager::AddScene(std::string sceneName, ECS& refECS, AssetManager& refAssetManager)
+	void SceneManager::AddScene(std::string sceneName, AssetManager& refAssetManager)
 	{
 		m_scenes.emplace(std::piecewise_construct,
 			std::forward_as_tuple(sceneName),
-			std::forward_as_tuple(refECS, refAssetManager));
+			std::forward_as_tuple(m_refECS, refAssetManager));
 	}
 
-	void SceneManager::LoadScene(std::string sceneName)
+	void SceneManager::CheckForSceneChange()
 	{
-		auto it = m_scenes.find(sceneName);
-		if (it != m_scenes.end())
+		if (!m_queuedSceneName.empty())
 		{
-			if (m_ptrCurrentScene) { m_ptrCurrentScene->OnSceneEnd(); }
+			UnloadCurrentScene();
+			LoadQueuedScene();
+			m_queuedSceneName.clear();
+		}
+	}
+
+	void SceneManager::LoadQueuedScene()
+	{
+		auto it = m_scenes.find(m_queuedSceneName);
+		if (it != m_scenes.end())
+		{	
 			m_ptrCurrentScene = &it->second;
 			m_ptrCurrentScene->OnScenePlay();
 		}
@@ -33,11 +42,40 @@ namespace Engine
 		}
 	}
 
+	const Entity SceneManager::GetEntity(const std::string& sceneName, const char tileChar)
+	{
+		auto it = m_scenes.find(sceneName);
+		if (it != m_scenes.end())
+		{
+			return it->second.GetTileMapEntity(tileChar);
+		}
+		else
+		{
+			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+			return m_refECS.INVALID_ENTITY;
+		}
+	}
+
+	const std::vector<Entity>& SceneManager::GetEntities(const std::string& sceneName, const char tileChar)
+	{
+		auto it = m_scenes.find(sceneName);
+		if (it != m_scenes.end())
+		{
+			return it->second.GetTileMapEntities(tileChar);
+		}
+		else
+		{
+			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+			static const std::vector<Entity> emptyVector;
+			return emptyVector;
+		}
+	}
+
 	void SceneManager::UnloadCurrentScene()
 	{
 		// Save what needs to be saved in current scene...
 		// 
-		// m_currentScene->Unload();
+		if (m_ptrCurrentScene) { m_ptrCurrentScene->OnSceneEnd(); }
 	}
 
 	// Only called when the application is closing.
@@ -50,22 +88,98 @@ namespace Engine
 		m_scenes.clear();
 	}
 
-	Scene& SceneManager::GetScene(const std::string& sceneName)
+	const std::vector<Entity>& SceneManager::GetTileMapEntities(const std::string& sceneName, const char tileChar) const 
 	{
-		if (sceneName.compare("Current") == 0)
+		auto it = m_scenes.find(sceneName);
+		if (it != m_scenes.end()) 
 		{
-			if (m_ptrCurrentScene == nullptr)
-			{
-				ENGINE_ERROR_D("Current scene is null.");
-				return *m_ptrCurrentScene;
-			}
-			return *m_ptrCurrentScene;
+			return it->second.GetTileMapEntities(tileChar);
 		}
-		if (m_scenes.find(sceneName) == m_scenes.end())
+		else 
 		{
-			ENGINE_ERROR_D("Scene not found: " + sceneName);
-			return *m_ptrCurrentScene;
+			static const std::vector<Entity> emptyVector;
+			return emptyVector;
 		}
-		return m_scenes.at(sceneName);
+	}
+
+	void SceneManager::RegisterOnScenePlay(const std::string& sceneName, std::function<void()> func)
+	{
+		auto it = m_scenes.find(sceneName);
+		if (it != m_scenes.end())
+		{
+			it->second.RegisterOnScenePlay(func);
+		}
+		else
+		{
+			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+		}
+
+	}
+
+	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const char entityA, const char entityB, Scene::ContactCallback callback)
+	{
+		auto it = m_scenes.find(sceneName);
+		if (it != m_scenes.end())
+		{
+			it->second.RegisterContactCallback(contactType, entityA, entityB, callback);
+		}
+		else
+		{
+			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+
+		}
+	}
+
+	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const char entity, Scene::ContactCallback callback)
+	{
+		auto it = m_scenes.find(sceneName);
+		if (it != m_scenes.end())
+		{
+			it->second.RegisterContactCallback(contactType, entity, callback);
+		}
+		else
+		{
+			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+
+		}
+	}
+
+	void SceneManager::SetGravity(const std::string& sceneName, const Vector2D<float> gravity)
+	{
+		auto it = m_scenes.find(sceneName);
+		if (it != m_scenes.end())
+		{
+			it->second.SetGravity(gravity);
+		}
+		else
+		{
+			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+		}
+	}
+
+	void SceneManager::AddTileMap(const std::string& sceneName, const std::string& mapFileName, const std::string& rulesFileName)
+	{
+		auto it = m_scenes.find(sceneName);
+		if (it != m_scenes.end())
+		{
+			it->second.AddTileMap(mapFileName, rulesFileName);
+		}
+		else
+		{
+			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+		}
+	}
+
+	void SceneManager::SetLevelDimensions(const std::string& sceneName, const Vector2D<int> dimensions)
+	{
+		auto it = m_scenes.find(sceneName);
+		if (it != m_scenes.end())
+		{
+			it->second.SetLevelDimensions(dimensions);
+		}
+		else
+		{
+			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+		}
 	}
 }

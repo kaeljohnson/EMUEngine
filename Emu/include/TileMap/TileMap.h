@@ -55,7 +55,13 @@ namespace Engine
 			arg1: tileChar - The character representing the tile.
 			returns: A vector by reference of Entities that match the character.
 		*/
-		const std::vector<Entity>& GetEntities(char tileChar) const;
+		const std::vector<Entity>& GetEntities(char tileChar) const
+		{
+			if (m_groupedEntitiesByCharMap.find(tileChar) != m_groupedEntitiesByCharMap.end())
+				return m_groupedEntitiesByCharMap.at(tileChar);
+
+			return std::vector<Entity>(); // Return an empty vector if no entities found.
+		}
 
 		/*
 			Gets the entire map.

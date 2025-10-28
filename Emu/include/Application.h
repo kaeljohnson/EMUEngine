@@ -21,9 +21,6 @@ namespace Engine
 		void Start();
 		void End();
 
-		void Activate(Entity entity);
-		void Deactivate(Entity entity);
-
 		~Application();
 
 		// Deleted functions to ensure our app instance cannot be copied or moved.
@@ -38,7 +35,6 @@ namespace Engine
 		IRenderer m_IRenderer;
 		
 		SceneManager& m_refSceneManager;
-		Scene* m_ptrCurrentScene;
 		IOEventSystem& m_refIOEventSystem;
 		AnimationSystem& m_refAnimationSystem;
 		AudioSystem& m_refAudioSystem;

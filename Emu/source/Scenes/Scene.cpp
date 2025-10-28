@@ -214,11 +214,6 @@ namespace Engine
 		return m_tileMap.GetEntity(tileChar);
 	}
 
-	const std::vector<Entity>& Scene::GetTileMapEntities(const char tileChar) const
-	{
-		return m_tileMap.GetEntities(tileChar);
-	}
-
 	void Scene::loadAudioFiles()
 	{
 		// Open and parse the rules file

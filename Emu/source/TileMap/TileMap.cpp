@@ -25,14 +25,6 @@ namespace Engine
         return m_refECS.INVALID_ENTITY;
     }
 
-	const std::vector<Entity>& TileMap::GetEntities(char tileChar) const
-	{
-		if (m_groupedEntitiesByCharMap.find(tileChar) != m_groupedEntitiesByCharMap.end())
-            return m_groupedEntitiesByCharMap.at(tileChar);
-
-		return std::vector<Entity>(); // Return an empty vector if no entities found.
-	}
-
     void TileMap::CreateMap(const std::string mapFile, const std::string rulesFile)
     {
         // Parse file.
