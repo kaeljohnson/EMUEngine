@@ -7,8 +7,7 @@
 PlayerCamera::PlayerCamera() : 
     m_smoothingFactor(0.001f),
     m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(true),
-    m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(0.5f), m_lookAhead(0.0f),
-	m_refTransformInterface(Engine::EMU::GetInstance()->ITRANSFORMS())
+    m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(0.5f), m_lookAhead(0.0f)
 {
     // Combine this whole class into player class.
 
@@ -25,8 +24,8 @@ void PlayerCamera::Update(Engine::Entity entity)
 
     const float interpFactor = Engine::Time::GetInterpolationFactor();
 
-	const Engine::Vector2D<float> targetPrevPosition = m_refTransformInterface.GetPrevPosition(entity);
-	const Engine::Vector2D<float> targetPosition = m_refTransformInterface.GetPosition(entity);
+	const Engine::Vector2D<float> targetPrevPosition = Engine::EMU::GetInstance()->Transform_GetPrevPosition(entity);
+	const Engine::Vector2D<float> targetPosition = Engine::EMU::GetInstance()->Transform_GetPosition(entity);
 
     Engine::Vector2D<float> targetPos = Engine::Lerp(targetPrevPosition, targetPosition, interpFactor);
 	Engine::Vector2D<float> cameraSize = Engine::EMU::GetInstance()->Camera_GetSize(entity);

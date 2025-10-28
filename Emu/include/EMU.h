@@ -430,6 +430,109 @@ namespace Engine
 		
 		////////////////////////////////////////////////////
 
+		//////// Transform Interface functions /////////////
+
+		/*
+			Gets the previous position of the transform component of the given entity.
+			arg1: entity - The entity whose transform component's previous position is to be retrieved.
+			returns: The previous position of the transform as a Vector2D<float>.
+		*/
+		EMU_API const Vector2D<float> Transform_GetPrevPosition(Entity entity);
+
+		/*
+			Gets the previous position of the given transform.
+			arg1: transform - The transform whose previous position is to be retrieved.
+			returns: The previous position of the transform as a Vector2D<float>.
+		*/
+		EMU_API const Vector2D<float> Transform_GetPrevPosition(Transform& transform);
+
+		/*
+			Sets the position of the transform component of the given entity.
+			Note: This has no effect if the entity has a physics body.
+			arg1: entity - The entity whose transform component's position is to be set.
+			arg2: position - The position to set for the transform.
+		*/
+		EMU_API void Transform_SetPosition(Entity entity, const Vector2D<float> position);
+
+		/*
+			Gets the position of the transform component of the given entity.
+			arg1: entity - The entity whose transform component's position is to be retrieved.
+			returns: The position of the transform as a Vector2D<float>.
+		*/
+		EMU_API const Vector2D<float> Transform_GetPosition(Entity entity);
+
+		/*
+			Sets the dimensions of the transform component of the given entity.
+			arg1: entity - The entity whose transform component's dimensions are to be set.
+			arg2: dimensions - The dimensions to set for the transform.
+		*/
+		EMU_API void Transform_SetDimensions(Entity entity, const Vector2D<float> dimensions);
+
+		/*
+			Gets the dimensions of the transform component of the given entity.
+			arg1: entity - The entity whose transform component's dimensions are to be retrieved.
+			returns: The dimensions of the transform as a Vector2D<float>.
+		*/
+		EMU_API const Vector2D<float> Transform_GetDimensions(Entity entity);
+
+		/*
+			Sets the Z index of the transform component of the given entity.
+			arg1: entity - The entity whose transform component's Z index is to be set.
+			arg2: zIndex - The Z index to set for the transform.
+		*/
+		EMU_API void Transform_SetZIndex(Entity entity, const int zIndex);
+
+		/*
+			Gets the Z index of the transform component of the given entity.
+			arg1: entity - The entity whose transform component's Z index is to be retrieved.
+			returns: The Z index of the transform as an int.
+		*/
+		EMU_API const int Transform_GetZIndex(Entity entity);
+
+		/*
+			Sets the rotation of the transform component of the given entity.
+			arg1: entity - The entity whose transform component's rotation is to be set.
+			arg2: rotation - The rotation to set for the transform in degrees.
+		*/
+		EMU_API void Transform_SetRotation(Entity entity, const float rotation);
+
+		/*
+			Gets the rotation of the transform component of the given entity.
+			arg1: entity - The entity whose transform component's rotation is to be retrieved.
+			returns: The rotation of the transform in degrees as a float.
+		*/
+		EMU_API const float Transform_GetRotation(Entity entity);
+
+		/*
+			Sets the scale of the transform component of the given entity.
+			arg1: entity - The entity whose transform component's scale is to be set.
+			arg2: scale - The scale to set for the transform.
+		*/
+		EMU_API void Transform_SetScale(Entity entity, const float scale);
+
+		/*
+			Gets the scale of the transform component of the given entity.
+			arg1: entity - The entity whose transform component's scale is to be retrieved.
+			returns: The scale of the transform as a float.
+		*/
+		EMU_API const float Transform_GetScale(Entity entity);
+
+		/*
+			Sets the direction facing of the transform component of the given entity.
+			arg1: entity - The entity whose transform component's direction facing is to be set.
+			arg2: direction - The direction to set for the transform (e.g., 1 for right, -1 for left).
+		*/
+		EMU_API void Transform_SetDirectionFacing(Entity entity, const int direction);
+
+		/*
+			Gets the direction facing of the transform component of the given entity.
+			arg1: entity - The entity whose transform component's direction facing is to be retrieved.
+			returns: The direction facing of the transform as an int (e.g., 1 for right, -1 for left).
+		*/
+		EMU_API const int Transform_GetDirectionFacing(Entity entity);
+
+		////////////////////////////////////////////////////
+
 		///////////// Screen Interface functions ///////////
 
 		/*

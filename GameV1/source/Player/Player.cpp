@@ -14,8 +14,7 @@
         m_jumpKeyDown(Engine::SPACE_KEY_DOWN), m_jumpKeyUp(Engine::SPACE_KEY_UP),
         m_moveLeftKeyDown(Engine::A_KEY_DOWN), m_moveLeftKeyUp(Engine::A_KEY_UP),
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
-        m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right),
-		m_refTransformInterface(Engine::EMU::GetInstance()->ITRANSFORMS())
+        m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right)
     {
 
 		Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::PhysicsUpdater>("Level1", 'P',
@@ -85,10 +84,8 @@
     {
         float currentVelocityX = Engine::EMU::GetInstance()->Physics_GetVelocity(entity).X;
 
-		Engine::TransformInterface* transformInterface = &m_refTransformInterface;
-
-		if (m_currentDirection == PlayerDirection::Right) transformInterface->SetDirectionFacing(entity, 1);
-		else transformInterface->SetDirectionFacing(entity, -1);
+		if (m_currentDirection == PlayerDirection::Right) Engine::EMU::GetInstance()->Transform_SetDirectionFacing(entity, 1);
+		else Engine::EMU::GetInstance()->Transform_SetDirectionFacing(entity, -1);
 
         switch (m_currentState)
         {

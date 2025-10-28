@@ -145,6 +145,22 @@ namespace Engine
 	const bool EMU::Physics_HasContactLeft(Entity entity) { return m_physicsInterface.HasContactLeft(entity); }
 	const bool EMU::Physics_HasContactRight(Entity entity) { return m_physicsInterface.HasContactRight(entity); }
 
+	// Transform getter and setter wrappers
+	const Vector2D<float> EMU::Transform_GetPrevPosition(Entity entity) { return m_transformInterface.GetPrevPosition(entity); }
+	const Vector2D<float> EMU::Transform_GetPrevPosition(Transform& transform) { return m_transformInterface.GetPrevPosition(transform); }
+	void EMU::Transform_SetPosition(Entity entity, const Vector2D<float> position) { m_transformInterface.SetPosition(entity, position); }
+	const Vector2D<float> EMU::Transform_GetPosition(Entity entity) { return m_transformInterface.GetPosition(entity); }
+	void EMU::Transform_SetDimensions(Entity entity, const Vector2D<float> dimensions) { m_transformInterface.SetDimensions(entity, dimensions); }
+	const Vector2D<float> EMU::Transform_GetDimensions(Entity entity) { return m_transformInterface.GetDimensions(entity); }
+	void EMU::Transform_SetZIndex(Entity entity, const int zIndex) { m_transformInterface.SetZIndex(entity, zIndex); }
+	const int EMU::Transform_GetZIndex(Entity entity) { return m_transformInterface.GetZIndex(entity); }
+	void EMU::Transform_SetRotation(Entity entity, const float rotation) { m_transformInterface.SetRotation(entity, rotation); }
+	const float EMU::Transform_GetRotation(Entity entity) { return m_transformInterface.GetRotation(entity); }
+	void EMU::Transform_SetScale(Entity entity, const float scale) { m_transformInterface.SetScale(entity, scale); }
+	const float EMU::Transform_GetScale(Entity entity) { return m_transformInterface.GetScale(entity); }
+	void EMU::Transform_SetDirectionFacing(Entity entity, const int direction) { m_transformInterface.SetDirectionFacing(entity, direction); }
+	const int EMU::Transform_GetDirectionFacing(Entity entity) { return m_transformInterface.GetDirectionFacing(entity); }
+
 	// Screen interface
 	const Vector2D<int> EMU::GetScreenSize() { return Screen::GetScreenSize(); }
 	const Vector2D<int> EMU::GetVirtualSize() { return Screen::GetVirtualSize(); }

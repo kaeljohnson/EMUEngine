@@ -5,7 +5,6 @@
 #include "Scenes/SceneManager.h"
 #include "Rendering/IRenderer.h"
 #include "Events/IOEventSystem.h"
-#include "Core.h"
 #include "AssetManager.h"
 #include "Animations/AnimationSystem.h"
 #include "Audio/AudioSystem.h"
