@@ -98,6 +98,12 @@ namespace Engine
 		// Or should there be a more detailed check so assets that might transfer
 		// to next scene are not unloaded? This takes awhile.
 		m_refAssetManager.UnloadTextures();
+		for (auto& animations : m_refECS.GetHotComponents<Animations>())
+		{
+			// Free texture pointer associated with animations.
+			animations.m_ptrLoadedTexture = nullptr;
+		}
+
 		m_refAssetManager.UnloadSounds();
 
 		// Deactivate all entities and destroy all components.
@@ -307,11 +313,26 @@ namespace Engine
 		bool drawDebug = transformJson.contains("DrawDebug");
 		std::string debugColor = drawDebug ? transformJson.value("DrawDebug", "red") : "red";
 
+		DebugColor debugColorEnum;
+
+		if (debugColor == "green")
+		{
+			debugColorEnum = DebugColor::Green;
+		}
+		else if (debugColor == "blue")
+		{
+			debugColorEnum = DebugColor::Blue;
+		}
+		else
+		{
+			debugColorEnum = DebugColor::Red;
+		}
+
 		refECS.AddComponent<Transform>(
 			entity,
 			Vector2D<float>(x * (float)numUnitsPerTile, y * (float)numUnitsPerTile),
 			Vector2D<float>((float)numUnitsPerTile, (float)numUnitsPerTile),
-			1.0f, 1.0f, 1, zIndex, drawDebug, debugColor
+			1.0f, 1.0f, 1, zIndex, drawDebug, debugColorEnum
 		);
 	}
 
@@ -565,7 +586,7 @@ namespace Engine
 			return;
 		}
 
-		refAssetManager.LoadTexture(entity, spriteSheetsPath + path);
+		void* ptrLoadedTexture = refAssetManager.LoadTexture(entity, spriteSheetsPath + path);
 
 		Vector2D<float> frameSize = ExtractVector2DFromJSON<float>(spriteJson, "SizeInUnits", { 1.0f, 1.0f });
 		Vector2D<int> pixelsPerFrame = ExtractVector2DFromJSON<int>(spriteJson, "PixelsPerFrame", { 32, 32 });
@@ -574,13 +595,27 @@ namespace Engine
 
 		bool drawDebug = spriteJson.contains("DrawDebug");
 		std::string debugColor = drawDebug ? spriteJson["DrawDebug"].get<std::string>() : "red";
+		DebugColor debugColorEnum;
+
+		if (debugColor == "green")
+		{
+			debugColorEnum = DebugColor::Green;
+		}
+		else if (debugColor == "blue")
+		{
+			debugColorEnum = DebugColor::Blue;
+		}
+		else
+		{
+			debugColorEnum = DebugColor::Red;
+		}
 
 		std::unordered_map<std::string, Animation> animations;
 		json j = json::parse(characterRules["Animations"].dump());
 
 		auto makeAnimation = [](const std::string& name, const json& jAnim, Vector2D<int> pixelsPerFrame,
 			const Vector2D<float> offsetFromTransform, const Vector2D<size_t> dimensions,
-			const Vector2D<float> frameSize, bool drawDebug, const std::string& debugColor)
+			const Vector2D<float> frameSize, bool drawDebug, DebugColor debugColor)
 			{
 				Animation a;
 				a.m_name = name;
@@ -602,10 +637,10 @@ namespace Engine
 		for (auto& [name, value] : j.items())
 		{
 			animations.emplace(name, makeAnimation(name, value, pixelsPerFrame, offsetFromTransform,
-				dimensions, frameSize, drawDebug, debugColor));
+				dimensions, frameSize, drawDebug, debugColorEnum));
 		}
 
-		refECS.AddComponent<Animations>(entity, animations);
+		refECS.AddComponent<Animations>(entity, animations, ptrLoadedTexture);
 	}
 
 

@@ -427,6 +427,8 @@ namespace Engine
 
 	void PhysicsSimulation::Update()
 	{
+		 // auto start = std::chrono::high_resolution_clock::now();
+
 		b2World_Step(*m_ptrWorldId, Time::GetTimeStep(), 4);
 		m_contactSystem.ProcessContacts(m_ptrWorldId);
 
@@ -435,6 +437,9 @@ namespace Engine
 		for (PhysicsBody& refPhysicsBody : hotPhysicsBodies) // Update physics bodies first since all bodies need updating but not all entities with bodies have transforms.
 		{
 			if (refPhysicsBody.m_checkSimpleContacts) ProcessSimpleContacts(refPhysicsBody);
+
+			// Static bodies don't move, so no need to update their position/rotation.
+			if (refPhysicsBody.m_bodyType == STATIC) continue;
 
 			b2Vec2 position = b2Body_GetPosition(*refPhysicsBody.m_bodyId);
 			refPhysicsBody.m_position = Vector2D<float>(position.x - refPhysicsBody.m_halfDimensions.X, position.y - refPhysicsBody.m_halfDimensions.Y);
@@ -455,6 +460,10 @@ namespace Engine
 			if (ptrPhysicsUpdater)
 				ptrPhysicsUpdater->Update(refPhysicsBody.m_entity);
 		}
+
+		// auto end = std::chrono::high_resolution_clock::now();
+		// std::chrono::duration<double, std::milli> elapsed = end - start;
+		// ENGINE_INFO_D("Physics step time: " + std::to_string(elapsed.count()) + " ms");
 	}
 
 	void PhysicsSimulation::DestroyWorld()

@@ -27,6 +27,15 @@ namespace Engine
 		const Vector2D<int> viewportSizeInPixels, const Vector2D<float> scale)
 	{
 
+		// auto start = std::chrono::high_resolution_clock::now();
+
+		auto& renderBuckets = refCamera.m_renderBucket;
+		auto& debugBuckets = refCamera.m_debugRenderBucket;
+		auto& debugLineBuckets = refCamera.m_debugLinesRenderBucket;
+
+		const float scaleX = refCamera.m_pixelsPerUnit * scale.X;
+		const float scaleY = refCamera.m_pixelsPerUnit * scale.Y;
+
 		// Camera setup
 		const Vector2D<float> viewportSizeInTiles(
 			viewportSizeInPixels.X / (refCamera.m_pixelsPerUnit * scale.X),
@@ -79,11 +88,8 @@ namespace Engine
 			const float lerpedX = Lerp(refTransform.PrevPosition.X, refTransform.Position.X, interpolation);
 			const float lerpedY = Lerp(refTransform.PrevPosition.Y, refTransform.Position.Y, interpolation);
 
-			const float scaleX = refCamera.m_pixelsPerUnit * scale.X;
-			const float scaleY = refCamera.m_pixelsPerUnit * scale.Y;
-
-			int width = static_cast<int>(round(refTransform.Dimensions.X * scaleX));
-			int height = static_cast<int>(round(refTransform.Dimensions.Y * scaleY));
+			int width = int(refTransform.Dimensions.X * scaleX);
+			int height = int(refTransform.Dimensions.Y * scaleY);
 			float offsetFromTransformX = 0.0f;
 			float offsetFromTransformY = 0.0f;
 
@@ -92,12 +98,12 @@ namespace Engine
 			if (animations)
 			{
 				const Animation& currentAnimation = animations->m_animations.at(animations->m_currentAnimation);
-				width = static_cast<int>(round(currentAnimation.m_size.X * scaleX));
-				height = static_cast<int>(round(currentAnimation.m_size.Y * scaleY));
+				width = int(currentAnimation.m_size.X * scaleX);
+				height = int(currentAnimation.m_size.Y * scaleY);
 				offsetFromTransformX = currentAnimation.m_offsetFromTransform.X;
 				offsetFromTransformY = currentAnimation.m_offsetFromTransform.Y;
 
-				SDLTexture* spriteTexture = (SDLTexture*)refAssetManager.GetTexture(animations->m_entity);
+				SDLTexture* spriteTexture = (SDLTexture*)animations->m_ptrLoadedTexture;
 				if (spriteTexture == nullptr)
 					continue;
 
@@ -113,14 +119,13 @@ namespace Engine
 
 				// Screen-space coordinates
 				const int locationInPixelsOnScreenX =
-					static_cast<int>(round((lerpedX - cameraAdjustedOffset.X + offsetFromTransformX) * scaleX));
+					int((lerpedX - cameraAdjustedOffset.X + offsetFromTransformX) * scaleX);
 				const int locationInPixelsOnScreenY =
-					static_cast<int>(round((lerpedY - cameraAdjustedOffset.Y + offsetFromTransformY) * scaleY));
+					int((lerpedY - cameraAdjustedOffset.Y + offsetFromTransformY) * scaleY);
 
 				//Submit(std::move(ro));
 
-				auto& bucket = refCamera.m_renderBucket.try_emplace(refTransform.ZIndex).first->second;
-				bucket.emplace_back(
+				renderBuckets[refTransform.ZIndex].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are under 1-10
 					refTransform.m_entity,
 					Vector2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
 					Vector2D<int>(width, height),
@@ -132,25 +137,23 @@ namespace Engine
 				// debug objects when in debug mode.
 				if (refTransform.m_drawDebug)
 				{
-					auto& debugBucket = refCamera.m_debugRenderBucket.try_emplace(refTransform.ZIndex).first->second;
-					debugBucket.emplace_back(
+					debugBuckets[refTransform.ZIndex].emplace_back(
 						refTransform.m_entity,
 						false,
 						Vector2D<int>(
-							static_cast<int>(round((lerpedX - cameraAdjustedOffset.X) * scaleX)),
-							static_cast<int>(round((lerpedY - cameraAdjustedOffset.Y) * scaleY))
+							int((lerpedX - cameraAdjustedOffset.X) * scaleX),
+							int((lerpedY - cameraAdjustedOffset.Y) * scaleY)
 						),
 						Vector2D<int>(
-							static_cast<int>(round(refTransform.Dimensions.X * scaleX)), // Need transform dimensions, not animation dimensions
-							static_cast<int>(round(refTransform.Dimensions.Y * scaleY))
+							int((refTransform.Dimensions.X * scaleX)), // Need transform dimensions, not animation dimensions
+							int((refTransform.Dimensions.Y * scaleY))
 						),
 						refTransform.m_debugColor
 					);
 				}
 				if (currentAnimation.m_drawDebug)
 				{
-					auto& debugBucket = refCamera.m_debugRenderBucket.try_emplace(refTransform.ZIndex).first->second;
-					debugBucket.emplace_back(
+					debugBuckets[refTransform.ZIndex].emplace_back(
 						refTransform.m_entity,
 						false,
 						Vector2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
@@ -165,13 +168,12 @@ namespace Engine
 #ifndef NDEBUG
 				// if there is no animation at all,
 				// draw the transform rectangle when in debug.
-				auto& debugBucket = refCamera.m_debugRenderBucket.try_emplace(refTransform.ZIndex).first->second;
-				debugBucket.emplace_back(
+				debugBuckets[refTransform.ZIndex].emplace_back(
 					refTransform.m_entity,
 					true,
 					Vector2D<int>(
-						static_cast<int>(round((lerpedX - cameraAdjustedOffset.X) * scaleX)),
-						static_cast<int>(round((lerpedY - cameraAdjustedOffset.Y) * scaleY))
+						int((lerpedX - cameraAdjustedOffset.X) * scaleX),
+						int((lerpedY - cameraAdjustedOffset.Y) * scaleY)
 					),
 					Vector2D<int>(width, height),
 					refTransform.m_debugColor
@@ -179,16 +181,15 @@ namespace Engine
 
 				auto submitChainsForRendering = [&](auto& ptrChainCollider)
 					{
-						auto& debugLinesBucket = refCamera.m_debugLinesRenderBucket.try_emplace(refTransform.ZIndex).first->second;
-						debugLinesBucket.emplace_back(
+						debugLineBuckets[refTransform.ZIndex].emplace_back(
 							ptrChainCollider->m_entity,
 							Vector2D<int>(
-								static_cast<int>(round((ptrChainCollider->m_points[1].X - cameraAdjustedOffset.X) * scaleX)),
-								static_cast<int>(round((ptrChainCollider->m_points[1].Y - cameraAdjustedOffset.Y) * scaleY))
+								int((ptrChainCollider->m_points[1].X - cameraAdjustedOffset.X) * scaleX),
+								int((ptrChainCollider->m_points[1].Y - cameraAdjustedOffset.Y) * scaleY)
 							),
 							Vector2D<int>(
-								static_cast<int>(round((ptrChainCollider->m_points[2].X - cameraAdjustedOffset.X) * scaleX)),
-								static_cast<int>(round((ptrChainCollider->m_points[2].Y - cameraAdjustedOffset.Y) * scaleY))
+								int((ptrChainCollider->m_points[2].X - cameraAdjustedOffset.X) * scaleX),
+								int((ptrChainCollider->m_points[2].Y - cameraAdjustedOffset.Y) * scaleY)
 							)
 						);
 					};
@@ -217,10 +218,15 @@ namespace Engine
 #endif
 			}
 		}
+
+		// auto end = std::chrono::high_resolution_clock::now();
+		// std::chrono::duration<double, std::milli> elapsed = end - start;
+		// ENGINE_TRACE_D("Camera prepareForRendering took " + std::to_string(elapsed.count()) + " ms");
 	}
 
     void CameraSystem::Update(AssetManager& refAssetManager)
     {
+		// auto start = std::chrono::high_resolution_clock::now();
         for (auto& camera : m_refECS.GetHotComponents<Camera>())
         {
             CameraUpdater* ptrCameraUpdater = m_refECS.GetComponent<CameraUpdater>(camera.m_entity);
@@ -232,6 +238,9 @@ namespace Engine
 			// Prepare this camera for rendering
 			prepareForRendering(camera, refAssetManager, m_refECS, Screen::VIEWPORT_SIZE, Screen::SCALE);
         }
+		// auto end = std::chrono::high_resolution_clock::now();
+		//std::chrono::duration<double, std::milli> elapsed = end - start;
+		// ENGINE_TRACE_D("CameraSystem Update took " + std::to_string(elapsed.count()) + " ms");
     }
 
     void CameraSystem::Frame(const Vector2D<int> mapBounds)

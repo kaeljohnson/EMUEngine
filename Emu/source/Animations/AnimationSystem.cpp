@@ -10,6 +10,8 @@ namespace Engine
 
 	void AnimationSystem::Update()
 	{
+		// auto now = std::chrono::high_resolution_clock::now();
+
 		// Update logic for animations
 		for (auto& animations : m_refECS.GetHotComponents<Animations>())
 		{
@@ -51,5 +53,9 @@ namespace Engine
 				currentAnimation.m_currentFrame = currentAnimation.m_frames[currentAnimation.m_frameCounter];
 			}
 		}
+
+		// auto end = std::chrono::high_resolution_clock::now();
+		// std::chrono::duration<double, std::milli> elapsed = end - now;
+		// ENGINE_TRACE_D("AnimationSystem Update took " + std::to_string(elapsed.count()) + " ms");
 	}
 }

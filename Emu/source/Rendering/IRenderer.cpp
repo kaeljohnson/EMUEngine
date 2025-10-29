@@ -23,7 +23,7 @@ namespace Engine
 	Vector2D<int> Screen::VIRTUAL_SIZE = Vector2D<int>(0, 0);
 
 	IRenderer::IRenderer(ECS& refECS, AssetManager& refAssetManager) 
-		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS), m_refAssetManager(refAssetManager)
+		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS), m_refAssetManager(refAssetManager), m_lastDebugColor(DebugColor::Black)
 	{
 		ENGINE_INFO_D("Creating Renderer");
 
@@ -97,6 +97,8 @@ namespace Engine
 
 	void IRenderer::Render()
 	{
+		auto startTime = std::chrono::high_resolution_clock::now();
+
 		clearScreen();
 
 		for (auto& refCamera : m_refECS.GetHotComponents<Camera>())
@@ -109,33 +111,37 @@ namespace Engine
 
 			SDL_RenderSetClipRect((SDL_Renderer*)m_ptrRenderer, &clipRect);
 
-			for (auto& [key, vec] : std::views::reverse(refCamera.m_renderBucket)) 
-			{					
-				for (auto& value : vec) 
+			for (auto ptrToVec = refCamera.m_renderBucket.rbegin(); ptrToVec != refCamera.m_renderBucket.rend(); ++ptrToVec)
+			{
+				for (auto& value : *ptrToVec)
 				{
 					draw(value);
 				}
+
+				ptrToVec->clear();
 			}
-			refCamera.m_renderBucket.clear(); // CLEAR MAP EACH FRAME.
 
 #ifndef NDEBUG // DO NOT ADD DEBUG OBJECTS WHEN NOT IN DEBUG AS THE QUEUES WILL GROW INDEFINITELY.
-			for (auto& [key, vec] : std::views::reverse(refCamera.m_debugRenderBucket))
+			for (auto ptrToVec = refCamera.m_debugRenderBucket.rbegin(); ptrToVec != refCamera.m_debugRenderBucket.rend(); ++ptrToVec)
 			{
-				for (auto& value : vec)
+				for (auto& value : *ptrToVec)
 				{
 					draw(value);
 				}
-			}
-			refCamera.m_debugRenderBucket.clear(); // CLEAR MAP EACH FRAME.
 
-			for (auto& [key, vec] : std::views::reverse(refCamera.m_debugLinesRenderBucket))
+				ptrToVec->clear();
+			}
+
+
+			for (auto ptrToVec = refCamera.m_debugLinesRenderBucket.rbegin(); ptrToVec != refCamera.m_debugLinesRenderBucket.rend(); ++ptrToVec)
 			{
-				for (auto& value : vec)
+				for (auto& value : *ptrToVec)
 				{
 					draw(value);
 				}
+
+				ptrToVec->clear();
 			}
-			refCamera.m_debugLinesRenderBucket.clear(); // CLEAR MAP EACH FRAME.
 #endif
 
 			// If "border on"
@@ -147,10 +153,12 @@ namespace Engine
 			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x + clipRect.w - 1, clipRect.y, clipRect.x + clipRect.w - 1, clipRect.y + clipRect.h); // right line
 			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y + clipRect.h - 1, clipRect.x + clipRect.w, clipRect.y + clipRect.h - 1); // bottom line
 		}
-		
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 
 		display();
+
+		auto endTime = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float, std::milli> renderDuration = endTime - startTime;
+		ENGINE_INFO_D("Render time (ms): " + std::to_string(renderDuration.count()));
 	}	
 
 	void IRenderer::draw(RenderObject& object)
@@ -196,23 +204,36 @@ namespace Engine
 			object.m_sizeInPixelsOnScreen.Y
 		};
 
-		std::string_view debugColor = object.m_debugColor;
+		DebugColor debugColor = object.m_debugColor;
 
-		if (debugColor == "green") SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
-		else if (debugColor == "blue") SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 255, SDL_ALPHA_OPAQUE);
-		else if (debugColor == "black") SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-		else SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE); // Default to red
+		// Only change debug color if different from last time to reduce calls to GPU.
+		if (debugColor != m_lastDebugColor)
+		{
+			switch (debugColor)
+			{
+			case DebugColor::Green:
+				SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+				break;
+			case DebugColor::Blue:
+				SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 255, SDL_ALPHA_OPAQUE);
+				break;
+			case DebugColor::Black:
+				SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+				break;
+			default: // Red
+				SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+				break;
+			}
+			m_lastDebugColor = debugColor;
+		}
 
 		if (object.m_filled)
 		{
-			// Draw a black rectangle for debug objects
 			SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &dst);
-			ISDL::RenderCopyEx((SDLRenderer*)m_ptrRenderer, nullptr, nullptr, &dst, 0.0, nullptr, SDL_FLIP_NONE);
 		}
 		else
 		{
 			SDL_RenderDrawRect((SDLRenderer*)m_ptrRenderer, &dst);
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 		}
 	}
 

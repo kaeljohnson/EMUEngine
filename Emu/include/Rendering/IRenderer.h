@@ -78,6 +78,8 @@ namespace Engine
 
 		bool m_rendererCreated;
 
+		DebugColor m_lastDebugColor;
+
 		ECS& m_refECS;
 		AssetManager& m_refAssetManager;
 	};

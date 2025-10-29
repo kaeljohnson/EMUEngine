@@ -15,6 +15,14 @@ struct b2ChainId;
 
 namespace Engine
 {
+	enum class DebugColor
+	{
+		Red,
+		Green,
+		Blue,
+		Black
+	};
+
 	struct Transform : public Component
 	{
 		Vector2D<float> PrevPosition;	// Previous position of transform in world space.
@@ -27,12 +35,12 @@ namespace Engine
 		float Scale;
 		int DirectionFacing;
 		bool m_drawDebug;
-		std::string m_debugColor;
+		DebugColor m_debugColor;
 
 		Transform(Entity entity) : PrevPosition(0.0f, 0.0f), Position(0.0f, 0.0f),
-			Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1), ZIndex(0), m_drawDebug(false), m_debugColor("red"), Component(entity) {}
+			Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1), ZIndex(0), m_drawDebug(false), m_debugColor(DebugColor::Red), Component(entity) {}
 
-		Transform(Entity entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction, int zIndex, const bool drawDebug, std::string debugColor) :
+		Transform(Entity entity, Vector2D<float> position, Vector2D<float> dimensions, float rotation, float scale, int direction, int zIndex, const bool drawDebug, DebugColor debugColor) :
 			PrevPosition(position), Position(position),
 			Dimensions(dimensions), Rotation(rotation), Scale(scale), 
 			DirectionFacing(direction), ZIndex(zIndex), m_drawDebug(drawDebug),
@@ -120,13 +128,13 @@ namespace Engine
 
 	struct DebugObject
 	{
-		DebugObject(size_t entity, bool filled, Vector2D<int> locationInPixelsOnScreen, Vector2D<int> sizeInPixelsOnScreen, std::string debugColor)
+		DebugObject(size_t entity, bool filled, Vector2D<int> locationInPixelsOnScreen, Vector2D<int> sizeInPixelsOnScreen, DebugColor debugColor)
 			: m_entity(entity), m_filled(filled), m_locationInPixelsOnScreen(locationInPixelsOnScreen), 
 			m_sizeInPixelsOnScreen(sizeInPixelsOnScreen), m_debugColor(debugColor) {}
 
 		size_t m_entity;
 		bool m_filled;
-		std::string m_debugColor;
+		DebugColor m_debugColor;
 		Vector2D<int> m_locationInPixelsOnScreen;
 		Vector2D<int> m_sizeInPixelsOnScreen;
 	};
@@ -141,21 +149,25 @@ namespace Engine
 		Vector2D<int> m_endPointInPixelsOnScreen;
 	};
 
-	using RenderBucket = std::map<size_t, std::vector<RenderObject>>;
-	using DebugRenderBucket = std::map<size_t, std::vector<DebugObject>>;
-	using LinesRenderBucket = std::map<size_t, std::vector<LineObject>>;
+	using RenderBucket = std::vector<std::vector<RenderObject>>;      // Vector index is the zIndex.
+	using DebugRenderBucket = std::vector<std::vector<DebugObject>>;  // Vector index is the zIndex.
+	using LinesRenderBucket = std::vector<std::vector<LineObject>>;	  // Vector index is the zIndex.
 
 	struct Camera : public Component
 	{
 		Camera(Entity entity)
 			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_screenRatio(1.0f, 1.0f), 
 			m_positionInFractionOfScreenSize(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), 
-			m_bounds(0, 0), m_clipRectPosition(0, 0), m_clipRectSize(0, 0),
-			Component(entity) {}
+			m_bounds(0, 0), m_clipRectPosition(0, 0), m_clipRectSize(0, 0), m_renderBucket(10, std::vector<RenderObject>()),
+			m_debugRenderBucket(10, std::vector<DebugObject>()), m_debugLinesRenderBucket(10, std::vector<LineObject>()),
+			Component(entity) 
+		{
+		}
 		Camera(Entity entity, Vector2D<float> size, Vector2D<float> screenRatio, Vector2D<float> position, int pixelsPerUnit, bool clampingOn)
 			: m_size(size), m_screenRatio(screenRatio), m_positionInFractionOfScreenSize(position), 
 			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0),
-			m_clipRectPosition(0, 0), m_clipRectSize(0, 0), 
+			m_clipRectPosition(0, 0), m_clipRectSize(0, 0), m_renderBucket(10, std::vector<RenderObject>()),
+			m_debugRenderBucket(10, std::vector<DebugObject>()), m_debugLinesRenderBucket(10, std::vector<LineObject>()),
 			Component(entity) {}
 		
 
@@ -255,10 +267,10 @@ namespace Engine
 		Animation() = default;
 		Animation(std::string name, std::vector<int> frames, int frameDuration, 
 			Vector2D<int> pixelsPerFrame, Vector2D<float> offsetFromTransform, 
-			Vector2D<size_t> dimensions, bool loop, Vector2D<float> size, const bool drawDebug, std::string debugColor)
+			Vector2D<size_t> dimensions, bool loop, Vector2D<float> size, const bool drawDebug, DebugColor debugColor)
 			: m_name(name), m_frames(frames), m_numFrames(frames.size()), m_frameTime(0), 
 			m_frameDuration(frameDuration), m_pixelsPerFrame(pixelsPerFrame), 
-			m_dimensions(dimensions), m_loop(loop), m_size(size), m_drawDebug(drawDebug)
+			m_dimensions(dimensions), m_loop(loop), m_size(size), m_drawDebug(drawDebug), m_debugColor(debugColor)
 		{
 		};
 		
@@ -273,7 +285,7 @@ namespace Engine
 		Vector2D<size_t> m_dimensions;	 // Dimensions of the sprite sheet in frames (width, height)
 		Vector2D<float> m_size;
 		bool m_drawDebug;
-		std::string m_debugColor;
+		DebugColor m_debugColor;
 		
 		Vector2D<float> m_offsetFromTransform;
 		bool m_loop;
@@ -281,15 +293,17 @@ namespace Engine
 
 	struct Animations : public Component
 	{
-		Animations(Entity entity, std::unordered_map<std::string, Animation> animations)
+		Animations(Entity entity, std::unordered_map<std::string, Animation> animations, void* ptrLoadedTexture)
 			:
 			m_animations(animations), 
 			m_currentAnimation("Idle"), // Idle for now, need a animation interface for client to set animation in a state machine.
+			m_ptrLoadedTexture(ptrLoadedTexture),
 			Component(entity) 
 		{}
 
 		std::unordered_map<std::string, Animation> m_animations; // All animations for this sprite
-		std::string m_currentAnimation;  // Name of the current animation being played
+		std::string m_currentAnimation;							 // Name of the current animation being played
+		void* m_ptrLoadedTexture;								 // Pointer to the loaded texture for this sprite
 		
 	};
 

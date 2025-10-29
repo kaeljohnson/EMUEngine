@@ -26,17 +26,15 @@ namespace Engine
 		UnloadSounds();
 	}
 
-	void AssetManager::LoadTexture(Entity entity, const std::string& filePath)
+	void* AssetManager::LoadTexture(Entity entity, const std::string& filePath)
 	{
 		// Check if already loaded
 		auto it = m_textureIndices.find(filePath);
 		if (it != m_textureIndices.end())
 		{
-			ENGINE_INFO_D("Adding entity to texture: " + std::to_string(entity));
-
 			// Texture already loaded, just map entity to existing texture
 			m_textureNames[entity] = filePath;
-			return;
+			return m_loadedTextures[it->second];
 		}
 
 		// Otherwise, load new texture
@@ -46,7 +44,7 @@ namespace Engine
 		if (!m_ptrRenderer) 
 		{
 			ENGINE_CRITICAL("Renderer is not initialized.");
-			return;
+			return nullptr;
 		}
 
 		// Load texture
@@ -54,7 +52,7 @@ namespace Engine
 		if (!ptrTexture) 
 		{
 			ENGINE_CRITICAL("Failed to load texture: " + filePath + ", SDL_Error: " + std::string(SDL_GetError()));
-			return;
+			return nullptr;
 		}
 
 		// Store texture
@@ -63,6 +61,8 @@ namespace Engine
 		size_t index = m_loadedTextures.size() - 1;
 		m_textureNames[entity] = filePath;
 		m_textureIndices[filePath] = index;
+
+		return ptrTexture;
 	}
 
 	void AssetManager::UnloadTextures()

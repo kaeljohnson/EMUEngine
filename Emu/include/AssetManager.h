@@ -27,7 +27,7 @@ namespace Engine
 			Loads texture by calling IMG_LoadTexture. Adds loaded texture to m_loadedTextures.
 			arg1: entity: The entity to associate the texture with.
 		*/
-		void LoadTexture(Entity entity, const std::string& filePath);
+		void* LoadTexture(Entity entity, const std::string& filePath);
 
 		/*
 			Unloads all loaded textures.
