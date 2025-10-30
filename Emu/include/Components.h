@@ -156,8 +156,8 @@ namespace Engine
 	struct Camera : public Component
 	{
 		Camera(Entity entity)
-			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_screenRatio(1.0f, 1.0f), 
-			m_positionInFractionOfScreenSize(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), 
+			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_screenRatio(1.0f, 1.0f),
+			m_positionInFractionOfScreenSize(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), m_borderOn(false),
 			m_bounds(0, 0), m_clipRectPosition(0, 0), m_clipRectSize(0, 0), m_renderBucket(10, std::vector<RenderObject>()),
 			m_debugRenderBucket(10, std::vector<DebugObject>()), m_debugLinesRenderBucket(10, std::vector<LineObject>()),
 			Component(entity) 
@@ -165,7 +165,7 @@ namespace Engine
 		}
 		Camera(Entity entity, Vector2D<float> size, Vector2D<float> screenRatio, Vector2D<float> position, int pixelsPerUnit, bool clampingOn)
 			: m_size(size), m_screenRatio(screenRatio), m_positionInFractionOfScreenSize(position), 
-			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0),
+			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0), m_borderOn(false),
 			m_clipRectPosition(0, 0), m_clipRectSize(0, 0), m_renderBucket(10, std::vector<RenderObject>()),
 			m_debugRenderBucket(10, std::vector<DebugObject>()), m_debugLinesRenderBucket(10, std::vector<LineObject>()),
 			Component(entity) {}
@@ -183,6 +183,7 @@ namespace Engine
 		int m_pixelsPerUnit;
 		bool m_clampingOn;
 		Vector2D<int> m_bounds;
+		bool m_borderOn;
 
 		Vector2D<int> m_clipRectPosition;
 		Vector2D<int> m_clipRectSize;

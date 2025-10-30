@@ -97,7 +97,7 @@ namespace Engine
 
 	void IRenderer::Render()
 	{
-		auto startTime = std::chrono::high_resolution_clock::now();
+		// auto startTime = std::chrono::high_resolution_clock::now();
 
 		clearScreen();
 
@@ -143,22 +143,23 @@ namespace Engine
 				ptrToVec->clear();
 			}
 #endif
-
-			// If "border on"
-			// Draw the camera frame
+			// Reset background color. Temp for now.
 			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 
-			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x + clipRect.w, clipRect.y); // top line
-			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x, clipRect.y + clipRect.h); // left line
-			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x + clipRect.w - 1, clipRect.y, clipRect.x + clipRect.w - 1, clipRect.y + clipRect.h); // right line
-			SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y + clipRect.h - 1, clipRect.x + clipRect.w, clipRect.y + clipRect.h - 1); // bottom line
+			if (refCamera.m_borderOn)
+			{
+				SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x + clipRect.w, clipRect.y); // top line
+				SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x, clipRect.y + clipRect.h); // left line
+				SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x + clipRect.w - 1, clipRect.y, clipRect.x + clipRect.w - 1, clipRect.y + clipRect.h); // right line
+				SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y + clipRect.h - 1, clipRect.x + clipRect.w, clipRect.y + clipRect.h - 1); // bottom line
+			}
 		}
 
 		display();
 
-		auto endTime = std::chrono::high_resolution_clock::now();
+		/*auto endTime = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float, std::milli> renderDuration = endTime - startTime;
-		ENGINE_INFO_D("Render time (ms): " + std::to_string(renderDuration.count()));
+		ENGINE_INFO_D("Render time (ms): " + std::to_string(renderDuration.count()));*/
 	}	
 
 	void IRenderer::draw(RenderObject& object)

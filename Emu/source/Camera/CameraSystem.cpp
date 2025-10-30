@@ -26,7 +26,6 @@ namespace Engine
 	static void prepareForRendering(Camera& refCamera, AssetManager& refAssetManager, ECS& refECS,
 		const Vector2D<int> viewportSizeInPixels, const Vector2D<float> scale)
 	{
-
 		// auto start = std::chrono::high_resolution_clock::now();
 
 		auto& renderBuckets = refCamera.m_renderBucket;
