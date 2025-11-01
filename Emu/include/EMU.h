@@ -223,6 +223,14 @@ namespace Engine
 		*/
 		EMU_API void Camera_SetOffsets(Entity entity, const Vector2D<float> offsets);
 
+		/*
+			Add camera shake to the camera component of the given entity.
+			arg1: entity - The entity whose camera component is to receive the shake effect.
+			arg2: intensity - The intensity of the shake effect in world units.
+			arg3: duration - The duration of the shake effect in seconds.
+		*/
+		EMU_API void Camera_AddShake(Entity entity, const Vector2D<float> intensity, const Vector2D<float> duration);
+
 		////////////////////////////////////////////////////
 
 		/////////// Physics Interface Functions ////////////

@@ -111,6 +111,7 @@ namespace Engine
 	const bool EMU::Camera_GetClampingOn(Entity entity) { return m_cameraInterface.GetClampingOn(entity); }
 	const Vector2D<float> EMU::Camera_GetSize(Entity entity) { return m_cameraInterface.GetSize(entity); }
 	void EMU::Camera_SetOffsets(Entity entity, const Vector2D<float> offsets) { m_cameraInterface.SetOffsets(entity, offsets); }
+	void EMU::Camera_AddShake(Entity entity, const Vector2D<float> intensity, const Vector2D<float> duration) { /*Add shaek to camera*/ }
 
 	// PhysicsBody2d getter and setter wrappers
 	void EMU::Physics_CreateBody(Entity entity) { m_physicsInterface.CreateBody(entity); }

@@ -1080,6 +1080,201 @@
                     "Loop": true
                 }
             }
+        },
+        "y":
+        {
+            "ActiveOnStart": true,
+            "Physics":
+            {
+                "BodyType": "SENSOR",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "CheckSimpleContacts": false,
+                "UseChains": true
+            },
+            "Transform":
+            {
+                "ZIndex": 2,
+                "DrawDebug": "red"
+            },
+            "SpriteSheet": 
+            {
+                "Path": "GrassTileSet32x32.png",
+                "PixelsPerFrame": [32, 32],
+                "SizeInUnits": [1.0, 1.0],
+                "OffsetFromTransform": [0.0, 0.0],
+                "Height": 20,
+                "Width": 40,
+                "DrawDebug": "green"
+            },
+            "Animations":
+            {
+                "Idle": 
+                {
+                    "Frames": [16],
+                    "FrameTime": 20,
+                    "Loop": true
+                }
+            }
+        },
+        "s":
+        {
+            "ActiveOnStart": true,
+            "Physics":
+            {
+                "BodyType": "SENSOR",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "CheckSimpleContacts": false,
+                "UseChains": true
+            },
+            "Transform":
+            {
+                "ZIndex": 2,
+                "DrawDebug": "red"
+            },
+            "SpriteSheet": 
+            {
+                "Path": "GrassTileSet32x32.png",
+                "PixelsPerFrame": [32, 32],
+                "SizeInUnits": [1.0, 1.0],
+                "OffsetFromTransform": [0.0, 0.0],
+                "Height": 20,
+                "Width": 40,
+                "DrawDebug": "green"
+            },
+            "Animations":
+            {
+                "Idle": 
+                {
+                    "Frames": [24],
+                    "FrameTime": 20,
+                    "Loop": true
+                }
+            }
+        },
+        ",":
+        {
+            "ActiveOnStart": true,
+            "Physics":
+            {
+                "BodyType": "SENSOR",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "CheckSimpleContacts": false,
+                "UseChains": true
+            },
+            "Transform":
+            {
+                "ZIndex": 2,
+                "DrawDebug": "red"
+            },
+            "SpriteSheet": 
+            {
+                "Path": "GrassTileSet32x32.png",
+                "PixelsPerFrame": [32, 32],
+                "SizeInUnits": [1.0, 1.0],
+                "OffsetFromTransform": [0.0, 0.0],
+                "Height": 20,
+                "Width": 40,
+                "DrawDebug": "green"
+            },
+            "Animations":
+            {
+                "Idle": 
+                {
+                    "Frames": [26],
+                    "FrameTime": 20,
+                    "Loop": true
+                }
+            }
+        },
+        "`":
+        {
+            "ActiveOnStart": true,
+            "Physics":
+            {
+                "BodyType": "SENSOR",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "CheckSimpleContacts": false,
+                "UseChains": true
+            },
+            "Transform":
+            {
+                "ZIndex": 2,
+                "DrawDebug": "red"
+            },
+            "SpriteSheet": 
+            {
+                "Path": "GrassTileSet32x32.png",
+                "PixelsPerFrame": [32, 32],
+                "SizeInUnits": [1.0, 1.0],
+                "OffsetFromTransform": [0.0, 0.0],
+                "Height": 20,
+                "Width": 40,
+                "DrawDebug": "green"
+            },
+            "Animations":
+            {
+                "Idle": 
+                {
+                    "Frames": [29],
+                    "FrameTime": 20,
+                    "Loop": true
+                }
+            }
+        },
+        "!":
+        {
+            "ActiveOnStart": true,
+            "Physics":
+            {
+                "BodyType": "STATIC",
+                "Category" : "ALL",
+                "Mask" : "ALL",
+                "Size": [1.0, 1.0],
+                "Rotation": 0.0,
+                "GravityOn": false,
+                "CheckSimpleContacts": false,
+                "UseChains": true
+            },
+            "Transform":
+            {
+                "ZIndex": 2,
+                "DrawDebug": "red"
+            },
+            "SpriteSheet": 
+            {
+                "Path": "GrassTileSet32x32.png",
+                "PixelsPerFrame": [32, 32],
+                "SizeInUnits": [1.0, 1.0],
+                "OffsetFromTransform": [0.0, 0.0],
+                "Height": 20,
+                "Width": 40,
+                "DrawDebug": "green"
+            },
+            "Animations":
+            {
+                "Idle": 
+                {
+                    "Frames": [56],
+                    "FrameTime": 20,
+                    "Loop": true
+                }
+            }
         }
     }
 }
