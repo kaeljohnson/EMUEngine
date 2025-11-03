@@ -144,7 +144,7 @@ namespace Engine
 			}
 #endif
 			// Reset background color. Temp for now.
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 173, 216, 230, SDL_ALPHA_OPAQUE);
 
 			if (refCamera.m_borderOn)
 			{
