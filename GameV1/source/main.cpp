@@ -59,7 +59,7 @@ int main(int argc, char* args[])
 
 	// Temp for now. Client will not be able to call functions directly on scene object.
 	engine->Scenes_AddTileMap("Level1", "testMap1.txt", "Rules.json");
-	engine->Scenes_AddTileMap("Level2", "TestMap2.txt", "Rules.json");
+	engine->Scenes_AddTileMap("Level2", "TestMap2.txt", "Level2Rules.json");
 
 	Player player;
 
