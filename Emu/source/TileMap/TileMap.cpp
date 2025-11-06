@@ -25,7 +25,7 @@ namespace Engine
         return m_refECS.INVALID_ENTITY;
     }
 
-    void TileMap::CreateMap(const std::string mapFile, const std::string rulesFile)
+    void TileMap::CreateMap(const std::string mapFile)
     {
         // Parse file.
         std::ifstream file(mapFile);

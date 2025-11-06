@@ -10,8 +10,10 @@
 #include "../../include/Time.h"
 #include "../../include/AppState.h"
 
+#include <filesystem>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+namespace fs = std::filesystem;
 
 static json rulesJson; // Only one rules file per game for now so this will work.
 
@@ -116,7 +118,7 @@ namespace Engine
 		m_mapFileName = mapFileName;
 		m_rulesFileName = rulesFileName;
 
-		m_tileMap.CreateMap(mapFileName, rulesFileName);
+		m_tileMap.CreateMap(mapFileName);
 
 		m_levelDimensionsInUnits = Vector2D<int>(m_tileMap.GetWidth(), m_tileMap.GetHeight());
 
@@ -265,7 +267,8 @@ namespace Engine
 	template<typename T>
 	static Vector2D<T> ExtractVector2DFromJSON(const json& j, const std::string& key, Vector2D<T> ioVec)
 	{
-		if (!j.contains(key)) return ioVec;
+		if (!j.contains(key)) throw std::runtime_error("Invalid Rules File. Field Not Found: " + key);
+
 		const auto& arr = j.at(key);
 		if (!arr.is_array() || arr.size() != 2) return ioVec;
 
@@ -284,34 +287,49 @@ namespace Engine
 		return ioVec;
 	}
 
-	size_t Scene::loadNumUnitsPerTile()
+	static size_t ExtractSizeTFromJSON(const json& j, const std::string& key, size_t defaultValue)
 	{
-		if (rulesJson.contains("NumMetersPerTile") && rulesJson["NumMetersPerTile"].is_number())
-			return rulesJson["NumMetersPerTile"].get<size_t>();
+		if (!j.contains(key)) throw std::runtime_error("Invalid Rules File. Field Not Found: " + key);
+
+		const auto& value = j.at(key);
+		if (value.is_number_unsigned()) return value.get<size_t>();
+		else if (value.is_number_integer())
+		{
+			int intValue = value.get<int>();
+			if (intValue >= 0) return static_cast<size_t>(intValue);
+		}
+		else if (value.is_number())
+		{
+			double doubleValue = value.get<double>();
+			if (doubleValue >= 0.0) return static_cast<size_t>(doubleValue);
+		}
+		return defaultValue;
+	}
+
+	size_t Scene::loadNumUnitsPerTile(const std::string& sceneName)
+	{
+		if (rulesJson[sceneName]["World"].contains("NumMetersPerTile") && rulesJson[sceneName]["World"]["NumMetersPerTile"].is_number())
+			return rulesJson[sceneName]["World"]["NumMetersPerTile"].get<size_t>();
 
 		throw std::runtime_error("NumMetersPerTile not found or invalid in rules JSON");
 	}
 
-	std::string Scene::validateSpriteSheetPath()
+	static const json& getJson(const json& j, std::string key)
 	{
-		if (!rulesJson.contains("PathToSpriteSheets"))
-			throw std::runtime_error("Missing 'PathToSpriteSheets' in rules file");
-
-		std::string spriteSheetsPath = rulesJson["PathToSpriteSheets"];
-		if (!std::filesystem::exists(spriteSheetsPath))
-			throw std::runtime_error("Sprite sheets path does not exist: " + spriteSheetsPath);
-
-		return spriteSheetsPath;
+		auto it = j.find(key);
+		if (it == j.end())
+			throw std::runtime_error("Invalid Rules File. Field Not Found: " + key);
+		return *it; // return reference to value
 	}
 
-	static void addTransformComponent(ECS& refECS, Entity entity, const json& characterRules, int x, int y, size_t numUnitsPerTile)
+	static void addTransformComponent(ECS& refECS, Entity entity, const json& transformTemplates, std::string templateKey, int x, int y, size_t numUnitsPerTile)
 	{
-		if (!characterRules.contains("Transform")) return;
+		auto& entityTransformTemplate = getJson(transformTemplates, templateKey);
+		size_t zIndex = ExtractSizeTFromJSON(entityTransformTemplate, "ZIndex", 0);
 
-		auto& transformJson = characterRules["Transform"];
-		int zIndex = transformJson.value("ZIndex", 0);
-		bool drawDebug = transformJson.contains("DrawDebug");
-		std::string debugColor = drawDebug ? transformJson.value("DrawDebug", "red") : "red";
+		bool drawDebug = entityTransformTemplate.contains("DrawDebug");
+		if (drawDebug && templateKey == "Player") ENGINE_CRITICAL_D("DrawDebug: " + std::to_string(drawDebug));
+		std::string debugColor = drawDebug ? entityTransformTemplate.value("DrawDebug", "red") : "red";
 
 		DebugColor debugColorEnum;
 
@@ -328,6 +346,10 @@ namespace Engine
 			debugColorEnum = DebugColor::Red;
 		}
 
+		ENGINE_CRITICAL_D("Adding Transform Component to entity: " + std::to_string(entity) + " at position: ("
+			+ std::to_string(x * (float)numUnitsPerTile) + ", " + std::to_string(y * (float)numUnitsPerTile) + "), zIndex: "
+			+ std::to_string(zIndex) + ", drawDebug: " + std::to_string(drawDebug));
+
 		refECS.AddComponent<Transform>(
 			entity,
 			Vector2D<float>(x * (float)numUnitsPerTile, y * (float)numUnitsPerTile),
@@ -336,21 +358,20 @@ namespace Engine
 		);
 	}
 
-	static void addCameraComponent(ECS& refECS, Entity entity, const json& characterRules)
+	static void addCameraComponent(ECS& refECS, Entity entity, const json& cameraTemplate, const std::string& cameraTemplateKey)
 	{
-		if (!characterRules.contains("Camera")) return;
+		auto& entityCameraTemplate = getJson(cameraTemplate, cameraTemplateKey);
 
-		auto& cameraJSON = characterRules["Camera"];
-		Vector2D<float> size = ExtractVector2DFromJSON<float>(cameraJSON, "Size", { 0.0f, 0.0f });
-		int pixelsPerUnit = cameraJSON.value("PixelsPerUnit", 0);
-		bool clampingOn = cameraJSON.value("ClampingOn", false);
+		Vector2D<float> size = { 0.0f, 0.0f }; // size determined by engine 
+		size_t pixelsPerUnit = ExtractSizeTFromJSON(entityCameraTemplate, "PixelsPerUnit", 0);
+		bool clampingOn = entityCameraTemplate.contains("ClampingOn") ? getJson(entityCameraTemplate, "ClampingOn").get<bool>() : false;
 
 		Vector2D<float> screenRatio = { 1.0f, 1.0f };
 		Vector2D<float> position = { 0.0f, 0.0f };
 
-		if (cameraJSON.contains("Window"))
+		if (entityCameraTemplate.contains("Window"))
 		{
-			auto& win = cameraJSON["Window"];
+			auto& win = entityCameraTemplate["Window"];
 			position.X = win.value("X", 0.0f);
 			position.Y = win.value("Y", 0.0f);
 			screenRatio.X = win.value("Width", 1.0f);
@@ -360,11 +381,9 @@ namespace Engine
 		refECS.AddComponent<Camera>(entity, size, screenRatio, position, pixelsPerUnit, clampingOn);
 	}
 
-	static void addPhysicsComponent(ECS& refECS, TileMap& refTileMap, Entity tileEntity, const char tileChar, const json& characterRulesJson,
-		int x, int y, size_t numUnitsPerTile, std::unordered_set<char>& isSolid, const bool activeOnStart)
+	static void addPhysicsComponent(ECS& refECS, TileMap& refTileMap, Entity tileEntity, const char tileChar, const json& physicsComponentTemplate,
+		const std::string& physicsTemplateKey, int x, int y, size_t numUnitsPerTile, std::unordered_set<char>& isSolid)
 	{
-		if (!characterRulesJson.contains("Physics")) return;
-
 		// Add Physics components.
 		BodyType bodyType = STATIC;
 		Filter category = ALL;
@@ -374,12 +393,12 @@ namespace Engine
 		bool checkSimpleContacts = false;
 		bool useChains = false;
 
-		if (characterRulesJson.contains("Physics"))
+		if (physicsComponentTemplate.contains(physicsTemplateKey))
 		{
-			json characterPhysicsRulesJson = characterRulesJson["Physics"];
+			json characterPhysicsRulesJson = physicsComponentTemplate[physicsTemplateKey];
 
 			// Physics library needs to know if the body is enabled or not.
-			const bool enabled = activeOnStart;
+			const bool enabled = characterPhysicsRulesJson.contains("ActiveOnStart") ? characterPhysicsRulesJson["ActiveOnStart"].get<bool>() : true;
 
 			if (characterPhysicsRulesJson.contains("Category"))
 			{
@@ -418,9 +437,9 @@ namespace Engine
 
 				if (characterPhysicsRulesJson.contains("UseChains")) // Chains are not used for sensors.
 				{
-					const auto& useChainsJson = characterPhysicsRulesJson["UseChains"];
-					bool useChainsStr = useChainsJson;
-					if (useChainsStr == true)
+					const auto& useChainsJson = getJson(characterPhysicsRulesJson, "UseChains");
+					const bool useChainsBool = useChainsJson.get<bool>();
+					if (useChainsBool == true)
 					{
 						useChains = true;
 					}
@@ -563,6 +582,7 @@ namespace Engine
 			}
 			else // Create a regular physics body for the tiles that don't use chains.
 			{
+				ENGINE_CRITICAL_D("Tile char: " + std::string(1, tileChar) + " adding PhysicsBody component. BodyType: " + std::to_string(bodyType));
 				refECS.AddComponent<PhysicsBody>(tileEntity, enabled, bodyType, category, mask,
 					Vector2D<float>(size.X, size.Y),
 					Vector2D<float>(static_cast<float>(x) * static_cast<float>(numUnitsPerTile), static_cast<float>(y) * static_cast<float>(numUnitsPerTile)),
@@ -571,30 +591,52 @@ namespace Engine
 		}
 	}
 
-	void addSpriteComponent(ECS& refECS, AssetManager& refAssetManager, Entity entity, const json& characterRules,
-		const std::string& spriteSheetsPath, char tileChar)
+	static void addSpriteComponent(ECS& refECS, AssetManager& refAssetManager, Entity entity, const json& characterComponents,
+		const json& spriteRules, const json& spriteSheetRules, const json& animationRules, char tileChar)
 	{
-		if (!characterRules.contains("SpriteSheet") || !characterRules.contains("Animations")) return;
+		if (!characterComponents.contains("SpriteSheet") || !characterComponents.contains("Animations")) return;
 
-		auto& spriteJson = characterRules["SpriteSheet"];
-		auto& animJson = characterRules["Animations"];
+		const json& pathJson = getJson(spriteRules, "PathToSpriteSheets");
+		std::string path = pathJson.get<std::string>();
 
-		std::string path = spriteJson.value("Path", "");
+		const json& texturesJson = getJson(spriteRules, "Textures");
+		const json& characterTextureJson = getJson(characterComponents, "SpriteSheet");
+		std::string textureName = characterTextureJson.get<std::string>();
+
+		// check if it is there
+		if (!texturesJson.contains(textureName))
+		{
+			ENGINE_CRITICAL("No texture found for sprite sheet: " + textureName + " for tile: " + std::string(1, tileChar));
+			return;
+		}
+
+		auto& animJson = getJson(characterComponents, "Animations");
+		std::string animName = animJson.get<std::string>();
+
+		// Check if its there
+		if (!animationRules.contains(animName))
+		{
+			ENGINE_CRITICAL("No animation found for sprite sheet: " + textureName + " animation: " + animName + " for tile: " + std::string(1, tileChar));
+			return;
+		}
+
+		const json& entitySpriteJson = getJson(spriteSheetRules, animName);
+
 		if (path.empty())
 		{
 			ENGINE_CRITICAL("No path for sprite sheet found for tile: " + std::string(1, tileChar));
 			return;
 		}
 
-		void* ptrLoadedTexture = refAssetManager.LoadTexture(entity, spriteSheetsPath + path);
+		void* ptrLoadedTexture = refAssetManager.LoadTexture(entity, path + textureName);
 
-		Vector2D<float> frameSize = ExtractVector2DFromJSON<float>(spriteJson, "SizeInUnits", { 1.0f, 1.0f });
-		Vector2D<int> pixelsPerFrame = ExtractVector2DFromJSON<int>(spriteJson, "PixelsPerFrame", { 32, 32 });
-		Vector2D<float> offsetFromTransform = ExtractVector2DFromJSON<float>(spriteJson, "OffsetFromTransform", { 0.0f, 0.0f });
-		Vector2D<size_t> dimensions = { spriteJson.value("Width", (size_t)1), spriteJson.value("Height", (size_t)1) };
+		Vector2D<float> frameSize = ExtractVector2DFromJSON<float>(entitySpriteJson, "SizeInUnits", { 1.0f, 1.0f });
+		Vector2D<int> pixelsPerFrame = ExtractVector2DFromJSON<int>(entitySpriteJson, "PixelsPerFrame", { 32, 32 });
+		Vector2D<float> offsetFromTransform = ExtractVector2DFromJSON<float>(entitySpriteJson, "OffsetFromTransform", { 0.0f, 0.0f });
+		Vector2D<size_t> dimensions = { entitySpriteJson.value("Width", (size_t)1), entitySpriteJson.value("Height", (size_t)1) };
 
-		bool drawDebug = spriteJson.contains("DrawDebug");
-		std::string debugColor = drawDebug ? spriteJson["DrawDebug"].get<std::string>() : "red";
+		bool drawDebug = entitySpriteJson.contains("DrawDebug");
+		std::string debugColor = drawDebug ? entitySpriteJson["DrawDebug"].get<std::string>() : "red";
 		DebugColor debugColorEnum;
 
 		if (debugColor == "green")
@@ -611,7 +653,7 @@ namespace Engine
 		}
 
 		std::unordered_map<std::string, Animation> animations;
-		json j = json::parse(characterRules["Animations"].dump());
+		json j = json::parse(animJson.dump());
 
 		auto makeAnimation = [](const std::string& name, const json& jAnim, Vector2D<int> pixelsPerFrame,
 			const Vector2D<float> offsetFromTransform, const Vector2D<size_t> dimensions,
@@ -643,12 +685,90 @@ namespace Engine
 		refECS.AddComponent<Animations>(entity, animations, ptrLoadedTexture);
 	}
 
+	static void verifyAssetPaths(const json& assetsRules)
+	{
+		// Verify Sprites
+		if (assetsRules.contains("Sprites"))
+		{
+			const auto& spriteRules = getJson(assetsRules, "Sprites");
+			std::string spriteDir = spriteRules.value("PathToSpriteSheets", "");
+
+			if (spriteDir.empty() || !fs::exists(spriteDir) || !fs::is_directory(spriteDir))
+				throw std::runtime_error("Invalid or missing sprite sheet directory: " + spriteDir);
+
+			if (spriteRules.contains("Textures"))
+			{
+				const auto& textures = getJson(spriteRules, "Textures");
+				for (const auto& [textureName, textureFile] : textures.items())
+				{
+					std::string fullPath = spriteDir + textureFile.get<std::string>();
+					if (!fs::exists(fullPath))
+						throw std::runtime_error("Missing texture file: " + fullPath);
+				}
+			}
+			else
+			{
+				throw std::runtime_error("Missing 'Textures' section in 'Sprites'.");
+			}
+		}
+
+		// Verify Audio
+		if (assetsRules.contains("Audio"))
+		{
+			const auto& audioRules = getJson(assetsRules, "Audio");
+			std::string audioDir = audioRules.value("PathToAudioFiles", "");
+
+			if (audioDir.empty() || !fs::exists(audioDir) || !fs::is_directory(audioDir))
+				throw std::runtime_error("Invalid or missing audio directory: " + audioDir);
+
+			if (audioRules.contains("Sounds"))
+			{
+				const auto& sounds = getJson(audioRules, "Sounds");
+				for (const auto& [soundFile, _] : sounds.items())
+				{
+					std::string fullPath = audioDir + soundFile;
+					if (!fs::exists(fullPath))
+						throw std::runtime_error("Missing sound file: " + fullPath);
+				}
+			}
+			else
+			{
+				throw std::runtime_error("Missing 'Sounds' section in 'Audio'.");
+			}
+		}
+	}
 
 	void Scene::loadSceneEntitiesFromTileMap()
 	{
-		size_t numUnitsPerTile = loadNumUnitsPerTile();
-		std::string spriteSheetsPath = validateSpriteSheetPath();
-		auto& tileRules = rulesJson["Tile Rules"];
+		auto& sceneName = rulesJson.begin().key();
+		ENGINE_INFO_D("Loading scene entities for scene: " + sceneName);
+
+		auto& sceneRules = rulesJson[sceneName];
+
+		// Load the physics rules.
+		auto& worldRules = getJson(sceneRules, "World");
+		ENGINE_INFO_D("World rules: " + worldRules.dump(4));
+		auto& physicsRules = getJson(worldRules, "Physics");
+
+		SetGravity(ExtractVector2DFromJSON<float>(physicsRules, "Gravity", { 0.0f, 0.0f }));
+		size_t numUnitsPerTile = ExtractSizeTFromJSON(physicsRules, "NumMetersPerTile", 1);
+		size_t numLayers = ExtractSizeTFromJSON(physicsRules, "NumLayers", 1);
+
+		ENGINE_INFO_D("NumUnitsPerTile: " + std::to_string(numUnitsPerTile) + ", NumLayers: " + std::to_string(numLayers));
+
+		// Load Assets.
+		auto& assetsRules = getJson(sceneRules, "Assets");
+		auto& spriteRules = getJson(assetsRules, "Sprites");
+		auto& audioRules = getJson(assetsRules, "Audio");
+
+		verifyAssetPaths(assetsRules);
+
+		const json& characterRules = getJson(sceneRules, "CharacterRules");
+		const json& componentTemplates = getJson(sceneRules, "ComponentTemplates");
+		const json& spriteSheetTemplate = getJson(componentTemplates, "SpriteSheets");
+		const json& animationTemplate = getJson(componentTemplates, "Animations");
+
+
 		std::unordered_set<char> isSolid;
 
 		for (auto& [coords, info] : m_tileMap.GetMap())
@@ -659,24 +779,38 @@ namespace Engine
 			Entity tileEntity = info.first;
 
 			std::string tileKey(1, tileChar);
-			if (!tileRules.contains(tileKey))
+			if (!characterRules.contains(tileKey))
 			{
 				ENGINE_INFO_D("No such tile exists: " + tileKey);
 				continue;
 			}
 
-			json& characterRules = tileRules[tileKey];
-			bool activeOnStart = characterRules.value("ActiveOnStart", true);
+			const json& characterComponents = characterRules[tileKey];
+			// bool activeOnStart = characterComponents.value("ActiveOnStart", true);
 
-			addTransformComponent(m_refECS, tileEntity, characterRules, x, y, numUnitsPerTile);
-			addCameraComponent(m_refECS, tileEntity, characterRules);
-			addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileChar, characterRules, x, y, numUnitsPerTile, isSolid, activeOnStart);
-			addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, characterRules, spriteSheetsPath, tileChar);
-
+			if (characterComponents.contains("Transform"))
+			{
+				std::string transformTemplateKey = getJson(characterComponents, "Transform");
+				addTransformComponent(m_refECS, tileEntity, getJson(componentTemplates, "Transforms"), transformTemplateKey, x, y, numUnitsPerTile);
+			}
+			if (characterComponents.contains("Camera"))
+			{
+				std::string cameraTemplateKey = getJson(characterComponents, "Camera");
+				addCameraComponent(m_refECS, tileEntity, getJson(componentTemplates, "Camera"), cameraTemplateKey);
+			}
+			if (characterComponents.contains("Physics"))
+			{
+				std::string physicsTemplateKey = getJson(characterComponents, "Physics");
+				addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileChar, getJson(componentTemplates, "Physics"), physicsTemplateKey, x, y, numUnitsPerTile, isSolid);
+			}
+			/*if (characterComponents.contains("Animations"))
+			{
+				std::string animationsTemplateKey = getJson(characterComponents, "Animations");
+				addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, characterComponents, spriteRules, spriteSheetTemplate, animationTemplate, tileChar);
+			}*/
 			// ACTIVATE IN ECS AFTER ALL COMPONENTS CREATED.
-			if (activeOnStart)
+			// if (activeOnStart)
 				m_refECS.Activate(tileEntity);
 		}
 	}
-
 }

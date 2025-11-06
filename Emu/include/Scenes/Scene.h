@@ -160,13 +160,7 @@ namespace Engine
 		/*
 			Loads the number of units per tile from the asset manager.
 		*/
-		size_t loadNumUnitsPerTile();
-
-		/*
-			Validates the sprite sheet path from the asset manager.
-			returns: The validated sprite sheet path as a string.
-		*/
-		std::string validateSpriteSheetPath();
+		size_t loadNumUnitsPerTile(const std::string& sceneName);
 
 		/*
 			Loads all entities defined in the scene's tile map.
