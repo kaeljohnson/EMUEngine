@@ -341,6 +341,10 @@ namespace Engine
 		{
 			debugColorEnum = DebugColor::Blue;
 		}
+		else if (debugColor == "black")
+		{
+			debugColorEnum = DebugColor::Black;
+		}
 		else
 		{
 			debugColorEnum = DebugColor::Red;

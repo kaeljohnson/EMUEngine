@@ -61,7 +61,7 @@
                 "Player":
                 {
                     "ZIndex": 1,
-                    "DrawDebug": "red",
+                    "DrawDebug": "black",
                     "Size": [1.0, 1.0],
                     "ActiveOnStart": true
                 },

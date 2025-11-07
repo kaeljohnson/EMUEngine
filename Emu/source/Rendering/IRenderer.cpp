@@ -208,7 +208,7 @@ namespace Engine
 		DebugColor debugColor = object.m_debugColor;
 
 		// Only change debug color if different from last time to reduce calls to GPU.
-		if (debugColor != m_lastDebugColor)
+		// if (debugColor != m_lastDebugColor) TODO: this is causing a bug where it the if block is never entered. 
 		{
 			switch (debugColor)
 			{
