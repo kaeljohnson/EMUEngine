@@ -93,28 +93,29 @@ namespace Engine
 			float offsetFromTransformY = 0.0f;
 
 			// 3. Render object construction & submission
+			Sprite* ptrSpriteComponent = refECS.GetComponent<Sprite>(refTransform.m_entity);
 			Animations* animations = refECS.GetComponent<Animations>(refTransform.m_entity);
 			if (animations)
 			{
 				const Animation& currentAnimation = animations->m_animations.at(animations->m_currentAnimation);
-				width = int(currentAnimation.m_size.X * scaleX);
-				height = int(currentAnimation.m_size.Y * scaleY);
-				offsetFromTransformX = currentAnimation.m_offsetFromTransform.X;
-				offsetFromTransformY = currentAnimation.m_offsetFromTransform.Y;
+				width = int(ptrSpriteComponent->m_sizeInUnits.X * scaleX);
+				height = int(ptrSpriteComponent->m_sizeInUnits.Y * scaleY);
+				offsetFromTransformX = ptrSpriteComponent->m_offsetFromTransform.X;
+				offsetFromTransformY = ptrSpriteComponent->m_offsetFromTransform.Y;
 
-				SDLTexture* spriteTexture = (SDLTexture*)animations->m_ptrLoadedTexture;
+				SDLTexture* spriteTexture = (SDLTexture*)ptrSpriteComponent->m_ptrLoadedTexture;
 				if (spriteTexture == nullptr)
 					continue;
 
 				// Sprite sheet coordinates
 				const int locationInPixelsOnSpriteSheetX =
-					static_cast<int>((currentAnimation.m_currentFrame % currentAnimation.m_dimensions.X) *
-						currentAnimation.m_pixelsPerFrame.X);
+					static_cast<int>((currentAnimation.m_currentFrame % ptrSpriteComponent->m_dimensions.X) *
+						ptrSpriteComponent->m_pixelsPerFrame.X);
 				const int locationInPixelsOnSpriteSheetY =
-					static_cast<int>((currentAnimation.m_currentFrame / currentAnimation.m_dimensions.X) *
-						currentAnimation.m_pixelsPerFrame.Y);
-				const int sizseInPixelsOnSpriteSheetX = static_cast<int>(currentAnimation.m_pixelsPerFrame.X);
-				const int sizseInPixelsOnSpriteSheetY = static_cast<int>(currentAnimation.m_pixelsPerFrame.Y);
+					static_cast<int>((currentAnimation.m_currentFrame / ptrSpriteComponent->m_dimensions.X) *
+						ptrSpriteComponent->m_pixelsPerFrame.Y);
+				const int sizseInPixelsOnSpriteSheetX = static_cast<int>(ptrSpriteComponent->m_pixelsPerFrame.X);
+				const int sizseInPixelsOnSpriteSheetY = static_cast<int>(ptrSpriteComponent->m_pixelsPerFrame.Y);
 
 				// Screen-space coordinates
 				const int locationInPixelsOnScreenX =
@@ -150,14 +151,14 @@ namespace Engine
 						refTransform.m_debugColor
 					);
 				}
-				if (currentAnimation.m_drawDebug)
+				if (ptrSpriteComponent->m_drawDebug)
 				{
 					debugBuckets[refTransform.ZIndex].emplace_back(
 						refTransform.m_entity,
 						false,
 						Vector2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
 						Vector2D<int>(width, height),
-						currentAnimation.m_debugColor
+						ptrSpriteComponent->m_debugColor
 					);
 				}
 #endif

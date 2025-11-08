@@ -100,9 +100,9 @@ namespace Engine
 		// Or should there be a more detailed check so assets that might transfer
 		// to next scene are not unloaded? This takes awhile.
 		m_refAssetManager.UnloadTextures();
-		for (auto& animations : m_refECS.GetHotComponents<Animations>())
+		for (auto& animations : m_refECS.GetHotComponents<Sprite>())
 		{
-			// Free texture pointer associated with animations.
+			// Free texture pointer associated with sprite.
 			animations.m_ptrLoadedTexture = nullptr;
 		}
 
@@ -398,7 +398,7 @@ namespace Engine
 			json characterPhysicsRulesJson = physicsComponentTemplate[physicsTemplateKey];
 
 			// Physics library needs to know if the body is enabled or not.
-			const bool enabled = characterPhysicsRulesJson.contains("ActiveOnStart") ? characterPhysicsRulesJson["ActiveOnStart"].get<bool>() : true;
+			const bool enabled = characterPhysicsRulesJson.contains("enabled") ? characterPhysicsRulesJson["enabled"].get<bool>() : true;
 
 			if (characterPhysicsRulesJson.contains("Category"))
 			{
@@ -590,10 +590,9 @@ namespace Engine
 		}
 	}
 
-	static void addAnimationsComponent(ECS& refECS, AssetManager& refAssetManager, Entity entity, const char tileChar, const json& animationsTemplate,
-		const std::string& animationTemplateKey, const json& spriteSheetsTemplate, const std::string& spriteSheetKey, const json& spritePaths)
+	static void addSpriteComponent(ECS& refECS, AssetManager& refAssetManager, Entity entity, 
+		const char tileChar, const json& spriteSheetsTemplate, const std::string& spriteSheetKey, const json& spritePaths)
 	{
-
 		const json& pathJson = getJson(spritePaths, "PathToSpriteSheets");
 		std::string path = pathJson.get<std::string>();
 
@@ -609,14 +608,9 @@ namespace Engine
 		const json& texturesJson = getJson(spritePaths, "Textures");
 		std::string spriteSheetName = getJson(texturesJson, spriteSheetPathKey).get<std::string>();
 
-		// const json& entitySpriteJson = getJson(texturesJson, animName);
-
-		
-
 		void* ptrLoadedTexture = refAssetManager.LoadTexture(entity, path + spriteSheetName);
 
-
-		Vector2D<float> frameSize = ExtractVector2DFromJSON<float>(entitySpriteSheetJson, "SizeInUnits", { 1.0f, 1.0f });
+		Vector2D<float> sizeInUnits = ExtractVector2DFromJSON<float>(entitySpriteSheetJson, "SizeInUnits", { 1.0f, 1.0f });
 		Vector2D<int> pixelsPerFrame = ExtractVector2DFromJSON<int>(entitySpriteSheetJson, "PixelsPerFrame", { 32, 32 });
 		Vector2D<float> offsetFromTransform = ExtractVector2DFromJSON<float>(entitySpriteSheetJson, "OffsetFromTransform", { 0.0f, 0.0f });
 		Vector2D<size_t> dimensions = { entitySpriteSheetJson.value("Width", (size_t)1), entitySpriteSheetJson.value("Height", (size_t)1) };
@@ -638,40 +632,24 @@ namespace Engine
 			debugColorEnum = DebugColor::Red;
 		}
 
+		refECS.AddComponent<Sprite>(entity, ptrLoadedTexture, pixelsPerFrame, offsetFromTransform,
+			dimensions, sizeInUnits, drawDebug, debugColorEnum);
+	}
 
+	static void addAnimationsComponent(ECS& refECS, AssetManager& refAssetManager, Entity entity, const char tileChar, const json& animationsTemplate,
+		const std::string& animationTemplateKey)
+	{
 		const json& entityAnimationsTemplate = getJson(animationsTemplate, animationTemplateKey);
 
 		std::unordered_map<std::string, Animation> animations;
 		json j = json::parse(entityAnimationsTemplate.dump());
 
-		auto makeAnimation = [](const std::string& name, const json& jAnim, Vector2D<int> pixelsPerFrame,
-			const Vector2D<float> offsetFromTransform, const Vector2D<size_t> dimensions,
-			const Vector2D<float> frameSize, bool drawDebug, DebugColor debugColor)
-			{
-				Animation a;
-				a.m_name = name;
-				a.m_frames = jAnim.at("Frames").get<std::vector<int>>();
-				a.m_numFrames = a.m_frames.size();
-				a.m_frameDuration = jAnim.at("FrameTime").get<int>();
-				a.m_pixelsPerFrame = pixelsPerFrame;
-				a.m_dimensions = dimensions;
-				a.m_size = frameSize;
-				a.m_offsetFromTransform = offsetFromTransform;
-				a.m_loop = jAnim.at("Loop").get<bool>();
-				a.m_drawDebug = drawDebug;
-				a.m_debugColor = debugColor;
-
-				return a;
-			};
-
-
 		for (auto& [name, value] : j.items())
 		{
-			animations.emplace(name, makeAnimation(name, value, pixelsPerFrame, offsetFromTransform,
-				dimensions, frameSize, drawDebug, debugColorEnum));
+			animations.emplace(name, Animation(name, value.at("Frames").get<std::vector<int>>(), value.at("FrameTime").get<int>(), value.at("Loop").get<bool>()));
 		}
 
-		refECS.AddComponent<Animations>(entity, animations, ptrLoadedTexture);
+		refECS.AddComponent<Animations>(entity, animations);
 	}
 
 	static void verifyAssetPaths(const json& assetsRules)
@@ -772,7 +750,7 @@ namespace Engine
 			}
 
 			const json& characterComponents = characterRules[tileKey];
-			// bool activeOnStart = characterComponents.value("ActiveOnStart", true);
+			bool activeOnStart = characterComponents.value("ActiveOnStart", true);
 
 			if (characterComponents.contains("Transform"))
 			{
@@ -789,15 +767,20 @@ namespace Engine
 				std::string physicsTemplateKey = getJson(characterComponents, "Physics");
 				addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileChar, getJson(componentTemplates, "Physics"), physicsTemplateKey, x, y, numUnitsPerTile, isSolid);
 			}
+			if (characterComponents.contains("SpriteSheet"))
+			{
+				std::string spriteSheetTemplateKey = getJson(characterComponents, "SpriteSheet");
+				addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, tileChar, getJson(componentTemplates, "SpriteSheets"),
+					spriteSheetTemplateKey, spriteRules);
+			}
 			if (characterComponents.contains("Animations"))
 			{
 				std::string animationsTemplateKey = getJson(characterComponents, "Animations");
-				std::string spriteSheetTemplateKey = getJson(characterComponents, "SpriteSheet");
 				addAnimationsComponent(m_refECS, m_refAssetManager, tileEntity, tileChar, getJson(componentTemplates, "Animations"), 
-					animationsTemplateKey, getJson(componentTemplates, "SpriteSheets"), spriteSheetTemplateKey, spriteRules);
+					animationsTemplateKey);
 			}
 			// ACTIVATE IN ECS AFTER ALL COMPONENTS CREATED.
-			// if (activeOnStart)
+			if (activeOnStart)
 				m_refECS.Activate(tileEntity);
 		}
 	}

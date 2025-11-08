@@ -35,6 +35,7 @@ namespace Engine
 		m_ecs.RegisterComponentManager<ChainColliderLeft>();
 		m_ecs.RegisterComponentManager<ChainColliderRight>();
 		m_ecs.RegisterComponentManager<ChainColliderBottom>();
+		m_ecs.RegisterComponentManager<Sprite>();
 		m_ecs.RegisterComponentManager<Animations>();
 		m_ecs.RegisterComponentManager<AudioSource>();
 
