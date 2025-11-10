@@ -17,6 +17,7 @@ namespace Engine
 {
 	enum class DebugColor
 	{
+		NoColor,
 		Red,
 		Green,
 		Blue,
