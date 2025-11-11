@@ -259,12 +259,26 @@ namespace Engine
 		const json* sceneRules = getJson(rulesJson, sceneName);
 
 		const json* assetsJson = getJson(*sceneRules, "Assets");
+		if (!assetsJson)
+		{
+			ENGINE_CRITICAL("Assets section not found in rules file. Continuing without.");
+			return;
+		}
+
 		const json* audioJson = getJson(*assetsJson, "Audio");
+		if (!audioJson)
+		{
+			ENGINE_CRITICAL("Audio section not found in rules file. Continuing without.");
+			return;
+		}
 
 		const json* audioFilePathJson = getJson(*audioJson, "PathToAudioFiles");
+		if (!audioFilePathJson) throw std::runtime_error("PathToAudioFiles not found in rules file.");
+
 		std::string audioFilePath = audioFilePathJson->get<std::string>();
 
 		const json* soundsJson = getJson(*audioJson, "Sounds");
+		if (!soundsJson) throw std::runtime_error("Sounds section not found in rules file.");
 
 		json j = json::parse(soundsJson->dump());
 
@@ -274,7 +288,6 @@ namespace Engine
 		{
 			int idxInt = idx.get<int>();
 			std::string fullPath = audioFilePath + file;
-			ENGINE_INFO_D("Loading sound at index: " + std::to_string(idxInt) + " from file: " + fullPath);
 			m_refAssetManager.LoadSound(idxInt, fullPath);
 		}
 	}
@@ -364,7 +377,7 @@ namespace Engine
 		);
 	}
 
-	static void addCameraComponent(ECS& refECS, Entity entity, const json& cameraTemplate, const std::string& cameraTemplateKey)
+	static void addCameraComponent(ECS& refECS, Entity entity, const json& cameraTemplate, const std::string& cameraTemplateKey, const size_t numLayers)
 	{
 		const json* entityCameraTemplate = getJson(cameraTemplate, cameraTemplateKey);
 
@@ -384,7 +397,7 @@ namespace Engine
 			screenRatio.Y = windowJson->value("Height", 1.0f);
 		}
 
-		refECS.AddComponent<Camera>(entity, size, screenRatio, position, pixelsPerUnit, clampingOn);
+		refECS.AddComponent<Camera>(entity, size, screenRatio, position, pixelsPerUnit, clampingOn, numLayers);
 	}
 
 	static void addPhysicsComponent(ECS& refECS, TileMap& refTileMap, Entity tileEntity, const char tileChar, const json& physicsComponentTemplate,
@@ -738,30 +751,28 @@ namespace Engine
 
 		// Load the physics rules.
 		size_t numUnitsPerTile = 1;
+		size_t numLayers = 5;
 		if (const json* worldRules = getJson(*sceneRules, "World"))
 		{
-			ENGINE_INFO_D("World rules: " + worldRules->dump(4));
 			const json* physicsRules = getJson(*worldRules, "Physics");
+			if (!physicsRules) throw std::runtime_error("No physics rules found for world in scene: " + sceneName);
 
 			SetGravity(ExtractVector2DFromJSON<float>(*physicsRules, "Gravity", { 0.0f, 0.0f }));
 			numUnitsPerTile = ExtractSizeTFromJSON(*physicsRules, "NumMetersPerTile", 1);
-			size_t numLayers = ExtractSizeTFromJSON(*physicsRules, "NumLayers", 1);
-
-			ENGINE_INFO_D("NumUnitsPerTile: " + std::to_string(numUnitsPerTile) + ", NumLayers: " + std::to_string(numLayers));
+			numLayers = ExtractSizeTFromJSON(*physicsRules, "NumLayers", 5);
 		}
-
 
 		// Load Assets.
 		const json* assetsRules = getJson(*sceneRules, "Assets");
-		if (!assetsRules) throw std::runtime_error("No assets rules found for scene: " + sceneName);
 
-		const json* spriteRules = getJson(*assetsRules, "Sprites");
-		if (!spriteRules) throw std::runtime_error("No sprite rules found for scene: " + sceneName);
-
-		const json* audioRules = getJson(*assetsRules, "Audio");
-		if (!audioRules) throw std::runtime_error("No audio rules found for scene: " + sceneName);
-
-		verifyAssetPaths(*assetsRules);
+		if (assetsRules) 
+		{
+			verifyAssetPaths(*assetsRules);
+		}
+		else
+		{
+			ENGINE_CRITICAL("No assets rules found for scene. Continuing with debug ojects only: " + sceneName);
+		}
 
 		const json* characterRules = getJson(*sceneRules, "CharacterRules");
 		if (!characterRules) throw std::runtime_error("No character rules found for scene: " + sceneName);
@@ -802,7 +813,7 @@ namespace Engine
 				std::string cameraTemplateKey = characterCameraJson->get<std::string>();
 				const json* cameraTemplates = getJson(*componentTemplates, "Camera");
 				if (cameraTemplates)
-					addCameraComponent(m_refECS, tileEntity, *cameraTemplates, cameraTemplateKey);
+					addCameraComponent(m_refECS, tileEntity, *cameraTemplates, cameraTemplateKey, numLayers);
 			}
 			if (const json* characterPhysicsJson = getJson(*characterComponents, "Physics"))
 			{
@@ -816,15 +827,15 @@ namespace Engine
 				std::string spriteSheetTemplateKey = characterSpriteSheetJson->get<std::string>();
 				const json* spriteSheetTemplates = getJson(*componentTemplates, "SpriteSheets");
 
-				addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, tileChar, *spriteSheetTemplates, spriteSheetTemplateKey, *spriteRules);
+				if (spriteSheetTemplates)
+					addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, tileChar, *spriteSheetTemplates, spriteSheetTemplateKey, *getJson(*assetsRules, "Sprites"));
 			}
 			if (const json* characterAnimationsJson = getJson(*characterComponents, "Animations"))
 			{
 				std::string animationsTemplateKey = characterAnimationsJson->get<std::string>();
 				const json* animationsTemplate = getJson(*componentTemplates, "Animations");
-
-				addAnimationsComponent(m_refECS, m_refAssetManager, tileEntity, tileChar, *animationsTemplate, 
-					animationsTemplateKey);
+				if (animationsTemplate)
+					addAnimationsComponent(m_refECS, m_refAssetManager, tileEntity, tileChar, *animationsTemplate, animationsTemplateKey);
 			}
 			// ACTIVATE IN ECS AFTER ALL COMPONENTS CREATED.
 			if (activeOnStart)
