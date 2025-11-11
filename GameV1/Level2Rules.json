@@ -1,0 +1,243 @@
+{
+    "Level1":
+    {
+        "World": 
+        {
+            "Physics":
+            {
+                "Gravity": [0.0, 100.0],
+                "NumMetersPerTile": 1,
+                "NumLayers": 5
+            }
+        },
+        "Assets": 
+        {
+            "Sprites":
+            {
+                "PathToSpriteSheets": "Assets/Sprites/",
+                "Textures":
+                {
+                    "PlayerSprite": "FirstDraftZombieGameGuy.png",
+                    "GrassTileMap": "GrassTileSet32x32.png"
+                }
+            },
+            "Audio":
+            {
+                "PathToAudioFiles": "Assets/Sounds/",
+                "Sounds":
+                {
+                    "boing.wav": 0,
+                    "TenseMusic.wav": 1
+                }
+            }
+        },
+        "ComponentTemplates":
+        {
+            "Transforms": 
+            {
+                "Player":
+                {
+                    "ZIndex": 1,
+                    "DrawDebug": "black",
+                    "Size": [1.0, 1.0],
+                    "enabled": true
+                },
+                "GenericTransform1":
+                {
+                    "ZIndex": 2,
+                    "DrawDebug": "red",
+                    "Size": [1.0, 1.0]
+                },
+                "GenericTransformNoDebug":
+                {
+                    "ZIndex": 2,
+                    "Size": [1.0, 1.0]
+                }
+            },
+            "Physics": 
+            {
+                "Player":
+                {
+                    "BodyType": "DYNAMIC",
+                    "Category" : "PLAYER",
+                    "Mask" : "ALL",
+                    "DefaultPhysicsBodySize": [0.5, 0.95],
+                    "Rotation": 0.0,
+                    "GravityOn": true,
+                    "CheckSimpleContacts": true,
+                    "enabled": true
+                },
+                "GenericStatic1":
+                {
+                    "BodyType": "STATIC",
+                    "Category" : "ALL",
+                    "Mask" : "ALL",
+                    "Size": [1.0, 1.0],
+                    "Rotation": 0.0,
+                    "GravityOn": false,
+                    "CheckSimpleContacts": false,
+                    "UseChains": true,
+                    "enabled": true
+                },
+                "GenericSensor1":
+                {
+                    "BodyType": "SENSOR",
+                    "Category" : "ALL",
+                    "Mask" : "ALL",
+                    "Size": [1.0, 1.0],
+                    "Rotation": 0.0,
+                    "GravityOn": false,
+                    "CheckSimpleContacts": false,
+                    "enabled": true
+                }
+            },
+            "Camera": 
+            {
+                "Player":
+                {
+                    "Window":
+                    {
+                        "X": 0.5,
+                        "Y": 0.0,
+                        "Width": 0.5,
+                        "Height": 1.0
+                    },
+                    "PixelsPerUnit": 32,
+                    "ClampingOn": true,
+                    "enabled": true
+                },
+                "GenericStaticCamera":
+                {
+                    "Window":
+                    {
+                        "X": 0.0,
+                        "Y": 0.0,
+                        "Width": 0.5,
+                        "Height": 1.0
+                    },
+                    "PixelsPerUnit": 16,
+                    "ClampingOn": true,
+                    "enabled": false
+                }
+            },
+            "SpriteSheets": 
+            {
+                "Player":
+                {
+                    "Path": "PlayerSprite",
+                    "PixelsPerFrame": [32, 32],
+                    "SizeInUnits": [1.0, 1.0],
+                    "OffsetFromTransform": [-0.25, -0.05],
+                    "Height": 3,
+                    "Width": 4,
+                    "DrawDebug": "green"
+                },
+                "GrassTileSet": 
+                {
+                    "Path": "GrassTileMap",
+                    "PixelsPerFrame": [32, 32],
+                    "SizeInUnits": [1.0, 1.0],
+                    "OffsetFromTransform": [0.0, 0.0],
+                    "Height": 20,
+                    "Width": 40,
+                    "DrawDebug": "green"
+                }
+            },
+            "Animations": 
+            {
+                "Player":
+                {
+                    "Idle": 
+                    {
+                        "Frames": [0, 1, 2, 3],
+                        "FrameTime": 15,
+                        "Loop": true
+                    },
+                    "WalkRight": 
+                    {
+                        "Frames": [4, 5, 6, 7, 8, 9, 10, 11],
+                        "FrameTime": 10,
+                        "Loop": true
+                    },
+                    "WalkLeft": 
+                    {
+                        "Frames": [12, 13, 14, 15],
+                        "FrameTime": 10,
+                        "Loop": true
+                    },
+                    "Jump": 
+                    {
+                        "Frames": [0],
+                        "FrameTime": 10,
+                        "Loop": false
+                    }
+                },
+                "TopLeftGrassCorner":                   { "Idle": { "Frames": [0],   "FrameTime": 20, "Loop": true } },
+                "TopGrass":                             { "Idle": { "Frames": [2],   "FrameTime": 20, "Loop": true } },
+                "TopRightGrassCorner":                  { "Idle": { "Frames": [4],   "FrameTime": 20, "Loop": true } },
+                "InteriorWallBackwardCGrass":           { "Idle": { "Frames": [12],  "FrameTime": 20, "Loop": true } },
+                "SingleLeftInteriorWall":               { "Idle": { "Frames": [13],  "FrameTime": 20, "Loop": true } },
+                "TopRightGrassCornerWithLeftGrass":     { "Idle": { "Frames": [16],  "FrameTime": 20, "Loop": true } },
+                "NarrowGrassCorridorVertical":          { "Idle": { "Frames": [24],  "FrameTime": 20, "Loop": true } },
+                "UShapedGrass":                         { "Idle": { "Frames": [26],  "FrameTime": 20, "Loop": true } },
+                "BackwardCShapedGrass":                 { "Idle": { "Frames": [29],  "FrameTime": 20, "Loop": true } },
+                "TopLeftInteriorWall":                  { "Idle": { "Frames": [41],  "FrameTime": 20, "Loop": true } },
+                "TopInteriorWall":                      { "Idle": { "Frames": [42],  "FrameTime": 20, "Loop": true } },
+                "TopRightInteriorWall":                 { "Idle": { "Frames": [43],  "FrameTime": 20, "Loop": true } },
+                "SingleInteriorWall":                   { "Idle": { "Frames": [46],  "FrameTime": 20, "Loop": true } },
+                "BottomRightGrassCornerWithLeftGrass":  { "Idle": { "Frames": [56],  "FrameTime": 20, "Loop": true } },
+                "LeftGrass":                            { "Idle": { "Frames": [80],  "FrameTime": 20, "Loop": true } },
+                "BottomLeftGrassCorner":                { "Idle": { "Frames": [160], "FrameTime": 20, "Loop": true } },
+                "LeftInteriorWall":                     { "Idle": { "Frames": [81],  "FrameTime": 20, "Loop": true } },
+                "CentralInteriorWall":                  { "Idle": { "Frames": [82],  "FrameTime": 20, "Loop": true } },
+                "RightInteriorWall":                    { "Idle": { "Frames": [83],  "FrameTime": 20, "Loop": true } },
+                "RightGrass":                           { "Idle": { "Frames": [84],  "FrameTime": 20, "Loop": true } },
+                "BottomLeftOpenGrassCorner":            { "Idle": { "Frames": [89],  "FrameTime": 20, "Loop": true } },
+                "BottomRightOpenGrassCorner":           { "Idle": { "Frames": [90],  "FrameTime": 20, "Loop": true } },
+                "BottomLeftInteriorWall":               { "Idle": { "Frames": [121], "FrameTime": 20, "Loop": true } },
+                "BottomInteriorWall":                   { "Idle": { "Frames": [122], "FrameTime": 20, "Loop": true } },
+                "BottomRightInteriorWall":              { "Idle": { "Frames": [123], "FrameTime": 20, "Loop": true } },
+                "BottomGrass":                          { "Idle": { "Frames": [162], "FrameTime": 20, "Loop": true } },
+                "BottomRightGrassCorner":               { "Idle": { "Frames": [164], "FrameTime": 20, "Loop": true } },
+                "TopLeftOpenGrassCorner":               { "Idle": { "Frames": [49],  "FrameTime": 20, "Loop": true } },
+                "CShapedGrass":                         { "Idle": { "Frames": [28],  "FrameTime": 20, "Loop": true } }
+            }
+        },
+        "CharacterRules": 
+        {
+            "P": { "ActiveOnStart": true, "Transform": "Player",                  "Physics": "Player",           "Camera": "Player",                                  "Animations": "Player",                              "SpriteSheet": "Player" },
+            "S": { "ActiveOnStart": true, "Transform": "GenericTransformNoDebug", "Physics": "GenericSensor1" },
+            "T": { "ActiveOnStart": false,"Transform": "GenericTransformNoDebug", "Physics": "GenericSensor1" },
+            "Y": { "ActiveOnStart": true, "Transform": "GenericTransformNoDebug", "Physics": "GenericSensor1",   "Camera": "GenericStaticCamera" },
+            "w": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "TopInteriorWall",                     "SpriteSheet": "GrassTileSet" },
+            "c": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "TopLeftInteriorWall",                 "SpriteSheet": "GrassTileSet" },
+            "v": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "TopRightInteriorWall",                "SpriteSheet": "GrassTileSet" },
+            "e": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "BottomInteriorWall",                  "SpriteSheet": "GrassTileSet" },
+            "l": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "LeftInteriorWall",                    "SpriteSheet": "GrassTileSet" },
+            "r": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "RightInteriorWall",                   "SpriteSheet": "GrassTileSet" },
+            "d": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "BottomLeftInteriorWall",              "SpriteSheet": "GrassTileSet" },
+            "f": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "BottomRightInteriorWall",             "SpriteSheet": "GrassTileSet" },
+            "j": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "SingleInteriorWall",                  "SpriteSheet": "GrassTileSet" },
+            "q": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "TopGrass",                            "SpriteSheet": "GrassTileSet" },
+            "n": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "TopLeftGrassCorner",                  "SpriteSheet": "GrassTileSet" },
+            "m": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "TopRightGrassCorner",                 "SpriteSheet": "GrassTileSet" },
+            "o": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "LeftGrass",                           "SpriteSheet": "GrassTileSet" },
+            "k": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "RightGrass",                          "SpriteSheet": "GrassTileSet" },
+            "i": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "BottomLeftGrassCorner",               "SpriteSheet": "GrassTileSet" },
+            "g": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "BottomGrass",                         "SpriteSheet": "GrassTileSet" },
+            "b": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "BottomRightGrassCorner",              "SpriteSheet": "GrassTileSet" },
+            "x": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "BottomLeftOpenGrassCorner",           "SpriteSheet": "GrassTileSet" },
+            "z": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "BottomRightOpenGrassCorner",          "SpriteSheet": "GrassTileSet" },
+            "h": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "SingleLeftInteriorWall",              "SpriteSheet": "GrassTileSet" },
+            "y": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "TopRightGrassCornerWithLeftGrass",    "SpriteSheet": "GrassTileSet" },
+            "a": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "CentralInteriorWall",                 "SpriteSheet": "GrassTileSet" },
+            ",": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "UShapedGrass",                        "SpriteSheet": "GrassTileSet" },
+            "`": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "BackwardCShapedGrass",                "SpriteSheet": "GrassTileSet" },
+            "!": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "BottomRightGrassCornerWithLeftGrass", "SpriteSheet": "GrassTileSet" },
+            "s": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "NarrowGrassCorridorVertical",         "SpriteSheet": "GrassTileSet" },
+            "Q": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "TopLeftOpenGrassCorner",              "SpriteSheet": "GrassTileSet" },
+            "W": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "CShapedGrass",                        "SpriteSheet": "GrassTileSet" },
+            "E": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "InteriorWallBackwardCGrass",          "SpriteSheet": "GrassTileSet" }
+        }
+    }
+}

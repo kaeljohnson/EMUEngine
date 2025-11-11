@@ -72,9 +72,8 @@ namespace Engine
 		/*
 			Creates the tile map from the specified map and rules files.
 			arg1: mapFile - The path to the map file.
-			arg2: rulesFile - The path to the rules file.
 		*/
-		 void CreateMap(const std::string mapFile, const std::string rulesFile);
+		 void CreateMap(const std::string mapFile);
 
 
 	private:

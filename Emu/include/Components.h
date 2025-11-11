@@ -17,6 +17,7 @@ namespace Engine
 {
 	enum class DebugColor
 	{
+		NoColor,
 		Red,
 		Green,
 		Blue,
@@ -156,18 +157,18 @@ namespace Engine
 	struct Camera : public Component
 	{
 		Camera(Entity entity)
-			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_screenRatio(1.0f, 1.0f),
+			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_screenRatio(1.0f, 1.0f), m_numLayers(10),
 			m_positionInFractionOfScreenSize(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), m_borderOn(false),
 			m_bounds(0, 0), m_clipRectPosition(0, 0), m_clipRectSize(0, 0), m_renderBucket(10, std::vector<RenderObject>()),
 			m_debugRenderBucket(10, std::vector<DebugObject>()), m_debugLinesRenderBucket(10, std::vector<LineObject>()),
 			Component(entity) 
 		{
 		}
-		Camera(Entity entity, Vector2D<float> size, Vector2D<float> screenRatio, Vector2D<float> position, int pixelsPerUnit, bool clampingOn)
+		Camera(Entity entity, Vector2D<float> size, Vector2D<float> screenRatio, Vector2D<float> position, int pixelsPerUnit, bool clampingOn, size_t numLayers)
 			: m_size(size), m_screenRatio(screenRatio), m_positionInFractionOfScreenSize(position), 
 			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0), m_borderOn(false),
-			m_clipRectPosition(0, 0), m_clipRectSize(0, 0), m_renderBucket(10, std::vector<RenderObject>()),
-			m_debugRenderBucket(10, std::vector<DebugObject>()), m_debugLinesRenderBucket(10, std::vector<LineObject>()),
+			m_clipRectPosition(0, 0), m_clipRectSize(0, 0), m_renderBucket(numLayers, std::vector<RenderObject>()), m_numLayers(numLayers),
+			m_debugRenderBucket(numLayers, std::vector<DebugObject>()), m_debugLinesRenderBucket(numLayers, std::vector<LineObject>()),
 			Component(entity) {}
 		
 
@@ -184,6 +185,7 @@ namespace Engine
 		bool m_clampingOn;
 		Vector2D<int> m_bounds;
 		bool m_borderOn;
+		size_t m_numLayers;
 
 		Vector2D<int> m_clipRectPosition;
 		Vector2D<int> m_clipRectSize;
@@ -263,15 +265,31 @@ namespace Engine
 		~ChainColliderBottom() = default;
 	};
 
+	struct Sprite : public Component
+	{
+		Sprite(Entity entity, void* ptrLoadedTexture, Vector2D<int> pixelsPerFrame, Vector2D<float> offsetFromTransform,
+			Vector2D<size_t> dimensions, Vector2D<float> size, const bool drawDebug, DebugColor debugColor)
+			: m_ptrLoadedTexture(ptrLoadedTexture), m_offsetFromTransform(offsetFromTransform), m_pixelsPerFrame(pixelsPerFrame),
+			m_dimensions(dimensions), m_sizeInUnits(size), m_drawDebug(drawDebug), m_debugColor(debugColor), Component(entity) {}
+
+		~Sprite() = default;
+
+		void* m_ptrLoadedTexture;
+		Vector2D<int> m_pixelsPerFrame;
+		Vector2D<float> m_sizeInUnits;
+		Vector2D<float> m_offsetFromTransform;
+		Vector2D<size_t> m_dimensions;	 // Dimensions of the sprite sheet in frames (width, height)
+
+		bool m_drawDebug;
+		DebugColor m_debugColor;
+	};
+
 	struct Animation
 	{
 		Animation() = default;
-		Animation(std::string name, std::vector<int> frames, int frameDuration, 
-			Vector2D<int> pixelsPerFrame, Vector2D<float> offsetFromTransform, 
-			Vector2D<size_t> dimensions, bool loop, Vector2D<float> size, const bool drawDebug, DebugColor debugColor)
+		Animation(std::string name, std::vector<int> frames, int frameDuration,  bool loop)
 			: m_name(name), m_frames(frames), m_numFrames(frames.size()), m_frameTime(0), 
-			m_frameDuration(frameDuration), m_pixelsPerFrame(pixelsPerFrame), 
-			m_dimensions(dimensions), m_loop(loop), m_size(size), m_drawDebug(drawDebug), m_debugColor(debugColor)
+			m_frameDuration(frameDuration), m_loop(loop)
 		{
 		};
 		
@@ -281,30 +299,21 @@ namespace Engine
 		size_t m_frameTime = 0;
 		size_t m_frameDuration;
 		int m_currentFrame = 0;          // current frame in the current animation
-		size_t m_frameCounter = 0;       // tracks the number of frames passed since the last frame change
-		Vector2D<int> m_pixelsPerFrame;
-		Vector2D<size_t> m_dimensions;	 // Dimensions of the sprite sheet in frames (width, height)
-		Vector2D<float> m_size;
-		bool m_drawDebug;
-		DebugColor m_debugColor;
-		
-		Vector2D<float> m_offsetFromTransform;
+		size_t m_frameCounter = 0;       // tracks the number of frames passed since the last frame change 
 		bool m_loop;
 	};
 
 	struct Animations : public Component
 	{
-		Animations(Entity entity, std::unordered_map<std::string, Animation> animations, void* ptrLoadedTexture)
+		Animations(Entity entity, std::unordered_map<std::string, Animation> animations)
 			:
 			m_animations(animations), 
 			m_currentAnimation("Idle"), // Idle for now, need a animation interface for client to set animation in a state machine.
-			m_ptrLoadedTexture(ptrLoadedTexture),
 			Component(entity) 
 		{}
 
 		std::unordered_map<std::string, Animation> m_animations; // All animations for this sprite
 		std::string m_currentAnimation;							 // Name of the current animation being played
-		void* m_ptrLoadedTexture;								 // Pointer to the loaded texture for this sprite
 		
 	};
 

@@ -144,7 +144,7 @@ namespace Engine
 			}
 #endif
 			// Reset background color. Temp for now.
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 173, 216, 230, SDL_ALPHA_OPAQUE);
 
 			if (refCamera.m_borderOn)
 			{
@@ -208,7 +208,7 @@ namespace Engine
 		DebugColor debugColor = object.m_debugColor;
 
 		// Only change debug color if different from last time to reduce calls to GPU.
-		if (debugColor != m_lastDebugColor)
+		// if (debugColor != m_lastDebugColor) TODO: this is causing a bug where it the if block is never entered. 
 		{
 			switch (debugColor)
 			{

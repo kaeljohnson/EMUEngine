@@ -58,8 +58,8 @@ int main(int argc, char* args[])
 	engine->Scenes_SetGravity("Level2", Engine::Vector2D(0.0f, 100.0f));
 
 	// Temp for now. Client will not be able to call functions directly on scene object.
-	engine->Scenes_AddTileMap("Level1", "testMap1.txt", "Rules.json");
-	engine->Scenes_AddTileMap("Level2", "TestMap2.txt", "Rules.json");
+	engine->Scenes_AddTileMap("Level1", "testMap1.txt", "Level2Rules.json");
+	engine->Scenes_AddTileMap("Level2", "TestMap2.txt", "Level2Rules.json");
 
 	Player player;
 
