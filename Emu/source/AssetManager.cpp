@@ -38,7 +38,7 @@ namespace Engine
 		}
 
 		// Otherwise, load new texture
-		ENGINE_INFO("Loading new texture: " + filePath);
+		ENGINE_INFO("Loading new texture: {}", filePath);
 
 		// Check if renderer is valid
 		if (!m_ptrRenderer) 
@@ -51,12 +51,12 @@ namespace Engine
 		SDLTexture* ptrTexture = IMG_LoadTexture((SDL_Renderer*)m_ptrRenderer, filePath.c_str());
 		if (!ptrTexture) 
 		{
-			ENGINE_CRITICAL("Failed to load texture: " + filePath + ", SDL_Error: " + std::string(SDL_GetError()));
+			ENGINE_CRITICAL("Failed to load texture: {}, SDL_Error: {}", filePath, SDL_GetError());
 			return nullptr;
 		}
 
 		// Store texture
-		ENGINE_INFO("Texture loaded: " + filePath);
+		ENGINE_INFO("Texture loaded: {}", filePath);
 		m_loadedTextures.push_back(ptrTexture);
 		size_t index = m_loadedTextures.size() - 1;
 		m_textureNames[entity] = filePath;
@@ -107,11 +107,11 @@ namespace Engine
 		Mix_Chunk* ptrSound = Mix_LoadWAV(filePath.c_str());
 		if (!ptrSound)
 		{
-			ENGINE_CRITICAL("Failed to load sound: " + filePath + ", Mix_Error: " + std::string(Mix_GetError()));
+			ENGINE_CRITICAL("Failed to load sound: {}, Mix_Error: {}", filePath, std::string(Mix_GetError()));
 			return;
 		}
 
-		ENGINE_INFO("Sound loaded: " + soundIndex);
+		ENGINE_INFO("Sound loaded: {}", soundIndex);
 		m_loadedSounds[soundIndex] = ptrSound;
 	}
 

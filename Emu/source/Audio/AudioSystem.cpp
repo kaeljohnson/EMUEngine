@@ -12,7 +12,7 @@ namespace Engine
 		Mix_Chunk* ptrSound = (Mix_Chunk*)m_refAssetManager.GetSound(soundIndex);
 		if (!ptrSound)
 		{
-			ENGINE_CRITICAL("Sound not found: " + std::to_string(soundIndex));
+			ENGINE_CRITICAL("Sound not found: {}", soundIndex);
 			return;
 		}
 

@@ -17,7 +17,7 @@ namespace Engine
 		{
 			if (animations.m_animations.empty() || animations.m_currentAnimation == "None")
 			{
-				ENGINE_CRITICAL_D("No animations found for sprite with entity ID: " + std::to_string(animations.m_entity));
+				ENGINE_CRITICAL_D("No animations found for sprite with entity ID {}", animations.m_entity);
 				continue; // No animations to update or invalid animation index
 			}
 

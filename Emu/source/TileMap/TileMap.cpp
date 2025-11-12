@@ -31,7 +31,7 @@ namespace Engine
         std::ifstream file(mapFile);
         if (!file)
         {
-            ENGINE_CRITICAL("Failed to open map file: " + mapFile);
+            ENGINE_CRITICAL("Failed to open map file: {}", mapFile);
             return;
         }
 
@@ -48,7 +48,7 @@ namespace Engine
             else if (line.length() != m_mapDimensions.X)
             {
                 // Handle error: line does not have the same length as the first line
-                ENGINE_CRITICAL("Map is not a rectangle: line " + std::to_string(m_mapDimensions.Y + 1) + " has a different length");
+                ENGINE_CRITICAL("Map is not a rectangle: line {} has a different length.", m_mapDimensions.Y + 1);
 				throw std::runtime_error("Map is not a rectangle: line " + std::to_string(m_mapDimensions.Y + 1) + " has a different length");
                 return;
             }
@@ -75,7 +75,7 @@ namespace Engine
                 }
                 else
                 {
-                    ENGINE_CRITICAL("Map size exceeds maximum size of " + std::to_string(MAX_SIZE));
+                    ENGINE_CRITICAL("Map size exceeds maximum size of {}", MAX_SIZE);
                 }
 				x++;
             }

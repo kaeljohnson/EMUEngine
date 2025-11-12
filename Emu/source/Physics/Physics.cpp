@@ -315,7 +315,7 @@ namespace Engine
 	void PhysicsSimulation::AddLineCollidersToWorld(std::vector<Entity>& entities)
 	{
 		// This function also needs to connect lines together that meet at the same point.
-		ENGINE_INFO_D("Hot chains size! " + std::to_string(m_refECS.GetHotComponents<ChainCollider>().size()));
+		ENGINE_INFO_D("Hot chains size! {}", m_refECS.GetHotComponents<ChainCollider>().size());
 
 		auto createChain = [&](ChainCollider* ptrChain)
 			{
@@ -528,7 +528,7 @@ namespace Engine
 	{
 		if (AppState::IN_SCENE)
 		{
-			ENGINE_CRITICAL_D("Activating body: " + std::to_string(entity));
+			ENGINE_CRITICAL_D("Activating body: {}" + std::to_string(entity));
 			// bug here: If it wasn't a part of the scene, it will have to be added to the world here.
 			if (m_refECS.HasComponent<PhysicsBody>(entity))
 			{

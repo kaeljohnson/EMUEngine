@@ -41,7 +41,7 @@ namespace Engine
 
 		if (m_ptrWindow == nullptr)
 		{
-			ENGINE_CRITICAL("Window not created! SDL_Error: " + std::string(ISDL::GetError()));
+			ENGINE_CRITICAL("Window not created! SDL_Error: {}", ISDL::GetError());
 		}
 
 		ENGINE_INFO_D("Window created!");
@@ -49,13 +49,13 @@ namespace Engine
 		SDLDisplayMode displayMode;
 		if (ISDL::GetDesktopDisplayMode(0, &displayMode) != 0)
 		{
-			ENGINE_CRITICAL("Get desktop display mode failed: " + std::string(ISDL::GetError()));
+			ENGINE_CRITICAL("Get desktop display mode failed: {}", ISDL::GetError());
 		}
 
 		Screen::DISPLAY_RESOLUTION.X = displayMode.w;
 		Screen::DISPLAY_RESOLUTION.Y = displayMode.h;
 
-		ENGINE_INFO_D("Display resolution: " + std::to_string(displayMode.w) + ", " + std::to_string(displayMode.h));
+		ENGINE_INFO_D("Display resolution: {}, {}", displayMode.w, displayMode.h);
 
 		SDL_SetWindowMinimumSize((SDL_Window*)m_ptrWindow, Screen::DISPLAY_RESOLUTION.X / 2, Screen::DISPLAY_RESOLUTION.Y / 2); // User should not be able to resize smaller than half the display resolution.
 
@@ -63,7 +63,7 @@ namespace Engine
 		m_ptrRenderer = ISDL::CreateRenderer((SDLWindow*)m_ptrWindow, -1, SDL_RENDERER_ACCELERATED);
 		if (m_ptrRenderer == nullptr)
 		{
-			ENGINE_CRITICAL("Renderer could not be created! SDL Error: " + std::string(ISDL::GetError()));
+			ENGINE_CRITICAL("Renderer could not be created! SDL Error: {}", ISDL::GetError());
 		}
 
 		ISDL::SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
@@ -265,11 +265,11 @@ namespace Engine
 		int windowWidthInPixels, windowHeightInPixels;
 		SDL_GetRendererOutputSize((SDLRenderer*)m_ptrRenderer, &windowWidthInPixels, &windowHeightInPixels);
 
-		ENGINE_INFO_D("Window size in pixels: " + std::to_string(windowWidthInPixels) + ", " + std::to_string(windowHeightInPixels));
+		ENGINE_INFO_D("Window size in pixels: {}, {}", windowWidthInPixels, windowHeightInPixels);
 
 		float aspectRatio = (float)windowWidthInPixels / (float)windowHeightInPixels;   
 
-		ENGINE_INFO_D("Aspect Ratio: " + std::to_string(aspectRatio));
+		ENGINE_INFO_D("Aspect Ratio: {}", aspectRatio);
 
 		Screen::VIRTUAL_SIZE.Y = 720; // Fixed virtual height in units for consistent rendering.
 
@@ -278,7 +278,7 @@ namespace Engine
 		const float scaleX = static_cast<float>(windowWidthInPixels) / Screen::VIRTUAL_SIZE.X;
 		const float scaleY = static_cast<float>(windowHeightInPixels) / Screen::VIRTUAL_SIZE.Y;
 
-		ENGINE_INFO_D("Scale X: " + std::to_string(scaleX) + ", Scale Y: " + std::to_string(scaleY));
+		ENGINE_INFO_D("Scale X: {}, Scale Y: {}", scaleX, scaleY);
 
 		Screen::SCALE = Vector2D<float>(scaleX, scaleY);
 
@@ -308,7 +308,7 @@ namespace Engine
 
 		if (ISDL::SetWindowFullscreen((SDLWindow*)m_ptrWindow, isFullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)
 		{
-			ENGINE_ERROR("Fullscreen failed! SDL_Error: " + std::string(ISDL::GetError()));
+			ENGINE_ERROR("Fullscreen failed! SDL_Error: {}", ISDL::GetError());
 		}
 		else
 		{
@@ -325,7 +325,7 @@ namespace Engine
 		SDLDisplayMode displayMode;
 		if (ISDL::GetDesktopDisplayMode(0, &displayMode) != 0)
 		{
-			ENGINE_ERROR("Could not get display mode: " + std::string(ISDL::GetError()));
+			ENGINE_ERROR("Could not get display mode: {}", ISDL::GetError());
 			return 60.0f; // Default to 60 if we can't get the refresh rate
 		}
 

@@ -76,11 +76,10 @@ namespace Engine
 
 		// 8. Deactivate all components that should not be active at the start of the scene?
 
-		ENGINE_CRITICAL_D("Num transforms: " + std::to_string(m_refECS.GetHotComponents<Transform>().size()) + ", Num bodies: "
-			+ std::to_string(m_refECS.GetHotComponents<PhysicsBody>().size()) + ", Num line colliders: "
-			+ std::to_string(m_refECS.GetHotComponents<ChainCollider>().size()) + ", Num cameras: "
-			+ std::to_string(m_refECS.GetHotComponents<Camera>().size()) + ", Num tile map entities: "
-			+ std::to_string(m_tileMap.GetMap().size()));
+		ENGINE_CRITICAL_D("Num transforms: {}, Num bodies: {}, Num line colliders: {}, Num cameras: {}, Num tile map entities: {}", 
+			m_refECS.GetHotComponents<Transform>().size(), m_refECS.GetHotComponents<PhysicsBody>().size(),
+			m_refECS.GetHotComponents<ChainCollider>().size(), m_refECS.GetHotComponents<Camera>().size(),
+			m_tileMap.GetMap().size());
 
 		// process items client wants to do.
 		if (m_clientOnScenePlay) m_clientOnScenePlay();
@@ -121,8 +120,7 @@ namespace Engine
 
 		m_levelDimensionsInUnits = Vector2D<int>(m_tileMap.GetWidth(), m_tileMap.GetHeight());
 
-		ENGINE_CRITICAL_D("Map width: " + std::to_string(m_levelDimensionsInUnits.X) + ", Map height: " 
-			+ std::to_string(m_levelDimensionsInUnits.Y));
+		ENGINE_CRITICAL_D("Map width: {}, Map height: {}", m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y);
 
 		m_hasTileMap = true;
 
@@ -136,7 +134,7 @@ namespace Engine
 	{
 		if (std::find(m_entities.begin(), m_entities.end(), entity) != m_entities.end()) // SLOW. Temp for now.
 		{
-			ENGINE_INFO("Entity already exists in the scene: " + std::to_string(entity));
+			ENGINE_INFO("Entity already exists in the scene: {}", entity);
 			return;
 		}
 
@@ -147,7 +145,7 @@ namespace Engine
 	{
 		if (std::find(m_entities.begin(), m_entities.end(), entity) == m_entities.end()) // SLOW. Temp for now.
 		{
-			ENGINE_INFO("Entity does not exist in the current scene: " + std::to_string(entity));
+			ENGINE_INFO("Entity does not exist in the current scene: {}", entity);
 			return;
 		}
 
@@ -166,7 +164,7 @@ namespace Engine
 	{
 		if (std::find(m_entities.begin(), m_entities.end(), entity) == m_entities.end()) // SLOW. Temp for now.
 		{
-			ENGINE_INFO("Entity does not exist in the current scene: " + std::to_string(entity));
+			ENGINE_INFO("Entity does not exist in the current scene: {}", entity);
 			return;
 		}
 
@@ -211,7 +209,7 @@ namespace Engine
 
 	void Scene::SetGravity(const Vector2D<float> gravity)
 	{
-		ENGINE_INFO_D("Setting gravity: " + std::to_string(gravity.X) + ", " + std::to_string(gravity.Y));
+		ENGINE_INFO_D("Setting gravity: {}, {}", gravity.X, gravity.Y);
 
 		m_physicsSimulation.UpdateGravity(gravity);
 	}
@@ -228,7 +226,7 @@ namespace Engine
 		auto it = j.find(key);
 		if (it == j.end())
 		{
-			ENGINE_CRITICAL_D("Field not found in rules file: " + key + ". Returning nullptr.");
+			ENGINE_CRITICAL_D("Field not found in rules file: {}. Returning nullptr.", key);
 			return nullptr;
 		}
 		return &(*it);
@@ -254,7 +252,7 @@ namespace Engine
 		}
 
 		auto& sceneName = rulesJson.begin().key();
-		ENGINE_INFO_D("Loading scene entities for scene: " + sceneName);
+		ENGINE_INFO_D("Loading scene entities for scene: {}", sceneName);
 
 		const json* sceneRules = getJson(rulesJson, sceneName);
 
@@ -621,7 +619,7 @@ namespace Engine
 		const json* entitySpriteSheetJson = getJson(spriteSheetsTemplate, spriteSheetKey);
 		if (!entitySpriteSheetJson) 
 		{
-			ENGINE_CRITICAL("No sprite sheet template found for key: " + spriteSheetKey);
+			ENGINE_CRITICAL("No sprite sheet template found for key: {}", spriteSheetKey);
 			return;
 		}
 
@@ -744,7 +742,7 @@ namespace Engine
 	void Scene::loadSceneEntitiesFromTileMap()
 	{
 		const std::string& sceneName = rulesJson.begin().key();
-		ENGINE_INFO_D("Loading scene entities for scene: " + sceneName);
+		ENGINE_INFO_D("Loading scene entities for scene: {}", sceneName);
 
 		const json* sceneRules = getJson(rulesJson, sceneName);
 		if (!sceneRules) throw std::runtime_error("No scene rules found for scene: " + sceneName);
@@ -771,7 +769,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL("No assets rules found for scene. Continuing with debug ojects only: " + sceneName);
+			ENGINE_CRITICAL("No assets rules found for scene. Continuing with debug ojects only: {}", sceneName);
 		}
 
 		const json* characterRules = getJson(*sceneRules, "CharacterRules");
@@ -792,7 +790,7 @@ namespace Engine
 			std::string tileKey(1, tileChar);
 			if (!characterRules->contains(tileKey))
 			{
-				ENGINE_INFO_D("No such tile exists: " + tileKey);
+				ENGINE_INFO_D("No such tile exists: {}", tileKey);
 				continue;
 			}
 
@@ -827,7 +825,7 @@ namespace Engine
 				std::string spriteSheetTemplateKey = characterSpriteSheetJson->get<std::string>();
 				const json* spriteSheetTemplates = getJson(*componentTemplates, "SpriteSheets");
 
-				if (spriteSheetTemplates)
+				if (spriteSheetTemplates && assetsRules)
 					addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, tileChar, *spriteSheetTemplates, spriteSheetTemplateKey, *getJson(*assetsRules, "Sprites"));
 			}
 			if (const json* characterAnimationsJson = getJson(*characterComponents, "Animations"))
