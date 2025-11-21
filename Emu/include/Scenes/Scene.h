@@ -158,11 +158,6 @@ namespace Engine
 		void deactivatePhysics(Entity entity);
 
 		/*
-			Loads the number of units per tile from the asset manager.
-		*/
-		size_t loadNumUnitsPerTile(const std::string& sceneName);
-
-		/*
 			Loads all entities defined in the scene's tile map.
 		*/
 		void loadSceneEntitiesFromTileMap();

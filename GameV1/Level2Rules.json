@@ -3,11 +3,11 @@
     {
         "World": 
         {
+            "NumLayers": 5,
             "Physics":
             {
                 "Gravity": [0.0, 100.0],
-                "NumMetersPerTile": 1,
-                "NumLayers": 5
+                "NumUnitsPerTile": 1
             }
         },
         "Assets": 
@@ -39,19 +39,24 @@
                 {
                     "ZIndex": 1,
                     "DrawDebug": "black",
-                    "Size": [1.0, 1.0],
+                    "SizeInUnits": [0.5, 0.95],
                     "enabled": true
                 },
                 "GenericTransform1":
                 {
                     "ZIndex": 2,
-                    "DrawDebug": "red",
-                    "Size": [1.0, 1.0]
+                    "SizeInUnits": [1.0, 1.0]
                 },
                 "GenericTransformNoDebug":
                 {
                     "ZIndex": 2,
-                    "Size": [1.0, 1.0]
+                    "SizeInUnits": [1.0, 1.0]
+                },
+                "GenericDoubleSizeTransform":
+                {
+                    "ZIndex": 2,
+                    "DrawDebug": "red",
+                    "SizeInUnits": [2.0, 2.0]
                 }
             },
             "Physics": 
@@ -61,7 +66,6 @@
                     "BodyType": "DYNAMIC",
                     "Category" : "PLAYER",
                     "Mask" : "ALL",
-                    "DefaultPhysicsBodySize": [0.5, 0.95],
                     "Rotation": 0.0,
                     "GravityOn": true,
                     "CheckSimpleContacts": true,
@@ -72,11 +76,33 @@
                     "BodyType": "STATIC",
                     "Category" : "ALL",
                     "Mask" : "ALL",
-                    "Size": [1.0, 1.0],
                     "Rotation": 0.0,
                     "GravityOn": false,
                     "CheckSimpleContacts": false,
                     "UseChains": true,
+                    "enabled": true,
+                    "DrawDebug": "red"
+                },
+                "GenericStaticGreen1":
+                {
+                    "BodyType": "STATIC",
+                    "Category" : "ALL",
+                    "Mask" : "ALL",
+                    "Rotation": 0.0,
+                    "GravityOn": false,
+                    "CheckSimpleContacts": false,
+                    "UseChains": true,
+                    "enabled": true,
+                    "DrawDebug": "green"
+                },
+                "GenericStaticDouble":
+                {
+                    "BodyType": "STATIC",
+                    "Category" : "ALL",
+                    "Mask" : "ALL",
+                    "Rotation": 0.0,
+                    "GravityOn": false,
+                    "CheckSimpleContacts": false,
                     "enabled": true
                 },
                 "GenericSensor1":
@@ -84,7 +110,6 @@
                     "BodyType": "SENSOR",
                     "Category" : "ALL",
                     "Mask" : "ALL",
-                    "Size": [1.0, 1.0],
                     "Rotation": 0.0,
                     "GravityOn": false,
                     "CheckSimpleContacts": false,
@@ -139,8 +164,7 @@
                     "SizeInUnits": [1.0, 1.0],
                     "OffsetFromTransform": [0.0, 0.0],
                     "Height": 20,
-                    "Width": 40,
-                    "DrawDebug": "green"
+                    "Width": 40
                 }
             },
             "Animations": 
@@ -216,7 +240,7 @@
             "l": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "LeftInteriorWall",                    "SpriteSheet": "GrassTileSet" },
             "r": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "RightInteriorWall",                   "SpriteSheet": "GrassTileSet" },
             "d": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "BottomLeftInteriorWall",              "SpriteSheet": "GrassTileSet" },
-            "f": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "BottomRightInteriorWall",             "SpriteSheet": "GrassTileSet" },
+            "f": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStaticGreen1",                                                   "Animations": "BottomRightInteriorWall",             "SpriteSheet": "GrassTileSet" },
             "j": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "SingleInteriorWall",                  "SpriteSheet": "GrassTileSet" },
             "q": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "TopGrass",                            "SpriteSheet": "GrassTileSet" },
             "n": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "TopLeftGrassCorner",                  "SpriteSheet": "GrassTileSet" },
@@ -237,7 +261,9 @@
             "s": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "NarrowGrassCorridorVertical",         "SpriteSheet": "GrassTileSet" },
             "Q": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "TopLeftOpenGrassCorner",              "SpriteSheet": "GrassTileSet" },
             "W": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericSensor1",                                                        "Animations": "CShapedGrass",                        "SpriteSheet": "GrassTileSet" },
-            "E": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "InteriorWallBackwardCGrass",          "SpriteSheet": "GrassTileSet" }
+            "E": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "InteriorWallBackwardCGrass",          "SpriteSheet": "GrassTileSet" },
+            "M": { "ActiveOnStart": true, "Transform": "GenericDoubleSizeTransform",       "Physics": "GenericStaticDouble",                                          "Animations": "SingleInteriorWall",                  "SpriteSheet": "GrassTileSet" }
+
         }
     }
 }

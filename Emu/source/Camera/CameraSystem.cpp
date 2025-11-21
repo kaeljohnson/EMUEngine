@@ -163,71 +163,69 @@ namespace Engine
 				}
 #endif
 			}
-			else
-			{
+
 #ifndef NDEBUG
-				// if there is no animation at all,
-				// draw the transform rectangle for static objects when in debug.
-				// Draw borders if it is a sensor.
+			if (PhysicsBody* ptrPhysicsBody = refECS.GetComponent<PhysicsBody>(refTransform.m_entity))
+			{
+				if (!ptrPhysicsBody->m_drawDebug)
+					continue;
 
-				// Temp: need better way to determine if we should fill the rect or not.
-				ChainColliderLeft* ptrChainColliderLeft = refECS.GetComponent<ChainColliderLeft>(refTransform.m_entity);
-				ChainColliderRight* ptrChainColliderRight = refECS.GetComponent<ChainColliderRight>(refTransform.m_entity);
-				ChainColliderTop* ptrChainColliderTop = refECS.GetComponent<ChainColliderTop>(refTransform.m_entity);
-				ChainColliderBottom* ptrChainColliderBottom = refECS.GetComponent<ChainColliderBottom>(refTransform.m_entity);
-
-				const bool fillRect = ptrChainColliderLeft ||
-					ptrChainColliderRight ||
-					ptrChainColliderTop ||
-					ptrChainColliderBottom ||
-					(refECS.HasComponent<PhysicsBody>(refTransform.m_entity) &&
-					refECS.GetComponent<PhysicsBody>(refTransform.m_entity)->m_bodyType != BodyType::SENSOR);
-
+				// submit debug border
+				// debug objects when in debug mode.
 				debugBuckets[refTransform.ZIndex].emplace_back(
 					refTransform.m_entity,
-					fillRect,
+					ptrPhysicsBody->m_fillRect,
 					Vector2D<int>(
 						int((lerpedX - cameraAdjustedOffset.X) * scaleX),
 						int((lerpedY - cameraAdjustedOffset.Y) * scaleY)
 					),
-					Vector2D<int>(width, height),
-					refTransform.m_debugColor
+					Vector2D<int>(
+						int((refTransform.Dimensions.X * scaleX)), // Need transform dimensions, not animation dimensions
+						int((refTransform.Dimensions.Y * scaleY))
+					),
+					ptrPhysicsBody->m_debugColor
 				);
-
-				auto submitChainsForRendering = [&](auto& ptrChainCollider)
-					{
-						debugLineBuckets[refTransform.ZIndex].emplace_back(
-							ptrChainCollider->m_entity,
-							Vector2D<int>(
-								int((ptrChainCollider->m_points[1].X - cameraAdjustedOffset.X) * scaleX),
-								int((ptrChainCollider->m_points[1].Y - cameraAdjustedOffset.Y) * scaleY)
-							),
-							Vector2D<int>(
-								int((ptrChainCollider->m_points[2].X - cameraAdjustedOffset.X) * scaleX),
-								int((ptrChainCollider->m_points[2].Y - cameraAdjustedOffset.Y) * scaleY)
-							)
-						);
-					};
-
-
-				if (ptrChainColliderLeft)
-				{
-					submitChainsForRendering(ptrChainColliderLeft);
-				}
-				if (ptrChainColliderRight)
-				{
-					submitChainsForRendering(ptrChainColliderRight);
-				}
-				if (ptrChainColliderTop)
-				{
-					submitChainsForRendering(ptrChainColliderTop);
-				}
-				if (ptrChainColliderBottom)
-				{
-					submitChainsForRendering(ptrChainColliderBottom);
-				}
-#endif
 			}
+
+			ChainColliderLeft* ptrChainColliderLeft = refECS.GetComponent<ChainColliderLeft>(refTransform.m_entity);
+			ChainColliderRight* ptrChainColliderRight = refECS.GetComponent<ChainColliderRight>(refTransform.m_entity);
+			ChainColliderTop* ptrChainColliderTop = refECS.GetComponent<ChainColliderTop>(refTransform.m_entity);
+			ChainColliderBottom* ptrChainColliderBottom = refECS.GetComponent<ChainColliderBottom>(refTransform.m_entity);
+
+			auto submitChainsForRendering = [&](auto& ptrChainCollider)
+				{
+					debugLineBuckets[refTransform.ZIndex].emplace_back(
+						ptrChainCollider->m_entity,
+						Vector2D<int>(
+							int((ptrChainCollider->m_points[1].X - cameraAdjustedOffset.X) * scaleX),
+							int((ptrChainCollider->m_points[1].Y - cameraAdjustedOffset.Y) * scaleY)
+						),
+						Vector2D<int>(
+							int((ptrChainCollider->m_points[2].X - cameraAdjustedOffset.X) * scaleX),
+							int((ptrChainCollider->m_points[2].Y - cameraAdjustedOffset.Y) * scaleY)
+						),
+						ptrChainCollider->m_debugColor
+					);
+				};
+
+
+			if (ptrChainColliderLeft)
+			{
+				submitChainsForRendering(ptrChainColliderLeft);
+			}
+			if (ptrChainColliderRight)
+			{
+				submitChainsForRendering(ptrChainColliderRight);
+			}
+			if (ptrChainColliderTop)
+			{
+					submitChainsForRendering(ptrChainColliderTop);
+			}
+			if (ptrChainColliderBottom)
+			{
+				submitChainsForRendering(ptrChainColliderBottom);
+			}
+#endif
 		}
 
 		// auto end = std::chrono::high_resolution_clock::now();

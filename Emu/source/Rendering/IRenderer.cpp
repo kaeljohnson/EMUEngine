@@ -240,8 +240,21 @@ namespace Engine
 
 	void IRenderer::draw(LineObject& lineObject)
 	{
-		// Draw the chain collider as a series of lines in red.
-		SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE); // Should client decide color?
+		switch (lineObject.m_debugColor)
+		{
+		case DebugColor::Green:
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+			break;
+		case DebugColor::Blue:
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 255, SDL_ALPHA_OPAQUE);
+			break;
+		case DebugColor::Black:
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+			break;
+		default: // Red
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+			break;
+		}
 
 		SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, lineObject.m_endPointInPixelsOnScreen.X, lineObject.m_endPointInPixelsOnScreen.Y,
 			lineObject.m_startPointInPixelsOnScreen.X, lineObject.m_startPointInPixelsOnScreen.Y);

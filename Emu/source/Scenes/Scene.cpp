@@ -332,18 +332,12 @@ namespace Engine
 		return defaultValue;
 	}
 
-	size_t Scene::loadNumUnitsPerTile(const std::string& sceneName)
-	{
-		if (rulesJson[sceneName]["World"].contains("NumMetersPerTile") && rulesJson[sceneName]["World"]["NumMetersPerTile"].is_number())
-			return rulesJson[sceneName]["World"]["NumMetersPerTile"].get<size_t>();
-
-		throw std::runtime_error("NumMetersPerTile not found or invalid in rules JSON");
-	}
-
 	static void addTransformComponent(ECS& refECS, Entity entity, const json& transformTemplates, std::string templateKey, int x, int y, size_t numUnitsPerTile)
 	{
 		const json* entityTransformTemplate = getJson(transformTemplates, templateKey);
 		size_t zIndex = ExtractSizeTFromJSON(*entityTransformTemplate, "ZIndex", 0);
+		const Vector2D<float> sizeInUnits = 
+			ExtractVector2DFromJSON<float>(*entityTransformTemplate, "SizeInUnits", Vector2D<float>(1.0f, 1.0f));
 
 		bool drawDebug = entityTransformTemplate->contains("DrawDebug");
 		std::string debugColor = entityTransformTemplate->value("DrawDebug", "red");
@@ -370,7 +364,7 @@ namespace Engine
 		refECS.AddComponent<Transform>(
 			entity,
 			Vector2D<float>(x * (float)numUnitsPerTile, y * (float)numUnitsPerTile),
-			Vector2D<float>((float)numUnitsPerTile, (float)numUnitsPerTile),
+			Vector2D<float>(sizeInUnits.X * (float)numUnitsPerTile, sizeInUnits.Y * (float)numUnitsPerTile),
 			1.0f, 1.0f, 1, zIndex, drawDebug, debugColorEnum
 		);
 	}
@@ -399,7 +393,8 @@ namespace Engine
 	}
 
 	static void addPhysicsComponent(ECS& refECS, TileMap& refTileMap, Entity tileEntity, const char tileChar, const json& physicsComponentTemplate,
-		const std::string& physicsTemplateKey, int x, int y, size_t numUnitsPerTile, std::unordered_set<char>& isSolid)
+		const std::string& physicsTemplateKey, const json& transformsComponentTemplate, const std::string& transformTemplateKey,
+		int x, int y, size_t numUnitsPerTile, std::unordered_set<char>& isSolid)
 	{
 		// Add Physics components.
 		BodyType bodyType = STATIC;
@@ -409,6 +404,9 @@ namespace Engine
 		bool gravityOn = false;
 		bool checkSimpleContacts = false;
 		bool useChains = false;
+		bool fillRect = false;
+		bool drawDebug = false;
+		DebugColor debugColor = DebugColor::NoColor;
 
 		if (physicsComponentTemplate.contains(physicsTemplateKey))
 		{
@@ -436,10 +434,18 @@ namespace Engine
 			if (const json* bodyTypeJson = getJson(characterPhysicsRulesJson, "BodyType"))
 			{
 				std::string bodyTypeStr = bodyTypeJson->get<std::string>();
+
+				if (bodyTypeStr != "SENSOR") isSolid.emplace(tileChar);
+
 				if (bodyTypeStr == "STATIC") bodyType = STATIC;
 				else if (bodyTypeStr == "DYNAMIC") bodyType = DYNAMIC;
 				else if (bodyTypeStr == "KINEMATIC") bodyType = KINEMATIC;
 				else if (bodyTypeStr == "SENSOR") bodyType = SENSOR;
+			}
+
+			if (const json* fillRectJson = getJson(characterPhysicsRulesJson, "FillRect"))
+			{
+				fillRect = fillRectJson->get<bool>();
 			}
 
 			if (bodyType != SENSOR)
@@ -447,9 +453,9 @@ namespace Engine
 				// If body is not a sensor, it is solid and collides with other bodies.
 				// This information is needed for the chain system to know which tiles to link to.
 				// Not the best design but will work for now.
-				isSolid.emplace(tileChar);
-
-				if (const json* useChainsJson = getJson(characterPhysicsRulesJson, "UseChains")) // Chains are not used for sensors.
+				// isSolid.emplace(tileChar);
+				
+				if (const json* useChainsJson = getJson(characterPhysicsRulesJson, "UseChains"))
 				{
 					const bool useChainsBool = useChainsJson->get<bool>();
 					if (useChainsBool == true)
@@ -476,31 +482,59 @@ namespace Engine
 				}
 
 			}
-			if (const json* sizeJson = getJson(characterPhysicsRulesJson, "DefaultPhysicsBodySize"))
+
+			json characterTransformRulesJson = transformsComponentTemplate[transformTemplateKey];
+			if (const json* transformSizeJson = getJson(characterTransformRulesJson, "SizeInUnits"))
 			{
-				if (sizeJson->is_array() && sizeJson->size() == 2)
+				if (transformSizeJson->is_array() && transformSizeJson->size() == 2)
 				{
 
-					if ((*sizeJson)[0].is_number() && (*sizeJson)[1].is_number())
+					if ((*transformSizeJson)[0].is_number() && (*transformSizeJson)[1].is_number())
 					{
-						size.X = (*sizeJson)[0].get<float>();
-						size.Y = (*sizeJson)[1].get<float>();
+						size.X = (*transformSizeJson)[0].get<float>();
+						size.Y = (*transformSizeJson)[1].get<float>();
 					}
 					else
 					{
-						ENGINE_CRITICAL("Invalid DefaultPhysicsBodySize values. Using default size.");
+						ENGINE_CRITICAL("Invalid transform size values. Using default size.");
 					}
 				}
 			}
 
-			if (useChains) // Chains are used on tiles, typically map tiles, to avoid ghose collisions on adjacent tiles.
+			if (const json* drawDebugJson = getJson(characterPhysicsRulesJson, "DrawDebug"))
+			{
+				drawDebug = true;
+				const std::string& debugColorString = drawDebugJson->get<std::string>();
+				if (debugColorString == "green")
+				{
+					debugColor = DebugColor::Green;
+				}
+				else if (debugColorString == "blue")
+				{
+					debugColor = DebugColor::Blue;
+				}
+				else if (debugColorString == "black")
+				{
+					debugColor = DebugColor::Black;
+				}
+				else if (debugColorString == "red")
+				{
+					debugColor = DebugColor::Red;
+				}
+			}
+
+			if (useChains) // Chains are used on tiles, typically map tiles, to avoid ghost collisions on adjacent tiles.
 			{
 				auto isTileSolid = [&](int x, int y) -> bool
 					{
 						const auto* tile = refTileMap.GetTile(x, y);
-						return tile && isSolid.find(tile->second) != isSolid.end();
+						if (!tile) return false;
+
+						return isSolid.find(tile->second) != isSolid.end();
 					};
 
+
+				//adjacent tiles must include if a tile size is larger than 1x1 units.
 				bool hasTileAbove = y > 0 && isTileSolid(x, y - 1);
 				bool hasTileBelow = y < refTileMap.GetHeight() - 1 && isTileSolid(x, y + 1);
 				bool hasTileLeft = x > 0 && refTileMap.GetTile(x - 1, y) && isTileSolid(x - 1, y);
@@ -529,7 +563,7 @@ namespace Engine
 					else if (hasTileLeft) { ghostX0 = (float)x - 1.0f; ghostY0 = (float)y; }
 
 					refECS.AddComponent<ChainColliderTop>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
-						Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
+						Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3), drawDebug, debugColor);
 				}
 
 				if (!hasTileLeft)
@@ -550,7 +584,7 @@ namespace Engine
 					else if (hasTileBelow) { ghostX0 = (float)x; ghostY0 = (float)y + 2.0f; }
 
 					refECS.AddComponent<ChainColliderLeft>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
-						Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
+						Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3), drawDebug, debugColor);
 				}
 
 				if (!hasTileBelow)
@@ -571,7 +605,7 @@ namespace Engine
 					else if (hasTileRight) { ghostX0 = (float)x + 2.0f; ghostY0 = (float)y + 1.0f; }
 
 					refECS.AddComponent<ChainColliderBottom>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
-						Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
+						Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3), drawDebug, debugColor);
 				}
 
 				if (!hasTileRight)
@@ -592,7 +626,7 @@ namespace Engine
 					else if (hasTileBelow) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y + 2.0f; }
 
 					refECS.AddComponent<ChainColliderRight>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
-						Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3));
+						Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3), drawDebug, debugColor);
 				}
 			}
 			else // Create a regular physics body for the tiles that don't use chains.
@@ -600,7 +634,7 @@ namespace Engine
 				refECS.AddComponent<PhysicsBody>(tileEntity, enabled, bodyType, category, mask,
 					Vector2D<float>(size.X, size.Y),
 					Vector2D<float>(static_cast<float>(x) * static_cast<float>(numUnitsPerTile), static_cast<float>(y) * static_cast<float>(numUnitsPerTile)),
-					0.0f, gravityOn, checkSimpleContacts);
+					0.0f, gravityOn, checkSimpleContacts, drawDebug, fillRect, debugColor);
 			}
 		}
 	}
@@ -739,6 +773,38 @@ namespace Engine
 		}
 	}
 
+	static std::unordered_set<char> determineSolidTiles(const json& characterRules, const json& componentTemplates)
+	{
+		// Predetermine the solid tiles based on their physics body type to assist with chain creation.
+		// Otherwise, when processing each tile we need to get the physics body type of all adjacent tiles.
+		std::unordered_set<char> isSolid;
+
+		for (auto& [key, value] : characterRules.items())
+		{
+			if (const json* characterPhysicsJson = getJson(value, "Physics"))
+			{
+				std::string physicsTemplateKey = characterPhysicsJson->get<std::string>();
+				if (const json* physicsTemplates = getJson(componentTemplates, "Physics"))
+				{
+					if (const json* entityPhysicsTemplate = getJson(*physicsTemplates, physicsTemplateKey))
+					{
+						if (const json* bodyTypeJson = getJson(*entityPhysicsTemplate, "BodyType"))
+						{
+							std::string bodyTypeStr = bodyTypeJson->get<std::string>();
+							if (bodyTypeStr != "SENSOR")
+							{
+								isSolid.emplace(key[0]);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return isSolid;
+	}
+	
+
 	void Scene::loadSceneEntitiesFromTileMap()
 	{
 		const std::string& sceneName = rulesJson.begin().key();
@@ -752,12 +818,12 @@ namespace Engine
 		size_t numLayers = 5;
 		if (const json* worldRules = getJson(*sceneRules, "World"))
 		{
+			numLayers = ExtractSizeTFromJSON(*worldRules, "NumLayers", 5);
 			const json* physicsRules = getJson(*worldRules, "Physics");
 			if (!physicsRules) throw std::runtime_error("No physics rules found for world in scene: " + sceneName);
 
 			SetGravity(ExtractVector2DFromJSON<float>(*physicsRules, "Gravity", { 0.0f, 0.0f }));
-			numUnitsPerTile = ExtractSizeTFromJSON(*physicsRules, "NumMetersPerTile", 1);
-			numLayers = ExtractSizeTFromJSON(*physicsRules, "NumLayers", 5);
+			numUnitsPerTile = ExtractSizeTFromJSON(*physicsRules, "NumUnitsPerTile", 1);
 		}
 
 		// Load Assets.
@@ -778,7 +844,7 @@ namespace Engine
 		const json* componentTemplates = getJson(*sceneRules, "ComponentTemplates");
 		if (!componentTemplates) throw std::runtime_error("No component templates found for scene: " + sceneName);
 
-		std::unordered_set<char> isSolid;
+		std::unordered_set<char> isSolid = determineSolidTiles(*characterRules, *componentTemplates);
 
 		for (auto& [coords, info] : m_tileMap.GetMap())
 		{
@@ -799,13 +865,16 @@ namespace Engine
 
 			bool activeOnStart = characterComponents->value("ActiveOnStart", true);
 
-			if (const json* characterTransformJson = getJson(*characterComponents, "Transform"))
+			const json* characterTransformJson = nullptr;
+			if (characterTransformJson = getJson(*characterComponents, "Transform"))
 			{
 				std::string transformTemplateKey = characterTransformJson->get<std::string>();
 				const json* transformTemplates = getJson(*componentTemplates, "Transforms");
 				if (transformTemplates)
 					addTransformComponent(m_refECS, tileEntity, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile);
 			}
+			else throw std::runtime_error("Transform component is required for all entities. Missing for tile: " + tileKey);
+
 			if (const json* characterCameraJson = getJson(*characterComponents, "Camera"))
 			{
 				std::string cameraTemplateKey = characterCameraJson->get<std::string>();
@@ -817,8 +886,10 @@ namespace Engine
 			{
 				std::string physicsTemplateKey = characterPhysicsJson->get<std::string>();
 				const json* physicsTemplates = getJson(*componentTemplates, "Physics");
+				std::string transformTemplateKey = characterTransformJson->get<std::string>();
+				const json* transformTemplates = getJson(*componentTemplates, "Transforms");
 				if (physicsTemplates)
-					addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileChar, *physicsTemplates, physicsTemplateKey, x, y, numUnitsPerTile, isSolid);
+					addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileChar, *physicsTemplates, physicsTemplateKey, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile, isSolid);
 			}
 			if (const json* characterSpriteSheetJson = getJson(*characterComponents, "SpriteSheet"))
 			{
