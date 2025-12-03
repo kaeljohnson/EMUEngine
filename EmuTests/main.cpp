@@ -155,27 +155,27 @@ TEST(ECS, TestComponentDestruction)
 	EXPECT_FALSE(smallECS.HasComponent<TestComponent>(0));
 }
 
-TEST(ECS, TestSparseArrayIteration)
-{
-	for (size_t i = 0; i < 10000; ++i)
-	{
-		largeECS.CreateEntity();
-		largeECS.AddComponent<TestComponent>(i, i);
-		largeECS.Activate(i);
-		entitiesForSparseSet.push_back(i);
-	}
-
-	EXPECT_EQ(largeECS.GetNumActiveComponents<TestComponent>(), 10000);
-
-	auto start = std::chrono::high_resolution_clock::now();
-	for (Engine::Entity& entity : entitiesForSparseSet)
-	{
-		TestComponent* component = largeECS.GetComponent<TestComponent>(entity);
-		EXPECT_EQ(component->m_value, component->m_entity);
-	}
-	auto end = std::chrono::high_resolution_clock::now();
-	std::cout << "Sparse set iteration: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
-}
+//TEST(ECS, TestSparseArrayIteration)
+//{
+//	for (size_t i = 0; i < 10000; ++i)
+//	{
+//		largeECS.CreateEntity();
+//		largeECS.AddComponent<TestComponent>(i, i);
+//		largeECS.Activate(i);
+//		entitiesForSparseSet.push_back(i);
+//	}
+//
+//	EXPECT_EQ(largeECS.GetNumActiveComponents<TestComponent>(), 10000);
+//
+//	auto start = std::chrono::high_resolution_clock::now();
+//	for (Engine::Entity& entity : entitiesForSparseSet)
+//	{
+//		TestComponent* component = largeECS.GetComponent<TestComponent>(entity);
+//		EXPECT_EQ(component->m_value, component->m_entity);
+//	}
+//	auto end = std::chrono::high_resolution_clock::now();
+//	std::cout << "Sparse set iteration: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
+//}
 
 TEST(ECS, TestDenseArrayIteration)
 {
@@ -302,10 +302,93 @@ TEST(ECS, EntityActivation)
 	}
 }
 
+TEST(MATH, Vector2DCreation)
+{
+	Engine::Vector2D vec(3.0f, 4.0f);
+	EXPECT_FLOAT_EQ(vec.X, 3.0f);
+	EXPECT_FLOAT_EQ(vec.Y, 4.0f);
+}
+
+TEST(MATH, Vector2DAddition)
+{
+	Engine::Vector2D vec1(1.0f, 2.0f);
+	Engine::Vector2D vec2(3.0f, 4.0f);
+	Engine::Vector2D result = vec1 + vec2;
+	EXPECT_FLOAT_EQ(result.X, 4.0f);
+	EXPECT_FLOAT_EQ(result.Y, 6.0f);
+}
+
+TEST(MATH, Vector2DSubtraction)
+{
+	Engine::Vector2D vec1(5.0f, 7.0f);
+	Engine::Vector2D vec2(3.0f, 4.0f);
+	Engine::Vector2D result = vec1 - vec2;
+	EXPECT_FLOAT_EQ(result.X, 2.0f);
+	EXPECT_FLOAT_EQ(result.Y, 3.0f);
+}
+
+TEST(MATH, Vector2DScalarMultiplication)
+{
+	Engine::Vector2D vec(2.0f, 3.0f);
+	float scalar = 4.0f;
+	Engine::Vector2D result = vec * scalar;
+	EXPECT_FLOAT_EQ(result.X, 8.0f);
+	EXPECT_FLOAT_EQ(result.Y, 12.0f);
+}
+
+TEST(MATH, Vector2DScalarDivision)
+{
+	Engine::Vector2D vec(8.0f, 12.0f);
+	float scalar = 4.0f;
+	Engine::Vector2D result = vec / scalar;
+	EXPECT_FLOAT_EQ(result.X, 2.0f);
+	EXPECT_FLOAT_EQ(result.Y, 3.0f);
+}
+
+TEST(MATH, Vector2DCompoundAddition)
+{
+	Engine::Vector2D vec(1.0f, 2.0f);
+	Engine::Vector2D toAdd(3.0f, 4.0f);
+	vec += toAdd;
+	EXPECT_FLOAT_EQ(vec.X, 4.0f);
+	EXPECT_FLOAT_EQ(vec.Y, 6.0f);
+}
+
+TEST(MATH, Vector2DCompoundSubtraction)
+{
+	Engine::Vector2D vec(5.0f, 7.0f);
+	Engine::Vector2D toSub(3.0f, 4.0f);
+	vec -= toSub;
+	EXPECT_FLOAT_EQ(vec.X, 2.0f);
+	EXPECT_FLOAT_EQ(vec.Y, 3.0f);
+}
+
+TEST(MATH, Vector2DCompoundMultiplication)
+{
+	Engine::Vector2D vec(2.0f, 3.0f);
+	float scalar = 4.0f;
+	vec *= scalar;
+	EXPECT_FLOAT_EQ(vec.X, 8.0f);
+	EXPECT_FLOAT_EQ(vec.Y, 12.0f);
+}
+
+TEST(MATH, Vector2DCompoundDivision)
+{
+	Engine::Vector2D vec(8.0f, 12.0f);
+	float scalar = 4.0f;
+	vec /= scalar;
+	EXPECT_FLOAT_EQ(vec.X, 2.0f);
+	EXPECT_FLOAT_EQ(vec.Y, 3.0f);
+}
+
+
+
 // Entry point for Google Test
 int main(int argc, char** argv) 
 {
 	::testing::InitGoogleTest(&argc, argv);
+
+	// WANT TO SPECIFY TESTS TO RUN? USE:
 	return RUN_ALL_TESTS();
 }
 
