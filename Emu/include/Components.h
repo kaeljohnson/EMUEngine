@@ -218,57 +218,20 @@ namespace Engine
 		}
 	};
 
-	struct ChainSegment
-	{
-		ChainSegment(Entity entity, Vector2D<float> startPoint, Vector2D<float> endPoint)
-			: m_entity(entity), m_startPoint(startPoint), m_endPoint(endPoint) {}
-
-		Entity m_entity;
-		Vector2D<float> m_startPoint;
-		Vector2D<float> m_endPoint;
-
-		bool operator==(const ChainSegment& other) const
-		{
-			return m_entity == other.m_entity &&
-				m_startPoint.X == other.m_startPoint.X &&
-				m_startPoint.Y == other.m_startPoint.Y &&
-				m_endPoint.X == other.m_endPoint.X &&
-				m_endPoint.Y == other.m_endPoint.Y;
-		}
-	};
-
-	struct ChainSegmentHash
-	{
-		std::size_t operator()(const ChainSegment& segment) const noexcept
-		{
-			std::size_t h1 = std::hash<size_t>{}(segment.m_entity);
-			std::size_t h2 = std::hash<float>{}(segment.m_startPoint.X);
-			std::size_t h3 = std::hash<float>{}(segment.m_startPoint.Y);
-			std::size_t h4 = std::hash<float>{}(segment.m_endPoint.X);
-			std::size_t h5 = std::hash<float>{}(segment.m_endPoint.Y);
-
-			return h1 ^ (h2 << 1) ^ (h3 << 2) ^ (h4 << 3) ^ (h5 << 4);
-		}
-	};
-
 	struct ChainCollider : public Component
 	{
-		ChainCollider(Entity entity, const bool enabled, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
-																   Vector2D<float> thirdPoint, Vector2D<float> fourthPoint, bool drawDebug, DebugColor debugColor)
-			: m_category(category), m_enabled(enabled), m_mask(mask), m_drawDebug(true), m_debugColor(debugColor), Component(entity) 
-		{
-			m_points[0] = firstPoint;
-			m_points[1] = secondPoint;
-			m_points[2] = thirdPoint;
-			m_points[3] = fourthPoint;
+		ChainCollider(Entity entity, Chain refPoints, 
+			const bool enabled, Filter category, Filter mask, bool drawDebug, DebugColor debugColor)
+			: m_chain(refPoints), m_category(category), m_enabled(enabled), m_mask(mask), m_drawDebug(true), m_debugColor(debugColor),
+			Component(entity)
 
+		{
 
 		}
 		~ChainCollider() = default;
 
-		Vector2D<float> m_points[4];
-		std::unordered_set<ChainSegment, ChainSegmentHash> segments;
-
+		// std::vector<Edge> m_edges;
+		Chain m_chain;
 
 		b2BodyId* m_bodyId = nullptr;
 		b2ChainId* m_chainId = nullptr;
@@ -277,36 +240,14 @@ namespace Engine
 		Filter m_category;
 		Filter m_mask;
 
+		bool m_loop = false;
+		Vector2D<float> m_loopVertex;
+
 		bool m_drawDebug;
 		DebugColor m_debugColor;
 
 		bool m_enabled;
 
-	};
-
-	struct ChainColliderLeft : public ChainCollider 
-	{
-		ChainColliderLeft(Entity entity, const bool enabled, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
-			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint, bool drawDebug, DebugColor debugColor) : ChainCollider(entity, enabled, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint, drawDebug, debugColor) {}
-		~ChainColliderLeft() = default;
-	};
-	struct ChainColliderRight : public ChainCollider 
-	{
-		ChainColliderRight(Entity entity, const bool enabled, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
-			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint, bool drawDebug, DebugColor debugColor) : ChainCollider(entity, enabled, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint, drawDebug, debugColor) {}
-		~ChainColliderRight() = default;
-	};
-	struct ChainColliderTop : public ChainCollider 
-	{
-		ChainColliderTop(Entity entity, const bool enabled, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
-			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint, bool drawDebug, DebugColor debugColor) : ChainCollider(entity, enabled, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint, drawDebug, debugColor) {}
-		~ChainColliderTop() = default;
-	};
-	struct ChainColliderBottom : public ChainCollider 
-	{
-		ChainColliderBottom(Entity entity, const bool enabled, Filter category, Filter mask, Vector2D<float> firstPoint, Vector2D<float> secondPoint,
-			Vector2D<float> thirdPoint, Vector2D<float> fourthPoint, bool drawDebug, DebugColor debugColor) : ChainCollider(entity, enabled, category, mask, firstPoint, secondPoint, thirdPoint, fourthPoint, drawDebug, debugColor) {}
-		~ChainColliderBottom() = default;
 	};
 
 	struct Sprite : public Component

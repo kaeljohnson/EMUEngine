@@ -28,13 +28,9 @@ namespace Engine
 		m_ecs.RegisterComponentManager<PhysicsUpdater>();
 		m_ecs.RegisterComponentManager<CameraUpdater>();
 		m_ecs.RegisterComponentManager<PhysicsBody>();
+		m_ecs.RegisterComponentManager<ChainCollider>();
 		m_ecs.RegisterComponentManager<Transform>();
 		m_ecs.RegisterComponentManager<Camera>();
-		m_ecs.RegisterComponentManager<ChainCollider>();
-		m_ecs.RegisterComponentManager<ChainColliderTop>();
-		m_ecs.RegisterComponentManager<ChainColliderLeft>();
-		m_ecs.RegisterComponentManager<ChainColliderRight>();
-		m_ecs.RegisterComponentManager<ChainColliderBottom>();
 		m_ecs.RegisterComponentManager<Sprite>();
 		m_ecs.RegisterComponentManager<Animations>();
 		m_ecs.RegisterComponentManager<AudioSource>();

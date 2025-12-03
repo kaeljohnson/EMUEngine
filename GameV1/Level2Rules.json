@@ -74,31 +74,29 @@
                 "GenericStatic1":
                 {
                     "BodyType": "STATIC",
-                    "Category" : "ALL",
+                    "Category" : "MAP",
                     "Mask" : "ALL",
                     "Rotation": 0.0,
                     "GravityOn": false,
                     "CheckSimpleContacts": false,
-                    "UseChains": true,
                     "enabled": true,
                     "DrawDebug": "red"
                 },
                 "GenericStaticGreen1":
                 {
                     "BodyType": "STATIC",
-                    "Category" : "ALL",
+                    "Category" : "MAP",
                     "Mask" : "ALL",
                     "Rotation": 0.0,
                     "GravityOn": false,
                     "CheckSimpleContacts": false,
-                    "UseChains": true,
                     "enabled": true,
                     "DrawDebug": "green"
                 },
                 "GenericStaticDouble":
                 {
                     "BodyType": "STATIC",
-                    "Category" : "ALL",
+                    "Category" : "MAP",
                     "Mask" : "ALL",
                     "Rotation": 0.0,
                     "GravityOn": false,
@@ -140,7 +138,7 @@
                         "Width": 0.5,
                         "Height": 1.0
                     },
-                    "PixelsPerUnit": 16,
+                    "PixelsPerUnit": 8,
                     "ClampingOn": true,
                     "enabled": false
                 }

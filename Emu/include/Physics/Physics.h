@@ -89,6 +89,12 @@ namespace Engine
 		void AddLineCollidersToWorld(std::vector<Entity>& entities);
 
 		/*
+			Add chain colliders to the world.
+			arg1: vector of chain colliders
+		*/
+		void AddChainCollidersToWorld(std::vector<ChainCollider> m_chainColliders);
+
+		/*
 			Activate contact callbacks in contact system.
 		*/
 		void ActivateContactCallbacks();

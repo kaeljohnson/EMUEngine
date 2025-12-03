@@ -141,6 +141,9 @@ namespace Engine
 		PhysicsSimulation m_physicsSimulation;
 		CameraSystem m_cameraSystem;
 
+		std::vector<Chain> m_staticChains;
+		std::vector<ChainCollider> m_chainColliders;
+
 		// Need better container for tracking entities in scene at runtime.
 		std::vector<Entity> m_entities;
 	private:

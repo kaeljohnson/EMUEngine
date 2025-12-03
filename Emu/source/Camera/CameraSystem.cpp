@@ -187,7 +187,7 @@ namespace Engine
 				);
 			}
 
-			ChainColliderLeft* ptrChainColliderLeft = refECS.GetComponent<ChainColliderLeft>(refTransform.m_entity);
+			/*ChainColliderLeft* ptrChainColliderLeft = refECS.GetComponent<ChainColliderLeft>(refTransform.m_entity);
 			ChainColliderRight* ptrChainColliderRight = refECS.GetComponent<ChainColliderRight>(refTransform.m_entity);
 			ChainColliderTop* ptrChainColliderTop = refECS.GetComponent<ChainColliderTop>(refTransform.m_entity);
 			ChainColliderBottom* ptrChainColliderBottom = refECS.GetComponent<ChainColliderBottom>(refTransform.m_entity);
@@ -224,10 +224,50 @@ namespace Engine
 			if (ptrChainColliderBottom)
 			{
 				submitChainsForRendering(ptrChainColliderBottom);
-			}
+			}*/
 #endif
 		}
 
+#ifndef NDEBUG
+		auto submitEdgeForRendering = [&](auto& refEdge)
+		{
+			// Transform to screen space
+			const int edgePointAInPixelsX = static_cast<int>((refEdge.m_startPoint.X - cameraAdjustedOffset.X) * scaleX);
+			const int edgePointAInPixelsY = static_cast<int>((refEdge.m_startPoint.Y - cameraAdjustedOffset.Y) * scaleY);
+			const Vector2D<int> edgePointAInPixels(edgePointAInPixelsX, edgePointAInPixelsY);
+			const int edgePointBInPixelsX = static_cast<int>((refEdge.m_endPoint.X - cameraAdjustedOffset.X) * scaleX);
+			const int edgePointBInPixelsY = static_cast<int>((refEdge.m_endPoint.Y - cameraAdjustedOffset.Y) * scaleY);
+			const Vector2D<int> edgePointBInPixels(edgePointBInPixelsX, edgePointBInPixelsY);
+
+			debugLineBuckets[0].emplace_back(
+				-1,
+				edgePointAInPixels,
+				edgePointBInPixels,
+				DebugColor::Red
+			);
+		};
+
+		for (auto& chainCollider : refECS.GetHotComponents<ChainCollider>())
+		{
+			for (auto& edge : chainCollider.m_chain.m_originalEdges)
+			{
+				float leftMostPoint = std::min(edge.m_startPoint.X, edge.m_endPoint.X);
+				float rightMostPoint = std::max(edge.m_startPoint.X, edge.m_endPoint.X);
+				float topMostPoint = std::min(edge.m_startPoint.Y, edge.m_endPoint.Y);
+				float bottomMostPoint = std::max(edge.m_startPoint.Y, edge.m_endPoint.Y);
+				// 1. Culling
+
+				const bool isVisible =
+					rightMostPoint >= leftRenderBound && leftMostPoint <= rightRenderBound &&
+					bottomMostPoint >= topRenderBound && topMostPoint <= bottomRenderBound;
+
+				if (!isVisible)
+					continue;
+
+				submitEdgeForRendering(edge);
+			}
+		}
+#endif
 		// auto end = std::chrono::high_resolution_clock::now();
 		// std::chrono::duration<double, std::milli> elapsed = end - start;
 		// ENGINE_TRACE_D("Camera prepareForRendering took " + std::to_string(elapsed.count()) + " ms");

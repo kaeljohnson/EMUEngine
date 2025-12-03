@@ -38,7 +38,14 @@ namespace Engine
 				throw std::runtime_error("Error: Component already exists.");
             }
 
-            m_components.emplace(entity, T(std::forward<Args>(args)...)); // Move it into the map
+            try
+            {
+                m_components.emplace(entity, T(std::forward<Args>(args)...)); // Move it into the map
+            } 
+            catch (const std::exception& e)
+            {
+                std::cerr << "Failed to add component: " << std::string(e.what());
+            }
         }
 
         // Finds component by entity and destroy it.
