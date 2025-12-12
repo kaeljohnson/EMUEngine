@@ -30,7 +30,7 @@ namespace Engine
         IOEventQueue* ptrEventQ;
         std::unordered_map<IOEventType, bool>& refKeyStates;
         std::unordered_map<IOEventType, bool>& refMouseButtonStates;
-        Vector2D<int>& refMousePosition;
-        Vector2D<int>& refScrollDirection;
+        Math2D::Point2D<int>& refMousePosition;
+        Math2D::Point2D<int>& refScrollDirection;
 	};
 }

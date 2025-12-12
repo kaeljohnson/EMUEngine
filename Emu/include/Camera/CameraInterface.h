@@ -11,12 +11,12 @@ namespace Engine
 	public:
 		void SetPixelsPerUnit(Entity entity, const int pixelsPerUnit);
 		const int GetPixelsPerUnit(Entity entity);
-		void SetOffset(Entity entity, const Vector2D<float> offset);
-		const Vector2D<float> GetOffset(Entity entity);
+		void SetOffset(Entity entity, const Math2D::Point2D<float> offset);
+		const Math2D::Point2D<float> GetOffset(Entity entity);
 		void SetClampingOn(Entity entity, const bool clampingOn);
 		const bool GetClampingOn(Entity entity);
-		const Vector2D<float> GetSize(Entity entity);
-		void SetOffsets(Entity entity, const Vector2D<float> offsets);
+		const Math2D::Point2D<float> GetSize(Entity entity);
+		void SetOffsets(Entity entity, const Math2D::Point2D<float> offsets);
 
 		CameraInterface(ECS& refECS);
 		~CameraInterface() = default;

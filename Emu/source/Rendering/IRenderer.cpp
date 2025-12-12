@@ -15,12 +15,12 @@ namespace Engine
 {
 	bool Screen::WINDOW_RESIZE_REQUEST = false;
 	bool Screen::TOGGLE_FULLSCREEN_REQUEST = false;
-	Vector2D<int> Screen::VIEWPORT_SIZE = Vector2D<int>(0, 0);
-	Vector2D<int> Screen::VIEWPORT_POSITION = Vector2D<int>(0, 0);
-	Vector2D<float> Screen::SCALE = Vector2D<float>(0.0f, 0.0f);
+	Math2D::Point2D<int> Screen::VIEWPORT_SIZE = Math2D::Point2D<int>(0, 0);
+	Math2D::Point2D<int> Screen::VIEWPORT_POSITION = Math2D::Point2D<int>(0, 0);
+	Math2D::Point2D<float> Screen::SCALE = Math2D::Point2D<float>(0.0f, 0.0f);
 	float Screen::SCALE_CONSTANT = 0.0f;
-	Vector2D<int> Screen::DISPLAY_RESOLUTION = Vector2D<int>(0, 0);
-	Vector2D<int> Screen::VIRTUAL_SIZE = Vector2D<int>(0, 0);
+	Math2D::Point2D<int> Screen::DISPLAY_RESOLUTION = Math2D::Point2D<int>(0, 0);
+	Math2D::Point2D<int> Screen::VIRTUAL_SIZE = Math2D::Point2D<int>(0, 0);
 
 	IRenderer::IRenderer(ECS& refECS, AssetManager& refAssetManager) 
 		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS), m_refAssetManager(refAssetManager), m_lastDebugColor(DebugColor::Black)
@@ -293,14 +293,14 @@ namespace Engine
 
 		ENGINE_INFO_D("Scale X: {}, Scale Y: {}", scaleX, scaleY);
 
-		Screen::SCALE = Vector2D<float>(scaleX, scaleY);
+		Screen::SCALE = Math2D::Point2D<float>(scaleX, scaleY);
 
 		Screen::SCALE_CONSTANT = scaleY; // Use height as fixed scale factor since most monitors are wider than they are tall. This also allows for variable display width with no distortion.
 
 		const int viewportWidth = static_cast<int>(Screen::VIRTUAL_SIZE.X * Screen::SCALE_CONSTANT);
 		const int viewportHeight = static_cast<int>(Screen::VIRTUAL_SIZE.Y * Screen::SCALE_CONSTANT);
 
-		Screen::VIEWPORT_SIZE = Vector2D<int>(viewportWidth, viewportHeight);
+		Screen::VIEWPORT_SIZE = Math2D::Point2D<int>(viewportWidth, viewportHeight);
 
 		Screen::VIEWPORT_POSITION.X = (windowWidthInPixels - Screen::VIEWPORT_SIZE.X) / 2;
 		Screen::VIEWPORT_POSITION.Y = (windowHeightInPixels - Screen::VIEWPORT_SIZE.Y) / 2;

@@ -71,7 +71,7 @@ namespace Engine
 			arg1: name - The name of the scene for which the physics simulation is to be set.
 			arg2: gravity - The gravity vector to be applied in the physics simulation.
 		*/
-		EMU_API void Scenes_SetGravity(const std::string& name, const Vector2D<float> gravity);
+		EMU_API void Scenes_SetGravity(const std::string& name, const Math2D::Point2D<float> gravity);
 
 		/*
 			TODO: Not supported for now.
@@ -84,9 +84,9 @@ namespace Engine
 
 		/*
 			Gets the first entity with the given character in the current scene.
-			arg1: c - The character representing the entity to be retrieved.
+			arg1: tileId - The tile id.
 		*/
-		EMU_API Entity Scenes_GetCurrentRuntimeEntity(const char c);
+		EMU_API Entity Scenes_GetCurrentRuntimeEntity(const size_t tileId);
 
 		/*
 			Gets the first entity with the given character in the specified scene.
@@ -134,24 +134,24 @@ namespace Engine
 			Gets the first entity corresponding to the specified tile character from the tile map
 			of the scene with the given name.
 			arg1: name - The name of the scene from which to retrieve the entity.
-			arg2: tileChar - The character representing the tile for which to retrieve the entity.
+			arg2: tileId - The character representing the tile for which to retrieve the entity.
 		*/
-		EMU_API const Entity Scenes_GetTileMapEntity(const std::string& name, char tileChar);
+		EMU_API const Entity Scenes_GetTileMapEntity(const std::string& name, const size_t tileId);
 
 		/*
 			Gets all entities corresponding to the specified tile character from the tile map
 			of the scene with the given name.
 			arg1: name - The name of the scene from which to retrieve the entities.
-			arg2: tileChar - The character representing the tile for which to retrieve the entities.
+			arg2: tileId - The character representing the tile for which to retrieve the entities.
 		*/
-		EMU_API const std::vector<Entity>& Scenes_GetTileMapEntities(const std::string& name, const char tileChar);
+		EMU_API const std::vector<Entity>& Scenes_GetTileMapEntities(const std::string& name, const size_t tileId);
 
 		/*
 			Sets the level dimensions for a scene without a tile map.
 			arg1: name - The name of the scene for which to set the level dimensions.
 			arg2: levelWidthInUnits - The dimensions of the level in world units.
 		*/
-		EMU_API void Scenes_SetLevelDimensions(const std::string& name, const Vector2D<int> levelWidthInUnits);
+		EMU_API void Scenes_SetLevelDimensions(const std::string& name, const Math2D::Point2D<int> levelWidthInUnits);
 
 		////////////////////////////////////////////////////
 
@@ -185,14 +185,14 @@ namespace Engine
 			arg1: entity - The entity whose camera component's offset is to be set.
 			arg2: offset - The offset vector in world units.
 		*/
-		EMU_API void Camera_SetOffset(Entity entity, const Vector2D<float> offset);
+		EMU_API void Camera_SetOffset(Entity entity, const Math2D::Point2D<float> offset);
 
 		/*
 			Gets the offset for the camera component of the given entity in world units.
 			arg1: entity - The entity whose camera component's offset is to be retrieved.
 			returns: The offset vector in world units.
 		*/
-		EMU_API const Vector2D<float> Camera_GetOffset(Entity entity);
+		EMU_API const Math2D::Point2D<float> Camera_GetOffset(Entity entity);
 
 		/*
 			Enables or disables clamping for the camera component of the given entity.
@@ -212,16 +212,16 @@ namespace Engine
 		/*
 			Gets the size of camera in world units.
 			arg1: entity - The entity whose camera component's size is to be retrieved.
-			returns: The size of the camera in world units as a Vector2D<float>.
+			returns: The size of the camera in world units as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Vector2D<float> Camera_GetSize(Entity entity);
+		EMU_API const Math2D::Point2D<float> Camera_GetSize(Entity entity);
 
 		/* 
 			Sets the offsets for the camera component of the given entity in world units.
 			arg1: entity - The entity whose camera component's offsets are to be set.
 			arg2: offsets - The offsets vector in world units.
 		*/
-		EMU_API void Camera_SetOffsets(Entity entity, const Vector2D<float> offsets);
+		EMU_API void Camera_SetOffsets(Entity entity, const Math2D::Point2D<float> offsets);
 
 		/*
 			Add camera shake to the camera component of the given entity.
@@ -229,7 +229,7 @@ namespace Engine
 			arg2: intensity - The intensity of the shake effect in world units.
 			arg3: duration - The duration of the shake effect in seconds.
 		*/
-		EMU_API void Camera_AddShake(Entity entity, const Vector2D<float> intensity, const Vector2D<float> duration);
+		EMU_API void Camera_AddShake(Entity entity, const Math2D::Point2D<float> intensity, const Math2D::Point2D<float> duration);
 
 		////////////////////////////////////////////////////
 
@@ -262,21 +262,21 @@ namespace Engine
 			arg1: entity - The entity whose physics body dimensions are to be set.
 			arg2: dimensions - The dimensions to set for the physics body.
 		*/
-		EMU_API void Physics_SetDimensions(Entity entity, const Vector2D<float> dimensions);
+		EMU_API void Physics_SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions);
 
 		/*
 			Gets the dimensions for the physics body of the given entity.
 			arg1: entity - The entity whose physics body dimensions are to be retrieved.
-			returns: The dimensions of the physics body as a Vector2D<float>.
+			returns: The dimensions of the physics body as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Vector2D<float> Physics_GetDimensions(Entity entity);
+		EMU_API const Math2D::Point2D<float> Physics_GetDimensions(Entity entity);
 
 		/*
 			Gets the dimensions for the given physics body.
 			arg1: body - The PhysicsBody whose dimensions are to be retrieved.
-			returns: The dimensions of the physics body as a Vector2D<float>.
+			returns: The dimensions of the physics body as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Vector2D<float> Physics_GetDimensions(PhysicsBody& body);
+		EMU_API const Math2D::Point2D<float> Physics_GetDimensions(PhysicsBody& body);
 
 		/*
 			Enables or disables gravity for the physics body of the given entity.
@@ -290,49 +290,49 @@ namespace Engine
 			arg1: entity - The entity whose physics body starting position is to be set.
 			arg2: position - The starting position to set for the physics body.
 		*/
-		EMU_API void Physics_SetStartingPosition(Entity entity, const Vector2D<float> position);
+		EMU_API void Physics_SetStartingPosition(Entity entity, const Math2D::Point2D<float> position);
 
 		/*
 			Sets the position for the physics body of the given entity.
 			arg1: entity - The entity whose physics body position is to be set.
 			arg2: position - The position to set for the physics body.
 		*/
-		EMU_API void Physics_SetPosition(Entity entity, const Vector2D<float> position);
+		EMU_API void Physics_SetPosition(Entity entity, const Math2D::Point2D<float> position);
 
 		/*
 			Gets the position for the physics body of the given entity.
 			arg1: entity - The entity whose physics body position is to be retrieved.
-			returns: The position of the physics body as a Vector2D<float>.
+			returns: The position of the physics body as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Vector2D<float> Physics_GetPosition(Entity entity);
+		EMU_API const Math2D::Point2D<float> Physics_GetPosition(Entity entity);
 
 		/*
 			Gets the top-left position for the physics body of the given entity.
 			arg1: entity - The entity whose physics body top-left position is to be retrieved.
-			returns: The top-left position of the physics body as a Vector2D<float>.
+			returns: The top-left position of the physics body as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Vector2D<float> Physics_GetTopLeftPosition(Entity entity);
+		EMU_API const Math2D::Point2D<float> Physics_GetTopLeftPosition(Entity entity);
 
 		/*
 			Applies force to a physics body of the given entity.
 			arg1: entity - The entity whose physics body to apply force to.
 			arg2: force - The force vector to apply to the physics body.
 		*/
-		EMU_API void Physics_ApplyForceToBody(Entity entity, Vector2D<float> force);
+		EMU_API void Physics_ApplyForceToBody(Entity entity, Math2D::Point2D<float> force);
 
 		/*
 			Applies impulse to a physics body of the given entity.
 			arg1: entity - The entity whose physics body to apply impulse to.
 			arg2: impulse - The impulse vector to apply to the physics body.
 		*/
-		EMU_API void Physics_ApplyImpulseToBody(Entity entity, Vector2D<float> impulse);
+		EMU_API void Physics_ApplyImpulseToBody(Entity entity, Math2D::Point2D<float> impulse);
 
 		/*
 			Sets velocity for the physics body of the given entity.
 			arg1: entity - The entity whose physics body velocity is to be set.
 			arg2: velocity - The velocity vector to set for the physics body.
 		*/
-		EMU_API void Physics_SetVelocity(Entity entity, const Vector2D<float> velocity);
+		EMU_API void Physics_SetVelocity(Entity entity, const Math2D::Point2D<float> velocity);
 
 		/*
 			Sets the X velocity for the physics body of the given entity.
@@ -358,9 +358,9 @@ namespace Engine
 		/*
 			Gets the velocity for the physics body of the given entity.
 			arg1: entity - The entity whose physics body velocity is to be retrieved.
-			returns: The velocity of the physics body as a Vector2D<float>.
+			returns: The velocity of the physics body as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Vector2D<float> Physics_GetVelocity(Entity entity);
+		EMU_API const Math2D::Point2D<float> Physics_GetVelocity(Entity entity);
 
 		/*
 			Sets the restitution for the physics body of the given entity.
@@ -443,16 +443,16 @@ namespace Engine
 		/*
 			Gets the previous position of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's previous position is to be retrieved.
-			returns: The previous position of the transform as a Vector2D<float>.
+			returns: The previous position of the transform as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Vector2D<float> Transform_GetPrevPosition(Entity entity);
+		EMU_API const Math2D::Point2D<float> Transform_GetPrevPosition(Entity entity);
 
 		/*
 			Gets the previous position of the given transform.
 			arg1: transform - The transform whose previous position is to be retrieved.
-			returns: The previous position of the transform as a Vector2D<float>.
+			returns: The previous position of the transform as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Vector2D<float> Transform_GetPrevPosition(Transform& transform);
+		EMU_API const Math2D::Point2D<float> Transform_GetPrevPosition(Transform& transform);
 
 		/*
 			Sets the position of the transform component of the given entity.
@@ -460,28 +460,28 @@ namespace Engine
 			arg1: entity - The entity whose transform component's position is to be set.
 			arg2: position - The position to set for the transform.
 		*/
-		EMU_API void Transform_SetPosition(Entity entity, const Vector2D<float> position);
+		EMU_API void Transform_SetPosition(Entity entity, const Math2D::Point2D<float> position);
 
 		/*
 			Gets the position of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's position is to be retrieved.
-			returns: The position of the transform as a Vector2D<float>.
+			returns: The position of the transform as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Vector2D<float> Transform_GetPosition(Entity entity);
+		EMU_API const Math2D::Point2D<float> Transform_GetPosition(Entity entity);
 
 		/*
 			Sets the dimensions of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's dimensions are to be set.
 			arg2: dimensions - The dimensions to set for the transform.
 		*/
-		EMU_API void Transform_SetDimensions(Entity entity, const Vector2D<float> dimensions);
+		EMU_API void Transform_SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions);
 
 		/*
 			Gets the dimensions of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's dimensions are to be retrieved.
-			returns: The dimensions of the transform as a Vector2D<float>.
+			returns: The dimensions of the transform as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Vector2D<float> Transform_GetDimensions(Entity entity);
+		EMU_API const Math2D::Point2D<float> Transform_GetDimensions(Entity entity);
 
 		/*
 			Sets the Z index of the transform component of the given entity.
@@ -546,19 +546,19 @@ namespace Engine
 		/*
 			Gets the display resolution of the screen.
 		*/
-		EMU_API const Vector2D<int> GetScreenSize();
+		EMU_API const Math2D::Point2D<int> GetScreenSize();
 
 		/*
 			Gets the virtual size of the screen. Based on aspect ratio of render
 			output size. Virtual size height is fixed at 720 to support a reasonable
 			aspect ratio across different display resolutions.
 		*/
-		EMU_API const Vector2D<int> GetVirtualSize();
+		EMU_API const Math2D::Point2D<int> GetVirtualSize();
 
 		/*
 			Gets the scale factors for the screen.
 		*/
-		EMU_API const Vector2D<float> GetScale();
+		EMU_API const Math2D::Point2D<float> GetScale();
 
 		/*
 			Gets the scale constant for the screen.
@@ -568,18 +568,18 @@ namespace Engine
 		/*
 			Gets the current viewport size.
 		*/
-		EMU_API const Vector2D<int> GetViewportSize();
+		EMU_API const Math2D::Point2D<int> GetViewportSize();
 
 		/*
 			Gets the current viewport position.
 		*/
-		EMU_API const Vector2D<int> GetViewportPosition();
+		EMU_API const Math2D::Point2D<int> GetViewportPosition();
 
 		/*
 			Sets the window size to the specified size.
-			arg1: size - The desired window size as a Vector2D<int>.
+			arg1: size - The desired window size as a Math2D::Point2D<int>.
 		*/
-		EMU_API void SetWindowSize(const Vector2D<int>& size);
+		EMU_API void SetWindowSize(const Math2D::Point2D<int>& size);
 
 		/*
 			Sets the window to fullscreen mode.
@@ -608,9 +608,9 @@ namespace Engine
 			the specified character for all scenes.
 		*/
 		template <typename T, typename... Args>
-		void Scenes_AddComponent(const std::string sceneName, const char c, Args&&... componentArgs)
+		void Scenes_AddComponent(const std::string sceneName, const size_t tileId, Args&&... componentArgs)
 		{
-			m_sceneManager.AddComponent<T>(sceneName, c, std::forward<Args>(componentArgs)...);
+			m_sceneManager.AddComponent<T>(sceneName, tileId, std::forward<Args>(componentArgs)...);
 		}
 
 		////////////////////////////////////////////////////

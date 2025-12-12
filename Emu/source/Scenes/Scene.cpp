@@ -65,7 +65,7 @@ namespace Engine
 		loadSceneEntitiesFromTileMap();
 
 		// 5. Frame the cameras
-		m_cameraSystem.Frame(Vector2D<int>(m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y));
+		m_cameraSystem.Frame(Math2D::Point2D<int>(m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y));
 		
 		// 6. Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld(m_entities);
@@ -119,7 +119,7 @@ namespace Engine
 
 		m_tileMap.CreateMap(mapFileName);
 
-		m_levelDimensionsInUnits = Vector2D<int>(m_tileMap.GetWidth(), m_tileMap.GetHeight());
+		m_levelDimensionsInUnits = Math2D::Point2D<int>(m_tileMap.GetWidth(), m_tileMap.GetHeight());
 
 		ENGINE_CRITICAL_D("Map width: {}, Map height: {}", m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y);
 
@@ -187,7 +187,7 @@ namespace Engine
 	//	m_refECS.Deactivate(entity);
 	//}
 
-	void Scene::SetLevelDimensions(const Vector2D<int> levelDimensions)
+	void Scene::SetLevelDimensions(const Math2D::Point2D<int> levelDimensions)
 	{
 		if (m_hasTileMap)
 		{
@@ -208,16 +208,16 @@ namespace Engine
 		m_cameraSystem.Update(refAssetManager);
 	}
 
-	void Scene::SetGravity(const Vector2D<float> gravity)
+	void Scene::SetGravity(const Math2D::Point2D<float> gravity)
 	{
 		ENGINE_INFO_D("Setting gravity: {}, {}", gravity.X, gravity.Y);
 
 		m_physicsSimulation.UpdateGravity(gravity);
 	}
 
-	const Entity Scene::GetTileMapEntity(char tileChar) const
+	const Entity Scene::GetTileMapEntity(size_t tileId) const
 	{
-		return m_tileMap.GetEntity(tileChar);
+		return m_tileMap.GetEntity(tileId);
 	}
 
 	// This function should only be called if the json should be guaranteed to exist.
@@ -292,7 +292,7 @@ namespace Engine
 	}
 
 	template<typename T>
-	static Vector2D<T> ExtractVector2DFromJSON(const json& j, const std::string& key, Vector2D<T> ioVec)
+	static Math2D::Point2D<T> ExtractPoint2DFromJSON(const json& j, const std::string& key, Math2D::Point2D<T> ioVec)
 	{
 		if (!j.contains(key)) throw std::runtime_error("Invalid Rules File. Field Not Found: " + key);
 
@@ -337,8 +337,8 @@ namespace Engine
 	{
 		const json* entityTransformTemplate = getJson(transformTemplates, templateKey);
 		size_t zIndex = ExtractSizeTFromJSON(*entityTransformTemplate, "ZIndex", 0);
-		const Vector2D<float> sizeInUnits = 
-			ExtractVector2DFromJSON<float>(*entityTransformTemplate, "SizeInUnits", Vector2D<float>(1.0f, 1.0f));
+		const Math2D::Point2D<float> sizeInUnits = 
+			ExtractPoint2DFromJSON<float>(*entityTransformTemplate, "SizeInUnits", Math2D::Point2D<float>(1.0f, 1.0f));
 
 		bool drawDebug = entityTransformTemplate->contains("DrawDebug");
 		std::string debugColor = entityTransformTemplate->value("DrawDebug", "red");
@@ -364,8 +364,8 @@ namespace Engine
 
 		refECS.AddComponent<Transform>(
 			entity,
-			Vector2D<float>(x * (float)numUnitsPerTile, y * (float)numUnitsPerTile),
-			Vector2D<float>(sizeInUnits.X * (float)numUnitsPerTile, sizeInUnits.Y * (float)numUnitsPerTile),
+			Math2D::Point2D<float>(x * (float)numUnitsPerTile, y * (float)numUnitsPerTile),
+			Math2D::Point2D<float>(sizeInUnits.X * (float)numUnitsPerTile, sizeInUnits.Y * (float)numUnitsPerTile),
 			1.0f, 1.0f, 1, zIndex, drawDebug, debugColorEnum
 		);
 	}
@@ -374,13 +374,13 @@ namespace Engine
 	{
 		const json* entityCameraTemplate = getJson(cameraTemplate, cameraTemplateKey);
 
-		Vector2D<float> size = { 0.0f, 0.0f }; // size determined by engine 
+		Math2D::Point2D<float> size = { 0.0f, 0.0f }; // size determined by engine 
 		size_t pixelsPerUnit = ExtractSizeTFromJSON(*entityCameraTemplate, "PixelsPerUnit", 0);
 
 		bool clampingOn = entityCameraTemplate->contains("ClampingOn") ? getJson(*entityCameraTemplate, "ClampingOn")->get<bool>() : false;
 
-		Vector2D<float> screenRatio = { 1.0f, 1.0f };
-		Vector2D<float> position = { 0.0f, 0.0f };
+		Math2D::Point2D<float> screenRatio = { 1.0f, 1.0f };
+		Math2D::Point2D<float> position = { 0.0f, 0.0f };
 
 		if (const json* windowJson = getJson(*entityCameraTemplate, "Window"))
 		{
@@ -393,13 +393,13 @@ namespace Engine
 		refECS.AddComponent<Camera>(entity, size, screenRatio, position, pixelsPerUnit, clampingOn, numLayers);
 	}
 
-	static void createEdge(TileMap& refTileMap, std::unordered_set<char>& isMap, int x, int y, char tileChar, Entity tileEntity, std::vector<Edge>& refEdges)
+	static void createEdge(TileMap& refTileMap, std::unordered_set<size_t>& isMap, int x, int y, Entity tileEntity, std::vector<Math2D::Edge>& refEdges)
 	{
 		
 		auto isTileSolid = [&](int x, int y) -> bool
 				{
 					const auto* tile = refTileMap.GetTile(x, y);
-					
+
 					return tile && isMap.find(tile->second) != isMap.end();
 				};
 		
@@ -408,59 +408,111 @@ namespace Engine
 		bool hasTileBelow = y < refTileMap.GetHeight() - 1 && isTileSolid(x, y + 1);
 		bool hasTileRight = x < refTileMap.GetWidth() - 1 && isTileSolid(x + 1, y);
 
-		//ENGINE_CRITICAL_D("x, y = {},{}", x, y);
-		////adjacent tiles must include if a tile size is larger than 1x1 units.
-		//bool hasTileAbove  = y > 0 && isTileSolid(x, y - 1);
-		//ENGINE_CRITICAL_D("BLERF");
-		//bool hasTileBelow = y < refTileMap.GetHeight() - 1 && isTileSolid(x, y + 1);
-		//bool hasTileLeft = x > 0 && refTileMap.GetTile(x - 1, y) && isTileSolid(x - 1, y);
-		//bool hasTileRight = x < refTileMap.GetWidth() - 1 && isTileSolid(x + 1, y);
+		bool hasTileDiagonalLeftAbove = x > 0 && y > 0 && isTileSolid(x - 1, y - 1);
+		bool hasTileDiagonalLeftBelow = x > 0 && y < refTileMap.GetHeight() - 1 && isTileSolid(x - 1, y + 1);
+		bool hasTileDiagonalRightAbove = x < refTileMap.GetWidth() - 1 && y > 0 && isTileSolid(x + 1, y - 1);
+		bool hasTileDiagonalRightBelow = x < refTileMap.GetWidth() - 1 && y < refTileMap.GetHeight() - 1 && isTileSolid(x + 1, y + 1);
 
-		//bool hasTileDiagonalLeftAbove = x > 0 && y > 0 && isTileSolid(x - 1, y - 1);
-		//bool hasTileDiagonalLeftBelow = x > 0 && y < refTileMap.GetHeight() - 1 && isTileSolid(x - 1, y + 1);
-		//bool hasTileDiagonalRightAbove = x < refTileMap.GetWidth() - 1 && y > 0 && isTileSolid(x + 1, y - 1);
-		//bool hasTileDiagonalRightBelow = x < refTileMap.GetWidth() - 1 && y < refTileMap.GetHeight() - 1 && isTileSolid(x + 1, y + 1);
-
-		ENGINE_CRITICAL_D("Processing edges for tile at {},{}. hasTileAbove {}, y > 0: {}, isTileSolid(x, y - 1): {}", x, y, hasTileAbove, y > 0, isTileSolid(x, y - 1));
-
+		//adjacent tiles must include if a tile size is larger than 1x1 units.
+			
 		if (!hasTileAbove)
 		{
-			ENGINE_CRITICAL_D("Creating top edge for tile at [({},{}), ({},{})]", x, y, x + 1.0f, y);
 			// TODO: Need to organize by catergory and mask.
-			refEdges.emplace_back(tileEntity, Vector2D<float>(x, y), Vector2D<float>(x + 1.0f, y));
+
+			float ghostX0, ghostY0;
+			float x1 = (float)x;
+			float y1 = (float)y;
+			float x2 = x + 1.0f;
+			float y2 = (float)y;
+			float ghostX3, ghostY3;
+
+			if (!hasTileRight) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y + 1.0f; }
+			else if (hasTileRight && hasTileDiagonalRightAbove) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y - 1.0f; }
+			else if (hasTileRight) { ghostX3 = (float)x + 2.0f; ghostY3 = (float)y; }
+
+			if (!hasTileLeft) { ghostX0 = (float)x; ghostY0 = (float)y + 1.0f; }
+			else if (hasTileLeft && hasTileDiagonalLeftAbove) { ghostX0 = (float)x; ghostY0 = (float)y - 1.0f; }
+			else if (hasTileLeft) { ghostX0 = (float)x - 1.0f; ghostY0 = (float)y; }		
+
+			refEdges.emplace_back(Math2D::Point2D<float>(ghostX0, ghostY0), Math2D::Point2D<float>(x1, y1), Math2D::Point2D<float>(x2, y2), Math2D::Point2D<float>(ghostX3, ghostY3));
 		}
 
 		if (!hasTileLeft)
 		{
-			ENGINE_CRITICAL_D("Creating left edge for tile at [({},{}), ({},{})]", x, y + 1.0f, x, y);
 			// TODO: Need to organize by catergory and mask.
-			refEdges.emplace_back(tileEntity, Vector2D<float>(x, y + 1.0f), Vector2D<float>(x, y));
+
+			float ghostX0, ghostY0;
+			float x1 = (float)x;
+			float y1 = y + 1.0f;
+			float x2 = (float)x;
+			float y2 = (float)y;
+			float ghostX3, ghostY3;
+
+			if (!hasTileAbove) { ghostX3 = x + 1.0f; ghostY3 = (float)y; }
+			else if (hasTileAbove && hasTileDiagonalLeftAbove) { ghostX3 = (float)x - 1.0f; ghostY3 = (float)y; }
+			else if (hasTileAbove) { ghostX3 = (float)x; ghostY3 = (float)y - 1.0f; }
+
+			if (!hasTileBelow) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y + 1.0f; }
+			else if (hasTileBelow && hasTileDiagonalLeftBelow) { ghostX0 = (float)x - 1.0f; ghostY0 = (float)y + 1.0f; }
+			else if (hasTileBelow) { ghostX0 = (float)x; ghostY0 = (float)y + 2.0f; }
+
+			refEdges.emplace_back(Math2D::Point2D<float>(ghostX0, ghostY0), Math2D::Point2D<float>(x1, y1), Math2D::Point2D<float>(x2, y2), Math2D::Point2D<float>(ghostX3, ghostY3));
 		}
 
 		if (!hasTileBelow)
 		{
-			ENGINE_CRITICAL_D("Creating bottom edge for tile at [({},{}), ({},{})]", x + 1.0f, y + 1.0f, x, y + 1.0f);
 			// TODO: Need to organize by catergory and mask.
-			refEdges.emplace_back(tileEntity, Vector2D<float>(x + 1.0f, y + 1.0f), Vector2D<float>(x, y + 1.0f));
+
+			float ghostX0, ghostY0;
+			float x1 = x + 1.0f;
+			float y1 = y + 1.0f;
+			float x2 = (float)x;
+			float y2 = y + 1.0f;
+			float ghostX3, ghostY3;
+
+			if (!hasTileLeft) { ghostX3 = (float)x; ghostY3 = (float)y; }
+			else if (hasTileLeft && hasTileDiagonalLeftBelow) { ghostX3 = (float)x; ghostY3 = (float)y + 2.0f; }
+			else if (hasTileLeft) { ghostX3 = (float)x - 1.0f; ghostY3 = (float)y + 1.0f; }
+
+			if (!hasTileRight) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y; }
+			else if (hasTileRight && hasTileDiagonalRightBelow) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y + 2.0f; }
+			else if (hasTileRight) { ghostX0 = (float)x + 2.0f; ghostY0 = (float)y + 1.0f; }
+
+			refEdges.emplace_back(Math2D::Point2D<float>(ghostX0, ghostY0), Math2D::Point2D<float>(x1, y1), Math2D::Point2D<float>(x2, y2), Math2D::Point2D<float>(ghostX3, ghostY3));
 		}
 
 		if (!hasTileRight)
 		{
-			ENGINE_CRITICAL_D("Creating right edge for tile at [({},{}), ({},{})]", x + 1.0f, y, x + 1.0f, y + 1.0f);
 			// TODO: Need to organize by catergory and mask.
-			refEdges.emplace_back(tileEntity, Vector2D<float>(x + 1.0f, y), Vector2D<float>(x + 1.0f, y + 1.0f));
+
+			float ghostX0, ghostY0;
+			float x1 = x + 1.0f;
+			float y1 = (float)y;
+			float x2 = x + 1.0f;
+			float y2 = y + 1.0f;
+			float ghostX3, ghostY3;
+
+			if (!hasTileAbove) { ghostX0 = (float)x; ghostY0 = (float)y; }
+			else if (hasTileAbove && hasTileDiagonalRightAbove) { ghostX0 = (float)x + 2.0f; ghostY0 = (float)y; }
+			else if (hasTileAbove) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y - 1.0f; }
+
+			if (!hasTileBelow) { ghostX3 = (float)x; ghostY3 = (float)y + 1.0f; }
+			else if (hasTileBelow && hasTileDiagonalRightBelow) { ghostX3 = (float)x + 2.0f; ghostY3 = (float)y + 1.0f; }
+			else if (hasTileBelow) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y + 2.0f; }
+
+			refEdges.emplace_back(Math2D::Point2D<float>(ghostX0, ghostY0), Math2D::Point2D<float>(x1, y1), Math2D::Point2D<float>(x2, y2), Math2D::Point2D<float>(ghostX3, ghostY3));
 		}
 	}
 
-	static void addPhysicsComponent(ECS& refECS, TileMap& refTileMap, Entity tileEntity, const char tileChar, const json& physicsComponentTemplate,
+	static void addPhysicsComponent(ECS& refECS, TileMap& refTileMap, Entity tileEntity, const size_t tileId, const json& physicsComponentTemplate,
 		const std::string& physicsTemplateKey, const json& transformsComponentTemplate, const std::string& transformTemplateKey,
-		int x, int y, size_t numUnitsPerTile, std::unordered_set<char>& isMap, std::vector<Edge>& edges)
+		int x, int y, size_t numUnitsPerTile, std::unordered_set<size_t>& isMap, std::vector<Math2D::Edge>& edges)
 	{
 		// Add Physics components.
 		BodyType bodyType = STATIC;
 		Filter category = ALL;
 		Filter mask = ALL;
-		Vector2D<float> size = Vector2D<float>(static_cast<float>(numUnitsPerTile), static_cast<float>(numUnitsPerTile));
+		Math2D::Point2D<float> size = Math2D::Point2D<float>(static_cast<float>(numUnitsPerTile), static_cast<float>(numUnitsPerTile));
 		bool gravityOn = false;
 		bool checkSimpleContacts = false;
 		bool useChains = false;
@@ -575,131 +627,20 @@ namespace Engine
 
 			if (useChains && category == MAP) // only add to map chain if part of map category for now.
 			{
-				ENGINE_CRITICAL_D("Creating edges for tile at {},{}", x, y);
-				createEdge(refTileMap, isMap, x, y, tileChar, tileEntity, edges);
-
-				//adjacent tiles must include if a tile size is larger than 1x1 units.
-			//	bool hasTileAbove = y > 0 && isTileSolid(x, y - 1);
-			//	bool hasTileBelow = y < refTileMap.GetHeight() - 1 && isTileSolid(x, y + 1);
-			//	bool hasTileLeft = x > 0 && refTileMap.GetTile(x - 1, y) && isTileSolid(x - 1, y);
-			//	bool hasTileRight = x < refTileMap.GetWidth() - 1 && isTileSolid(x + 1, y);
-
-			//	bool hasTileDiagonalLeftAbove = x > 0 && y > 0 && isTileSolid(x - 1, y - 1);
-			//	bool hasTileDiagonalLeftBelow = x > 0 && y < refTileMap.GetHeight() - 1 && isTileSolid(x - 1, y + 1);
-			//	bool hasTileDiagonalRightAbove = x < refTileMap.GetWidth() - 1 && y > 0 && isTileSolid(x + 1, y - 1);
-			//	bool hasTileDiagonalRightBelow = x < refTileMap.GetWidth() - 1 && y < refTileMap.GetHeight() - 1 && isTileSolid(x + 1, y + 1);
-
-			//	if (!hasTileAbove)
-			//	{
-			//		// TODO: Need to organize by catergory and mask.
-			//		refChainSegments.emplace_back(tileEntity, Vector2D<float>(x, y), Vector2D<float>(x + 1.0f, y));
-
-			//		/*float ghostX0, ghostY0;
-			//		float x1 = (float)x;
-			//		float y1 = (float)y;
-			//		float x2 = x + 1.0f;
-			//		float y2 = (float)y;
-			//		float ghostX3, ghostY3;
-
-			//		if (!hasTileRight) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y + 1.0f; }
-			//		else if (hasTileRight && hasTileDiagonalRightAbove) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y - 1.0f; }
-			//		else if (hasTileRight) { ghostX3 = (float)x + 2.0f; ghostY3 = (float)y; }
-
-			//		if (!hasTileLeft) { ghostX0 = (float)x; ghostY0 = (float)y + 1.0f; }
-			//		else if (hasTileLeft && hasTileDiagonalLeftAbove) { ghostX0 = (float)x; ghostY0 = (float)y - 1.0f; }
-			//		else if (hasTileLeft) { ghostX0 = (float)x - 1.0f; ghostY0 = (float)y; }
-
-			//		
-
-
-			//		refECS.AddComponent<ChainColliderTop>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
-			//			Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3), drawDebug, debugColor);*/
-			//	}
-
-			//	if (!hasTileLeft)
-			//	{
-			//		// TODO: Need to organize by catergory and mask.
-			//		refChainSegments.emplace_back(tileEntity, Vector2D<float>(x, y), Vector2D<float>(x, y + 1.0f));
-
-			//		/*float ghostX0, ghostY0;
-			//		float x1 = (float)x;
-			//		float y1 = y + 1.0f;
-			//		float x2 = (float)x;
-			//		float y2 = (float)y;
-			//		float ghostX3, ghostY3;
-
-			//		if (!hasTileAbove) { ghostX3 = x + 1.0f; ghostY3 = (float)y; }
-			//		else if (hasTileAbove && hasTileDiagonalLeftAbove) { ghostX3 = (float)x - 1.0f; ghostY3 = (float)y; }
-			//		else if (hasTileAbove) { ghostX3 = (float)x; ghostY3 = (float)y - 1.0f; }
-
-			//		if (!hasTileBelow) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y + 1.0f; }
-			//		else if (hasTileBelow && hasTileDiagonalLeftBelow) { ghostX0 = (float)x - 1.0f; ghostY0 = (float)y + 1.0f; }
-			//		else if (hasTileBelow) { ghostX0 = (float)x; ghostY0 = (float)y + 2.0f; }
-
-			//		refECS.AddComponent<ChainColliderLeft>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
-			//			Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3), drawDebug, debugColor);*/
-			//	}
-
-			//	if (!hasTileBelow)
-			//	{
-			//		// TODO: Need to organize by catergory and mask.
-			//		refChainSegments.emplace_back(tileEntity, Vector2D<float>(x, y + 1.0f), Vector2D<float>(x + 1.0f, y + 1.0f));
-
-			//		/*float ghostX0, ghostY0;
-			//		float x1 = x + 1.0f;
-			//		float y1 = y + 1.0f;
-			//		float x2 = (float)x;
-			//		float y2 = y + 1.0f;
-			//		float ghostX3, ghostY3;
-
-			//		if (!hasTileLeft) { ghostX3 = (float)x; ghostY3 = (float)y; }
-			//		else if (hasTileLeft && hasTileDiagonalLeftBelow) { ghostX3 = (float)x; ghostY3 = (float)y + 2.0f; }
-			//		else if (hasTileLeft) { ghostX3 = (float)x - 1.0f; ghostY3 = (float)y + 1.0f; }
-
-			//		if (!hasTileRight) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y; }
-			//		else if (hasTileRight && hasTileDiagonalRightBelow) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y + 2.0f; }
-			//		else if (hasTileRight) { ghostX0 = (float)x + 2.0f; ghostY0 = (float)y + 1.0f; }
-
-			//		refECS.AddComponent<ChainColliderBottom>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
-			//			Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3), drawDebug, debugColor);*/
-			//	}
-
-			//	if (!hasTileRight)
-			//	{
-			//		// TODO: Need to organize by catergory and mask.
-			//		refChainSegments.emplace_back(tileEntity, Vector2D<float>(x + 1.0f, y), Vector2D<float>(x + 1.0f, y + 1.0f));
-
-			//		/*float ghostX0, ghostY0;
-			//		float x1 = x + 1.0f;
-			//		float y1 = (float)y;
-			//		float x2 = x + 1.0f;
-			//		float y2 = y + 1.0f;
-			//		float ghostX3, ghostY3;
-
-			//		if (!hasTileAbove) { ghostX0 = (float)x; ghostY0 = (float)y; }
-			//		else if (hasTileAbove && hasTileDiagonalRightAbove) { ghostX0 = (float)x + 2.0f; ghostY0 = (float)y; }
-			//		else if (hasTileAbove) { ghostX0 = (float)x + 1.0f; ghostY0 = (float)y - 1.0f; }
-
-			//		if (!hasTileBelow) { ghostX3 = (float)x; ghostY3 = (float)y + 1.0f; }
-			//		else if (hasTileBelow && hasTileDiagonalRightBelow) { ghostX3 = (float)x + 2.0f; ghostY3 = (float)y + 1.0f; }
-			//		else if (hasTileBelow) { ghostX3 = (float)x + 1.0f; ghostY3 = (float)y + 2.0f; }
-
-			//		refECS.AddComponent<ChainColliderRight>(tileEntity, enabled, category, mask, Vector2D<float>(ghostX0, ghostY0), Vector2D<float>(x1, y1),
-			//			Vector2D<float>(x2, y2), Vector2D<float>(ghostX3, ghostY3), drawDebug, debugColor);*/
-			//	}
+				createEdge(refTileMap, isMap, x, y, tileEntity, edges);
 			}
 			else // Create a regular physics body for the tiles that don't use chains.
 			{
 				refECS.AddComponent<PhysicsBody>(tileEntity, enabled, bodyType, category, mask,
-					Vector2D<float>(size.X, size.Y),
-					Vector2D<float>(static_cast<float>(x) * static_cast<float>(numUnitsPerTile), static_cast<float>(y) * static_cast<float>(numUnitsPerTile)),
+					Math2D::Point2D<float>(size.X, size.Y),
+					Math2D::Point2D<float>(static_cast<float>(x) * static_cast<float>(numUnitsPerTile), static_cast<float>(y) * static_cast<float>(numUnitsPerTile)),
 					0.0f, gravityOn, checkSimpleContacts, drawDebug, fillRect, debugColor);
 			}
 		}
 	}
 
 	static void addSpriteComponent(ECS& refECS, AssetManager& refAssetManager, Entity entity, 
-		const char tileChar, const json& spriteSheetsTemplate, const std::string& spriteSheetKey, const json& spriteSettings)
+		const json& spriteSheetsTemplate, const std::string& spriteSheetKey, const json& spriteSettings)
 	{
 		std::string path = getJson(spriteSettings, "PathToSpriteSheets")->get<std::string>();
 
@@ -729,10 +670,10 @@ namespace Engine
 
 		void* ptrLoadedTexture = refAssetManager.LoadTexture(entity, path + spriteSheetName);
 
-		Vector2D<float> sizeInUnits = ExtractVector2DFromJSON<float>(*entitySpriteSheetJson, "SizeInUnits", { 1.0f, 1.0f });
-		Vector2D<int> pixelsPerFrame = ExtractVector2DFromJSON<int>(*entitySpriteSheetJson, "PixelsPerFrame", { 32, 32 });
-		Vector2D<float> offsetFromTransform = ExtractVector2DFromJSON<float>(*entitySpriteSheetJson, "OffsetFromTransform", { 0.0f, 0.0f });
-		Vector2D<size_t> dimensions = { entitySpriteSheetJson->value("Width", (size_t)1), entitySpriteSheetJson->value("Height", (size_t)1) };
+		Math2D::Point2D<float> sizeInUnits = ExtractPoint2DFromJSON<float>(*entitySpriteSheetJson, "SizeInUnits", { 1.0f, 1.0f });
+		Math2D::Point2D<int> pixelsPerFrame = ExtractPoint2DFromJSON<int>(*entitySpriteSheetJson, "PixelsPerFrame", { 32, 32 });
+		Math2D::Point2D<float> offsetFromTransform = ExtractPoint2DFromJSON<float>(*entitySpriteSheetJson, "OffsetFromTransform", { 0.0f, 0.0f });
+		Math2D::Point2D<size_t> dimensions = { entitySpriteSheetJson->value("Width", (size_t)1), entitySpriteSheetJson->value("Height", (size_t)1) };
  
 		DebugColor debugColorEnum = DebugColor::NoColor;
 		bool drawDebug = false;
@@ -763,7 +704,7 @@ namespace Engine
 			dimensions, sizeInUnits, drawDebug, debugColorEnum);
 	}
 
-	static void addAnimationsComponent(ECS& refECS, AssetManager& refAssetManager, Entity entity, const char tileChar, const json& animationsTemplate,
+	static void addAnimationsComponent(ECS& refECS, AssetManager& refAssetManager, Entity entity, const json& animationsTemplate,
 		const std::string& animationTemplateKey)
 	{
 		const json* entityAnimationsTemplate = getJson(animationsTemplate, animationTemplateKey);
@@ -832,14 +773,28 @@ namespace Engine
 		}
 	}
 
-	static std::unordered_set<char> determineMapTiles(const json& characterRules, const json& componentTemplates)
+	static std::unordered_set<size_t> determineMapTiles(const json& characterRules, const json& componentTemplates)
 	{
-		// Predetermine the solid tiles based on their physics body type to assist with chain creation.
-		// Otherwise, when processing each tile we need to get the physics body type of all adjacent tiles.
-		std::unordered_set<char> isMap;
+		std::unordered_set<size_t> isMap;
 
-		for (auto& [key, value] : characterRules.items())
+		for (const auto& item : characterRules.items())
 		{
+			const std::string key = item.key();
+			const json& value = item.value();
+
+			// Convert key -> size_t
+			size_t tileId = 0;
+			try
+			{
+				// nlohmann::json stores object keys as strings, convert safely
+				tileId = static_cast<size_t>(std::stoull(key));
+			}
+			catch (const std::exception& e)
+			{
+				continue;
+			}
+
+			// Look for Physics -> template -> Category == "MAP"
 			if (const json* characterPhysicsJson = getJson(value, "Physics"))
 			{
 				std::string physicsTemplateKey = characterPhysicsJson->get<std::string>();
@@ -852,7 +807,7 @@ namespace Engine
 							std::string categoryString = categoryJson->get<std::string>();
 							if (categoryString == "MAP")
 							{
-								isMap.emplace(key[0]);
+								isMap.emplace(tileId);
 							}
 						}
 					}
@@ -863,107 +818,13 @@ namespace Engine
 		return isMap;
 	}
 
-	static std::unordered_set<char> determineSolidTiles(const json& characterRules, const json& componentTemplates)
+
+	static std::vector<ChainCollider> createChainColliders(std::vector<Math2D::Chain>& refChains, ECS& refECS)
 	{
-		// Predetermine the solid tiles based on their physics body type to assist with chain creation.
-		// Otherwise, when processing each tile we need to get the physics body type of all adjacent tiles.
-		std::unordered_set<char> isSolid;
-
-		for (auto& [key, value] : characterRules.items())
-		{
-			if (const json* characterPhysicsJson = getJson(value, "Physics"))
-			{
-				std::string physicsTemplateKey = characterPhysicsJson->get<std::string>();
-				if (const json* physicsTemplates = getJson(componentTemplates, "Physics"))
-				{
-					if (const json* entityPhysicsTemplate = getJson(*physicsTemplates, physicsTemplateKey))
-					{
-						if (const json* bodyTypeJson = getJson(*entityPhysicsTemplate, "BodyType"))
-						{
-							std::string bodyTypeStr = bodyTypeJson->get<std::string>();
-							if (bodyTypeStr == "STATIC")
-							{
-								isSolid.emplace(key[0]);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return isSolid;
-	}
-	
-	//static std::vector<Edge> createEdges(TileMap& refTileMap, std::unordered_set<char>& isSolid)
-	//{
-
-	//	std::vector<Edge> edges;
-
-	//	for (auto& [coords, info] : refTileMap.GetMap())
-	//	{
-	//		const char tileChar = info.second;
-	//		const int x = coords.first;
-	//		const int y = coords.second;
-	//		Entity tileEntity = info.first;
-
-	//		auto isTileSolid = [&](int x, int y) -> bool
-	//			{
-	//				const auto* tile = refTileMap.GetTile(x, y);
-	//				if (!tile) return false;
-
-	//				return isSolid.find(tile->second) != isSolid.end();
-	//			};
-
-	//		//adjacent tiles must include if a tile size is larger than 1x1 units.
-	//		bool hasTileAbove = y > 0 && isTileSolid(x, y - 1);
-	//		bool hasTileBelow = y < refTileMap.GetHeight() - 1 && isTileSolid(x, y + 1);
-	//		bool hasTileLeft = x > 0 && refTileMap.GetTile(x - 1, y) && isTileSolid(x - 1, y);
-	//		bool hasTileRight = x < refTileMap.GetWidth() - 1 && isTileSolid(x + 1, y);
-
-	//		bool hasTileDiagonalLeftAbove = x > 0 && y > 0 && isTileSolid(x - 1, y - 1);
-	//		bool hasTileDiagonalLeftBelow = x > 0 && y < refTileMap.GetHeight() - 1 && isTileSolid(x - 1, y + 1);
-	//		bool hasTileDiagonalRightAbove = x < refTileMap.GetWidth() - 1 && y > 0 && isTileSolid(x + 1, y - 1);
-	//		bool hasTileDiagonalRightBelow = x < refTileMap.GetWidth() - 1 && y < refTileMap.GetHeight() - 1 && isTileSolid(x + 1, y + 1);
-
-	//		if (!hasTileAbove)
-	//		{
-	//			// TODO: Need to organize by catergory and mask.
-	//			edges.emplace_back(tileEntity, Vector2D<float>(x, y), Vector2D<float>(x + 1.0f, y));
-	//		}
-
-	//		if (!hasTileLeft)
-	//		{
-	//			// TODO: Need to organize by catergory and mask.
-	//			edges.emplace_back(tileEntity, Vector2D<float>(x, y), Vector2D<float>(x, y + 1.0f));
-	//		}
-
-	//		if (!hasTileBelow)
-	//		{
-	//			// TODO: Need to organize by catergory and mask.
-	//			edges.emplace_back(tileEntity, Vector2D<float>(x, y + 1.0f), Vector2D<float>(x + 1.0f, y + 1.0f));
-
-	//		}
-
-	//		if (!hasTileRight)
-	//		{
-	//			// TODO: Need to organize by catergory and mask.
-	//			edges.emplace_back(tileEntity, Vector2D<float>(x + 1.0f, y), Vector2D<float>(x + 1.0f, y + 1.0f));
-
-	//		}
-	//	}
-
-	//	return edges;
-	//}
-
-	static std::vector<ChainCollider> createChainColliders(std::vector<Chain>& refChains, ECS& refECS)
-	{
-		// Temp.
-
 		std::vector<ChainCollider> chainColliders;
 
 		for (auto& refChain : refChains)
 		{
-
 			Entity chainEntity = refECS.CreateEntity();
 			chainColliders.emplace_back(chainEntity, refChain,
 				true, MAP, ALL, true, DebugColor::Red);
@@ -994,7 +855,7 @@ namespace Engine
 			const json* physicsRules = getJson(*worldRules, "Physics");
 			if (!physicsRules) throw std::runtime_error("No physics rules found for world in scene: " + sceneName);
 
-			SetGravity(ExtractVector2DFromJSON<float>(*physicsRules, "Gravity", { 0.0f, 0.0f }));
+			SetGravity(ExtractPoint2DFromJSON<float>(*physicsRules, "Gravity", { 0.0f, 0.0f }));
 			numUnitsPerTile = ExtractSizeTFromJSON(*physicsRules, "NumUnitsPerTile", 1);
 		}
 
@@ -1016,17 +877,17 @@ namespace Engine
 		const json* componentTemplates = getJson(*sceneRules, "ComponentTemplates");
 		if (!componentTemplates) throw std::runtime_error("No component templates found for scene: " + sceneName);
 
-		std::unordered_set<char> isMap = determineMapTiles(*characterRules, *componentTemplates);
-		std::vector<Edge> edges;
+		std::unordered_set<size_t> isMap = determineMapTiles(*characterRules, *componentTemplates);
+		std::vector<Math2D::Edge> edges;
 
 		for (auto& [coords, info] : m_tileMap.GetMap())
 		{
-			const char tileChar = info.second;
+			const size_t tileId = info.second;
 			const int x = coords.first;
 			const int y = coords.second;
 			Entity tileEntity = info.first;
 
-			std::string tileKey(1, tileChar);
+			std::string tileKey = std::to_string(tileId);
 			if (!characterRules->contains(tileKey))
 			{
 				ENGINE_INFO_D("No such tile exists: {}", tileKey);
@@ -1062,7 +923,7 @@ namespace Engine
 				std::string transformTemplateKey = characterTransformJson->get<std::string>();
 				const json* transformTemplates = getJson(*componentTemplates, "Transforms");
 				if (physicsTemplates)
-					addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileChar, *physicsTemplates, physicsTemplateKey, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile, isMap, edges);
+					addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileId, *physicsTemplates, physicsTemplateKey, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile, isMap, edges);
 			}
 			if (const json* characterSpriteSheetJson = getJson(*characterComponents, "SpriteSheet"))
 			{
@@ -1070,21 +931,21 @@ namespace Engine
 				const json* spriteSheetTemplates = getJson(*componentTemplates, "SpriteSheets");
 
 				if (spriteSheetTemplates && assetsRules)
-					addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, tileChar, *spriteSheetTemplates, spriteSheetTemplateKey, *getJson(*assetsRules, "Sprites"));
+					addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, *spriteSheetTemplates, spriteSheetTemplateKey, *getJson(*assetsRules, "Sprites"));
 			}
 			if (const json* characterAnimationsJson = getJson(*characterComponents, "Animations"))
 			{
 				std::string animationsTemplateKey = characterAnimationsJson->get<std::string>();
 				const json* animationsTemplate = getJson(*componentTemplates, "Animations");
 				if (animationsTemplate)
-					addAnimationsComponent(m_refECS, m_refAssetManager, tileEntity, tileChar, *animationsTemplate, animationsTemplateKey);
+					addAnimationsComponent(m_refECS, m_refAssetManager, tileEntity, *animationsTemplate, animationsTemplateKey);
 			}
 			// ACTIVATE IN ECS AFTER ALL COMPONENTS CREATED.
 			if (activeOnStart)
 				m_refECS.Activate(tileEntity);
 		}
 
-		m_staticChains = MergeEdgesToChains(edges);
+		m_staticChains = MergeGridLinesIntoChains(edges);
 		m_chainColliders = createChainColliders(m_staticChains, m_refECS);
 	}
 }

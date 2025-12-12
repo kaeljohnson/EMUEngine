@@ -4,42 +4,42 @@
 
 namespace Engine
 {
-	void TransformInterface::SetPrevPosition(Entity entity, const Vector2D<float> position)
+	void TransformInterface::SetPrevPosition(Entity entity, const Math2D::Point2D<float> position)
 	{
 		Transform* ptrTransform = GetTransform(entity);
 		ptrTransform->PrevPosition = position;
 	}
 
-	const Vector2D<float> TransformInterface::GetPrevPosition(Entity entity)
+	const Math2D::Point2D<float> TransformInterface::GetPrevPosition(Entity entity)
 	{
 		Transform* ptrTransform = GetTransform(entity);
 		return ptrTransform->PrevPosition;
 	}
 
-	const Vector2D<float> TransformInterface::GetPrevPosition(Transform& transform)
+	const Math2D::Point2D<float> TransformInterface::GetPrevPosition(Transform& transform)
 	{
 		return transform.PrevPosition;
 	}
 
-	void TransformInterface::SetPosition(Entity entity, const Vector2D<float> position)
+	void TransformInterface::SetPosition(Entity entity, const Math2D::Point2D<float> position)
 	{
 		Transform* ptrTransform = GetTransform(entity);
 		ptrTransform->Position = position;
 	}
 
-	const Vector2D<float> TransformInterface::GetPosition(Entity entity)
+	const Math2D::Point2D<float> TransformInterface::GetPosition(Entity entity)
 	{
 		Transform* ptrTransform = GetTransform(entity);
 		return ptrTransform->Position;
 	}
 
-	void TransformInterface::SetDimensions(Entity entity, const Vector2D<float> dimensions)
+	void TransformInterface::SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions)
 	{
 		Transform* ptrTransform = GetTransform(entity);
 		ptrTransform->Dimensions = dimensions;
 	}
 
-	const Vector2D<float> TransformInterface::GetDimensions(Entity entity)
+	const Math2D::Point2D<float> TransformInterface::GetDimensions(Entity entity)
 	{
 		Transform* ptrTransform = GetTransform(entity);
 		return ptrTransform->Dimensions;

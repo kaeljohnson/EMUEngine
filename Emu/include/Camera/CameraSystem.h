@@ -12,7 +12,7 @@ namespace Engine
 		CameraSystem(ECS& refECS);
 		~CameraSystem() = default;
 
-		void Frame(const Vector2D<int> mapBounds);
+		void Frame(const Math2D::Point2D<int> mapBounds);
 		void Update(AssetManager& refAssetManager);
 
 	private:

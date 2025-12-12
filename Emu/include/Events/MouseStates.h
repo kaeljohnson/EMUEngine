@@ -12,13 +12,13 @@ namespace Engine
 	struct MouseStates
 	{
 		EMU_API static const MouseStatesMap& GetMouseStates() { return m_mouseStates; }
-		EMU_API static const Vector2D<int>& GetMousePosition() { return m_mousePosition; }
-		EMU_API static const Vector2D<int>& GetScrollDirection()  { return m_scrollDirection; }
+		EMU_API static const Math2D::Point2D<int>& GetMousePosition() { return m_mousePosition; }
+		EMU_API static const Math2D::Point2D<int>& GetScrollDirection()  { return m_scrollDirection; }
 
 	protected:
 		static MouseStatesMap m_mouseStates;
-		static Vector2D<int> m_mousePosition;
-		static Vector2D<int> m_scrollDirection;
+		static Math2D::Point2D<int> m_mousePosition;
+		static Math2D::Point2D<int> m_scrollDirection;
 
 		friend class IOEventDispatcher;
 		friend class IOEventSystem;

@@ -17,21 +17,21 @@ namespace Engine
 		void CreateBody(Entity entity);
 		const bool HasBody(Entity entity);
 		void SetBodyType(Entity entity, const BodyType type);
-		void SetDimensions(Entity entity, const Vector2D<float> dimensions);
-		const Vector2D<float> GetDimensions(Entity entity);
-		const Vector2D<float> GetDimensions(PhysicsBody& body);
+		void SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions);
+		const Math2D::Point2D<float> GetDimensions(Entity entity);
+		const Math2D::Point2D<float> GetDimensions(PhysicsBody& body);
 		void SetGravity(Entity entity, bool enabled);
-		void SetStartingPosition(Entity entity, const Vector2D<float> position);
-		void SetPosition(Entity entity, const Vector2D<float> position);
-		const Vector2D<float> GetPosition(Entity entity);
-		const Vector2D<float> GetTopLeftPosition(Entity entity);
-		void ApplyForceToBody(Entity entity, Vector2D<float> force);
-		void ApplyImpulseToBody(Entity entity, Vector2D<float> impulse);
-		void SetVelocity(Entity entity, const Vector2D<float> velocity);
+		void SetStartingPosition(Entity entity, const Math2D::Point2D<float> position);
+		void SetPosition(Entity entity, const Math2D::Point2D<float> position);
+		const Math2D::Point2D<float> GetPosition(Entity entity);
+		const Math2D::Point2D<float> GetTopLeftPosition(Entity entity);
+		void ApplyForceToBody(Entity entity, Math2D::Point2D<float> force);
+		void ApplyImpulseToBody(Entity entity, Math2D::Point2D<float> impulse);
+		void SetVelocity(Entity entity, const Math2D::Point2D<float> velocity);
 		void SetXVelocity(Entity entity, const float xVelocity);
 		void SetYVelocity(Entity entity, const float yVelocity);
 		void SetDeceleration(Entity entity, const float decel);
-		const Vector2D<float> GetVelocity(Entity entity);
+		const Math2D::Point2D<float> GetVelocity(Entity entity);
 		void SetRestitution(Entity entity, const float restitution);
 		void SetDensity(Entity entity, const float density);
 		void SetFriction(Entity entity, const float friction);
@@ -68,7 +68,7 @@ namespace Engine
 			Update the world's gravity vector.
 			arg1: gravity vector
 		*/
-		void UpdateGravity(const Vector2D<float> gravity);
+		void UpdateGravity(const Math2D::Point2D<float> gravity);
 
 		/*
 			Add physics bodies from entities to the world.
@@ -151,6 +151,6 @@ namespace Engine
 		
 		ECS& m_refECS;
 
-		Vector2D<float> m_gravity;
+		Math2D::Point2D<float> m_gravity;
 	};
 }

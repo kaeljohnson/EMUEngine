@@ -23,10 +23,10 @@ namespace Engine
 
 	struct BeginContact : public Contact
 	{
-		BeginContact(Entity entityA, Entity entityB, Vector2D<float> normalVec)
+		BeginContact(Entity entityA, Entity entityB, Math2D::Point2D<float> normalVec)
 			: m_normalVec(normalVec), Contact(entityA, entityB) {}
 
-		Vector2D<float> m_normalVec;
+		Math2D::Point2D<float> m_normalVec;
 	};
 
 	struct EndContact : public Contact

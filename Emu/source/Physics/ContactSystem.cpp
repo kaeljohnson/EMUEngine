@@ -26,7 +26,7 @@ namespace Engine
 			Entity entityB = (Entity)b2Body_GetUserData(b2Shape_GetBody(shapeIdB));
 
 			// normal points from A to B
-			Vector2D<float> normal = Vector2D(beginEvent->manifold.normal.x, beginEvent->manifold.normal.y);
+			Math2D::Point2D<float> normal = Math2D::Point2D(beginEvent->manifold.normal.x, beginEvent->manifold.normal.y);
 
 			// Process Event Handlers
 			auto singleContactEventHandlerA = m_beginSingleEntityContactCallbacks.find(SingleEntityBeginContactKey(entityA));

@@ -61,9 +61,9 @@ namespace Engine
 
 		/*
 			Sets the physics simulation parameters for the scene.
-			arg1: gravity - A Vector2D<float> representing the gravity vector for the physics simulation.
+			arg1: gravity - A Math2D::Point2D<float> representing the gravity vector for the physics simulation.
 		*/
-		void SetGravity(const Vector2D<float> gravity);
+		void SetGravity(const Math2D::Point2D<float> gravity);
 		// void Add(Entity entity); // No support for manually adding entities to scene for now. All entities must be added via tile map prior to runtime.
 		// void Remove(Entity entity); // No support for manually removing entities from scene for now. All entities will be removed when scene ends.
 
@@ -93,27 +93,27 @@ namespace Engine
 
 		/*
 			Gets the entity associated with a specific character in the tile map.
-			arg1: tileChar - The character representing the entity in the tile map.
+			arg1: tileId - The id representing the entity in the tile map.
 			returns: The Entity associated with the specified character.
 		*/
-		const Entity GetTileMapEntity(char tileChar) const;
+		const Entity GetTileMapEntity(size_t tileId) const;
 
 		/*
 			Gets all entities associated with a specific character in the tile map.
-			arg1: tileChar - The character representing the entities in the tile map.
+			arg1: tileId - The character representing the entities in the tile map.
 			returns: A vector of Entities associated with the specified character.
 		*/
-		inline const std::vector<Entity>& GetTileMapEntities(const char tileChar) const
+		inline const std::vector<Entity>& GetTileMapEntities(const size_t tileId) const
 		{
-			return m_tileMap.GetEntities(tileChar);
+			return m_tileMap.GetEntities(tileId);
 		}
 
 		/*
 			Not really supported right now since tile map is required.
 			Sets the level dimensions in units when there is no tile map.
-			arg1: levelWidthInUnits - A Vector2D<int> representing the width and height of the level in units.
+			arg1: levelWidthInUnits - A Math::Math2D::Point2D<int> representing the width and height of the level in units.
 		*/
-		void SetLevelDimensions(const Vector2D<int> levelDimInUnits);
+		void SetLevelDimensions(const Math2D::Point2D<int> levelDimInUnits);
 
 		/*
 			Updates the physics simulation for the scene.
@@ -135,13 +135,13 @@ namespace Engine
 
 		std::function<void()> m_clientOnScenePlay;
 
-		Vector2D<int> m_levelDimensionsInUnits;
+		Math2D::Point2D<int> m_levelDimensionsInUnits;
 		TileMap m_tileMap;
 
 		PhysicsSimulation m_physicsSimulation;
 		CameraSystem m_cameraSystem;
 
-		std::vector<Chain> m_staticChains;
+		std::vector<Math2D::Chain> m_staticChains;
 		std::vector<ChainCollider> m_chainColliders;
 
 		// Need better container for tracking entities in scene at runtime.

@@ -24,7 +24,7 @@ namespace Engine
 	}
 
 	static void prepareForRendering(Camera& refCamera, AssetManager& refAssetManager, ECS& refECS,
-		const Vector2D<int> viewportSizeInPixels, const Vector2D<float> scale)
+		const Math2D::Point2D<int> viewportSizeInPixels, const Math2D::Point2D<float> scale)
 	{
 		// auto start = std::chrono::high_resolution_clock::now();
 
@@ -36,14 +36,14 @@ namespace Engine
 		const float scaleY = refCamera.m_pixelsPerUnit * scale.Y;
 
 		// Camera setup
-		const Vector2D<float> viewportSizeInTiles(
+		const Math2D::Point2D<float> viewportSizeInTiles(
 			viewportSizeInPixels.X / (refCamera.m_pixelsPerUnit * scale.X),
 			viewportSizeInPixels.Y / (refCamera.m_pixelsPerUnit * scale.Y)
 		);
 
 		// Calculate "adjusted offset". This is the offset that takes
 		// into account the position of the camera on the screen.
-		const Vector2D<float> cameraAdjustedOffset(
+		const Math2D::Point2D<float> cameraAdjustedOffset(
 			refCamera.m_offset.X - refCamera.m_positionInFractionOfScreenSize.X * viewportSizeInTiles.X,
 			refCamera.m_offset.Y - refCamera.m_positionInFractionOfScreenSize.Y * viewportSizeInTiles.Y
 		);
@@ -84,8 +84,8 @@ namespace Engine
 
 			// 2. Position & scale
 			const float interpolation = Time::GetInterpolationFactor();
-			const float lerpedX = Lerp(refTransform.PrevPosition.X, refTransform.Position.X, interpolation);
-			const float lerpedY = Lerp(refTransform.PrevPosition.Y, refTransform.Position.Y, interpolation);
+			const float lerpedX = Math2D::Lerp(refTransform.PrevPosition.X, refTransform.Position.X, interpolation);
+			const float lerpedY = Math2D::Lerp(refTransform.PrevPosition.Y, refTransform.Position.Y, interpolation);
 
 			int width = int(refTransform.Dimensions.X * scaleX);
 			int height = int(refTransform.Dimensions.Y * scaleY);
@@ -127,10 +127,10 @@ namespace Engine
 
 				renderBuckets[refTransform.ZIndex].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are under 1-10
 					refTransform.m_entity,
-					Vector2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
-					Vector2D<int>(width, height),
-					Vector2D<int>(locationInPixelsOnSpriteSheetX, locationInPixelsOnSpriteSheetY),
-					Vector2D<int>(sizseInPixelsOnSpriteSheetX, sizseInPixelsOnSpriteSheetY)
+					Math2D::Point2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
+					Math2D::Point2D<int>(width, height),
+					Math2D::Point2D<int>(locationInPixelsOnSpriteSheetX, locationInPixelsOnSpriteSheetY),
+					Math2D::Point2D<int>(sizseInPixelsOnSpriteSheetX, sizseInPixelsOnSpriteSheetY)
 				);
 #ifndef NDEBUG
 				// submit debug border
@@ -140,11 +140,11 @@ namespace Engine
 					debugBuckets[refTransform.ZIndex].emplace_back(
 						refTransform.m_entity,
 						false,
-						Vector2D<int>(
+						Math2D::Point2D<int>(
 							int((lerpedX - cameraAdjustedOffset.X) * scaleX),
 							int((lerpedY - cameraAdjustedOffset.Y) * scaleY)
 						),
-						Vector2D<int>(
+						Math2D::Point2D<int>(
 							int((refTransform.Dimensions.X * scaleX)), // Need transform dimensions, not animation dimensions
 							int((refTransform.Dimensions.Y * scaleY))
 						),
@@ -156,8 +156,8 @@ namespace Engine
 					debugBuckets[refTransform.ZIndex].emplace_back(
 						refTransform.m_entity,
 						false,
-						Vector2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
-						Vector2D<int>(width, height),
+						Math2D::Point2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
+						Math2D::Point2D<int>(width, height),
 						ptrSpriteComponent->m_debugColor
 					);
 				}
@@ -175,56 +175,17 @@ namespace Engine
 				debugBuckets[refTransform.ZIndex].emplace_back(
 					refTransform.m_entity,
 					ptrPhysicsBody->m_fillRect,
-					Vector2D<int>(
+					Math2D::Point2D<int>(
 						int((lerpedX - cameraAdjustedOffset.X) * scaleX),
 						int((lerpedY - cameraAdjustedOffset.Y) * scaleY)
 					),
-					Vector2D<int>(
+					Math2D::Point2D<int>(
 						int((refTransform.Dimensions.X * scaleX)), // Need transform dimensions, not animation dimensions
 						int((refTransform.Dimensions.Y * scaleY))
 					),
 					ptrPhysicsBody->m_debugColor
 				);
 			}
-
-			/*ChainColliderLeft* ptrChainColliderLeft = refECS.GetComponent<ChainColliderLeft>(refTransform.m_entity);
-			ChainColliderRight* ptrChainColliderRight = refECS.GetComponent<ChainColliderRight>(refTransform.m_entity);
-			ChainColliderTop* ptrChainColliderTop = refECS.GetComponent<ChainColliderTop>(refTransform.m_entity);
-			ChainColliderBottom* ptrChainColliderBottom = refECS.GetComponent<ChainColliderBottom>(refTransform.m_entity);
-
-			auto submitChainsForRendering = [&](auto& ptrChainCollider)
-				{
-					debugLineBuckets[refTransform.ZIndex].emplace_back(
-						ptrChainCollider->m_entity,
-						Vector2D<int>(
-							int((ptrChainCollider->m_points[1].X - cameraAdjustedOffset.X) * scaleX),
-							int((ptrChainCollider->m_points[1].Y - cameraAdjustedOffset.Y) * scaleY)
-						),
-						Vector2D<int>(
-							int((ptrChainCollider->m_points[2].X - cameraAdjustedOffset.X) * scaleX),
-							int((ptrChainCollider->m_points[2].Y - cameraAdjustedOffset.Y) * scaleY)
-						),
-						ptrChainCollider->m_debugColor
-					);
-				};
-
-
-			if (ptrChainColliderLeft)
-			{
-				submitChainsForRendering(ptrChainColliderLeft);
-			}
-			if (ptrChainColliderRight)
-			{
-				submitChainsForRendering(ptrChainColliderRight);
-			}
-			if (ptrChainColliderTop)
-			{
-					submitChainsForRendering(ptrChainColliderTop);
-			}
-			if (ptrChainColliderBottom)
-			{
-				submitChainsForRendering(ptrChainColliderBottom);
-			}*/
 #endif
 		}
 
@@ -234,10 +195,10 @@ namespace Engine
 			// Transform to screen space
 			const int edgePointAInPixelsX = static_cast<int>((refEdge.m_startPoint.X - cameraAdjustedOffset.X) * scaleX);
 			const int edgePointAInPixelsY = static_cast<int>((refEdge.m_startPoint.Y - cameraAdjustedOffset.Y) * scaleY);
-			const Vector2D<int> edgePointAInPixels(edgePointAInPixelsX, edgePointAInPixelsY);
+			const Math2D::Point2D<int> edgePointAInPixels(edgePointAInPixelsX, edgePointAInPixelsY);
 			const int edgePointBInPixelsX = static_cast<int>((refEdge.m_endPoint.X - cameraAdjustedOffset.X) * scaleX);
 			const int edgePointBInPixelsY = static_cast<int>((refEdge.m_endPoint.Y - cameraAdjustedOffset.Y) * scaleY);
-			const Vector2D<int> edgePointBInPixels(edgePointBInPixelsX, edgePointBInPixelsY);
+			const Math2D::Point2D<int> edgePointBInPixels(edgePointBInPixelsX, edgePointBInPixelsY);
 
 			debugLineBuckets[0].emplace_back(
 				-1,
@@ -292,7 +253,7 @@ namespace Engine
 		// ENGINE_TRACE_D("CameraSystem Update took " + std::to_string(elapsed.count()) + " ms");
     }
 
-    void CameraSystem::Frame(const Vector2D<int> mapBounds)
+    void CameraSystem::Frame(const Math2D::Point2D<int> mapBounds)
     {
 		std::vector<Camera>& activeCameras = m_refECS.GetHotComponents<Camera>();
 
@@ -307,7 +268,7 @@ namespace Engine
 		{
 			refCamera.m_bounds = mapBounds;
 			refCamera.m_size
-				= Vector2D<float>((Screen::VIEWPORT_SIZE.X * refCamera.m_screenRatio.X) / (refCamera.m_pixelsPerUnit * Screen::SCALE.X),
+				= Math2D::Point2D<float>((Screen::VIEWPORT_SIZE.X * refCamera.m_screenRatio.X) / (refCamera.m_pixelsPerUnit * Screen::SCALE.X),
 					(Screen::VIEWPORT_SIZE.Y * refCamera.m_screenRatio.Y) / (refCamera.m_pixelsPerUnit * Screen::SCALE.Y));
 
 			// If the entity with the camera has a transform component, center the camera on the transform position

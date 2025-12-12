@@ -13,8 +13,8 @@ namespace Engine
     // Provide the actual definition of the static member variable
     KeyStatesMap KeyStates::m_keyStates;
 	MouseStatesMap MouseStates::m_mouseStates;
-    Vector2D<int> MouseStates::m_mousePosition;
-	Vector2D<int> MouseStates::m_scrollDirection;
+    Math2D::Point2D<int> MouseStates::m_mousePosition;
+	Math2D::Point2D<int> MouseStates::m_scrollDirection;
 
     static IOEventDispatcher m_eventDispatcher;
 

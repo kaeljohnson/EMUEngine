@@ -4,428 +4,415 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <iostream>
+#include <algorithm>
 
-
-namespace Engine
+namespace Math2D
 {
+	/*
+		Basic 2D point structure with common operations.
+		
+		Param1: X - The X coordinate of the point.
+		Param2: Y - The Y coordinate of the point.
+	*/
     template <typename T>
-    struct Vector2D
+    struct Point2D
     {
         T X, Y;
 
-        Vector2D() : X(0), Y(0) {}
-        Vector2D(T x, T y) : X(x), Y(y) {}
+        Point2D() : X(0), Y(0) {}
+        Point2D(T x, T y) : X(x), Y(y) {}
 
-        Vector2D operator+(const Vector2D& other) const
+        Point2D operator+(const Point2D& other) const
         {
-            return Vector2D(X + other.X, Y + other.Y);
+            return Point2D(X + other.X, Y + other.Y);
         }
 
-        Vector2D operator-(const Vector2D& other) const
+        Point2D operator-(const Point2D& other) const
         {
-            return Vector2D(X - other.X, Y - other.Y);
+            return Point2D(X - other.X, Y - other.Y);
         }
 
-        Vector2D operator*(T scalar) const
+        Point2D operator*(T scalar) const
         {
-            return Vector2D(X * scalar, Y * scalar);
+            return Point2D(X * scalar, Y * scalar);
         }
 
-        Vector2D operator/(T scalar) const
+        Point2D operator/(T scalar) const
         {
-            return Vector2D(X / scalar, Y / scalar);
+            return Point2D(X / scalar, Y / scalar);
         }
 
-        Vector2D& operator+=(const Vector2D& other)
+        Point2D& operator+=(const Point2D& other)
         {
             X += other.X;
             Y += other.Y;
             return *this;
         }
 
-        Vector2D& operator-=(const Vector2D& other)
+        Point2D& operator-=(const Point2D& other)
         {
             X -= other.X;
             Y -= other.Y;
             return *this;
         }
 
-        Vector2D& operator*=(T scalar)
+        Point2D& operator*=(T scalar)
         {
             X *= scalar;
             Y *= scalar;
             return *this;
         }
 
-        Vector2D& operator/=(T scalar)
+        Point2D& operator/=(T scalar)
         {
             X /= scalar;
             Y /= scalar;
             return *this;
         }
 
-        bool operator==(const Vector2D& other) const
+        bool operator==(const Point2D& other) const
         {
             return X == other.X && Y == other.Y;
         }
 
-        bool operator!=(const Vector2D& other) const
+        bool operator!=(const Point2D& other) const
         {
             return !(*this == other);
         }
     };
 
-    // Hash for Vector2D<float> to allow hashing.
-    struct Vector2DFloatHash
+    // Hash for Point2D<float> to allow hashing.
+    struct Point2DFloatHash
     {
-        size_t operator()(const Vector2D<float>& v) const noexcept {
+        size_t operator()(const Point2D<float>& v) const noexcept {
             size_t h1 = std::hash<float>()(v.X);
             size_t h2 = std::hash<float>()(v.Y);
             return h1 ^ (h2 << 1);
         }
     };
 
+	/*
+		Basic 2D vector structure with common operations.
+		Param1: X - The X component of the vector.
+		Param2: Y - The Y component of the vector.
+	*/
+	template <typename T>
+    struct Vector2D
+	{
+		Point2D<T> X, Y;
+
+		Vector2D() : X(0), Y(0) {}
+		Vector2D(Point2D<T> x, Point2D<T> y) : X(x), Y(y) {}
+
+		Vector2D operator+(const Vector2D& other) const
+		{
+			return Vector2D(X + other.X, Y + other.Y);
+		}
+
+		Vector2D operator-(const Vector2D& other) const
+		{
+			return Vector2D(X - other.X, Y - other.Y);
+		}
+
+		Vector2D operator*(T scalar) const
+		{
+			return Vector2D(X * scalar, Y * scalar);
+		}
+
+		Vector2D operator/(T scalar) const
+		{
+			return Vector2D(X / scalar, Y / scalar);
+		}
+
+		Vector2D& operator+=(const Vector2D& other)
+		{
+			X += other.X;
+			Y += other.Y;
+			return *this;
+		}
+
+		Vector2D& operator-=(const Vector2D& other)
+		{
+			X -= other.X;
+			Y -= other.Y;
+			return *this;
+		}
+
+		Vector2D& operator*=(T scalar)
+		{
+			X *= scalar;
+			Y *= scalar;
+			return *this;
+		}
+
+		Vector2D& operator/=(T scalar)
+		{
+			X /= scalar;
+			Y /= scalar;
+			return *this;
+		}
+
+		bool operator==(const Vector2D& other) const
+		{
+			return X == other.X && Y == other.Y;
+		}
+
+		bool operator!=(const Vector2D& other) const
+		{
+			return !(*this == other);
+		}
+
+		Vector2D& operator=(const Point2D<T>& point)
+		{
+			X = point.X;
+			Y = point.Y;
+			return *this;
+		}
+	};
+
     inline static float Lerp(float a, float b, float f)
     {
         return a + (b - a) * f;
     }
 
-    inline static Vector2D<float> Lerp(Vector2D<float> a, Vector2D<float> b, float f)
+    inline static Point2D<float> Lerp(Point2D<float> a, Point2D<float> b, float f)
     {
-        return Vector2D<float>(Lerp(a.X, b.X, f), Lerp(a.Y, b.Y, f));
+        return Point2D<float>(Lerp(a.X, b.X, f), Lerp(a.Y, b.Y, f));
     }
 
     // Geometric structures
+
+	/*
+		Edge structure representing a line segment with trailing and leading points.
+		When used, edges should be thought of as puzzle pieces, where they connect 
+		to edges whose start and end points match either 
+		the (trailingPoint, startPoint) or(endPoint, leadingPoint) pairs.
+		Trailing and leading points are not intended to be part of the actual edge,
+		but rather to facilitate the connection between edges when forming chains.
+		Note that the MergeGridLinesIntoChains algorithm merges from trailing point to leading point.
+
+		param1: trailingPoint - The point before the startPoint of the edge.
+		param2: startPoint - The starting point of the edge.
+		param3: endPoint - The ending point of the edge.
+		param4: leadingPoint - The point after the endPoint of the edge.
+	*/
     struct Edge
     {
-		size_t m_id; // optional identifier
-        Vector2D<float> m_startPoint;
-        Vector2D<float> m_endPoint;
+        Point2D<float> m_trailingPoint;
+        Point2D<float> m_startPoint;
+        Point2D<float> m_endPoint;
+		Point2D<float> m_leadingPoint;
+
+        bool operator==(const Edge& other) const
+        {
+			return m_startPoint == other.m_startPoint &&
+				m_endPoint == other.m_endPoint &&
+				m_trailingPoint == other.m_trailingPoint &&
+				m_leadingPoint == other.m_leadingPoint;
+        }
+
+        Edge& operator=(const Edge& other)
+        {
+			m_trailingPoint = other.m_trailingPoint;
+            m_startPoint = other.m_startPoint;
+            m_endPoint = other.m_endPoint;
+			m_leadingPoint = other.m_leadingPoint;
+            return *this;
+        }
     };
 
-	struct Adjacency
+	struct EdgeHash
 	{
-		std::vector<Vector2D<float>> m_previousPoints;
-		std::vector<Vector2D<float>> m_nextPoints;
+		size_t operator()(const Edge& e) const noexcept
+		{
+			size_t h1 = Point2DFloatHash{}(e.m_startPoint);
+			size_t h2 = Point2DFloatHash{}(e.m_endPoint);
+			size_t h3 = Point2DFloatHash{}(e.m_trailingPoint);
+			size_t h4 = Point2DFloatHash{}(e.m_leadingPoint);
+			return h1 ^ (h2 << 1) ^ (h3 << 2) ^ (h4 << 3);
+		}
 	};
 
-    /*struct EdgeHash
-    {
-        size_t operator()(const Edge& e) const noexcept 
-        {
-            size_t h1 = Vector2DFloatHash{}(e.a);
-            size_t h2 = Vector2DFloatHash{}(e.b);
-            size_t h3 = std::hash<size_t>{}(e.id);
-
-            return h1 ^ (h2 << 1) ^ (h3 << 2);
-        }
-    };*/
-
+	/*
+		Chain structure representing a merged polyline formed by connecting edges.
+		param1: m_points - The points forming the merged polyline.
+		param2: m_originalEdges - The original edges that formed this chain.
+		param3: m_loop - Whether the chain is a loop.
+	*/
     struct Chain
     {
-        std::vector<Vector2D<float>> m_points;        // merged polyline
+        std::vector<Point2D<float>> m_points;         // merged polyline
         std::vector<Edge> m_originalEdges;	          // original edges that formed this chain
 
 		bool m_loop = false;                          // whether the chain is a loop
-		Vector2D<float> m_loopVertex = { INFINITY, INFINITY }; // vertex where loop closes (if applicable)
+
+		bool operator==(const Chain& other) const
+		{
+			if (m_points.size() != other.m_points.size())
+				return false;
+
+			for (size_t i = 0; i < m_points.size(); ++i)
+			{
+				if (m_points[i] != other.m_points[i])
+					return false;
+			}
+
+			for (size_t i = 0; i < m_originalEdges.size(); ++i)
+			{
+				if (m_originalEdges[i] != other.m_originalEdges[i])
+					return false;
+			}
+
+			return true;
+		}
     };
 
-    inline std::vector<Chain> DirectionalMergEdgesToChains(const std::vector<Edge>& edges)
-    {
-        std::unordered_map<Vector2D<float>, Adjacency, Vector2DFloatHash> graph;
-		for (const Edge& e : edges)
+    using Point = Point2D<float>;
+
+    struct PointPairHash
+	{
+		size_t operator()(const std::pair<Point, Point>& p) const noexcept
 		{
-			graph[e.m_startPoint].m_nextPoints.push_back(e.m_endPoint);
-			graph[e.m_endPoint].m_previousPoints.push_back(e.m_startPoint);
-		} 
+			size_t h1 = Point2DFloatHash{}(p.first);
+			size_t h2 = Point2DFloatHash{}(p.second);
+			return h1 ^ (h2 << 1);
+		}
+	};
 
-        auto edgeKey = [](const Vector2D<float>& a, const Vector2D<float>& b)
-            {
-                return std::pair<Vector2D<float>, Vector2D<float>>(a, b);
-            };
+    using AdjList = std::unordered_map<const std::pair<Point, Point>, const Edge*, PointPairHash>;
 
-        struct PairHash
+
+	/*
+		Helper for MergeGridLinesIntoChains to build adjacency graph from edges.
+	*/
+    inline AdjList buildAdjacencyGraph(const std::vector<Edge>& edges)
+    {
+		AdjList adj;
+        for (const auto& e : edges)
         {
-            std::size_t operator()(const std::pair<Vector2D<float>, Vector2D<float>>& p) const noexcept
-            {
-                Vector2DFloatHash h;
-                return h(p.first) ^ (h(p.second) << 1);
-            }
-        };
+            const auto it = adj.find({ e.m_startPoint, e.m_endPoint });
 
-        std::unordered_map<
-            std::pair<Vector2D<float>, Vector2D<float>>, // pair of points as key.
-            Edge,                                        // maps to edge so we can keep track of original edges and their entities.
-            PairHash
-        > edgeTable;
-
-        for (const Edge& e : edges)
-        {
-            edgeTable[edgeKey(e.m_startPoint, e.m_endPoint)] = e;
-            edgeTable[edgeKey(e.m_endPoint, e.m_startPoint)] = e;
+            adj[{e.m_startPoint, e.m_endPoint}] = &e;
         }
-
-		std::unordered_set<Vector2D<float>, Vector2DFloatHash> visited;
-        std::vector<Chain> chains;
-
-        auto walk = [&](const Vector2D<float>& start) -> Chain
-        {
-                Chain chain;
-				chain.m_points.clear();
-				chain.m_originalEdges.clear();
-
-				Vector2D<float> current = start;
-				Vector2D<float> prev = { INFINITY, INFINITY };
-
-                while (true)
-                {
-					for (auto& nextPoint : graph[current].m_nextPoints)
-					{
-                        chain.m_points.push_back(current);
-                        visited.insert(current);
-
-						if (nextPoint != prev && visited.count(nextPoint) == 0)
-						{
-
-							// Store the edge between current and next vertex.
-							auto it = edgeTable.find(edgeKey(current, nextPoint));
-							if (it != edgeTable.end())
-								chain.m_originalEdges.push_back(it->second);
-
-							prev = current;
-							current = nextPoint;
-							break;
-						}
-                        if (nextPoint != prev && visited.count(nextPoint) > 0)
-                        {
-							chain.m_loop = true;
-                            chain.m_points.push_back(nextPoint); // close the loop
-                            break;
-                        }
-
-					}
-
-
-                }
-        };
+		return adj;
     }
 
-    inline std::vector<Chain> MergeGridLinesIntoChains(const std::vector<Edge>& edges)
-    {
-        // 1. Build adjacency graph.
-        std::unordered_map<Vector2D<float>, std::vector<Vector2D<float>>, Vector2DFloatHash> graph;
+	/*
+		Walks the the edges in both directions from the start edge, collecting points and edges,
+		and marking edges as visited. Sets loop to true if a loop is detected.
+		Param1: start - The starting edge to walk from.
+		Param2: adj - The adjacency list mapping edge connections.
+		Param3: visitedEdges - The set of already visited edges.
+		Param4: outPoints - The output vector to collect points.
+		Param5: outEdges - The output vector to collect edges.
+		Param6: loop - Output flag indicating if a loop was detected.
+	*/
+	inline void WalkGridLines(const Edge& start,
+		AdjList& adj,
+		std::unordered_set<Edge, EdgeHash>& visitedEdges,
+		std::vector<Point>& outPoints,
+		std::vector<Edge>& outEdges,
+		bool& loop)
+	{
+		Edge current = start;
 
-        for (const Edge& e : edges)
-        {
-            graph[e.m_startPoint].push_back(e.m_endPoint);
-            graph[e.m_endPoint].push_back(e.m_startPoint);
-        }
+		// Walk forward
+		while (true)
+		{
+			const auto it = adj.find({ current.m_endPoint, current.m_leadingPoint });
+			if (it == adj.end()) // No loop
+			{
+				// no next edge but need to add the final point
+				outPoints.push_back(current.m_endPoint);
+				break;
+			}
 
-        // 2. Track visited vertices.
-        std::unordered_set<Vector2D<float>, Vector2DFloatHash> visited;
-
-		std::vector<Chain> chains;
-
-        auto walk = [&](const Vector2D<float>& startPoint, const Vector2D<float>& currentPoint, bool& completeLoop) -> Chain
-            {
-				std::vector<Vector2D<float>>& neighbors = graph[currentPoint];
-
-				Chain chain;
-				chain.m_points.clear();
-				chain.m_originalEdges.clear();
-
-				// Vector2D<float> current = startPoint;
-				Vector2D<float> prev = { INFINITY, INFINITY };
-				if (neighbors.size() > 2) throw std::runtime_error("Node has more than 2 neighbors, cannot form simple grid chain.");
-                if (neighbors.size() == 2)
-                {
-                    bool completeLoop1 = true;
-					bool completeLoop2 = true;
-					Chain chain1;
-					Chain chain2;
-
-					Chain chain1 = walk(neighbors[0], completeLoop1);
-					Chain chain2 = walk(neighbors[1], completeLoop2);
-
-					if (completeLoop1 && completeLoop2)
-					{
-						// start point was intersection, can concatenate on either side.
-                        chain1.m_points.insert(chain1.m_points.end(), chain2.m_points.begin(), chain2.m_points.end());
-                        return chain1;
-					}
-					else if (completeLoop1)
-					{
-						// Chain 2 must be concatenated to chain 1
-                        chain1.m_points.insert(chain1.m_points.end(), chain2.m_points.begin(), chain2.m_points.end());
-						return chain1;
-					}
-					else if (completeLoop2)
-					{
-						// Chain 1 must be concatenated to chain 2
-						chain2.m_points.insert(chain2.m_points.end(), chain1.m_points.begin(), chain1.m_points.end());
-						return chain2;
-					}
-					else
-					{
-						// Neither side completed a loop, concatenate chains
-						chain1.m_points.insert(chain1.m_points.end(), chain2.m_points.begin(), chain2.m_points.end());
-						return chain1;
-					}
-
-				}
-				else
+			const Edge nextEdge = *it->second;
+			if (visitedEdges.count(nextEdge))
+			{
+				// Already visited
+				// endpoint accounted for already because of loop.
+				if (current == start)
 				{
-                    if (visited.count(currentPoint) == 0)
-                    {
-                        bool completeLoopX = false;
-						chain.m_points.push_back(walk(startPoint, neighbors[0], completeLoopX));
-						visited.insert(currentPoint);
+					loop = true;
+				}
+				break;
 
-                    }
-                }
-            };
+			}
 
+			outPoints.push_back(nextEdge.m_startPoint);
 
-        // 4. Find all endpoints (degree == 1) ? start polylines here
-        for (const auto& [point, neighbors] : graph)
-        {
-            if (neighbors.size() == 1 && visited.count(point) == 0)
-            {
-				bool completeLoop0 = true;
-                chains.push_back(walk(point, completeLoop0));
-            }
-        }
+			outEdges.push_back(nextEdge);
+			visitedEdges.insert(nextEdge);
+			current = nextEdge;
+		}
 
-		return chains;
+		current = start;
 
-    }
+		std::reverse(outPoints.begin(), outPoints.end());
 
-    inline std::vector<Chain> MergeEdgesToChains(const std::vector<Edge>& edges)
+		// Walk backward
+		while (true)
+		{
+			const auto it = adj.find({ current.m_trailingPoint, current.m_startPoint });
+			if (it == adj.end()) // No loop
+			{
+				// No previous edge
+				outPoints.push_back(current.m_startPoint);
+				break;
+			}
+
+			Edge prevEdge = *it->second;
+			if (visitedEdges.count(prevEdge))
+			{
+				// Already visited
+				if (current == start)
+				{
+					loop = true;
+				}
+				break;
+			}
+
+			outPoints.push_back(prevEdge.m_endPoint);
+
+			outEdges.push_back(prevEdge);
+			visitedEdges.insert(prevEdge);
+			current = prevEdge;
+		}
+
+		std::reverse(outPoints.begin(), outPoints.end());
+	}
+
+	/*
+		Merges edges into chains by connecting edges based on their start and end points.
+		Param1: edges - The input edges to be merged into chains.
+		Returns: A vector of merged chains.
+	*/
+    inline std::vector<Math2D::Chain> MergeGridLinesIntoChains(const std::vector<Edge>& edges)
     {
-        // 1. Build adjacency graph.
-        std::unordered_map<Vector2D<float>, std::vector<Vector2D<float>>, Vector2DFloatHash> graph;
+        AdjList adj = buildAdjacencyGraph(edges);
 
-        for (const Edge& e : edges)
+        std::unordered_set<Edge, EdgeHash> visitedEdges;
+        std::vector<Math2D::Chain> chains;
+
+        for (const auto& e : edges)
         {
-            graph[e.m_startPoint].push_back(e.m_endPoint);
-            graph[e.m_endPoint].push_back(e.m_startPoint);
-        }
+            if (visitedEdges.count(e))
+                continue;
 
-        auto edgeKey = [](const Vector2D<float>& a, const Vector2D<float>& b)
-            {
-                return std::pair<Vector2D<float>, Vector2D<float>>(a, b);
-            };
+            std::vector<Point> points;
+            std::vector<Edge> chainEdges;
+            bool loop = false;
 
-        struct PairHash
-        {
-            std::size_t operator()(const std::pair<Vector2D<float>, Vector2D<float>>& p) const noexcept
-            {
-                Vector2DFloatHash h;
-                return h(p.first) ^ (h(p.second) << 1);
-            }
-        };
+			// Walk grid lines
+			WalkGridLines(e, adj, visitedEdges, points, chainEdges, loop);
 
-        std::unordered_map<
-			std::pair<Vector2D<float>, Vector2D<float>>, // pair of points as key.
-			Edge,                                        // maps to edge so we can keep track of original edges and their entities.
-            PairHash
-        > edgeTable;
+            Math2D::Chain chain;
+            chain.m_points = std::move(points);
+            chain.m_originalEdges = std::move(chainEdges);
+			chain.m_loop = loop;
 
-        for (const Edge& e : edges)
-        {
-            edgeTable[edgeKey(e.m_startPoint, e.m_endPoint)] = e;
-            edgeTable[edgeKey(e.m_endPoint, e.m_startPoint)] = e;
-        }
-
-        // 3. Track visited vertices.
-        std::unordered_set<Vector2D<float>, Vector2DFloatHash> visited;
-
-        std::vector<Chain> chains;
-
-        // Walk a path from a given start vertex
-        auto walk = [&](const Vector2D<float>& start) -> Chain
-            {
-                Chain chain;
-                chain.m_points.clear();
-                chain.m_originalEdges.clear();
-
-                Vector2D<float> current = start;
-                Vector2D<float> prev = { INFINITY, INFINITY };
-
-				std::cout << "Start: (" << start.X << ", " << start.Y << ")\n";
-
-                while (true)
-                {
-                    std::cout << "Visiting: (" << current.X << ", " << current.Y << ")\n";
-                    chain.m_points.push_back(current);
-                    visited.insert(current);
-
-                    const auto& neighbors = graph[current];
-
-                    // Find next vertex
-                    Vector2D<float> next = { INFINITY, INFINITY };
-
-                    for (auto& n : neighbors)
-                    {
-                        if (n != prev && visited.count(n) == 0)
-                        {
-                            next = n;
-                            break;
-                        }
-                        if (n != prev && n == start)
-                        {
-                            chain.m_loop = true;
-							//if (n != start) throw std::runtime_error("Connecting vertex must be at start");
-                            chain.m_loopVertex = start;
-							next = n;
-                            break;
-                        }
-                    }
-
-                    // If no valid next, chain ends
-                    if (next.X == INFINITY)
-                        break;
-
-                    // Store the edge between current and next vertex.
-                    auto it = edgeTable.find(edgeKey(current, next));
-                    if (it != edgeTable.end())
-                        chain.m_originalEdges.push_back(it->second);
-
-                    prev = current;
-                    current = next;
-
-                    if (chain.m_loop)
-                    {
-						// throw std::runtime_error("Loops not fully supported yet.");
-                        break;
-                    }
-                }
-
-                return chain;
-            };
-
-
-        for (const auto& [point, neighbors] : graph)
-        {
-			std::cout << "Point (" << point.X << ", " << point.Y << ") has " << neighbors.size() << " neighbors." << std::endl;
-        }
-
-        // 4. Find all endpoints (degree == 1) ? start polylines here
-        for (const auto& [point, neighbors] : graph)
-        {
-            if (neighbors.size() == 1 && visited.count(point) == 0)
-            {
-                chains.push_back(walk(point));
-            }
-        }
-
-        // 5. Any remaining points must be loops or leftover segments
-        for (const auto& [point, neighbors] : graph)
-        {
-            if (visited.count(point) == 0)
-            {
-                chains.push_back(walk(point));
-            }
+            chains.push_back(std::move(chain));
         }
 
         return chains;
