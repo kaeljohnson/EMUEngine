@@ -142,7 +142,6 @@ namespace Engine
 		CameraSystem m_cameraSystem;
 
 		std::vector<Math2D::Chain> m_staticChains;
-		std::vector<ChainCollider> m_chainColliders;
 
 		// Need better container for tracking entities in scene at runtime.
 		std::vector<Entity> m_entities;

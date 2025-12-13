@@ -223,14 +223,9 @@ namespace Engine
 		ChainCollider(Entity entity, Math2D::Chain refPoints, 
 			const bool enabled, Filter category, Filter mask, bool drawDebug, DebugColor debugColor)
 			: m_chain(refPoints), m_category(category), m_enabled(enabled), m_mask(mask), m_drawDebug(true), m_debugColor(debugColor),
-			Component(entity)
-
-		{
-
-		}
+			Component(entity) {}
 		~ChainCollider() = default;
 
-		// std::vector<Edge> m_edges;
 		Math2D::Chain m_chain;
 
 		b2BodyId* m_bodyId = nullptr;
@@ -241,13 +236,11 @@ namespace Engine
 		Filter m_mask;
 
 		bool m_loop = false;
-		Math2D::Point2D<float> m_loopVertex;
 
 		bool m_drawDebug;
 		DebugColor m_debugColor;
 
 		bool m_enabled;
-
 	};
 
 	struct Sprite : public Component

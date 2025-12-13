@@ -69,18 +69,12 @@ namespace Engine
 		
 		// 6. Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld(m_entities);
-		// m_physicsSimulation.AddLineCollidersToWorld(m_entities);
-		m_physicsSimulation.AddChainCollidersToWorld(m_chainColliders);
+		m_physicsSimulation.AddChainCollidersToWorld();
 
 		// 7. Contact callbacks need to be activated.
 		m_physicsSimulation.ActivateContactCallbacks();
 
 		// 8. Deactivate all components that should not be active at the start of the scene?
-
-		/*ENGINE_CRITICAL_D("Num transforms: {}, Num bodies: {}, Num line colliders: {}, Num cameras: {}, Num tile map entities: {}", 
-			m_refECS.GetHotComponents<Transform>().size(), m_refECS.GetHotComponents<PhysicsBody>().size(),
-			m_refECS.GetHotComponents<ChainCollider>().size(), m_refECS.GetHotComponents<Camera>().size(),
-			m_tileMap.GetMap().size());*/
 
 		// process items client wants to do.
 		if (m_clientOnScenePlay) m_clientOnScenePlay();
@@ -515,7 +509,6 @@ namespace Engine
 		Math2D::Point2D<float> size = Math2D::Point2D<float>(static_cast<float>(numUnitsPerTile), static_cast<float>(numUnitsPerTile));
 		bool gravityOn = false;
 		bool checkSimpleContacts = false;
-		bool useChains = false;
 		bool fillRect = false;
 		bool drawDebug = false;
 		DebugColor debugColor = DebugColor::NoColor;
@@ -556,15 +549,6 @@ namespace Engine
 			if (const json* fillRectJson = getJson(characterPhysicsRulesJson, "FillRect"))
 			{
 				fillRect = fillRectJson->get<bool>();
-			}
-
-			if (bodyType == STATIC)
-			{
-				// If body is not a sensor, it is solid and collides with other bodies.
-				// This information is needed for the chain system to know which tiles to link to.
-				// Not the best design but will work for now.
-				
-				useChains = true;
 			}
 
 			if (const json* gravityOnJson = getJson(characterPhysicsRulesJson, "GravityOn"))
@@ -625,7 +609,7 @@ namespace Engine
 				}
 			}
 
-			if (useChains && category == MAP) // only add to map chain if part of map category for now.
+			if (bodyType == STATIC && category == MAP) // only add to map chain if part of map category for now.
 			{
 				createEdge(refTileMap, isMap, x, y, tileEntity, edges);
 			}
@@ -818,24 +802,19 @@ namespace Engine
 		return isMap;
 	}
 
-
-	static std::vector<ChainCollider> createChainColliders(std::vector<Math2D::Chain>& refChains, ECS& refECS)
+	static void createChainColliders(std::vector<Math2D::Chain>& refChains, ECS& refECS)
 	{
 		std::vector<ChainCollider> chainColliders;
 
 		for (auto& refChain : refChains)
 		{
 			Entity chainEntity = refECS.CreateEntity();
-			chainColliders.emplace_back(chainEntity, refChain,
-				true, MAP, ALL, true, DebugColor::Red);
 
 			refECS.AddComponent<ChainCollider>(chainEntity, refChain,
 				true, MAP, ALL, true, DebugColor::Red);
 
 			refECS.Activate(chainEntity);
 		}
-
-		return chainColliders;
 	}
 
 	void Scene::loadSceneEntitiesFromTileMap()
@@ -946,6 +925,6 @@ namespace Engine
 		}
 
 		m_staticChains = MergeGridLinesIntoChains(edges);
-		m_chainColliders = createChainColliders(m_staticChains, m_refECS);
+		createChainColliders(m_staticChains, m_refECS);
 	}
 }

@@ -92,7 +92,7 @@ namespace Engine
 			Add chain colliders to the world.
 			arg1: vector of chain colliders
 		*/
-		void AddChainCollidersToWorld(std::vector<ChainCollider> m_chainColliders);
+		void AddChainCollidersToWorld();
 
 		/*
 			Activate contact callbacks in contact system.

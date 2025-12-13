@@ -312,9 +312,9 @@ namespace Engine
 		refPhysicsBody.m_worldId = m_ptrWorldId;
 	}
 
-	void PhysicsSimulation::AddChainCollidersToWorld(std::vector<ChainCollider> m_chainColliders)
+	void PhysicsSimulation::AddChainCollidersToWorld()
 	{
-		for (auto& chainCollider : m_chainColliders)
+		for (auto& chainCollider : m_refECS.GetHotComponents<ChainCollider>())
 		{
 			b2ChainDef chainDef = b2DefaultChainDef();
 			b2BodyDef bodyDef = b2DefaultBodyDef();
@@ -333,13 +333,13 @@ namespace Engine
 			}
 
 			chainDef.points = points.data();
-			// chainDef.userData = (void*)chainCollider.m_entity;
+			chainDef.userData = (void*)chainCollider.m_entity;
 
 			bodyDef.isEnabled = chainCollider.m_enabled;
 
 			bodyDef.type = b2_staticBody;
 			bodyDef.fixedRotation = true;
-			// bodyDef.userData = (void*)chainCollider.m_entity;
+			bodyDef.userData = (void*)chainCollider.m_entity;
 
 			b2BodyId bodyId = b2CreateBody(*m_ptrWorldId, &bodyDef);
 			b2ChainId chainId = b2CreateChain(bodyId, &chainDef);
@@ -524,30 +524,7 @@ namespace Engine
 	{
 		if (AppState::IN_SCENE)
 		{
-			/*if (m_refECS.HasComponent<ChainColliderLeft>(entity))
-			{
-				ChainColliderLeft* ptrChainColliderLeft = m_refECS.GetComponent<ChainColliderLeft>(entity);
-				b2Body_Enable(*ptrChainColliderLeft->m_bodyId);
-				ptrChainColliderLeft->m_enabled = true;
-			}
-			if (m_refECS.HasComponent<ChainColliderRight>(entity))
-			{
-				ChainColliderRight* ptrChainColliderRight = m_refECS.GetComponent<ChainColliderRight>(entity);
-				b2Body_Enable(*ptrChainColliderRight->m_bodyId);
-				ptrChainColliderRight->m_enabled = true;
-			}
-			if (m_refECS.HasComponent<ChainColliderTop>(entity))
-			{
-				ChainColliderTop* ptrChainColliderTop = m_refECS.GetComponent<ChainColliderTop>(entity);
-				b2Body_Enable(*ptrChainColliderTop->m_bodyId);
-				ptrChainColliderTop->m_enabled = true;
-			}
-			if (m_refECS.HasComponent<ChainColliderBottom>(entity))
-			{
-				ChainColliderBottom* ptrChainColliderBottom = m_refECS.GetComponent<ChainColliderBottom>(entity);
-				b2Body_Enable(*ptrChainColliderBottom->m_bodyId);
-				ptrChainColliderBottom->m_enabled = true;
-			}*/
+			
 		}
 	}
 
@@ -555,30 +532,7 @@ namespace Engine
 	{
 		if (AppState::IN_SCENE)
 		{
-			/*if (m_refECS.HasComponent<ChainColliderLeft>(entity))
-			{
-				ChainColliderLeft* ptrChainColliderLeft = m_refECS.GetComponent<ChainColliderLeft>(entity);
-				b2Body_Disable(*ptrChainColliderLeft->m_bodyId);
-				ptrChainColliderLeft->m_enabled = false;
-			}
-			if (m_refECS.HasComponent<ChainColliderRight>(entity))
-			{
-				ChainColliderRight* ptrChainColliderRight = m_refECS.GetComponent<ChainColliderRight>(entity);
-				b2Body_Disable(*ptrChainColliderRight->m_bodyId);
-				ptrChainColliderRight->m_enabled = false;
-			}
-			if (m_refECS.HasComponent<ChainColliderTop>(entity))
-			{
-				ChainColliderTop* ptrChainColliderTop = m_refECS.GetComponent<ChainColliderTop>(entity);
-				b2Body_Disable(*ptrChainColliderTop->m_bodyId);
-				ptrChainColliderTop->m_enabled = false;
-			}
-			if (m_refECS.HasComponent<ChainColliderBottom>(entity))
-			{
-				ChainColliderBottom* ptrChainColliderBottom = m_refECS.GetComponent<ChainColliderBottom>(entity);
-				b2Body_Disable(*ptrChainColliderBottom->m_bodyId);
-				ptrChainColliderBottom->m_enabled = false;
-			}*/
+			
 		}
 	}
 }
