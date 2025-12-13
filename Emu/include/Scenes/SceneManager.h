@@ -15,19 +15,19 @@ namespace Engine
 
 		inline Scene* GetCurrentScene() const { return m_ptrCurrentScene; };
 
-		const std::vector<Entity>& GetTileMapEntities(const std::string& sceneName, const char tileChar) const;
-		const Entity GetEntity(const std::string& sceneName, const char tileChar);
-		const std::vector<Entity>& GetEntities(const std::string& sceneName, const char tileChar);
+		const std::vector<Entity>& GetTileMapEntities(const std::string& sceneName, const size_t tileId) const;
+		const Entity GetEntity(const std::string& sceneName, const size_t tileId);
+		const std::vector<Entity>& GetEntities(const std::string& sceneName, const size_t tileId);
 
 		void RegisterOnScenePlay(const std::string& sceneName, std::function<void()> func);
 		void RegisterContactCallback(const std::string& sceneName, ContactType contactType, const char entityA, const char entityB, Scene::ContactCallback callback);
 		void RegisterContactCallback(const std::string& sceneName, ContactType contactType, const char entity, Scene::ContactCallback callback);
-		void SetGravity(const std::string& sceneName, const Vector2D<float> gravity);
+		void SetGravity(const std::string& sceneName, const Math2D::Point2D<float> gravity);
 		void AddTileMap(const std::string& sceneName, const std::string& mapFileName, const std::string& rulesFileName);
-		void SetLevelDimensions(const std::string& sceneName, const Vector2D<int> dimensions);
+		void SetLevelDimensions(const std::string& sceneName, const Math2D::Point2D<int> dimensions);
 
 		template <typename T, typename... Args>
-		void AddComponent(const std::string sceneName, const char c, Args&&... componentArgs)
+		void AddComponent(const std::string sceneName, const size_t tileId, Args&&... componentArgs)
 		{
 			auto it = m_scenes.find(sceneName);
 			if (it == m_scenes.end())
@@ -36,7 +36,7 @@ namespace Engine
 				return;
 			}
 
-			const std::vector<Entity>& entities = it->second.GetTileMapEntities(c);
+			const std::vector<Entity>& entities = it->second.GetTileMapEntities(tileId);
 			for (Entity entity : entities)
 			{
 				m_refECS.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);

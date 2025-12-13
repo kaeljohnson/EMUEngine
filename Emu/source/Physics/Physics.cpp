@@ -33,19 +33,19 @@ namespace Engine
 		GetBody(entity)->m_bodyType = type;
 	}
 
-	void PhysicsInterface::SetDimensions(Entity entity, const Vector2D<float> dimensions)
+	void PhysicsInterface::SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions)
 	{
 		PhysicsBody* ptrBody = GetBody(entity);
 		ptrBody->m_dimensions = dimensions;
 		ptrBody->m_halfDimensions = dimensions / 2.0f;
 	}
 
-	const Vector2D<float> PhysicsInterface::GetDimensions(Entity entity)
+	const Math2D::Point2D<float> PhysicsInterface::GetDimensions(Entity entity)
 	{
 		return GetBody(entity)->m_dimensions;
 	}
 
-	const Vector2D<float> PhysicsInterface::GetDimensions(PhysicsBody& body)
+	const Math2D::Point2D<float> PhysicsInterface::GetDimensions(PhysicsBody& body)
 	{
 		return body.m_dimensions;
 	}
@@ -55,38 +55,38 @@ namespace Engine
 		return m_refECS.GetComponent<PhysicsBody>(entity);
 	}
 
-	void PhysicsInterface::SetStartingPosition(Entity entity, Vector2D<float> position)
+	void PhysicsInterface::SetStartingPosition(Entity entity, Math2D::Point2D<float> position)
 	{
 		PhysicsBody* ptrBody = GetBody(entity);
 		ptrBody->m_startingPosition = position;
 	}
 
-	void PhysicsInterface::SetPosition(Entity entity, Vector2D<float> position)
+	void PhysicsInterface::SetPosition(Entity entity, Math2D::Point2D<float> position)
 	{
 		b2BodyId bodyId = *GetBody(entity)->m_bodyId;
 		b2Rot rotation = b2Body_GetRotation(bodyId);
 		b2Body_SetTransform(bodyId, b2Vec2(position.X, position.Y), rotation);
 	}
 
-	const Vector2D<float> PhysicsInterface::GetPosition(Entity entity)
+	const Math2D::Point2D<float> PhysicsInterface::GetPosition(Entity entity)
 	{
 		return GetBody(entity)->m_position;
 	}
 
-	const Vector2D<float> PhysicsInterface::GetTopLeftPosition(Entity entity)
+	const Math2D::Point2D<float> PhysicsInterface::GetTopLeftPosition(Entity entity)
 	{
 		PhysicsBody* ptrBody = GetBody(entity);
 		b2Vec2 position = b2Body_GetPosition(*ptrBody->m_bodyId);
-		return Vector2D<float>(position.x - ptrBody->m_halfDimensions.X, position.y - ptrBody->m_halfDimensions.Y);
+		return Math2D::Point2D<float>(position.x - ptrBody->m_halfDimensions.X, position.y - ptrBody->m_halfDimensions.Y);
 	}
 
-	void PhysicsInterface::ApplyForceToBody(Entity entity, Vector2D<float> force)
+	void PhysicsInterface::ApplyForceToBody(Entity entity, Math2D::Point2D<float> force)
 	{
 		b2BodyId bodyId = *GetBody(entity)->m_bodyId;
 		b2Body_ApplyForceToCenter(bodyId, b2Vec2(force.X, force.Y), true);
 	}
 
-	void PhysicsInterface::ApplyImpulseToBody(Entity entity, Vector2D<float> impulse)
+	void PhysicsInterface::ApplyImpulseToBody(Entity entity, Math2D::Point2D<float> impulse)
 	{
 		b2BodyId bodyId = *GetBody(entity)->m_bodyId;
 		b2Body_ApplyLinearImpulseToCenter(bodyId, b2Vec2(impulse.X, impulse.Y), true);
@@ -109,7 +109,7 @@ namespace Engine
 
 	}
 
-	void PhysicsInterface::SetVelocity(Entity entity, const Vector2D<float> velocity)
+	void PhysicsInterface::SetVelocity(Entity entity, const Math2D::Point2D<float> velocity)
 	{
 		b2BodyId bodyId = *GetBody(entity)->m_bodyId;
 		b2Body_SetLinearVelocity(bodyId, b2Vec2(velocity.X, velocity.Y));
@@ -129,11 +129,11 @@ namespace Engine
 		b2Body_SetLinearVelocity(bodyId, b2Vec2(velocity.x, yVel));
 	}
 
-	const Vector2D<float> PhysicsInterface::GetVelocity(Entity entity)
+	const Math2D::Point2D<float> PhysicsInterface::GetVelocity(Entity entity)
 	{
 		b2BodyId bodyId = *GetBody(entity)->m_bodyId;
 		b2Vec2 velocity = b2Body_GetLinearVelocity(bodyId);
-		return Vector2D<float>(velocity.x, velocity.y);
+		return Math2D::Point2D<float>(velocity.x, velocity.y);
 	}
 
 	void PhysicsInterface::SetRestitution(Entity entity, const float restitution)
@@ -228,7 +228,7 @@ namespace Engine
 		ENGINE_INFO_D("World created!");
 	}
 
-	void PhysicsSimulation::UpdateGravity(const Vector2D<float> gravity)
+	void PhysicsSimulation::UpdateGravity(const Math2D::Point2D<float> gravity)
 	{
 		if (AppState::IN_SCENE)
 		{
@@ -312,60 +312,41 @@ namespace Engine
 		refPhysicsBody.m_worldId = m_ptrWorldId;
 	}
 
-	void PhysicsSimulation::AddLineCollidersToWorld(std::vector<Entity>& entities)
+	void PhysicsSimulation::AddChainCollidersToWorld(std::vector<ChainCollider> m_chainColliders)
 	{
-		// This function also needs to connect lines together that meet at the same point.
-		ENGINE_INFO_D("Hot chains size! {}", m_refECS.GetHotComponents<ChainCollider>().size());
-
-		auto createChain = [&](ChainCollider* ptrChain)
-			{
-				b2ChainDef chainDef = b2DefaultChainDef();
-				b2BodyDef bodyDef = b2DefaultBodyDef();
-
-				chainDef.count = 4;
-				chainDef.filter.categoryBits = ptrChain->m_category;
-				chainDef.filter.maskBits = ptrChain->m_mask;
-				chainDef.friction = 0.0f;
-				chainDef.restitution = 0.0f;
-				chainDef.isLoop = false;
-
-				b2Vec2 points[4];
-				for (int i = 0; i < 4; ++i)
-				{
-					points[i].x = ptrChain->m_points[i].X;
-					points[i].y = ptrChain->m_points[i].Y;
-				}
-
-				chainDef.points = points;
-				chainDef.userData = (void*)ptrChain->m_entity;
-
-				bodyDef.isEnabled = ptrChain->m_enabled;
-
-				bodyDef.type = b2_staticBody;
-				bodyDef.fixedRotation = true;
-				bodyDef.userData = (void*)ptrChain->m_entity;
-
-				b2BodyId bodyId = b2CreateBody(*m_ptrWorldId, &bodyDef);
-				b2ChainId chainId = b2CreateChain(bodyId, &chainDef);
-
-				ptrChain->m_bodyId = new b2BodyId(bodyId);
-				ptrChain->m_chainId = new b2ChainId(chainId);
-				ptrChain->m_worldId = m_ptrWorldId;
-			};
-
-		for (auto& entity : entities)
+		for (auto& chainCollider : m_chainColliders)
 		{
-			if (m_refECS.HasComponent<ChainColliderLeft>(entity))
-				createChain(m_refECS.GetComponent<ChainColliderLeft>(entity));
+			b2ChainDef chainDef = b2DefaultChainDef();
+			b2BodyDef bodyDef = b2DefaultBodyDef();
 
-			if (m_refECS.HasComponent<ChainColliderRight>(entity))
-				createChain(m_refECS.GetComponent<ChainColliderRight>(entity));
+			chainDef.count = (int)chainCollider.m_chain.m_points.size();
+			chainDef.filter.categoryBits = chainCollider.m_category;
+			chainDef.filter.maskBits = chainCollider.m_mask;
+			chainDef.friction = 0.0f;
+			chainDef.restitution = 0.0f;
+			chainDef.isLoop = chainCollider.m_chain.m_loop;
 
-			if (m_refECS.HasComponent<ChainColliderTop>(entity))
-				createChain(m_refECS.GetComponent<ChainColliderTop>(entity));
+			std::vector<b2Vec2> points;
+			for (const auto& point : chainCollider.m_chain.m_points)
+			{
+				points.push_back(b2Vec2(point.X, point.Y));
+			}
 
-			if (m_refECS.HasComponent<ChainColliderBottom>(entity))
-				createChain(m_refECS.GetComponent<ChainColliderBottom>(entity));
+			chainDef.points = points.data();
+			// chainDef.userData = (void*)chainCollider.m_entity;
+
+			bodyDef.isEnabled = chainCollider.m_enabled;
+
+			bodyDef.type = b2_staticBody;
+			bodyDef.fixedRotation = true;
+			// bodyDef.userData = (void*)chainCollider.m_entity;
+
+			b2BodyId bodyId = b2CreateBody(*m_ptrWorldId, &bodyDef);
+			b2ChainId chainId = b2CreateChain(bodyId, &chainDef);
+
+			chainCollider.m_bodyId = new b2BodyId(bodyId);
+			chainCollider.m_chainId = new b2ChainId(chainId);
+			chainCollider.m_worldId = m_ptrWorldId;
 		}
 	}
 
@@ -442,7 +423,7 @@ namespace Engine
 			if (refPhysicsBody.m_bodyType == STATIC) continue;
 
 			b2Vec2 position = b2Body_GetPosition(*refPhysicsBody.m_bodyId);
-			refPhysicsBody.m_position = Vector2D<float>(position.x - refPhysicsBody.m_halfDimensions.X, position.y - refPhysicsBody.m_halfDimensions.Y);
+			refPhysicsBody.m_position = Math2D::Point2D<float>(position.x - refPhysicsBody.m_halfDimensions.X, position.y - refPhysicsBody.m_halfDimensions.Y);
 
 			b2Rot rotation = b2Body_GetRotation(*refPhysicsBody.m_bodyId);
 			refPhysicsBody.m_rotation = b2Rot_GetAngle(rotation) * 180.0f / 3.14159265359f;
@@ -450,7 +431,7 @@ namespace Engine
 			if (Transform* ptrTransform = m_refECS.GetComponent<Transform>(refPhysicsBody.m_entity)) // Don't worry about transform being inactive as we already know its corresponding physics body is active.
 			{
 				ptrTransform->PrevPosition = ptrTransform->Position;
-				ptrTransform->Dimensions = refPhysicsBody.m_dimensions;
+				//ptrTransform->Dimensions = refPhysicsBody.m_dimensions;
 				ptrTransform->Position = refPhysicsBody.m_position;
 				ptrTransform->Rotation = refPhysicsBody.m_rotation;
 			}
@@ -543,7 +524,7 @@ namespace Engine
 	{
 		if (AppState::IN_SCENE)
 		{
-			if (m_refECS.HasComponent<ChainColliderLeft>(entity))
+			/*if (m_refECS.HasComponent<ChainColliderLeft>(entity))
 			{
 				ChainColliderLeft* ptrChainColliderLeft = m_refECS.GetComponent<ChainColliderLeft>(entity);
 				b2Body_Enable(*ptrChainColliderLeft->m_bodyId);
@@ -566,7 +547,7 @@ namespace Engine
 				ChainColliderBottom* ptrChainColliderBottom = m_refECS.GetComponent<ChainColliderBottom>(entity);
 				b2Body_Enable(*ptrChainColliderBottom->m_bodyId);
 				ptrChainColliderBottom->m_enabled = true;
-			}
+			}*/
 		}
 	}
 
@@ -574,7 +555,7 @@ namespace Engine
 	{
 		if (AppState::IN_SCENE)
 		{
-			if (m_refECS.HasComponent<ChainColliderLeft>(entity))
+			/*if (m_refECS.HasComponent<ChainColliderLeft>(entity))
 			{
 				ChainColliderLeft* ptrChainColliderLeft = m_refECS.GetComponent<ChainColliderLeft>(entity);
 				b2Body_Disable(*ptrChainColliderLeft->m_bodyId);
@@ -597,7 +578,7 @@ namespace Engine
 				ChainColliderBottom* ptrChainColliderBottom = m_refECS.GetComponent<ChainColliderBottom>(entity);
 				b2Body_Disable(*ptrChainColliderBottom->m_bodyId);
 				ptrChainColliderBottom->m_enabled = false;
-			}
+			}*/
 		}
 	}
 }

@@ -10,14 +10,14 @@ namespace Engine
 	{
 	public:
 		// Transform getter and setter wrappers
-		const Vector2D<float> GetPrevPosition(Entity entity);
-		const Vector2D<float> GetPrevPosition(Transform& transform);
+		const Math2D::Point2D<float> GetPrevPosition(Entity entity);
+		const Math2D::Point2D<float> GetPrevPosition(Transform& transform);
 
 		// Calling this on a transform that is connected to a physics component is meaningless.
-		void SetPosition(Entity entity, const Vector2D<float> position);
-		const Vector2D<float> GetPosition(Entity entity);
-		void SetDimensions(Entity entity, const Vector2D<float> dimensions);
-		const Vector2D<float> GetDimensions(Entity entity);
+		void SetPosition(Entity entity, const Math2D::Point2D<float> position);
+		const Math2D::Point2D<float> GetPosition(Entity entity);
+		void SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions);
+		const Math2D::Point2D<float> GetDimensions(Entity entity);
 		void SetZIndex(Entity entity, const int zIndex);
 		const int GetZIndex(Entity entity);
 		void SetRotation(Entity entity, const float rotation);
@@ -31,7 +31,7 @@ namespace Engine
 		Transform* GetTransform(Entity entity);
 		TransformInterface(ECS& refEcs);
 
-		void SetPrevPosition(Entity entity, const Vector2D<float> position);
+		void SetPrevPosition(Entity entity, const Math2D::Point2D<float> position);
 	private:
 		ECS& m_refECS;
 	};

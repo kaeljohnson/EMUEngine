@@ -11,10 +11,10 @@ PlayerCamera::PlayerCamera() :
 {
     // Combine this whole class into player class.
 
-    Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::CameraUpdater>("Level1", 'P',
+    Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::CameraUpdater>("Level1", 1,
 		[this](Engine::Entity entity) { Update(entity); });
 
-	Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::CameraUpdater>("Level2", 'P',
+	Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::CameraUpdater>("Level2", 1,
 		[this](Engine::Entity entity) { Update(entity); });
 }
 
@@ -24,18 +24,18 @@ void PlayerCamera::Update(Engine::Entity entity)
 
     const float interpFactor = Engine::Time::GetInterpolationFactor();
 
-	const Engine::Vector2D<float> targetPrevPosition = Engine::EMU::GetInstance()->Transform_GetPrevPosition(entity);
-	const Engine::Vector2D<float> targetPosition = Engine::EMU::GetInstance()->Transform_GetPosition(entity);
+	const Math2D::Point2D<float> targetPrevPosition = Engine::EMU::GetInstance()->Transform_GetPrevPosition(entity);
+	const Math2D::Point2D<float> targetPosition = Engine::EMU::GetInstance()->Transform_GetPosition(entity);
 
-    Engine::Vector2D<float> targetPos = Engine::Lerp(targetPrevPosition, targetPosition, interpFactor);
-	Engine::Vector2D<float> cameraSize = Engine::EMU::GetInstance()->Camera_GetSize(entity);
+    Math2D::Point2D<float> targetPos = Math2D::Lerp(targetPrevPosition, targetPosition, interpFactor);
+	Math2D::Point2D<float> cameraSize = Engine::EMU::GetInstance()->Camera_GetSize(entity);
 
 	// Calculate the desired camera position based on the target's position
 	float desiredCameraTopLeftX = targetPos.X - (cameraSize.X / 2.0f);
 	float desiredCameraTopLeftY = targetPos.Y - (cameraSize.Y / 2.0f);
 
 	// Set the camera offset to the desired position
-	Engine::EMU::GetInstance()->Camera_SetOffset(entity, Engine::Vector2D<float>(desiredCameraTopLeftX, desiredCameraTopLeftY));
+	Engine::EMU::GetInstance()->Camera_SetOffset(entity, Math2D::Point2D<float>(desiredCameraTopLeftX, desiredCameraTopLeftY));
 
     return;
 
@@ -45,15 +45,15 @@ void PlayerCamera::Update(Engine::Entity entity)
 	// Engine::TransformInterface& refTransformInterface = Engine::EMU::GetInstance()->ITRANSFORMS();
 	// Engine::Camera* ptrCamera = Engine::EMU::GetInstance()->IECS().GetComponentManager<Engine::Camera>().GetComponent(m_entity);
 
-	//Engine::Vector2D<float> targetPrevPosition = refTransformInterface.GetPrevPosition(m_entity);
-	//Engine::Vector2D<float> targetPosition = refTransformInterface.GetPosition(m_entity);
- //   Engine::Vector2D<float> target = Engine::Lerp(targetPrevPosition, targetPosition, Engine::Time::GetInterpolationFactor());
+	//Math2D::Point2D<float> targetPrevPosition = refTransformInterface.GetPrevPosition(m_entity);
+	//Math2D::Point2D<float> targetPosition = refTransformInterface.GetPosition(m_entity);
+ //   Math2D::Point2D<float> target = Engine::Lerp(targetPrevPosition, targetPosition, Engine::Time::GetInterpolationFactor());
 
 
 	//Engine::CameraInterface& refCameraInterface = Engine::EMU::GetInstance()->ICAMERA();
- //   const Engine::Vector2D<float> cameraSize = refCameraInterface.GetSize(m_entity);
+ //   const Math2D::Point2D<float> cameraSize = refCameraInterface.GetSize(m_entity);
 	//Engine::EMU::GetInstance()->ICAMERA().SetOffsets(m_entity, 
- //       Engine::Vector2D<float>(target.X - (cameraSize.X / 2.0f), target.Y - (cameraSize.Y / 2.0f)));
+ //       Math2D::Point2D<float>(target.X - (cameraSize.X / 2.0f), target.Y - (cameraSize.Y / 2.0f)));
 
  //   // if (ptrCamera->m_clampingOn) ptrCamera->Clamp(); Engine willhandle clamping.
 
@@ -77,27 +77,27 @@ void PlayerCamera::Update(Engine::Entity entity)
  //   float desiredCameraTopLeftX = target.X - (cameraSize.X / 2.0f);
  //   float desiredCameraTopLeftY = target.Y - (cameraSize.Y / 2.0f);
 
- //   const Engine::Vector2D<float> cameraOffset = refCameraInterface.GetOffset(m_entity);
+ //   const Math2D::Point2D<float> cameraOffset = refCameraInterface.GetOffset(m_entity);
 
-	//refCameraInterface.SetOffsets(m_entity, Engine::Vector2D<float>(desiredCameraTopLeftX - cameraOffset.X, cameraOffset.Y));
+	//refCameraInterface.SetOffsets(m_entity, Math2D::Point2D<float>(desiredCameraTopLeftX - cameraOffset.X, cameraOffset.Y));
 
  //   if (target.Y > cameraOffset.Y + ((cameraSize.Y) * m_bottomTargetScreenBound))
  //   {
-	//	refCameraInterface.SetOffsets(m_entity, Engine::Vector2D<float>(cameraOffset.X, target.Y - ((cameraSize.Y) * m_bottomTargetScreenBound)));
+	//	refCameraInterface.SetOffsets(m_entity, Math2D::Point2D<float>(cameraOffset.X, target.Y - ((cameraSize.Y) * m_bottomTargetScreenBound)));
  //   }
  //   else if (target.Y < cameraOffset.Y + ((cameraSize.Y)*m_topTargetScreenBound))
  //   {
-	//	refCameraInterface.SetOffsets(m_entity, Engine::Vector2D<float>(cameraOffset.X, target.Y - ((cameraSize.Y) * m_topTargetScreenBound)));
+	//	refCameraInterface.SetOffsets(m_entity, Math2D::Point2D<float>(cameraOffset.X, target.Y - ((cameraSize.Y) * m_topTargetScreenBound)));
  //   }
  //   else if (m_smoothingOn)
  //   {
 	//	// Smoothly move the camera towards the desired position
  //       refCameraInterface.SetOffsets(m_entity, 
- //           Engine::Vector2D<float>(cameraOffset.X, (desiredCameraTopLeftY - cameraOffset.Y) * (m_smoothingFactor / Engine::Screen::GetScale().Y)));
+ //           Math2D::Point2D<float>(cameraOffset.X, (desiredCameraTopLeftY - cameraOffset.Y) * (m_smoothingFactor / Engine::Screen::GetScale().Y)));
  //   }
  //   else
  //   {
-	//	refCameraInterface.SetOffsets(m_entity, Engine::Vector2D<float>(cameraOffset.X, desiredCameraTopLeftY));
+	//	refCameraInterface.SetOffsets(m_entity, Math2D::Point2D<float>(cameraOffset.X, desiredCameraTopLeftY));
  //   }
 
     // if (ptrCamera->m_clampingOn) ptrCamera->Clamp();

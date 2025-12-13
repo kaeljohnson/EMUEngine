@@ -42,12 +42,12 @@ namespace Engine
 		}
 	}
 
-	const Entity SceneManager::GetEntity(const std::string& sceneName, const char tileChar)
+	const Entity SceneManager::GetEntity(const std::string& sceneName, const size_t tileId)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
 		{
-			return it->second.GetTileMapEntity(tileChar);
+			return it->second.GetTileMapEntity(tileId);
 		}
 		else
 		{
@@ -56,12 +56,12 @@ namespace Engine
 		}
 	}
 
-	const std::vector<Entity>& SceneManager::GetEntities(const std::string& sceneName, const char tileChar)
+	const std::vector<Entity>& SceneManager::GetEntities(const std::string& sceneName, const size_t tileId)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
 		{
-			return it->second.GetTileMapEntities(tileChar);
+			return it->second.GetTileMapEntities(tileId);
 		}
 		else
 		{
@@ -88,12 +88,12 @@ namespace Engine
 		m_scenes.clear();
 	}
 
-	const std::vector<Entity>& SceneManager::GetTileMapEntities(const std::string& sceneName, const char tileChar) const 
+	const std::vector<Entity>& SceneManager::GetTileMapEntities(const std::string& sceneName, const size_t tileId) const 
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end()) 
 		{
-			return it->second.GetTileMapEntities(tileChar);
+			return it->second.GetTileMapEntities(tileId);
 		}
 		else 
 		{
@@ -144,7 +144,7 @@ namespace Engine
 		}
 	}
 
-	void SceneManager::SetGravity(const std::string& sceneName, const Vector2D<float> gravity)
+	void SceneManager::SetGravity(const std::string& sceneName, const Math2D::Point2D<float> gravity)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
@@ -170,7 +170,7 @@ namespace Engine
 		}
 	}
 
-	void SceneManager::SetLevelDimensions(const std::string& sceneName, const Vector2D<int> dimensions)
+	void SceneManager::SetLevelDimensions(const std::string& sceneName, const Math2D::Point2D<int> dimensions)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())

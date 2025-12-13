@@ -17,7 +17,7 @@ namespace Engine
 		ptrCamera->m_pixelsPerUnit = pixelsPerUnit;
 
 		ptrCamera->m_size
-			= Vector2D<float>(Screen::VIEWPORT_SIZE.X * ptrCamera->m_screenRatio.X / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.X),
+			= Math2D::Point2D<float>(Screen::VIEWPORT_SIZE.X * ptrCamera->m_screenRatio.X / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.X),
 				Screen::VIEWPORT_SIZE.Y * ptrCamera->m_screenRatio.Y / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.Y));
 	}
 
@@ -26,17 +26,17 @@ namespace Engine
 		return m_refECS.GetComponent<Camera>(entity)->m_pixelsPerUnit;
 	}
 
-	const Vector2D<float> CameraInterface::GetSize(Entity entity)
+	const Math2D::Point2D<float> CameraInterface::GetSize(Entity entity)
 	{
 		return m_refECS.GetComponent<Camera>(entity)->m_size;
 	}
 
-	void CameraInterface::SetOffsets(Entity entity, const Vector2D<float> offsets)
+	void CameraInterface::SetOffsets(Entity entity, const Math2D::Point2D<float> offsets)
 	{
 		m_refECS.GetComponent<Camera>(entity)->m_offset = offsets;
 	}
 
-	void CameraInterface::SetOffset(Entity entity, const Vector2D<float> offset)
+	void CameraInterface::SetOffset(Entity entity, const Math2D::Point2D<float> offset)
 	{
 		Camera* ptrCamera = m_refECS.GetComponent<Camera>(entity);
 
@@ -44,7 +44,7 @@ namespace Engine
 		ptrCamera->m_offset.Y = offset.Y;
 	}
 
-	const Vector2D<float> CameraInterface::GetOffset(Entity entity)
+	const Math2D::Point2D<float> CameraInterface::GetOffset(Entity entity)
 	{
 		return m_refECS.GetComponent<Camera>(entity)->m_offset;
 	}

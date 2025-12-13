@@ -70,7 +70,7 @@ private:
 	float m_jumpCharge;
 	float m_coyoteTime;
 	bool m_onGround;
-	Engine::Vector2D<float> m_force;
+	Math2D::Point2D<float> m_force;
 
 	const Engine::IOEventStatesMap& refKeyStates;
 

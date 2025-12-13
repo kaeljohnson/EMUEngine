@@ -28,7 +28,7 @@ namespace Engine
 			arg2: y - The y-coordinate of the tile.
 			returns: Pointer to a pair of Entity and char, or nullptr if not found.
 		*/
-		const std::pair<Entity, char>* GetTile(int x, int y) const;
+		const std::pair<Entity, size_t>* GetTile(int x, int y) const;
 		
 		/*
 			Gets the Width of the map in tiles.
@@ -45,20 +45,20 @@ namespace Engine
 		/*
 			Gets the first entity that matches the character.
 			Ideally used on unique tiles like player start, exit, etc.
-			arg1: tileChar - The character representing the tile.
+			arg1: tileId - The character representing the tile.
 			returns: The first Entity that matches the character.
 		*/
-		Entity GetEntity(char tileChar) const;
+		Entity GetEntity(size_t tileId) const;
 
 		/*
 			Gets all entities that match the character.
-			arg1: tileChar - The character representing the tile.
+			arg1: tileId - The character representing the tile.
 			returns: A vector by reference of Entities that match the character.
 		*/
-		const std::vector<Entity>& GetEntities(char tileChar) const
+		const std::vector<Entity>& GetEntities(size_t tileId) const
 		{
-			if (m_groupedEntitiesByCharMap.find(tileChar) != m_groupedEntitiesByCharMap.end())
-				return m_groupedEntitiesByCharMap.at(tileChar);
+			if (m_groupedEntitiesByNumMap.find(tileId) != m_groupedEntitiesByNumMap.end())
+				return m_groupedEntitiesByNumMap.at(tileId);
 
 			return std::vector<Entity>(); // Return an empty vector if no entities found.
 		}
@@ -67,7 +67,7 @@ namespace Engine
 			Gets the entire map.
 			returns: A constant reference to the map.
 		*/
-		const std::unordered_map<std::pair<int, int>, std::pair<Entity, char>, PairIntHash>& GetMap() const { return m_tileMap; }
+		const std::unordered_map<std::pair<int, int>, std::pair<Entity, size_t>, PairIntHash>& GetMap() const { return m_tileMap; }
 
 		/*
 			Creates the tile map from the specified map and rules files.
@@ -77,10 +77,10 @@ namespace Engine
 
 
 	private:
-		std::unordered_map<std::pair<int, int>, std::pair<Entity, char>, PairIntHash> m_tileMap;
-		std::unordered_map<char, std::vector<Entity>> m_groupedEntitiesByCharMap;
+		std::unordered_map<std::pair<int, int>, std::pair<Entity, size_t>, PairIntHash> m_tileMap;
+		std::unordered_map<size_t, std::vector<Entity>> m_groupedEntitiesByNumMap;
 
-		Vector2D<int> m_mapDimensions;
+		Math2D::Point2D<int> m_mapDimensions;
 		ECS& m_refECS;
 	};
 }

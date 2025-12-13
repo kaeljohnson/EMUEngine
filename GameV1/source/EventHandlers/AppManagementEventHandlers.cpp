@@ -20,7 +20,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 		{
 			// Window Interface to call the resize function.
 			// refApp.GetWindowRenderer().ResizeWindow(e.X_POS, e.Y_POS);
-			Engine::EMU::GetInstance()->SetWindowSize(Engine::Vector2D<int>(e.X_POS, e.Y_POS));
+			Engine::EMU::GetInstance()->SetWindowSize(Math2D::Point2D<int>(e.X_POS, e.Y_POS));
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::RESIZE_WINDOW)));
 			e.Handled = true;
 		});

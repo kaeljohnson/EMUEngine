@@ -28,13 +28,9 @@ namespace Engine
 		m_ecs.RegisterComponentManager<PhysicsUpdater>();
 		m_ecs.RegisterComponentManager<CameraUpdater>();
 		m_ecs.RegisterComponentManager<PhysicsBody>();
+		m_ecs.RegisterComponentManager<ChainCollider>();
 		m_ecs.RegisterComponentManager<Transform>();
 		m_ecs.RegisterComponentManager<Camera>();
-		m_ecs.RegisterComponentManager<ChainCollider>();
-		m_ecs.RegisterComponentManager<ChainColliderTop>();
-		m_ecs.RegisterComponentManager<ChainColliderLeft>();
-		m_ecs.RegisterComponentManager<ChainColliderRight>();
-		m_ecs.RegisterComponentManager<ChainColliderBottom>();
 		m_ecs.RegisterComponentManager<Sprite>();
 		m_ecs.RegisterComponentManager<Animations>();
 		m_ecs.RegisterComponentManager<AudioSource>();
@@ -79,9 +75,9 @@ namespace Engine
 		return m_sceneManager.GetEntities(sceneName, c);
 	}
 
-	Entity EMU::Scenes_GetCurrentRuntimeEntity(const char c)
+	Entity EMU::Scenes_GetCurrentRuntimeEntity(const size_t tileId)
 	{
-		return m_sceneManager.GetCurrentScene()->GetTileMapEntity(c);
+		return m_sceneManager.GetCurrentScene()->GetTileMapEntity(tileId);
 	}
 
 	void EMU::Scenes_Activate(Entity entity) { m_sceneManager.GetCurrentScene()->Activate(entity); }
@@ -96,43 +92,43 @@ namespace Engine
 	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entity, ContactCallback callback) {
 		m_sceneManager.RegisterContactCallback(name, contactType, entity, callback);
 	}
-	void EMU::Scenes_SetGravity(const std::string& name, const Vector2D<float> gravity) { m_sceneManager.SetGravity(name, gravity); }
+	void EMU::Scenes_SetGravity(const std::string& name, const Math2D::Point2D<float> gravity) { m_sceneManager.SetGravity(name, gravity); }
 	// void EMU::Scenes_Add(const std::string& name, Entity entity) { getScene(name).Add(entity); }
 	// void EMU::Scenes_Remove(const std::string& name, Entity entity) { getScene(name).Remove(entity); m_ecs.Deactivate(entity); }
 	void EMU::Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName) { m_sceneManager.AddTileMap(name, mapFileName, rulesFileName); }
-	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const char tileChar) { return m_sceneManager.GetEntity(name, tileChar); }
-	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const char tileChar) { return m_sceneManager.GetTileMapEntities(name, tileChar); }
-	void EMU::Scenes_SetLevelDimensions(const std::string& name, const Vector2D<int> levelWidthInUnits) { m_sceneManager.SetLevelDimensions(name, levelWidthInUnits); }
+	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const size_t tileId) { return m_sceneManager.GetEntity(name, tileId); }
+	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const size_t tileId) { return m_sceneManager.GetTileMapEntities(name, tileId); }
+	void EMU::Scenes_SetLevelDimensions(const std::string& name, const Math2D::Point2D<int> levelWidthInUnits) { m_sceneManager.SetLevelDimensions(name, levelWidthInUnits); }
 
 	void EMU::Camera_SetPixelsPerUnit(Entity entity, const int pixelsPerUnit) { m_cameraInterface.SetPixelsPerUnit(entity, pixelsPerUnit); }
 	const int EMU::Camera_GetPixelsPerUnit(Entity entity) { return m_cameraInterface.GetPixelsPerUnit(entity); }
-	void EMU::Camera_SetOffset(Entity entity, const Vector2D<float> offset) { m_cameraInterface.SetOffset(entity, offset); }
-	const Vector2D<float> EMU::Camera_GetOffset(Entity entity) { return m_cameraInterface.GetOffset(entity); }
+	void EMU::Camera_SetOffset(Entity entity, const Math2D::Point2D<float> offset) { m_cameraInterface.SetOffset(entity, offset); }
+	const Math2D::Point2D<float> EMU::Camera_GetOffset(Entity entity) { return m_cameraInterface.GetOffset(entity); }
 	void EMU::Camera_SetClampingOn(Entity entity, const bool clampingOn) { m_cameraInterface.SetClampingOn(entity, clampingOn); }
 	const bool EMU::Camera_GetClampingOn(Entity entity) { return m_cameraInterface.GetClampingOn(entity); }
-	const Vector2D<float> EMU::Camera_GetSize(Entity entity) { return m_cameraInterface.GetSize(entity); }
-	void EMU::Camera_SetOffsets(Entity entity, const Vector2D<float> offsets) { m_cameraInterface.SetOffsets(entity, offsets); }
-	void EMU::Camera_AddShake(Entity entity, const Vector2D<float> intensity, const Vector2D<float> duration) { /*Add shaek to camera*/ }
+	const Math2D::Point2D<float> EMU::Camera_GetSize(Entity entity) { return m_cameraInterface.GetSize(entity); }
+	void EMU::Camera_SetOffsets(Entity entity, const Math2D::Point2D<float> offsets) { m_cameraInterface.SetOffsets(entity, offsets); }
+	void EMU::Camera_AddShake(Entity entity, const Math2D::Point2D<float> intensity, const Math2D::Point2D<float> duration) { /*Add shaek to camera*/ }
 
 	// PhysicsBody2d getter and setter wrappers
 	void EMU::Physics_CreateBody(Entity entity) { m_physicsInterface.CreateBody(entity); }
 	const bool EMU::Physics_HasBody(Entity entity) { return m_physicsInterface.HasBody(entity); }
 	void EMU::Physics_SetBodyType(Entity entity, const BodyType type) { m_physicsInterface.SetBodyType(entity, type); }
-	void EMU::Physics_SetDimensions(Entity entity, const Vector2D<float> dimensions) { m_physicsInterface.SetDimensions(entity, dimensions); }
-	const Vector2D<float> EMU::Physics_GetDimensions(Entity entity) { return m_physicsInterface.GetDimensions(entity); }
-	const Vector2D<float> EMU::Physics_GetDimensions(PhysicsBody& body) { return m_physicsInterface.GetDimensions(body); }
+	void EMU::Physics_SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions) { m_physicsInterface.SetDimensions(entity, dimensions); }
+	const Math2D::Point2D<float> EMU::Physics_GetDimensions(Entity entity) { return m_physicsInterface.GetDimensions(entity); }
+	const Math2D::Point2D<float> EMU::Physics_GetDimensions(PhysicsBody& body) { return m_physicsInterface.GetDimensions(body); }
 	void EMU::Physics_SetGravity(Entity entity, bool enabled) { m_physicsInterface.SetGravity(entity, enabled); }
-	void EMU::Physics_SetStartingPosition(Entity entity, const Vector2D<float> position) { m_physicsInterface.SetStartingPosition(entity, position); }
-	void EMU::Physics_SetPosition(Entity entity, const Vector2D<float> position) { m_physicsInterface.SetPosition(entity, position); }
-	const Vector2D<float> EMU::Physics_GetPosition(Entity entity) { return m_physicsInterface.GetPosition(entity); }
-	const Vector2D<float> EMU::Physics_GetTopLeftPosition(Entity entity) { return m_physicsInterface.GetTopLeftPosition(entity); }
-	void EMU::Physics_ApplyForceToBody(Entity entity, Vector2D<float> force) { m_physicsInterface.ApplyForceToBody(entity, force); }
-	void EMU::Physics_ApplyImpulseToBody(Entity entity, Vector2D<float> impulse) { m_physicsInterface.ApplyImpulseToBody(entity, impulse); }
-	void EMU::Physics_SetVelocity(Entity entity, const Vector2D<float> velocity) { m_physicsInterface.SetVelocity(entity, velocity); }
+	void EMU::Physics_SetStartingPosition(Entity entity, const Math2D::Point2D<float> position) { m_physicsInterface.SetStartingPosition(entity, position); }
+	void EMU::Physics_SetPosition(Entity entity, const Math2D::Point2D<float> position) { m_physicsInterface.SetPosition(entity, position); }
+	const Math2D::Point2D<float> EMU::Physics_GetPosition(Entity entity) { return m_physicsInterface.GetPosition(entity); }
+	const Math2D::Point2D<float> EMU::Physics_GetTopLeftPosition(Entity entity) { return m_physicsInterface.GetTopLeftPosition(entity); }
+	void EMU::Physics_ApplyForceToBody(Entity entity, Math2D::Point2D<float> force) { m_physicsInterface.ApplyForceToBody(entity, force); }
+	void EMU::Physics_ApplyImpulseToBody(Entity entity, Math2D::Point2D<float> impulse) { m_physicsInterface.ApplyImpulseToBody(entity, impulse); }
+	void EMU::Physics_SetVelocity(Entity entity, const Math2D::Point2D<float> velocity) { m_physicsInterface.SetVelocity(entity, velocity); }
 	void EMU::Physics_SetXVelocity(Entity entity, const float xVelocity) { m_physicsInterface.SetXVelocity(entity, xVelocity); }
 	void EMU::Physics_SetYVelocity(Entity entity, const float yVelocity) { m_physicsInterface.SetYVelocity(entity, yVelocity); }
 	void EMU::Physics_SetDeceleration(Entity entity, const float decel) { m_physicsInterface.SetDeceleration(entity, decel); }
-	const Vector2D<float> EMU::Physics_GetVelocity(Entity entity) { return m_physicsInterface.GetVelocity(entity); }
+	const Math2D::Point2D<float> EMU::Physics_GetVelocity(Entity entity) { return m_physicsInterface.GetVelocity(entity); }
 	void EMU::Physics_SetRestitution(Entity entity, const float restitution) { m_physicsInterface.SetRestitution(entity, restitution); }
 	void EMU::Physics_SetDensity(Entity entity, const float density) { m_physicsInterface.SetDensity(entity, density); }
 	void EMU::Physics_SetFriction(Entity entity, const float friction) { m_physicsInterface.SetFriction(entity, friction); }
@@ -148,12 +144,12 @@ namespace Engine
 	const bool EMU::Physics_HasContactRight(Entity entity) { return m_physicsInterface.HasContactRight(entity); }
 
 	// Transform getter and setter wrappers
-	const Vector2D<float> EMU::Transform_GetPrevPosition(Entity entity) { return m_transformInterface.GetPrevPosition(entity); }
-	const Vector2D<float> EMU::Transform_GetPrevPosition(Transform& transform) { return m_transformInterface.GetPrevPosition(transform); }
-	void EMU::Transform_SetPosition(Entity entity, const Vector2D<float> position) { m_transformInterface.SetPosition(entity, position); }
-	const Vector2D<float> EMU::Transform_GetPosition(Entity entity) { return m_transformInterface.GetPosition(entity); }
-	void EMU::Transform_SetDimensions(Entity entity, const Vector2D<float> dimensions) { m_transformInterface.SetDimensions(entity, dimensions); }
-	const Vector2D<float> EMU::Transform_GetDimensions(Entity entity) { return m_transformInterface.GetDimensions(entity); }
+	const Math2D::Point2D<float> EMU::Transform_GetPrevPosition(Entity entity) { return m_transformInterface.GetPrevPosition(entity); }
+	const Math2D::Point2D<float> EMU::Transform_GetPrevPosition(Transform& transform) { return m_transformInterface.GetPrevPosition(transform); }
+	void EMU::Transform_SetPosition(Entity entity, const Math2D::Point2D<float> position) { m_transformInterface.SetPosition(entity, position); }
+	const Math2D::Point2D<float> EMU::Transform_GetPosition(Entity entity) { return m_transformInterface.GetPosition(entity); }
+	void EMU::Transform_SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions) { m_transformInterface.SetDimensions(entity, dimensions); }
+	const Math2D::Point2D<float> EMU::Transform_GetDimensions(Entity entity) { return m_transformInterface.GetDimensions(entity); }
 	void EMU::Transform_SetZIndex(Entity entity, const int zIndex) { m_transformInterface.SetZIndex(entity, zIndex); }
 	const int EMU::Transform_GetZIndex(Entity entity) { return m_transformInterface.GetZIndex(entity); }
 	void EMU::Transform_SetRotation(Entity entity, const float rotation) { m_transformInterface.SetRotation(entity, rotation); }
@@ -164,12 +160,12 @@ namespace Engine
 	const int EMU::Transform_GetDirectionFacing(Entity entity) { return m_transformInterface.GetDirectionFacing(entity); }
 
 	// Screen interface
-	const Vector2D<int> EMU::GetScreenSize() { return Screen::GetScreenSize(); }
-	const Vector2D<int> EMU::GetVirtualSize() { return Screen::GetVirtualSize(); }
-	const Vector2D<float> EMU::GetScale() { return Screen::GetScale(); }
+	const Math2D::Point2D<int> EMU::GetScreenSize() { return Screen::GetScreenSize(); }
+	const Math2D::Point2D<int> EMU::GetVirtualSize() { return Screen::GetVirtualSize(); }
+	const Math2D::Point2D<float> EMU::GetScale() { return Screen::GetScale(); }
 	const float EMU::GetScaleConstant() { return Screen::GetScaleConstant(); }
-	const Vector2D<int> EMU::GetViewportSize() { return Screen::GetViewportSize(); }
-	const Vector2D<int> EMU::GetViewportPosition() { return Screen::GetViewportPosition(); }
-	void EMU::SetWindowSize(const Vector2D<int>& size) { Screen::SetWindowSize(size); }
+	const Math2D::Point2D<int> EMU::GetViewportSize() { return Screen::GetViewportSize(); }
+	const Math2D::Point2D<int> EMU::GetViewportPosition() { return Screen::GetViewportPosition(); }
+	void EMU::SetWindowSize(const Math2D::Point2D<int>& size) { Screen::SetWindowSize(size); }
 	void EMU::SetFullscreen() { Screen::SetFullscreen(); }
 }
