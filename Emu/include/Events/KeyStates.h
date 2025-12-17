@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Core.h"
 #include "../Includes.h"
 #include "IOEvent.h"
 
@@ -10,7 +9,7 @@ namespace Engine
 
 	struct KeyStates
 	{
-		EMU_API static const KeyStatesMap& GetKeyStates() { return m_keyStates; }
+		static const KeyStatesMap& GetKeyStates() { return m_keyStates; }
 
 	protected:
 		static KeyStatesMap m_keyStates;

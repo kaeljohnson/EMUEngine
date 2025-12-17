@@ -1,12 +1,10 @@
 #pragma once
 
-#include "../Core.h"
-
 namespace Engine
 {
 	// All the possible engine supported body types.
 
-	enum EMU_API BodyType
+	enum BodyType
 	{
 		STATIC,
 		DYNAMIC,
@@ -14,7 +12,7 @@ namespace Engine
 		SENSOR
 	}; 
 
-	enum EMU_API Filter
+	enum Filter
 	{
 		NONE = 0x00000000, // No collision
 		PLAYER = 0x00000002,

@@ -1,11 +1,10 @@
 #pragma once
 
-#include "Core.h"
 
 namespace Engine
 {
 	// Init class. Initializes the engine.
-	class EMU_API Init
+	class Init
 	{
 	public:
 		// Init constructor.

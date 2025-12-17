@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Core.h"
 #include "../MathUtil.h"
 #include "../Includes.h"
 #include "IOEvent.h"
@@ -11,9 +10,9 @@ namespace Engine
 
 	struct MouseStates
 	{
-		EMU_API static const MouseStatesMap& GetMouseStates() { return m_mouseStates; }
-		EMU_API static const Math2D::Point2D<int>& GetMousePosition() { return m_mousePosition; }
-		EMU_API static const Math2D::Point2D<int>& GetScrollDirection()  { return m_scrollDirection; }
+		static const MouseStatesMap& GetMouseStates() { return m_mouseStates; }
+		static const Math2D::Point2D<int>& GetMousePosition() { return m_mousePosition; }
+		static const Math2D::Point2D<int>& GetScrollDirection()  { return m_scrollDirection; }
 
 	protected:
 		static MouseStatesMap m_mouseStates;

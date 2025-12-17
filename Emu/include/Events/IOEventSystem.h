@@ -2,7 +2,6 @@
 
 #include "../Events/IOEvent.h"
 #include "../Includes.h"
-#include "../Core.h"
 #include "../MathUtil.h"
 
 namespace Engine
@@ -15,7 +14,7 @@ namespace Engine
     class IOEventSystem
     {
     public:
-        EMU_API void RegisterIOEventListener(IOEventType type, IOEventHandler handler);
+        void RegisterIOEventListener(IOEventType type, IOEventHandler handler);
         
     public:
 

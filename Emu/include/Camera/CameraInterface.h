@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Core.h"
 #include "../MathUtil.h"
 #include "../ECS/ECS.h"
 

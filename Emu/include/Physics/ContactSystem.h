@@ -2,7 +2,6 @@
 
 #include "../ECS/ECS.h"
 #include "../Includes.h"
-#include "../Core.h"
 #include "../Components.h"
 #include "../MathUtil.h"
 #include "../TileMap/TileMap.h"
@@ -101,10 +100,10 @@ namespace Engine
 		using ContactCallback = std::function<void(const Contact&)>; 
 
 
-		EMU_API void RegisterContactCallback(ContactType contactType, const char B, ContactCallback callback);
+		void RegisterContactCallback(ContactType contactType, const char B, ContactCallback callback);
 		void ActivateContactCallback(ContactType contactType, Entity entityA, Entity entityB, ContactCallback callback);
 
-		EMU_API void RegisterContactCallback(ContactType contactType, const char A, const char B, ContactCallback callback);
+		void RegisterContactCallback(ContactType contactType, const char A, const char B, ContactCallback callback);
 		void ActivateContactCallback(ContactType contactType, Entity entityA, ContactCallback callback);
 
 	public:

@@ -5,7 +5,6 @@
 #include "AppState.h"
 #include "Includes.h"
 #include "MathUtil.h"
-#include "Core.h"
 #include "Logging/Logger.h"
 
 struct b2BodyId;

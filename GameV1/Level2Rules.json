@@ -39,7 +39,7 @@
                 {
                     "ZIndex": 1,
                     "DrawDebug": "black",
-                    "SizeInUnits": [0.5, 0.95],
+                    "SizeInUnits": [0.5, 0.9],
                     "enabled": true
                 },
                 "GenericTransform1":

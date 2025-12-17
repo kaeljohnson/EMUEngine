@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Core.h"
 #include "../Includes.h"
 
 namespace Engine
@@ -71,19 +70,19 @@ namespace Engine
 		}
 
 	private:
-		EMU_API void engineTrace(const std::string& message);
-		EMU_API void engineInfo(const std::string& message);
-		EMU_API void engineWarn(const std::string& message);
-		EMU_API void engineError(const std::string& message);
-		EMU_API void engineCritical(const std::string& message);
-		EMU_API void clientTrace(const std::string& message);
-		EMU_API void clientInfo(const std::string& message);
-		EMU_API void clientWarn(const std::string& message);
-		EMU_API void clientError(const std::string& message);
-		EMU_API void clientCritical(const std::string& message);
+		void engineTrace(const std::string& message);
+		void engineInfo(const std::string& message);
+		void engineWarn(const std::string& message);
+		void engineError(const std::string& message);
+		void engineCritical(const std::string& message);
+		void clientTrace(const std::string& message);
+		void clientInfo(const std::string& message);
+		void clientWarn(const std::string& message);
+		void clientError(const std::string& message);
+		void clientCritical(const std::string& message);
 	};
 
-	EMU_API extern std::shared_ptr<Logger> GlobalLogger;
+	extern std::shared_ptr<Logger> GlobalLogger;
 }
 
 #if defined(DEBUG)

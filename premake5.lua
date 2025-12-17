@@ -4,9 +4,12 @@ workspace "gameV1"
 
 outputDirectory = "%{cfg.buildcfg}-%{cfg.architecture}"
 
+-- ====================
+-- Emu Engine
+-- ====================
 project "Emu"
     location "Emu"
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
     staticruntime "off"
 
@@ -15,7 +18,7 @@ project "Emu"
 
     files
     {
-        "{%prj.name}/public/**.h",
+        "%{prj.name}/public/**.h",
         "%{prj.name}/include/**.h",
         "%{prj.name}/source/**.cpp",
     }
@@ -28,43 +31,43 @@ project "Emu"
     }
 
     libdirs
-	{
-		"%{prj.name}/external/vcpkg/installed/x64-windows/lib",
-		"%{prj.name}/external/box2d/build/install/lib"
-	}
+    {
+        "%{prj.name}/external/vcpkg/installed/x64-windows/lib",
+        "%{prj.name}/external/box2d/build/install/lib"
+    }
 
     links
-	{
-		"SDL2",
-		"/manual-link/SDL2main",
-		"SDL2_image",
+    {
+        "SDL2",
+        "/manual-link/SDL2main",
+        "SDL2_image",
         "SDL2_mixer",
-		"box2dd"
+        "box2dd"
     }
 
     filter "system:windows"
         cppdialect "C++20"
-        staticruntime "off"
         systemversion "latest"
         buildoptions { "/utf-8" }
 
-        defines
-        {
-            "EMU_BUILD_DLL"
-        }
-
     filter "configurations:Debug"
+        runtime "Debug"
         symbols "On"
-        defines { "DEBUG"}
+        defines { "DEBUG" }
 
     filter "configurations:Release"
-        optimize "On"
-        defines { "NDEBUG"}
-
-    filter "configurations:Dist"
+        runtime "Release"
         optimize "On"
         defines { "NDEBUG" }
 
+    filter "configurations:Dist"
+        runtime "Release"
+        optimize "On"
+        defines { "NDEBUG" }
+
+-- ====================
+-- GameV1 Executable
+-- ====================
 project "GameV1"
     location "GameV1"
     kind "ConsoleApp"
@@ -87,9 +90,9 @@ project "GameV1"
     }
 
     libdirs
-	{
-		"Emu/external/vcpkg/installed/x64-windows/lib",
-	}
+    {
+        "Emu/external/vcpkg/installed/x64-windows/lib",
+    }
 
     links
     {
@@ -101,18 +104,23 @@ project "GameV1"
         systemversion "latest"
 
     filter "configurations:Debug"
+        runtime "Debug"
         symbols "On"
-        defines { "DEBUG"}
+        defines { "DEBUG" }
 
     filter "configurations:Release"
-        optimize "On"
-        defines { "NDEBUG"}
-
-    filter "configurations:Dist"
+        runtime "Release"
         optimize "On"
         defines { "NDEBUG" }
 
+    filter "configurations:Dist"
+        runtime "Release"
+        optimize "On"
+        defines { "NDEBUG" }
 
+-- ====================
+-- EmuTests Executable
+-- ====================
 project "EmuTests"
     location "EmuTests"
     kind "ConsoleApp"
@@ -151,13 +159,16 @@ project "EmuTests"
         systemversion "latest"
 
     filter "configurations:Debug"
+        runtime "Debug"
         symbols "On"
         defines { "DEBUG" }
 
     filter "configurations:Release"
+        runtime "Release"
         optimize "On"
         defines { "NDEBUG" }
 
     filter "configurations:Dist"
+        runtime "Release"
         optimize "On"
         defines { "NDEBUG" }

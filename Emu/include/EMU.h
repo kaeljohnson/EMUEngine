@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core.h"
 #include "Application.h"
 #include "Scenes/SceneManager.h"
 #include "Events/IOEventSystem.h"
@@ -17,9 +16,9 @@ namespace Engine
 	class EMU
 	{
 	public:
-		EMU_API static EMU* GetInstance();
-		EMU_API inline void RunApp() { m_application.Start(); }
-		EMU_API inline void EndApp() { m_application.End(); }
+		static EMU* GetInstance();
+		inline void RunApp() { m_application.Start(); }
+		inline void EndApp() { m_application.End(); }
 
 		//////////// Scene Management functions ////////////
 
@@ -29,21 +28,21 @@ namespace Engine
 			Create a new scene with the given name.
 			arg1: name - The name of the scene to be created.
 		*/
-		EMU_API void Scenes_Create(const std::string& name);
+		void Scenes_Create(const std::string& name);
 
 		/*
 			Load the scene with the given name. Calling this ends the current scene
 			and unloads it before loading the new scene.
 			arg1: name - The name of the scene to be loaded.
 		*/
-		EMU_API void Scenes_Load(const std::string& name);
+		void Scenes_Load(const std::string& name);
 
 		/*
 			Registers a callback function that is triggered when a new scene is played.
 			arg1: name - The name of the scene for which the callback is to be registered.
 			arg2: callback - The function to be called when the scene is played.
 		*/
-		EMU_API void Scenes_RegisterOnPlay(const std::string& name, std::function<void()>);
+		void Scenes_RegisterOnPlay(const std::string& name, std::function<void()>);
 
 		/*
 			Register a contact callback between two entities identified by their characters.
@@ -54,7 +53,7 @@ namespace Engine
 			arg3: entityA - The character representing the first entity involved in the contact.
 			arg4: entityB - The character representing the second entity involved in the contact.
 		*/
-		EMU_API void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entityA, const char entityB, ContactCallback callback);
+		void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entityA, const char entityB, ContactCallback callback);
 
 		/*
 			Register a contact callback for a single entity identified by its character.
@@ -64,14 +63,14 @@ namespace Engine
 			arg2: contactType - The type of contact event (e.g., BEGIN_SENSOR, END_SENSOR).
 			arg3: entity - The character representing the entity involved in the contact.
 		*/
-		EMU_API void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entity, ContactCallback callback);
+		void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entity, ContactCallback callback);
 
 		/*
 			Sets the physics simulation parameters for the scene with the given name.
 			arg1: name - The name of the scene for which the physics simulation is to be set.
 			arg2: gravity - The gravity vector to be applied in the physics simulation.
 		*/
-		EMU_API void Scenes_SetGravity(const std::string& name, const Math2D::Point2D<float> gravity);
+		void Scenes_SetGravity(const std::string& name, const Math2D::Point2D<float> gravity);
 
 		/*
 			TODO: Not supported for now.
@@ -86,33 +85,33 @@ namespace Engine
 			Gets the first entity with the given character in the current scene.
 			arg1: tileId - The tile id.
 		*/
-		EMU_API Entity Scenes_GetCurrentRuntimeEntity(const size_t tileId);
+		Entity Scenes_GetCurrentRuntimeEntity(const size_t tileId);
 
 		/*
 			Gets the first entity with the given character in the specified scene.
 			arg1: sceneName - The name of the scene from which to retrieve the entity.
 			arg2: c - The character representing the entity to be retrieved.
 		*/
-		EMU_API Entity Scenes_GetEntityByCharacter(const std::string& sceneName, const char c);
+		Entity Scenes_GetEntityByCharacter(const std::string& sceneName, const char c);
 
 		/*
 			Gets all entities with the given character in the specified scene.
 			arg1: sceneName - The name of the scene from which to retrieve the entities.
 			arg2: c - The character representing the entities to be retrieved.
 		*/
-		EMU_API std::vector<Entity> Scenes_GetEntitiesByCharacter(const std::string& sceneName, const char c);
+		std::vector<Entity> Scenes_GetEntitiesByCharacter(const std::string& sceneName, const char c);
 
 		/*
 			Activates the specified entity in the scene with the given name.
 			arg1: entity - The entity to be activated in the scene.
 		*/
-		EMU_API void Scenes_Activate(Entity entity);
+		void Scenes_Activate(Entity entity);
 
 		/*
 			Deactivates the specified entity in the scene with the given name.
 			arg1: entity - The entity to be deactivated in the scene.
 		*/
-		EMU_API void Scenes_Deactivate(Entity entity);
+		void Scenes_Deactivate(Entity entity);
 
 		/*
 			TODO: Not supported for now.
@@ -128,7 +127,7 @@ namespace Engine
 			arg2: mapFileName - The filename of the tile map.
 			arg3: rulesFileName - The filename of the rules for the tile map.
 		*/
-		EMU_API void Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName);
+		void Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName);
 
 		/*
 			Gets the first entity corresponding to the specified tile character from the tile map
@@ -136,7 +135,7 @@ namespace Engine
 			arg1: name - The name of the scene from which to retrieve the entity.
 			arg2: tileId - The character representing the tile for which to retrieve the entity.
 		*/
-		EMU_API const Entity Scenes_GetTileMapEntity(const std::string& name, const size_t tileId);
+		const Entity Scenes_GetTileMapEntity(const std::string& name, const size_t tileId);
 
 		/*
 			Gets all entities corresponding to the specified tile character from the tile map
@@ -144,24 +143,24 @@ namespace Engine
 			arg1: name - The name of the scene from which to retrieve the entities.
 			arg2: tileId - The character representing the tile for which to retrieve the entities.
 		*/
-		EMU_API const std::vector<Entity>& Scenes_GetTileMapEntities(const std::string& name, const size_t tileId);
+		const std::vector<Entity>& Scenes_GetTileMapEntities(const std::string& name, const size_t tileId);
 
 		/*
 			Sets the level dimensions for a scene without a tile map.
 			arg1: name - The name of the scene for which to set the level dimensions.
 			arg2: levelWidthInUnits - The dimensions of the level in world units.
 		*/
-		EMU_API void Scenes_SetLevelDimensions(const std::string& name, const Math2D::Point2D<int> levelWidthInUnits);
+		void Scenes_SetLevelDimensions(const std::string& name, const Math2D::Point2D<int> levelWidthInUnits);
 
 		////////////////////////////////////////////////////
 
-		EMU_API TransformInterface& ITRANSFORMS() { return m_transformInterface; }
+		TransformInterface& ITRANSFORMS() { return m_transformInterface; }
 
 		// ECS Interface functions
-		EMU_API Entity CreateEntity();
+		Entity CreateEntity();
 
 		// Play a sound once. Take string temporarily as they may cause dynamic allocations.
-		EMU_API void PlaySound(int soundIndex, int volume, const bool loop = false);
+		void PlaySound(int soundIndex, int volume, const bool loop = false);
 
 		//////////// Camera Interface Functions ////////////
 
@@ -171,28 +170,28 @@ namespace Engine
 			arg1: entity - The entity whose camera component's pixels per unit is to be set.
 			arg2: pixelsPerUnit - The number of pixels that correspond to one unit in the game world.
 		*/
-		EMU_API void Camera_SetPixelsPerUnit(Entity entity, const int pixelsPerUnit);
+		void Camera_SetPixelsPerUnit(Entity entity, const int pixelsPerUnit);
 
 		/* 
 			Gets the pixels per unit for the camera component of the given entity.
 			arg1: entity - The entity whose camera component's pixels per unit is to be retrieved.
 			returns: The number of pixels that correspond to one unit in the game world.
 		*/
-		EMU_API const int Camera_GetPixelsPerUnit(Entity entity);
+		const int Camera_GetPixelsPerUnit(Entity entity);
 
 		/*
 			Sets the offset for the camera component of the given entity in world units.
 			arg1: entity - The entity whose camera component's offset is to be set.
 			arg2: offset - The offset vector in world units.
 		*/
-		EMU_API void Camera_SetOffset(Entity entity, const Math2D::Point2D<float> offset);
+		void Camera_SetOffset(Entity entity, const Math2D::Point2D<float> offset);
 
 		/*
 			Gets the offset for the camera component of the given entity in world units.
 			arg1: entity - The entity whose camera component's offset is to be retrieved.
 			returns: The offset vector in world units.
 		*/
-		EMU_API const Math2D::Point2D<float> Camera_GetOffset(Entity entity);
+		const Math2D::Point2D<float> Camera_GetOffset(Entity entity);
 
 		/*
 			Enables or disables clamping for the camera component of the given entity.
@@ -200,28 +199,28 @@ namespace Engine
 			arg1: entity - The entity whose camera component's clamping setting is to be modified.
 			arg2: clampingOn - A boolean indicating whether clamping should be enabled (true) or disabled (false).
 		*/
-		EMU_API void Camera_SetClampingOn(Entity entity, const bool clampingOn);
+		void Camera_SetClampingOn(Entity entity, const bool clampingOn);
 
 		/*
 			Checks if clamping is enabled for the camera component of the given entity.
 			arg1: entity - The entity whose camera component's clamping setting is to be checked.
 			returns: A boolean indicating whether clamping is enabled (true) or disabled (false).
 		*/
-		EMU_API const bool Camera_GetClampingOn(Entity entity);
+		const bool Camera_GetClampingOn(Entity entity);
 
 		/*
 			Gets the size of camera in world units.
 			arg1: entity - The entity whose camera component's size is to be retrieved.
 			returns: The size of the camera in world units as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Math2D::Point2D<float> Camera_GetSize(Entity entity);
+		const Math2D::Point2D<float> Camera_GetSize(Entity entity);
 
 		/* 
 			Sets the offsets for the camera component of the given entity in world units.
 			arg1: entity - The entity whose camera component's offsets are to be set.
 			arg2: offsets - The offsets vector in world units.
 		*/
-		EMU_API void Camera_SetOffsets(Entity entity, const Math2D::Point2D<float> offsets);
+		void Camera_SetOffsets(Entity entity, const Math2D::Point2D<float> offsets);
 
 		/*
 			Add camera shake to the camera component of the given entity.
@@ -229,7 +228,7 @@ namespace Engine
 			arg2: intensity - The intensity of the shake effect in world units.
 			arg3: duration - The duration of the shake effect in seconds.
 		*/
-		EMU_API void Camera_AddShake(Entity entity, const Math2D::Point2D<float> intensity, const Math2D::Point2D<float> duration);
+		void Camera_AddShake(Entity entity, const Math2D::Point2D<float> intensity, const Math2D::Point2D<float> duration);
 
 		////////////////////////////////////////////////////
 
@@ -241,174 +240,174 @@ namespace Engine
 			Creates a physics body for the given entity.
 			arg1: entity - The entity for which to create the physics body.
 		*/
-		EMU_API void Physics_CreateBody(Entity entity);
+		void Physics_CreateBody(Entity entity);
 
 		/*
 			Checks if the given entity has a physics body.
 			arg1: entity - The entity to check for a physics body.
 			returns: True if the entity has a physics body, false otherwise.
 		*/
-		EMU_API const bool Physics_HasBody(Entity entity);
+		const bool Physics_HasBody(Entity entity);
 
 		/*
 			Sets the body type for the physics body of the given entity.
 			arg1: entity - The entity whose physics body type is to be set.
 			arg2: type - The BodyType to set for the physics body.
 		*/
-		EMU_API void Physics_SetBodyType(Entity entity, const BodyType type);
+		void Physics_SetBodyType(Entity entity, const BodyType type);
 
 		/*
 			Sets the dimensions for the physics body of the given entity.
 			arg1: entity - The entity whose physics body dimensions are to be set.
 			arg2: dimensions - The dimensions to set for the physics body.
 		*/
-		EMU_API void Physics_SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions);
+		void Physics_SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions);
 
 		/*
 			Gets the dimensions for the physics body of the given entity.
 			arg1: entity - The entity whose physics body dimensions are to be retrieved.
 			returns: The dimensions of the physics body as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Math2D::Point2D<float> Physics_GetDimensions(Entity entity);
+		const Math2D::Point2D<float> Physics_GetDimensions(Entity entity);
 
 		/*
 			Gets the dimensions for the given physics body.
 			arg1: body - The PhysicsBody whose dimensions are to be retrieved.
 			returns: The dimensions of the physics body as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Math2D::Point2D<float> Physics_GetDimensions(PhysicsBody& body);
+		const Math2D::Point2D<float> Physics_GetDimensions(PhysicsBody& body);
 
 		/*
 			Enables or disables gravity for the physics body of the given entity.
 			arg1: entity - The entity whose physics body gravity setting is to be modified.
 			arg2: enabled - A boolean indicating whether gravity should be enabled (true) or disabled (false).
 		*/
-		EMU_API void Physics_SetGravity(Entity entity, bool enabled);
+		void Physics_SetGravity(Entity entity, bool enabled);
 
 		/*
 			Sets the starting position for the physics body of the given entity.
 			arg1: entity - The entity whose physics body starting position is to be set.
 			arg2: position - The starting position to set for the physics body.
 		*/
-		EMU_API void Physics_SetStartingPosition(Entity entity, const Math2D::Point2D<float> position);
+		void Physics_SetStartingPosition(Entity entity, const Math2D::Point2D<float> position);
 
 		/*
 			Sets the position for the physics body of the given entity.
 			arg1: entity - The entity whose physics body position is to be set.
 			arg2: position - The position to set for the physics body.
 		*/
-		EMU_API void Physics_SetPosition(Entity entity, const Math2D::Point2D<float> position);
+		void Physics_SetPosition(Entity entity, const Math2D::Point2D<float> position);
 
 		/*
 			Gets the position for the physics body of the given entity.
 			arg1: entity - The entity whose physics body position is to be retrieved.
 			returns: The position of the physics body as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Math2D::Point2D<float> Physics_GetPosition(Entity entity);
+		const Math2D::Point2D<float> Physics_GetPosition(Entity entity);
 
 		/*
 			Gets the top-left position for the physics body of the given entity.
 			arg1: entity - The entity whose physics body top-left position is to be retrieved.
 			returns: The top-left position of the physics body as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Math2D::Point2D<float> Physics_GetTopLeftPosition(Entity entity);
+		const Math2D::Point2D<float> Physics_GetTopLeftPosition(Entity entity);
 
 		/*
 			Applies force to a physics body of the given entity.
 			arg1: entity - The entity whose physics body to apply force to.
 			arg2: force - The force vector to apply to the physics body.
 		*/
-		EMU_API void Physics_ApplyForceToBody(Entity entity, Math2D::Point2D<float> force);
+		void Physics_ApplyForceToBody(Entity entity, Math2D::Point2D<float> force);
 
 		/*
 			Applies impulse to a physics body of the given entity.
 			arg1: entity - The entity whose physics body to apply impulse to.
 			arg2: impulse - The impulse vector to apply to the physics body.
 		*/
-		EMU_API void Physics_ApplyImpulseToBody(Entity entity, Math2D::Point2D<float> impulse);
+		void Physics_ApplyImpulseToBody(Entity entity, Math2D::Point2D<float> impulse);
 
 		/*
 			Sets velocity for the physics body of the given entity.
 			arg1: entity - The entity whose physics body velocity is to be set.
 			arg2: velocity - The velocity vector to set for the physics body.
 		*/
-		EMU_API void Physics_SetVelocity(Entity entity, const Math2D::Point2D<float> velocity);
+		void Physics_SetVelocity(Entity entity, const Math2D::Point2D<float> velocity);
 
 		/*
 			Sets the X velocity for the physics body of the given entity.
 			arg1: entity - The entity whose physics body X velocity is to be set.
 			arg2: xVelocity - The X velocity to set for the physics body.
 		*/
-		EMU_API void Physics_SetXVelocity(Entity entity, const float xVelocity);
+		void Physics_SetXVelocity(Entity entity, const float xVelocity);
 
 		/*
 			Sets the Y velocity for the physics body of the given entity.
 			arg1: entity - The entity whose physics body Y velocity is to be set.
 			arg2: yVelocity - The Y velocity to set for the physics body.
 		*/
-		EMU_API void Physics_SetYVelocity(Entity entity, const float yVelocity);
+		void Physics_SetYVelocity(Entity entity, const float yVelocity);
 
 		/*
 			Sets the deceleration for the physics body of the given entity.
 			arg1: entity - The entity whose physics body deceleration is to be set.
 			arg2: decel - The deceleration value to set for the physics body.
 		*/
-		EMU_API void Physics_SetDeceleration(Entity entity, const float decel);
+		void Physics_SetDeceleration(Entity entity, const float decel);
 
 		/*
 			Gets the velocity for the physics body of the given entity.
 			arg1: entity - The entity whose physics body velocity is to be retrieved.
 			returns: The velocity of the physics body as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Math2D::Point2D<float> Physics_GetVelocity(Entity entity);
+		const Math2D::Point2D<float> Physics_GetVelocity(Entity entity);
 
 		/*
 			Sets the restitution for the physics body of the given entity.
 			arg1: entity - The entity whose physics body restitution is to be set.
 			arg2: restitution - The restitution value to set for the physics body.
 		*/
-		EMU_API void Physics_SetRestitution(Entity entity, const float restitution);
+		void Physics_SetRestitution(Entity entity, const float restitution);
 
 		/*
 			Sets the density for the physics body of the given entity.
 			arg1: entity - The entity whose physics body density is to be set.
 			arg2: density - The density value to set for the physics body.
 		*/
-		EMU_API void Physics_SetDensity(Entity entity, const float density);
+		void Physics_SetDensity(Entity entity, const float density);
 
 		/*
 			Sets the friction for the physics body of the given entity.
 			arg1: entity - The entity whose physics body friction is to be set.
 			arg2: friction - The friction value to set for the physics body.
 		*/
-		EMU_API void Physics_SetFriction(Entity entity, const float friction);
+		void Physics_SetFriction(Entity entity, const float friction);
 
 		/*
 			Sets whether the physics body of the given entity has fixed rotation.
 			arg1: entity - The entity whose physics body fixed rotation setting is to be modified.
 			arg2: fixed - A boolean indicating whether fixed rotation should be enabled (true) or disabled (false).
 		*/
-		EMU_API void Physics_SetFixedRotation(Entity entity, bool fixed);
+		void Physics_SetFixedRotation(Entity entity, bool fixed);
 
 		/*
 			Gets the angle of the physics body of the given entity in radians.
 			arg1: entity - The entity whose physics body angle is to be retrieved.
 			returns: The angle of the physics body in radians as a float.
 		*/
-		EMU_API const float Physics_GetAngleInRadians(Entity entity);
+		const float Physics_GetAngleInRadians(Entity entity);
 
 		/*
 			Gets the angle of the physics body of the given entity in degrees.
 			arg1: entity - The entity whose physics body angle is to be retrieved.
 			returns: The angle of the physics body in degrees as a float.
 		*/
-		EMU_API const float Physics_GetAngleInDegrees(Entity entity);
+		const float Physics_GetAngleInDegrees(Entity entity);
 
 		/*
 			Removes the physics body from the world for the given entity.
 			arg1: entity - The entity whose physics body is to be removed from the world.
 		*/
-		EMU_API void Physics_RemoveBodyFromWorld(Entity entity);
+		void Physics_RemoveBodyFromWorld(Entity entity);
 
 		// Contact System interface
 
@@ -416,25 +415,25 @@ namespace Engine
 			Has contact below the physics body of the given entity.
 			arg1: entity - The entity whose physics body contact below is to be checked.
 		*/
-		EMU_API const bool Physics_HasContactBelow(Entity entity);
+		const bool Physics_HasContactBelow(Entity entity);
 
 		/*
 			Has contact above the physics body of the given entity.
 			arg1: entity - The entity whose physics body contact above is to be checked.
 		*/
-		EMU_API const bool Physics_HasContactAbove(Entity entity);
+		const bool Physics_HasContactAbove(Entity entity);
 
 		/*
 			Has contact to the left of the physics body of the given entity.
 			arg1: entity - The entity whose physics body contact left is to be checked.
 		*/
-		EMU_API const bool Physics_HasContactLeft(Entity entity);
+		const bool Physics_HasContactLeft(Entity entity);
 
 		/*
 			Has contact to the right of the physics body of the given entity.
 			arg1: entity - The entity whose physics body contact right is to be checked.
 		*/
-		EMU_API const bool Physics_HasContactRight(Entity entity);
+		const bool Physics_HasContactRight(Entity entity);
 		
 		////////////////////////////////////////////////////
 
@@ -445,14 +444,14 @@ namespace Engine
 			arg1: entity - The entity whose transform component's previous position is to be retrieved.
 			returns: The previous position of the transform as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Math2D::Point2D<float> Transform_GetPrevPosition(Entity entity);
+		const Math2D::Point2D<float> Transform_GetPrevPosition(Entity entity);
 
 		/*
 			Gets the previous position of the given transform.
 			arg1: transform - The transform whose previous position is to be retrieved.
 			returns: The previous position of the transform as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Math2D::Point2D<float> Transform_GetPrevPosition(Transform& transform);
+		const Math2D::Point2D<float> Transform_GetPrevPosition(Transform& transform);
 
 		/*
 			Sets the position of the transform component of the given entity.
@@ -460,84 +459,84 @@ namespace Engine
 			arg1: entity - The entity whose transform component's position is to be set.
 			arg2: position - The position to set for the transform.
 		*/
-		EMU_API void Transform_SetPosition(Entity entity, const Math2D::Point2D<float> position);
+		void Transform_SetPosition(Entity entity, const Math2D::Point2D<float> position);
 
 		/*
 			Gets the position of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's position is to be retrieved.
 			returns: The position of the transform as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Math2D::Point2D<float> Transform_GetPosition(Entity entity);
+		const Math2D::Point2D<float> Transform_GetPosition(Entity entity);
 
 		/*
 			Sets the dimensions of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's dimensions are to be set.
 			arg2: dimensions - The dimensions to set for the transform.
 		*/
-		EMU_API void Transform_SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions);
+		void Transform_SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions);
 
 		/*
 			Gets the dimensions of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's dimensions are to be retrieved.
 			returns: The dimensions of the transform as a Math2D::Point2D<float>.
 		*/
-		EMU_API const Math2D::Point2D<float> Transform_GetDimensions(Entity entity);
+		const Math2D::Point2D<float> Transform_GetDimensions(Entity entity);
 
 		/*
 			Sets the Z index of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's Z index is to be set.
 			arg2: zIndex - The Z index to set for the transform.
 		*/
-		EMU_API void Transform_SetZIndex(Entity entity, const int zIndex);
+		void Transform_SetZIndex(Entity entity, const int zIndex);
 
 		/*
 			Gets the Z index of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's Z index is to be retrieved.
 			returns: The Z index of the transform as an int.
 		*/
-		EMU_API const int Transform_GetZIndex(Entity entity);
+		const int Transform_GetZIndex(Entity entity);
 
 		/*
 			Sets the rotation of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's rotation is to be set.
 			arg2: rotation - The rotation to set for the transform in degrees.
 		*/
-		EMU_API void Transform_SetRotation(Entity entity, const float rotation);
+		void Transform_SetRotation(Entity entity, const float rotation);
 
 		/*
 			Gets the rotation of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's rotation is to be retrieved.
 			returns: The rotation of the transform in degrees as a float.
 		*/
-		EMU_API const float Transform_GetRotation(Entity entity);
+		const float Transform_GetRotation(Entity entity);
 
 		/*
 			Sets the scale of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's scale is to be set.
 			arg2: scale - The scale to set for the transform.
 		*/
-		EMU_API void Transform_SetScale(Entity entity, const float scale);
+		void Transform_SetScale(Entity entity, const float scale);
 
 		/*
 			Gets the scale of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's scale is to be retrieved.
 			returns: The scale of the transform as a float.
 		*/
-		EMU_API const float Transform_GetScale(Entity entity);
+		const float Transform_GetScale(Entity entity);
 
 		/*
 			Sets the direction facing of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's direction facing is to be set.
 			arg2: direction - The direction to set for the transform (e.g., 1 for right, -1 for left).
 		*/
-		EMU_API void Transform_SetDirectionFacing(Entity entity, const int direction);
+		void Transform_SetDirectionFacing(Entity entity, const int direction);
 
 		/*
 			Gets the direction facing of the transform component of the given entity.
 			arg1: entity - The entity whose transform component's direction facing is to be retrieved.
 			returns: The direction facing of the transform as an int (e.g., 1 for right, -1 for left).
 		*/
-		EMU_API const int Transform_GetDirectionFacing(Entity entity);
+		const int Transform_GetDirectionFacing(Entity entity);
 
 		////////////////////////////////////////////////////
 
@@ -546,45 +545,45 @@ namespace Engine
 		/*
 			Gets the display resolution of the screen.
 		*/
-		EMU_API const Math2D::Point2D<int> GetScreenSize();
+		const Math2D::Point2D<int> GetScreenSize();
 
 		/*
 			Gets the virtual size of the screen. Based on aspect ratio of render
 			output size. Virtual size height is fixed at 720 to support a reasonable
 			aspect ratio across different display resolutions.
 		*/
-		EMU_API const Math2D::Point2D<int> GetVirtualSize();
+		const Math2D::Point2D<int> GetVirtualSize();
 
 		/*
 			Gets the scale factors for the screen.
 		*/
-		EMU_API const Math2D::Point2D<float> GetScale();
+		const Math2D::Point2D<float> GetScale();
 
 		/*
 			Gets the scale constant for the screen.
 		*/
-		EMU_API const float GetScaleConstant();
+		const float GetScaleConstant();
 
 		/*
 			Gets the current viewport size.
 		*/
-		EMU_API const Math2D::Point2D<int> GetViewportSize();
+		const Math2D::Point2D<int> GetViewportSize();
 
 		/*
 			Gets the current viewport position.
 		*/
-		EMU_API const Math2D::Point2D<int> GetViewportPosition();
+		const Math2D::Point2D<int> GetViewportPosition();
 
 		/*
 			Sets the window size to the specified size.
 			arg1: size - The desired window size as a Math2D::Point2D<int>.
 		*/
-		EMU_API void SetWindowSize(const Math2D::Point2D<int>& size);
+		void SetWindowSize(const Math2D::Point2D<int>& size);
 
 		/*
 			Sets the window to fullscreen mode.
 		*/
-		EMU_API void SetFullscreen();
+		void SetFullscreen();
 
 		////////////////////////////////////////////////////
 
@@ -616,7 +615,7 @@ namespace Engine
 		////////////////////////////////////////////////////
 
 		// Event IO System Interface functions
-		EMU_API void RegisterIOEventListener(IOEventType type, IOEventHandler handler);
+		void RegisterIOEventListener(IOEventType type, IOEventHandler handler);
 
 	public:
 		static void Init(const size_t numEntities);

@@ -1,16 +1,14 @@
 #pragma once
 
-#include "Core.h"
-
 namespace Engine
 {
 	struct Time
 	{
-		EMU_API inline static const float GetInterpolationFactor() { return INTERPOLATION_FACTOR; }
-		EMU_API inline static const float GetTimeStep() { return TIME_STEP; }
+		inline static const float GetInterpolationFactor() { return INTERPOLATION_FACTOR; }
+		inline static const float GetTimeStep() { return TIME_STEP; }
 
-		EMU_API inline static void SetInterpolationFactor(const float interpolationFactor) { INTERPOLATION_FACTOR = interpolationFactor; }
-		EMU_API inline static void SetTimeStep(const float timeStep) { TIME_STEP = timeStep; }
+		inline static void SetInterpolationFactor(const float interpolationFactor) { INTERPOLATION_FACTOR = interpolationFactor; }
+		inline static void SetTimeStep(const float timeStep) { TIME_STEP = timeStep; }
 
 		inline static void SetAppRunning(const bool appRunning) { APP_RUNNING = appRunning; }
 		inline static const bool IsAppRunning() { return APP_RUNNING; }
