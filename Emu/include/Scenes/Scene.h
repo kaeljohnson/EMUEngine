@@ -143,7 +143,6 @@ namespace Engine
 
 		std::vector<Math2D::Chain> m_staticChains;
 
-		// Need better container for tracking entities in scene at runtime.
 		std::unordered_set<Entity> m_entities;
 	private:
 

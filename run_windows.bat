@@ -21,6 +21,14 @@ if "%CONFIG%"=="distribution" (
     exit /b 1
 )
 
+:: Get the submodules
+if exist .git (
+    echo Initializing and updating submodules...
+    git submodule update --init --recursive
+) else (
+    echo Warning: .git directory not found. Skipping submodule update.
+)
+
 :: Check if vcpkg exists
 if not exist Emu\external\vcpkg\ (
     echo Cloning and bootstrapping vcpkg...
