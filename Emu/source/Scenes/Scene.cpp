@@ -103,7 +103,10 @@ namespace Engine
 
 		// Deactivate all entities and destroy all components.
 		m_refECS.DeactivateEntities();
-		m_refECS.DestroyComponents(m_entities);
+
+		for (auto& entity : m_entities)
+			m_refECS.DestroyComponents(entity);
+
 		m_entities.clear();
 	}
 
@@ -128,18 +131,18 @@ namespace Engine
 
 	void Scene::add(Entity entity)
 	{
-		if (std::find(m_entities.begin(), m_entities.end(), entity) != m_entities.end()) // SLOW. Temp for now.
+		if (m_entities.contains(entity))
 		{
 			ENGINE_INFO("Entity already exists in the scene: {}", entity);
 			return;
 		}
 
-		m_entities.push_back(entity);
+		m_entities.emplace(entity);
 	}
 
 	void Scene::Activate(Entity entity)
 	{
-		if (std::find(m_entities.begin(), m_entities.end(), entity) == m_entities.end()) // SLOW. Temp for now.
+		if (!m_entities.contains(entity))
 		{
 			ENGINE_INFO("Entity does not exist in the current scene: {}", entity);
 			return;
@@ -158,7 +161,7 @@ namespace Engine
 
 	void Scene::Deactivate(Entity entity)
 	{
-		if (std::find(m_entities.begin(), m_entities.end(), entity) == m_entities.end()) // SLOW. Temp for now.
+		if (!m_entities.contains(entity))
 		{
 			ENGINE_INFO("Entity does not exist in the current scene: {}", entity);
 			return;

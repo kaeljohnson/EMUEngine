@@ -74,7 +74,7 @@ namespace Engine
 			Add physics bodies from entities to the world.
 			arg1: vector of entities
 		*/
-		void AddPhysicsBodiesToWorld(std::vector<Entity>& entities);
+		void AddPhysicsBodiesToWorld(std::unordered_set<Entity>& entities);
 
 		/*
 			Add a single physics body to the world.
@@ -86,7 +86,7 @@ namespace Engine
 			Add line colliders from entities to the world.
 			arg1: vector of entities
 		*/
-		void AddLineCollidersToWorld(std::vector<Entity>& entities);
+		void AddLineCollidersToWorld(std::unordered_set<Entity>& entities);
 
 		/*
 			Add chain colliders to the world.

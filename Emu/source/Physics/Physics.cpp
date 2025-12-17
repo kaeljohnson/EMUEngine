@@ -242,9 +242,9 @@ namespace Engine
 		}
 	}
 
-	void PhysicsSimulation::AddPhysicsBodiesToWorld(std::vector<Entity>& entities)
+	void PhysicsSimulation::AddPhysicsBodiesToWorld(std::unordered_set<Entity>& entities)
 	{
-		for (Entity& entitiy : entities)
+		for (auto& entitiy : entities)
 		{
 			if (!m_refECS.HasComponent<PhysicsBody>(entitiy)) continue;
 
