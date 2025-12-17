@@ -70,10 +70,10 @@ namespace Engine
 		for (Transform& refTransform : transformManager)
 		{
 			// 1. Culling
-			const float objectLeft = refTransform.Position.X;
-			const float objectRight = objectLeft + refTransform.Dimensions.X;
-			const float objectTop = refTransform.Position.Y;
-			const float objectBottom = objectTop + refTransform.Dimensions.Y;
+			const float objectLeft = refTransform.m_position.X;
+			const float objectRight = objectLeft + refTransform.m_dimensions.X;
+			const float objectTop = refTransform.m_position.Y;
+			const float objectBottom = objectTop + refTransform.m_dimensions.Y;
 
 			const bool isVisible =
 				objectRight >= leftRenderBound && objectLeft <= rightRenderBound &&
@@ -84,11 +84,11 @@ namespace Engine
 
 			// 2. Position & scale
 			const float interpolation = Time::GetInterpolationFactor();
-			const float lerpedX = Math2D::Lerp(refTransform.PrevPosition.X, refTransform.Position.X, interpolation);
-			const float lerpedY = Math2D::Lerp(refTransform.PrevPosition.Y, refTransform.Position.Y, interpolation);
+			const float lerpedX = Math2D::Lerp(refTransform.m_prevPosition.X, refTransform.m_position.X, interpolation);
+			const float lerpedY = Math2D::Lerp(refTransform.m_prevPosition.Y, refTransform.m_position.Y, interpolation);
 
-			int width = int(refTransform.Dimensions.X * scaleX);
-			int height = int(refTransform.Dimensions.Y * scaleY);
+			int width = int(refTransform.m_dimensions.X * scaleX);
+			int height = int(refTransform.m_dimensions.Y * scaleY);
 			float offsetFromTransformX = 0.0f;
 			float offsetFromTransformY = 0.0f;
 
@@ -125,7 +125,7 @@ namespace Engine
 
 				//Submit(std::move(ro));
 
-				renderBuckets[refTransform.ZIndex].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are under 1-10
+				renderBuckets[refTransform.m_zIndex].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are under 1-10
 					refTransform.m_entity,
 					Math2D::Point2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
 					Math2D::Point2D<int>(width, height),
@@ -137,7 +137,7 @@ namespace Engine
 				// debug objects when in debug mode.
 				if (refTransform.m_drawDebug)
 				{
-					debugBuckets[refTransform.ZIndex].emplace_back(
+					debugBuckets[refTransform.m_zIndex].emplace_back(
 						refTransform.m_entity,
 						false,
 						Math2D::Point2D<int>(
@@ -145,15 +145,15 @@ namespace Engine
 							int((lerpedY - cameraAdjustedOffset.Y) * scaleY)
 						),
 						Math2D::Point2D<int>(
-							int((refTransform.Dimensions.X * scaleX)), // Need transform dimensions, not animation dimensions
-							int((refTransform.Dimensions.Y * scaleY))
+							int((refTransform.m_dimensions.X * scaleX)), // Need transform m_dimensions, not animation m_dimensions
+							int((refTransform.m_dimensions.Y * scaleY))
 						),
 						refTransform.m_debugColor
 					);
 				}
 				if (ptrSpriteComponent->m_drawDebug)
 				{
-					debugBuckets[refTransform.ZIndex].emplace_back(
+					debugBuckets[refTransform.m_zIndex].emplace_back(
 						refTransform.m_entity,
 						false,
 						Math2D::Point2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
@@ -172,7 +172,7 @@ namespace Engine
 
 				// submit debug border
 				// debug objects when in debug mode.
-				debugBuckets[refTransform.ZIndex].emplace_back(
+				debugBuckets[refTransform.m_zIndex].emplace_back(
 					refTransform.m_entity,
 					ptrPhysicsBody->m_fillRect,
 					Math2D::Point2D<int>(
@@ -180,8 +180,8 @@ namespace Engine
 						int((lerpedY - cameraAdjustedOffset.Y) * scaleY)
 					),
 					Math2D::Point2D<int>(
-						int((refTransform.Dimensions.X * scaleX)), // Need transform dimensions, not animation dimensions
-						int((refTransform.Dimensions.Y * scaleY))
+						int((refTransform.m_dimensions.X * scaleX)), // Need transform m_dimensions, not animation m_dimensions
+						int((refTransform.m_dimensions.Y * scaleY))
 					),
 					ptrPhysicsBody->m_debugColor
 				);
@@ -275,8 +275,8 @@ namespace Engine
 			if (m_refECS.HasComponent<Transform>(refCamera.m_entity))
 			{
 				Transform* ptrTransform = m_refECS.GetComponent<Transform>(refCamera.m_entity);
-				refCamera.m_offset.X = ptrTransform->Position.X - (refCamera.m_size.X) / 2;
-				refCamera.m_offset.Y = ptrTransform->Position.Y - (refCamera.m_size.Y) / 2;
+				refCamera.m_offset.X = ptrTransform->m_position.X - (refCamera.m_size.X) / 2;
+				refCamera.m_offset.Y = ptrTransform->m_position.Y - (refCamera.m_size.Y) / 2;
 			}
 
 			clamp(refCamera);

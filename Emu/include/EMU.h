@@ -90,16 +90,16 @@ namespace Engine
 		/*
 			Gets the first entity with the given character in the specified scene.
 			arg1: sceneName - The name of the scene from which to retrieve the entity.
-			arg2: c - The character representing the entity to be retrieved.
+			arg2: tileId - The tileId representing the entity to be retrieved.
 		*/
-		Entity Scenes_GetEntityByCharacter(const std::string& sceneName, const char c);
+		Entity Scenes_GetEntityById(const std::string& sceneName, const size_t tileId);
 
 		/*
 			Gets all entities with the given character in the specified scene.
 			arg1: sceneName - The name of the scene from which to retrieve the entities.
-			arg2: c - The character representing the entities to be retrieved.
+			arg2: tileId - The number representing the entities to be retrieved.
 		*/
-		std::vector<Entity> Scenes_GetEntitiesByCharacter(const std::string& sceneName, const char c);
+		const std::vector<Entity>& Scenes_GetEntitiesById(const std::string& sceneName, const size_t tileId);
 
 		/*
 			Activates the specified entity in the scene with the given name.

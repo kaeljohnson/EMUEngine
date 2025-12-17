@@ -430,10 +430,10 @@ namespace Engine
 
 			if (Transform* ptrTransform = m_refECS.GetComponent<Transform>(refPhysicsBody.m_entity)) // Don't worry about transform being inactive as we already know its corresponding physics body is active.
 			{
-				ptrTransform->PrevPosition = ptrTransform->Position;
+				ptrTransform->m_prevPosition = ptrTransform->m_position;
 				//ptrTransform->Dimensions = refPhysicsBody.m_dimensions;
-				ptrTransform->Position = refPhysicsBody.m_position;
-				ptrTransform->Rotation = refPhysicsBody.m_rotation;
+				ptrTransform->m_position = refPhysicsBody.m_position;
+				ptrTransform->m_rotation = refPhysicsBody.m_rotation;
 			}
 
 			// Is this the best place for this?

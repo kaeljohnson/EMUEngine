@@ -7,90 +7,90 @@ namespace Engine
 	void TransformInterface::SetPrevPosition(Entity entity, const Math2D::Point2D<float> position)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		ptrTransform->PrevPosition = position;
+		ptrTransform->m_prevPosition = position;
 	}
 
 	const Math2D::Point2D<float> TransformInterface::GetPrevPosition(Entity entity)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		return ptrTransform->PrevPosition;
+		return ptrTransform->m_prevPosition;
 	}
 
 	const Math2D::Point2D<float> TransformInterface::GetPrevPosition(Transform& transform)
 	{
-		return transform.PrevPosition;
+		return transform.m_prevPosition;
 	}
 
 	void TransformInterface::SetPosition(Entity entity, const Math2D::Point2D<float> position)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		ptrTransform->Position = position;
+		ptrTransform->m_position = position;
 	}
 
 	const Math2D::Point2D<float> TransformInterface::GetPosition(Entity entity)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		return ptrTransform->Position;
+		return ptrTransform->m_position;
 	}
 
 	void TransformInterface::SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		ptrTransform->Dimensions = dimensions;
+		ptrTransform->m_dimensions = dimensions;
 	}
 
 	const Math2D::Point2D<float> TransformInterface::GetDimensions(Entity entity)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		return ptrTransform->Dimensions;
+		return ptrTransform->m_dimensions;
 	}
 
 	void TransformInterface::SetZIndex(Entity entity, const int zIndex)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		ptrTransform->ZIndex = zIndex;
+		ptrTransform->m_zIndex = zIndex;
 	}
 
 	const int TransformInterface::GetZIndex(Entity entity)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		return ptrTransform->ZIndex;
+		return ptrTransform->m_zIndex;
 	}
 
 	void TransformInterface::SetRotation(Entity entity, const float rotation)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		ptrTransform->Rotation = rotation;
+		ptrTransform->m_rotation = rotation;
 	}
 
 	const float TransformInterface::GetRotation(Entity entity)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		return ptrTransform->Rotation;
+		return ptrTransform->m_rotation;
 	}
 
 	void TransformInterface::SetScale(Entity entity, const float scale)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		ptrTransform->Scale = scale;
+		ptrTransform->m_scale = scale;
 	}
 
 	const float TransformInterface::GetScale(Entity entity)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		return ptrTransform->Scale;
+		return ptrTransform->m_scale;
 	}
 
 	void TransformInterface::SetDirectionFacing(Entity entity, const int direction)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		ptrTransform->DirectionFacing = direction;
+		ptrTransform->m_directionFacing = direction;
 	}
 
 	const int TransformInterface::GetDirectionFacing(Entity entity)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		return ptrTransform->DirectionFacing;
+		return ptrTransform->m_directionFacing;
 	}
 
 	Transform* TransformInterface::GetTransform(Entity entity)

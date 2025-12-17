@@ -14,82 +14,82 @@ namespace Math2D
 		Param1: X - The X coordinate of the point.
 		Param2: Y - The Y coordinate of the point.
 	*/
-    template <typename T>
-    struct Point2D
-    {
-        T X, Y;
+	template <typename T>
+	struct Point2D
+	{
+		T X, Y;
 
-        Point2D() : X(0), Y(0) {}
-        Point2D(T x, T y) : X(x), Y(y) {}
+		Point2D() : X(0), Y(0) {}
+		Point2D(T x, T y) : X(x), Y(y) {}
 
-        Point2D operator+(const Point2D& other) const
-        {
-            return Point2D(X + other.X, Y + other.Y);
-        }
+		Point2D operator+(const Point2D& other) const
+		{
+			return Point2D(X + other.X, Y + other.Y);
+		}
 
-        Point2D operator-(const Point2D& other) const
-        {
-            return Point2D(X - other.X, Y - other.Y);
-        }
+		Point2D operator-(const Point2D& other) const
+		{
+			return Point2D(X - other.X, Y - other.Y);
+		}
 
-        Point2D operator*(T scalar) const
-        {
-            return Point2D(X * scalar, Y * scalar);
-        }
+		Point2D operator*(T scalar) const
+		{
+			return Point2D(X * scalar, Y * scalar);
+		}
 
-        Point2D operator/(T scalar) const
-        {
-            return Point2D(X / scalar, Y / scalar);
-        }
+		Point2D operator/(T scalar) const
+		{
+			return Point2D(X / scalar, Y / scalar);
+		}
 
-        Point2D& operator+=(const Point2D& other)
-        {
-            X += other.X;
-            Y += other.Y;
-            return *this;
-        }
+		Point2D& operator+=(const Point2D& other)
+		{
+			X += other.X;
+			Y += other.Y;
+			return *this;
+		}
 
-        Point2D& operator-=(const Point2D& other)
-        {
-            X -= other.X;
-            Y -= other.Y;
-            return *this;
-        }
+		Point2D& operator-=(const Point2D& other)
+		{
+			X -= other.X;
+			Y -= other.Y;
+			return *this;
+		}
 
-        Point2D& operator*=(T scalar)
-        {
-            X *= scalar;
-            Y *= scalar;
-            return *this;
-        }
+		Point2D& operator*=(T scalar)
+		{
+			X *= scalar;
+			Y *= scalar;
+			return *this;
+		}
 
-        Point2D& operator/=(T scalar)
-        {
-            X /= scalar;
-            Y /= scalar;
-            return *this;
-        }
+		Point2D& operator/=(T scalar)
+		{
+			X /= scalar;
+			Y /= scalar;
+			return *this;
+		}
 
-        bool operator==(const Point2D& other) const
-        {
-            return X == other.X && Y == other.Y;
-        }
+		bool operator==(const Point2D& other) const
+		{
+			return X == other.X && Y == other.Y;
+		}
 
-        bool operator!=(const Point2D& other) const
-        {
-            return !(*this == other);
-        }
-    };
+		bool operator!=(const Point2D& other) const
+		{
+			return !(*this == other);
+		}
+	};
 
-    // Hash for Point2D<float> to allow hashing.
-    struct Point2DFloatHash
-    {
-        size_t operator()(const Point2D<float>& v) const noexcept {
-            size_t h1 = std::hash<float>()(v.X);
-            size_t h2 = std::hash<float>()(v.Y);
-            return h1 ^ (h2 << 1);
-        }
-    };
+	// Hash for Point2D<float> to allow hashing.
+	struct Point2DFloatHash
+	{
+		size_t operator()(const Point2D<float>& v) const noexcept {
+			size_t h1 = std::hash<float>()(v.X);
+			size_t h2 = std::hash<float>()(v.Y);
+			return h1 ^ (h2 << 1);
+		}
+	};
 
 	/*
 		Basic 2D vector structure with common operations.
@@ -170,15 +170,15 @@ namespace Math2D
 		}
 	};
 
-    inline static float Lerp(float a, float b, float f)
-    {
-        return a + (b - a) * f;
-    }
+	inline static float Lerp(float a, float b, float f)
+	{
+		return a + (b - a) * f;
+	}
 
-    inline static Point2D<float> Lerp(Point2D<float> a, Point2D<float> b, float f)
-    {
-        return Point2D<float>(Lerp(a.X, b.X, f), Lerp(a.Y, b.Y, f));
-    }
+	inline static Point2D<float> Lerp(Point2D<float> a, Point2D<float> b, float f)
+	{
+		return Point2D<float>(Lerp(a.X, b.X, f), Lerp(a.Y, b.Y, f));
+	}
 
     // Geometric structures
 
@@ -196,30 +196,30 @@ namespace Math2D
 		param3: endPoint - The ending point of the edge.
 		param4: leadingPoint - The point after the endPoint of the edge.
 	*/
-    struct Edge
-    {
-        Point2D<float> m_trailingPoint;
-        Point2D<float> m_startPoint;
-        Point2D<float> m_endPoint;
+	struct Edge
+	{
+		Point2D<float> m_trailingPoint;
+		Point2D<float> m_startPoint;
+		Point2D<float> m_endPoint;
 		Point2D<float> m_leadingPoint;
 
-        bool operator==(const Edge& other) const
-        {
+		bool operator==(const Edge& other) const
+		{
 			return m_startPoint == other.m_startPoint &&
 				m_endPoint == other.m_endPoint &&
 				m_trailingPoint == other.m_trailingPoint &&
 				m_leadingPoint == other.m_leadingPoint;
-        }
+		}
 
-        Edge& operator=(const Edge& other)
-        {
+		Edge& operator=(const Edge& other)
+		{
 			m_trailingPoint = other.m_trailingPoint;
-            m_startPoint = other.m_startPoint;
-            m_endPoint = other.m_endPoint;
+			m_startPoint = other.m_startPoint;
+			m_endPoint = other.m_endPoint;
 			m_leadingPoint = other.m_leadingPoint;
-            return *this;
-        }
-    };
+			return *this;
+		}
+	};
 
 	struct EdgeHash
 	{
@@ -239,10 +239,10 @@ namespace Math2D
 		param2: m_originalEdges - The original edges that formed this chain.
 		param3: m_loop - Whether the chain is a loop.
 	*/
-    struct Chain
-    {
-        std::vector<Point2D<float>> m_points;         // merged polyline
-        std::vector<Edge> m_originalEdges;	          // original edges that formed this chain
+	struct Chain
+	{
+		std::vector<Point2D<float>> m_points;         // merged polyline
+		std::vector<Edge> m_originalEdges;	          // original edges that formed this chain
 
 		bool m_loop = false;                          // whether the chain is a loop
 
@@ -265,11 +265,11 @@ namespace Math2D
 
 			return true;
 		}
-    };
+	};
 
-    using Point = Point2D<float>;
+	using Point = Point2D<float>;
 
-    struct PointPairHash
+	struct PointPairHash
 	{
 		size_t operator()(const std::pair<Point, Point>& p) const noexcept
 		{
@@ -279,23 +279,23 @@ namespace Math2D
 		}
 	};
 
-    using AdjList = std::unordered_map<const std::pair<Point, Point>, const Edge*, PointPairHash>;
+	using AdjList = std::unordered_map<const std::pair<Point, Point>, const Edge*, PointPairHash>;
 
 
 	/*
 		Helper for MergeGridLinesIntoChains to build adjacency graph from edges.
 	*/
-    inline AdjList buildAdjacencyGraph(const std::vector<Edge>& edges)
-    {
+	inline AdjList buildAdjacencyGraph(const std::vector<Edge>& edges)
+	{
 		AdjList adj;
-        for (const auto& e : edges)
-        {
-            const auto it = adj.find({ e.m_startPoint, e.m_endPoint });
+		for (const auto& e : edges)
+		{
+			const auto it = adj.find({ e.m_startPoint, e.m_endPoint });
 
-            adj[{e.m_startPoint, e.m_endPoint}] = &e;
-        }
+			adj[{e.m_startPoint, e.m_endPoint}] = &e;
+		}
 		return adj;
-    }
+	}
 
 	/*
 		Walks the the edges in both directions from the start edge, collecting points and edges,
@@ -388,33 +388,33 @@ namespace Math2D
 		Param1: edges - The input edges to be merged into chains.
 		Returns: A vector of merged chains.
 	*/
-    inline std::vector<Math2D::Chain> MergeGridLinesIntoChains(const std::vector<Edge>& edges)
-    {
-        AdjList adj = buildAdjacencyGraph(edges);
+	inline std::vector<Math2D::Chain> MergeGridLinesIntoChains(const std::vector<Edge>& edges)
+	{
+		AdjList adj = buildAdjacencyGraph(edges);
 
-        std::unordered_set<Edge, EdgeHash> visitedEdges;
-        std::vector<Math2D::Chain> chains;
+		std::unordered_set<Edge, EdgeHash> visitedEdges;
+		std::vector<Math2D::Chain> chains;
 
-        for (const auto& e : edges)
-        {
-            if (visitedEdges.count(e))
-                continue;
+		for (const auto& e : edges)
+		{
+			if (visitedEdges.count(e))
+				continue;
 
-            std::vector<Point> points;
-            std::vector<Edge> chainEdges;
-            bool loop = false;
+			std::vector<Point> points;
+			std::vector<Edge> chainEdges;
+			bool loop = false;
 
 			// Walk grid lines
 			WalkGridLines(e, adj, visitedEdges, points, chainEdges, loop);
 
-            Math2D::Chain chain;
-            chain.m_points = std::move(points);
-            chain.m_originalEdges = std::move(chainEdges);
+			Math2D::Chain chain;
+			chain.m_points = std::move(points);
+			chain.m_originalEdges = std::move(chainEdges);
 			chain.m_loop = loop;
 
-            chains.push_back(std::move(chain));
-        }
+			chains.push_back(std::move(chain));
+		}
 
-        return chains;
-    }
+		return chains;
+	}
 }

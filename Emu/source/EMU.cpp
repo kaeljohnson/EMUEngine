@@ -65,14 +65,14 @@ namespace Engine
 
 	// Scene management
 
-	Entity EMU::Scenes_GetEntityByCharacter(const std::string& sceneName, const char c)
+	Entity EMU::Scenes_GetEntityById(const std::string& sceneName, const size_t tileId)
 	{
-		return m_sceneManager.GetEntity(sceneName, c);
+		return m_sceneManager.GetEntity(sceneName, tileId);
 	}
 
-	std::vector<Entity> EMU::Scenes_GetEntitiesByCharacter(const std::string& sceneName, const char c)
+	const std::vector<Entity>& EMU::Scenes_GetEntitiesById(const std::string& sceneName, const size_t id)
 	{
-		return m_sceneManager.GetEntities(sceneName, c);
+		return m_sceneManager.GetEntities(sceneName, id);
 	}
 
 	Entity EMU::Scenes_GetCurrentRuntimeEntity(const size_t tileId)

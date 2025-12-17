@@ -25,25 +25,27 @@ namespace Engine
 
 	struct Transform : public Component
 	{
-		Math2D::Point2D<float> PrevPosition;	// Previous position of transform in world space.
-		Math2D::Point2D<float> Position;		// Current position of transform in world space.
-		Math2D::Point2D<float> Velocity;
-		Math2D::Point2D<float> Dimensions;
+		Math2D::Point2D<float> m_prevPosition;
+		Math2D::Point2D<float> m_position;
+		Math2D::Point2D<float> m_velocity;
+		Math2D::Point2D<float> m_dimensions;
 
-		int ZIndex;
-		float Rotation;
-		float Scale;
-		int DirectionFacing;
+		int m_zIndex;
+		float m_rotation;
+		float m_scale;
+		int m_directionFacing;
 		bool m_drawDebug;
 		DebugColor m_debugColor;
 
-		Transform(Entity entity) : PrevPosition(0.0f, 0.0f), Position(0.0f, 0.0f),
-			Dimensions(0.0f, 0.0f), Rotation(0.0f), Scale(1.0f), DirectionFacing(1), ZIndex(0), m_drawDebug(false), m_debugColor(DebugColor::Red), Component(entity) {}
+		Transform(Entity entity) : m_prevPosition(0.0f, 0.0f), m_position(0.0f, 0.0f),
+			m_dimensions(0.0f, 0.0f), m_rotation(0.0f), m_scale(1.0f), m_directionFacing(1), m_zIndex(0), 
+			m_drawDebug(false), m_debugColor(DebugColor::Red), Component(entity) {}
 
-		Transform(Entity entity, Math2D::Point2D<float> position, Math2D::Point2D<float> dimensions, float rotation, float scale, int direction, int zIndex, const bool drawDebug, DebugColor debugColor) :
-			PrevPosition(position), Position(position),
-			Dimensions(dimensions), Rotation(rotation), Scale(scale), 
-			DirectionFacing(direction), ZIndex(zIndex), m_drawDebug(drawDebug),
+		Transform(Entity entity, Math2D::Point2D<float> position, Math2D::Point2D<float> dimensions, float rotation, 
+			float scale, int direction, int zIndex, const bool drawDebug, DebugColor debugColor) :
+			m_prevPosition(position), m_position(position),
+			m_dimensions(dimensions), m_rotation(rotation), m_scale(scale), 
+			m_directionFacing(direction), m_zIndex(zIndex), m_drawDebug(drawDebug),
 			m_debugColor(debugColor),
 			Component(entity) {}
 
@@ -56,16 +58,18 @@ namespace Engine
 			m_bodyId(nullptr), m_enabled(true), m_shapeId(nullptr), m_worldId(nullptr),
 			m_bodyType(STATIC), m_dimensions(Math2D::Point2D<float>(1.0f, 1.0f)),
 			m_halfDimensions(Math2D::Point2D<float>(0.5f, 0.5f)), m_startingPosition(Math2D::Point2D<float>(1.0f, 1.0f)),
-			m_position(Math2D::Point2D<float>(0.0f, 0.0f)), m_rotation(0.0f), m_drawDebug(false), m_fillRect(false), m_debugColor(DebugColor::Red),
-			m_gravityOn(true), m_category(ALL), m_mask(ALL), m_checkSimpleContacts(false), Component(entity) {}
+			m_position(Math2D::Point2D<float>(0.0f, 0.0f)), m_rotation(0.0f), m_drawDebug(false), m_fillRect(false), 
+			m_debugColor(DebugColor::Red), m_gravityOn(true), m_category(ALL), m_mask(ALL), m_checkSimpleContacts(false), 
+			Component(entity) {}
 
 		PhysicsBody(Entity entity, const bool enabled, BodyType bodyType, Filter category, Filter mask,
 			Math2D::Point2D<float> dimensions, Math2D::Point2D<float> startingPosition,
 			float rotation, bool gravityOn, bool checkSimpleContacts, bool drawDebug, bool fillRect, DebugColor debugColor)
 			: m_bodyId(nullptr), m_enabled(enabled), m_shapeId(nullptr), m_worldId(nullptr),
 			m_bodyType(bodyType), m_category(category), m_mask(mask), m_dimensions(dimensions),
-			m_halfDimensions(dimensions / 2.0f), m_startingPosition(startingPosition), m_drawDebug(drawDebug), m_fillRect(fillRect), m_debugColor(debugColor),
-			m_rotation(rotation), m_gravityOn(gravityOn), m_checkSimpleContacts(checkSimpleContacts), Component(entity) {}
+			m_halfDimensions(dimensions / 2.0f), m_startingPosition(startingPosition), m_drawDebug(drawDebug), 
+			m_fillRect(fillRect), m_debugColor(debugColor), m_rotation(rotation), m_gravityOn(gravityOn), 
+			m_checkSimpleContacts(checkSimpleContacts), Component(entity) {}
 
 		~PhysicsBody() = default;
 
@@ -89,7 +93,7 @@ namespace Engine
 		float m_rotation;
 		bool m_gravityOn;
 
-		bool m_checkSimpleContacts = false; // If true, the physics system will check for simple contacts and set the contact booleans below to true or false.	
+		bool m_checkSimpleContacts = false;
 
 		bool m_contactAbove = false;
 		bool m_contactBelow = false;
@@ -119,7 +123,8 @@ namespace Engine
 
 	struct RenderObject
 	{
-		RenderObject(size_t entity, Math2D::Point2D<int> locationInPixelsOnScreen, Math2D::Point2D<int> sizeInPixelsOnScreen, Math2D::Point2D<int> locationInPixelsOnSpriteSheet, Math2D::Point2D<int> sizeInPixelsOnSpriteSheet)
+		RenderObject(size_t entity, Math2D::Point2D<int> locationInPixelsOnScreen, Math2D::Point2D<int> sizeInPixelsOnScreen, 
+			Math2D::Point2D<int> locationInPixelsOnSpriteSheet, Math2D::Point2D<int> sizeInPixelsOnSpriteSheet)
 			: m_entity(entity), m_locationInPixelsOnScreen(locationInPixelsOnScreen), m_sizeInPixelsOnScreen(sizeInPixelsOnScreen),
 			m_locationInPixelsOnSpriteSheet(locationInPixelsOnSpriteSheet), m_sizeInPixelsOnSpriteSheet(sizeInPixelsOnSpriteSheet) {}
 
@@ -132,7 +137,8 @@ namespace Engine
 
 	struct DebugObject
 	{
-		DebugObject(size_t entity, bool filled, Math2D::Point2D<int> locationInPixelsOnScreen, Math2D::Point2D<int> sizeInPixelsOnScreen, DebugColor debugColor)
+		DebugObject(size_t entity, bool filled, Math2D::Point2D<int> locationInPixelsOnScreen, 
+			Math2D::Point2D<int> sizeInPixelsOnScreen, DebugColor debugColor)
 			: m_entity(entity), m_filled(filled), m_locationInPixelsOnScreen(locationInPixelsOnScreen), 
 			m_sizeInPixelsOnScreen(sizeInPixelsOnScreen), m_debugColor(debugColor) {}
 
@@ -145,8 +151,10 @@ namespace Engine
 
 	struct LineObject
 	{
-		LineObject(size_t entity, Math2D::Point2D<int> startPointInPixelsOnScreen, Math2D::Point2D<int> endPointInPixelsOnScreen, DebugColor debugColor)
-			: m_entity(entity), m_startPointInPixelsOnScreen(startPointInPixelsOnScreen), m_endPointInPixelsOnScreen(endPointInPixelsOnScreen), m_debugColor(debugColor) {}
+		LineObject(size_t entity, Math2D::Point2D<int> startPointInPixelsOnScreen, 
+			Math2D::Point2D<int> endPointInPixelsOnScreen, DebugColor debugColor)
+			: m_entity(entity), m_startPointInPixelsOnScreen(startPointInPixelsOnScreen), 
+			m_endPointInPixelsOnScreen(endPointInPixelsOnScreen), m_debugColor(debugColor) {}
 
 		size_t m_entity;
 		Math2D::Point2D<int> m_startPointInPixelsOnScreen;
@@ -168,11 +176,13 @@ namespace Engine
 			Component(entity) 
 		{
 		}
-		Camera(Entity entity, Math2D::Point2D<float> size, Math2D::Point2D<float> screenRatio, Math2D::Point2D<float> position, int pixelsPerUnit, bool clampingOn, size_t numLayers)
+		Camera(Entity entity, Math2D::Point2D<float> size, Math2D::Point2D<float> screenRatio, 
+			Math2D::Point2D<float> position, int pixelsPerUnit, bool clampingOn, size_t numLayers)
 			: m_size(size), m_screenRatio(screenRatio), m_positionInFractionOfScreenSize(position), 
-			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0), m_borderOn(false),
-			m_clipRectPosition(0, 0), m_clipRectSize(0, 0), m_renderBucket(numLayers, std::vector<RenderObject>()), m_numLayers(numLayers),
-			m_debugRenderBucket(numLayers, std::vector<DebugObject>()), m_debugLinesRenderBucket(numLayers, std::vector<LineObject>()),
+			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0), 
+			m_borderOn(false), m_clipRectPosition(0, 0), m_clipRectSize(0, 0), m_renderBucket(numLayers, std::vector<RenderObject>()), 
+			m_numLayers(numLayers), m_debugRenderBucket(numLayers, std::vector<DebugObject>()), 
+			m_debugLinesRenderBucket(numLayers, std::vector<LineObject>()),
 			Component(entity) {}
 		
 
@@ -182,7 +192,7 @@ namespace Engine
 		Math2D::Point2D<float> m_positionInFractionOfScreenSize;
 		Math2D::Point2D<float> m_screenRatio;
 
-		Math2D::Point2D<float> m_offset;		// Top left position of the camera in world space.
+		Math2D::Point2D<float> m_offset;		// Top left position of the camera in world units.
 		Math2D::Point2D<float> m_size;			// Size of the camera in world units.
 		
 		int m_pixelsPerUnit;
@@ -221,8 +231,8 @@ namespace Engine
 	{
 		ChainCollider(Entity entity, Math2D::Chain refPoints, 
 			const bool enabled, Filter category, Filter mask, bool drawDebug, DebugColor debugColor)
-			: m_chain(refPoints), m_category(category), m_enabled(enabled), m_mask(mask), m_drawDebug(true), m_debugColor(debugColor),
-			Component(entity) {}
+			: m_chain(refPoints), m_category(category), m_enabled(enabled), m_mask(mask), 
+			m_drawDebug(true), m_debugColor(debugColor), Component(entity) {}
 		~ChainCollider() = default;
 
 		Math2D::Chain m_chain;
@@ -244,10 +254,12 @@ namespace Engine
 
 	struct Sprite : public Component
 	{
-		Sprite(Entity entity, void* ptrLoadedTexture, Math2D::Point2D<int> pixelsPerFrame, Math2D::Point2D<float> offsetFromTransform,
-			Math2D::Point2D<size_t> dimensions, Math2D::Point2D<float> size, const bool drawDebug, DebugColor debugColor)
-			: m_ptrLoadedTexture(ptrLoadedTexture), m_offsetFromTransform(offsetFromTransform), m_pixelsPerFrame(pixelsPerFrame),
-			m_dimensions(dimensions), m_sizeInUnits(size), m_drawDebug(drawDebug), m_debugColor(debugColor), Component(entity) {}
+		Sprite(Entity entity, void* ptrLoadedTexture, Math2D::Point2D<int> pixelsPerFrame, 
+			Math2D::Point2D<float> offsetFromTransform, Math2D::Point2D<size_t> dimensions, 
+			Math2D::Point2D<float> size, const bool drawDebug, DebugColor debugColor)
+			: m_ptrLoadedTexture(ptrLoadedTexture), m_offsetFromTransform(offsetFromTransform), 
+			m_pixelsPerFrame(pixelsPerFrame), m_dimensions(dimensions), m_sizeInUnits(size), 
+			m_drawDebug(drawDebug), m_debugColor(debugColor), Component(entity) {}
 
 		~Sprite() = default;
 
@@ -266,9 +278,7 @@ namespace Engine
 		Animation() = default;
 		Animation(std::string name, std::vector<int> frames, int frameDuration,  bool loop)
 			: m_name(name), m_frames(frames), m_numFrames(frames.size()), m_frameTime(0), 
-			m_frameDuration(frameDuration), m_loop(loop)
-		{
-		};
+			m_frameDuration(frameDuration), m_loop(loop) {};
 		
 		std::string m_name;
 		std::vector<int> m_frames;
@@ -286,12 +296,10 @@ namespace Engine
 			:
 			m_animations(animations), 
 			m_currentAnimation("Idle"), // Idle for now, need a animation interface for client to set animation in a state machine.
-			Component(entity) 
-		{}
+			Component(entity) {}
 
 		std::unordered_map<std::string, Animation> m_animations; // All animations for this sprite
 		std::string m_currentAnimation;							 // Name of the current animation being played
-		
 	};
 
 	struct AudioSource : public Component

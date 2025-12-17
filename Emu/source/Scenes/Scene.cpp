@@ -104,6 +104,7 @@ namespace Engine
 		// Deactivate all entities and destroy all components.
 		m_refECS.DeactivateEntities();
 		m_refECS.DestroyComponents(m_entities);
+		m_entities.clear();
 	}
 
 	void Scene::AddTileMap(std::string mapFileName, std::string rulesFileName)
