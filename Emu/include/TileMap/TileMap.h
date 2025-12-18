@@ -60,7 +60,8 @@ namespace Engine
 			if (m_groupedEntitiesByNumMap.find(tileId) != m_groupedEntitiesByNumMap.end())
 				return m_groupedEntitiesByNumMap.at(tileId);
 
-			return std::vector<Entity>(); // Return an empty vector if no entities found.
+			static const std::vector<Entity> emptyVector;
+			return emptyVector;
 		}
 
 		/*

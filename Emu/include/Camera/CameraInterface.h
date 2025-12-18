@@ -9,7 +9,7 @@ namespace Engine
 	{
 	public:
 		void SetPixelsPerUnit(Entity entity, const int pixelsPerUnit);
-		const int GetPixelsPerUnit(Entity entity);
+		const size_t GetPixelsPerUnit(Entity entity);
 		void SetOffset(Entity entity, const Math2D::Point2D<float> offset);
 		const Math2D::Point2D<float> GetOffset(Entity entity);
 		void SetClampingOn(Entity entity, const bool clampingOn);

@@ -32,12 +32,12 @@ namespace Engine
 		m_physicsSimulation.Cleanup();
 	}
 	
-	void Scene::RegisterContactCallback(ContactType contactType, const char entityA, const char entityB, ContactCallback callback)
+	void Scene::RegisterContactCallback(ContactType contactType, const size_t entityA, const size_t entityB, ContactCallback callback)
 	{
 		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entityA, entityB, callback);
 	}
 
-	void Scene::RegisterContactCallback(ContactType contactType, const char entity, ContactCallback callback)
+	void Scene::RegisterContactCallback(ContactType contactType, const size_t entity, ContactCallback callback)
 	{
 		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entity, callback);
 	}
@@ -779,7 +779,7 @@ namespace Engine
 			}
 			catch (const std::exception& e)
 			{
-				continue;
+				throw std::runtime_error("Invalid tile ID key in character rules: " + key + ". Error: " + e.what());
 			}
 
 			// Look for Physics -> template -> Category == "MAP"

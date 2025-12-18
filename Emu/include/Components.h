@@ -30,7 +30,7 @@ namespace Engine
 		Math2D::Point2D<float> m_velocity;
 		Math2D::Point2D<float> m_dimensions;
 
-		int m_zIndex;
+		size_t m_zIndex;
 		float m_rotation;
 		float m_scale;
 		int m_directionFacing;
@@ -42,7 +42,7 @@ namespace Engine
 			m_drawDebug(false), m_debugColor(DebugColor::Red), Component(entity) {}
 
 		Transform(Entity entity, Math2D::Point2D<float> position, Math2D::Point2D<float> dimensions, float rotation, 
-			float scale, int direction, int zIndex, const bool drawDebug, DebugColor debugColor) :
+			float scale, int direction, size_t zIndex, const bool drawDebug, DebugColor debugColor) :
 			m_prevPosition(position), m_position(position),
 			m_dimensions(dimensions), m_rotation(rotation), m_scale(scale), 
 			m_directionFacing(direction), m_zIndex(zIndex), m_drawDebug(drawDebug),
@@ -177,7 +177,7 @@ namespace Engine
 		{
 		}
 		Camera(Entity entity, Math2D::Point2D<float> size, Math2D::Point2D<float> screenRatio, 
-			Math2D::Point2D<float> position, int pixelsPerUnit, bool clampingOn, size_t numLayers)
+			Math2D::Point2D<float> position, size_t pixelsPerUnit, bool clampingOn, size_t numLayers)
 			: m_size(size), m_screenRatio(screenRatio), m_positionInFractionOfScreenSize(position), 
 			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0), 
 			m_borderOn(false), m_clipRectPosition(0, 0), m_clipRectSize(0, 0), m_renderBucket(numLayers, std::vector<RenderObject>()), 
@@ -195,7 +195,7 @@ namespace Engine
 		Math2D::Point2D<float> m_offset;		// Top left position of the camera in world units.
 		Math2D::Point2D<float> m_size;			// Size of the camera in world units.
 		
-		int m_pixelsPerUnit;
+		size_t m_pixelsPerUnit;
 		bool m_clampingOn;
 		Math2D::Point2D<int> m_bounds;
 		bool m_borderOn;

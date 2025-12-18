@@ -85,11 +85,11 @@ namespace Engine
 	void EMU::Scenes_Create(const std::string& name) { m_sceneManager.AddScene(name, m_assetManager); }
 	void EMU::Scenes_Load(const std::string& name) { m_sceneManager.QueueNewScene(name); }
 	void EMU::Scenes_RegisterOnPlay(const std::string& name, std::function<void()> func) { m_sceneManager.RegisterOnScenePlay(name, func); }
-	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entityA, const char entityB, ContactCallback callback)
+	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const size_t entityA, const size_t entityB, ContactCallback callback)
 	{ 
 		m_sceneManager.RegisterContactCallback(name, contactType, entityA, entityB, callback); 
 	}
-	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entity, ContactCallback callback) {
+	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const size_t entity, ContactCallback callback) {
 		m_sceneManager.RegisterContactCallback(name, contactType, entity, callback);
 	}
 	void EMU::Scenes_SetGravity(const std::string& name, const Math2D::Point2D<float> gravity) { m_sceneManager.SetGravity(name, gravity); }
@@ -101,7 +101,7 @@ namespace Engine
 	void EMU::Scenes_SetLevelDimensions(const std::string& name, const Math2D::Point2D<int> levelWidthInUnits) { m_sceneManager.SetLevelDimensions(name, levelWidthInUnits); }
 
 	void EMU::Camera_SetPixelsPerUnit(Entity entity, const int pixelsPerUnit) { m_cameraInterface.SetPixelsPerUnit(entity, pixelsPerUnit); }
-	const int EMU::Camera_GetPixelsPerUnit(Entity entity) { return m_cameraInterface.GetPixelsPerUnit(entity); }
+	const size_t EMU::Camera_GetPixelsPerUnit(Entity entity) { return m_cameraInterface.GetPixelsPerUnit(entity); }
 	void EMU::Camera_SetOffset(Entity entity, const Math2D::Point2D<float> offset) { m_cameraInterface.SetOffset(entity, offset); }
 	const Math2D::Point2D<float> EMU::Camera_GetOffset(Entity entity) { return m_cameraInterface.GetOffset(entity); }
 	void EMU::Camera_SetClampingOn(Entity entity, const bool clampingOn) { m_cameraInterface.SetClampingOn(entity, clampingOn); }
@@ -151,7 +151,7 @@ namespace Engine
 	void EMU::Transform_SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions) { m_transformInterface.SetDimensions(entity, dimensions); }
 	const Math2D::Point2D<float> EMU::Transform_GetDimensions(Entity entity) { return m_transformInterface.GetDimensions(entity); }
 	void EMU::Transform_SetZIndex(Entity entity, const int zIndex) { m_transformInterface.SetZIndex(entity, zIndex); }
-	const int EMU::Transform_GetZIndex(Entity entity) { return m_transformInterface.GetZIndex(entity); }
+	const size_t EMU::Transform_GetZIndex(Entity entity) { return m_transformInterface.GetZIndex(entity); }
 	void EMU::Transform_SetRotation(Entity entity, const float rotation) { m_transformInterface.SetRotation(entity, rotation); }
 	const float EMU::Transform_GetRotation(Entity entity) { return m_transformInterface.GetRotation(entity); }
 	void EMU::Transform_SetScale(Entity entity, const float scale) { m_transformInterface.SetScale(entity, scale); }

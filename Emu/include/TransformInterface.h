@@ -19,7 +19,7 @@ namespace Engine
 		void SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions);
 		const Math2D::Point2D<float> GetDimensions(Entity entity);
 		void SetZIndex(Entity entity, const int zIndex);
-		const int GetZIndex(Entity entity);
+		const size_t GetZIndex(Entity entity);
 		void SetRotation(Entity entity, const float rotation);
 		const float GetRotation(Entity entity);
 		void SetScale(Entity entity, const float scale);

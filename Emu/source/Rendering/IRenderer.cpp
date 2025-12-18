@@ -286,7 +286,7 @@ namespace Engine
 
 		Screen::VIRTUAL_SIZE.Y = 720; // Fixed virtual height in units for consistent rendering.
 
-		Screen::VIRTUAL_SIZE.X = Screen::VIRTUAL_SIZE.Y * aspectRatio; // Need the virtual width to be based on the fixed units of height. Otherwise will get weird stretching.
+		Screen::VIRTUAL_SIZE.X = (int)(Screen::VIRTUAL_SIZE.Y * aspectRatio); // Need the virtual width to be based on the fixed units of height. Otherwise will get weird stretching.
 
 		const float scaleX = static_cast<float>(windowWidthInPixels) / Screen::VIRTUAL_SIZE.X;
 		const float scaleY = static_cast<float>(windowHeightInPixels) / Screen::VIRTUAL_SIZE.Y;

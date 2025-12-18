@@ -176,11 +176,6 @@ namespace Engine
 		}
 	}
 
-	void ContactSystem::RegisterContactCallback(ContactType contactType, const char A, ContactCallback callback)
-	{
-		m_singleEntityContactCallbacks.emplace_back(contactType, A, callback);
-	}
-
 	void ContactSystem::ActivateContactCallback(ContactType contactType, Entity entityA, ContactCallback callback)
 	{
 		PhysicsBody* ptrPhysicsBody = m_refECS.GetComponent<PhysicsBody>(entityA);
@@ -219,9 +214,14 @@ namespace Engine
 		}
 	}
 
-	void ContactSystem::RegisterContactCallback(ContactType contactType, const char A, const char B, ContactCallback callback)
+	void ContactSystem::RegisterContactCallback(ContactType contactType, const size_t A, const size_t B, ContactCallback callback)
 	{
 		m_multiContactCallbacks.emplace_back(contactType, A, B, callback);
+	}
+
+	void ContactSystem::RegisterContactCallback(ContactType contactType, const size_t A, ContactCallback callback)
+	{
+		m_singleEntityContactCallbacks.emplace_back(contactType, A, callback);
 	}
 
 	void ContactSystem::ActivateContactCallback(ContactType contactType, Entity entityA, Entity entityB, ContactCallback callback)

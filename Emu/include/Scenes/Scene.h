@@ -39,7 +39,7 @@ namespace Engine
 		using ContactCallback = std::function<void(const Contact&)>;
 
 		/*
-			Register a contact callback between two entities identified by their characters.
+			Register a contact callback between two entities identified by their tileId.
 			Call this function to add a behavior that should be triggered when two entities
 			come into contact.
 			arg1: name - The name of the scene where the contact callback is to be registered.
@@ -47,17 +47,17 @@ namespace Engine
 			arg3: entityA - The character representing the first entity involved in the contact.
 			arg4: entityB - The character representing the second entity involved in the contact.
 		*/
-		void RegisterContactCallback(ContactType contactType, const char entityA, const char entityB, ContactCallback callback);
+		void RegisterContactCallback(ContactType contactType, const size_t entityA, const size_t entityB, ContactCallback callback);
 
 		/*
-			Register a contact callback for a specific entity identified by its character.
+			Register a contact callback for a specific entity identified by its tileId.
 			Call this function to add a behavior that should be triggered when the specified
 			entity comes into contact with any other entity.
 			arg1: name - The name of the scene where the contact callback is to be registered.
 			arg2: contactType - The type of contact event (e.g., BEGIN_CONTACT, END_CONTACT).
 			arg3: entity - The character representing the entity involved in the contact.
 		*/
-		void RegisterContactCallback(ContactType contactType, const char entity, ContactCallback callback);
+		void RegisterContactCallback(ContactType contactType, const size_t entity, ContactCallback callback);
 
 		/*
 			Sets the physics simulation parameters for the scene.

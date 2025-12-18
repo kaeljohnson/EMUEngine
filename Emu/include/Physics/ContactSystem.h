@@ -100,10 +100,10 @@ namespace Engine
 		using ContactCallback = std::function<void(const Contact&)>; 
 
 
-		void RegisterContactCallback(ContactType contactType, const char B, ContactCallback callback);
+		void RegisterContactCallback(ContactType contactType, const size_t tileIdA, ContactCallback callback);
 		void ActivateContactCallback(ContactType contactType, Entity entityA, Entity entityB, ContactCallback callback);
 
-		void RegisterContactCallback(ContactType contactType, const char A, const char B, ContactCallback callback);
+		void RegisterContactCallback(ContactType contactType, const size_t tileIdA, const size_t tileIdB, ContactCallback callback);
 		void ActivateContactCallback(ContactType contactType, Entity entityA, ContactCallback callback);
 
 	public:
@@ -116,8 +116,8 @@ namespace Engine
 		ECS& m_refECS;
 		TileMap& m_refTileMap;
 
-		std::vector<std::tuple<ContactType, const char, ContactCallback>> m_singleEntityContactCallbacks;
-		std::vector<std::tuple<ContactType, const char, const char, ContactCallback>> m_multiContactCallbacks;
+		std::vector<std::tuple<ContactType, const size_t, ContactCallback>> m_singleEntityContactCallbacks;
+		std::vector<std::tuple<ContactType, const size_t, const size_t, ContactCallback>> m_multiContactCallbacks;
 
 		std::unordered_map<SingleEntityBeginContactKey, ContactCallback> m_beginSingleEntityContactCallbacks;
 		std::unordered_map<SingleEntityBeginContactKey, ContactCallback> m_beginSingleEntitySensingCallbacks;

@@ -116,7 +116,7 @@ namespace Engine
 
 	}
 
-	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const char entityA, const char entityB, Scene::ContactCallback callback)
+	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const size_t entityA, const size_t entityB, Scene::ContactCallback callback)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
@@ -130,7 +130,7 @@ namespace Engine
 		}
 	}
 
-	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const char entity, Scene::ContactCallback callback)
+	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const size_t entity, Scene::ContactCallback callback)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())

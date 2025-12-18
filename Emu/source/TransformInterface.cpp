@@ -51,7 +51,7 @@ namespace Engine
 		ptrTransform->m_zIndex = zIndex;
 	}
 
-	const int TransformInterface::GetZIndex(Entity entity)
+	const size_t TransformInterface::GetZIndex(Entity entity)
 	{
 		Transform* ptrTransform = GetTransform(entity);
 		return ptrTransform->m_zIndex;

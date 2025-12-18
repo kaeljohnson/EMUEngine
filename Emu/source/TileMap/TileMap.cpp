@@ -12,7 +12,7 @@ namespace Engine
 	TileMap::TileMap(ECS& refECS)
 		: m_refECS(refECS), m_mapDimensions(0, 0)
 	{
-        m_tileMap.reserve(MAX_SIZE);
+    m_tileMap.reserve(MAX_SIZE);
     }
 
     Entity TileMap::GetEntity(size_t tileId) const
@@ -40,61 +40,71 @@ namespace Engine
 
         while (std::getline(file, line))
         {
-            // Parse integers out of this line
-            std::vector<int> tokens;
-            {
-                std::stringstream ss(line);
-                std::string token;
-                while (std::getline(ss, token, ','))
-                {
-                    // Trim whitespace
-                    token.erase(remove_if(token.begin(), token.end(), ::isspace), token.end());
+            // Trim whitespace from the line
+            line.erase(line.begin(), std::find_if(line.begin(), line.end(), [](unsigned char c) { return !std::isspace(c); }));
+            line.erase(std::find_if(line.rbegin(), line.rend(), [](unsigned char c) { return !std::isspace(c); }).base(), line.end());
 
-                    if (!token.empty())
-                        tokens.push_back(std::stoi(token));
-                }
+            if (line.empty()) // skip blank lines
+                continue;
+
+            // Remove first and last '|' if present
+            if (line.front() == '|') line.erase(line.begin());
+            if (!line.empty() && line.back() == '|') line.pop_back();
+
+            if (line.empty()) // nothing left to parse
+                continue;
+
+            std::vector<int> tokens;
+            std::stringstream ss(line);
+            std::string token;
+
+            while (std::getline(ss, token, '|'))
+            {
+                token.erase(remove_if(token.begin(), token.end(), ::isspace), token.end());
+                if (token.empty())
+                    tokens.push_back(-1); // empty tile
+                else
+                    tokens.push_back(std::stoi(token));
             }
 
             if (tokens.empty())
                 continue;
 
-            // Set map width
+            // Set map width if first row
             if (m_mapDimensions.Y == 0)
             {
-                m_mapDimensions.X = (int)tokens.size();
+                m_mapDimensions.X = static_cast<int>(tokens.size());
             }
-            else if (tokens.size() != m_mapDimensions.X)
+            else if (tokens.size() != static_cast<size_t>(m_mapDimensions.X))
             {
                 ENGINE_CRITICAL("Map is not a rectangle on line {}", m_mapDimensions.Y + 1);
                 throw std::runtime_error("Map is not a rectangle");
             }
 
-            // Now store the integers
-            for (int x = 0; x < tokens.size(); x++)
+            // Store tiles
+            for (int x = 0; x < static_cast<int>(tokens.size()); x++)
             {
                 int tileValue = tokens[x];
-
                 if (tileValue == -1)
-                    continue; // don't create entity
+                    continue;
 
-                if (numEntities < MAX_SIZE)
-                {
-                    Entity tileEntity = m_refECS.CreateEntity();
-                    m_tileMap[{x, m_mapDimensions.Y}] =
-                        std::make_pair(tileEntity, tileValue);
-                    m_groupedEntitiesByNumMap[tileValue].push_back(tileEntity);
-                    numEntities++;
-                }
-                else
+                if (numEntities >= MAX_SIZE)
                 {
                     ENGINE_CRITICAL("Map size exceeds maximum size {}", MAX_SIZE);
+                    break;
                 }
+
+                Entity tileEntity = m_refECS.CreateEntity();
+                m_tileMap[{x, m_mapDimensions.Y}] = { tileEntity, tileValue };
+                m_groupedEntitiesByNumMap[tileValue].push_back(tileEntity);
+                numEntities++;
             }
 
             m_mapDimensions.Y++;
         }
-
     }
+
+
 
     const std::pair<Entity, size_t>* TileMap::GetTile(int x, int y) const
     {

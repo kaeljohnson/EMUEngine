@@ -21,7 +21,7 @@ namespace Engine
 				Screen::VIEWPORT_SIZE.Y * ptrCamera->m_screenRatio.Y / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.Y));
 	}
 
-	const int CameraInterface::GetPixelsPerUnit(Entity entity)
+	const size_t CameraInterface::GetPixelsPerUnit(Entity entity)
 	{
 		return m_refECS.GetComponent<Camera>(entity)->m_pixelsPerUnit;
 	}

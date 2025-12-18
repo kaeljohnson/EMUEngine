@@ -45,7 +45,7 @@ namespace Engine
 		void Scenes_RegisterOnPlay(const std::string& name, std::function<void()>);
 
 		/*
-			Register a contact callback between two entities identified by their characters.
+			Register a contact callback between two entities identified by their tileIds.
 			Call this function to add a behavior that should be triggered when two entities
 			come into contact.
 			arg1: name - The name of the scene where the contact callback is to be registered.
@@ -53,7 +53,7 @@ namespace Engine
 			arg3: entityA - The character representing the first entity involved in the contact.
 			arg4: entityB - The character representing the second entity involved in the contact.
 		*/
-		void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entityA, const char entityB, ContactCallback callback);
+		void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const size_t entityA, const size_t entityB, ContactCallback callback);
 
 		/*
 			Register a contact callback for a single entity identified by its character.
@@ -63,7 +63,7 @@ namespace Engine
 			arg2: contactType - The type of contact event (e.g., BEGIN_SENSOR, END_SENSOR).
 			arg3: entity - The character representing the entity involved in the contact.
 		*/
-		void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const char entity, ContactCallback callback);
+		void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const size_t entity, ContactCallback callback);
 
 		/*
 			Sets the physics simulation parameters for the scene with the given name.
@@ -177,7 +177,7 @@ namespace Engine
 			arg1: entity - The entity whose camera component's pixels per unit is to be retrieved.
 			returns: The number of pixels that correspond to one unit in the game world.
 		*/
-		const int Camera_GetPixelsPerUnit(Entity entity);
+		const size_t Camera_GetPixelsPerUnit(Entity entity);
 
 		/*
 			Sets the offset for the camera component of the given entity in world units.
@@ -494,7 +494,7 @@ namespace Engine
 			arg1: entity - The entity whose transform component's Z index is to be retrieved.
 			returns: The Z index of the transform as an int.
 		*/
-		const int Transform_GetZIndex(Entity entity);
+		const size_t Transform_GetZIndex(Entity entity);
 
 		/*
 			Sets the rotation of the transform component of the given entity.

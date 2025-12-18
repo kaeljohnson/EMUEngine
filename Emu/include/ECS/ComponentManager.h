@@ -31,7 +31,7 @@ namespace Engine
         void AddComponent(Args&&... args)
         {
             auto argsTuple = std::make_tuple(std::forward<Args>(args)...);
-            Entity entity = std::get<0>(argsTuple);
+            Entity entity = (Entity)std::get<0>(argsTuple);
 
             if (m_components.count(entity) || m_hotIndices[entity] != INVALID_INDEX)
             {
