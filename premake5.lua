@@ -1,12 +1,11 @@
-workspace "gameV1"
+workspace "EMUEngine"
     architecture "x64"
     configurations { "Debug", "Release", "Dist" }
 
 outputDirectory = "%{cfg.buildcfg}-%{cfg.architecture}"
 
--- ====================
+
 -- Emu Engine
--- ====================
 project "Emu"
     location "Emu"
     kind "StaticLib"
@@ -65,11 +64,10 @@ project "Emu"
         optimize "On"
         defines { "NDEBUG" }
 
--- ====================
+
 -- GameV1 Executable
--- ====================
-project "GameV1"
-    location "GameV1"
+project "SandBox"
+    location "SandBox"
     kind "ConsoleApp"
     language "C++"
     staticruntime "off"
@@ -118,9 +116,8 @@ project "GameV1"
         optimize "On"
         defines { "NDEBUG" }
 
--- ====================
+
 -- EmuTests Executable
--- ====================
 project "EmuTests"
     location "EmuTests"
     kind "ConsoleApp"
