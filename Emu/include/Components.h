@@ -28,7 +28,6 @@ namespace Engine
 		Math2D::Point2D<float> m_prevPosition;
 		Math2D::Point2D<float> m_position;
 		Math2D::Point2D<float> m_velocity;
-		Math2D::Point2D<float> m_dimensions;
 
 		size_t m_zIndex;
 		float m_rotation;
@@ -38,13 +37,12 @@ namespace Engine
 		DebugColor m_debugColor;
 
 		Transform(Entity entity) : m_prevPosition(0.0f, 0.0f), m_position(0.0f, 0.0f),
-			m_dimensions(0.0f, 0.0f), m_rotation(0.0f), m_scale(1.0f), m_directionFacing(1), m_zIndex(0), 
+			m_rotation(0.0f), m_scale(1.0f), m_directionFacing(1), m_zIndex(0), 
 			m_drawDebug(false), m_debugColor(DebugColor::Red), Component(entity) {}
 
 		Transform(Entity entity, Math2D::Point2D<float> position, Math2D::Point2D<float> dimensions, float rotation, 
 			float scale, int direction, size_t zIndex, const bool drawDebug, DebugColor debugColor) :
-			m_prevPosition(position), m_position(position),
-			m_dimensions(dimensions), m_rotation(rotation), m_scale(scale), 
+			m_prevPosition(position), m_position(position), m_rotation(rotation), m_scale(scale), 
 			m_directionFacing(direction), m_zIndex(zIndex), m_drawDebug(drawDebug),
 			m_debugColor(debugColor),
 			Component(entity) {}
@@ -162,10 +160,21 @@ namespace Engine
 		DebugColor m_debugColor;
 	};
 
-	using RenderBucket = std::vector<std::vector<RenderObject>>;      // Vector index is the zIndex.
-	using DebugRenderBucket = std::vector<std::vector<DebugObject>>;  // Vector index is the zIndex.
-	using LinesRenderBucket = std::vector<std::vector<LineObject>>;	  // Vector index is the zIndex.
+	struct DebugPointObject
+	{
+		DebugPointObject(size_t entity, Math2D::Point2D<int> pointInPixelsOnScreen, DebugColor debugColor)
+			: m_entity(entity), m_locationInPixelsOnScreen(pointInPixelsOnScreen), m_debugColor(debugColor) {}
 
+		size_t m_entity;
+		Math2D::Point2D<int> m_locationInPixelsOnScreen;
+		DebugColor m_debugColor;
+	};
+
+	using RenderBucket = std::vector<std::vector<RenderObject>>;				// Vector index is the zIndex.
+	using DebugRenderBucket = std::vector<std::vector<DebugObject>>;			// Vector index is the zIndex.
+	using LinesRenderBucket = std::vector<std::vector<LineObject>>;				// Vector index is the zIndex.
+	using DebugPointRenderBucket = std::vector<std::vector<DebugPointObject>>;  // Vector index is the zIndex.
+	
 	struct Camera : public Component
 	{
 		Camera(Entity entity)
@@ -173,6 +182,7 @@ namespace Engine
 			m_positionInFractionOfScreenSize(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), m_borderOn(false),
 			m_bounds(0, 0), m_clipRectPosition(0, 0), m_clipRectSize(0, 0), m_renderBucket(10, std::vector<RenderObject>()),
 			m_debugRenderBucket(10, std::vector<DebugObject>()), m_debugLinesRenderBucket(10, std::vector<LineObject>()),
+			m_debugPointsRenderBucket(10, std::vector<DebugPointObject>()),
 			Component(entity) 
 		{
 		}
@@ -182,7 +192,7 @@ namespace Engine
 			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0), 
 			m_borderOn(false), m_clipRectPosition(0, 0), m_clipRectSize(0, 0), m_renderBucket(numLayers, std::vector<RenderObject>()), 
 			m_numLayers(numLayers), m_debugRenderBucket(numLayers, std::vector<DebugObject>()), 
-			m_debugLinesRenderBucket(numLayers, std::vector<LineObject>()),
+			m_debugLinesRenderBucket(numLayers, std::vector<LineObject>()), m_debugPointsRenderBucket(numLayers, std::vector<DebugPointObject>()),
 			Component(entity) {}
 		
 
@@ -204,9 +214,10 @@ namespace Engine
 		Math2D::Point2D<int> m_clipRectPosition;
 		Math2D::Point2D<int> m_clipRectSize;
 
-		RenderBucket m_renderBucket;				// Map of zIndex to vector of RenderObjects.
-		DebugRenderBucket m_debugRenderBucket;		// Map of zIndex to vector of DebugObjects.
-		LinesRenderBucket m_debugLinesRenderBucket;	// Map of zIndex to vector of lines (2 points per line).
+		RenderBucket m_renderBucket;					  // Map of zIndex to vector of RenderObjects.
+		DebugRenderBucket m_debugRenderBucket;			  // Map of zIndex to vector of DebugObjects.
+		LinesRenderBucket m_debugLinesRenderBucket;		  // Map of zIndex to vector of lines (2 points per line).
+		DebugPointRenderBucket m_debugPointsRenderBucket; // Map of zIndex to vector of debug points.
 	};
 
 	struct CameraUpdater : public Component
@@ -254,17 +265,19 @@ namespace Engine
 
 	struct Sprite : public Component
 	{
-		Sprite(Entity entity, void* ptrLoadedTexture, Math2D::Point2D<int> pixelsPerFrame, 
-			Math2D::Point2D<float> offsetFromTransform, Math2D::Point2D<size_t> dimensions, 
+		Sprite(Entity entity, void* ptrLoadedTexture, Math2D::Point2D<int> pixelsPerFrame,
+			Math2D::Point2D<float> offsetFromTransform, Math2D::Point2D<size_t> dimensions,
 			Math2D::Point2D<float> size, const bool drawDebug, DebugColor debugColor)
-			: m_ptrLoadedTexture(ptrLoadedTexture), m_offsetFromTransform(offsetFromTransform), 
-			m_pixelsPerFrame(pixelsPerFrame), m_dimensions(dimensions), m_sizeInUnits(size), 
-			m_drawDebug(drawDebug), m_debugColor(debugColor), Component(entity) {}
+			: m_ptrLoadedTexture(ptrLoadedTexture), m_offsetFromTransform(offsetFromTransform),
+			m_pixelsPerFrame(pixelsPerFrame), m_dimensions(dimensions), m_sizeInUnits(size),
+			m_drawDebug(drawDebug), m_debugColor(debugColor), m_locationInPixelsOnSpriteSheet(0, 0),
+			Component(entity) {}
 
 		~Sprite() = default;
 
 		void* m_ptrLoadedTexture;
 		Math2D::Point2D<int> m_pixelsPerFrame;
+		Math2D::Point2D<int> m_locationInPixelsOnSpriteSheet;
 		Math2D::Point2D<float> m_sizeInUnits;
 		Math2D::Point2D<float> m_offsetFromTransform;
 		Math2D::Point2D<size_t> m_dimensions;	 // Dimensions of the sprite sheet in frames (width, height)

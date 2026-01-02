@@ -52,6 +52,20 @@ namespace Engine
 				// Continue to the next frame in the animation
 				currentAnimation.m_currentFrame = currentAnimation.m_frames[currentAnimation.m_frameCounter];
 			}
+
+			// Update the sprite component to reflect the current frame data.
+			Sprite* ptrSpriteComponent = m_refECS.GetComponent<Sprite>(animations.m_entity);
+			if (ptrSpriteComponent)
+			{
+				ptrSpriteComponent->m_locationInPixelsOnSpriteSheet =
+				{ static_cast<int>((currentAnimation.m_currentFrame % ptrSpriteComponent->m_dimensions.X) *
+						ptrSpriteComponent->m_pixelsPerFrame.X),
+					static_cast<int>((currentAnimation.m_currentFrame / ptrSpriteComponent->m_dimensions.X) *
+						ptrSpriteComponent->m_pixelsPerFrame.Y) };
+
+				const int sizseInPixelsOnSpriteSheetX = static_cast<int>(ptrSpriteComponent->m_pixelsPerFrame.X);
+				const int sizseInPixelsOnSpriteSheetY = static_cast<int>(ptrSpriteComponent->m_pixelsPerFrame.Y);
+			}
 		}
 
 		// auto end = std::chrono::high_resolution_clock::now();

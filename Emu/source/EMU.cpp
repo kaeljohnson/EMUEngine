@@ -148,8 +148,6 @@ namespace Engine
 	const Math2D::Point2D<float> EMU::Transform_GetPrevPosition(Transform& transform) { return m_transformInterface.GetPrevPosition(transform); }
 	void EMU::Transform_SetPosition(Entity entity, const Math2D::Point2D<float> position) { m_transformInterface.SetPosition(entity, position); }
 	const Math2D::Point2D<float> EMU::Transform_GetPosition(Entity entity) { return m_transformInterface.GetPosition(entity); }
-	void EMU::Transform_SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions) { m_transformInterface.SetDimensions(entity, dimensions); }
-	const Math2D::Point2D<float> EMU::Transform_GetDimensions(Entity entity) { return m_transformInterface.GetDimensions(entity); }
 	void EMU::Transform_SetZIndex(Entity entity, const int zIndex) { m_transformInterface.SetZIndex(entity, zIndex); }
 	const size_t EMU::Transform_GetZIndex(Entity entity) { return m_transformInterface.GetZIndex(entity); }
 	void EMU::Transform_SetRotation(Entity entity, const float rotation) { m_transformInterface.SetRotation(entity, rotation); }

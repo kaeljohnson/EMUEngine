@@ -45,6 +45,7 @@
                 "GenericTransform1":
                 {
                     "ZIndex": 2,
+                    "DrawDebug": "red",
                     "SizeInUnits": [1.0, 1.0]
                 },
                 "GenericTransformNoDebug":
@@ -69,7 +70,8 @@
                     "Rotation": 0.0,
                     "GravityOn": true,
                     "CheckSimpleContacts": true,
-                    "enabled": true
+                    "enabled": true,
+                    "DrawDebug": "black"
                 },
                 "GenericStatic1":
                 {
@@ -111,6 +113,7 @@
                     "Rotation": 0.0,
                     "GravityOn": false,
                     "CheckSimpleContacts": false,
+                    "DrawDebug": "red",
                     "enabled": true
                 }
             },
@@ -228,7 +231,7 @@
         "CharacterRules": 
         {
             "1": { "ActiveOnStart": true, "Transform": "Player",                  "Physics": "Player",           "Camera": "Player",                                  "Animations": "Player",                              "SpriteSheet": "Player" },
-            "2": { "ActiveOnStart": true, "Transform": "GenericTransformNoDebug", "Physics": "GenericSensor1" },
+            "2": { "ActiveOnStart": true, "Transform": "GenericTransform1", "Physics": "GenericSensor1" },
             "3": { "ActiveOnStart": false,"Transform": "GenericTransformNoDebug", "Physics": "GenericSensor1" },
             "4": { "ActiveOnStart": true, "Transform": "GenericTransformNoDebug", "Physics": "GenericSensor1",   "Camera": "GenericStaticCamera" },
             "5": { "ActiveOnStart": true, "Transform": "GenericTransform1",       "Physics": "GenericStatic1",                                                        "Animations": "TopInteriorWall",                     "SpriteSheet": "GrassTileSet" },

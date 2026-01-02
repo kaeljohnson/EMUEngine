@@ -142,6 +142,16 @@ namespace Engine
 
 				ptrToVec->clear();
 			}
+
+			for (auto ptrToVec = refCamera.m_debugPointsRenderBucket.rbegin(); ptrToVec != refCamera.m_debugPointsRenderBucket.rend(); ++ptrToVec)
+			{
+				for (auto& value : *ptrToVec)
+				{
+					// draw(value);
+				}
+
+				ptrToVec->clear();
+			}
 #endif
 			// Reset background color. Temp for now.
 			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 173, 216, 230, SDL_ALPHA_OPAQUE);

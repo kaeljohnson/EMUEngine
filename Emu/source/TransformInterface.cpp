@@ -33,18 +33,6 @@ namespace Engine
 		return ptrTransform->m_position;
 	}
 
-	void TransformInterface::SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions)
-	{
-		Transform* ptrTransform = GetTransform(entity);
-		ptrTransform->m_dimensions = dimensions;
-	}
-
-	const Math2D::Point2D<float> TransformInterface::GetDimensions(Entity entity)
-	{
-		Transform* ptrTransform = GetTransform(entity);
-		return ptrTransform->m_dimensions;
-	}
-
 	void TransformInterface::SetZIndex(Entity entity, const int zIndex)
 	{
 		Transform* ptrTransform = GetTransform(entity);
