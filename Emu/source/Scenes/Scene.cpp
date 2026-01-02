@@ -335,8 +335,6 @@ namespace Engine
 	{
 		const json* entityTransformTemplate = getJson(transformTemplates, templateKey);
 		size_t zIndex = ExtractSizeTFromJSON(*entityTransformTemplate, "ZIndex", 0);
-		const Math2D::Point2D<float> sizeInUnits = 
-			ExtractPoint2DFromJSON<float>(*entityTransformTemplate, "SizeInUnits", Math2D::Point2D<float>(1.0f, 1.0f));
 
 		bool drawDebug = entityTransformTemplate->contains("DrawDebug");
 		std::string debugColor = entityTransformTemplate->value("DrawDebug", "red");
@@ -363,7 +361,6 @@ namespace Engine
 		refECS.AddComponent<Transform>(
 			entity,
 			Math2D::Point2D<float>(x * (float)numUnitsPerTile, y * (float)numUnitsPerTile),
-			Math2D::Point2D<float>(sizeInUnits.X * (float)numUnitsPerTile, sizeInUnits.Y * (float)numUnitsPerTile),
 			1.0f, 1.0f, 1, zIndex, drawDebug, debugColorEnum
 		);
 	}
@@ -503,8 +500,7 @@ namespace Engine
 	}
 
 	static void addPhysicsComponent(ECS& refECS, TileMap& refTileMap, Entity tileEntity, const size_t tileId, const json& physicsComponentTemplate,
-		const std::string& physicsTemplateKey, const json& transformsComponentTemplate, const std::string& transformTemplateKey,
-		int x, int y, size_t numUnitsPerTile, std::unordered_set<size_t>& isMap, std::vector<Math2D::Edge>& edges)
+		const std::string& physicsTemplateKey, int x, int y, size_t numUnitsPerTile, std::unordered_set<size_t>& isMap, std::vector<Math2D::Edge>& edges)
 	{
 		// Add Physics components.
 		BodyType bodyType = STATIC;
@@ -573,16 +569,15 @@ namespace Engine
 
 			}
 
-			json characterTransformRulesJson = transformsComponentTemplate[transformTemplateKey];
-			if (const json* transformSizeJson = getJson(characterTransformRulesJson, "SizeInUnits"))
+			if (const json* physicsSizeJson = getJson(characterPhysicsRulesJson, "SizeInUnits"))
 			{
-				if (transformSizeJson->is_array() && transformSizeJson->size() == 2)
+				if (physicsSizeJson->is_array() && physicsSizeJson->size() == 2)
 				{
 
-					if ((*transformSizeJson)[0].is_number() && (*transformSizeJson)[1].is_number())
+					if ((*physicsSizeJson)[0].is_number() && (*physicsSizeJson)[1].is_number())
 					{
-						size.X = (*transformSizeJson)[0].get<float>();
-						size.Y = (*transformSizeJson)[1].get<float>();
+						size.X = (*physicsSizeJson)[0].get<float>();
+						size.Y = (*physicsSizeJson)[1].get<float>();
 					}
 					else
 					{
@@ -906,7 +901,7 @@ namespace Engine
 				std::string transformTemplateKey = characterTransformJson->get<std::string>();
 				const json* transformTemplates = getJson(*componentTemplates, "Transforms");
 				if (physicsTemplates)
-					addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileId, *physicsTemplates, physicsTemplateKey, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile, isMap, edges);
+					addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileId, *physicsTemplates, physicsTemplateKey, x, y, numUnitsPerTile, isMap, edges);
 			}
 			if (const json* characterSpriteSheetJson = getJson(*characterComponents, "SpriteSheet"))
 			{

@@ -39,31 +39,28 @@
                 {
                     "ZIndex": 1,
                     "DrawDebug": "green",
-                    "SizeInUnits": [0.5, 0.9],
                     "enabled": true
                 },
                 "GenericTransform1":
                 {
                     "ZIndex": 2,
-                    "DrawDebug": "green",
-                    "SizeInUnits": [1.0, 1.0]
+                    "DrawDebug": "green"
                 },
                 "GenericTransformNoDebug":
                 {
-                    "ZIndex": 2,
-                    "SizeInUnits": [1.0, 1.0]
+                    "ZIndex": 2
                 },
                 "GenericDoubleSizeTransform":
                 {
                     "ZIndex": 2,
-                    "DrawDebug": "red",
-                    "SizeInUnits": [2.0, 2.0]
+                    "DrawDebug": "red"
                 }
             },
             "Physics": 
             {
                 "Player":
                 {
+                    "SizeInUnits": [0.5, 0.9],
                     "BodyType": "DYNAMIC",
                     "Category" : "PLAYER",
                     "Mask" : "ALL",
@@ -75,6 +72,7 @@
                 },
                 "GenericStatic1":
                 {
+                    "SizeInUnits": [1.0, 1.0],
                     "BodyType": "STATIC",
                     "Category" : "MAP",
                     "Mask" : "ALL",
@@ -86,6 +84,7 @@
                 },
                 "GenericStaticGreen1":
                 {
+                    "SizeInUnits": [1.0, 1.0],
                     "BodyType": "STATIC",
                     "Category" : "MAP",
                     "Mask" : "ALL",
@@ -97,6 +96,7 @@
                 },
                 "GenericStaticDouble":
                 {
+                    "SizeInUnits": [1.0, 1.0],
                     "BodyType": "STATIC",
                     "Category" : "MAP",
                     "Mask" : "ALL",
@@ -107,6 +107,7 @@
                 },
                 "GenericSensor1":
                 {
+                    "SizeInUnits": [1.0, 1.0],
                     "BodyType": "SENSOR",
                     "Category" : "ALL",
                     "Mask" : "ALL",

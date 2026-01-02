@@ -40,7 +40,7 @@ namespace Engine
 			m_rotation(0.0f), m_scale(1.0f), m_directionFacing(1), m_zIndex(0), 
 			m_drawDebug(false), m_debugColor(DebugColor::Red), Component(entity) {}
 
-		Transform(Entity entity, Math2D::Point2D<float> position, Math2D::Point2D<float> dimensions, float rotation, 
+		Transform(Entity entity, Math2D::Point2D<float> position, float rotation, 
 			float scale, int direction, size_t zIndex, const bool drawDebug, DebugColor debugColor) :
 			m_prevPosition(position), m_position(position), m_rotation(rotation), m_scale(scale), 
 			m_directionFacing(direction), m_zIndex(zIndex), m_drawDebug(drawDebug),
