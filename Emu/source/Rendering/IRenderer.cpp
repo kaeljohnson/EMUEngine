@@ -147,7 +147,7 @@ namespace Engine
 			{
 				for (auto& value : *ptrToVec)
 				{
-					// draw(value);
+					draw(value);
 				}
 
 				ptrToVec->clear();
@@ -267,8 +267,28 @@ namespace Engine
 		}
 
 		SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, lineObject.m_endPointInPixelsOnScreen.X, lineObject.m_endPointInPixelsOnScreen.Y,
-			lineObject.m_startPointInPixelsOnScreen.X, lineObject.m_startPointInPixelsOnScreen.Y);
-		
+			lineObject.m_startPointInPixelsOnScreen.X, lineObject.m_startPointInPixelsOnScreen.Y);	
+	}
+
+	void IRenderer::draw(DebugPointObject& pointObject)
+	{
+		switch (pointObject.m_debugColor)
+		{
+		case DebugColor::Green:
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+			break;
+		case DebugColor::Blue:
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 255, SDL_ALPHA_OPAQUE);
+			break;
+		case DebugColor::Black:
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+			break;
+		default: // Red
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+			break;
+		}
+
+		SDL_RenderDrawPoint((SDLRenderer*)m_ptrRenderer, pointObject.m_locationInPixelsOnScreen.X, pointObject.m_locationInPixelsOnScreen.Y);
 	}
 
 	// Wrapper for SDL_RenderPresent. Talks to the actual hardwares renderer to display the renderer.

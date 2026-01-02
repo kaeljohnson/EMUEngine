@@ -38,14 +38,14 @@
                 "Player":
                 {
                     "ZIndex": 1,
-                    "DrawDebug": "black",
+                    "DrawDebug": "green",
                     "SizeInUnits": [0.5, 0.9],
                     "enabled": true
                 },
                 "GenericTransform1":
                 {
                     "ZIndex": 2,
-                    "DrawDebug": "red",
+                    "DrawDebug": "green",
                     "SizeInUnits": [1.0, 1.0]
                 },
                 "GenericTransformNoDebug":

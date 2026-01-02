@@ -54,6 +54,12 @@ namespace Engine
 		void draw(LineObject& line);
 
 		/*
+			Draw Point objects to the screen. Point objects are
+			simple points drawn with solid colors.
+		*/
+		void draw(DebugPointObject& point);
+
+		/*
 			Display the rendered objects to the screen.
 		*/
 		void display();
