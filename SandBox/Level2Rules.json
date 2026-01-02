@@ -60,7 +60,7 @@
             {
                 "Player":
                 {
-                    "SizeInUnits": [0.5, 0.9],
+                    "SizeInUnits": [0.5, 0.85],
                     "BodyType": "DYNAMIC",
                     "Category" : "PLAYER",
                     "Mask" : "ALL",
@@ -154,7 +154,7 @@
                     "Path": "PlayerSprite",
                     "PixelsPerFrame": [32, 32],
                     "SizeInUnits": [1.0, 1.0],
-                    "OffsetFromTransform": [-0.25, -0.05],
+                    "OffsetFromTransform": [-0.25, -0.15],
                     "Height": 3,
                     "Width": 4,
                     "DrawDebug": "green"
