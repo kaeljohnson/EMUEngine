@@ -17,6 +17,13 @@ namespace Engine
     class IOEventSystem
     {
     public:
+
+		/**
+		* @brief Registers an event listener for a specific IO event type.
+        * 
+		* * @param type The type of the IO event to listen for.
+		* * @param handler The handler function to be called when the event occurs.
+		*/
         void RegisterIOEventListener(IOEventType type, IOEventHandler handler);
         
     public:
