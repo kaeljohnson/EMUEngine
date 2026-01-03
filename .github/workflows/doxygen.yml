@@ -2,11 +2,13 @@ name: Generate Doxygen Docs
 
 on:
   push:
-    branches: [ master ]         # or 'main', whichever is your default branch
+    branches: [ master ]         # or 'main' if your default branch
   workflow_dispatch:             # manual run option
 
 permissions:
-  contents: write   # allows pushing to gh-pages
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   build-docs:
@@ -30,7 +32,10 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./documentation/html
+          publish_dir: ./documentation/html   # local HTML folder
+          publish_branch: gh-pages            # target branch
+          destination_dir: ""                 # flatten to root of gh-pages
+
 
 
 
