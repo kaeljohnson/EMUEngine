@@ -42,7 +42,7 @@ namespace Engine
         void dispatchMouseButtonUpEvent(SDL_MouseButtonEvent& mouseButtonEvent);
         void dispatchMouseScrollEvent(SDL_MouseWheelEvent& mouseWheelEvent);
 
-		IOEventQueue* ptrEventQ;                                        /// Pointer to the event queue to dispatch events to.
+		IOEventQueue* ptrEventQ;                                        /// Pointer to the event queue to dispatch events to. 
 		std::unordered_map<IOEventType, bool>& refKeyStates;            /// Reference to the key states map.
 		std::unordered_map<IOEventType, bool>& refMouseButtonStates;	/// Reference to the mouse button states map.
 		Math2D::Point2D<int>& refMousePosition;							/// Reference to the mouse position.

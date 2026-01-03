@@ -11,6 +11,9 @@ namespace Engine
     using IOEventHandlerMap = std::unordered_map<IOEventType, IOEventHandler>;
     using IOEventStatesMap = std::unordered_map<IOEventType, bool>;
 
+    /**
+	* @brief System to manage IO events, including registration of event listeners and processing of events.
+    */
     class IOEventSystem
     {
     public:
