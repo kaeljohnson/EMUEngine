@@ -2,7 +2,9 @@
 
 namespace Engine
 {
-	// Custom event types to hide the SDL2 event types from the user.
+	/** 
+	* @brief Custom event types to hide the SDL2 event types from the client.
+	*/
 	enum IOEventType
 	{
 		QUIT = 0,
@@ -64,15 +66,32 @@ namespace Engine
 		ENGINE_NOT_INITIALIZED, ENGINE_INITIALIZED, ENGINE_SHUTDOWN, ENGINE_ERROR
 	};
 	
-	// Custom event class to hide the SDL2 event from the user.
+	/** 
+	* @brief Custom event struct to hide the SDL2 event from the user.
+	* 
+	* Contains useful data about the event.
+	*/
 	struct IOEvent
 	{
-		const IOEventType Type;
-		const int X_POS;
-		const int Y_POS;
-		bool Handled;
+		const IOEventType Type; /// The type of the event.
+		const int X_POS;        /// The X position of the mouse (if applicable).
+		const int Y_POS;		/// The Y position of the mouse (if applicable).
+		bool Handled;			/// Whether the event has been handled or not.
 
+		/**
+		* @brief Constructor for IOEvent without position data.
+		* 
+		* @param eventType The type of the event.
+		*/
 		IOEvent(const IOEventType eventType) : Type(eventType), X_POS(-1), Y_POS(-1), Handled(false) {}
+
+		/**
+		* @brief Constructor for IOEvent with position data.
+		* 
+		* * @param eventType The type of the event.
+		* * @param xPos The X position of the mouse.
+		* * @param yPos The Y position of the mouse.
+		*/
 		IOEvent(const IOEventType eventType, const int xPos, const int yPos)
 			: Type(eventType), X_POS(xPos), Y_POS(yPos), Handled(false) {}
 	};

@@ -107,7 +107,7 @@ namespace Engine
 	void EMU::Camera_SetClampingOn(Entity entity, const bool clampingOn) { m_cameraInterface.SetClampingOn(entity, clampingOn); }
 	const bool EMU::Camera_GetClampingOn(Entity entity) { return m_cameraInterface.GetClampingOn(entity); }
 	const Math2D::Point2D<float> EMU::Camera_GetSize(Entity entity) { return m_cameraInterface.GetSize(entity); }
-	void EMU::Camera_SetOffsets(Entity entity, const Math2D::Point2D<float> offsets) { m_cameraInterface.SetOffsets(entity, offsets); }
+	void EMU::Camera_SetOffsets(Entity entity, const Math2D::Point2D<float> offsets) { m_cameraInterface.SetOffset(entity, offsets); }
 	void EMU::Camera_AddShake(Entity entity, const Math2D::Point2D<float> intensity, const Math2D::Point2D<float> duration) { /*Add shaek to camera*/ }
 
 	// PhysicsBody2d getter and setter wrappers

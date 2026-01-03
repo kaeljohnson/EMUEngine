@@ -31,17 +31,9 @@ namespace Engine
 		return m_refECS.GetComponent<Camera>(entity)->m_size;
 	}
 
-	void CameraInterface::SetOffsets(Entity entity, const Math2D::Point2D<float> offsets)
-	{
-		m_refECS.GetComponent<Camera>(entity)->m_offset = offsets;
-	}
-
 	void CameraInterface::SetOffset(Entity entity, const Math2D::Point2D<float> offset)
 	{
-		Camera* ptrCamera = m_refECS.GetComponent<Camera>(entity);
-
-		ptrCamera->m_offset.X = offset.X;
-		ptrCamera->m_offset.Y = offset.Y;
+		m_refECS.GetComponent<Camera>(entity)->m_offset = offset;
 	}
 
 	const Math2D::Point2D<float> CameraInterface::GetOffset(Entity entity)

@@ -7,6 +7,12 @@ namespace Engine
 {
     using Entity = size_t;
 
+    /**
+	* @brief Base class for component managers.
+	*
+	* Manages the lifecycle and storage of components of a specific type.
+	*/
+    
     class ComponentManagerBase 
     {
     public:
@@ -22,11 +28,22 @@ namespace Engine
 		virtual bool IsActive(Entity entity) = 0;
     };
 
+
+    /**
+	* @brief Templated component manager for managing components of type T.
+    * 
+	* Provides functions to add, remove, activate, and deactivate components.
+    */
     template <typename T>
     class ComponentManager : public ComponentManagerBase 
     {
     public:
 
+        /**
+		* @brief Adds a new component of type T for the specified entity.
+        * 
+		* * @tparam Args Variadic template parameters for component constructor.
+        */
         template<typename... Args>
         void AddComponent(Args&&... args)
         {
@@ -48,7 +65,13 @@ namespace Engine
             }
         }
 
-        // Finds component by entity and destroy it.
+        /**
+		* @brief Destroys the component associated with the specified entity.
+		* Destroying a component erases it from both hot and cold storage.
+		* This is different from deactivating a component, which only moves it from hot to cold storage.
+        * 
+		* * @param entity The entity whose component is to be destroyed.
+        */
         void DestroyComponent(Entity entity) override
         {
             // Check hot components first.
@@ -77,6 +100,12 @@ namespace Engine
             }
         }
 
+        /**
+		* @brief Activates components for the specified entities.
+		* Calls the ActivateComponent function for each entity in the vector. 
+        * 
+		* * @param The entities whose components are to be activated.
+        */
 		void ActivateComponents(std::vector<Entity>& entities) override
         {
             for (Entity entity : entities)
@@ -85,6 +114,13 @@ namespace Engine
             }
         }
 
+        /**
+		* @brief Activates the component associated with the specified entity.
+		* Activation moves the component from cold storage (unordered_map) to
+		* hot storage (contiguous vector) for better cache performance at runtime.
+        * 
+		* * @param The entity whose component is to be activated.
+        */
         void ActivateComponent(Entity entity) override
         {
             auto it = m_components.find(entity);
@@ -103,6 +139,11 @@ namespace Engine
             m_components.erase(it);    // Remove from the cold map.
         }
 
+		/**
+		* @brief Deactivates all active components.
+		* Deactivation moves all components from hot storage (contiguous vector)
+		* back to cold storage (unordered_map).
+		*/
 		void DeactivateComponents() override
         {
             for (T& component : m_hotComponents)
@@ -115,6 +156,13 @@ namespace Engine
 			m_hotIndices.assign(m_maxComponents, INVALID_INDEX);
         }
 
+		/**
+		* @brief Deactivates the component associated with the specified entity.
+		* Deactivation moves the component from hot storage (contiguous vector)
+		* back to cold storage (unordered_map).
+        * 
+		* * @param The entity whose component is to be deactivated.
+		*/
         void DeactivateComponent(Entity entity) override
         {
 			if (entity > m_maxComponents || entity < 0)
@@ -150,7 +198,13 @@ namespace Engine
             m_hotEntities.pop_back();
         }
 
-		// Returns a component by entity pointer.
+		/**
+		* @brief Retrieves a pointer to the component associated with the specified entity.
+		* Checks the hot components first, then the cold components.
+        * 
+		* * @param The entity whose component is to be retrieved.
+		* * @return Pointer to the component if found, nullptr otherwise.
+        */
         T* GetComponent(Entity entity)
         {
 			size_t hotIndex = m_hotIndices[entity];
@@ -169,18 +223,34 @@ namespace Engine
             return nullptr;
 		}
 
-        // Check if entity has a component attached.
+        /**
+		* @brief Checks if a component exists for the specified entity.
+        * 
+		* * @param The entity to check for a component.
+		* * @return True if the component exists, false otherwise.
+        */
         bool HasComponent(Entity entity)
         {
             return m_hotIndices[entity] != INVALID_INDEX || m_components.contains(entity);
         }
 
+		/**
+		* @brief Checks if the component associated with the specified entity is active.
+		* An active component is one that is currently in hot storage.
+		*
+		* * @param The entity to check for an active component.
+		* * @return True if the component is active, false otherwise.
+		*/
 		bool IsActive(Entity entity) override
 		{
 			return m_hotIndices[entity] != INVALID_INDEX;
 		}
 
-		// Allocate memory for components and hot components array.
+		/**
+		* @brief Allocates memory for the components and hot components array.
+		*
+		* * @param maxComponents The maximum number of components to allocate memory for.
+		*/
         void Allocate(size_t maxComponents) override
 		{
 			m_hotComponents.reserve(maxComponents);
@@ -190,18 +260,29 @@ namespace Engine
 			m_maxComponents = maxComponents;
 		}
 
+		/**
+		* @brief Gets the number of active components.
+		*
+		* * @return The number of active components.
+		*/
 		const size_t GetNumActiveComponents() const override { return m_hotComponents.size(); }
+
+		/**
+		* @brief Gets the vector of hot components.
+        * 
+		* @return Reference to the vector of hot components.
+		*/
 		std::vector<T>& GetHotComponents() { return m_hotComponents; }
 
     private:
-		std::unordered_map<size_t, T> m_components;             // Holds all components
+		std::unordered_map<size_t, T> m_components;             /// Holds all components
 
-		const int INVALID_INDEX = -1;                           // Invalid index for hot indices
+		const int INVALID_INDEX = -1;                           /// Invalid index for hot indices
 		size_t m_maxComponents = 0;
 
-		std::vector<size_t> m_hotIndices;                       // Maps entity entity to index in m_hotComponents. The "sparse set" array.
-		std::vector<size_t> m_hotEntities;                      // Maps hot index to entity entity. The entity entity of each hot component in same order as hot component array.
-		std::vector<T> m_hotComponents;                         // Hot components. The "dense set" array.
+		std::vector<size_t> m_hotIndices;                       /// Maps entity entity to index in m_hotComponents. The "sparse set" array.
+		std::vector<size_t> m_hotEntities;                      /// Maps hot index to entity entity. The entity entity of each hot component in same order as hot component array.
+		std::vector<T> m_hotComponents;                         /// Hot components. The "dense set" array.
     };
 
 
