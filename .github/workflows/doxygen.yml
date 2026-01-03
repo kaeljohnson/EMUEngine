@@ -1,10 +1,12 @@
 name: Generate Doxygen Docs
 
-# Trigger the workflow
 on:
   push:
-    branches: [ master ]         # runs on pushes to master
-  workflow_dispatch:             # allows manual run from Actions tab
+    branches: [ master ]         # or 'main', whichever is your default branch
+  workflow_dispatch:             # manual run option
+
+permissions:
+  contents: write   # allows pushing to gh-pages
 
 jobs:
   build-docs:
@@ -15,11 +17,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: install Doxygen
+      # Step 2: install Doxygen + Graphviz
       - name: Install Doxygen
         run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
 
-      # Step 3: generate docs
+      # Step 3: generate documentation
       - name: Generate documentation
         run: doxygen Doxyfile
 
@@ -28,6 +30,8 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/html   # must match OUTPUT_DIRECTORY/html in Doxyfile
+          publish_dir: ./documentation/html
+
+
 
 
