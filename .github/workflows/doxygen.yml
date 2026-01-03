@@ -28,9 +28,10 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/html   # must exactly match where index.html is
+          publish_dir: ./documentation/html   # must exactly match where index.html is
           publish_branch: gh-pages
           destination_dir: ""         # flatten to root
+
 
 
 
