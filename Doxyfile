@@ -1,5 +1,5 @@
 PROJECT_NAME            = EMUEngine
-OUTPUT_DIRECTORY        = documentation/html
+OUTPUT_DIRECTORY        = documentation
 GENERATE_HTML           = YES
 GENERATE_RELATIVE_PATHS = YES
 GENERATE_LATEX          = NO
