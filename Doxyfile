@@ -1,7 +1,6 @@
 PROJECT_NAME           = EMUEngine
 OUTPUT_DIRECTORY       = documentation
 GENERATE_HTML          = YES
-HTML_OUTPUT            = EMU/include
 GENERATE_LATEX         = NO
 RECURSIVE              = YES
 EXTRACT_ALL            = YES
