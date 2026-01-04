@@ -30,7 +30,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: documentation
+          path: documentation/html
 
       - name: Verify index.html exists
         run: |
@@ -44,6 +44,7 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
+
 
 
 
