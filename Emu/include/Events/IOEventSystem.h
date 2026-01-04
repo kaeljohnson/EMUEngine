@@ -18,6 +18,8 @@ namespace Engine
     {
     public:
 
+        IOEventSystem();
+
 		/**
 		* @brief Registers an event listener for a specific IO event type.
         * 
@@ -25,14 +27,21 @@ namespace Engine
 		* * @param handler The handler function to be called when the event occurs.
 		*/
         void RegisterIOEventListener(IOEventType type, IOEventHandler handler);
-        
-    public:
 
-		IOEventSystem();
-
+        /**
+		* @brief Initializes the IO event system.
+        */
 		void Initialize();
 
+        /**
+		* @brief Handles incoming IO events.
+        *
+        */
         void HandleEvents();
+
+		/**
+		* @brief Processes all events in the event queue.
+		*/
         void ProcessEvents();
 
     private:
