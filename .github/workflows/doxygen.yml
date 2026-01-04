@@ -1,43 +1,44 @@
-name: Generate Doxygen Docs
+name: Build and Publish Doxygen Docs
 
 on:
   push:
-    branches: [ master ]   # or 'main'
+    branches:
+      - master
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
 jobs:
-  build-docs:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: checkout repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: install Doxygen + Graphviz
-      - name: Install Doxygen
-        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+      - name: Install Doxygen and Graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
 
-      # Step 3: generate documentation
       - name: Generate documentation
         run: doxygen Doxyfile
 
-      # Step 4: deploy to GitHub Pages
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./documentation/html   # must exactly match output HTML folder
-          publish_branch: gh-pages
-          destination_dir: ""                 # flatten into root of gh-pages
+          path: documentation/html
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
 
-
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
 
 
 
