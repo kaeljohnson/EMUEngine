@@ -43,12 +43,10 @@ namespace Engine
 		delete m_instance;
 	}
 
-	Entity EMU::CreateEntity()
+	Entity EMU::ECS_CreateEntity()
 	{
 		return m_ecs.CreateEntity();
 	}
-
-	
 
 	/*void EMU::ChangeCamera(Entity entity)
 	{
