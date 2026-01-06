@@ -96,12 +96,12 @@ int main(int argc, char* args[])
 
 	engine->Scenes_Load("Level1");
 
-	engine->Scenes_RegisterOnPlay("Level1", []()
+	engine->Scenes_RegisterOnPlayEvent("Level1", []()
 		{
 			Engine::EMU::GetInstance()->PlaySound(1, 128, true);
 		});
 
-	engine->Scenes_RegisterOnPlay("Level2", []()
+	engine->Scenes_RegisterOnPlayEvent("Level2", []()
 		{
 			Engine::EMU::GetInstance()->PlaySound(1, 128, true);
 		});

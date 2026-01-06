@@ -33,7 +33,7 @@ namespace Engine
 		/*
 			Client can register a function to be called when the scene starts playing.
 		*/
-		void RegisterOnScenePlay(std::function<void()>);
+		void RegisterOnScenePlayEvent(std::function<void()>&);
 
 
 		using ContactCallback = std::function<void(const Contact&)>;
@@ -133,7 +133,7 @@ namespace Engine
 		std::string m_mapFileName;
 		std::string m_rulesFileName;
 
-		std::function<void()> m_clientOnScenePlay;
+		std::vector<std::function<void()>> m_clientOnScenePlayEvents;
 
 		Math2D::Point2D<int> m_levelDimensionsInUnits;
 		TileMap m_tileMap;

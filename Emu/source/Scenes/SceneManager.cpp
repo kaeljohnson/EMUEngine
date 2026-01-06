@@ -103,12 +103,12 @@ namespace Engine
 		}
 	}
 
-	void SceneManager::RegisterOnScenePlay(const std::string& sceneName, std::function<void()> func)
+	void SceneManager::RegisterOnScenePlayEvent(const std::string& sceneName, std::function<void()>& func)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
 		{
-			it->second.RegisterOnScenePlay(func);
+			it->second.RegisterOnScenePlayEvent(func);
 		}
 		else
 		{

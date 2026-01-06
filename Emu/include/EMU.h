@@ -62,7 +62,7 @@ namespace Engine
 		* * @param name: The name of the scene for which the callback is to be registered.
 		* * @param callback: The function to be called when the scene is played.
 		*/
-		void Scenes_RegisterOnPlay(const std::string& name, std::function<void()> callback);
+		void Scenes_RegisterOnPlayEvent(const std::string& name, std::function<void()> callback);
 
 		/**
 		* @brief Register a contact callback between two entities identified by their tileIds.

@@ -16,12 +16,18 @@
         m_moveRightKeyDown(Engine::D_KEY_DOWN), m_moveRightKeyUp(Engine::D_KEY_UP),
         m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right)
     {
-
-		Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::PhysicsUpdater>("Level1", 1,
-            [this](Engine::Entity entity) { Update(entity); });
-
-		Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::PhysicsUpdater>("Level2", 1,
-			[this](Engine::Entity entity) { Update(entity); });
+        Engine::EMU::GetInstance()->Scenes_RegisterOnPlayEvent("Level1", [this]()
+            {
+                Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::PhysicsUpdater>("Level1", 1,
+                    [this](Engine::Entity entity) { Update(entity); });
+            });
+		
+        Engine::EMU::GetInstance()->Scenes_RegisterOnPlayEvent("Level2", [this]()
+            {
+                Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::PhysicsUpdater>("Level2", 1,
+                    [this](Engine::Entity entity) { Update(entity); });
+            });
+		
     }
 
     void Player::OnBeginContact(Engine::BeginContact beginContact) 

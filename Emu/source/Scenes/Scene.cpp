@@ -42,11 +42,11 @@ namespace Engine
 		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entity, callback);
 	}
 
-	void Scene::RegisterOnScenePlay(std::function<void()> func)
+	void Scene::RegisterOnScenePlayEvent(std::function<void()>& func)
 	{
 		// Register a function to be called when the scene starts playing.
 		// This can be used to initialize things that need to be set up when the scene starts.
-		m_clientOnScenePlay = func;
+		m_clientOnScenePlayEvents.push_back(func);
 	}
 
 	void Scene::OnScenePlay()
@@ -77,7 +77,10 @@ namespace Engine
 		// 8. Deactivate all components that should not be active at the start of the scene?
 
 		// process items client wants to do.
-		if (m_clientOnScenePlay) m_clientOnScenePlay();
+		for (auto& func : m_clientOnScenePlayEvents)
+		{
+			func();
+		}
 
 		AppState::IN_SCENE = true;
 	}

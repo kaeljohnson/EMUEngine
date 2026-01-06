@@ -19,7 +19,7 @@ namespace Engine
 		const Entity GetEntity(const std::string& sceneName, const size_t tileId);
 		const std::vector<Entity>& GetEntities(const std::string& sceneName, const size_t tileId);
 
-		void RegisterOnScenePlay(const std::string& sceneName, std::function<void()> func);
+		void RegisterOnScenePlayEvent(const std::string& sceneName, std::function<void()>& func);
 		void RegisterContactCallback(const std::string& sceneName, ContactType contactType, const size_t entityA, const size_t entityB, Scene::ContactCallback callback);
 		void RegisterContactCallback(const std::string& sceneName, ContactType contactType, const size_t entity, Scene::ContactCallback callback);
 		void SetGravity(const std::string& sceneName, const Math2D::Point2D<float> gravity);

@@ -77,12 +77,12 @@ namespace Engine
 	{
 		return m_sceneManager.GetCurrentScene()->GetTileMapEntity(tileId);
 	}
-
+	
 	void EMU::Scenes_Activate(Entity entity) { m_sceneManager.GetCurrentScene()->Activate(entity); }
 	void EMU::Scenes_Deactivate(Entity entity) { m_sceneManager.GetCurrentScene()->Deactivate(entity); }
 	void EMU::Scenes_Create(const std::string& name) { m_sceneManager.AddScene(name, m_assetManager); }
 	void EMU::Scenes_Load(const std::string& name) { m_sceneManager.QueueNewScene(name); }
-	void EMU::Scenes_RegisterOnPlay(const std::string& name, std::function<void()> func) { m_sceneManager.RegisterOnScenePlay(name, func); }
+	void EMU::Scenes_RegisterOnPlayEvent(const std::string& name, std::function<void()> func) { m_sceneManager.RegisterOnScenePlayEvent(name, func); }
 	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const size_t entityA, const size_t entityB, ContactCallback callback)
 	{ 
 		m_sceneManager.RegisterContactCallback(name, contactType, entityA, entityB, callback); 
