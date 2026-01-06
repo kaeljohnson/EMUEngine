@@ -61,7 +61,7 @@ namespace Engine
             } 
             catch (const std::exception& e)
             {
-                std::cerr << "Failed to add component: " << std::string(e.what());
+                std::cerr << "Failed to add component for entity: " << std::to_string(entity) << ". Error: " << std::string(e.what());
             }
         }
 
@@ -127,6 +127,7 @@ namespace Engine
 
             if (it == m_components.end())
             {
+				std::cout << "Warning: Trying to activate component that does not exist for entity: " + std::to_string(entity) + "\n";
                 return; // Component doesn't exist in m_components.
             }
 

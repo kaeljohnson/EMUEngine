@@ -366,6 +366,8 @@ namespace Engine
 		Entity entity = refPhysicsBody.m_entity;
 		b2ShapeId* shapeId = m_refECS.GetComponent<PhysicsBody>(entity)->m_shapeId;
 
+		if (shapeId == nullptr) ENGINE_CRITICAL_D("Shape ID is null in ProcessSimpleContacts for entity {}!", entity);
+
 		b2ContactData contactData[10];
 		int shapeContactCount = b2Shape_GetContactData(*shapeId, contactData, 10);
 

@@ -106,8 +106,6 @@ namespace Engine
 
 		for (auto& entity : m_entities)
 			m_refECS.DestroyComponents(entity);
-
-		m_entities.clear();
 	}
 
 	void Scene::AddTileMap(std::string mapFileName, std::string rulesFileName)
@@ -561,12 +559,13 @@ namespace Engine
 			}
 			if (const json* checkSimpleContactsJson = getJson(characterPhysicsRulesJson, "CheckSimpleContacts"))
 			{
-				bool checkSimpleContactsStr = checkSimpleContactsJson;
+				bool checkSimpleContactsStr = checkSimpleContactsJson->get<bool>();
 				if (checkSimpleContactsStr == true)
 				{
+					ENGINE_CRITICAL_D("CheckSimpleContacts enabled for tile entity: {}", tileEntity);
+
 					checkSimpleContacts = true;
 				}
-
 			}
 
 			if (const json* physicsSizeJson = getJson(characterPhysicsRulesJson, "SizeInUnits"))

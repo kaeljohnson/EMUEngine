@@ -105,7 +105,7 @@ namespace Engine
 		* @param name: The name of the scene to which the entity is to be added.
 		* @param entity: The entity to be added to the scene.
 		*/
-		// EMU_API void Scenes_Add(const std::string& name, Entity entity);
+		void Scenes_Add(const std::string& name, Entity entity) {}
 
 		/**
 		* @brief Gets the first entity with the given character in the current scene.
@@ -152,7 +152,7 @@ namespace Engine
 		* @param name: The name of the scene from which the entity is to be removed.
 		* @param entity: The entity to be removed from the scene.
 		*/
-		// EMU_API void Scenes_Remove(const std::string& name, Entity entity);
+		void Scenes_Remove(const std::string& name, Entity entity) {}
 
 		/**
 		* @brief Adds a tile map to the scene with the given name using the specified map and rules files.
@@ -714,13 +714,13 @@ namespace Engine
 		* @param entity The entity to which the component would be added.
 		* @param componentArgs Arguments forwarded to the component constructor.
 		*/
-		/*
+		
 		template<typename T, typename... Args>
 		void AddComponent(Entity entity, Args&&... componentArgs)
 		{
-			m_ecs.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
+			// m_ecs.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
 		}
-		*/
+		
 
 		/**
 		* @brief Adds a component of type @c T to all entities matching a tile ID

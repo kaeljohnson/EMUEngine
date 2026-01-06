@@ -76,6 +76,7 @@ namespace Engine
 		// Save what needs to be saved in current scene...
 		// 
 		if (m_ptrCurrentScene) { m_ptrCurrentScene->OnSceneEnd(); }
+		m_ptrCurrentScene = nullptr;
 	}
 
 	// Only called when the application is closing.

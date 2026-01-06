@@ -62,6 +62,13 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			e.Handled = true;
 		});
 
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::U_KEY_DOWN, [&](Engine::IOEvent& e)
+		{
+			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::U_KEY_DOWN)));
+			Engine::EMU::GetInstance()->Scenes_Load("Level1");
+			e.Handled = true;
+		});
+
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event O KEY DOWN: " + std::to_string(static_cast<int>(Engine::O_KEY_DOWN)));
