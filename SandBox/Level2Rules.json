@@ -124,9 +124,9 @@
                 {
                     "Window":
                     {
-                        "X": 0.0,
+                        "X": 0.5,
                         "Y": 0.0,
-                        "Width": 1.0,
+                        "Width": 0.5,
                         "Height": 1.0
                     },
                     "PixelsPerUnit": 32,

@@ -511,7 +511,7 @@ namespace Engine
 	{
 		if (AppState::IN_SCENE)
 		{
-			ENGINE_CRITICAL_D("Activating body: {}" + std::to_string(entity));
+			ENGINE_CRITICAL_D("Activating body: {}", entity);
 			// bug here: If it wasn't a part of the scene, it will have to be added to the world here.
 			if (m_refECS.HasComponent<PhysicsBody>(entity))
 			{

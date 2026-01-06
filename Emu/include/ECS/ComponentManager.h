@@ -208,6 +208,12 @@ namespace Engine
         */
         T* GetComponent(Entity entity)
         {
+			if (entity > m_maxComponents || entity < 0)
+			{
+				ENGINE_ERROR_D("Trying to get component for invalid entity (entity does not exist or was created improperly): " + std::to_string(entity));
+				return nullptr; // Invalid entity, nothing to get.
+			}
+
 			size_t hotIndex = m_hotIndices[entity];
 
             if (hotIndex != INVALID_INDEX)

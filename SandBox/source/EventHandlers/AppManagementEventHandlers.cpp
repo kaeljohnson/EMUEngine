@@ -41,7 +41,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::G_KEY_DOWN, [](Engine::IOEvent& e)
 		{
-			Engine::Entity entity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity('P');
+			Engine::Entity entity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::G_KEY_DOWN)));
 			Engine::EMU::GetInstance()->Camera_SetPixelsPerUnit(entity, 16);
 			e.Handled = true;
@@ -49,7 +49,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::H_KEY_DOWN, [](Engine::IOEvent& e)
 		{
-			Engine::Entity entity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity('P');
+			Engine::Entity entity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
 			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::H_KEY_DOWN)));
 			Engine::EMU::GetInstance()->Camera_SetPixelsPerUnit(entity, 16);
 			e.Handled = true;
@@ -72,7 +72,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event O KEY DOWN: " + std::to_string(static_cast<int>(Engine::O_KEY_DOWN)));
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity('S');
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(2);
 			Engine::EMU::GetInstance()->Scenes_Activate(testEntity);
 			CLIENT_TRACE_D("Done with O key down listener");
 		});
@@ -80,7 +80,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_UP, [](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event O KEY UP: " + std::to_string(static_cast<int>(Engine::O_KEY_UP)));
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity('S');
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(2);
 			Engine::EMU::GetInstance()->Scenes_Deactivate(testEntity);
 			CLIENT_TRACE_D("Done with O key up listener");
 		});
@@ -88,7 +88,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::P_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event P KEY DOWN: " + std::to_string(static_cast<int>(Engine::P_KEY_DOWN)));
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity('T');
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(3);
 			Engine::EMU::GetInstance()->Scenes_Activate(testEntity);
 			CLIENT_TRACE_D("Done with P key down listener");
 		});
@@ -96,7 +96,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::P_KEY_UP, [](Engine::IOEvent& e)
 		{
 			CLIENT_TRACE_D("Handled event P KEY UP: " + std::to_string(static_cast<int>(Engine::P_KEY_UP)));
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity('T');
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(3);
 			Engine::EMU::GetInstance()->Scenes_Deactivate(testEntity);
 		});
 
@@ -114,8 +114,13 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::T_KEY_DOWN, [](Engine::IOEvent& e)
 		{
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity('P');
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
 			Engine::EMU::GetInstance()->Scenes_Deactivate(testEntity);
+		});
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::T_KEY_UP, [](Engine::IOEvent& e)
+		{
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
+			Engine::EMU::GetInstance()->Scenes_Activate(testEntity);
 		});
 }
 
