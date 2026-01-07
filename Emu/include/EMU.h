@@ -716,15 +716,14 @@ namespace Engine
 		*/
 		
 		template<typename T, typename... Args>
-		void AddComponent(Entity entity, Args&&... componentArgs)
+		void Scenes_AddComponent(Entity entity, Args&&... componentArgs)
 		{
 			// m_ecs.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
 		}
 		
-
 		/**
-		* @brief Adds a component of type @c T to all entities matching a tile ID
-		* in the specified scene.
+		* @brief Registers an "on scene play event" which adds a component of 
+		* type @c T to all entities matching a tile ID at OnScenePlay for the specified scene.
 		*
 		* @note This function is temporarily exposed for scripting components only.
 		* Once scripting components can be registered via rules files, this function
@@ -737,9 +736,25 @@ namespace Engine
 		* @param componentArgs Arguments forwarded to the component constructor.
 		*/
 		template <typename T, typename... Args>
-		void Scenes_AddComponent(const std::string sceneName, const size_t tileId, Args&&... componentArgs)
+		void Scenes_AddComponent(const std::string& sceneName, size_t tileId, Args&&... args)
 		{
-			m_sceneManager.AddComponent<T>(sceneName, tileId, std::forward<Args>(componentArgs)...);
+			Engine::EMU::GetInstance()->Scenes_RegisterOnPlayEvent(
+				sceneName,
+				[this,
+				sceneName,
+				tileId,
+				args = std::make_tuple(std::forward<Args>(args)...)]() mutable
+				{
+					std::apply(
+						[&](auto&&... unpacked)
+						{
+							m_sceneManager.AddComponent<T>(
+								sceneName,
+								tileId,
+								std::move(unpacked)...);
+						},
+						args);
+				});
 		}
 
 		////////////////////////////////////////////////////
