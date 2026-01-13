@@ -36,7 +36,7 @@ if not exist Emu\external\vcpkg\ (
     git clone https://github.com/microsoft/vcpkg.git
     cd vcpkg
     call bootstrap-vcpkg.bat
-    call vcpkg integrate install
+    
     cd ../../..
 )
 
