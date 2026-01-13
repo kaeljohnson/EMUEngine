@@ -1,6 +1,6 @@
 workspace "EMUEngine"
     architecture "x64"
-    configurations { "Debug", "Release", "Dist" }
+    configurations { "Debug", "Release", "Distribution" }
 
 outputDirectory = "%{cfg.buildcfg}-%{cfg.architecture}"
 
@@ -41,7 +41,6 @@ project "Emu"
         "/manual-link/SDL2main",
         "SDL2_image",
         "SDL2_mixer",
-        "box2dd"
     }
 
     filter "system:windows"
@@ -53,19 +52,22 @@ project "Emu"
         runtime "Debug"
         symbols "On"
         defines { "DEBUG" }
+        links { "box2dd" }
 
     filter "configurations:Release"
         runtime "Release"
         optimize "On"
         defines { "NDEBUG" }
+        links { "box2d" }
 
-    filter "configurations:Dist"
+    filter "configurations:Distribution"
         runtime "Release"
         optimize "On"
         defines { "NDEBUG" }
+        links { "box2d" }
 
 
--- GameV1 Executable
+-- Sandbox Executable
 project "SandBox"
     location "SandBox"
     kind "ConsoleApp"
@@ -83,13 +85,7 @@ project "SandBox"
 
     includedirs
     {
-        "Emu/public",
-        "Emu/external/vcpkg/installed/x64-windows/include",
-    }
-
-    libdirs
-    {
-        "Emu/external/vcpkg/installed/x64-windows/lib",
+        "Emu/public"
     }
 
     links
@@ -111,7 +107,7 @@ project "SandBox"
         optimize "On"
         defines { "NDEBUG" }
 
-    filter "configurations:Dist"
+    filter "configurations:Distribution"
         runtime "Release"
         optimize "On"
         defines { "NDEBUG" }
@@ -135,13 +131,7 @@ project "EmuTests"
 
     includedirs
     {
-        "Emu/public",
-        "Emu/external/vcpkg/installed/x64-windows/include",
-    }
-
-    libdirs
-    {
-        "Emu/external/vcpkg/installed/x64-windows/lib",
+        "Emu/public"
     }
 
     links
@@ -165,7 +155,7 @@ project "EmuTests"
         optimize "On"
         defines { "NDEBUG" }
 
-    filter "configurations:Dist"
+    filter "configurations:Distribution"
         runtime "Release"
         optimize "On"
         defines { "NDEBUG" }
