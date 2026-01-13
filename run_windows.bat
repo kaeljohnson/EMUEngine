@@ -29,6 +29,31 @@ if exist .git (
     echo Warning: .git directory not found. Skipping submodule update.
 )
 
+:: Locate CMake if not on PATH
+where cmake >nul 2>nul
+if errorlevel 1 (
+    echo CMake not found in PATH. Attempting to locate it...
+
+    for %%D in (
+        "C:\Program Files\CMake\bin"
+        "C:\Program Files (x86)\CMake\bin"
+    ) do (
+        if exist %%D\cmake.exe (
+            echo Found CMake in %%D
+            set "PATH=%%D;%PATH%"
+            goto :cmake_found
+        )
+    )
+
+    echo ERROR: CMake is not installed.
+    echo Please install CMake from https://cmake.org/download/
+    pause
+    exit /b 1
+)
+
+:cmake_found
+
+
 :: Check if vcpkg exists
 if not exist Emu\external\vcpkg\ (
     echo Cloning and bootstrapping vcpkg...
