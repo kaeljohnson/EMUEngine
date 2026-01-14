@@ -1,15 +1,21 @@
 @echo off
 setlocal
 
+:: Check if Git is installed
+where git >nul 2>nul
+if errorlevel 1 (
+    echo ERROR: Git is not installed or not in PATH.
+    echo Please install Git from:
+    echo https://git-scm.com/download/win
+    pause
+    exit /b 1
+)
+
 :: Default to Debug if no configuration is specified
 if "%~1"=="" (set CONFIG=Debug) else (set CONFIG=%~1)
 
-PAUSE
-
 :: Convert to lowercase
 for /f %%i in ('echo %CONFIG% ^| powershell -Command "$input | ForEach-Object { $_.ToLower() }"') do set CONFIG=%%i
-
-PAUSE
 
 :: Map "distribution" to "release"
 if "%CONFIG%"=="distribution" (
@@ -29,7 +35,7 @@ if exist .git (
     echo Warning: .git directory not found. Skipping submodule update.
 )
 
-:: Locate CMake if not on PATH
+:: Locate CMake if not in PATH
 where cmake >nul 2>nul
 if errorlevel 1 (
     echo CMake not found in PATH. Attempting to locate it...
@@ -65,14 +71,10 @@ if not exist Emu\external\vcpkg\ (
     cd ../../..
 )
 
-PAUSE
-
 :: Install dependencies via vcpkg
 cd Emu\external\vcpkg
 call vcpkg install sdl2 sdl2-image sdl2-mixer gtest nlohmann-json
 cd ../../..
-
-PAUSE
 
 :: Build Box2D with the specified configuration
 cd Emu\external\box2d\
@@ -90,10 +92,6 @@ if not exist build\bin\%CONFIG%\ (
 )
 
 cd ../../../
-
-echo %CD%
-
-PAUSE
 
 :: Run premake
 Emu\external\premake\premake5.exe vs2022

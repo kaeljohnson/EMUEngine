@@ -38,7 +38,6 @@ project "Emu"
     links
     {
         "SDL2",
-        "/manual-link/SDL2main",
         "SDL2_image",
         "SDL2_mixer",
     }
@@ -85,7 +84,7 @@ project "SandBox"
 
     includedirs
     {
-        "Emu/public"
+        "Emu/public",
     }
 
     links
@@ -96,6 +95,10 @@ project "SandBox"
     filter "system:windows"
         cppdialect "C++20"
         systemversion "latest"
+        postbuildcommands
+        {
+            '{COPYDIR} "../Emu/external/vcpkg/installed/x64-windows/bin" "%{cfg.targetdir}"'
+        }
 
     filter "configurations:Debug"
         runtime "Debug"
@@ -111,6 +114,7 @@ project "SandBox"
         runtime "Release"
         optimize "On"
         defines { "NDEBUG" }
+
 
 
 -- EmuTests Executable
