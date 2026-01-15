@@ -1,0 +1,99 @@
+@echo off
+setlocal
+
+:: Check if Git is installed
+where git >nul 2>nul
+if errorlevel 1 (
+    echo ERROR: Git is not installed or not in PATH.
+    echo Please install Git from:
+    echo https://git-scm.com/download/win
+    pause
+    exit /b 1
+)
+
+:: Default to Debug if no configuration is specified
+if "%~1"=="" (set CONFIG=Debug) else (set CONFIG=%~1)
+
+:: Convert to lowercase
+for /f %%i in ('echo %CONFIG% ^| powershell -Command "$input | ForEach-Object { $_.ToLower() }"') do set CONFIG=%%i
+
+:: Map "distribution" to "release"
+if "%CONFIG%"=="distribution" (
+    set CONFIG=release
+) else if not "%CONFIG%"=="debug" if not "%CONFIG%"=="release" (
+    echo Invalid configuration: %CONFIG%
+    echo Please specify one of: debug, release, distribution
+    PAUSE
+    exit /b 1
+)
+
+:: Get the submodules
+if exist .git (
+    echo Initializing and updating submodules...
+    git submodule update --init --recursive
+) else (
+    echo Warning: .git directory not found. Skipping submodule update.
+)
+
+:: Locate CMake if not in PATH
+where cmake >nul 2>nul
+if errorlevel 1 (
+    echo CMake not found in PATH. Attempting to locate it...
+
+    for %%D in (
+        "C:\Program Files\CMake\bin"
+        "C:\Program Files (x86)\CMake\bin"
+    ) do (
+        if exist %%D\cmake.exe (
+            echo Found CMake in %%D
+            set "PATH=%%D;%PATH%"
+            goto :cmake_found
+        )
+    )
+
+    echo ERROR: CMake is not installed.
+    echo Please install CMake from https://cmake.org/download/
+    pause
+    exit /b 1
+)
+
+:cmake_found
+
+
+:: Check if vcpkg exists
+if not exist Emu\external\vcpkg\ (
+    echo Cloning and bootstrapping vcpkg...
+    cd Emu\external
+    git clone https://github.com/microsoft/vcpkg.git
+    cd vcpkg
+    call bootstrap-vcpkg.bat
+    
+    cd ../../..
+)
+
+:: Install dependencies via vcpkg
+cd Emu\external\vcpkg
+call vcpkg install sdl2 sdl2-image sdl2-mixer nlohmann-json
+cd ../../..
+
+:: Build Box2D with the specified configuration
+cd Emu\external\box2d\
+echo Deleting wrong builds...
+if "%CONFIG%"=="debug" if exist build\bin\release\ (rmdir /s /q build\bin\release)
+if "%CONFIG%"=="release" if exist build\bin\debug\ (rmdir /s /q build\bin\debug)
+if not exist build\bin\%CONFIG%\ (
+    echo Building %CONFIG%...
+    if not exist build\ (mkdir build)
+    cd build
+    cmake -DBOX2D_BUILD_DOCS=ON -DCMAKE_BUILD_TYPE=%CONFIG% -DCMAKE_INSTALL_PREFIX="install" ..
+    cmake --build .
+    cmake --build . --config %CONFIG% --target INSTALL
+    cd ..
+)
+
+cd ../../../
+
+:: Run premake
+Emu\external\premake\premake5.exe --engine-only vs2022
+
+PAUSE

@@ -4,7 +4,17 @@ workspace "EMUEngine"
 
 outputDirectory = "%{cfg.buildcfg}-%{cfg.architecture}"
 
+-- =========================
+-- Command-line options
+-- =========================
+newoption {
+    trigger = "engine-only",
+    description = "Generate only the engine project"
+}
 
+-- =========================
+-- Core workspace + engine
+-- =========================
 -- Emu Engine
 project "Emu"
     location "Emu"
@@ -65,101 +75,103 @@ project "Emu"
         defines { "NDEBUG" }
         links { "box2d" }
 
+-- =========================
+-- Optional projects
+-- =========================
+if not _OPTIONS["engine-only"] then
+    -- Sandbox Executable
+    project "SandBox"
+        location "SandBox"
+        kind "ConsoleApp"
+        language "C++"
+        staticruntime "off"
 
--- Sandbox Executable
-project "SandBox"
-    location "SandBox"
-    kind "ConsoleApp"
-    language "C++"
-    staticruntime "off"
+        targetdir ("bin/" .. outputDirectory .. "/%{prj.name}")
+        objdir ("bin-int/" .. outputDirectory .. "/%{prj.name}")
 
-    targetdir ("bin/" .. outputDirectory .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputDirectory .. "/%{prj.name}")
-
-    files
-    {
-        "%{prj.name}/**.h",
-        "%{prj.name}/**.cpp",
-    }
-
-    includedirs
-    {
-        "Emu/public",
-    }
-
-    links
-    {
-        "Emu",
-    }
-
-    filter "system:windows"
-        cppdialect "C++20"
-        systemversion "latest"
-        postbuildcommands
+        files
         {
-            '{COPYDIR} "../Emu/external/vcpkg/installed/x64-windows/bin" "%{cfg.targetdir}"'
+            "%{prj.name}/**.h",
+            "%{prj.name}/**.cpp",
         }
 
-    filter "configurations:Debug"
-        runtime "Debug"
-        symbols "On"
-        defines { "DEBUG" }
+        includedirs
+        {
+            "Emu/public",
+        }
 
-    filter "configurations:Release"
-        runtime "Release"
-        optimize "On"
-        defines { "NDEBUG" }
+        links
+        {
+            "Emu",
+        }
 
-    filter "configurations:Distribution"
-        runtime "Release"
-        optimize "On"
-        defines { "NDEBUG" }
+        filter "system:windows"
+            cppdialect "C++20"
+            systemversion "latest"
+            postbuildcommands
+            {
+                '{COPYDIR} "../Emu/external/vcpkg/installed/x64-windows/bin" "%{cfg.targetdir}"'
+            }
 
+        filter "configurations:Debug"
+            runtime "Debug"
+            symbols "On"
+            defines { "DEBUG" }
 
+        filter "configurations:Release"
+            runtime "Release"
+            optimize "On"
+            defines { "NDEBUG" }
 
--- EmuTests Executable
-project "EmuTests"
-    location "EmuTests"
-    kind "ConsoleApp"
-    language "C++"
-    staticruntime "off"
+        filter "configurations:Distribution"
+            runtime "Release"
+            optimize "On"
+            defines { "NDEBUG" }
 
-    targetdir ("bin/" .. outputDirectory .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputDirectory .. "/%{prj.name}")
+    -- EmuTests Executable
+    project "EmuTests"
+        location "EmuTests"
+        kind "ConsoleApp"
+        language "C++"
+        staticruntime "off"
 
-    files
-    {
-        "%{prj.name}/**.h",
-        "%{prj.name}/**.cpp"
-    }
+        targetdir ("bin/" .. outputDirectory .. "/%{prj.name}")
+        objdir ("bin-int/" .. outputDirectory .. "/%{prj.name}")
 
-    includedirs
-    {
-        "Emu/public"
-    }
+        files
+        {
+            "%{prj.name}/**.h",
+            "%{prj.name}/**.cpp"
+        }
 
-    links
-    {
-        "Emu",
-        "gtest",
-        "gtest_main"
-    }
+        includedirs
+        {
+            "Emu/public"
+        }
 
-    filter "system:windows"
-        cppdialect "C++20"
-        systemversion "latest"
+        links
+        {
+            "Emu",
+            "gtest",
+            "gtest_main"
+        }
 
-    filter "configurations:Debug"
-        runtime "Debug"
-        symbols "On"
-        defines { "DEBUG" }
+        filter "system:windows"
+            cppdialect "C++20"
+            systemversion "latest"
 
-    filter "configurations:Release"
-        runtime "Release"
-        optimize "On"
-        defines { "NDEBUG" }
+        filter "configurations:Debug"
+            runtime "Debug"
+            symbols "On"
+            defines { "DEBUG" }
 
-    filter "configurations:Distribution"
-        runtime "Release"
-        optimize "On"
-        defines { "NDEBUG" }
+        filter "configurations:Release"
+            runtime "Release"
+            optimize "On"
+            defines { "NDEBUG" }
+
+        filter "configurations:Distribution"
+            runtime "Release"
+            optimize "On"
+            defines { "NDEBUG" }
+end
