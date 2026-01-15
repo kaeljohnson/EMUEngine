@@ -37,6 +37,9 @@ git, cmake, and Visual Studio.
 6. Run app via Visual Studio.
 7. Can also run exe from SandBox folder in file explorer if all necessary binary files are there.
 
+### Building EMU with build_windows_minimal.bat
+This script builds only the engine and minimal necessary dependencies. The user will have to create their own exe and link to the engine manually.
+
 ## How to use
 
 ### Creating a tile map
@@ -49,7 +52,6 @@ Currently, the engine is meant to be used via a tilemap that is formatted as a t
 ### Creating a rules file
 The rules file is a json file that defines the characteristics that each tile has based on the tile id. Below is the detailed format and explanation:
 
-{
     "Level Name":
     {
         "World": 
@@ -167,4 +169,4 @@ The rules file is a json file that defines the characteristics that each tile ha
             },
         }
     }
-}
+
