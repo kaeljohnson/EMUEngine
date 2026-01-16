@@ -362,7 +362,7 @@ namespace Engine
 		refECS.AddComponent<Transform>(
 			entity,
 			Math2D::Point2D<float>(x * (float)numUnitsPerTile, y * (float)numUnitsPerTile),
-			1.0f, 1.0f, 1, zIndex, drawDebug, debugColorEnum
+			1.0f, 1, zIndex, drawDebug, debugColorEnum
 		);
 	}
 

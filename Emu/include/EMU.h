@@ -593,22 +593,6 @@ namespace Engine
 		const float Transform_GetRotation(Entity entity);
 
 		/**
-		 * @brief Sets the scale of the transform component for the given entity.
-		 *
-		 * @param entity The entity whose transform scale is to be set.
-		 * @param scale The scale value to apply.
-		 */
-		void Transform_SetScale(Entity entity, const float scale);
-
-		/**
-		 * @brief Gets the scale of the transform component for the given entity.
-		 *
-		 * @param entity The entity whose transform scale is to be retrieved.
-		 * @return The scale of the transform.
-		 */
-		const float Transform_GetScale(Entity entity);
-
-		/**
 		 * @brief Sets the direction the transform is facing.
 		 *
 		 * Commonly used for sprite flipping or directional logic

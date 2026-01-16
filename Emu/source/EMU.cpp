@@ -150,8 +150,6 @@ namespace Engine
 	const size_t EMU::Transform_GetZIndex(Entity entity) { return m_transformInterface.GetZIndex(entity); }
 	void EMU::Transform_SetRotation(Entity entity, const float rotation) { m_transformInterface.SetRotation(entity, rotation); }
 	const float EMU::Transform_GetRotation(Entity entity) { return m_transformInterface.GetRotation(entity); }
-	void EMU::Transform_SetScale(Entity entity, const float scale) { m_transformInterface.SetScale(entity, scale); }
-	const float EMU::Transform_GetScale(Entity entity) { return m_transformInterface.GetScale(entity); }
 	void EMU::Transform_SetDirectionFacing(Entity entity, const int direction) { m_transformInterface.SetDirectionFacing(entity, direction); }
 	const int EMU::Transform_GetDirectionFacing(Entity entity) { return m_transformInterface.GetDirectionFacing(entity); }
 

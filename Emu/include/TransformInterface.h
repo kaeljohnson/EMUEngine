@@ -20,8 +20,6 @@ namespace Engine
 		const size_t GetZIndex(Entity entity);
 		void SetRotation(Entity entity, const float rotation);
 		const float GetRotation(Entity entity);
-		void SetScale(Entity entity, const float scale);
-		const float GetScale(Entity entity);
 		void SetDirectionFacing(Entity entity, const int direction);
 		const int GetDirectionFacing(Entity entity);
 

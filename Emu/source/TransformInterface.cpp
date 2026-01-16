@@ -57,18 +57,6 @@ namespace Engine
 		return ptrTransform->m_rotation;
 	}
 
-	void TransformInterface::SetScale(Entity entity, const float scale)
-	{
-		Transform* ptrTransform = GetTransform(entity);
-		ptrTransform->m_scale = scale;
-	}
-
-	const float TransformInterface::GetScale(Entity entity)
-	{
-		Transform* ptrTransform = GetTransform(entity);
-		return ptrTransform->m_scale;
-	}
-
 	void TransformInterface::SetDirectionFacing(Entity entity, const int direction)
 	{
 		Transform* ptrTransform = GetTransform(entity);
