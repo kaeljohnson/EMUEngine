@@ -5,9 +5,12 @@ This project is licensed under the MIT License. See the LICENSE file for details
 This project uses third-party libraries which are distributed under their own
 licenses. See THIRD_PARTY_LICENSES.md for details.
 
+## Overview
+
+Below is the link to the doxygen documentation for EMU
+
 [Documentation](https://kaeljohnson.github.io/EMUEngine/)
 
-## Overview
 Emu is 2D game engine which has a backend written entirely in C++. The main use case of this engine 
 is to build simple 2D tile based simulations. Clients can primarily interact with the engine via
 a text file based tile map and a "rules" json file. The map and rules file format is detailed below. 
@@ -37,6 +40,9 @@ git, cmake, and Visual Studio.
 6. Run app via Visual Studio.
 7. Can also run exe from SandBox folder in file explorer if all necessary binary files are there.
 
+### Building EMU with build_windows_minimal.bat
+This script builds only the engine and minimal necessary dependencies. The user will have to create their own exe and link to the engine manually.
+
 ## How to use
 
 ### Creating a tile map
@@ -49,7 +55,6 @@ Currently, the engine is meant to be used via a tilemap that is formatted as a t
 ### Creating a rules file
 The rules file is a json file that defines the characteristics that each tile has based on the tile id. Below is the detailed format and explanation:
 
-{
     "Level Name":
     {
         "World": 
@@ -167,4 +172,4 @@ The rules file is a json file that defines the characteristics that each tile ha
             },
         }
     }
-}
+
