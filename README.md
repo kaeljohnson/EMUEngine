@@ -174,3 +174,5 @@ The rules file is a json file that defines the characteristics that each tile ha
         }
     }
 
+Some important considerations:
+* EMU does not store types as strings to avoid complexity and unnecessary allocations. Therefore, it is up to the client to keep id and name associations in mind. For example, the id field in the animation component could be associated with an enum in the client.
