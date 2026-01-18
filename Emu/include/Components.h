@@ -375,7 +375,7 @@ namespace Engine
 	*/
 	struct Animation
 	{
-		std::string m_name;				/// Name of animation. 
+		size_t m_id;						/// Name of animation. 
 		std::vector<int> m_frames;		/// Frames in the animation. Each int corresponds to a frame index in the sprite sheet.
 		size_t m_numFrames;				/// Number of frames in the animation.
 		size_t m_frameTime = 0;			/// Time since the last frame change.
@@ -385,8 +385,8 @@ namespace Engine
 		bool m_loop;					/// Whether the animation should loop.
 
 		Animation() = default;
-		Animation(std::string name, std::vector<int> frames, int frameDuration,  bool loop)
-			: m_name(name), m_frames(frames), m_numFrames(frames.size()), m_frameTime(0), 
+		Animation(size_t id, std::vector<int> frames, int frameDuration,  bool loop)
+			: m_id(id), m_frames(frames), m_numFrames(frames.size()), m_frameTime(0),
 			m_frameDuration(frameDuration), m_loop(loop) {};
 	
 	};
@@ -399,13 +399,13 @@ namespace Engine
 	*/
 	struct Animations : public Component
 	{
-		std::unordered_map<std::string, Animation> m_animations; /// All animations for this sprite
-		std::string m_currentAnimation;							 /// Name of the current animation being played
+		std::unordered_map<size_t, Animation> m_animations; /// All animations for this sprite
+		size_t m_currentAnimation;							 /// Name of the current animation being played
 
-		Animations(Entity entity, std::unordered_map<std::string, Animation> animations)
+		Animations(Entity entity, std::unordered_map<size_t, Animation> animations)
 			:
 			m_animations(animations), 
-			m_currentAnimation("Idle"), // Idle for now, need a animation interface for client to set animation in a state machine.
+			m_currentAnimation(0),
 			Component(entity) {}
 
 		~Animations() = default;

@@ -315,7 +315,11 @@ namespace Engine
 
 	static size_t ExtractSizeTFromJSON(const json& j, const std::string& key, size_t defaultValue)
 	{
-		if (!j.contains(key)) throw std::runtime_error("Invalid Rules File. Field Not Found: " + key);
+		if (!j.contains(key))
+		{
+			ENGINE_CRITICAL_D("Invalid Rules File. Field Not Found: {}.", key);
+			throw std::runtime_error("Invalid Rules File. Field Not Found: " + key);
+		}
 
 		const auto& value = j.at(key);
 		if (value.is_number_unsigned()) return value.get<size_t>();
@@ -694,12 +698,14 @@ namespace Engine
 	{
 		const json* entityAnimationsTemplate = getJson(animationsTemplate, animationTemplateKey);
 
-		std::unordered_map<std::string, Animation> animations;
+		std::unordered_map<size_t, Animation> animations;
 		json j = json::parse(entityAnimationsTemplate->dump());
 
 		for (auto& [name, value] : j.items())
 		{
-			animations.emplace(name, Animation(name, value.at("Frames").get<std::vector<int>>(), value.at("FrameTime").get<int>(), value.at("Loop").get<bool>()));
+			size_t id = ExtractSizeTFromJSON(value, "id", -1);
+
+			animations.emplace(id, Animation(id, value.at("Frames").get<std::vector<int>>(), value.at("FrameTime").get<int>(), value.at("Loop").get<bool>()));
 		}
 
 		refECS.AddComponent<Animations>(entity, animations);

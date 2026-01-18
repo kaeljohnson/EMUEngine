@@ -9,6 +9,7 @@
 #include "TransformInterface.h"
 #include "AssetManager.h"
 #include "Animations/AnimationSystem.h"
+#include "Animations/AnimationInterface.h"
 
 namespace Engine
 {
@@ -678,6 +679,16 @@ namespace Engine
 
 		////////////////////////////////////////////////////
 
+		////// Animation Interface functions ///////////////
+		
+		/**
+		* @brief Plays the specified animation on the given entity.
+		* 
+		* @param entity The entity on which to play the animation.
+		* @param animationName The name of the animation to play.
+		*/
+		void Animation_Play(Entity entity, const size_t animationName);
+
 		////// Templated ECS Interface functions ///////////
 
 		/**
@@ -755,7 +766,9 @@ namespace Engine
 
 		ECS m_ecs;
 		AssetManager m_assetManager;
+		
 		AnimationSystem m_animationSystem;
+		AnimationInterface m_animationInterface;
 
 		AudioSystem m_audioSystem;
 

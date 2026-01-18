@@ -12,6 +12,11 @@
 
 namespace Engine
 {
+	/**
+	* @class Application
+	* 
+	* @brief The main application that manages the game loop along with updating systems.
+	*/
 	class Application
 	{
 	public:
@@ -29,14 +34,14 @@ namespace Engine
 		Application& operator=(Application&&) = delete;
 
 	private:
-		ECS& m_refECS;
+		ECS& m_refECS;								/// Reference to the ECS instance.
 
-		IRenderer m_IRenderer;
+		IRenderer m_IRenderer;						/// The renderer instance.
 		
-		SceneManager& m_refSceneManager;
-		IOEventSystem& m_refIOEventSystem;
-		AnimationSystem& m_refAnimationSystem;
-		AudioSystem& m_refAudioSystem;
-		AssetManager& m_refAssetManager;
+		SceneManager& m_refSceneManager;			/// Reference to the scene manager.
+		IOEventSystem& m_refIOEventSystem;			/// Reference to the IO event system.
+		AnimationSystem& m_refAnimationSystem;		/// Reference to the animation system.
+		AudioSystem& m_refAudioSystem;				/// Reference to the audio system.
+		AssetManager& m_refAssetManager;			/// Reference to the asset manager.
 	};
 }

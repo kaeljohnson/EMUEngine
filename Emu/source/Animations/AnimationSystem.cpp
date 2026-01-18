@@ -15,7 +15,7 @@ namespace Engine
 		// Update logic for animations
 		for (auto& animations : m_refECS.GetHotComponents<Animations>())
 		{
-			if (animations.m_animations.empty() || animations.m_currentAnimation == "None")
+			if (animations.m_animations.empty() /* || animations is not valid. */)
 			{
 				ENGINE_CRITICAL_D("No animations found for sprite with entity ID {}", animations.m_entity);
 				continue; // No animations to update or invalid animation index

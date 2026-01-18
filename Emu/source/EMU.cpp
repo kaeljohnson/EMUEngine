@@ -19,7 +19,7 @@ namespace Engine
 	}
 
 	EMU::EMU(const size_t numEntities)
-		: m_ecs(), m_sceneManager(m_ecs), m_assetManager(), m_animationSystem(m_ecs), 
+		: m_ecs(), m_sceneManager(m_ecs), m_assetManager(), m_animationSystem(m_ecs), m_animationInterface(m_ecs),
 		m_audioSystem(m_ecs, m_assetManager), m_physicsInterface(m_ecs), m_transformInterface(m_ecs), m_ioEventSystem(),
 		m_application(m_ecs, m_sceneManager, m_ioEventSystem, m_assetManager, m_audioSystem, m_animationSystem), m_cameraInterface(m_ecs)
 	{
@@ -152,6 +152,8 @@ namespace Engine
 	const float EMU::Transform_GetRotation(Entity entity) { return m_transformInterface.GetRotation(entity); }
 	void EMU::Transform_SetDirectionFacing(Entity entity, const int direction) { m_transformInterface.SetDirectionFacing(entity, direction); }
 	const int EMU::Transform_GetDirectionFacing(Entity entity) { return m_transformInterface.GetDirectionFacing(entity); }
+
+	void EMU::Animation_Play(const Entity entity, const size_t animationId) { m_animationInterface.PlayAnimation(entity, animationId); }
 
 	// Screen interface
 	const Math2D::Point2D<int> EMU::GetScreenSize() { return Screen::GetScreenSize(); }

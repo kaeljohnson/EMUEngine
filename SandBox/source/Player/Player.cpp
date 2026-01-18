@@ -93,13 +93,13 @@
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
             {
                 m_currentDirection = PlayerDirection::Right;
-                TransitionToState(entity, PlayerState::HorizontalMovement);
+                TransitionToState(entity, PlayerState::MoveRight);
                 startHorizontalMove();
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
             {
                 m_currentDirection = PlayerDirection::Left;
-                TransitionToState(entity, PlayerState::HorizontalMovement);
+                TransitionToState(entity, PlayerState::MoveLeft);
                 startHorizontalMove();
             }
             else
@@ -114,12 +114,49 @@
             }
             break;
 
-        case PlayerState::HorizontalMovement:
+        case PlayerState::MoveRight:
 
             // Horizontal Movement
             if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
             {
                 m_currentDirection = PlayerDirection::Right;
+                updateHorizontalMove();
+            }
+            else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
+            {
+                m_currentDirection = PlayerDirection::Left;
+                TransitionToState(entity, PlayerState::MoveLeft);
+                updateHorizontalMove();
+            }
+            else
+            {
+                // Apply deceleration when no movement keys are pressed
+                endHorizontalMove(entity);
+                m_force.X = -currentVelocityX * X_DECELERATION;
+                if (m_onGround && std::abs(currentVelocityX) < MIN_VELOCITY_THRESHOLD)
+                {
+                    TransitionToState(entity, PlayerState::Idle);
+                }
+            }
+
+            // Vertical Movement
+            if (refKeyStates.at(m_jumpKeyDown) && m_canJump)
+            {
+                TransitionToState(entity, PlayerState::Jumping);
+            }
+            else if (!m_onGround)
+            {
+                TransitionToState(entity, PlayerState::Falling);
+            }
+            break;
+
+        case PlayerState::MoveLeft:
+
+            // Horizontal Movement
+            if (refKeyStates.at(m_moveRightKeyDown) && refKeyStates.at(m_moveLeftKeyUp))
+            {
+                m_currentDirection = PlayerDirection::Right;
+                TransitionToState(entity, PlayerState::MoveRight);
                 updateHorizontalMove();
             }
             else if (refKeyStates.at(m_moveLeftKeyDown) && refKeyStates.at(m_moveRightKeyUp))
@@ -208,10 +245,15 @@
                 }
             }
 
-            if (m_onGround && continueMoving)
+            if (m_onGround && continueMoving && m_currentDirection == PlayerDirection::Right)
             {
                 updateHorizontalMove();
-                TransitionToState(entity, PlayerState::HorizontalMovement);
+                TransitionToState(entity, PlayerState::MoveRight);
+            }
+            else if (m_onGround && continueMoving && m_currentDirection == PlayerDirection::Left)
+            {
+				updateHorizontalMove();
+				TransitionToState(entity, PlayerState::MoveLeft);
             }
             else if (m_onGround)
             {
@@ -247,16 +289,27 @@
         case PlayerState::Idle:
             m_jumpCharge = 0.0f;
             Engine::EMU::GetInstance()->Physics_SetXVelocity(entity, 0.0f);
+            Engine::EMU::GetInstance()->Animation_Play(entity, PlayerState::Idle);
             break;
 
-        case PlayerState::HorizontalMovement:
+        case PlayerState::MoveRight:
+        {
+            Engine::EMU::GetInstance()->Animation_Play(entity, PlayerState::MoveRight);
             break;
+        }
+
+		case PlayerState::MoveLeft:
+		{
+			Engine::EMU::GetInstance()->Animation_Play(entity, PlayerState::MoveLeft);
+			break;
+		}
 
         case PlayerState::Jumping:
             m_canJump = false;
             Engine::EMU::GetInstance()->Physics_SetYVelocity(entity, 0.0f);
             Engine::EMU::GetInstance()->PlaySound(0, 64); // For some reason this plays the sound multiple times if the space bar is held for even a little while.
             Engine::EMU::GetInstance()->Physics_ApplyImpulseToBody(entity, { 0.0f, -MIN_JUMP_FORCE });
+            Engine::EMU::GetInstance()->Animation_Play(entity, PlayerState::Jumping);
             break;
 
         case PlayerState::Falling:

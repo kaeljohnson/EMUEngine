@@ -17,7 +17,7 @@
                 "PathToSpriteSheets": "Assets/Sprites/",
                 "Textures":
                 {
-                    "PlayerSprite": "FirstDraftZombieGameGuy.png",
+                    "PlayerSprite": "Guy.png",
                     "GrassTileMap": "GrassTileSet32x32.png"
                 }
             },
@@ -155,8 +155,8 @@
                     "PixelsPerFrame": [32, 32],
                     "SizeInUnits": [1.0, 1.0],
                     "OffsetFromTransform": [-0.25, -0.15],
-                    "Height": 3,
-                    "Width": 4,
+                    "Height": 4,
+                    "Width": 5,
                     "DrawDebug": "green"
                 },
                 "GrassTileSet": 
@@ -175,58 +175,62 @@
                 {
                     "Idle": 
                     {
-                        "Frames": [0, 1, 2, 3],
+                        "id": 0,
+                        "Frames": [0],
                         "FrameTime": 15,
-                        "Loop": true
-                    },
-                    "WalkRight": 
-                    {
-                        "Frames": [4, 5, 6, 7, 8, 9, 10, 11],
-                        "FrameTime": 10,
                         "Loop": true
                     },
                     "WalkLeft": 
                     {
-                        "Frames": [12, 13, 14, 15],
-                        "FrameTime": 10,
+                        "id": 1,
+                        "Frames": [1, 2, 3, 4, 5, 6, 7, 8],
+                        "FrameTime": 5,
+                        "Loop": true
+                    },
+                    "WalkRight": 
+                    {
+                        "id": 2,
+                        "Frames": [9, 10, 11, 12, 13, 14, 15, 16],
+                        "FrameTime": 5,
                         "Loop": true
                     },
                     "Jump": 
                     {
-                        "Frames": [0],
+                        "id": 3,
+                        "Frames": [17],
                         "FrameTime": 10,
                         "Loop": false
                     }
                 },
-                "TopLeftGrassCorner":                   { "Idle": { "Frames": [0],   "FrameTime": 20, "Loop": true } },
-                "TopGrass":                             { "Idle": { "Frames": [2],   "FrameTime": 20, "Loop": true } },
-                "TopRightGrassCorner":                  { "Idle": { "Frames": [4],   "FrameTime": 20, "Loop": true } },
-                "InteriorWallBackwardCGrass":           { "Idle": { "Frames": [12],  "FrameTime": 20, "Loop": true } },
-                "SingleLeftInteriorWall":               { "Idle": { "Frames": [13],  "FrameTime": 20, "Loop": true } },
-                "TopRightGrassCornerWithLeftGrass":     { "Idle": { "Frames": [16],  "FrameTime": 20, "Loop": true } },
-                "NarrowGrassCorridorVertical":          { "Idle": { "Frames": [24],  "FrameTime": 20, "Loop": true } },
-                "UShapedGrass":                         { "Idle": { "Frames": [26],  "FrameTime": 20, "Loop": true } },
-                "BackwardCShapedGrass":                 { "Idle": { "Frames": [29],  "FrameTime": 20, "Loop": true } },
-                "TopLeftInteriorWall":                  { "Idle": { "Frames": [41],  "FrameTime": 20, "Loop": true } },
-                "TopInteriorWall":                      { "Idle": { "Frames": [42],  "FrameTime": 20, "Loop": true } },
-                "TopRightInteriorWall":                 { "Idle": { "Frames": [43],  "FrameTime": 20, "Loop": true } },
-                "SingleInteriorWall":                   { "Idle": { "Frames": [46],  "FrameTime": 20, "Loop": true } },
-                "BottomRightGrassCornerWithLeftGrass":  { "Idle": { "Frames": [56],  "FrameTime": 20, "Loop": true } },
-                "LeftGrass":                            { "Idle": { "Frames": [80],  "FrameTime": 20, "Loop": true } },
-                "BottomLeftGrassCorner":                { "Idle": { "Frames": [160], "FrameTime": 20, "Loop": true } },
-                "LeftInteriorWall":                     { "Idle": { "Frames": [81],  "FrameTime": 20, "Loop": true } },
-                "CentralInteriorWall":                  { "Idle": { "Frames": [82],  "FrameTime": 20, "Loop": true } },
-                "RightInteriorWall":                    { "Idle": { "Frames": [83],  "FrameTime": 20, "Loop": true } },
-                "RightGrass":                           { "Idle": { "Frames": [84],  "FrameTime": 20, "Loop": true } },
-                "BottomLeftOpenGrassCorner":            { "Idle": { "Frames": [89],  "FrameTime": 20, "Loop": true } },
-                "BottomRightOpenGrassCorner":           { "Idle": { "Frames": [90],  "FrameTime": 20, "Loop": true } },
-                "BottomLeftInteriorWall":               { "Idle": { "Frames": [121], "FrameTime": 20, "Loop": true } },
-                "BottomInteriorWall":                   { "Idle": { "Frames": [122], "FrameTime": 20, "Loop": true } },
-                "BottomRightInteriorWall":              { "Idle": { "Frames": [123], "FrameTime": 20, "Loop": true } },
-                "BottomGrass":                          { "Idle": { "Frames": [162], "FrameTime": 20, "Loop": true } },
-                "BottomRightGrassCorner":               { "Idle": { "Frames": [164], "FrameTime": 20, "Loop": true } },
-                "TopLeftOpenGrassCorner":               { "Idle": { "Frames": [49],  "FrameTime": 20, "Loop": true } },
-                "CShapedGrass":                         { "Idle": { "Frames": [28],  "FrameTime": 20, "Loop": true } }
+                "TopLeftGrassCorner":                   { "Idle": { "id": 0, "Frames": [0],   "FrameTime": 20, "Loop": true } },
+                "TopGrass":                             { "Idle": { "id": 0, "Frames": [2],   "FrameTime": 20, "Loop": true } },
+                "TopRightGrassCorner":                  { "Idle": { "id": 0, "Frames": [4],   "FrameTime": 20, "Loop": true } },
+                "InteriorWallBackwardCGrass":           { "Idle": { "id": 0, "Frames": [12],  "FrameTime": 20, "Loop": true } },
+                "SingleLeftInteriorWall":               { "Idle": { "id": 0, "Frames": [13],  "FrameTime": 20, "Loop": true } },
+                "TopRightGrassCornerWithLeftGrass":     { "Idle": { "id": 0, "Frames": [16],  "FrameTime": 20, "Loop": true } },
+                "NarrowGrassCorridorVertical":          { "Idle": { "id": 0, "Frames": [24],  "FrameTime": 20, "Loop": true } },
+                "UShapedGrass":                         { "Idle": { "id": 0, "Frames": [26],  "FrameTime": 20, "Loop": true } },
+                "BackwardCShapedGrass":                 { "Idle": { "id": 0, "Frames": [29],  "FrameTime": 20, "Loop": true } },
+                "TopLeftInteriorWall":                  { "Idle": { "id": 0, "Frames": [41],  "FrameTime": 20, "Loop": true } },
+                "TopInteriorWall":                      { "Idle": { "id": 0, "Frames": [42],  "FrameTime": 20, "Loop": true } },
+                "TopRightInteriorWall":                 { "Idle": { "id": 0, "Frames": [43],  "FrameTime": 20, "Loop": true } },
+                "SingleInteriorWall":                   { "Idle": { "id": 0, "Frames": [46],  "FrameTime": 20, "Loop": true } },
+                "BottomRightGrassCornerWithLeftGrass":  { "Idle": { "id": 0, "Frames": [56],  "FrameTime": 20, "Loop": true } },
+                "LeftGrass":                            { "Idle": { "id": 0, "Frames": [80],  "FrameTime": 20, "Loop": true } },
+                "BottomLeftGrassCorner":                { "Idle": { "id": 0, "Frames": [160], "FrameTime": 20, "Loop": true } },
+                "LeftInteriorWall":                     { "Idle": { "id": 0, "Frames": [81],  "FrameTime": 20, "Loop": true } },
+                "CentralInteriorWall":                  { "Idle": { "id": 0, "Frames": [82],  "FrameTime": 20, "Loop": true } },
+                "RightInteriorWall":                    { "Idle": { "id": 0, "Frames": [83],  "FrameTime": 20, "Loop": true } },
+                "RightGrass":                           { "Idle": { "id": 0, "Frames": [84],  "FrameTime": 20, "Loop": true } },
+                "BottomLeftOpenGrassCorner":            { "Idle": { "id": 0, "Frames": [89],  "FrameTime": 20, "Loop": true } },
+                "BottomRightOpenGrassCorner":           { "Idle": { "id": 0, "Frames": [90],  "FrameTime": 20, "Loop": true } },
+                "BottomLeftInteriorWall":               { "Idle": { "id": 0, "Frames": [121], "FrameTime": 20, "Loop": true } },
+                "BottomInteriorWall":                   { "Idle": { "id": 0, "Frames": [122], "FrameTime": 20, "Loop": true } },
+                "BottomRightInteriorWall":              { "Idle": { "id": 0, "Frames": [123], "FrameTime": 20, "Loop": true } },
+                "BottomGrass":                          { "Idle": { "id": 0, "Frames": [162], "FrameTime": 20, "Loop": true } },
+                "BottomRightGrassCorner":               { "Idle": { "id": 0, "Frames": [164], "FrameTime": 20, "Loop": true } },
+                "TopLeftOpenGrassCorner":               { "Idle": { "id": 0, "Frames": [49],  "FrameTime": 20, "Loop": true } },
+                "CShapedGrass":                         { "Idle": { "id": 0, "Frames": [28],  "FrameTime": 20, "Loop": true } }
             }
         },
         "CharacterRules": 

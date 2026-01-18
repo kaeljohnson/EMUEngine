@@ -40,7 +40,8 @@ struct PlayerSensorListener : public Engine::SingleEntitySensorListener
 enum PlayerState
 {
 	Idle,
-	HorizontalMovement,
+	MoveLeft,
+	MoveRight,
 	Jumping,
 	Falling,
 };
