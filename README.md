@@ -150,6 +150,7 @@ The rules file is a json file that defines the characteristics that each tile ha
                 {
                     <Animation key name>: 
                     {
+                        "id": <int> -> unique id for animation. Used so runtime does not have to query strings.
                         "Frames": [int, int, int, int] -> the frames that this animation makes up.
                         "FrameTime": <int> -> how many frames (based on 60hz tick rate) does each frame in animation last.
                         "Loop": <bool> -> does the animation loop?
