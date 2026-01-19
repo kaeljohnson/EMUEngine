@@ -200,6 +200,13 @@
                         "Frames": [17],
                         "FrameTime": 10,
                         "Loop": false
+                    },
+                    "Fall":
+                    {
+                        "id": 4, 
+                        "Frames": [18],
+                        "FrameTime": 10,
+                        "Loop": false
                     }
                 },
                 "TopLeftGrassCorner":                   { "Idle": { "id": 0, "Frames": [0],   "FrameTime": 20, "Loop": true } },

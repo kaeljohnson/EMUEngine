@@ -313,6 +313,7 @@
             break;
 
         case PlayerState::Falling:
+            Engine::EMU::GetInstance()->Animation_Play(entity, PlayerState::Falling);
             m_jumpCharge = 0.0f;
             if (Engine::EMU::GetInstance()->Physics_GetVelocity(entity).Y < 0)
             {
