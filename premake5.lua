@@ -13,7 +13,7 @@ newoption {
 }
 
 newoption {
-    trigger = "tests"
+    trigger = "tests",
     description = "Generate the tests with the engine"
 }
 
