@@ -23,4 +23,4 @@ jobs:
 
     - name: Run EmuTests
       run: |
-        bin/Debug-x64/EmuTests/EmuTests.exe --gtest_color=yes
+        .\bin\Debug-x64\EmuTests\EmuTests.exe --gtest_color=yes
