@@ -4,12 +4,6 @@
 
 namespace Engine
 {
-	void TransformInterface::SetPrevPosition(Entity entity, const Math2D::Point2D<float> position)
-	{
-		Transform* ptrTransform = GetTransform(entity);
-		ptrTransform->m_prevPosition = position;
-	}
-
 	const Math2D::Point2D<float> TransformInterface::GetPrevPosition(Entity entity)
 	{
 		Transform* ptrTransform = GetTransform(entity);

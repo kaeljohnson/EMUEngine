@@ -17,16 +17,16 @@ namespace Engine
 		* @brief Sets the pixels per unit for the entity's camera. A smaller pixels per unit
 		* value results in a more zoomed-out view.
 		* 
-		* * @param entity The entity whose camera component to modify.
-		* * @param pixelsPerUnit The new pixels per unit value.
+		* @param entity The entity whose camera component to modify.
+		* @param pixelsPerUnit The new pixels per unit value.
 		*/
 		void SetPixelsPerUnit(Entity entity, const int pixelsPerUnit);
 
 		/**
 		* @brief Gets the pixels per unit for the entity's camera.
 		* 
-		* * @param entity The entity whose camera component to query.
-		* * @return The current pixels per unit value.
+		* @param entity The entity whose camera component to query.
+		* @return The current pixels per unit value.
 		*/
 		const size_t GetPixelsPerUnit(Entity entity);
 
@@ -34,24 +34,24 @@ namespace Engine
 		* @brief Sets the offset for the entity's camera. The offset shifts the camera's view
 		* relative to the entity's position.
 		* 
-		* * @param entity The entity whose camera component to modify.
-		* * @param offset The new offset value.
+		* @param entity The entity whose camera component to modify.
+		* @param offset The new offset value.
 		*/
 		void SetOffset(Entity entity, const Math2D::Point2D<float> offset);
 
 		/**
 		* @brief Gets the offset for the entity's camera.
 		* 
-		* * @param entity The entity whose camera component to query.
-		* * @return The current offset value.
+		* @param entity The entity whose camera component to query.
+		* @return The current offset value.
 		*/
 		const Math2D::Point2D<float> GetOffset(Entity entity);
 
 		/**
 		* @brief Sets whether clamping is enabled for the entity's camera.
 		* 
-		* * @param entity The entity whose camera component to modify.
-		* * @param clampingOn True to enable clamping, false to disable.
+		* @param entity The entity whose camera component to modify.
+		* @param clampingOn True to enable clamping, false to disable.
 		*/
 		void SetClampingOn(Entity entity, const bool clampingOn);
 
@@ -60,16 +60,16 @@ namespace Engine
 		* Clamping restricts the camera's movement within defined bounds.
 		* For now, its the map bounds.
 		* 
-		* * @param entity The entity whose camera component to query.
-		* * @return True if clamping is enabled, false otherwise.
+		* @param entity The entity whose camera component to query.
+		* @return True if clamping is enabled, false otherwise.
 		*/
 		const bool GetClampingOn(Entity entity);
 
 		/**
 		* @brief Gets the size for the entity's camera.
 		* 
-		* * @param entity The entity whose camera component to query.
-		* * @return The current size value.
+		* @param entity The entity whose camera component to query.
+		* @return The current size value.
 		*/
 		const Math2D::Point2D<float> GetSize(Entity entity);
 

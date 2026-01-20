@@ -5,29 +5,118 @@
 #include "Components.h"
 namespace Engine
 {
-	// Global utility transform interface
+	/**
+	* @class TransformInterface
+	*
+	* @brief Global utility transform interface
+	*/
 	class TransformInterface
 	{
 	public:
-		// Transform getter and setter wrappers
+		/** 
+		* @brief Get previous position of an entity's transform in world space.
+		* 
+		* @param entity The entity whose transform to get the previous position of.
+		* 
+		* @return The previous position of the entity's transform in world space.
+		*/
 		const Math2D::Point2D<float> GetPrevPosition(Entity entity);
+
+		/**
+		* @brief Get previous position of a transform in world space.
+		* 
+		* @param transform The transform to get the previous position of.
+		* 
+		* @return The previous position of the transform in world space.
+		*/
 		const Math2D::Point2D<float> GetPrevPosition(Transform& transform);
 
-		// Calling this on a transform that is connected to a physics component is meaningless.
+		/** 
+		* @brief Set position of transform.
+		* 
+		* @Note Calling this on an entity with a physics body does nothing as physics system controls position.
+		* 
+		* @param entity The entity whose transform to set the position of.
+		* @param position The new position of the entity's transform in world space.
+		*/
 		void SetPosition(Entity entity, const Math2D::Point2D<float> position);
+
+		/**
+		* @brief Get position of an entity's transform in world space.
+		* 
+		* @param entity The entity whose transform to get the position of.
+		* 
+		* @return The position of the entity's transform in world space.
+		*/
 		const Math2D::Point2D<float> GetPosition(Entity entity);
+
+		/**
+		* @brief Set Z index of an entity's transform.
+		* 
+		* @param entity The entity whose transform to set the Z index of.
+		* @param zIndex The new Z index of the entity's transform.
+		*/
 		void SetZIndex(Entity entity, const int zIndex);
+
+		/**
+		* @brief Get Z index of an entity's transform.
+		* 
+		* @param entity The entity whose transform to get the Z index of.
+		* 
+		* @return The Z index of the entity's transform.
+		*/
 		const size_t GetZIndex(Entity entity);
+
+		/**
+		* @brief Set rotation of an entity's transform.
+		* 
+		* @param entity The entity whose transform to set the rotation of.
+		* @param rotation The new rotation of the entity's transform in degrees.
+		*/
 		void SetRotation(Entity entity, const float rotation);
+
+		/**
+		* @brief Get rotation of an entity's transform.
+		* 
+		* @param entity The entity whose transform to get the rotation of.
+		* 
+		* @return The rotation of the entity's transform in degrees.
+		*/
 		const float GetRotation(Entity entity);
+
+		/**
+		* @brief Set direction facing of an entity's transform.
+		* 
+		* @param entity The entity whose transform to set the direction facing of.
+		* @param direction The new direction facing of the entity's transform. (1 = right, -1 = left)
+		*/
 		void SetDirectionFacing(Entity entity, const int direction);
+
+		/**
+		* @brief Get direction facing of an entity's transform.
+		* 
+		* @param entity The entity whose transform to get the direction facing of.
+		* 
+		* @return The direction facing of the entity's transform. (1 = right, -1 = left)
+		*/
 		const int GetDirectionFacing(Entity entity);
 
-	public:
+		/**
+		* @brief Get transform component of an entity.
+		* 
+		* @param entity The entity whose transform component to get.
+		* 
+		* @return Pointer to the entity's transform component.
+		*/
 		Transform* GetTransform(Entity entity);
+
+		/**
+		* @brief Constructor for TransformInterface.
+		* 
+		* @param refEcs Reference to the ECS instance.
+		*/
 		TransformInterface(ECS& refEcs);
 
-		void SetPrevPosition(Entity entity, const Math2D::Point2D<float> position);
 	private:
 		ECS& m_refECS;
 	};

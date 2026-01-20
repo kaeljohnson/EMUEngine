@@ -5,9 +5,9 @@
 namespace Engine
 {
 	/**
-	* @brief Audio system.
+	* @class Audio system.
 	* 
-	* Handles audio playback and management.
+	* @brief Handles audio playback and management.
 	*/
 
 	class AudioSystem
@@ -15,17 +15,19 @@ namespace Engine
 	public:
 		/**
 		* @brief Constructs the audio system.
-		* * @param refECS Reference to the ECS instance.
-		* * @param refAssetManager Reference to the Asset Manager instance.
+		* 
+		* @param refECS Reference to the ECS instance.
+		* @param refAssetManager Reference to the Asset Manager instance.
 		*/
 		AudioSystem(ECS& refECS, AssetManager& refAssetManager);
 		~AudioSystem() = default;
 
 		/** 
 		* @brief Plays a sound by its id / index.Volume is from 0 to 128 (max).
-		* * @param soundIndex: The index of the sound to play.
-		* * @param volume: The volume at which to play the sound. Default is 128 (max).
-		* * @param loop: Whether to loop the sound or not. Default is false.
+		* 
+		* @param soundIndex: The index of the sound to play.
+		* @param volume: The volume at which to play the sound. Default is 128 (max).
+		* @param loop: Whether to loop the sound or not. Default is false.
 		*/
 		void PlaySound(int soundIndex, int volume = 128, const bool loop = false);
 
@@ -35,6 +37,6 @@ namespace Engine
 		AudioSystem& operator=(AudioSystem&&) = delete;
 
 	private:
-		AssetManager& m_refAssetManager;
+		AssetManager& m_refAssetManager; /// Reference to the Asset Manager instance.
 	};
 }

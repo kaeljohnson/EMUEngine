@@ -3,11 +3,14 @@
 
 namespace Engine
 {
-	// Init class. Initializes the engine.
+	/** 
+	* @class Init class
+	* 
+	* @brief Class to initialize engine subsystems.
+	*/
 	class Init
 	{
 	public:
-		// Init constructor.
-		Init(size_t numEntitiesNeeded);
+		Init(size_t numEntitiesNeeded); /// Init constructor.
 	};
 }

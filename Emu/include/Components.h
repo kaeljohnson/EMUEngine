@@ -375,7 +375,7 @@ namespace Engine
 	*/
 	struct Animation
 	{
-		size_t m_id;						/// Name of animation. 
+		size_t m_id;					/// Name of animation. 
 		std::vector<int> m_frames;		/// Frames in the animation. Each int corresponds to a frame index in the sprite sheet.
 		size_t m_numFrames;				/// Number of frames in the animation.
 		size_t m_frameTime = 0;			/// Time since the last frame change.

@@ -23,7 +23,7 @@ namespace Engine
 		/**
 		 * @brief Updates all animations in the system.
 		 *
-		 * Uses frame delta time to advance animation state.
+		 * @note Uses frame delta time to advance animation state.
 		 */
 		void Update();
 

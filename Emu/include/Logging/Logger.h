@@ -4,65 +4,153 @@
 
 namespace Engine
 {
+	/**
+	* @class Logger
+	* 
+	* @brief Logging utility for engine and client messages.
+	* 
+	* Provides methods to log messages at various severity levels
+	* for both engine and client contexts.
+	*/
 	class Logger
 	{
 	public:
 		Logger();
 
+		/**
+		* @brief Logs a formatted engine trace message.
+		* 
+		* @tparam Args Variadic template parameters for formatting. 
+		* 
+		* @param fmt The format string.
+		* @param args The arguments to format into the string.
+		*/
 		template<typename... Args>
 		void EngineTrace(std::string_view fmt, Args&&... args)
 		{
 			engineTrace(std::vformat(fmt, std::make_format_args(args...)));
 		}
 
+		/**
+		* @brief Logs a formatted engine info message.
+		* 
+		* @tparam Args Variadic template parameters for formatting.
+		* 
+		* @param fmt The format string.
+		* @param args The arguments to format into the string.
+		*/
 		template<typename... Args>
 		void EngineInfo(std::string_view fmt, Args&&... args)
 		{
 			engineInfo(std::vformat(fmt, std::make_format_args(args...)));
 		}
 
+		/**
+		* @brief Logs a formatted engine warning message.
+		* 
+		* @tparam Args Variadic template parameters for formatting.
+		* 
+		* @param fmt The format string.
+		* @param args The arguments to format into the string.
+		*/
 		template<typename... Args>
 		void EngineWarn(std::string_view fmt, Args&&... args)
 		{
 			engineWarn(std::vformat(fmt, std::make_format_args(args...)));
 		}
 
+		/**
+		* @brief Logs a formatted engine error message.
+		* 
+		* @tparam Args Variadic template parameters for formatting.
+		* 
+		* @param fmt The format string.
+		* @param args The arguments to format into the string.
+		*/
 		template<typename... Args>
 		void EngineError(std::string_view fmt, Args&&... args)
 		{
 			engineError(std::vformat(fmt, std::make_format_args(args...)));
 		}
 
+		/**
+		* @brief Logs a formatted engine critical message.
+		* 
+		* @tparam Args Variadic template parameters for formatting.
+		* 
+		* @param fmt The format string.
+		* @param args The arguments to format into the string.
+		*/
 		template<typename... Args>
 		void EngineCritical(std::string_view fmt, Args&&... args)
 		{
 			engineCritical(std::vformat(fmt, std::make_format_args(args...)));
 		}
 
+		/**
+		* @brief Logs a formatted client trace message.
+		* 
+		* @tparam Args Variadic template parameters for formatting.
+		* 
+		* @param fmt The format string.
+		* * @param args The arguments to format into the string.
+		*/
 		template<typename... Args>
 		void ClientTrace(std::string_view fmt, Args&&... args)
 		{
 			clientTrace(std::vformat(fmt, std::make_format_args(args...)));
 		}
 
+		/**
+		* @brief Logs a formatted client info message.
+		* 
+		* @tparam Args Variadic template parameters for formatting.
+		* 
+		* @param fmt The format string.
+		* @param args The arguments to format into the string.
+		*/
 		template<typename... Args>
 		void ClientInfo(std::string_view fmt, Args&&... args)
 		{
 			clientInfo(std::vformat(fmt, std::make_format_args(args...)));
 		}
 
+		/**
+		* @brief Logs a formatted client warning message.
+		* 
+		* @tparam Args Variadic template parameters for formatting.
+		* 
+		* @param fmt The format string.
+		* @param args The arguments to format into the string.
+		*/
 		template<typename... Args>
 		void ClientWarn(std::string_view fmt, Args&&... args)
 		{
 			clientWarn(std::vformat(fmt, std::make_format_args(args...)));
 		}
 
+		/**
+		* @brief Logs a formatted client error message.
+		* 
+		* @tparam Args Variadic template parameters for formatting.
+		* 
+		* @param fmt The format string.
+		* @param args The arguments to format into the string.
+		*/
 		template<typename... Args>
 		void ClientError(std::string_view fmt, Args&&... args)
 		{
 			clientError(std::vformat(fmt, std::make_format_args(args...)));
 		}
 
+		/**
+		* @brief Logs a formatted client critical message.
+		* 
+		* @tparam Args Variadic template parameters for formatting.
+		* 
+		* @param fmt The format string.
+		* @param args The arguments to format into the string.
+		*/
 		template<typename... Args>
 		void ClientCritical(std::string_view fmt, Args&&... args)
 		{
