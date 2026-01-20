@@ -23,11 +23,8 @@ jobs:
 
     - name: Build EmuTests (Debug x64)
       run: |
-        msbuild EMUEngine.sln ^
-          /t:EmuTests ^
-          /p:Configuration=Debug ^
-          /p:Platform=x64 ^
-          /m
+        msbuild EMUEngine.sln /t:EmuTests /p:Configuration=Debug /p:Platform=x64 /m
+
 
     - name: Run EmuTests
       run: |
