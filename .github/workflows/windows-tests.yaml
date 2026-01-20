@@ -19,7 +19,7 @@ jobs:
 
     - name: Generate solution with Premake
       run: |
-        external/premake/premake5.exe --tests vs2022
+        Emu/external/premake/premake5.exe --tests vs2022
 
     - name: Build EmuTests (Debug)
       run: |
