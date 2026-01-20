@@ -388,7 +388,7 @@ TEST(MATH, Lerp)
 	Math2D::Point2D vec1(0.0f, 0.0f);
 	Math2D::Point2D vec2(10.0f, 10.0f);
 	float t = 0.5f;
-	Math2D::Point2D result = Engine::Lerp(vec1, vec2, t);
+	Math2D::Point2D result = Math2D::Lerp(vec1, vec2, t);
 	EXPECT_FLOAT_EQ(result.X, 5.0f);
 	EXPECT_FLOAT_EQ(result.Y, 5.0f);
 }
@@ -485,72 +485,72 @@ static inline bool checkChainsEquality(const std::vector<Math2D::Chain>& merged,
 TEST(MATH, MergeGridLines)
 {
 	// Chain 1 edges.
-	Engine::Edge edge1 =   { {1.0f, 2.0f}, {1.0f, 1.0f}, {2.0f, 1.0f}, {2.0f, 2.0f} };
+	Math2D::Edge edge1 =   { {1.0f, 2.0f}, {1.0f, 1.0f}, {2.0f, 1.0f}, {2.0f, 2.0f} };
 	std::cout << "Edge 1 created" << "(" << edge1.m_trailingPoint.X << ", " << edge1.m_trailingPoint.Y << "), "
 		<< "(" << edge1.m_startPoint.X << ", " << edge1.m_startPoint.Y << "), "
 		<< "(" << edge1.m_endPoint.X << ", " << edge1.m_endPoint.Y << "), "
 		<< "(" << edge1.m_leadingPoint.X << ", " << edge1.m_leadingPoint.Y << ")\n";
 
-	Engine::Edge edge2 =  { {1.0f, 1.0f}, {2.0f, 1.0f}, {2.0f, 2.0f}, {3.0f, 2.0f} };
-	Engine::Edge edge3 =  { {2.0f, 1.0f}, {2.0f, 2.0f}, {3.0f, 2.0f}, {3.0f, 3.0f} };
-	Engine::Edge edge4 =  { {2.0f, 2.0f}, {3.0f, 2.0f}, {3.0f, 3.0f}, {4.0f, 3.0f} };
-	Engine::Edge edge5 =  { {3.0f, 2.0f}, {3.0f, 3.0f}, {4.0f, 3.0f}, {4.0f, 4.0f} };
-	Engine::Edge edge6 =  { {3.0f, 3.0f}, {4.0f, 3.0f}, {4.0f, 4.0f}, {3.0f, 4.0f} };
-	Engine::Edge edge7 =  { {4.0f, 3.0f}, {4.0f, 4.0f}, {3.0f, 4.0f}, {3.0f, 3.0f} };
-	Engine::Edge edge8 =  { {4.0f, 4.0f}, {3.0f, 4.0f}, {3.0f, 3.0f}, {2.0f, 3.0f} };
-	Engine::Edge edge9 =  { {3.0f, 4.0f}, {3.0f, 3.0f}, {2.0f, 3.0f}, {2.0f, 2.0f} };
-	Engine::Edge edge10 = { {3.0f, 3.0f}, {2.0f, 3.0f}, {2.0f, 2.0f}, {1.0f, 2.0f} };
-	Engine::Edge edge11 = { {2.0f, 3.0f}, {2.0f, 2.0f}, {1.0f, 2.0f}, {1.0f, 1.0f} };
-	Engine::Edge edge12 = { {2.0f, 2.0f}, {1.0f, 2.0f}, {1.0f, 1.0f}, {2.0f, 1.0f} };
+	Math2D::Edge edge2 =  { {1.0f, 1.0f}, {2.0f, 1.0f}, {2.0f, 2.0f}, {3.0f, 2.0f} };
+	Math2D::Edge edge3 =  { {2.0f, 1.0f}, {2.0f, 2.0f}, {3.0f, 2.0f}, {3.0f, 3.0f} };
+	Math2D::Edge edge4 =  { {2.0f, 2.0f}, {3.0f, 2.0f}, {3.0f, 3.0f}, {4.0f, 3.0f} };
+	Math2D::Edge edge5 =  { {3.0f, 2.0f}, {3.0f, 3.0f}, {4.0f, 3.0f}, {4.0f, 4.0f} };
+	Math2D::Edge edge6 =  { {3.0f, 3.0f}, {4.0f, 3.0f}, {4.0f, 4.0f}, {3.0f, 4.0f} };
+	Math2D::Edge edge7 =  { {4.0f, 3.0f}, {4.0f, 4.0f}, {3.0f, 4.0f}, {3.0f, 3.0f} };
+	Math2D::Edge edge8 =  { {4.0f, 4.0f}, {3.0f, 4.0f}, {3.0f, 3.0f}, {2.0f, 3.0f} };
+	Math2D::Edge edge9 =  { {3.0f, 4.0f}, {3.0f, 3.0f}, {2.0f, 3.0f}, {2.0f, 2.0f} };
+	Math2D::Edge edge10 = { {3.0f, 3.0f}, {2.0f, 3.0f}, {2.0f, 2.0f}, {1.0f, 2.0f} };
+	Math2D::Edge edge11 = { {2.0f, 3.0f}, {2.0f, 2.0f}, {1.0f, 2.0f}, {1.0f, 1.0f} };
+	Math2D::Edge edge12 = { {2.0f, 2.0f}, {1.0f, 2.0f}, {1.0f, 1.0f}, {2.0f, 1.0f} };
 	
 
 	// Chain 2 edges.
-	Engine::Edge edge13 = { {5.0f, 2.0f}, {5.0f, 1.0f}, {6.0f, 1.0f}, {6.0f, 2.0f} };
-	Engine::Edge edge14 = { {5.0f, 1.0f}, {6.0f, 1.0f}, {6.0f, 2.0f}, {7.0f, 2.0f} };
-	Engine::Edge edge15 = { {6.0f, 1.0f}, {6.0f, 2.0f}, {7.0f, 2.0f}, {7.0f, 3.0f} };
-	Engine::Edge edge16 = { {6.0f, 2.0f}, {7.0f, 2.0f}, {7.0f, 3.0f}, {6.0f, 3.0f} };
-	Engine::Edge edge17 = { {7.0f, 2.0f}, {7.0f, 3.0f}, {6.0f, 3.0f}, {5.0f, 3.0f} };
-	Engine::Edge edge18 = { {7.0f, 3.0f}, {6.0f, 3.0f}, {5.0f, 3.0f}, {5.0f, 2.0f} };
-	Engine::Edge edge19 = { {6.0f, 3.0f}, {5.0f, 3.0f}, {5.0f, 2.0f}, {5.0f, 1.0f} };
-	Engine::Edge edge20 = { {5.0f, 3.0f}, {5.0f, 2.0f}, {5.0f, 1.0f}, {6.0f, 1.0f} };
+	Math2D::Edge edge13 = { {5.0f, 2.0f}, {5.0f, 1.0f}, {6.0f, 1.0f}, {6.0f, 2.0f} };
+	Math2D::Edge edge14 = { {5.0f, 1.0f}, {6.0f, 1.0f}, {6.0f, 2.0f}, {7.0f, 2.0f} };
+	Math2D::Edge edge15 = { {6.0f, 1.0f}, {6.0f, 2.0f}, {7.0f, 2.0f}, {7.0f, 3.0f} };
+	Math2D::Edge edge16 = { {6.0f, 2.0f}, {7.0f, 2.0f}, {7.0f, 3.0f}, {6.0f, 3.0f} };
+	Math2D::Edge edge17 = { {7.0f, 2.0f}, {7.0f, 3.0f}, {6.0f, 3.0f}, {5.0f, 3.0f} };
+	Math2D::Edge edge18 = { {7.0f, 3.0f}, {6.0f, 3.0f}, {5.0f, 3.0f}, {5.0f, 2.0f} };
+	Math2D::Edge edge19 = { {6.0f, 3.0f}, {5.0f, 3.0f}, {5.0f, 2.0f}, {5.0f, 1.0f} };
+	Math2D::Edge edge20 = { {5.0f, 3.0f}, {5.0f, 2.0f}, {5.0f, 1.0f}, {6.0f, 1.0f} };
 
 	// Chain 3 edges
-	Engine::Edge edge21 = { {1.0f, 6.0f}, {1.0f, 5.0f}, {2.0f, 5.0f}, {3.0f, 5.0f} };
-	Engine::Edge edge22 = { {1.0f, 5.0f}, {2.0f, 5.0f}, {3.0f, 5.0f}, {3.0f, 6.0f} };
-	Engine::Edge edge23 = { {2.0f, 5.0f}, {3.0f, 5.0f}, {3.0f, 6.0f}, {2.0f, 6.0f} };
-	Engine::Edge edge24 = { {3.0f, 5.0f}, {3.0f, 6.0f}, {2.0f, 6.0f}, {1.0f, 6.0f} };
-	Engine::Edge edge25 = { {3.0f, 6.0f}, {2.0f, 6.0f}, {1.0f, 6.0f}, {1.0f, 5.0f} };
-	Engine::Edge edge26 = { {2.0f, 6.0f}, {1.0f, 6.0f}, {1.0f, 5.0f}, {2.0f, 5.0f} };
+	Math2D::Edge edge21 = { {1.0f, 6.0f}, {1.0f, 5.0f}, {2.0f, 5.0f}, {3.0f, 5.0f} };
+	Math2D::Edge edge22 = { {1.0f, 5.0f}, {2.0f, 5.0f}, {3.0f, 5.0f}, {3.0f, 6.0f} };
+	Math2D::Edge edge23 = { {2.0f, 5.0f}, {3.0f, 5.0f}, {3.0f, 6.0f}, {2.0f, 6.0f} };
+	Math2D::Edge edge24 = { {3.0f, 5.0f}, {3.0f, 6.0f}, {2.0f, 6.0f}, {1.0f, 6.0f} };
+	Math2D::Edge edge25 = { {3.0f, 6.0f}, {2.0f, 6.0f}, {1.0f, 6.0f}, {1.0f, 5.0f} };
+	Math2D::Edge edge26 = { {2.0f, 6.0f}, {1.0f, 6.0f}, {1.0f, 5.0f}, {2.0f, 5.0f} };
 
 	// Chain 4 edges
-	Engine::Edge edge27 = { {5.0f, 5.0f}, {5.0f, 4.0f}, {6.0f, 4.0f}, {7.0f, 4.0f} };
-	Engine::Edge edge28 = { {5.0f, 4.0f}, {6.0f, 4.0f}, {7.0f, 4.0f}, {8.0f, 4.0f} };
-	Engine::Edge edge29 = { {6.0f, 4.0f}, {7.0f, 4.0f}, {8.0f, 4.0f}, {8.0f, 5.0f} };
-	Engine::Edge edge30 = { {7.0f, 4.0f}, {8.0f, 4.0f}, {8.0f, 5.0f}, {8.0f, 6.0f} };
-	Engine::Edge edge31 = { {8.0f, 4.0f}, {8.0f, 5.0f}, {8.0f, 6.0f}, {8.0f, 7.0f} };
-	Engine::Edge edge32 = { {8.0f, 5.0f}, {8.0f, 6.0f}, {8.0f, 7.0f}, {7.0f, 7.0f} };
-	Engine::Edge edge33 = { {8.0f, 6.0f}, {8.0f, 7.0f}, {7.0f, 7.0f}, {6.0f, 7.0f} };
-	Engine::Edge edge34 = { {8.0f, 7.0f}, {7.0f, 7.0f}, {6.0f, 7.0f}, {5.0f, 7.0f} };
-	Engine::Edge edge35 = { {7.0f, 7.0f}, {6.0f, 7.0f}, {5.0f, 7.0f}, {5.0f, 6.0f} };
-	Engine::Edge edge36 = { {6.0f, 7.0f}, {5.0f, 7.0f}, {5.0f, 6.0f}, {5.0f, 5.0f} };
-	Engine::Edge edge37 = { {5.0f, 7.0f}, {5.0f, 6.0f}, {5.0f, 5.0f}, {5.0f, 4.0f} };
-	Engine::Edge edge38 = { {5.0f, 6.0f}, {5.0f, 5.0f}, {5.0f, 4.0f}, {6.0f, 4.0f} };
+	Math2D::Edge edge27 = { {5.0f, 5.0f}, {5.0f, 4.0f}, {6.0f, 4.0f}, {7.0f, 4.0f} };
+	Math2D::Edge edge28 = { {5.0f, 4.0f}, {6.0f, 4.0f}, {7.0f, 4.0f}, {8.0f, 4.0f} };
+	Math2D::Edge edge29 = { {6.0f, 4.0f}, {7.0f, 4.0f}, {8.0f, 4.0f}, {8.0f, 5.0f} };
+	Math2D::Edge edge30 = { {7.0f, 4.0f}, {8.0f, 4.0f}, {8.0f, 5.0f}, {8.0f, 6.0f} };
+	Math2D::Edge edge31 = { {8.0f, 4.0f}, {8.0f, 5.0f}, {8.0f, 6.0f}, {8.0f, 7.0f} };
+	Math2D::Edge edge32 = { {8.0f, 5.0f}, {8.0f, 6.0f}, {8.0f, 7.0f}, {7.0f, 7.0f} };
+	Math2D::Edge edge33 = { {8.0f, 6.0f}, {8.0f, 7.0f}, {7.0f, 7.0f}, {6.0f, 7.0f} };
+	Math2D::Edge edge34 = { {8.0f, 7.0f}, {7.0f, 7.0f}, {6.0f, 7.0f}, {5.0f, 7.0f} };
+	Math2D::Edge edge35 = { {7.0f, 7.0f}, {6.0f, 7.0f}, {5.0f, 7.0f}, {5.0f, 6.0f} };
+	Math2D::Edge edge36 = { {6.0f, 7.0f}, {5.0f, 7.0f}, {5.0f, 6.0f}, {5.0f, 5.0f} };
+	Math2D::Edge edge37 = { {5.0f, 7.0f}, {5.0f, 6.0f}, {5.0f, 5.0f}, {5.0f, 4.0f} };
+	Math2D::Edge edge38 = { {5.0f, 6.0f}, {5.0f, 5.0f}, {5.0f, 4.0f}, {6.0f, 4.0f} };
 
 	// Chain 5 edges
-	Engine::Edge edge39 = { {6.0f, 6.0f}, {6.0f, 5.0f}, {7.0f, 5.0f}, {7.0f, 6.0f} };
-	Engine::Edge edge40 = { {6.0f, 5.0f}, {7.0f, 5.0f}, {7.0f, 6.0f}, {6.0f, 6.0f} };
-	Engine::Edge edge41 = { {7.0f, 5.0f}, {7.0f, 6.0f}, {6.0f, 6.0f}, {6.0f, 5.0f} };
-	Engine::Edge edge42 = { {7.0f, 6.0f}, {6.0f, 6.0f}, {6.0f, 5.0f}, {7.0f, 5.0f} };
+	Math2D::Edge edge39 = { {6.0f, 6.0f}, {6.0f, 5.0f}, {7.0f, 5.0f}, {7.0f, 6.0f} };
+	Math2D::Edge edge40 = { {6.0f, 5.0f}, {7.0f, 5.0f}, {7.0f, 6.0f}, {6.0f, 6.0f} };
+	Math2D::Edge edge41 = { {7.0f, 5.0f}, {7.0f, 6.0f}, {6.0f, 6.0f}, {6.0f, 5.0f} };
+	Math2D::Edge edge42 = { {7.0f, 6.0f}, {6.0f, 6.0f}, {6.0f, 5.0f}, {7.0f, 5.0f} };
 
 	// Chain 6 edges (not forming a loop, should remain separate)
-	Engine::Edge edge43 = { {10.0f, 10.0f}, {11.0f, 10.0f}, {12.0f, 10.0f}, {13.0f, 10.0f} };
-	Engine::Edge edge44 = { {11.0f, 10.0f}, {12.0f, 10.0f}, {13.0f, 10.0f}, {14.0f, 10.0f} };
-	Engine::Edge edge45 = { {12.0f, 10.0f}, {13.0f, 10.0f}, {14.0f, 10.0f}, {15.0f, 10.0f} };
-	Engine::Edge edge46 = { {13.0f, 10.0f}, {14.0f, 10.0f}, {15.0f, 10.0f}, {16.0f, 10.0f} };
-	Engine::Edge edge47 = { {14.0f, 10.0f}, {15.0f, 10.0f}, {16.0f, 10.0f}, {17.0f, 10.0f} };
-	Engine::Edge edge48 = { {15.0f, 10.0f}, {16.0f, 10.0f}, {17.0f, 10.0f}, {18.0f, 10.0f} };
+	Math2D::Edge edge43 = { {10.0f, 10.0f}, {11.0f, 10.0f}, {12.0f, 10.0f}, {13.0f, 10.0f} };
+	Math2D::Edge edge44 = { {11.0f, 10.0f}, {12.0f, 10.0f}, {13.0f, 10.0f}, {14.0f, 10.0f} };
+	Math2D::Edge edge45 = { {12.0f, 10.0f}, {13.0f, 10.0f}, {14.0f, 10.0f}, {15.0f, 10.0f} };
+	Math2D::Edge edge46 = { {13.0f, 10.0f}, {14.0f, 10.0f}, {15.0f, 10.0f}, {16.0f, 10.0f} };
+	Math2D::Edge edge47 = { {14.0f, 10.0f}, {15.0f, 10.0f}, {16.0f, 10.0f}, {17.0f, 10.0f} };
+	Math2D::Edge edge48 = { {15.0f, 10.0f}, {16.0f, 10.0f}, {17.0f, 10.0f}, {18.0f, 10.0f} };
 
-	std::vector<Engine::Edge> edges =
+	std::vector<Math2D::Edge> edges =
 	{ edge1, edge2, edge3, edge4, edge5, edge6, edge7, edge8, edge9, edge10, edge11, edge12,
 	  edge13, edge14, edge15, edge16, edge17, edge18, edge19, edge20,
 	  edge21, edge22, edge23, edge24, edge25, edge26,
@@ -566,7 +566,7 @@ TEST(MATH, MergeGridLines)
 	//// Shuffle the vector
 	ShuffleVector(edges); // Merge function should be able to handle an edges vector in any order.
 
-	std::vector<Math2D::Chain> mergedChains = Engine::MergeGridLinesIntoChains(edges);
+	std::vector<Math2D::Chain> mergedChains = Math2D::MergeGridLinesIntoChains(edges);
 
 	for (const auto& chain : mergedChains)
 	{

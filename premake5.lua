@@ -12,6 +12,11 @@ newoption {
     description = "Generate only the engine project"
 }
 
+newoption {
+    trigger = "tests"
+    description = "Generate the tests with the engine"
+}
+
 -- =========================
 -- Core workspace + engine
 -- =========================
@@ -128,6 +133,55 @@ if not _OPTIONS["engine-only"] then
             optimize "On"
             defines { "NDEBUG" }
 
+    -- EmuTests Executable
+    project "EmuTests"
+        location "EmuTests"
+        kind "ConsoleApp"
+        language "C++"
+        staticruntime "off"
+
+        targetdir ("bin/" .. outputDirectory .. "/%{prj.name}")
+        objdir ("bin-int/" .. outputDirectory .. "/%{prj.name}")
+
+        files
+        {
+            "%{prj.name}/**.h",
+            "%{prj.name}/**.cpp"
+        }
+
+        includedirs
+        {
+            "Emu/public"
+        }
+
+        links
+        {
+            "Emu",
+            "gtest",
+            "gtest_main"
+        }
+
+        filter "system:windows"
+            cppdialect "C++20"
+            systemversion "latest"
+
+        filter "configurations:Debug"
+            runtime "Debug"
+            symbols "On"
+            defines { "DEBUG" }
+
+        filter "configurations:Release"
+            runtime "Release"
+            optimize "On"
+            defines { "NDEBUG" }
+
+        filter "configurations:Distribution"
+            runtime "Release"
+            optimize "On"
+            defines { "NDEBUG" }
+end
+
+if _OPTIONS["tests"] then
     -- EmuTests Executable
     project "EmuTests"
         location "EmuTests"
