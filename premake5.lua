@@ -151,19 +151,28 @@ if not _OPTIONS["engine-only"] then
 
         includedirs
         {
-            "Emu/public"
+            "Emu/public",
+            "Emu/external/vcpkg/installed/x64-windows/include"
+        }
+
+        libdirs
+        {
+            "Emu/external/vcpkg/installed/x64-windows/lib"
         }
 
         links
         {
             "Emu",
-            "gtest",
-            "gtest_main"
+            "gtest"
         }
 
         filter "system:windows"
             cppdialect "C++20"
             systemversion "latest"
+            postbuildcommands
+            {
+                '{COPYDIR} "../Emu/external/vcpkg/installed/x64-windows/bin" "%{cfg.targetdir}"'
+            }
 
         filter "configurations:Debug"
             runtime "Debug"
@@ -200,19 +209,28 @@ if _OPTIONS["tests"] then
 
         includedirs
         {
-            "Emu/public"
+            "Emu/public",
+            "Emu/external/vcpkg/installed/x64-windows/include"
+        }
+
+        libdirs
+        {
+            "Emu/external/vcpkg/installed/x64-windows/lib"
         }
 
         links
         {
             "Emu",
-            "gtest",
-            "gtest_main"
+            "gtest"
         }
 
         filter "system:windows"
             cppdialect "C++20"
             systemversion "latest"
+            postbuildcommands
+            {
+                '{COPYDIR} "../Emu/external/vcpkg/installed/x64-windows/bin" "%{cfg.targetdir}"'
+            }
 
         filter "configurations:Debug"
             runtime "Debug"
