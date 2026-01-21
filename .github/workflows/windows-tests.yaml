@@ -27,16 +27,10 @@ jobs:
         cd Emu/external/vcpkg
         bootstrap-vcpkg.bat
 
-    - name: Install vcpkg dependencies
+    - name: Install dependencies
       run: |
-        Emu/external/vcpkg/vcpkg.exe install ^
-        sdl2 ^
-        sdl2-image ^
-        sdl2-mixer ^
-        gtest ^
-        spdlog ^
-        box2d ^
-        --triplet x64-windows
+        Emu/external/vcpkg/vcpkg.exe install sdl2 sdl2-image sdl2-mixer gtest spdlog box2d --triplet x64-windows
+
 
 
     - name: Generate solution with Premake
