@@ -23,21 +23,28 @@ jobs:
 
     # ---- vcpkg ----
     - name: Clone vcpkg
+      shell: cmd
       run: |
-        if not exist Emu\external\vcpkg ( git clone https://github.com/microsoft/vcpkg.git Emu\external\vcpkg )
+        if not exist Emu\external\vcpkg (
+        git clone https://github.com/microsoft/vcpkg.git Emu\external\vcpkg
+        )
+
 
     - name: Bootstrap vcpkg
+      shell: cmd
       run: |
         cd Emu\external\vcpkg
         bootstrap-vcpkg.bat
 
     - name: Install vcpkg dependencies
+      shell: cmd
       run: |
         cd Emu\external\vcpkg
         vcpkg install sdl2 sdl2-image sdl2-mixer gtest nlohmann-json
 
     # ---- Box2D ----
     - name: Build Box2D (Debug)
+      shell: cmd
       run: |
         cd Emu\external\box2d
         if exist build\bin\release rmdir /s /q build\bin\release
