@@ -24,9 +24,7 @@ jobs:
     # ---- vcpkg ----
     - name: Clone vcpkg
       run: |
-        if not exist Emu\external\vcpkg (
-          git clone https://github.com/microsoft/vcpkg.git Emu\external\vcpkg
-        )
+        if not exist Emu\external\vcpkg ( git clone https://github.com/microsoft/vcpkg.git Emu\external\vcpkg )
 
     - name: Bootstrap vcpkg
       run: |
