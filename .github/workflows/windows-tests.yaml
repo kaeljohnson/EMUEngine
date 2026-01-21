@@ -67,4 +67,4 @@ jobs:
     # ---- Run tests ----
     - name: Run EmuTests
       run: |
-        .\bin\Debug-x64\EmuTests\EmuTests.exe --gtest_color=yes
+        .\bin\Debug-x86_64\EmuTests\EmuTests.exe --gtest_color=yes
