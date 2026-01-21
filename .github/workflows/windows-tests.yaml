@@ -19,23 +19,23 @@ jobs:
 
     - name: Clone vcpkg
       run: |
-        git clone https://github.com/microsoft/vcpkg.git Emu/external/vcpkg
+        git clone https://github.com/microsoft/vcpkg.git Emu\external\vcpkg
 
 
     - name: Bootstrap vcpkg
       run: |
-        cd Emu/external/vcpkg
+        cd Emu\external\vcpkg
         bootstrap-vcpkg.bat
 
     - name: Install dependencies
       run: |
-        Emu/external/vcpkg/vcpkg.exe install sdl2 sdl2-image sdl2-mixer gtest spdlog box2d --triplet x64-windows
+        .\Emu\external\vcpkg\vcpkg.exe install sdl2 sdl2-image sdl2-mixer gtest spdlog box2d --triplet x64-windows
 
 
 
     - name: Generate solution with Premake
       run: |
-        Emu/external/premake/premake5.exe --tests vs2022
+        .\Emu\external\premake\premake5.exe --tests vs2022
 
     - name: Build EmuTests (Debug x64)
       run: |
