@@ -2,8 +2,7 @@ name: Windows Engine Tests
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   pull_request:
 
 jobs:
@@ -11,37 +10,56 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout repository (with submodules)
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
+    - name: Ensure CMake is available
+      uses: lukka/get-cmake@latest
+
+    # ---- vcpkg ----
     - name: Clone vcpkg
       run: |
-        git clone https://github.com/microsoft/vcpkg.git Emu\external\vcpkg
-
+        if not exist Emu\external\vcpkg (
+          git clone https://github.com/microsoft/vcpkg.git Emu\external\vcpkg
+        )
 
     - name: Bootstrap vcpkg
       run: |
         cd Emu\external\vcpkg
         bootstrap-vcpkg.bat
 
-    - name: Install dependencies
+    - name: Install vcpkg dependencies
       run: |
-        .\Emu\external\vcpkg\vcpkg.exe install sdl2 sdl2-image sdl2-mixer gtest spdlog box2d --triplet x64-windows
+        cd Emu\external\vcpkg
+        vcpkg install sdl2 sdl2-image sdl2-mixer gtest nlohmann-json
 
+    # ---- Box2D ----
+    - name: Build Box2D (Debug)
+      run: |
+        cd Emu\external\box2d
+        if exist build\bin\release rmdir /s /q build\bin\release
+        if not exist build mkdir build
+        cd build
+        cmake -DBOX2D_BUILD_DOCS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="install" ..
+        cmake --build .
+        cmake --build . --config Debug --target INSTALL
 
-
+    # ---- Premake ----
     - name: Generate solution with Premake
       run: |
         .\Emu\external\premake\premake5.exe --tests vs2022
 
+    # ---- Build tests ----
     - name: Build EmuTests (Debug x64)
       run: |
         msbuild EMUEngine.sln /t:EmuTests /p:Configuration=Debug /p:Platform=x64 /m
 
-
+    # ---- Run tests ----
     - name: Run EmuTests
       run: |
         .\bin\Debug-x64\EmuTests\EmuTests.exe --gtest_color=yes
