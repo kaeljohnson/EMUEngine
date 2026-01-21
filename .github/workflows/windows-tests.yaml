@@ -17,6 +17,23 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
+    - name: Bootstrap vcpkg
+      run: |
+        cd Emu/external/vcpkg
+        bootstrap-vcpkg.bat
+
+    - name: Install vcpkg dependencies
+      run: |
+        Emu/external/vcpkg/vcpkg.exe install ^
+        sdl2 ^
+        sdl2-image ^
+        sdl2-mixer ^
+        gtest ^
+        spdlog ^
+        box2d ^
+        --triplet x64-windows
+
+
     - name: Generate solution with Premake
       run: |
         Emu/external/premake/premake5.exe --tests vs2022
