@@ -40,22 +40,13 @@ namespace Engine
 		ptrBody->m_halfDimensions = dimensions / 2.0f;
 
 		b2ShapeId shapeId = *ptrBody->m_shapeId;
-		b2BodyId bodyId = *ptrBody->m_bodyId;
+		// b2BodyId bodyId = *ptrBody->m_bodyId;
 
-		b2DestroyShape(shapeId, true);
+		// b2DestroyShape(shapeId, true);
 
 		b2Polygon newBox = b2MakeBox(ptrBody->m_halfDimensions.X, ptrBody->m_halfDimensions.Y);
 
-		b2ShapeDef shapeDef = b2DefaultShapeDef();
-		shapeDef.density = 1.0f;
-		shapeDef.friction = 0.0f;
-		shapeDef.restitution = 0.0f;
-
-		shapeId = b2CreatePolygonShape(bodyId, &shapeDef, &newBox);
-
-		delete ptrBody->m_shapeId;
-
-		ptrBody->m_shapeId = new b2ShapeId(shapeId);
+		b2Shape_SetPolygon(shapeId, &newBox);
 	}
 
 	const Math2D::Point2D<float> PhysicsInterface::GetDimensions(Entity entity)
