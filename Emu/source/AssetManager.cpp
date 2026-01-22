@@ -38,7 +38,7 @@ namespace Engine
 		}
 
 		// Otherwise, load new texture
-		ENGINE_INFO("Loading new texture: {}", filePath);
+		ENGINE_LOG("Loading new texture: {}", filePath);
 
 		// Check if renderer is valid
 		if (!m_ptrRenderer) 
@@ -56,7 +56,7 @@ namespace Engine
 		}
 
 		// Store texture
-		ENGINE_INFO("Texture loaded: {}", filePath);
+		ENGINE_LOG("Texture loaded: {}", filePath);
 		m_loadedTextures.push_back(ptrTexture);
 		size_t index = m_loadedTextures.size() - 1;
 		m_textureNames[entity] = filePath;
@@ -100,7 +100,7 @@ namespace Engine
 	{
 		if (m_loadedSounds[soundIndex] != nullptr)
 		{
-			ENGINE_INFO("Sound already exists! Skipping");
+			ENGINE_LOG("Sound already exists! Skipping");
 			return;
 		}
 

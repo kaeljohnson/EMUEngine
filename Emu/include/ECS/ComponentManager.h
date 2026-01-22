@@ -115,11 +115,12 @@ namespace Engine
         }
 
         /**
-		* @brief Activates the component associated with the specified entity.
-		* Activation moves the component from cold storage (unordered_map) to
-		* hot storage (contiguous vector) for better cache performance at runtime.
+		* @brief Activates the component associated with the specified entity if that 
+        * entity has a component of the specified type. Activation moves the component 
+        * from cold storage (unordered_map) to hot storage (contiguous vector) for 
+        * better cache performance at runtime.
         * 
-		* * @param The entity whose component is to be activated.
+		* @param The entity whose component is to be activated.
         */
         void ActivateComponent(Entity entity) override
         {
@@ -127,7 +128,6 @@ namespace Engine
 
             if (it == m_components.end())
             {
-				std::cout << "Warning: Trying to activate component that does not exist for entity: " + std::to_string(entity) + "\n";
                 return; // Component doesn't exist in m_components.
             }
 

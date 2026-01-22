@@ -13,13 +13,13 @@ namespace Engine
 		Animations* ptrAnimations = m_refECS.GetComponent<Animations>(entity);
 		if (!ptrAnimations)
 		{
-			ENGINE_CRITICAL_D("Entity ID {} does not have an Animations component.", entity);
+			ENGINE_CRITICAL("Entity ID {} does not have an Animations component.", entity);
 			return;
 		}
 
 		if (ptrAnimations->m_animations.find(animationId) == ptrAnimations->m_animations.end())
 		{
-			ENGINE_CRITICAL_D("Animation '{}' not found for entity ID {}.", animationId, entity);
+			ENGINE_CRITICAL("Animation '{}' not found for entity ID {}.", animationId, entity);
 			return;
 		}
 

@@ -9,7 +9,7 @@ namespace Engine
 {
     Init::Init(const size_t numEntitiesNeeded)
     {
-        ENGINE_TRACE_D("Logger initialized!");
+        ENGINE_LOG_D("Logger initialized!");
 
         // 1. Initialize SDL first
         if (ISDL::Init() < 0)

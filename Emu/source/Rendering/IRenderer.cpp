@@ -25,11 +25,11 @@ namespace Engine
 	IRenderer::IRenderer(ECS& refECS, AssetManager& refAssetManager) 
 		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS), m_refAssetManager(refAssetManager), m_lastDebugColor(DebugColor::Black)
 	{
-		ENGINE_INFO_D("Creating Renderer");
+		ENGINE_INFO("Creating Renderer");
 
 		if (m_rendererCreated)
 		{
-			ENGINE_INFO_D("Renderer already created. Returning.");
+			ENGINE_INFO("Renderer already created. Returning.");
 			return;
 		}
 
@@ -41,10 +41,10 @@ namespace Engine
 
 		if (m_ptrWindow == nullptr)
 		{
-			ENGINE_CRITICAL("Window not created! SDL_Error: {}", ISDL::GetError());
+			ENGINE_ERROR("Window not created! SDL_Error: {}", ISDL::GetError());
 		}
 
-		ENGINE_INFO_D("Window created!");
+		ENGINE_INFO("Window created!");
 
 		SDLDisplayMode displayMode;
 		if (ISDL::GetDesktopDisplayMode(0, &displayMode) != 0)
@@ -55,7 +55,7 @@ namespace Engine
 		Screen::DISPLAY_RESOLUTION.X = displayMode.w;
 		Screen::DISPLAY_RESOLUTION.Y = displayMode.h;
 
-		ENGINE_INFO_D("Display resolution: {}, {}", displayMode.w, displayMode.h);
+		ENGINE_INFO("Display resolution: {}, {}", displayMode.w, displayMode.h);
 
 		SDL_SetWindowMinimumSize((SDL_Window*)m_ptrWindow, Screen::DISPLAY_RESOLUTION.X / 2, Screen::DISPLAY_RESOLUTION.Y / 2); // User should not be able to resize smaller than half the display resolution.
 
@@ -76,7 +76,7 @@ namespace Engine
 		// Give renderer pointer to asset manager so it can load textures.
 		m_refAssetManager.GiveRenderer(m_ptrRenderer);
 
-		ENGINE_CRITICAL("Renderer created.");
+		ENGINE_INFO("Renderer created.");
 	}
 
 	void IRenderer::CheckForWindowResizeRequest()
@@ -201,7 +201,7 @@ namespace Engine
 		}
 		else
 		{
-			throw std::runtime_error("Entity with no texture in wrong queue. " + std::to_string(object.m_entity));
+			ENGINE_ERROR("Entity with no texture in render queue: {}", object.m_entity);
 		}
 	}
 
@@ -381,10 +381,12 @@ namespace Engine
 		ENGINE_INFO("Freeing Renderer.");
 		ISDL::DestroyRenderer((SDLRenderer*)m_ptrRenderer);
 		m_ptrRenderer = nullptr;
+		ENGINE_INFO("Renderer freed.");
 
 		ENGINE_INFO("Freeing Window.");
 		ISDL::DestroyWindow((SDLWindow*)m_ptrWindow);
 		m_ptrWindow = nullptr;
+		ENGINE_INFO("Window freed.");
 	}
 
 	IRenderer::~IRenderer()

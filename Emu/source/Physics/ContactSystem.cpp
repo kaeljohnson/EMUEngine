@@ -155,7 +155,7 @@ namespace Engine
 			}
 			else
 			{
-				ENGINE_CRITICAL_D("Entity does not exist in the ECS. Cannot register contact callback.");
+				ENGINE_CRITICAL("Entity does not exist in the ECS. Cannot register contact callback.");
 			}
 		}
 
@@ -171,7 +171,7 @@ namespace Engine
 			}
 			else
 			{
-				ENGINE_CRITICAL_D("One or both entities do not exist in the ECS. Cannot register contact callback.");
+				ENGINE_CRITICAL("One or both entities do not exist in the ECS. Cannot register contact callback.");
 			}
 		}
 	}
@@ -181,19 +181,19 @@ namespace Engine
 		PhysicsBody* ptrPhysicsBody = m_refECS.GetComponent<PhysicsBody>(entityA);
 		if (ptrPhysicsBody == nullptr)
 		{
-			ENGINE_CRITICAL_D("Entity does not have a PhysicsBody component. Cannot register contact callback.");
+			ENGINE_CRITICAL("Entity does not have a PhysicsBody component. Cannot register contact callback.");
 			return;
 		}
 		
 		if (ptrPhysicsBody->m_bodyType == BodyType::SENSOR && (contactType == BEGIN_CONTACT || contactType == END_CONTACT))
 		{
-			ENGINE_CRITICAL_D("Entity is a sensor. Cannot register contact callback. Register a sensor callback instead.");
+			ENGINE_CRITICAL("Entity is a sensor. Cannot register contact callback. Register a sensor callback instead.");
 			return;
 		}
 
 		if (ptrPhysicsBody->m_bodyType != BodyType::SENSOR && (contactType == BEGIN_SENSOR || contactType == END_SENSOR))
 		{
-			ENGINE_CRITICAL_D("Entity is not a sensor. Cannot register sensor callback. Register a contact callback instead.");
+			ENGINE_CRITICAL("Entity is not a sensor. Cannot register sensor callback. Register a contact callback instead.");
 			return;
 		}
 
@@ -230,19 +230,19 @@ namespace Engine
 		PhysicsBody* ptrPhysicsBodyB = m_refECS.GetComponent<PhysicsBody>(entityB);
 		if (ptrPhysicsBodyA == nullptr || ptrPhysicsBodyB == nullptr)
 		{
-			ENGINE_CRITICAL_D("One or both entities do not have a PhysicsBody component. Cannot register contact callback.");
+			ENGINE_CRITICAL("One or both entities do not have a PhysicsBody component. Cannot register contact callback.");
 			return;
 		}
 		else if ((ptrPhysicsBodyA->m_bodyType == BodyType::SENSOR || ptrPhysicsBodyB->m_bodyType == BodyType::SENSOR) 
 			&& (contactType == BEGIN_CONTACT || contactType == END_CONTACT))
 		{
-			ENGINE_CRITICAL_D("One or both entities are sensors. Cannot register contact callback. Register a sensor callback instead.");
+			ENGINE_CRITICAL("One or both entities are sensors. Cannot register contact callback. Register a sensor callback instead.");
 			return;
 		}
 		else if ((ptrPhysicsBodyA->m_bodyType != BodyType::SENSOR && ptrPhysicsBodyB->m_bodyType != BodyType::SENSOR) 
 			&& (contactType == BEGIN_SENSOR || contactType == END_SENSOR))
 		{
-			ENGINE_CRITICAL_D("Neither entity are sensors. Cannot register Sensor callback. Register a Contact callback instead.");
+			ENGINE_CRITICAL("Neither entity are sensors. Cannot register Sensor callback. Register a Contact callback instead.");
 			return;
 		}
 

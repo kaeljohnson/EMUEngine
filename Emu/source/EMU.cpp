@@ -9,8 +9,12 @@ namespace Engine
 
 	void EMU::Init(const size_t numEntities)
 	{
+		ENGINE_LOG("Initializing EMU");
+
 		if (!m_instance)
 			m_instance = new EMU(numEntities);
+
+		ENGINE_LOG("EMU Initialized");
 	}
 
 	EMU* EMU::GetInstance()
@@ -40,6 +44,7 @@ namespace Engine
 
 	EMU::~EMU() 
 	{
+		ENGINE_LOG("Shutting down EMU");
 		delete m_instance;
 	}
 

@@ -12,7 +12,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			// Need interface to toggle fullscreen.
 			Engine::EMU::GetInstance()->SetFullscreen();
 			// Could add a setter for handled state and put the trace in there.
-			CLIENT_TRACE_D("Handled event:" + std::to_string(static_cast<int>(Engine::F_KEY_DOWN)));
+			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::F_KEY_DOWN));
 			e.Handled = true;
 		});
 
@@ -21,20 +21,20 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			// Window Interface to call the resize function.
 			// refApp.GetWindowRenderer().ResizeWindow(e.X_POS, e.Y_POS);
 			Engine::EMU::GetInstance()->SetWindowSize(Math2D::Point2D<int>(e.X_POS, e.Y_POS));
-			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::RESIZE_WINDOW)));
+			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::RESIZE_WINDOW));
 			e.Handled = true;
 		});
 
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::ESCAPE_KEY_DOWN, [](Engine::IOEvent& e)
 		{
-			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::ESCAPE_KEY_DOWN)));
+			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::ESCAPE_KEY_DOWN));
 			Engine::EMU::GetInstance()->EndApp();
 			e.Handled = true;
 		});
 
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::QUIT, [](Engine::IOEvent& e)
 		{
-			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::QUIT)));
+			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::QUIT));
 			Engine::EMU::GetInstance()->EndApp();
 			e.Handled = true;
 		});
@@ -42,7 +42,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::G_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			Engine::Entity entity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
-			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::G_KEY_DOWN)));
+			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::G_KEY_DOWN));
 			Engine::EMU::GetInstance()->Camera_SetPixelsPerUnit(entity, 16);
 			e.Handled = true;
 		});
@@ -50,52 +50,52 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::H_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			Engine::Entity entity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
-			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::H_KEY_DOWN)));
+			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::H_KEY_DOWN));
 			Engine::EMU::GetInstance()->Camera_SetPixelsPerUnit(entity, 16);
 			e.Handled = true;
 		});
 	
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::L_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
-			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::L_KEY_DOWN)));
+			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::L_KEY_DOWN));
 			Engine::EMU::GetInstance()->Scenes_Load("Level2");
 			e.Handled = true;
 		});
 
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::U_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
-			CLIENT_TRACE_D("Handled event: " + std::to_string(static_cast<int>(Engine::U_KEY_DOWN)));
+			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::U_KEY_DOWN));
 			Engine::EMU::GetInstance()->Scenes_Load("Level1");
 			e.Handled = true;
 		});
 
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_DOWN, [](Engine::IOEvent& e)
 		{
-			CLIENT_TRACE_D("Handled event O KEY DOWN: " + std::to_string(static_cast<int>(Engine::O_KEY_DOWN)));
+			CLIENT_LOG_D("Handled event O KEY DOWN: {}", static_cast<int>(Engine::O_KEY_DOWN));
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(2);
 			Engine::EMU::GetInstance()->Scenes_Activate(testEntity);
-			CLIENT_TRACE_D("Done with O key down listener");
+			CLIENT_LOG_D("Done with O key down listener");
 		});
 
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_UP, [](Engine::IOEvent& e)
 		{
-			CLIENT_TRACE_D("Handled event O KEY UP: " + std::to_string(static_cast<int>(Engine::O_KEY_UP)));
+			CLIENT_LOG_D("Handled event O KEY UP: {}", static_cast<int>(Engine::O_KEY_UP));
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(2);
 			Engine::EMU::GetInstance()->Scenes_Deactivate(testEntity);
-			CLIENT_TRACE_D("Done with O key up listener");
+			CLIENT_LOG_D("Done with O key up listener");
 		});
 
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::P_KEY_DOWN, [](Engine::IOEvent& e)
 		{
-			CLIENT_TRACE_D("Handled event P KEY DOWN: " + std::to_string(static_cast<int>(Engine::P_KEY_DOWN)));
+			CLIENT_LOG_D("Handled event P KEY DOWN: {}", static_cast<int>(Engine::P_KEY_DOWN));
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(3);
 			Engine::EMU::GetInstance()->Scenes_Activate(testEntity);
-			CLIENT_TRACE_D("Done with P key down listener");
+			CLIENT_LOG_D("Done with P key down listener");
 		});
 
 	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::P_KEY_UP, [](Engine::IOEvent& e)
 		{
-			CLIENT_TRACE_D("Handled event P KEY UP: " + std::to_string(static_cast<int>(Engine::P_KEY_UP)));
+			CLIENT_LOG_D("Handled event P KEY UP: {}", static_cast<int>(Engine::P_KEY_UP));
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(3);
 			Engine::EMU::GetInstance()->Scenes_Deactivate(testEntity);
 		});
@@ -121,6 +121,14 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 		{
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
 			Engine::EMU::GetInstance()->Scenes_Activate(testEntity);
+		});
+
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::B_KEY_DOWN, [](Engine::IOEvent& e)
+		{
+			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::B_KEY_DOWN));
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
+			Engine::EMU::GetInstance()->Physics_SetDimensions(testEntity, Math2D::Point2D<float>(1.0f, 2.0f));
+			e.Handled = true;
 		});
 }
 

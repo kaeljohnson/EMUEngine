@@ -15,7 +15,7 @@ namespace Engine
 
 	PhysicsInterface::PhysicsInterface(ECS& refECS) : m_refECS(refECS)
 	{
-		ENGINE_INFO_D("Physics Interface created!");
+		ENGINE_INFO("Physics Interface created!");
 	}
 
 	void PhysicsInterface::CreateBody(Entity entity)
@@ -38,6 +38,24 @@ namespace Engine
 		PhysicsBody* ptrBody = GetBody(entity);
 		ptrBody->m_dimensions = dimensions;
 		ptrBody->m_halfDimensions = dimensions / 2.0f;
+
+		b2ShapeId shapeId = *ptrBody->m_shapeId;
+		b2BodyId bodyId = *ptrBody->m_bodyId;
+
+		b2DestroyShape(shapeId, true);
+
+		b2Polygon newBox = b2MakeBox(ptrBody->m_halfDimensions.X, ptrBody->m_halfDimensions.Y);
+
+		b2ShapeDef shapeDef = b2DefaultShapeDef();
+		shapeDef.density = 1.0f;
+		shapeDef.friction = 0.0f;
+		shapeDef.restitution = 0.0f;
+
+		shapeId = b2CreatePolygonShape(bodyId, &shapeDef, &newBox);
+
+		delete ptrBody->m_shapeId;
+
+		ptrBody->m_shapeId = new b2ShapeId(shapeId);
 	}
 
 	const Math2D::Point2D<float> PhysicsInterface::GetDimensions(Entity entity)
@@ -257,7 +275,7 @@ namespace Engine
 	{
 		if (refPhysicsBody.m_bodyId != nullptr)
 		{
-			ENGINE_INFO_D("Body already exists. Not adding to world.");
+			ENGINE_LOG_D("Body already exists. Not adding to world.");
 			return;
 		}
 
@@ -453,7 +471,7 @@ namespace Engine
 	{
 		if (m_ptrWorldId == nullptr)
 		{
-			ENGINE_INFO_D("World is already null. No need to destroy.");
+			ENGINE_LOG_D("World is already null. No need to destroy.");
 			return;
 		}
 
@@ -497,7 +515,7 @@ namespace Engine
 				}
 				else 
 				{
-					ENGINE_INFO_D("Physics body is null. Cannot remove from world.");
+					ENGINE_LOG_D("Physics body is null. Cannot remove from world.");
 					return;
 				}
 

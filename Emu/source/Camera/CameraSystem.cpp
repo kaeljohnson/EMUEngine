@@ -258,7 +258,7 @@ namespace Engine
 
 		if (activeCameras.size() == 0)
 		{
-			ENGINE_CRITICAL_D("No active cameras in the scene. Cannot frame camera.");
+			ENGINE_CRITICAL("No active cameras in the scene. Cannot frame camera.");
 			std::runtime_error("No active cameras in the scene. Cannot frame camera.");
 			return;
 		}

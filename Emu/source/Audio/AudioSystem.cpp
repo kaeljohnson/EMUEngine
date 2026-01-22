@@ -16,7 +16,10 @@ namespace Engine
 			return;
 		}
 
-		Mix_VolumeChunk(ptrSound, volume);
+		if (!Mix_VolumeChunk(ptrSound, volume))
+		{
+			ENGINE_CRITICAL("Failed to set volume for sound: {}", soundIndex);
+		}
 
 		if (Mix_PlayChannel(-1, ptrSound, (loop ? -1 : 0)) == -1)
 		{

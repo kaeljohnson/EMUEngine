@@ -38,7 +38,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager");
 		}
 	}
 
@@ -51,7 +51,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager");
 			return m_refECS.INVALID_ENTITY;
 		}
 	}
@@ -65,7 +65,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager");
 			static const std::vector<Entity> emptyVector;
 			return emptyVector;
 		}
@@ -112,7 +112,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager");
 		}
 
 	}
@@ -126,7 +126,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager");
 
 		}
 	}
@@ -140,7 +140,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager");
 
 		}
 	}
@@ -154,7 +154,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager");
 		}
 	}
 
@@ -167,7 +167,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager");
 		}
 	}
 
@@ -180,7 +180,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL_D("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager");
 		}
 	}
 }

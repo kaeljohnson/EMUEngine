@@ -219,14 +219,12 @@ namespace Engine
 		return m_tileMap.GetEntity(tileId);
 	}
 
-	// This function should only be called if the json should be guaranteed to exist.
 	// j must out live the pointer returned.
 	static const json* getJson(const json& j, const std::string& key)
 	{
 		auto it = j.find(key);
 		if (it == j.end())
 		{
-			ENGINE_CRITICAL_D("Field not found in rules file: {}. Returning nullptr.", key);
 			return nullptr;
 		}
 		return &(*it);
@@ -239,6 +237,7 @@ namespace Engine
 		std::ifstream inFile(m_rulesFileName);
 		if (!inFile.is_open())
 		{
+			ENGINE_ERROR("Failed to open rules file.");
 			throw std::runtime_error("Failed to open rules file: " + m_rulesFileName);
 		}
 
@@ -248,11 +247,12 @@ namespace Engine
 		}
 		catch (const json::parse_error& e)
 		{
+			ENGINE_ERROR("Failed to parse rules JSON: {}", e.what());
 			throw std::runtime_error("Failed to parse rules JSON: " + std::string(e.what()));
 		}
 
 		auto& sceneName = rulesJson.begin().key();
-		ENGINE_INFO_D("Loading scene entities for scene: {}", sceneName);
+		ENGINE_LOG_D("Loading audio files for scene: {}", sceneName);
 
 		const json* sceneRules = getJson(rulesJson, sceneName);
 
@@ -317,7 +317,7 @@ namespace Engine
 	{
 		if (!j.contains(key))
 		{
-			ENGINE_CRITICAL_D("Invalid Rules File. Field Not Found: {}.", key);
+			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
 			throw std::runtime_error("Invalid Rules File. Field Not Found: " + key);
 		}
 
@@ -569,8 +569,6 @@ namespace Engine
 				bool checkSimpleContactsStr = checkSimpleContactsJson->get<bool>();
 				if (checkSimpleContactsStr == true)
 				{
-					ENGINE_CRITICAL_D("CheckSimpleContacts enabled for tile entity: {}", tileEntity);
-
 					checkSimpleContacts = true;
 				}
 			}
@@ -720,7 +718,10 @@ namespace Engine
 			std::string spriteDir = spriteRules->value("PathToSpriteSheets", "");
 
 			if (spriteDir.empty() || !fs::exists(spriteDir) || !fs::is_directory(spriteDir))
+			{
+				ENGINE_ERROR("Invalid or missing sprite sheet directory: {}", spriteDir);
 				throw std::runtime_error("Invalid or missing sprite sheet directory: " + spriteDir);
+			}
 
 			if (spriteRules->contains("Textures"))
 			{
@@ -729,11 +730,15 @@ namespace Engine
 				{
 					std::string fullPath = spriteDir + textureFile.get<std::string>();
 					if (!fs::exists(fullPath))
+					{
+						ENGINE_ERROR("Missing texture file: {}", fullPath);
 						throw std::runtime_error("Missing texture file: " + fullPath);
+					}
 				}
 			}
 			else
 			{
+				ENGINE_ERROR("Missing 'Textures' section in 'Sprites'.");
 				throw std::runtime_error("Missing 'Textures' section in 'Sprites'.");
 			}
 		}
@@ -745,7 +750,10 @@ namespace Engine
 			std::string audioDir = audioRules->value("PathToAudioFiles", "");
 
 			if (audioDir.empty() || !fs::exists(audioDir) || !fs::is_directory(audioDir))
+			{
+				ENGINE_ERROR("Invalid or missing audio directory: {}", audioDir);
 				throw std::runtime_error("Invalid or missing audio directory: " + audioDir);
+			}
 
 			if (audioRules->contains("Sounds"))
 			{
@@ -754,11 +762,15 @@ namespace Engine
 				{
 					std::string fullPath = audioDir + soundFile;
 					if (!fs::exists(fullPath))
+					{
+						ENGINE_ERROR("Missing sound file: {}", fullPath);
 						throw std::runtime_error("Missing sound file: " + fullPath);
+					}
 				}
 			}
 			else
 			{
+				ENGINE_ERROR("Missing 'Sounds' section in 'Audio'.");
 				throw std::runtime_error("Missing 'Sounds' section in 'Audio'.");
 			}
 		}
@@ -782,6 +794,7 @@ namespace Engine
 			}
 			catch (const std::exception& e)
 			{
+				ENGINE_ERROR("Invalid tile ID key in character rules: {}. Error: {}", key, e.what());
 				throw std::runtime_error("Invalid tile ID key in character rules: " + key + ". Error: " + e.what());
 			}
 
@@ -827,10 +840,14 @@ namespace Engine
 	void Scene::loadSceneEntitiesFromTileMap()
 	{
 		const std::string& sceneName = rulesJson.begin().key();
-		ENGINE_INFO_D("Loading scene entities for scene: {}", sceneName);
+		ENGINE_LOG("Loading scene entities for scene: {}", sceneName);
 
 		const json* sceneRules = getJson(rulesJson, sceneName);
-		if (!sceneRules) throw std::runtime_error("No scene rules found for scene: " + sceneName);
+		if (!sceneRules)
+		{
+			ENGINE_ERROR("No scene rules found for scene: {}", sceneName);
+			throw std::runtime_error("No scene rules found for scene: " + sceneName);
+		}
 
 		// Load the physics rules.
 		size_t numUnitsPerTile = 1;
@@ -839,7 +856,11 @@ namespace Engine
 		{
 			numLayers = ExtractSizeTFromJSON(*worldRules, "NumLayers", 5);
 			const json* physicsRules = getJson(*worldRules, "Physics");
-			if (!physicsRules) throw std::runtime_error("No physics rules found for world in scene: " + sceneName);
+			if (!physicsRules)
+			{
+				ENGINE_ERROR("No physics rules found for world in scene: {}", sceneName);
+				throw std::runtime_error("No physics rules found for world in scene: " + sceneName);
+			}
 
 			SetGravity(ExtractPoint2DFromJSON<float>(*physicsRules, "Gravity", { 0.0f, 0.0f }));
 			numUnitsPerTile = ExtractSizeTFromJSON(*physicsRules, "NumUnitsPerTile", 1);
@@ -858,10 +879,18 @@ namespace Engine
 		}
 
 		const json* characterRules = getJson(*sceneRules, "CharacterRules");
-		if (!characterRules) throw std::runtime_error("No character rules found for scene: " + sceneName);
+		if (!characterRules)
+		{
+			ENGINE_ERROR("No character rules found for scene: {}", sceneName);
+			throw std::runtime_error("No character rules found for scene: " + sceneName);
+		}
 
 		const json* componentTemplates = getJson(*sceneRules, "ComponentTemplates");
-		if (!componentTemplates) throw std::runtime_error("No component templates found for scene: " + sceneName);
+		if (!componentTemplates)
+		{
+			ENGINE_ERROR("No component templates found for scene: {}", sceneName);
+			throw std::runtime_error("No component templates found for scene: " + sceneName);
+		}
 
 		std::unordered_set<size_t> isMap = determineMapTiles(*characterRules, *componentTemplates);
 		std::vector<Math2D::Edge> edges;
@@ -874,14 +903,13 @@ namespace Engine
 			Entity tileEntity = info.first;
 
 			std::string tileKey = std::to_string(tileId);
-			if (!characterRules->contains(tileKey))
+
+			const json* characterComponents = nullptr;
+			if (!(characterComponents = getJson(*characterRules, tileKey)))
 			{
-				ENGINE_INFO_D("No such tile exists: {}", tileKey);
+				ENGINE_INFO("Tile ID {} at ({}, {}) has no character rules defined. Skipping entity creation.", tileId, x, y);
 				continue;
 			}
-
-			const json* characterComponents = getJson(*characterRules, tileKey);
-			if (!characterComponents) continue; // If character does not exist in json, skip.
 
 			bool activeOnStart = characterComponents->value("ActiveOnStart", true);
 

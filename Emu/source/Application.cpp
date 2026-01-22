@@ -16,6 +16,8 @@ namespace Engine
 	{}
 	void Application::Start()
 	{
+		
+
 		Time::SetAppRunning(true);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -74,7 +76,7 @@ namespace Engine
 
 	void Application::End()
 	{
-		ENGINE_INFO_D("Application ending!");
+		ENGINE_LOG_D("Application ending!");
 
 		Time::SetAppRunning(false);
 	}
