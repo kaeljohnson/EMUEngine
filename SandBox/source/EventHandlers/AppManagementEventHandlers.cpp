@@ -127,7 +127,15 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 		{
 			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::B_KEY_DOWN));
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
-			Engine::EMU::GetInstance()->Physics_SetDimensions(testEntity, Math2D::Point2D<float>(1.0f, 2.0f));
+			Engine::EMU::GetInstance()->Physics_SetDimensions(testEntity, Math2D::Point2D<float>(0.5f, 1.7f));
+			e.Handled = true;
+		});
+
+	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::N_KEY_DOWN, [](Engine::IOEvent& e)
+		{
+			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::N_KEY_DOWN));
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
+			Engine::EMU::GetInstance()->Physics_SetDimensions(testEntity, Math2D::Point2D<float>(0.5f, 0.85));
 			e.Handled = true;
 		});
 }
