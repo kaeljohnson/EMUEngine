@@ -24,7 +24,7 @@ Currently, EMU is only supported on Windows.
 
 EMU is currently meant to be built as a static library. There are a few dependencies 
 that are recommended to be used as shared libraries, which are built by vcpkg as such. Therefore, it
-is necessary to either put those dll files somewhere visual studio can find them when running the exe.
+is necessary to put those dll files somewhere visual studio can find them when running the exe.
 
 The following steps are specifically for building EMU via the build_windows.bat script.
 
