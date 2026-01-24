@@ -58,6 +58,8 @@ namespace Engine
 		ENGINE_INFO("Display resolution: {}, {}", displayMode.w, displayMode.h);
 
 		SDL_SetWindowMinimumSize((SDL_Window*)m_ptrWindow, Screen::DISPLAY_RESOLUTION.X / 2, Screen::DISPLAY_RESOLUTION.Y / 2); // User should not be able to resize smaller than half the display resolution.
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+
 
 		// Create renderer
 		m_ptrRenderer = ISDL::CreateRenderer((SDLWindow*)m_ptrWindow, -1, SDL_RENDERER_ACCELERATED);
@@ -308,35 +310,39 @@ namespace Engine
 		int windowWidthInPixels, windowHeightInPixels;
 		SDL_GetRendererOutputSize((SDLRenderer*)m_ptrRenderer, &windowWidthInPixels, &windowHeightInPixels);
 
-		ENGINE_INFO_D("Window size in pixels: {}, {}", windowWidthInPixels, windowHeightInPixels);
+		constexpr int VIRTUAL_HEIGHT = 720; // Fixed virtual height in units for consistent rendering.
 
-		float aspectRatio = (float)windowWidthInPixels / (float)windowHeightInPixels;   
+		// 1. Integer scale from height ONLY
+		int scale = windowHeightInPixels / VIRTUAL_HEIGHT;
+		if (scale < 1)
+			scale = 1;
 
-		ENGINE_INFO_D("Aspect Ratio: {}", aspectRatio);
+		Screen::SCALE_CONSTANT = (float)scale;
+		Screen::SCALE = { (float)scale, (float)scale };
 
-		Screen::VIRTUAL_SIZE.Y = 720; // Fixed virtual height in units for consistent rendering.
+		// 2. Virtual width expands to fill window (integer-safe)
+		const int virtualWidth = windowWidthInPixels / scale;
+		const int virtualHeight = VIRTUAL_HEIGHT;
 
-		Screen::VIRTUAL_SIZE.X = (int)(Screen::VIRTUAL_SIZE.Y * aspectRatio); // Need the virtual width to be based on the fixed units of height. Otherwise will get weird stretching.
+		Screen::VIRTUAL_SIZE = { virtualWidth, virtualHeight };
 
-		const float scaleX = static_cast<float>(windowWidthInPixels) / Screen::VIRTUAL_SIZE.X;
-		const float scaleY = static_cast<float>(windowHeightInPixels) / Screen::VIRTUAL_SIZE.Y;
+		// 3. Viewport derived from integer math only
+		const int viewportWidth = virtualWidth * scale;
+		const int viewportHeight = virtualHeight * scale;
 
-		ENGINE_INFO_D("Scale X: {}, Scale Y: {}", scaleX, scaleY);
+		const int viewportX = (windowWidthInPixels - viewportWidth) / 2;
+		const int viewportY = (windowHeightInPixels - viewportHeight) / 2;
 
-		Screen::SCALE = Math2D::Point2D<float>(scaleX, scaleY);
+		Screen::VIEWPORT_POSITION = { viewportX, viewportY };
+		Screen::VIEWPORT_SIZE = { viewportWidth, viewportHeight };
 
-		Screen::SCALE_CONSTANT = scaleY; // Use height as fixed scale factor since most monitors are wider than they are tall. This also allows for variable display width with no distortion.
+		SDL_Rect viewport = { viewportX, viewportY, viewportWidth, viewportHeight };
+		SDL_RenderSetViewport((SDLRenderer*)m_ptrRenderer, &viewport);
 
-		const int viewportWidth = static_cast<int>(Screen::VIRTUAL_SIZE.X * Screen::SCALE_CONSTANT);
-		const int viewportHeight = static_cast<int>(Screen::VIRTUAL_SIZE.Y * Screen::SCALE_CONSTANT);
-
-		Screen::VIEWPORT_SIZE = Math2D::Point2D<int>(viewportWidth, viewportHeight);
-
-		Screen::VIEWPORT_POSITION.X = (windowWidthInPixels - Screen::VIEWPORT_SIZE.X) / 2;
-		Screen::VIEWPORT_POSITION.Y = (windowHeightInPixels - Screen::VIEWPORT_SIZE.Y) / 2;
-
-		SDLRect viewport = { Screen::VIEWPORT_POSITION.X, Screen::VIEWPORT_POSITION.Y, Screen::VIEWPORT_SIZE.X, Screen::VIEWPORT_SIZE.Y };
-		ISDL::RenderSetViewport((SDLRenderer*)m_ptrRenderer, &viewport);
+		ENGINE_INFO_D(
+			"Virtual: {}x{} | Scale: {} | Viewport: {}x{}",
+			virtualWidth, virtualHeight, scale, viewportWidth, viewportHeight
+		);
 	}
 
 	void IRenderer::ToggleFullscreen()
