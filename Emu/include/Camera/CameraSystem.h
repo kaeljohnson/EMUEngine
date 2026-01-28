@@ -17,7 +17,7 @@ namespace Engine
 		~CameraSystem() = default;
 
 		/**
-		* @brief Frame the camera to an area defined by mapBounds.
+		* @brief Frame the camera to be centered on its entity and set its bounds to the map bounds.
 		* 
 		* @param mapBounds The bounds of the map to frame the camera within.
 		*/

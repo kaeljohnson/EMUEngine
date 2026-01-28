@@ -17,8 +17,8 @@ namespace Engine
 		ptrCamera->m_pixelsPerUnit = pixelsPerUnit;
 
 		ptrCamera->m_size
-			= Math2D::Point2D<float>(Screen::VIEWPORT_SIZE.X * ptrCamera->m_screenRatio.X / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.X),
-				Screen::VIEWPORT_SIZE.Y * ptrCamera->m_screenRatio.Y / (ptrCamera->m_pixelsPerUnit * Screen::SCALE.Y));
+			= Math2D::Point2D<float>(Screen::WINDOW_SIZE.X * ptrCamera->m_screenRatio.X / (ptrCamera->m_pixelsPerUnit * Screen::SCALE),
+				Screen::WINDOW_SIZE.Y * ptrCamera->m_screenRatio.Y / (ptrCamera->m_pixelsPerUnit * Screen::SCALE));
 	}
 
 	const size_t CameraInterface::GetPixelsPerUnit(Entity entity)

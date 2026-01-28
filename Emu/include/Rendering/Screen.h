@@ -9,6 +9,12 @@ namespace Engine
 	* 
 	* @brief Interface for client to set window size and fullscreen along with other misc screen properties
 	* 
+	* @note There is various terminology referring to similar concepts in this class. 
+	* When screen is used, it is referring generally to the window or display as a whole.
+	* the window is what the user sees on their monitor, whether in fullscreen or windowed mode.
+	* It is the canvas onto which things are drawn.
+	* Viewport refers to a subsection of the screen that has its own rendering context.
+	* 
 	* @todo Should this class be un-staticified and given a pointer to the window?
 	*/
 	struct Screen
@@ -25,42 +31,28 @@ namespace Engine
 		* 
 		* @return Various virtual screen properties
 		*/
-		inline static const Math2D::Point2D<int> GetVirtualSize() { return VIRTUAL_SIZE; }
+		inline int GetVirtualSize() { return VIRTUAL_HEIGHT; }
 
 		/**
 		* @brief Get scale properties
 		* 
-		* @return Various scale properties
+		* @return scale
 		*/
-		inline static const Math2D::Point2D<float> GetScale() { return SCALE; }
+		inline static const int GetScale() { return SCALE; }
 
 		/**
-		* @brief Get scale constant
+		* @brief Get window properties	
 		* 
-		* @return Scale constant
+		* @return Window size.
 		*/
-		inline static const float GetScaleConstant() { return SCALE_CONSTANT; }
+		inline static const Math2D::Point2D<int> GetWindowSize() { return WINDOW_SIZE; }
 
 		/**
-		* @brief Get viewport properties	
-		* 
-		* @return Various viewport properties
-		*/
-		inline static const Math2D::Point2D<int> GetViewportSize() { return VIEWPORT_SIZE; }
-
-		/**
-		* @brief Get viewport position
-		* 
-		* @return Viewport position
-		*/
-		inline static const Math2D::Point2D<int> GetViewportPosition() { return VIEWPORT_POSITION; }
-
-		/**
-		* @brief Set various screen properties
+		* @brief Set window size
 		*
 		* @param size New window size
 		*/
-		inline static void SetWindowSize(const Math2D::Point2D<int>& size) { VIEWPORT_SIZE = size; WINDOW_RESIZE_REQUEST = true; }
+		inline static void SetWindowSize(const Math2D::Point2D<int>& size) { WINDOW_SIZE = size; WINDOW_RESIZE_REQUEST = true; }
 
 		/**
 		* @brief Set fullscreen mode
@@ -72,16 +64,30 @@ namespace Engine
 		static bool WINDOW_RESIZE_REQUEST;				/// Request to resize the window
 		static bool TOGGLE_FULLSCREEN_REQUEST;			/// Request to toggle fullscreen mode
 
-		static Math2D::Point2D<int> DISPLAY_RESOLUTION; /// The current display resolution
-		static Math2D::Point2D<int> VIRTUAL_SIZE;		/// The virtual resolution the game is rendered at
-		static Math2D::Point2D<float> SCALE;			/// The scale between the display resolution and virtual resolution
-		static float SCALE_CONSTANT;					/// The scale constant used for scaling objects
+		/**
+		* @brief Display resolution is the current resolution of the window or fullscreen display.
+		*/
+		static Math2D::Point2D<int> DISPLAY_RESOLUTION;
 
-		static Math2D::Point2D<int> VIEWPORT_SIZE;		/// The size of the viewport within the window
-		static Math2D::Point2D<int> VIEWPORT_POSITION;	/// The position of the viewport within the window
+		/**
+		* @brief Virtual height is the resolution the simulation is based on before being scaled to the display resolution.
+		* The current implementation maintains a fixed height of 720 "virtual pixels" and adjusts the width based on the display aspect ratio.
+		*/
+		static int VIRTUAL_HEIGHT;
+
+		/**
+		* @brief Scale is the factor between the virtual resolution and the display resolution. Scale is
+		* set based on the height of the display resolution to maintain consistent vertical scaling.
+		*/
+		static int SCALE;
+
+		/**
+		* @brief Window size is the pixel size of the window on the screen.
+		*/
+		static Math2D::Point2D<int> WINDOW_SIZE;
 
 		friend class IRenderer;							/// Renderer needs access to the private members to handle window resizing and fullscreen toggling
-		friend class CameraInterface;					/// Camera interface needs access to viewport properties
-		friend class CameraSystem;						/// Camera system needs access to viewport properties
+		friend class CameraInterface;					/// Camera interface needs access to screen properties
+		friend class CameraSystem;						/// Camera system needs access to screen properties
 	};
 }

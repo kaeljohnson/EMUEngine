@@ -98,12 +98,12 @@ int main(int argc, char* args[])
 
 	engine->Scenes_RegisterOnPlayEvent("Level1", []()
 		{
-			Engine::EMU::GetInstance()->PlaySound(1, 128, true);
+			// Engine::EMU::GetInstance()->PlaySound(1, 128, true);
 		});
 
 	engine->Scenes_RegisterOnPlayEvent("Level2", []()
 		{
-			Engine::EMU::GetInstance()->PlaySound(1, 128, true);
+			// Engine::EMU::GetInstance()->PlaySound(1, 128, true);
 		});
 	
 	AppManagementEventHandlers appManagementEventHandlers;

@@ -142,7 +142,7 @@
                         "Width": 0.5,
                         "Height": 1.0
                     },
-                    "PixelsPerUnit": 8,
+                    "PixelsPerUnit": 32,
                     "ClampingOn": true,
                     "enabled": false
                 }

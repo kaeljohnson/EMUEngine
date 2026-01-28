@@ -51,7 +51,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 		{
 			Engine::Entity entity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
 			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::H_KEY_DOWN));
-			Engine::EMU::GetInstance()->Camera_SetPixelsPerUnit(entity, 16);
+			Engine::EMU::GetInstance()->Camera_SetPixelsPerUnit(entity, 32);
 			e.Handled = true;
 		});
 	

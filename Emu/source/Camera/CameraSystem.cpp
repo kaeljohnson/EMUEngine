@@ -24,7 +24,7 @@ namespace Engine
 	}
 
 	static void prepareForRendering(Camera& refCamera, AssetManager& refAssetManager, ECS& refECS,
-		const Math2D::Point2D<int> viewportSizeInPixels, const Math2D::Point2D<float> scale)
+		const Math2D::Point2D<int> windowSizeInPixels, const float scale)
 	{
 		// auto start = std::chrono::high_resolution_clock::now();
 
@@ -33,20 +33,20 @@ namespace Engine
 		auto& debugLineBuckets = refCamera.m_debugLinesRenderBucket;
 		auto& pointBuckets = refCamera.m_debugPointsRenderBucket;
 
-		const float scaleX = refCamera.m_pixelsPerUnit * scale.X;
-		const float scaleY = refCamera.m_pixelsPerUnit * scale.Y;
+		const float scaleX = refCamera.m_pixelsPerUnit * scale;
+		const float scaleY = refCamera.m_pixelsPerUnit * scale;
 
 		// Camera setup
-		const Math2D::Point2D<float> viewportSizeInTiles(
-			viewportSizeInPixels.X / (refCamera.m_pixelsPerUnit * scale.X),
-			viewportSizeInPixels.Y / (refCamera.m_pixelsPerUnit * scale.Y)
+		const Math2D::Point2D<float> windowSizeInTiles(
+			windowSizeInPixels.X / (refCamera.m_pixelsPerUnit * scale),
+			windowSizeInPixels.Y / (refCamera.m_pixelsPerUnit * scale)
 		);
 
 		// Calculate "adjusted offset". This is the offset that takes
 		// into account the position of the camera on the screen.
 		const Math2D::Point2D<float> cameraAdjustedOffset(
-			refCamera.m_offset.X - refCamera.m_positionInFractionOfScreenSize.X * viewportSizeInTiles.X,
-			refCamera.m_offset.Y - refCamera.m_positionInFractionOfScreenSize.Y * viewportSizeInTiles.Y
+			refCamera.m_offset.X - refCamera.m_positionInFractionOfScreenSize.X * windowSizeInTiles.X,
+			refCamera.m_offset.Y - refCamera.m_positionInFractionOfScreenSize.Y * windowSizeInTiles.Y
 		);
 
 		// Bounds of what to render in world space. For each camera, 
@@ -55,17 +55,17 @@ namespace Engine
 		// coordinates. Same for height.
 		const float leftRenderBound = refCamera.m_offset.X;
 		const float topRenderBound = refCamera.m_offset.Y;
-		const float rightRenderBound = leftRenderBound + refCamera.m_screenRatio.X * viewportSizeInTiles.X;
-		const float bottomRenderBound = topRenderBound + refCamera.m_screenRatio.Y * viewportSizeInTiles.Y;
+		const float rightRenderBound = leftRenderBound + refCamera.m_screenRatio.X * windowSizeInTiles.X;
+		const float bottomRenderBound = topRenderBound + refCamera.m_screenRatio.Y * windowSizeInTiles.Y;
 
 		const float renderAreaWidth = rightRenderBound - leftRenderBound;
 		const float renderAreaHeight = bottomRenderBound - topRenderBound;
 
 		// Set the render zone.
-		refCamera.m_clipRectPosition.X = static_cast<int>(refCamera.m_positionInFractionOfScreenSize.X * viewportSizeInPixels.X);
-		refCamera.m_clipRectPosition.Y = static_cast<int>(refCamera.m_positionInFractionOfScreenSize.Y * viewportSizeInPixels.Y);
-		refCamera.m_clipRectSize.X = static_cast<int>(renderAreaWidth * refCamera.m_pixelsPerUnit * scale.X);
-		refCamera.m_clipRectSize.Y = static_cast<int>(renderAreaHeight * refCamera.m_pixelsPerUnit * scale.Y);
+		refCamera.m_clipRectPosition.X = static_cast<int>(refCamera.m_positionInFractionOfScreenSize.X * windowSizeInPixels.X);
+		refCamera.m_clipRectPosition.Y = static_cast<int>(refCamera.m_positionInFractionOfScreenSize.Y * windowSizeInPixels.Y);
+		refCamera.m_clipRectSize.X = static_cast<int>(renderAreaWidth * refCamera.m_pixelsPerUnit * scale);
+		refCamera.m_clipRectSize.Y = static_cast<int>(renderAreaHeight * refCamera.m_pixelsPerUnit * scale);
 
 		auto& transformManager = refECS.GetHotComponents<Transform>();
 		for (Transform& refTransform : transformManager)
@@ -77,7 +77,6 @@ namespace Engine
 			const float lerpedX = Math2D::Lerp(refTransform.m_prevPosition.X, refTransform.m_position.X, interpolation);
 			const float lerpedY = Math2D::Lerp(refTransform.m_prevPosition.Y, refTransform.m_position.Y, interpolation);
 
-			// Separate this into the animation processing system.
 			if (Sprite* ptrSpriteComponent = refECS.GetComponent<Sprite>(refTransform.m_entity))
 			{
 				// 1. Culling
@@ -105,7 +104,7 @@ namespace Engine
 
 				// Sprite sheet coordinates
 				const int locationInPixelsOnSpriteSheetX = ptrSpriteComponent->m_locationInPixelsOnSpriteSheet.X;
-				const int locationInPixelsOnSpriteSheetY = ptrSpriteComponent->m_locationInPixelsOnSpriteSheet.Y; 
+				const int locationInPixelsOnSpriteSheetY = ptrSpriteComponent->m_locationInPixelsOnSpriteSheet.Y;
 				const int sizeInPixelsOnSpriteSheetX = static_cast<int>(ptrSpriteComponent->m_pixelsPerFrame.X);
 				const int sizeInPixelsOnSpriteSheetY = static_cast<int>(ptrSpriteComponent->m_pixelsPerFrame.Y);
 
@@ -245,7 +244,7 @@ namespace Engine
             if (camera.m_clampingOn) clamp(camera);
 
 			// Prepare this camera for rendering
-			prepareForRendering(camera, refAssetManager, m_refECS, Screen::VIEWPORT_SIZE, Screen::SCALE);
+			prepareForRendering(camera, refAssetManager, m_refECS, Screen::WINDOW_SIZE, Screen::SCALE);
         }
 		// auto end = std::chrono::high_resolution_clock::now();
 		//std::chrono::duration<double, std::milli> elapsed = end - start;
@@ -267,8 +266,8 @@ namespace Engine
 		{
 			refCamera.m_bounds = mapBounds;
 			refCamera.m_size
-				= Math2D::Point2D<float>((Screen::VIEWPORT_SIZE.X * refCamera.m_screenRatio.X) / (refCamera.m_pixelsPerUnit * Screen::SCALE.X),
-					(Screen::VIEWPORT_SIZE.Y * refCamera.m_screenRatio.Y) / (refCamera.m_pixelsPerUnit * Screen::SCALE.Y));
+				= Math2D::Point2D<float>((Screen::WINDOW_SIZE.X * refCamera.m_screenRatio.X) / (refCamera.m_pixelsPerUnit * Screen::SCALE),
+					(Screen::WINDOW_SIZE.Y * refCamera.m_screenRatio.Y) / (refCamera.m_pixelsPerUnit * Screen::SCALE));
 
 			// If the entity with the camera has a transform component, center the camera on the transform position
 			if (m_refECS.HasComponent<Transform>(refCamera.m_entity))

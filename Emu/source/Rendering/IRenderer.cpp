@@ -13,14 +13,12 @@
 
 namespace Engine
 {
-	bool Screen::WINDOW_RESIZE_REQUEST = false;
-	bool Screen::TOGGLE_FULLSCREEN_REQUEST = false;
-	Math2D::Point2D<int> Screen::VIEWPORT_SIZE = Math2D::Point2D<int>(0, 0);
-	Math2D::Point2D<int> Screen::VIEWPORT_POSITION = Math2D::Point2D<int>(0, 0);
-	Math2D::Point2D<float> Screen::SCALE = Math2D::Point2D<float>(0.0f, 0.0f);
-	float Screen::SCALE_CONSTANT = 0.0f;
-	Math2D::Point2D<int> Screen::DISPLAY_RESOLUTION = Math2D::Point2D<int>(0, 0);
-	Math2D::Point2D<int> Screen::VIRTUAL_SIZE = Math2D::Point2D<int>(0, 0);
+	bool Screen::WINDOW_RESIZE_REQUEST =				false;
+	bool Screen::TOGGLE_FULLSCREEN_REQUEST =			false;
+	Math2D::Point2D<int> Screen::WINDOW_SIZE =			Math2D::Point2D<int>(0, 0);
+	int Screen::SCALE =									0.0f;
+	Math2D::Point2D<int> Screen::DISPLAY_RESOLUTION =	Math2D::Point2D<int>(0, 0);
+	int Screen::VIRTUAL_HEIGHT =						720.0f;
 
 	IRenderer::IRenderer(ECS& refECS, AssetManager& refAssetManager) 
 		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS), m_refAssetManager(refAssetManager), m_lastDebugColor(DebugColor::Black)
@@ -70,7 +68,7 @@ namespace Engine
 
 		ISDL::SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
 
-		setViewport();
+		setWindowScale();
 
 		// Renderer only supports one window.
 		m_rendererCreated = true;
@@ -85,14 +83,14 @@ namespace Engine
 	{
 		if (Screen::WINDOW_RESIZE_REQUEST)
 		{
-			setViewport();
+			setWindowScale();
 			Screen::WINDOW_RESIZE_REQUEST = false;
 		}
 
 		if (Screen::TOGGLE_FULLSCREEN_REQUEST)
 		{
 			ToggleFullscreen();
-			setViewport();
+			setWindowScale();
 			Screen::TOGGLE_FULLSCREEN_REQUEST = false;
 		}
 	}
@@ -305,43 +303,31 @@ namespace Engine
 		ISDL::RenderClear((SDLRenderer*)m_ptrRenderer);
 	}
 
-	void IRenderer::setViewport()
+	const Math2D::Point2D<int> IRenderer::GetWindowPosition()
 	{
+		int windowPosInPixelsX, windowPosInPixelsY;
+		SDL_GetWindowPosition((SDLWindow*)m_ptrWindow, &windowPosInPixelsX, &windowPosInPixelsY);
+
+		return Math2D::Point2D<int>(static_cast<float>(windowPosInPixelsX), static_cast<float>(windowPosInPixelsY));
+	}
+
+	void IRenderer::setWindowScale()
+	{ 
 		int windowWidthInPixels, windowHeightInPixels;
 		SDL_GetRendererOutputSize((SDLRenderer*)m_ptrRenderer, &windowWidthInPixels, &windowHeightInPixels);
 
-		constexpr int VIRTUAL_HEIGHT = 720; // Fixed virtual height in units for consistent rendering.
+		int scale = windowHeightInPixels / Screen::VIRTUAL_HEIGHT; // Scale based on height to maintain aspect ratio.
+		
+		if (scale < 1) scale = 1;
 
-		// 1. Integer scale from height ONLY
-		int scale = windowHeightInPixels / VIRTUAL_HEIGHT;
-		if (scale < 1)
-			scale = 1;
+		Screen::SCALE = scale;
 
-		Screen::SCALE_CONSTANT = (float)scale;
-		Screen::SCALE = { (float)scale, (float)scale };
+		Screen::WINDOW_SIZE = { windowWidthInPixels, windowHeightInPixels };
 
-		// 2. Virtual width expands to fill window (integer-safe)
-		const int virtualWidth = windowWidthInPixels / scale;
-		const int virtualHeight = VIRTUAL_HEIGHT;
-
-		Screen::VIRTUAL_SIZE = { virtualWidth, virtualHeight };
-
-		// 3. Viewport derived from integer math only
-		const int viewportWidth = virtualWidth * scale;
-		const int viewportHeight = virtualHeight * scale;
-
-		const int viewportX = (windowWidthInPixels - viewportWidth) / 2;
-		const int viewportY = (windowHeightInPixels - viewportHeight) / 2;
-
-		Screen::VIEWPORT_POSITION = { viewportX, viewportY };
-		Screen::VIEWPORT_SIZE = { viewportWidth, viewportHeight };
-
-		SDL_Rect viewport = { viewportX, viewportY, viewportWidth, viewportHeight };
-		SDL_RenderSetViewport((SDLRenderer*)m_ptrRenderer, &viewport);
-
-		ENGINE_INFO_D(
-			"Virtual: {}x{} | Scale: {} | Viewport: {}x{}",
-			virtualWidth, virtualHeight, scale, viewportWidth, viewportHeight
+		ENGINE_INFO_D( 
+			"Scale: {} | Window: {}x{} | Window size: {}x{}",
+			scale, windowWidthInPixels, windowHeightInPixels, 
+			Screen::WINDOW_SIZE.X, Screen::WINDOW_SIZE.Y
 		);
 	}
 

@@ -162,11 +162,9 @@ namespace Engine
 
 	// Screen interface
 	const Math2D::Point2D<int> EMU::GetScreenSize() { return Screen::GetScreenSize(); }
-	const Math2D::Point2D<int> EMU::GetVirtualSize() { return Screen::GetVirtualSize(); }
-	const Math2D::Point2D<float> EMU::GetScale() { return Screen::GetScale(); }
-	const float EMU::GetScaleConstant() { return Screen::GetScaleConstant(); }
-	const Math2D::Point2D<int> EMU::GetViewportSize() { return Screen::GetViewportSize(); }
-	const Math2D::Point2D<int> EMU::GetViewportPosition() { return Screen::GetViewportPosition(); }
+	// const Math2D::Point2D<int> EMU::GetVirtualSize() { return Screen::GetVirtualSize(); }
+	const int EMU::GetScale() { return Screen::GetScale(); }
+	const Math2D::Point2D<int> EMU::GetWindowSize() { return Screen::GetWindowSize(); }
 	void EMU::SetWindowSize(const Math2D::Point2D<int>& size) { Screen::SetWindowSize(size); }
 	void EMU::SetFullscreen() { Screen::SetFullscreen(); }
 }

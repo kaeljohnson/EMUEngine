@@ -632,7 +632,7 @@ namespace Engine
 		 *
 		 * @return The virtual screen resolution.
 		 */
-		const Math2D::Point2D<int> GetVirtualSize();
+		// const Math2D::Point2D<int> GetVirtualSize();
 
 		/**
 		 * @brief Gets the screen scale factors.
@@ -642,28 +642,14 @@ namespace Engine
 		 *
 		 * @return The screen scale factors.
 		 */
-		const Math2D::Point2D<float> GetScale();
+		const int GetScale();
 
 		/**
-		 * @brief Gets the uniform scale constant applied to rendering.
+		 * @brief Gets the current window size.
 		 *
-		 * @return The scale constant.
+		 * @return The size of the window in pixels.
 		 */
-		const float GetScaleConstant();
-
-		/**
-		 * @brief Gets the current viewport size.
-		 *
-		 * @return The size of the viewport in pixels.
-		 */
-		const Math2D::Point2D<int> GetViewportSize();
-
-		/**
-		 * @brief Gets the current viewport position.
-		 *
-		 * @return The position of the viewport in pixels.
-		 */
-		const Math2D::Point2D<int> GetViewportPosition();
+		const Math2D::Point2D<int> GetWindowSize();
 
 		/**
 		 * @brief Sets the window size to the specified dimensions.

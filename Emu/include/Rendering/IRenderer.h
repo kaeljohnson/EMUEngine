@@ -45,6 +45,13 @@ namespace Engine
 		* @brief Render the current scene.
 		*/
 		void Render();
+
+		/**
+		* @brief Get the position of the window.
+		* 
+		* @return The position of the window as a Point2D<float>.
+		*/
+		const Math2D::Point2D<int> GetWindowPosition();
 		
 	private:
 
@@ -86,7 +93,7 @@ namespace Engine
 		/**
 		* @brief Set the viewport dimensions based on the current window size
 		*/
-		void setViewport();
+		void setWindowScale();
 
 		/**
 		* @brief Clear the screen before rendering.

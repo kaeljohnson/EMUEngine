@@ -82,7 +82,7 @@ namespace Engine
             }
 
             // Store tiles
-            for (int x = 0; x < static_cast<int>(tokens.size()); x++)
+             for (int x = 0; x < static_cast<int>(tokens.size()); x++)
             {
                 int tileValue = tokens[x];
                 if (tileValue == -1)

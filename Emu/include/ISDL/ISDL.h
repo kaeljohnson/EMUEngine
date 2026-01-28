@@ -88,7 +88,7 @@ namespace Engine
         }
 
         /**
-		* @brief Sets the viewport for the specified SDL renderer.
+		* @brief Sets the window for the specified SDL renderer.
         * 
 		* * @param renderer: The SDL renderer.
 		* * @param viewport: The rectangle defining the viewport.
