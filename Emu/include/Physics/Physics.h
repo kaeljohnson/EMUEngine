@@ -308,7 +308,7 @@ namespace Engine
 		* 
 		* @param entities Vector of entities.
 		*/
-		void AddPhysicsBodiesToWorld(std::unordered_set<Entity>& entities);
+		void AddPhysicsBodiesToWorld(std::unordered_map<Entity, bool>& entities);
 
 		/**
 		* @brief Add a single physics body to the world.

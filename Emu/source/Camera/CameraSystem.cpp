@@ -42,30 +42,17 @@ namespace Engine
 			windowSizeInPixels.Y / (refCamera.m_pixelsPerUnit * scale)
 		);
 
-		// Calculate "adjusted offset". This is the offset that takes
-		// into account the position of the camera on the screen.
-		const Math2D::Point2D<float> cameraAdjustedOffset(
-			refCamera.m_offset.X - refCamera.m_positionInFractionOfScreenSize.X * windowSizeInTiles.X,
-			refCamera.m_offset.Y - refCamera.m_positionInFractionOfScreenSize.Y * windowSizeInTiles.Y
-		);
-
 		// Bounds of what to render in world space. For each camera, 
 		// user sees the left side of the camera's world coordinates
 		// offset all the way to the width of the camera in world 
 		// coordinates. Same for height.
 		const float leftRenderBound = refCamera.m_offset.X;
 		const float topRenderBound = refCamera.m_offset.Y;
-		const float rightRenderBound = leftRenderBound + refCamera.m_screenRatio.X * windowSizeInTiles.X;
-		const float bottomRenderBound = topRenderBound + refCamera.m_screenRatio.Y * windowSizeInTiles.Y;
+		const float rightRenderBound = leftRenderBound + refCamera.m_viewportSizeInPercentageOfScreen.X * windowSizeInTiles.X;
+		const float bottomRenderBound = topRenderBound + refCamera.m_viewportSizeInPercentageOfScreen.Y * windowSizeInTiles.Y;
 
 		const float renderAreaWidth = rightRenderBound - leftRenderBound;
 		const float renderAreaHeight = bottomRenderBound - topRenderBound;
-
-		// Set the render zone.
-		refCamera.m_clipRectPosition.X = static_cast<int>(refCamera.m_positionInFractionOfScreenSize.X * windowSizeInPixels.X);
-		refCamera.m_clipRectPosition.Y = static_cast<int>(refCamera.m_positionInFractionOfScreenSize.Y * windowSizeInPixels.Y);
-		refCamera.m_clipRectSize.X = static_cast<int>(renderAreaWidth * refCamera.m_pixelsPerUnit * scale);
-		refCamera.m_clipRectSize.Y = static_cast<int>(renderAreaHeight * refCamera.m_pixelsPerUnit * scale);
 
 		auto& transformManager = refECS.GetHotComponents<Transform>();
 		for (Transform& refTransform : transformManager)
@@ -110,9 +97,9 @@ namespace Engine
 
 				// Screen-space coordinates
 				const int locationInPixelsOnScreenX =
-					int((lerpedX - cameraAdjustedOffset.X + offsetFromTransformX) * scaleX);
+					int((lerpedX - refCamera.m_offset.X + offsetFromTransformX) * scaleX);
 				const int locationInPixelsOnScreenY =
-					int((lerpedY - cameraAdjustedOffset.Y + offsetFromTransformY) * scaleY);
+					int((lerpedY - refCamera.m_offset.Y + offsetFromTransformY) * scaleY);
 
 				renderBuckets[refTransform.m_zIndex].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are within 1-10
 					refTransform.m_entity,
@@ -129,8 +116,8 @@ namespace Engine
 					pointBuckets[refTransform.m_zIndex].emplace_back(
 						refTransform.m_entity,
 						Math2D::Point2D<int>(
-							int((lerpedX - cameraAdjustedOffset.X) * scaleX),
-							int((lerpedY - cameraAdjustedOffset.Y) * scaleY)
+							int((lerpedX - refCamera.m_offset.X) * scaleX),
+							int((lerpedY - refCamera.m_offset.Y) * scaleY)
 						),
 						refTransform.m_debugColor
 					);
@@ -174,8 +161,8 @@ namespace Engine
 					refTransform.m_entity,
 					ptrPhysicsBody->m_fillRect,
 					Math2D::Point2D<int>(
-						int((lerpedX - cameraAdjustedOffset.X) * scaleX),
-						int((lerpedY - cameraAdjustedOffset.Y) * scaleY)
+						int((lerpedX - refCamera.m_offset.X) * scaleX),
+						int((lerpedY - refCamera.m_offset.Y) * scaleY)
 					),
 					Math2D::Point2D<int>(
 						int((ptrPhysicsBody->m_dimensions.X * scaleX)), // Need transform m_dimensions, not animation m_dimensions
@@ -191,11 +178,11 @@ namespace Engine
 		auto submitEdgeForRendering = [&](auto& refEdge)
 			{
 				// Transform to screen space
-				const int edgePointAInPixelsX = static_cast<int>((refEdge.m_startPoint.X - cameraAdjustedOffset.X) * scaleX);
-				const int edgePointAInPixelsY = static_cast<int>((refEdge.m_startPoint.Y - cameraAdjustedOffset.Y) * scaleY);
+				const int edgePointAInPixelsX = static_cast<int>((refEdge.m_startPoint.X - refCamera.m_offset.X) * scaleX);
+				const int edgePointAInPixelsY = static_cast<int>((refEdge.m_startPoint.Y - refCamera.m_offset.Y) * scaleY);
 				const Math2D::Point2D<int> edgePointAInPixels(edgePointAInPixelsX, edgePointAInPixelsY);
-				const int edgePointBInPixelsX = static_cast<int>((refEdge.m_endPoint.X - cameraAdjustedOffset.X) * scaleX);
-				const int edgePointBInPixelsY = static_cast<int>((refEdge.m_endPoint.Y - cameraAdjustedOffset.Y) * scaleY);
+				const int edgePointBInPixelsX = static_cast<int>((refEdge.m_endPoint.X - refCamera.m_offset.X) * scaleX);
+				const int edgePointBInPixelsY = static_cast<int>((refEdge.m_endPoint.Y - refCamera.m_offset.Y) * scaleY);
 				const Math2D::Point2D<int> edgePointBInPixels(edgePointBInPixelsX, edgePointBInPixelsY);
 
 				debugLineBuckets[0].emplace_back(
@@ -266,8 +253,8 @@ namespace Engine
 		{
 			refCamera.m_bounds = mapBounds;
 			refCamera.m_size
-				= Math2D::Point2D<float>((Screen::WINDOW_SIZE.X * refCamera.m_screenRatio.X) / (refCamera.m_pixelsPerUnit * Screen::SCALE),
-					(Screen::WINDOW_SIZE.Y * refCamera.m_screenRatio.Y) / (refCamera.m_pixelsPerUnit * Screen::SCALE));
+				= Math2D::Point2D<float>((Screen::WINDOW_SIZE.X * refCamera.m_viewportSizeInPercentageOfScreen.X) / (refCamera.m_pixelsPerUnit * Screen::SCALE),
+					(Screen::WINDOW_SIZE.Y * refCamera.m_viewportSizeInPercentageOfScreen.Y) / (refCamera.m_pixelsPerUnit * Screen::SCALE));
 
 			// If the entity with the camera has a transform component, center the camera on the transform position
 			if (m_refECS.HasComponent<Transform>(refCamera.m_entity))

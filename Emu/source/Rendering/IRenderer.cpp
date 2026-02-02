@@ -95,6 +95,20 @@ namespace Engine
 		}
 	}
 
+	SDL_Rect ToSDLViewport(
+		const Math2D::Point2D<float>& pos,
+		const Math2D::Point2D<float>& size,
+		int windowW,
+		int windowH
+	) {
+		return SDL_Rect{
+			int(pos.X * windowW),
+			int(pos.Y * windowH),
+			int(size.X * windowW),
+			int(size.Y * windowH)
+		};
+	}
+
 	void IRenderer::Render()
 	{
 		// auto startTime = std::chrono::high_resolution_clock::now();
@@ -103,13 +117,14 @@ namespace Engine
 
 		for (auto& refCamera : m_refECS.GetHotComponents<Camera>())
 		{
-			SDL_Rect clipRect;
-			clipRect.x = refCamera.m_clipRectPosition.X;
-			clipRect.y = refCamera.m_clipRectPosition.Y;
-			clipRect.w = refCamera.m_clipRectSize.X;
-			clipRect.h = refCamera.m_clipRectSize.Y;
+			SDL_Rect vp = ToSDLViewport(refCamera.m_viewPortPositionInPercentageOfScreen, refCamera.m_viewportSizeInPercentageOfScreen, Screen::WINDOW_SIZE.X, Screen::WINDOW_SIZE.Y);
 
-			SDL_RenderSetClipRect((SDL_Renderer*)m_ptrRenderer, &clipRect);
+			SDL_RenderSetViewport((SDL_Renderer*)m_ptrRenderer, nullptr);
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, refCamera.m_backgroundColor[0], refCamera.m_backgroundColor[1], refCamera.m_backgroundColor[2], SDL_ALPHA_OPAQUE);
+			SDL_RenderFillRect((SDLRenderer*)m_ptrRenderer, &vp);
+
+			SDL_RenderSetViewport((SDL_Renderer*)m_ptrRenderer, &vp);
+
 
 			for (auto ptrToVec = refCamera.m_renderBucket.rbegin(); ptrToVec != refCamera.m_renderBucket.rend(); ++ptrToVec)
 			{
@@ -154,14 +169,14 @@ namespace Engine
 			}
 #endif
 			// Reset background color. Temp for now.
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 173, 216, 230, SDL_ALPHA_OPAQUE);
+			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 
-			if (refCamera.m_borderOn)
+			if (true)
 			{
-				SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x + clipRect.w, clipRect.y); // top line
-				SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y, clipRect.x, clipRect.y + clipRect.h); // left line
-				SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x + clipRect.w - 1, clipRect.y, clipRect.x + clipRect.w - 1, clipRect.y + clipRect.h); // right line
-				SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, clipRect.x, clipRect.y + clipRect.h - 1, clipRect.x + clipRect.w, clipRect.y + clipRect.h - 1); // bottom line
+				SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, vp.x, vp.y, vp.x + vp.w, vp.y); // top line
+				SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, vp.x, vp.y, vp.x, vp.y + vp.h); // left line
+				SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, vp.x + vp.w - 1, vp.y, vp.x + vp.w - 1, vp.y + vp.h); // right line
+				SDL_RenderDrawLine((SDLRenderer*)m_ptrRenderer, vp.x, vp.y + vp.h - 1, vp.x + vp.w, vp.y + vp.h - 1); // bottom line
 			}
 		}
 

@@ -64,17 +64,30 @@ namespace Engine
 		//    This function also activates the entites in the ECS.
 		loadSceneEntitiesFromTileMap();
 
-		// 5. Frame the cameras
+		// 4. Activate entities with camera first.
+		for (auto& pair : m_cameraOrder)
+		{
+			Activate(pair.second);
+		}
+
+		// 5. Activate the rest of the entities
+		for (auto& pair : m_entities)
+		{
+			if (pair.second == true) // entity active on start.
+				Activate(pair.first);
+		}
+
+		// 6. Frame the cameras
 		m_cameraSystem.Frame(Math2D::Point2D<int>(m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y));
 		
-		// 6. Physics bodies need to be added to the world after they are activated and pooled.
+		// 7. Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld(m_entities);
 		m_physicsSimulation.AddChainCollidersToWorld();
 
-		// 7. Contact callbacks need to be activated.
+		// 8. Contact callbacks need to be activated.
 		m_physicsSimulation.ActivateContactCallbacks();
 
-		// 8. Deactivate all components that should not be active at the start of the scene?
+		// 9. Deactivate all components that should not be active at the start of the scene?
 
 		// process items client wants to do.
 		for (auto& func : m_clientOnScenePlayEvents)
@@ -107,8 +120,8 @@ namespace Engine
 		// Deactivate all entities and destroy all components.
 		m_refECS.DeactivateEntities();
 
-		for (auto& entity : m_entities)
-			m_refECS.DestroyComponents(entity);
+		for (auto& pair : m_entities)
+			m_refECS.DestroyComponents(pair.first);
 	}
 
 	void Scene::AddTileMap(std::string mapFileName, std::string rulesFileName)
@@ -138,7 +151,7 @@ namespace Engine
 			return;
 		}
 
-		m_entities.emplace(entity);
+		m_entities.emplace(entity, true);
 	}
 
 	void Scene::Activate(Entity entity)
@@ -336,6 +349,33 @@ namespace Engine
 		return defaultValue;
 	}
 
+	static std::array<size_t, 3> ExtractColorArrayFromJSON(const json& j, const std::string& key, std::array<size_t, 3> defaultValue)
+	{
+		if (!j.contains(key))
+		{
+			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
+			throw std::runtime_error("Invalid Rules File. Field Not Found: " + key);
+		}
+		const auto& arr = j.at(key);
+		if (!arr.is_array() || arr.size() != 3) return defaultValue;
+		std::array<size_t, 3> colorArray = defaultValue;
+		for (size_t i = 0; i < 3; ++i)
+		{
+			if (arr[i].is_number_unsigned()) colorArray[i] = arr[i].get<size_t>();
+			else if (arr[i].is_number_integer())
+			{
+				int intValue = arr[i].get<int>();
+				if (intValue >= 0) colorArray[i] = static_cast<size_t>(intValue);
+			}
+			else if (arr[i].is_number())
+			{
+				double doubleValue = arr[i].get<double>();
+				if (doubleValue >= 0.0) colorArray[i] = static_cast<size_t>(doubleValue);
+			}
+		}
+		return colorArray;
+	}
+
 	static void addTransformComponent(ECS& refECS, Entity entity, const json& transformTemplates, std::string templateKey, int x, int y, size_t numUnitsPerTile)
 	{
 		const json* entityTransformTemplate = getJson(transformTemplates, templateKey);
@@ -370,7 +410,7 @@ namespace Engine
 		);
 	}
 
-	static void addCameraComponent(ECS& refECS, Entity entity, const json& cameraTemplate, const std::string& cameraTemplateKey, const size_t numLayers)
+	static std::pair<size_t, Entity> addCameraComponent(ECS& refECS, Entity entity, const json& cameraTemplate, const std::string& cameraTemplateKey, const size_t numLayers)
 	{
 		const json* entityCameraTemplate = getJson(cameraTemplate, cameraTemplateKey);
 
@@ -379,10 +419,17 @@ namespace Engine
 
 		bool clampingOn = entityCameraTemplate->contains("ClampingOn") ? getJson(*entityCameraTemplate, "ClampingOn")->get<bool>() : false;
 
+		bool borderOn = entityCameraTemplate->contains("border") ? getJson(*entityCameraTemplate, "border")->get<bool>() : false;
+		
+		size_t order = entityCameraTemplate->contains("order") ? getJson(*entityCameraTemplate, "order")->get<size_t>() : 1;
+
+		std::array<size_t, 3> backgroundColor = ExtractColorArrayFromJSON(*entityCameraTemplate, "backgroundColor", { 0, 0, 0 });
+		ENGINE_CRITICAL_D("Camera Background Color RGB: {}, {}, {}", backgroundColor[0], backgroundColor[1], backgroundColor[2]);
+
 		Math2D::Point2D<float> screenRatio = { 1.0f, 1.0f };
 		Math2D::Point2D<float> position = { 0.0f, 0.0f };
 
-		if (const json* windowJson = getJson(*entityCameraTemplate, "Window"))
+		if (const json* windowJson = getJson(*entityCameraTemplate, "Viewport"))
 		{
 			position.X = windowJson->value("X", 0.0f);
 			position.Y = windowJson->value("Y", 0.0f);
@@ -392,7 +439,9 @@ namespace Engine
 
 		ENGINE_INFO_D("Adding camera component with pixelsPerUnit: {}, Position: {}x{}, ScreenRatio: {}x{}", pixelsPerUnit, position.X, position.Y, screenRatio.X, screenRatio.Y);
 
-		refECS.AddComponent<Camera>(entity, size, screenRatio, position, pixelsPerUnit, clampingOn, numLayers);
+		refECS.AddComponent<Camera>(entity, size, screenRatio, position, pixelsPerUnit, clampingOn, borderOn, backgroundColor, numLayers);
+
+		return std::make_pair(order, entity);
 	}
 
 	static void createEdge(TileMap& refTileMap, std::unordered_set<size_t>& isMap, int x, int y, Entity tileEntity, std::vector<Math2D::Edge>& refEdges)
@@ -824,18 +873,19 @@ namespace Engine
 		return isMap;
 	}
 
-	static void createChainColliders(std::vector<Math2D::Chain>& refChains, ECS& refECS)
+	void Scene::createChainColliders(std::vector<Math2D::Chain>& refChains)
 	{
 		std::vector<ChainCollider> chainColliders;
 
 		for (auto& refChain : refChains)
 		{
-			Entity chainEntity = refECS.CreateEntity();
+			Entity chainEntity = m_refECS.CreateEntity();
 
-			refECS.AddComponent<ChainCollider>(chainEntity, refChain,
+			m_refECS.AddComponent<ChainCollider>(chainEntity, refChain,
 				true, MAP, ALL, true, DebugColor::Red);
 
-			refECS.Activate(chainEntity);
+			// refECS.Activate(chainEntity);
+			add(chainEntity);
 		}
 	}
 
@@ -930,7 +980,7 @@ namespace Engine
 				std::string cameraTemplateKey = characterCameraJson->get<std::string>();
 				const json* cameraTemplates = getJson(*componentTemplates, "Camera");
 				if (cameraTemplates)
-					addCameraComponent(m_refECS, tileEntity, *cameraTemplates, cameraTemplateKey, numLayers);
+					m_cameraOrder.emplace(addCameraComponent(m_refECS, tileEntity, *cameraTemplates, cameraTemplateKey, numLayers));
 			}
 			if (const json* characterPhysicsJson = getJson(*characterComponents, "Physics"))
 			{
@@ -956,12 +1006,13 @@ namespace Engine
 				if (animationsTemplate)
 					addAnimationsComponent(m_refECS, m_refAssetManager, tileEntity, *animationsTemplate, animationsTemplateKey);
 			}
+
 			// ACTIVATE IN ECS AFTER ALL COMPONENTS CREATED.
-			if (activeOnStart)
-				m_refECS.Activate(tileEntity);
+			//if (activeOnStart)
+			//	m_refECS.Activate(tileEntity);
 		}
 
-		m_staticChains = MergeGridLinesIntoChains(edges);
-		createChainColliders(m_staticChains, m_refECS);
+		m_staticChains = Math2D::MergeGridLinesIntoChains(edges);
+		createChainColliders(m_staticChains);
 	}
 }

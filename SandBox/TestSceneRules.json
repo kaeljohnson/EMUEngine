@@ -122,29 +122,35 @@
             {
                 "Player":
                 {
-                    "Window":
-                    {
-                        "X": 0.5,
-                        "Y": 0.0,
-                        "Width": 0.5,
-                        "Height": 1.0
-                    },
-                    "PixelsPerUnit": 32,
-                    "ClampingOn": true,
-                    "enabled": true
-                },
-                "GenericStaticCamera":
-                {
-                    "Window":
+                    "Viewport":
                     {
                         "X": 0.0,
                         "Y": 0.0,
-                        "Width": 0.5,
+                        "Width": 1.0,
                         "Height": 1.0
                     },
                     "PixelsPerUnit": 32,
                     "ClampingOn": true,
-                    "enabled": false
+                    "enabled": true,
+                    "border": true,
+                    "order": 1,
+                    "backgroundColor": [ 173, 216, 230 ]
+                },
+                "GenericStaticCamera":
+                {
+                    "Viewport":
+                    {
+                        "X": 0.025,
+                        "Y": 0.1,
+                        "Width": 0.125,
+                        "Height": 0.21
+                    },
+                    "PixelsPerUnit": 2,
+                    "ClampingOn": true,
+                    "enabled": false,
+                    "border": true,
+                    "order": 2,
+                    "backgroundColor": [ 0, 0, 0 ]
                 }
             },
             "SpriteSheets": 

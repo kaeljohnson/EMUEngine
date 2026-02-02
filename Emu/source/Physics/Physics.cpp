@@ -251,13 +251,13 @@ namespace Engine
 		}
 	}
 
-	void PhysicsSimulation::AddPhysicsBodiesToWorld(std::unordered_set<Entity>& entities)
+	void PhysicsSimulation::AddPhysicsBodiesToWorld(std::unordered_map<Entity, bool>& entities)
 	{
-		for (auto& entitiy : entities)
+		for (auto& pair : entities)
 		{
-			if (!m_refECS.HasComponent<PhysicsBody>(entitiy)) continue;
+			if (!m_refECS.HasComponent<PhysicsBody>(pair.first)) continue;
 
-			PhysicsBody& refPhysicsBody = *m_refECS.GetComponent<PhysicsBody>(entitiy);
+			PhysicsBody& refPhysicsBody = *m_refECS.GetComponent<PhysicsBody>(pair.first);
 			AddPhysicsBodyToWorld(refPhysicsBody);
 		}
 	}

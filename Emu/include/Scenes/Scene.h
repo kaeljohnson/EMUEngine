@@ -174,7 +174,9 @@ namespace Engine
 
 		std::vector<Math2D::Chain> m_staticChains;	   /// Static chains created from the tile map.
 
-		std::unordered_set<Entity> m_entities;			/// Set of all entities in the scene.
+		std::unordered_map<Entity, bool> m_entities;			/// Set of all entities in the scene.
+
+		std::map<size_t, Entity> m_cameraOrder;			/// Set to render camera order correctly.
 	private:
 
 		/**
@@ -202,6 +204,13 @@ namespace Engine
 		* @brief Loads audio files required for the Level.
 		*/
 		void loadAudioFiles();
+
+		/**
+		* @brief Creates the chain collider entities that make up the map.
+		* 
+		* @param refChains the chains that will make up the colliders.
+		*/
+		void createChainColliders(std::vector<Math2D::Chain>& refChains);
 
 		/**
 		* @brief Adds an entity to the scene's entity set.

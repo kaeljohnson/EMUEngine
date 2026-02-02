@@ -239,8 +239,9 @@ namespace Engine
 	*/
 	struct Camera : public Component
 	{
-		Math2D::Point2D<float> m_positionInFractionOfScreenSize; /// Position of the camera in fraction of screen size (0.0 - 1.0).
-		Math2D::Point2D<float> m_screenRatio;					 /// Screen ratio of the camera (width / height).
+
+		Math2D::Point2D<float> m_viewPortPositionInPercentageOfScreen;				 /// Position of the camera in fraction of screen size (0.0 - 1.0).
+		Math2D::Point2D<float> m_viewportSizeInPercentageOfScreen;					 /// Screen ratio of the camera (width / height).
 
 		Math2D::Point2D<float> m_offset;						 /// Top left position of the camera in world units.
 		Math2D::Point2D<float> m_size;							 /// Size of the camera in world units.
@@ -250,9 +251,7 @@ namespace Engine
 		Math2D::Point2D<int> m_bounds;							 /// Bounds of the camera in pixels.
 		bool m_borderOn;										 /// Flag indicating whether to draw a border around the camera view.
 		size_t m_numLayers;										 /// Number of layers for rendering.
-
-		Math2D::Point2D<int> m_clipRectPosition;				 /// Position of the clipping rectangle in pixels.
-		Math2D::Point2D<int> m_clipRectSize;					 /// Size of the clipping rectangle in pixels.
+		std::array<size_t, 3> m_backgroundColor;				 /// Background color of the camera in RGB format.
 
 		RenderBucket m_renderBucket;							 /// Bucket for storing renderable objects. Maps zIndex to vector of RenderObjects.
 		DebugRenderBucket m_debugRenderBucket;					 /// Bucket for storing renderable debug objects. Maps zIndex to vector of DebugObjects.
@@ -260,19 +259,18 @@ namespace Engine
 		DebugPointRenderBucket m_debugPointsRenderBucket;		 /// Bucket for storing renderable point objects. Maps zIndex to vector of debug points.
 
 		Camera(Entity entity)
-			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_screenRatio(1.0f, 1.0f), m_numLayers(10),
-			m_positionInFractionOfScreenSize(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), m_borderOn(false),
-			m_bounds(0, 0), m_clipRectPosition(0, 0), m_clipRectSize(0, 0), m_renderBucket(10, std::vector<RenderObject>()),
+			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_viewportSizeInPercentageOfScreen(1.0f, 1.0f), m_numLayers(10),
+			m_viewPortPositionInPercentageOfScreen(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), m_borderOn(false),
+			m_bounds(0, 0), m_renderBucket(10, std::vector<RenderObject>()), m_backgroundColor({ 0, 0, 0 }),
 			m_debugRenderBucket(10, std::vector<DebugObject>()), m_debugLinesRenderBucket(10, std::vector<LineObject>()),
 			m_debugPointsRenderBucket(10, std::vector<DebugPointObject>()),
-			Component(entity) 
-		{
-		}
+			Component(entity) {}
+
 		Camera(Entity entity, Math2D::Point2D<float> size, Math2D::Point2D<float> screenRatio, 
-			Math2D::Point2D<float> position, size_t pixelsPerUnit, bool clampingOn, size_t numLayers)
-			: m_size(size), m_screenRatio(screenRatio), m_positionInFractionOfScreenSize(position), 
+			Math2D::Point2D<float> position, size_t pixelsPerUnit, bool clampingOn, bool border, std::array<size_t, 3> backgroundColor, size_t numLayers)
+			: m_size(size), m_viewportSizeInPercentageOfScreen(screenRatio), m_viewPortPositionInPercentageOfScreen(position),
 			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0), 
-			m_borderOn(false), m_clipRectPosition(0, 0), m_clipRectSize(0, 0), m_renderBucket(numLayers, std::vector<RenderObject>()), 
+			m_borderOn(border), m_renderBucket(numLayers, std::vector<RenderObject>()), m_backgroundColor(backgroundColor),
 			m_numLayers(numLayers), m_debugRenderBucket(numLayers, std::vector<DebugObject>()), 
 			m_debugLinesRenderBucket(numLayers, std::vector<LineObject>()), m_debugPointsRenderBucket(numLayers, std::vector<DebugPointObject>()),
 			Component(entity) {}
