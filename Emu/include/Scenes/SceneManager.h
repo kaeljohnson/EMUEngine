@@ -72,6 +72,14 @@ namespace Engine
 		void RegisterOnScenePlayEvent(const std::string& sceneName, std::function<void()>& func);
 
 		/**
+		* @brief Registers a function to be called when the scene ends.
+		* 
+		* @param name The name of the scene.
+		* @param func The function to register.
+		*/
+		void RegisterOnSceneEndEvent(const std::string& name, std::function<void()> func);
+
+		/**
 		* @brief Registers a contact callback for specific entities in a given scene.
 		* 
 		* @param sceneName The name of the scene.
@@ -154,8 +162,12 @@ namespace Engine
 
 		/**
 		* @brief Checks if a scene change has been queued and performs the change if necessary.
+		* 
+		* @note Returning a bool in case client needs to do additional cleanup that the scene is not responsible in between runtime contexts.
+		* 
+		* @return a bool indicating if a new scene is starting. 
 		*/
-		void CheckForSceneChange();
+		bool IsSceneChanging();
 
 		/**
 		* @brief Queues a new scene to be loaded. Application checks if a new scene is queued at the start of each frame.

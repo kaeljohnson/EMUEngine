@@ -42,11 +42,16 @@ namespace Engine
 		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entity, callback);
 	}
 
-	void Scene::RegisterOnScenePlayEvent(std::function<void()>& func)
+	void Scene::RegisterOnScenePlayEvent(std::function<void()> func)
 	{
 		// Register a function to be called when the scene starts playing.
 		// This can be used to initialize things that need to be set up when the scene starts.
-		m_clientOnScenePlayEvents.push_back(func);
+		m_clientOnScenePlayEvents.push_back(std::move(func));
+	}
+
+	void Scene::RegisterOnSceneEndEvent(std::function<void()> func)
+	{
+		m_clientOnSceneEndEvents.push_back(std::move(func));
 	}
 
 	void Scene::OnScenePlay()
@@ -102,6 +107,12 @@ namespace Engine
 	{
 		// Could be problematic if this is called mid frame.
 		AppState::IN_SCENE = false;
+
+		// Call client defined OnSceneEndEvents.
+		for (auto& func : m_clientOnSceneEndEvents)
+		{
+			func();
+		}
 
 		m_physicsSimulation.Cleanup();
 
@@ -178,6 +189,14 @@ namespace Engine
 		if (!m_entities.contains(entity))
 		{
 			ENGINE_INFO("Entity does not exist in the current scene: {}", entity);
+			return;
+		}
+
+		// @todo temp solution to avoid deactivating entities with cameras. 
+		// Real solution might include making cameras separate from components.
+		if (m_refECS.HasComponent<Camera>(entity))
+		{
+			ENGINE_CRITICAL("Cannot deactivate entity with camera component: {}. Consider creating a separate entity which has the camera attached and follows the entity you are trying to deactivate.", entity);
 			return;
 		}
 
@@ -963,8 +982,6 @@ namespace Engine
 				continue;
 			}
 
-			bool activeOnStart = characterComponents->value("ActiveOnStart", true);
-
 			const json* characterTransformJson = nullptr;
 			if (characterTransformJson = getJson(*characterComponents, "Transform"))
 			{
@@ -973,7 +990,7 @@ namespace Engine
 				if (transformTemplates)
 					addTransformComponent(m_refECS, tileEntity, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile);
 			}
-			else throw std::runtime_error("Transform component is required for all entities. Missing for tile: " + tileKey);
+			else ENGINE_ERROR("Transform component is required for all entities. Missing for tile: " + tileKey);
 
 			if (const json* characterCameraJson = getJson(*characterComponents, "Camera"))
 			{
@@ -1006,10 +1023,6 @@ namespace Engine
 				if (animationsTemplate)
 					addAnimationsComponent(m_refECS, m_refAssetManager, tileEntity, *animationsTemplate, animationsTemplateKey);
 			}
-
-			// ACTIVATE IN ECS AFTER ALL COMPONENTS CREATED.
-			//if (activeOnStart)
-			//	m_refECS.Activate(tileEntity);
 		}
 
 		m_staticChains = Math2D::MergeGridLinesIntoChains(edges);

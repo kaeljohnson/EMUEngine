@@ -14,33 +14,33 @@ static std::mutex allocMutex;
 
 static size_t totalAllocated = 0;
 
-std::atomic<int> allocationCount = 0;
-
-void* operator new(std::size_t size) {
-	void* ptr = std::malloc(size);
-	totalAllocated += size;
-
-	int count = ++allocationCount;
-
-	{
-		std::lock_guard<std::mutex> lock(allocMutex);
-		std::cout << "Allocated " << size << " bytes (count: " << count << ")\n";
-	}
-
-	if (count == 400) {
-		std::lock_guard<std::mutex> lock(allocMutex);
-		std::cout << "=== 400th allocation reached ===\n";
-		// throw std::runtime_error("400th allocation reached");
-	}
-
-	return ptr;
-}
-
-void operator delete(void* ptr) noexcept {
-	std::lock_guard<std::mutex> lock(allocMutex);
-	std::cout << "Freed bytes from " << ptr << "\n";
-	free(ptr);
-}
+//std::atomic<int> allocationCount = 0;
+//
+//void* operator new(std::size_t size) {
+//	void* ptr = std::malloc(size);
+//	totalAllocated += size;
+//
+//	int count = ++allocationCount;
+//
+//	{
+//		std::lock_guard<std::mutex> lock(allocMutex);
+//		std::cout << "Allocated " << size << " bytes (count: " << count << ")\n";
+//	}
+//
+//	if (count == 400) {
+//		std::lock_guard<std::mutex> lock(allocMutex);
+//		std::cout << "=== 400th allocation reached ===\n";
+//		// throw std::runtime_error("400th allocation reached");
+//	}
+//
+//	return ptr;
+//}
+//
+//void operator delete(void* ptr) noexcept {
+//	std::lock_guard<std::mutex> lock(allocMutex);
+//	std::cout << "Freed bytes from " << ptr << "\n";
+//	free(ptr);
+//}
 
 int main(int argc, char* args[])
 {
@@ -66,30 +66,30 @@ int main(int argc, char* args[])
 	engine->Scenes_RegisterContactCallback("Level1", Engine::BEGIN_CONTACT, 1, 2, [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi Begin Contact");
+			
 		});
 
 	engine->Scenes_RegisterContactCallback("Level1", Engine::END_CONTACT, 1, 2, [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi End Contact");
-		});
-
-	engine->Scenes_RegisterContactCallback("Level1", Engine::BEGIN_SENSOR, 2, [](const Engine::Contact event)
-		{
-			CLIENT_INFO_D("Single Begin Sensing");
+			
 		});
 
 	engine->Scenes_RegisterContactCallback("Level1", Engine::BEGIN_SENSOR, 1, 2, [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi Begin Sensing");
+			Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::W_KEY_DOWN, [](Engine::IOEvent& e)
+				{
+					CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::W_KEY_DOWN));
+					Engine::EMU::GetInstance()->Scenes_Load("Level2");
+					e.Handled = true;
+				});
 		});
 
-	engine->Scenes_RegisterContactCallback("Level1", Engine::END_SENSOR, 2, [](const Engine::Contact event)
-		{
-			CLIENT_INFO_D("Single End Sensing");
-		});
 	engine->Scenes_RegisterContactCallback("Level1", Engine::END_SENSOR, 1, 2, [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi End Sensing");
+			Engine::EMU::GetInstance()->UnRegisterIOEventListener(Engine::W_KEY_DOWN);
 		});
 
 	PlayerCamera playerCamera;
@@ -99,6 +99,11 @@ int main(int argc, char* args[])
 	engine->Scenes_RegisterOnPlayEvent("Level1", []()
 		{
 			// Engine::EMU::GetInstance()->PlaySound(1, 128, true);
+		});
+
+	engine->Scenes_RegisterOnEndEvent("Level1", []()
+		{
+			Engine::EMU::GetInstance()->UnRegisterIOEventListener(Engine::W_KEY_DOWN);
 		});
 
 	engine->Scenes_RegisterOnPlayEvent("Level2", []()

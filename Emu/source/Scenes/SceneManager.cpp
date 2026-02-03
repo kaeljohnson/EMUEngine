@@ -18,14 +18,17 @@ namespace Engine
 			std::forward_as_tuple(m_refECS, refAssetManager));
 	}
 
-	void SceneManager::CheckForSceneChange()
+	bool SceneManager::IsSceneChanging()
 	{
 		if (!m_queuedSceneName.empty())
 		{
 			UnloadCurrentScene();
 			LoadQueuedScene();
 			m_queuedSceneName.clear();
+			return true;
 		}
+
+		return false;
 	}
 
 	void SceneManager::LoadQueuedScene()
@@ -115,6 +118,19 @@ namespace Engine
 			ENGINE_CRITICAL("Scene not found in SceneManager");
 		}
 
+	}
+
+	void SceneManager::RegisterOnSceneEndEvent(const std::string& name, std::function<void()> func)
+	{
+		auto it = m_scenes.find(name);
+		if (it != m_scenes.end())
+		{
+			it->second.RegisterOnSceneEndEvent(func);
+		}
+		else
+		{
+			ENGINE_CRITICAL("Scene not found in SceneManager");
+		}
 	}
 
 	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const size_t entityA, const size_t entityB, Scene::ContactCallback callback)

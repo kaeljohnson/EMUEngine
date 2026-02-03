@@ -66,6 +66,28 @@ namespace Engine
 		m_ioEventSystem.RegisterIOEventListener(type, handler);
 	}
 
+	void EMU::Scenes_RegisterIOEventListener(const std::string& refSceneName, IOEventType eventType, IOEventHandler handler)
+	{
+		Scenes_RegisterOnPlayEvent(
+			refSceneName,
+			[this, eventType, handler]() mutable
+			{	
+				m_ioEventSystem.RegisterIOEventListener(eventType, handler);
+			});
+
+		Scenes_RegisterOnEndEvent(
+			refSceneName,
+			[this, eventType]() mutable
+			{
+				m_ioEventSystem.UnRegisterIOEventListener(eventType);
+			});
+	}
+
+	void EMU::UnRegisterIOEventListener(IOEventType type)
+	{
+		m_ioEventSystem.UnRegisterIOEventListener(type);
+	}
+
 	// Scene management
 
 	Entity EMU::Scenes_GetEntityById(const std::string& sceneName, const size_t tileId)
@@ -88,6 +110,8 @@ namespace Engine
 	void EMU::Scenes_Create(const std::string& name) { m_sceneManager.AddScene(name, m_assetManager); }
 	void EMU::Scenes_Load(const std::string& name) { m_sceneManager.QueueNewScene(name); }
 	void EMU::Scenes_RegisterOnPlayEvent(const std::string& name, std::function<void()> func) { m_sceneManager.RegisterOnScenePlayEvent(name, func); }
+	void EMU::Scenes_RegisterOnEndEvent(const std::string& name, std::function<void()> func) { m_sceneManager.RegisterOnSceneEndEvent(name, func); }
+
 	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const size_t entityA, const size_t entityB, ContactCallback callback)
 	{ 
 		m_sceneManager.RegisterContactCallback(name, contactType, entityA, entityB, callback); 

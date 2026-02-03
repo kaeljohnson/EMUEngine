@@ -148,6 +148,15 @@ namespace Engine
 		m_ioEventListenerMap[type] = handler;
 	}
 
+    void IOEventSystem::UnRegisterIOEventListener(IOEventType type)
+    { 
+        ;
+        if (m_ioEventListenerMap.erase(type) == 0) {
+            ENGINE_CRITICAL_D("No handler registered for type {}", static_cast<int>(type));
+        }
+
+    }
+
 	void IOEventSystem::HandleEvents()
 	{
 		/*
@@ -189,4 +198,15 @@ namespace Engine
             m_eventQ.pop();
         }
 	}
+
+    void IOEventSystem::ClearAllHandlers()
+    {
+        m_ioEventListenerMap.clear();
+    }
+
+    void IOEventSystem::ClearEventQ()
+    {
+        IOEventQueue empty;
+        m_eventQ.swap(empty);
+    }
 }

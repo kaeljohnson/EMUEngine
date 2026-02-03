@@ -9,8 +9,6 @@ PlayerCamera::PlayerCamera() :
     m_rightTargetScreenBound(1.0f), m_leftTargetScreenBound(0.0f), m_smoothingOn(true),
     m_topTargetScreenBound(0.25f), m_bottomTargetScreenBound(0.75f), m_lookAheadFactor(0.5f), m_lookAhead(0.0f)
 {
-    // Combine this whole class into player class.
-
 	// Engine currently works by destroying all components on scene change.
 	// Must re-add camera updater on scene play.
 	Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::CameraUpdater>("Level1", 1,
@@ -39,36 +37,15 @@ void PlayerCamera::Update(Engine::Entity entity)
 	// Set the camera offset to the desired position
 	Engine::EMU::GetInstance()->Camera_SetOffset(entity, Math2D::Point2D<float>(desiredCameraTopLeftX, desiredCameraTopLeftY));
 
+	// Update minimap
+	Engine::Entity miniMapEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(35);
+
+	Math2D::Point2D<float> miniMapSize = Engine::EMU::GetInstance()->Camera_GetSize(miniMapEntity);
+
+	float desiredCameraTopLeftXMiniMap = targetPos.X - (miniMapSize.X / 2.0f);
+	float desiredCameraTopLeftYMiniMap = targetPos.Y - (miniMapSize.Y / 2.0f);
+
+	Engine::EMU::GetInstance()->Camera_SetOffset(miniMapEntity, Math2D::Point2D<float>(desiredCameraTopLeftXMiniMap, desiredCameraTopLeftYMiniMap));
+
     return;
-}
-
-void PlayerCamera::SetLookAheadFactor(const float lookAheadFactor)
-{
-	m_lookAheadFactor = lookAheadFactor;
-}
-
-void PlayerCamera::SetTargetSmoothingFactor(const float smoothingFactor)
-{
-	m_smoothingFactor = smoothingFactor;
-	m_smoothingOn = true;
-}
-
-void PlayerCamera::SetRightTargetScreenBound(const float screenBound)
-{
-	m_rightTargetScreenBound = screenBound;
-}
-
-void PlayerCamera::SetLeftTargetScreenBound(const float screenBound)
-{
-	m_leftTargetScreenBound = screenBound;
-}
-
-void PlayerCamera::SetTopTargetScreenBound(const float screenBound)
-{
-	m_topTargetScreenBound = screenBound;
-}
-
-void PlayerCamera::SetBottomTargetScreenBound(const float screenBound)
-{
-	m_bottomTargetScreenBound = screenBound;
 }

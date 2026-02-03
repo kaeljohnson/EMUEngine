@@ -8,16 +8,7 @@ public:
 	PlayerCamera();
 	~PlayerCamera() = default;
 
-	void SetTargetSmoothingFactor(const float smoothingFactor);
-	void SetRightTargetScreenBound(const float screenBound);
-	void SetLeftTargetScreenBound(const float screenBound);
-	void SetTopTargetScreenBound(const float screenBound);
-	void SetBottomTargetScreenBound(const float screenBound);
-	void SetLookAheadFactor(const float lookAhead);
-
-	// void Update(const double interpolation) override;
 	void Update(Engine::Entity entity);
-
 
 private:
 	bool m_smoothingOn;

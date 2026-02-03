@@ -60,10 +60,18 @@ namespace Engine
 		/**
 		* @brief Registers a callback function that is triggered when a new scene is played.
 		* 
-		* * @param name: The name of the scene for which the callback is to be registered.
-		* * @param callback: The function to be called when the scene is played.
+		* @param name: The name of the scene for which the callback is to be registered.
+		* @param callback: The function to be called when the scene is played.
 		*/
 		void Scenes_RegisterOnPlayEvent(const std::string& name, std::function<void()> callback);
+
+		/**
+		* @brief Registers a callback function that is triggered when a scene ends.
+		* 
+		* @param name The name of the scene.
+		* @param callback The callback function to be called.
+		*/
+		void Scenes_RegisterOnEndEvent(const std::string& name, std::function<void()> callback);
 
 		/**
 		* @brief Register a contact callback between two entities identified by their tileIds.
@@ -719,7 +727,7 @@ namespace Engine
 		template <typename T, typename... Args>
 		void Scenes_AddComponent(const std::string& sceneName, size_t tileId, Args&&... args)
 		{
-			Engine::EMU::GetInstance()->Scenes_RegisterOnPlayEvent(
+			Scenes_RegisterOnPlayEvent(
 				sceneName,
 				[this,
 				sceneName,
@@ -741,7 +749,34 @@ namespace Engine
 		////////////////////////////////////////////////////
 
 		// Event IO System Interface functions
+
+		/**
+		* @brief Register a key or mouse event listener.
+		* This can be called at runtime and client must remember to call the 
+		* unregister function later.
+		* 
+		* @param type The event type.
+		* @param handler The callback function.
+		*/
 		void RegisterIOEventListener(IOEventType type, IOEventHandler handler);
+
+		/**
+		* @brief Register a key or mouse event listener for a specific scene.
+		* This calls the OnScenePlay function and is not meant to be called during runtime.
+		* 
+		* @param sceneName Name of scene.
+		* @param type The type of io event.
+		* @param handler The function to be called when event fires.
+		*/
+		void Scenes_RegisterIOEventListener(const std::string& sceneName, IOEventType type, IOEventHandler handler);
+
+		/**
+		* @brief Unregister an event listener of a certain type.
+		* This is helpful when an event handler's existence is conditional.
+		* 
+		* @param type The event type.
+		*/
+		void UnRegisterIOEventListener(IOEventType type);
 
 	public:
 		static void Init(const size_t numEntities);

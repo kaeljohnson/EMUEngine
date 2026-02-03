@@ -50,8 +50,14 @@ namespace Engine
 		* 
 		* @param function The function to be called when the scene starts playing.
 		*/
-		void RegisterOnScenePlayEvent(std::function<void()>& function);
+		void RegisterOnScenePlayEvent(std::function<void()> function);
 
+		/**
+		* @brief Client can register a function to be called when the scene ends.
+		* 
+		* @param function The function to be called.
+		*/
+		void RegisterOnSceneEndEvent(std::function<void()> function);
 
 		using ContactCallback = std::function<void(const Contact&)>; /// Type definition for contact callback functions.
 
@@ -165,6 +171,7 @@ namespace Engine
 		std::string m_rulesFileName;		/// The filename of the rules file that defines entity mappings.
 
 		std::vector<std::function<void()>> m_clientOnScenePlayEvents; /// Client defined functions to be called when the scene starts playing.
+		std::vector<std::function<void()>> m_clientOnSceneEndEvents;  /// Client defined functions to be called when the scene ends.
 
 		Math2D::Point2D<int> m_levelDimensionsInUnits; /// The dimensions of the level in units.
 		TileMap m_tileMap;							   /// The tile map		

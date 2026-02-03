@@ -36,7 +36,7 @@ namespace Engine
 		while (Time::IsAppRunning())
 		{
 			// auto start = std::chrono::high_resolution_clock::now();
-			m_refSceneManager.CheckForSceneChange();
+			m_refSceneManager.IsSceneChanging();
 
 			m_refIOEventSystem.HandleEvents();
 			m_refIOEventSystem.ProcessEvents();
