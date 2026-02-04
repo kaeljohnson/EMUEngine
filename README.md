@@ -45,6 +45,35 @@ This script builds only the engine and minimal necessary dependencies. The user 
 
 ## How to use
 
+The following is a short summary of how the engine is intended to be used. Please peruse Sandbox along with the documentation to learn more.
+
+### Main
+Currently, the client owns the main function. There should be nothing special about it other than it needing to invoke the engine via:
+
+* Engine::Init(<num entities needed>)
+
+This function initializes the engine singleton, which can then be obtained via:
+
+* Engine::EMU* engine = Engine::EMU::GetInstance();
+
+### Getting a simulation running
+Currently, running a simulation is as easy as calling the following functions before runtime.
+
+The following creates a scene with the corresponding name:
+* engine->Scenes_Create("Level1");
+
+The following sets the gravity for simulation:
+* engine->Scenes_SetGravity("Level1", Math2D::Point2D(0.0f, 100.0f));
+
+The following adds the tile map and corresponding rules file to the scene.
+engine->Scenes_AddTileMap("Level1", "TestMap2.txt", "TestSceneRules.json");
+
+Lastly, the scene which is meant to be the first scene must be loaded before the app is started:
+* engine->Scenes_Load("Level1");
+
+Finally, run the app:
+* engine->RunApp();
+
 ### Creating a tile map
 Currently, the engine is meant to be used via a tilemap that is formatted as a text file. This file must follow these rules:
 * Tiles depicted via numbers.
@@ -173,6 +202,48 @@ The rules file is a json file that defines the characteristics that each tile ha
             },
         }
     }
+
+### Registering for Events
+Currently, all code related to the runtime environment must be added via a c++ function. This includes registering callback functions for events.
+Here is an example of adding a callback to a sensor event between two entities:
+
+    engine->Scenes_RegisterContactCallback("Level1", Engine::BEGIN_SENSOR, 1, 2, [](const Engine::Contact event)
+    {
+		Engine::EMU::GetInstance()->Scenes_RegisterIOEventListener("Level1", Engine::W_KEY_DOWN, [](Engine::IOEvent& e)		
+            {
+                Engine::EMU::GetInstance()->Scenes_Load("Level2");
+                e.Handled = true;
+            });
+    });
+
+This function call adds an event listener for when there is a contact event between entities whose tile ID's are 1 and 2. When this event occurs the callback will run. This callback registers another event listener, this time an IO event listener which loads level 2 upon the W key being pressed. 
+
+Events can be registered for at startup or during runtime.
+
+### OnScenePlay/OnSceneEnd
+Currently, the client can add items that need to be processed at the beginning and end of events. Here is an example of adding an OnScenePlay event:
+
+    engine->Scenes_RegisterOnPlayEvent("Level1", []()
+	{
+		Engine::EMU::GetInstance()->PlaySound(1, 128, true);
+	});
+
+This call to Scenes_RegisterOnPlayEvent() plays the specified sound when Level 1 starts.
+
+Similarly, adding an OnSceneEnd event:
+
+    engine->Scenes_RegisterOnEndEvent("Level1", []()
+	{
+        Engine::EMU::GetInstance()->StopSound(1);
+	});
+
+### The Updater Components
+Currently, specific runtime entity functionality is added via an updater component. Here is an example of adding an updater component to a player entity:
+
+    Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::PhysicsUpdater>("Level1", 1,
+    [this](Engine::Entity entity) { Update(entity); });
+
+This function call to Scenes_AddComponent() addes a PhysicsUpdater to the entity with the tile id of 1. This body of the callback is a client defined Update function which ostensibly updates the player movement each frame.
 
 Some important considerations:
 * EMU does not store types as strings to avoid complexity and unnecessary allocations. Therefore, it is up to the client to keep id and name associations in mind. For example, the id field in the animation component could be associated with an enum in the client.
