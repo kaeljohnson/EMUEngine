@@ -758,7 +758,7 @@ namespace Engine
 		* @param type The event type.
 		* @param handler The callback function.
 		*/
-		void RegisterIOEventListener(IOEventType type, IOEventHandler handler);
+		void Global_RegisterIOEventListener(IOEventType type, IOEventHandler handler);
 
 		/**
 		* @brief Register a key or mouse event listener for a specific scene.
@@ -771,12 +771,20 @@ namespace Engine
 		void Scenes_RegisterIOEventListener(const std::string& sceneName, IOEventType type, IOEventHandler handler);
 
 		/**
+		* @brief Unregisters an event listener of an event type for a specific scene.
+		* 
+		* @param sceneName The name of the scene.
+		* @param type The type of the event.
+		*/
+		void Scenes_UnRegisterIOEventListener(const std::string& sceneName, IOEventType type);
+
+		/**
 		* @brief Unregister an event listener of a certain type.
 		* This is helpful when an event handler's existence is conditional.
 		* 
 		* @param type The event type.
 		*/
-		void UnRegisterIOEventListener(IOEventType type);
+		void Global_UnRegisterIOEventListener(IOEventType type);
 
 	public:
 		static void Init(const size_t numEntities);

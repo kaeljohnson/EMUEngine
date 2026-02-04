@@ -8,6 +8,7 @@
 #include "../Camera/CameraSystem.h"
 #include "../Includes.h"
 #include "../MathUtil.h"
+#include "../Events/IOEventSystem.h"
 
 struct b2WorldId;
 
@@ -29,7 +30,7 @@ namespace Engine
 		* @param refECS Reference to the ECS instance.
 		* @param refAssetManager Reference to the AssetManager instance.
 		*/
-		Scene(ECS& refECS, AssetManager& refAssetManager);
+		Scene(ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem);
 		~Scene();
 
 		/**
@@ -162,9 +163,26 @@ namespace Engine
 		*/
 		void UpdateCamera(AssetManager& refAssetManager);
 
+		/**
+		* @brief Lets the scene know that this is an event the client cares about
+		* only for this scene's runtime.
+		* 
+		* @param type The type of the event.
+		*/
+		void AddIOEvent(IOEventType type);
+
+		/**
+		* @brief Lets the scene know that this event is no longer needed in the scene's
+		* runtime context.
+		* 
+		* @param type The type of the event.
+		*/
+		void RemoveIOEvent(IOEventType type);
+
 	private:
 		ECS& m_refECS;						/// Reference to the ECS instance.
 		AssetManager& m_refAssetManager;	/// Reference to the AssetManager instance.
+		IOEventSystem& m_refIOEventSystem;	/// Reference to the io event system.
 
 		bool m_hasTileMap;					/// Flag indicating if the scene has a tile map.
 		std::string m_mapFileName;			/// The filename of the tile map file.
@@ -173,17 +191,18 @@ namespace Engine
 		std::vector<std::function<void()>> m_clientOnScenePlayEvents; /// Client defined functions to be called when the scene starts playing.
 		std::vector<std::function<void()>> m_clientOnSceneEndEvents;  /// Client defined functions to be called when the scene ends.
 
-		Math2D::Point2D<int> m_levelDimensionsInUnits; /// The dimensions of the level in units.
-		TileMap m_tileMap;							   /// The tile map		
+		Math2D::Point2D<int> m_levelDimensionsInUnits;			/// The dimensions of the level in units.
+		TileMap m_tileMap;				 					    /// The tile map		
 
-		PhysicsSimulation m_physicsSimulation;   	   /// The physics simulation for the scene.
-		CameraSystem m_cameraSystem;				   /// The camera system for the scene.
+		PhysicsSimulation m_physicsSimulation;   				/// The physics simulation for the scene.
+		CameraSystem m_cameraSystem;							/// The camera system for the scene.
 
-		std::vector<Math2D::Chain> m_staticChains;	   /// Static chains created from the tile map.
+		std::vector<Math2D::Chain> m_staticChains;				/// Static chains created from the tile map.
 
 		std::unordered_map<Entity, bool> m_entities;			/// Set of all entities in the scene.
+		std::unordered_set<IOEventType> m_sceneRuntimeIOEvents;		/// All the IOEvents this scene has callbacks assigned to in the io system.
 
-		std::map<size_t, Entity> m_cameraOrder;			/// Set to render camera order correctly.
+		std::map<size_t, Entity> m_cameraOrder;					/// Set to render camera order correctly.
 	private:
 
 		/**

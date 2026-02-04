@@ -78,7 +78,7 @@ int main(int argc, char* args[])
 	engine->Scenes_RegisterContactCallback("Level1", Engine::BEGIN_SENSOR, 1, 2, [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi Begin Sensing");
-			Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::W_KEY_DOWN, [](Engine::IOEvent& e)
+			Engine::EMU::GetInstance()->Scenes_RegisterIOEventListener("Level1", Engine::W_KEY_DOWN, [](Engine::IOEvent& e)
 				{
 					CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::W_KEY_DOWN));
 					Engine::EMU::GetInstance()->Scenes_Load("Level2");
@@ -89,7 +89,7 @@ int main(int argc, char* args[])
 	engine->Scenes_RegisterContactCallback("Level1", Engine::END_SENSOR, 1, 2, [](const Engine::Contact event)
 		{
 			CLIENT_INFO_D("Multi End Sensing");
-			Engine::EMU::GetInstance()->UnRegisterIOEventListener(Engine::W_KEY_DOWN);
+			Engine::EMU::GetInstance()->Scenes_UnRegisterIOEventListener("Level1", Engine::W_KEY_DOWN);
 		});
 
 	PlayerCamera playerCamera;
@@ -103,7 +103,6 @@ int main(int argc, char* args[])
 
 	engine->Scenes_RegisterOnEndEvent("Level1", []()
 		{
-			Engine::EMU::GetInstance()->UnRegisterIOEventListener(Engine::W_KEY_DOWN);
 		});
 
 	engine->Scenes_RegisterOnPlayEvent("Level2", []()

@@ -7,7 +7,7 @@
 
 AppManagementEventHandlers::AppManagementEventHandlers() 
 {
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::F_KEY_DOWN, [](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::F_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			// Need interface to toggle fullscreen.
 			Engine::EMU::GetInstance()->SetFullscreen();
@@ -16,7 +16,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::RESIZE_WINDOW, [](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::RESIZE_WINDOW, [](Engine::IOEvent& e)
 		{
 			// Window Interface to call the resize function.
 			// refApp.GetWindowRenderer().ResizeWindow(e.X_POS, e.Y_POS);
@@ -25,21 +25,21 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::ESCAPE_KEY_DOWN, [](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::ESCAPE_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::ESCAPE_KEY_DOWN));
 			Engine::EMU::GetInstance()->EndApp();
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::QUIT, [](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::QUIT, [](Engine::IOEvent& e)
 		{
 			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::QUIT));
 			Engine::EMU::GetInstance()->EndApp();
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::G_KEY_DOWN, [](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::G_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			Engine::Entity entity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
 			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::G_KEY_DOWN));
@@ -47,7 +47,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::H_KEY_DOWN, [](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::H_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			Engine::Entity entity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
 			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::H_KEY_DOWN));
@@ -55,21 +55,21 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			e.Handled = true;
 		});
 	
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::L_KEY_DOWN, [&](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::L_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::L_KEY_DOWN));
 			Engine::EMU::GetInstance()->Scenes_Load("Level2");
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::U_KEY_DOWN, [&](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::U_KEY_DOWN, [&](Engine::IOEvent& e)
 		{
 			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::U_KEY_DOWN));
 			Engine::EMU::GetInstance()->Scenes_Load("Level1");
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_DOWN, [](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::O_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			CLIENT_LOG_D("Handled event O KEY DOWN: {}", static_cast<int>(Engine::O_KEY_DOWN));
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(2);
@@ -77,7 +77,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			CLIENT_LOG_D("Done with O key down listener");
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::O_KEY_UP, [](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::O_KEY_UP, [](Engine::IOEvent& e)
 		{
 			CLIENT_LOG_D("Handled event O KEY UP: {}", static_cast<int>(Engine::O_KEY_UP));
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(2);
@@ -85,7 +85,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			CLIENT_LOG_D("Done with O key up listener");
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::P_KEY_DOWN, [](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::P_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			CLIENT_LOG_D("Handled event P KEY DOWN: {}", static_cast<int>(Engine::P_KEY_DOWN));
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(3);
@@ -93,37 +93,37 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			CLIENT_LOG_D("Done with P key down listener");
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::P_KEY_UP, [](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::P_KEY_UP, [](Engine::IOEvent& e)
 		{
 			CLIENT_LOG_D("Handled event P KEY UP: {}", static_cast<int>(Engine::P_KEY_UP));
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(3);
 			Engine::EMU::GetInstance()->Scenes_Deactivate(testEntity);
 		});
 
-	/*Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::U_KEY_DOWN, [](Engine::IOEvent& e)
+	/*Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::U_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('Y');
 			Engine::EMU::GetInstance()->ChangeCamera(testEntity);
 		});*/
 
-	/*Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::U_KEY_UP, [](Engine::IOEvent& e)
+	/*Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::U_KEY_UP, [](Engine::IOEvent& e)
 		{
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('P');
 			Engine::EMU::GetInstance()->ChangeCamera(testEntity);
 		});*/
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::T_KEY_DOWN, [](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::T_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
 			Engine::EMU::GetInstance()->Scenes_Deactivate(testEntity);
 		});
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::T_KEY_UP, [](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::T_KEY_UP, [](Engine::IOEvent& e)
 		{
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
 			Engine::EMU::GetInstance()->Scenes_Activate(testEntity);
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::B_KEY_DOWN, [](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::B_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::B_KEY_DOWN));
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
@@ -131,7 +131,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			e.Handled = true;
 		});
 
-	Engine::EMU::GetInstance()->RegisterIOEventListener(Engine::N_KEY_DOWN, [](Engine::IOEvent& e)
+	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::N_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::N_KEY_DOWN));
 			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);

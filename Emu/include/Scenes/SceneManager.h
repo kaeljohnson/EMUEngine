@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "../AssetManager.h"
 #include "../Logging/Logger.h"
+#include "../Events/IOEventSystem.h"
 
 namespace Engine
 {
@@ -23,8 +24,9 @@ namespace Engine
 		* 
 		* @param sceneName The name of the scene to add.
 		* @param refAssetManager Reference to the AssetManager instance.
+		* @param refIOEventSystem Reference to the IOEventSystem instance.
 		*/
-		void AddScene(std::string sceneName, AssetManager& refAssetManager);
+		void AddScene(std::string sceneName, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem);
 
 		/**
 		* @brief Gets a pointer to the current active scene.
@@ -149,6 +151,9 @@ namespace Engine
 				m_refECS.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
 			}
 		}
+
+		void AddIOEvent(const std::string& sceneName, IOEventType type);
+		void RemoveIOEvent(const std::string& sceneName, IOEventType type);
 
 	public:
 		/**

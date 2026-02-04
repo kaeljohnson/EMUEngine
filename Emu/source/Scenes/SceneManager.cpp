@@ -3,6 +3,7 @@
 #include "../../include/Scenes/SceneManager.h"
 #include "../../include/Scenes/Scene.h"
 #include "../../include/Logging/Logger.h"
+#include "../../include/Events/IOEventSystem.h"
 
 namespace Engine
 {
@@ -11,11 +12,11 @@ namespace Engine
 		m_scenes.reserve(200);
 	}
 
-	void SceneManager::AddScene(std::string sceneName, AssetManager& refAssetManager)
+	void SceneManager::AddScene(std::string sceneName, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
 	{
 		m_scenes.emplace(std::piecewise_construct,
 			std::forward_as_tuple(sceneName),
-			std::forward_as_tuple(m_refECS, refAssetManager));
+			std::forward_as_tuple(m_refECS, refAssetManager, refIOEventSystem));
 	}
 
 	bool SceneManager::IsSceneChanging()
@@ -153,6 +154,34 @@ namespace Engine
 		if (it != m_scenes.end())
 		{
 			it->second.RegisterContactCallback(contactType, entity, callback);
+		}
+		else
+		{
+			ENGINE_CRITICAL("Scene not found in SceneManager");
+
+		}
+	}
+
+	void SceneManager::AddIOEvent(const std::string& sceneName, IOEventType type)
+	{
+		auto it = m_scenes.find(sceneName);
+		if (it != m_scenes.end())
+		{
+			it->second.AddIOEvent(type);
+		}
+		else
+		{
+			ENGINE_CRITICAL("Scene not found in SceneManager");
+
+		}
+	}
+
+	void SceneManager::RemoveIOEvent(const std::string& sceneName, IOEventType type)
+	{
+		auto it = m_scenes.find(sceneName);
+		if (it != m_scenes.end())
+		{
+			it->second.RemoveIOEvent(type);
 		}
 		else
 		{

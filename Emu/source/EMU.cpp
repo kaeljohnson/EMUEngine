@@ -61,29 +61,24 @@ namespace Engine
 	void EMU::PlaySound(int soundIndex, int volume, const bool loop) { m_audioSystem.PlaySound(soundIndex, volume, loop); }
 
 
-	void EMU::RegisterIOEventListener(IOEventType type, IOEventHandler handler)
+	void EMU::Global_RegisterIOEventListener(IOEventType type, IOEventHandler handler)
 	{
 		m_ioEventSystem.RegisterIOEventListener(type, handler);
 	}
 
 	void EMU::Scenes_RegisterIOEventListener(const std::string& refSceneName, IOEventType eventType, IOEventHandler handler)
 	{
-		Scenes_RegisterOnPlayEvent(
-			refSceneName,
-			[this, eventType, handler]() mutable
-			{	
-				m_ioEventSystem.RegisterIOEventListener(eventType, handler);
-			});
-
-		Scenes_RegisterOnEndEvent(
-			refSceneName,
-			[this, eventType]() mutable
-			{
-				m_ioEventSystem.UnRegisterIOEventListener(eventType);
-			});
+		m_sceneManager.AddIOEvent(refSceneName, eventType);
+		m_ioEventSystem.RegisterIOEventListener(eventType, handler);
 	}
 
-	void EMU::UnRegisterIOEventListener(IOEventType type)
+	void EMU::Scenes_UnRegisterIOEventListener(const std::string& refSceneName, IOEventType eventType)
+	{
+		m_sceneManager.RemoveIOEvent(refSceneName, eventType);
+		m_ioEventSystem.UnRegisterIOEventListener(eventType);
+	}
+
+	void EMU::Global_UnRegisterIOEventListener(IOEventType type)
 	{
 		m_ioEventSystem.UnRegisterIOEventListener(type);
 	}
@@ -107,7 +102,7 @@ namespace Engine
 	
 	void EMU::Scenes_Activate(Entity entity) { m_sceneManager.GetCurrentScene()->Activate(entity); }
 	void EMU::Scenes_Deactivate(Entity entity) { m_sceneManager.GetCurrentScene()->Deactivate(entity); }
-	void EMU::Scenes_Create(const std::string& name) { m_sceneManager.AddScene(name, m_assetManager); }
+	void EMU::Scenes_Create(const std::string& name) { m_sceneManager.AddScene(name, m_assetManager, m_ioEventSystem); }
 	void EMU::Scenes_Load(const std::string& name) { m_sceneManager.QueueNewScene(name); }
 	void EMU::Scenes_RegisterOnPlayEvent(const std::string& name, std::function<void()> func) { m_sceneManager.RegisterOnScenePlayEvent(name, func); }
 	void EMU::Scenes_RegisterOnEndEvent(const std::string& name, std::function<void()> func) { m_sceneManager.RegisterOnSceneEndEvent(name, func); }

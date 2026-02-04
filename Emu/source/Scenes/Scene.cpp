@@ -19,9 +19,9 @@ static json rulesJson; // Only one rules file per game for now so this will work
 
 namespace Engine
 {
-	Scene::Scene(ECS& refECS, AssetManager& refAssetManager)
+	Scene::Scene(ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
 		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), m_hasTileMap(false), m_tileMap(m_refECS), 
-		m_physicsSimulation(refECS, m_tileMap), m_refAssetManager(refAssetManager),
+		m_physicsSimulation(refECS, m_tileMap), m_refAssetManager(refAssetManager), m_refIOEventSystem(refIOEventSystem),
 		m_cameraSystem(refECS)
 	{
 		m_entities.reserve(50000);
@@ -124,6 +124,11 @@ namespace Engine
 		{
 			// Free texture pointer associated with sprite.
 			animations.m_ptrLoadedTexture = nullptr;
+		}
+
+		for (auto& eventType : m_sceneRuntimeIOEvents)
+		{
+			m_refIOEventSystem.UnRegisterIOEventListener(eventType);
 		}
 
 		m_refAssetManager.UnloadSounds();
@@ -237,6 +242,28 @@ namespace Engine
 	void Scene::UpdateCamera(AssetManager& refAssetManager)
 	{
 		m_cameraSystem.Update(refAssetManager);
+	}
+
+	void Scene::AddIOEvent(IOEventType type)
+	{
+		if (m_sceneRuntimeIOEvents.contains(type) != 0)
+		{
+			ENGINE_WARN("Event of type {} is already associated with a client callback function in scene.", static_cast<int>(type));
+			return;
+		}
+
+		m_sceneRuntimeIOEvents.insert(type);
+	}
+
+	void Scene::RemoveIOEvent(IOEventType type)
+	{
+		if (m_sceneRuntimeIOEvents.contains(type) == 0)
+		{
+			ENGINE_INFO("Event of type {} is not present in current runtime io events.");
+			return;
+		}
+
+		m_sceneRuntimeIOEvents.erase(type);
 	}
 
 	void Scene::SetGravity(const Math2D::Point2D<float> gravity)
