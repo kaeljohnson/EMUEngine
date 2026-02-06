@@ -54,72 +54,18 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 			Engine::EMU::GetInstance()->Camera_SetPixelsPerUnit(entity, 32);
 			e.Handled = true;
 		});
-	
-	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::L_KEY_DOWN, [&](Engine::IOEvent& e)
-		{
-			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::L_KEY_DOWN));
-			Engine::EMU::GetInstance()->Scenes_Load("Level2");
-			e.Handled = true;
-		});
-
-	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::U_KEY_DOWN, [&](Engine::IOEvent& e)
-		{
-			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::U_KEY_DOWN));
-			Engine::EMU::GetInstance()->Scenes_Load("Level1");
-			e.Handled = true;
-		});
 
 	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::O_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			CLIENT_LOG_D("Handled event O KEY DOWN: {}", static_cast<int>(Engine::O_KEY_DOWN));
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(2);
-			Engine::EMU::GetInstance()->Scenes_Activate(testEntity);
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(40);
+			Engine::EMU::GetInstance()->Scenes_Deactivate(testEntity);
 			CLIENT_LOG_D("Done with O key down listener");
 		});
 
 	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::O_KEY_UP, [](Engine::IOEvent& e)
 		{
-			CLIENT_LOG_D("Handled event O KEY UP: {}", static_cast<int>(Engine::O_KEY_UP));
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(2);
-			Engine::EMU::GetInstance()->Scenes_Deactivate(testEntity);
-			CLIENT_LOG_D("Done with O key up listener");
-		});
-
-	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::P_KEY_DOWN, [](Engine::IOEvent& e)
-		{
-			CLIENT_LOG_D("Handled event P KEY DOWN: {}", static_cast<int>(Engine::P_KEY_DOWN));
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(3);
-			Engine::EMU::GetInstance()->Scenes_Activate(testEntity);
-			CLIENT_LOG_D("Done with P key down listener");
-		});
-
-	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::P_KEY_UP, [](Engine::IOEvent& e)
-		{
-			CLIENT_LOG_D("Handled event P KEY UP: {}", static_cast<int>(Engine::P_KEY_UP));
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(3);
-			Engine::EMU::GetInstance()->Scenes_Deactivate(testEntity);
-		});
-
-	/*Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::U_KEY_DOWN, [](Engine::IOEvent& e)
-		{
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('Y');
-			Engine::EMU::GetInstance()->ChangeCamera(testEntity);
-		});*/
-
-	/*Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::U_KEY_UP, [](Engine::IOEvent& e)
-		{
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->GetCurrentRuntimeEntity('P');
-			Engine::EMU::GetInstance()->ChangeCamera(testEntity);
-		});*/
-
-	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::T_KEY_DOWN, [](Engine::IOEvent& e)
-		{
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
-			Engine::EMU::GetInstance()->Scenes_Deactivate(testEntity);
-		});
-	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::T_KEY_UP, [](Engine::IOEvent& e)
-		{
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(40);
 			Engine::EMU::GetInstance()->Scenes_Activate(testEntity);
 		});
 

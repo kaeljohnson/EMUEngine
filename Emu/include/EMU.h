@@ -751,9 +751,9 @@ namespace Engine
 		// Event IO System Interface functions
 
 		/**
-		* @brief Register a key or mouse event listener.
-		* This can be called at runtime and client must remember to call the 
-		* unregister function later.
+		* @brief Register a key or mouse event listener. Global functions are applied 
+		* throughout the duration of the entire application. This can be called at runtime 
+		* and client must remember to call the unregister function later.
 		* 
 		* @param type The event type.
 		* @param handler The callback function.
@@ -762,7 +762,7 @@ namespace Engine
 
 		/**
 		* @brief Register a key or mouse event listener for a specific scene.
-		* This calls the OnScenePlay function and is not meant to be called during runtime.
+		* This can be called at any time. The event listener will only work for this scene.
 		* 
 		* @param sceneName Name of scene.
 		* @param type The type of io event.
@@ -772,6 +772,8 @@ namespace Engine
 
 		/**
 		* @brief Unregisters an event listener of an event type for a specific scene.
+		* Scene event listeners (those registered via the Scenes_RegisterIOEventListener()) 
+		* are automatically removed at the end of the scene and do not need to be manually removed.
 		* 
 		* @param sceneName The name of the scene.
 		* @param type The type of the event.
@@ -780,7 +782,8 @@ namespace Engine
 
 		/**
 		* @brief Unregister an event listener of a certain type.
-		* This is helpful when an event handler's existence is conditional.
+		* If an event listener is registered globally, this must be called to
+		* unregister it.
 		* 
 		* @param type The event type.
 		*/

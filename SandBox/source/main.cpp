@@ -50,64 +50,39 @@ int main(int argc, char* args[])
 
 	CLIENT_INFO_D("Client Running!");
 
+	engine->Scenes_Create("StartScreen");
 	engine->Scenes_Create("Level1");
-	engine->Scenes_Create("Level2");
 
 	//// Need physcis to scale with pixels per unit.
+	engine->Scenes_SetGravity("StartScreen", Math2D::Point2D(0.0f, 100.0f));
 	engine->Scenes_SetGravity("Level1", Math2D::Point2D(0.0f, 100.0f));
-	engine->Scenes_SetGravity("Level2", Math2D::Point2D(0.0f, 100.0f));
 
-	// Temp for now. Client will not be able to call functions directly on scene object.
-	engine->Scenes_AddTileMap("Level1", "TestMap2.txt", "TestSceneRules.json");
-	engine->Scenes_AddTileMap("Level2", "TestMap1.txt", "TestSceneRules.json");
+	engine->Scenes_AddTileMap("StartScreen", "StartScreen.txt", "StartScreenRules.json");
+	engine->Scenes_AddTileMap("Level1", "TestMap1.txt", "Level1Rules.json");
 
 	Player player;
 
-	engine->Scenes_RegisterContactCallback("Level1", Engine::BEGIN_CONTACT, 1, 2, [](const Engine::Contact event)
+	engine->Scenes_RegisterContactCallback("StartScreen", Engine::BEGIN_SENSOR, 1, 40, [](const Engine::Contact event)
 		{
-			CLIENT_INFO_D("Multi Begin Contact");
-			
-		});
-
-	engine->Scenes_RegisterContactCallback("Level1", Engine::END_CONTACT, 1, 2, [](const Engine::Contact event)
-		{
-			CLIENT_INFO_D("Multi End Contact");
-			
-		});
-
-	engine->Scenes_RegisterContactCallback("Level1", Engine::BEGIN_SENSOR, 1, 2, [](const Engine::Contact event)
-		{
-			CLIENT_INFO_D("Multi Begin Sensing");
-			Engine::EMU::GetInstance()->Scenes_RegisterIOEventListener("Level1", Engine::W_KEY_DOWN, [](Engine::IOEvent& e)
+			Engine::EMU::GetInstance()->Scenes_RegisterIOEventListener("StartScreen", Engine::W_KEY_DOWN, [](Engine::IOEvent& e)
 				{
-					CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::W_KEY_DOWN));
-					Engine::EMU::GetInstance()->Scenes_Load("Level2");
+					Engine::EMU::GetInstance()->Scenes_Load("Level1");
 					e.Handled = true;
 				});
 		});
 
-	engine->Scenes_RegisterContactCallback("Level1", Engine::END_SENSOR, 1, 2, [](const Engine::Contact event)
+	engine->Scenes_RegisterContactCallback("StartScreen", Engine::END_SENSOR, 1, 40, [](const Engine::Contact event)
 		{
-			CLIENT_INFO_D("Multi End Sensing");
-			Engine::EMU::GetInstance()->Scenes_UnRegisterIOEventListener("Level1", Engine::W_KEY_DOWN);
+			Engine::EMU::GetInstance()->Scenes_UnRegisterIOEventListener("StartScreen", Engine::W_KEY_DOWN);
 		});
 
 	PlayerCamera playerCamera;
 
-	engine->Scenes_Load("Level1");
+	engine->Scenes_Load("StartScreen");
 
-	engine->Scenes_RegisterOnPlayEvent("Level1", []()
+	engine->Scenes_RegisterOnPlayEvent("StartScreen", []()
 		{
-			// Engine::EMU::GetInstance()->PlaySound(1, 128, true);
-		});
-
-	engine->Scenes_RegisterOnEndEvent("Level1", []()
-		{
-		});
-
-	engine->Scenes_RegisterOnPlayEvent("Level2", []()
-		{
-			// Engine::EMU::GetInstance()->PlaySound(1, 128, true);
+			Engine::EMU::GetInstance()->PlaySound(1, 128, true);
 		});
 	
 	AppManagementEventHandlers appManagementEventHandlers;

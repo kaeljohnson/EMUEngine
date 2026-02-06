@@ -11,11 +11,14 @@ PlayerCamera::PlayerCamera() :
 {
 	// Engine currently works by destroying all components on scene change.
 	// Must re-add camera updater on scene play.
-	Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::CameraUpdater>("Level1", 1,
-			[this](Engine::Entity entity) { Update(entity); });
-
-	Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::CameraUpdater>("Level2", 1,
+	Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::CameraUpdater>("StartScreen", 1,
 		[this](Engine::Entity entity) { Update(entity); });
+
+	Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::CameraUpdater>("Level1", 1,
+		[this](Engine::Entity entity) { Update(entity); });
+
+	// Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::CameraUpdater>("Level2", 1,
+		// [this](Engine::Entity entity) { Update(entity); });
 }
 
 void PlayerCamera::Update(Engine::Entity entity)
@@ -38,7 +41,7 @@ void PlayerCamera::Update(Engine::Entity entity)
 	Engine::EMU::GetInstance()->Camera_SetOffset(entity, Math2D::Point2D<float>(desiredCameraTopLeftX, desiredCameraTopLeftY));
 
 	// Update minimap
-	Engine::Entity miniMapEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(35);
+	Engine::Entity miniMapEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(2);
 
 	Math2D::Point2D<float> miniMapSize = Engine::EMU::GetInstance()->Camera_GetSize(miniMapEntity);
 
