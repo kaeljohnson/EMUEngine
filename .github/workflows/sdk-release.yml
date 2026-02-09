@@ -87,7 +87,7 @@ jobs:
         Copy-Item -Recurse -Force "Emu\public\*"  $includeDir
 
         # Emu.lib
-        $emuLib = "bin\Distribution-x64\Emu\Emu.lib"
+        $emuLib = "bin\Distribution-x86_64\Emu\Emu.lib"
         if (!(Test-Path $emuLib)) { throw "Expected Emu.lib not found at: $emuLib" }
         Copy-Item -Force $emuLib $libDir
 
@@ -100,10 +100,10 @@ jobs:
         Copy-Item -Force "$vcpkgBin\SDL2_mixer.dll" $binDir -ErrorAction SilentlyContinue
         Copy-Item -Force "$vcpkgBin\*.dll"          $binDir
 
-        # Example source (optional but nice)
+        # Example source
         if (Test-Path "SandBox") { Copy-Item -Recurse -Force "SandBox\*" $exDir }
 
-        # README / licenses (optional)
+        # README / licenses 
         if (Test-Path "README.md") { Copy-Item -Force "README.md" $root }
         if (Test-Path "LICENSE")   { Copy-Item -Force "LICENSE" $root }
 
