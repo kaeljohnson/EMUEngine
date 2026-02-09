@@ -3,9 +3,8 @@
 #include "ECS/Component.h"
 #include "Physics/BodyTypes.h"
 #include "AppState.h"
-#include "Includes.h"
-#include "MathUtil.h"
-#include "Logging/Logger.h"
+#include "../Public/Includes.h"
+#include "../Public/MathUtil.h"
 
 struct b2BodyId;
 struct b2ShapeId;

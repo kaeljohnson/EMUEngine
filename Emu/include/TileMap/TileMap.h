@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../ECS/ECS.h"
-#include "../Includes.h"
-#include "../MathUtil.h"
+#include "../../Public/Includes.h"
+#include "../../Public/MathUtil.h"
 
 namespace Engine
 {

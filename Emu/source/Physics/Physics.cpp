@@ -3,11 +3,11 @@
 #include <box2d/box2d.h>
 #include "../../include/Physics/Physics.h"
 #include "../../include/ECS/ECS.h"
-#include "../../include/Logging/Logger.h"
+#include "../../Public/Logger.h"
 #include "../../include/Physics/ContactSystem.h"
 #include "../../include/Components.h"
-#include "../../include/Time.h"
-#include "../../include/MathUtil.h"
+#include "../../Public/EMUTime.h"
+#include "../../Public/MathUtil.h"
 
 namespace Engine
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../include/Physics/ContactSystem.h"
-#include "../../include/Logging/Logger.h"
+#include "../../Public/Logger.h"
 #include <box2d/box2d.h>
 
 namespace Engine

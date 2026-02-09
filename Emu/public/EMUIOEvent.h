@@ -1,4 +1,5 @@
 #pragma once
+#include "Includes.h"
 
 namespace Engine
 {
@@ -95,5 +96,10 @@ namespace Engine
 		IOEvent(const IOEventType eventType, const int xPos, const int yPos)
 			: Type(eventType), X_POS(xPos), Y_POS(yPos), Handled(false) {}
 	};
+
+	using IOEventQueue = std::queue<IOEvent>;
+	using IOEventHandler = std::function<void(IOEvent&)>;
+	using IOEventHandlerMap = std::unordered_map<IOEventType, IOEventHandler>;
+	using IOEventStatesMap = std::unordered_map<IOEventType, bool>;
 }
  

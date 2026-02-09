@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../../include/Camera/CameraInterface.h"
-#include "../../include/Rendering/Screen.h"
+#include "../../Public/Screen.h"
 #include "../../include/Components.h"
-#include "../../include/Logging/Logger.h"
+#include "../../Public/Logger.h"
 
 namespace Engine
 {

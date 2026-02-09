@@ -3,10 +3,10 @@
 #include "../../include/ISDL/ISDL.h"
 #include "../../include/Events/IOEventSystem.h"
 #include "../../include/Events/IOEventDispatcher.h"
-#include "../../include/Events/IOEvent.h"
-#include "../../include/Logging/Logger.h"
-#include "../../include/Events/KeyStates.h"
-#include "../../include/Events/MouseStates.h"
+#include "../../Public/EMUIOEvent.h"
+#include "../../Public/Logger.h"
+#include "../../Public/KeyStates.h"
+#include "../../Public/MouseStates.h"
 
 namespace Engine
 {

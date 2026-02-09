@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Includes.h"
+#include "../Public/Includes.h"
 
 #include "ECS/ECS.h"
 
@@ -22,7 +22,7 @@ namespace Engine
 		*
 		* @param ptrRenderer Pointer to the SDL_Renderer.
 		*/
-		void GiveRenderer(void* ptrRenderer);
+		bool GiveRenderer(void* ptrRenderer);
 
 		/**
 		* @brief Shutdown asset manager, freeing all loaded assets.

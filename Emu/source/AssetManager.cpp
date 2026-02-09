@@ -15,9 +15,12 @@ namespace Engine
 		Shutdown();
 	}
 
-	void AssetManager::GiveRenderer(void* ptrRenderer)
+	bool AssetManager::GiveRenderer(void* ptrRenderer)
 	{
+		if (ptrRenderer == nullptr) return false;
+
 		m_ptrRenderer = ptrRenderer;
+		return true;
 	}
 
 	void AssetManager::Shutdown()

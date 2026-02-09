@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../include/EMU.h"
-#include "../include/Rendering/Screen.h"
+#include "../Public/EMU.h"
+#include "../Public/Screen.h"
+#include "../include/Application.h"
 
 namespace Engine
 {
@@ -23,9 +24,18 @@ namespace Engine
 	}
 
 	EMU::EMU(const size_t numEntities)
-		: m_ecs(), m_sceneManager(m_ecs), m_assetManager(), m_animationSystem(m_ecs), m_animationInterface(m_ecs),
-		m_audioSystem(m_ecs, m_assetManager), m_physicsInterface(m_ecs), m_transformInterface(m_ecs), m_ioEventSystem(),
-		m_application(m_ecs, m_sceneManager, m_ioEventSystem, m_assetManager, m_audioSystem, m_animationSystem), m_cameraInterface(m_ecs)
+		: m_ecs(),
+		m_application(std::make_unique<Application>(m_ecs)),
+		// m_sceneManager(m_ecs), 
+		//m_assetManager(),
+		//m_animationSystem(m_ecs),
+		m_animationInterface(m_ecs),
+		//m_audioSystem(m_ecs, m_assetManager),
+		m_physicsInterface(m_ecs),
+		m_transformInterface(m_ecs),
+		//m_ioEventSystem(),
+		m_cameraInterface(m_ecs)
+		
 	{
 		m_ecs.Initialize(numEntities);
 
@@ -38,9 +48,14 @@ namespace Engine
 		m_ecs.RegisterComponentManager<Sprite>();
 		m_ecs.RegisterComponentManager<Animations>();
 		m_ecs.RegisterComponentManager<AudioSource>();
-
-		m_ioEventSystem.Initialize();
 	}
+
+	void EMU::RunApp() { m_application->Start(); }
+
+	/**
+	* @brief Ends the EMU application.
+	*/
+	void EMU::EndApp() { m_application->End(); }
 
 	EMU::~EMU() 
 	{
@@ -58,69 +73,69 @@ namespace Engine
 		m_cameraInterface.ChangeCamera(entity);
 	}*/
 
-	void EMU::PlaySound(int soundIndex, int volume, const bool loop) { m_audioSystem.PlaySound(soundIndex, volume, loop); }
+	void EMU::PlaySound(int soundIndex, int volume, const bool loop) { m_application->m_audioSystem.PlaySound(soundIndex, volume, loop); }
 
 
 	void EMU::Global_RegisterIOEventListener(IOEventType type, IOEventHandler handler)
 	{
-		m_ioEventSystem.RegisterIOEventListener(type, handler);
+		m_application->m_IOEventSystem.RegisterIOEventListener(type, handler);
 	}
 
 	void EMU::Scenes_RegisterIOEventListener(const std::string& refSceneName, IOEventType eventType, IOEventHandler handler)
 	{
-		m_sceneManager.AddIOEvent(refSceneName, eventType);
-		m_ioEventSystem.RegisterIOEventListener(eventType, handler);
+		m_application->m_sceneManager.AddIOEvent(refSceneName, eventType);
+		m_application->m_IOEventSystem.RegisterIOEventListener(eventType, handler);
 	}
 
 	void EMU::Scenes_UnRegisterIOEventListener(const std::string& refSceneName, IOEventType eventType)
 	{
-		m_sceneManager.RemoveIOEvent(refSceneName, eventType);
-		m_ioEventSystem.UnRegisterIOEventListener(eventType);
+		m_application->m_sceneManager.RemoveIOEvent(refSceneName, eventType);
+		m_application->m_IOEventSystem.UnRegisterIOEventListener(eventType);
 	}
 
 	void EMU::Global_UnRegisterIOEventListener(IOEventType type)
 	{
-		m_ioEventSystem.UnRegisterIOEventListener(type);
+		m_application->m_IOEventSystem.UnRegisterIOEventListener(type);
 	}
 
 	// Scene management
 
 	Entity EMU::Scenes_GetEntityById(const std::string& sceneName, const size_t tileId)
 	{
-		return m_sceneManager.GetEntity(sceneName, tileId);
+		return m_application->m_sceneManager.GetEntity(sceneName, tileId);
 	}
 
 	const std::vector<Entity>& EMU::Scenes_GetEntitiesById(const std::string& sceneName, const size_t id)
 	{
-		return m_sceneManager.GetEntities(sceneName, id);
+		return m_application->m_sceneManager.GetEntities(sceneName, id);
 	}
 
 	Entity EMU::Scenes_GetCurrentRuntimeEntity(const size_t tileId)
 	{
-		return m_sceneManager.GetCurrentScene()->GetTileMapEntity(tileId);
+		return m_application->m_sceneManager.GetCurrentScene()->GetTileMapEntity(tileId);
 	}
 	
-	void EMU::Scenes_Activate(Entity entity) { m_sceneManager.GetCurrentScene()->Activate(entity); }
-	void EMU::Scenes_Deactivate(Entity entity) { m_sceneManager.GetCurrentScene()->Deactivate(entity); }
-	void EMU::Scenes_Create(const std::string& name) { m_sceneManager.AddScene(name, m_assetManager, m_ioEventSystem); }
-	void EMU::Scenes_Load(const std::string& name) { m_sceneManager.QueueNewScene(name); }
-	void EMU::Scenes_RegisterOnPlayEvent(const std::string& name, std::function<void()> func) { m_sceneManager.RegisterOnScenePlayEvent(name, func); }
-	void EMU::Scenes_RegisterOnEndEvent(const std::string& name, std::function<void()> func) { m_sceneManager.RegisterOnSceneEndEvent(name, func); }
+	void EMU::Scenes_Activate(Entity entity) { m_application->m_sceneManager.GetCurrentScene()->Activate(entity); }
+	void EMU::Scenes_Deactivate(Entity entity) { m_application->m_sceneManager.GetCurrentScene()->Deactivate(entity); }
+	void EMU::Scenes_Create(const std::string& name) { m_application->m_sceneManager.AddScene(name, m_application->m_assetManager, m_application->m_IOEventSystem); }
+	void EMU::Scenes_Load(const std::string& name) { m_application->m_sceneManager.QueueNewScene(name); }
+	void EMU::Scenes_RegisterOnPlayEvent(const std::string& name, std::function<void()> func) { m_application->m_sceneManager.RegisterOnScenePlayEvent(name, func); }
+	void EMU::Scenes_RegisterOnEndEvent(const std::string& name, std::function<void()> func) { m_application->m_sceneManager.RegisterOnSceneEndEvent(name, func); }
 
 	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const size_t entityA, const size_t entityB, ContactCallback callback)
 	{ 
-		m_sceneManager.RegisterContactCallback(name, contactType, entityA, entityB, callback); 
+		m_application->m_sceneManager.RegisterContactCallback(name, contactType, entityA, entityB, callback);
 	}
 	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const size_t entity, ContactCallback callback) {
-		m_sceneManager.RegisterContactCallback(name, contactType, entity, callback);
+		m_application->m_sceneManager.RegisterContactCallback(name, contactType, entity, callback);
 	}
-	void EMU::Scenes_SetGravity(const std::string& name, const Math2D::Point2D<float> gravity) { m_sceneManager.SetGravity(name, gravity); }
+	void EMU::Scenes_SetGravity(const std::string& name, const Math2D::Point2D<float> gravity) { m_application->m_sceneManager.SetGravity(name, gravity); }
 	// void EMU::Scenes_Add(const std::string& name, Entity entity) { getScene(name).Add(entity); }
 	// void EMU::Scenes_Remove(const std::string& name, Entity entity) { getScene(name).Remove(entity); m_ecs.Deactivate(entity); }
-	void EMU::Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName) { m_sceneManager.AddTileMap(name, mapFileName, rulesFileName); }
-	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const size_t tileId) { return m_sceneManager.GetEntity(name, tileId); }
-	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const size_t tileId) { return m_sceneManager.GetTileMapEntities(name, tileId); }
-	void EMU::Scenes_SetLevelDimensions(const std::string& name, const Math2D::Point2D<int> levelWidthInUnits) { m_sceneManager.SetLevelDimensions(name, levelWidthInUnits); }
+	void EMU::Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName) { m_application->m_sceneManager.AddTileMap(name, mapFileName, rulesFileName); }
+	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const size_t tileId) { return m_application->m_sceneManager.GetEntity(name, tileId); }
+	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const size_t tileId) { return m_application->m_sceneManager.GetTileMapEntities(name, tileId); }
+	void EMU::Scenes_SetLevelDimensions(const std::string& name, const Math2D::Point2D<int> levelWidthInUnits) { m_application->m_sceneManager.SetLevelDimensions(name, levelWidthInUnits); }
 
 	void EMU::Camera_SetPixelsPerUnit(Entity entity, const int pixelsPerUnit) { m_cameraInterface.SetPixelsPerUnit(entity, pixelsPerUnit); }
 	const size_t EMU::Camera_GetPixelsPerUnit(Entity entity) { return m_cameraInterface.GetPixelsPerUnit(entity); }
@@ -186,4 +201,189 @@ namespace Engine
 	const Math2D::Point2D<int> EMU::GetWindowSize() { return Screen::GetWindowSize(); }
 	void EMU::SetWindowSize(const Math2D::Point2D<int>& size) { Screen::SetWindowSize(size); }
 	void EMU::SetFullscreen() { Screen::SetFullscreen(); }
+
+
+	
+	template<class ComponentType, class... Args>
+	void RegisterAddOnPlay(EMU* emu, const std::string& sceneName, size_t tileId, Args&&... args)
+	{
+		auto packed = std::make_tuple(std::forward<Args>(args)...);
+
+		emu->Scenes_RegisterOnPlayEvent(
+			sceneName,
+			[emu, sceneName, tileId, packed = std::move(packed)]() mutable
+			{
+				std::apply([&](auto&... unpacked)
+					{
+						emu->m_application->m_sceneManager.AddComponent<ComponentType>(
+							sceneName,
+							tileId,
+							unpacked...);
+					}, packed);
+			});
+	}
+
+	void EMU::Scenes_AddPhysicsUpdaterComponent(
+		const std::string& sceneName,
+		size_t tileId,
+		std::function<void(Entity)> updaterCallback)
+	{
+		RegisterAddOnPlay<PhysicsUpdater>(
+			this,
+			sceneName,
+			tileId,
+			updaterCallback
+		);
+	}
+
+	void EMU::Scenes_AddCameraUpdaterComponent(const std::string& sceneName, 
+		size_t tileId, 
+		std::function<void(Entity entity)> updaterCallback) 
+	{
+		RegisterAddOnPlay<CameraUpdater>(
+			this,
+			sceneName,
+			tileId,
+			updaterCallback
+		);
+	}
+
+	/*void EMU::Scenes_AddPhysicsBodyComponent(
+		const std::string& sceneName,
+		size_t tileId,
+		bool enabled,
+		BodyType bodyType,
+		Filter category,
+		Filter mask,
+		Math2D::Point2D<float> dimensions,
+		Math2D::Point2D<float> startingPosition,
+		float rotation,
+		bool gravityOn,
+		bool checkSimpleContacts,
+		bool drawDebug,
+		bool fillRect,
+		DebugColor debugColor)
+	{
+		RegisterAddOnPlay<PhysicsBody>(
+			this,
+			sceneName,
+			tileId,
+			enabled, bodyType, category, mask,
+			dimensions, startingPosition, rotation,
+			gravityOn, checkSimpleContacts, drawDebug, fillRect, debugColor);
+	}
+
+	void EMU::Scenes_AddChainColliderComponent(
+		const std::string& sceneName,
+		size_t tileId,
+		Math2D::Chain refPoints,
+		bool enabled,
+		Filter category,
+		Filter mask,
+		bool drawDebug,
+		DebugColor debugColor)
+	{
+		RegisterAddOnPlay<ChainCollider>(
+			this,
+			sceneName,
+			tileId,
+			std::move(refPoints),
+			enabled,
+			category,
+			mask,
+			drawDebug,
+			debugColor);
+	}
+
+	void EMU::Scenes_AddTransformComponent(
+		const std::string& sceneName,
+		size_t tileId,
+		Math2D::Point2D<float> position,
+		float rotation,
+		int direction,
+		size_t zIndex,
+		bool drawDebug,
+		DebugColor debugColor)
+	{
+		RegisterAddOnPlay<Transform>(
+			this,
+			sceneName,
+			tileId,
+			position,
+			rotation,
+			direction,
+			zIndex,
+			drawDebug,
+			debugColor);
+	}
+
+	void EMU::Scenes_AddCameraComponent(
+		const std::string& sceneName,
+		size_t tileId,
+		Math2D::Point2D<float> size,
+		Math2D::Point2D<float> screenRatio,
+		Math2D::Point2D<float> position,
+		size_t pixelsPerUnit,
+		bool clampingOn,
+		bool border,
+		std::array<size_t, 3> backgroundColor,
+		size_t numLayers)
+	{
+		RegisterAddOnPlay<Camera>(
+			this,
+			sceneName,
+			tileId,
+			size,
+			screenRatio,
+			position,
+			pixelsPerUnit,
+			clampingOn,
+			border,
+			backgroundColor,
+			numLayers);
+	}
+
+	void EMU::Scenes_AddSpriteComponent(
+		const std::string& sceneName,
+		size_t tileId,
+		void* ptrLoadedTexture,
+		Math2D::Point2D<int> pixelsPerFrame,
+		Math2D::Point2D<float> offsetFromTransform,
+		Math2D::Point2D<size_t> dimensions,
+		Math2D::Point2D<float> size,
+		bool drawDebug,
+		DebugColor debugColor)
+	{
+		RegisterAddOnPlay<Sprite>(
+			this,
+			sceneName,
+			tileId,
+			ptrLoadedTexture,
+			pixelsPerFrame,
+			offsetFromTransform,
+			dimensions,
+			size,
+			drawDebug,
+			debugColor);
+	}
+
+	void EMU::Scenes_AddAnimationsComponent(
+		const std::string& sceneName,
+		size_t tileId,
+		std::unordered_map<size_t, Animation> animations)
+	{
+		RegisterAddOnPlay<Animations>(
+			this,
+			sceneName,
+			tileId,
+			std::move(animations));
+	}
+
+	void EMU::Scenes_AddAudioSourceComponent(
+		const std::string& sceneName, size_t tileId, std::string soundName)
+	{
+		RegisterAddOnPlay<AudioSource>(
+			this, sceneName, tileId, std::move(soundName));
+	}*/
+
 }

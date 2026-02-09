@@ -2,13 +2,13 @@
 
 #include "../../include/Camera/CameraSystem.h"
 #include "../../include/Camera/CameraInterface.h"
-#include "../../include/Rendering/Screen.h"
-#include "../../include/Time.h"
+#include "../../Public/Screen.h"
+#include "../../Public/EMUTime.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Components.h"
 #include "../../include/ISDL/ISDL.h"
 
-#include "../../include/Logging/Logger.h"
+#include "../../Public/Logger.h"
 
 namespace Engine
 {

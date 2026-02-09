@@ -1,18 +1,16 @@
 #pragma once
 
-#include "Application.h"
-#include "Scenes/SceneManager.h"
-#include "Events/IOEventSystem.h"
-#include "Physics/Physics.h"
-#include "Camera/CameraInterface.h"
-#include "Audio/AudioSystem.h"
-#include "TransformInterface.h"
-#include "AssetManager.h"
-#include "Animations/AnimationSystem.h"
-#include "Animations/AnimationInterface.h"
+#include "EMUIOEvent.h"
+#include "../include/Physics/PhysicsInterface.h"
+#include "../include/Camera/CameraInterface.h"
+#include "../include/TransformInterface.h"
+#include "../include/Animations/AnimationInterface.h"
+#include "Contacts.h"
 
 namespace Engine
 {
+	class Application;
+
 	/**
 	* @brief CLIENT ENTRY POINT FOR THE EMU ENGINE.
 	* 
@@ -34,12 +32,12 @@ namespace Engine
 		/**
 		* @brief Starts the EMU application.
 		*/
-		inline void RunApp() { m_application.Start(); }
+		void RunApp();
 
 		/**
 		* @brief Ends the EMU application.
 		*/
-		inline void EndApp() { m_application.End(); }
+		void EndApp();
 
 		//////////// Scene Management functions ////////////
 
@@ -712,39 +710,44 @@ namespace Engine
 		
 		/**
 		* @brief Registers an "on scene play event" which adds a component of 
-		* type @c T to all entities matching a tile ID at OnScenePlay for the specified scene.
+		* type Physics Updater to all entities matching a tile ID at OnScenePlay for the specified scene.
 		*
-		* @note This function is temporarily exposed for scripting components only.
+		* @note These function are temporarily exposed for scripting components only.
 		* Once scripting components can be registered via rules files, this function
 		* will be removed from the public API.
 		*
-		* @tparam T The component type to add.
-		* @tparam Args Variadic argument types used to construct the component.
-		* @param sceneName The name of the scene to modify.
-		* @param tileId The tile ID identifying which entities receive the component.
-		* @param componentArgs Arguments forwarded to the component constructor.
+		* @param sceneName The name of the scene.
+		* @param tileId The number that identifies the tile in the map.
+		* @param updaterCallback The callback to be executed.
 		*/
-		template <typename T, typename... Args>
-		void Scenes_AddComponent(const std::string& sceneName, size_t tileId, Args&&... args)
-		{
-			Scenes_RegisterOnPlayEvent(
-				sceneName,
-				[this,
-				sceneName,
-				tileId,
-				args = std::make_tuple(std::forward<Args>(args)...)]() mutable
-				{
-					std::apply(
-						[&](auto&&... unpacked)
-						{
-							m_sceneManager.AddComponent<T>(
-								sceneName,
-								tileId,
-								std::move(unpacked)...);
-						},
-						args);
-				});
-		}
+		void Scenes_AddPhysicsUpdaterComponent(const std::string& sceneName, size_t tileId, std::function<void(Entity entity)> updaterCallback);
+
+		/**
+		* @brief Registers an "on scene play event" which adds a component of
+		* type Camera Updater to all entities matching a tile ID at OnScenePlay for the specified scene.
+		*
+		* @note These function are temporarily exposed for scripting components only.
+		* Once scripting components can be registered via rules files, this function
+		* will be removed from the public API.
+		*
+		* @param sceneName The name of the scene.
+		* @param tileId The number that identifies the tile in the map.
+		* @param updaterCallback The callback to be executed.
+		*/
+		void Scenes_AddCameraUpdaterComponent(const std::string& sceneName, size_t tileId, std::function<void(Entity entity)> updaterCallback);
+		/*void Scenes_AddPhysicsBodyComponent(const std::string& sceneName, size_t tileId, const bool enabled, BodyType bodyType, Filter category, Filter mask,
+			Math2D::Point2D<float> dimensions, Math2D::Point2D<float> startingPosition, float rotation, bool gravityOn, bool checkSimpleContacts, bool drawDebug, bool fillRect, DebugColor debugColor);
+		void Scenes_AddChainColliderComponent(const std::string& sceneName, size_t tileId, Math2D::Chain refPoints,
+			const bool enabled, Filter category, Filter mask, bool drawDebug, DebugColor debugColor);
+		void Scenes_AddTransformComponent(const std::string& sceneName, size_t tileId, Math2D::Point2D<float> position, float rotation,
+			int direction, size_t zIndex, const bool drawDebug, DebugColor debugColor);
+		void Scenes_AddCameraComponent(const std::string& sceneName, size_t tileId, Math2D::Point2D<float> size, Math2D::Point2D<float> screenRatio,
+			Math2D::Point2D<float> position, size_t pixelsPerUnit, bool clampingOn, bool border, std::array<size_t, 3> backgroundColor, size_t numLayers);
+		void Scenes_AddSpriteComponent(const std::string& sceneName, size_t tileId, void* ptrLoadedTexture, Math2D::Point2D<int> pixelsPerFrame,
+			Math2D::Point2D<float> offsetFromTransform, Math2D::Point2D<size_t> dimensions,
+			Math2D::Point2D<float> size, const bool drawDebug, DebugColor debugColor);
+		void Scenes_AddAnimationsComponent(const std::string& sceneName, size_t tileId, std::unordered_map<size_t, Animation> animations);
+		void Scenes_AddAudioSourceComponent(const std::string& sceneName, size_t tileId, const std::string soundName);*/
 
 		////////////////////////////////////////////////////
 
@@ -793,24 +796,17 @@ namespace Engine
 		static void Init(const size_t numEntities);
 		~EMU();
 		
-	private:
+	public:
 		EMU(const size_t numEntities);
 
 		ECS m_ecs;
-		AssetManager m_assetManager;
 		
-		AnimationSystem m_animationSystem;
 		AnimationInterface m_animationInterface;
-
-		AudioSystem m_audioSystem;
-
 		PhysicsInterface m_physicsInterface;
 		CameraInterface m_cameraInterface;
 		TransformInterface m_transformInterface;
-
-		IOEventSystem m_ioEventSystem;
-		SceneManager m_sceneManager;
-		Application m_application;
+		
+		std::unique_ptr<Application> m_application;
 	};
 
 } // namespace Engine

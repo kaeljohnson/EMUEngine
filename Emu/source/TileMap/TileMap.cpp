@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../include/TileMap/TileMap.h"
-#include "../../include/Logging/Logger.h"
+#include "../../Public/Logger.h"
 #include "../../include/ECS/ECS.h"
 
 // Max number of entities in the map allowed by engine.

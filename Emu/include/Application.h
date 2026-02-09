@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Includes.h"
+#include "../Public/Includes.h"
 #include "Scenes/Scene.h"
 #include "Scenes/SceneManager.h"
 #include "Rendering/IRenderer.h"
@@ -20,8 +20,7 @@ namespace Engine
 	class Application
 	{
 	public:
-		Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, 
-			AssetManager& refAssetManager, AudioSystem& refAudioSystem, AnimationSystem& refAnimationSystem);
+		Application(ECS& refECS);
 		void Start();
 		void End();
 
@@ -33,15 +32,14 @@ namespace Engine
 		Application(Application&&) = delete;
 		Application& operator=(Application&&) = delete;
 
-	private:
+	public:
 		ECS& m_refECS;								/// Reference to the ECS instance.
 
+		AssetManager m_assetManager;				/// The asset manager instance
 		IRenderer m_IRenderer;						/// The renderer instance.
-		
-		SceneManager& m_refSceneManager;			/// Reference to the scene manager.
-		IOEventSystem& m_refIOEventSystem;			/// Reference to the IO event system.
-		AnimationSystem& m_refAnimationSystem;		/// Reference to the animation system.
-		AudioSystem& m_refAudioSystem;				/// Reference to the audio system.
-		AssetManager& m_refAssetManager;			/// Reference to the asset manager.
+		SceneManager m_sceneManager;				/// The scene manager instance.
+		IOEventSystem m_IOEventSystem;				/// The IO event system.
+		AnimationSystem m_animationSystem;			/// The animation system.
+		AudioSystem m_audioSystem;					/// The audio system.
 	};
 }

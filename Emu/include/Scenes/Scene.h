@@ -6,8 +6,8 @@
 #include "../AssetManager.h"
 #include "../Physics/Physics.h"
 #include "../Camera/CameraSystem.h"
-#include "../Includes.h"
-#include "../MathUtil.h"
+#include "../../Public/Includes.h"
+#include "../../Public/MathUtil.h"
 #include "../Events/IOEventSystem.h"
 
 struct b2WorldId;

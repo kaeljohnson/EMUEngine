@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Includes.h"
+#include "../../Public/Includes.h"
 #include "../ECS/ECS.h"
 
 namespace Engine

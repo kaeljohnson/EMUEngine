@@ -1,15 +1,15 @@
 #pragma once
 
 #include "../../include/ISDL/ISDL.h"
-#include "../../include/Logging/Logger.h"
+#include "../../Public/Logger.h"
 #include "../../include/Rendering/IRenderer.h"
 #include "../../include/Camera/CameraInterface.h"
 #include "../../include/ECS/ECS.h"
 #include "../../include/Components.h"
-#include "../../include/Time.h"
-#include "../../include/Rendering/Screen.h"
+#include "../../Public/EMUTime.h"
+#include "../../Public/Screen.h"
 
-#include "../../include/Includes.h"
+#include "../../Public/Includes.h"
 
 namespace Engine
 {
@@ -23,7 +23,7 @@ namespace Engine
 	IRenderer::IRenderer(ECS& refECS, AssetManager& refAssetManager) 
 		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS), m_refAssetManager(refAssetManager), m_lastDebugColor(DebugColor::Black)
 	{
-		ENGINE_INFO("Creating Renderer");
+		ENGINE_INFO("Creating Renderer...");
 
 		if (m_rendererCreated)
 		{
@@ -74,7 +74,11 @@ namespace Engine
 		m_rendererCreated = true;
 
 		// Give renderer pointer to asset manager so it can load textures.
-		m_refAssetManager.GiveRenderer(m_ptrRenderer);
+		if (!m_refAssetManager.GiveRenderer(m_ptrRenderer))
+		{
+			ENGINE_ERROR("Could not give renderer to asset manager! Exitiing.");
+			std::exit(1);
+		}
 
 		ENGINE_INFO("Renderer created.");
 	}

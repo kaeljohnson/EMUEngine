@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../include/ISDL/ISDL.h"
-#include "../include/Logging/Logger.h"
-#include "../include/EMU.h"
-#include "../include/Init.h"
+#include "../Public/Logger.h"
+#include "../Public/EMU.h"
+#include "../public/Init.h"
 
 namespace Engine
 {

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../Includes.h"
+#include "../../Public/Includes.h"
 #include "../ISDL/ISDL.h"
-#include "../MathUtil.h"
-#include "IOEvent.h"
-#include "KeyStates.h"
-#include "MouseStates.h"
+#include "../../Public/MathUtil.h"
+#include "../../Public/EMUIOEvent.h"
+#include "../../Public/KeyStates.h"
+#include "../../Public/MouseStates.h"
 
 namespace Engine
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../ECS/ECS.h"
-#include "../Includes.h"
+#include "../../Public/Includes.h"
 #include "../Components.h"
 #include "../AssetManager.h"
 

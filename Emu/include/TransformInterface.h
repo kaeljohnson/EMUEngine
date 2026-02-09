@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ECS/ECS.h"
-#include "MathUtil.h"
+#include "../Public/MathUtil.h"
 #include "Components.h"
 namespace Engine
 {

@@ -2,7 +2,7 @@
 
 #include "../ECS/ECS.h"
 #include "../AssetManager.h"
-#include "../MathUtil.h"
+#include "../../Public/MathUtil.h"
 
 namespace Engine
 {

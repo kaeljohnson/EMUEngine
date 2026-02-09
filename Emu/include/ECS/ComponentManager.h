@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Includes.h"
-#include "../Logging/Logger.h"
+#include "../../Public/Includes.h"
+#include "../../Public/Logger.h"
 
 namespace Engine
 {
@@ -44,26 +44,46 @@ namespace Engine
         * 
 		* * @tparam Args Variadic template parameters for component constructor.
         */
-        template<typename... Args>
-        void AddComponent(Args&&... args)
-        {
-            auto argsTuple = std::make_tuple(std::forward<Args>(args)...);
-            Entity entity = (Entity)std::get<0>(argsTuple);
+    //    template<typename... Args>
+    //    void AddComponent(Args&&... args)
+    //    {
+    //        auto argsTuple = std::make_tuple(std::forward<Args>(args)...);
+    //        Entity entity = (Entity)std::get<0>(argsTuple);
 
+    //        if (m_components.count(entity) || m_hotIndices[entity] != INVALID_INDEX)
+    //        {
+				//throw std::runtime_error("Error: Component already exists.");
+    //        }
+
+    //        try
+    //        {
+    //            m_components.emplace(entity, T(std::forward<Args>(args)...)); // Move it into the map
+    //        } 
+    //        catch (const std::exception& e)
+    //        {
+    //            std::cerr << "Failed to add component for entity: " << std::to_string(entity) << ". Error: " << std::string(e.what());
+    //        }
+    //    }
+        template <typename... Args>
+        void AddComponent(Entity entity, Args&&... ctorArgs)
+        {
             if (m_components.count(entity) || m_hotIndices[entity] != INVALID_INDEX)
-            {
-				throw std::runtime_error("Error: Component already exists.");
-            }
+                throw std::runtime_error("Error: Component already exists.");
 
             try
             {
-                m_components.emplace(entity, T(std::forward<Args>(args)...)); // Move it into the map
-            } 
+                // Construct the component in-place inside the map
+                m_components.try_emplace(entity, entity, std::forward<Args>(ctorArgs)...);
+                // If your value type is T directly, try_emplace will call T(ctorArgs...)
+            }
             catch (const std::exception& e)
             {
-                std::cerr << "Failed to add component for entity: " << std::to_string(entity) << ". Error: " << std::string(e.what());
+                std::cerr << "Failed to add component for entity: " << entity
+                    << ". Error: " << e.what() << "\n";
+                throw; // optional: rethrow so caller can react
             }
         }
+
 
         /**
 		* @brief Destroys the component associated with the specified entity.

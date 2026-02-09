@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../MathUtil.h"
+#include "MathUtil.h"
 
 namespace Engine
 {

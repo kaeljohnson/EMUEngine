@@ -2,7 +2,7 @@
 
 #include "../../include/Scenes/SceneManager.h"
 #include "../../include/Scenes/Scene.h"
-#include "../../include/Logging/Logger.h"
+#include "../../Public/Logger.h"
 #include "../../include/Events/IOEventSystem.h"
 
 namespace Engine
@@ -42,7 +42,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager: {}", m_queuedSceneName);
 		}
 	}
 
@@ -55,7 +55,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager: {}", sceneName);
 			return m_refECS.INVALID_ENTITY;
 		}
 	}
@@ -69,7 +69,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager: {}", sceneName);
 			static const std::vector<Entity> emptyVector;
 			return emptyVector;
 		}
@@ -116,7 +116,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager: {}", sceneName);
 		}
 
 	}
@@ -130,7 +130,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager: {}", name);
 		}
 	}
 
@@ -143,7 +143,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager: {}", sceneName);
 
 		}
 	}
@@ -157,7 +157,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager: {}", sceneName);
 
 		}
 	}
@@ -171,7 +171,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager: {}", sceneName);
 
 		}
 	}
@@ -185,7 +185,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager: {}", sceneName);
 
 		}
 	}
@@ -199,7 +199,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager: {}", sceneName);
 		}
 	}
 
@@ -212,7 +212,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager: {}", sceneName);
 		}
 	}
 
@@ -225,7 +225,7 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL("Scene not found in SceneManager");
+			ENGINE_CRITICAL("Scene not found in SceneManager: {}", sceneName);
 		}
 	}
 }

@@ -1,23 +1,27 @@
 #pragma once
 
-#include "../include/Logging/Logger.h"
+#include "../Public/Logger.h"
 #include "../include/Events/IOEventSystem.h"
 #include "../include/ISDL/ISDL.h"
-#include "../include/Time.h"
+#include "../Public/EMUTime.h"
 #include "../include/Application.h"
 
 namespace Engine
 {
 
-	Application::Application(ECS& refECS, SceneManager& refSceneManager, IOEventSystem& refIOEventSystem, 
-		AssetManager& refAssetManager, AudioSystem& refAudioSystem, AnimationSystem& refAnimationSystem)
-		: m_refECS(refECS), m_refAssetManager(refAssetManager), m_refAudioSystem(refAudioSystem),
-		m_IRenderer(refECS, refAssetManager), m_refSceneManager(refSceneManager), m_refIOEventSystem(refIOEventSystem), m_refAnimationSystem(refAnimationSystem)
-	{}
+	Application::Application(ECS& refECS)
+		: m_refECS(refECS), 
+		m_sceneManager(m_refECS), 
+		m_assetManager(), 
+		m_audioSystem(m_refECS, m_assetManager),
+		m_IRenderer(refECS, m_assetManager), 
+		m_IOEventSystem(), 
+		m_animationSystem(refECS)
+	{
+		m_IOEventSystem.Initialize();
+	}
 	void Application::Start()
 	{
-		
-
 		Time::SetAppRunning(true);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -36,10 +40,10 @@ namespace Engine
 		while (Time::IsAppRunning())
 		{
 			// auto start = std::chrono::high_resolution_clock::now();
-			m_refSceneManager.IsSceneChanging();
+			m_sceneManager.IsSceneChanging();
 
-			m_refIOEventSystem.HandleEvents();
-			m_refIOEventSystem.ProcessEvents();
+			m_IOEventSystem.HandleEvents();
+			m_IOEventSystem.ProcessEvents();
 
 			newTime = SDL_GetTicks64() / 1000.0;
 			frameTime = newTime - currentTime;
@@ -50,15 +54,15 @@ namespace Engine
 
 			while (accumulator >= timeStep)
 			{
-				m_refSceneManager.GetCurrentScene()->UpdatePhysics();
-				m_refAnimationSystem.Update();
+				m_sceneManager.GetCurrentScene()->UpdatePhysics();
+				m_animationSystem.Update();
 
 				accumulator -= timeStep;
 			}
 
 			Time::SetInterpolationFactor(((float)accumulator / timeStep));
 
-			m_refSceneManager.GetCurrentScene()->UpdateCamera(m_refAssetManager);
+			m_sceneManager.GetCurrentScene()->UpdateCamera(m_assetManager);
 			// m_refAudioSystem.PlayQueuedSound();
 
 			m_IRenderer.CheckForWindowResizeRequest();
@@ -66,7 +70,7 @@ namespace Engine
 
 			if (!Time::IsAppRunning())
 			{ 
-				m_refSceneManager.Cleanup();
+				m_sceneManager.Cleanup();
 			}
 			// auto end = std::chrono::high_resolution_clock::now();
 			// std::chrono::duration<double, std::milli> elapsed = end - start;

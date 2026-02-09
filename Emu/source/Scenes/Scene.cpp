@@ -4,10 +4,10 @@
 #include "../../include/TileMap/TileMap.h"
 #include "../../include/Physics/Physics.h"
 #include "../../include/Scenes/Scene.h"
-#include "../../include/Logging/Logger.h"
-#include "../../include/MathUtil.h"
+#include "../../Public/Logger.h"
+#include "../../Public/MathUtil.h"
 #include "../../include/ECS/ECS.h"
-#include "../../include/Time.h"
+#include "../../Public/EMUTime.h"
 #include "../../include/AppState.h"
 
 #include <filesystem>

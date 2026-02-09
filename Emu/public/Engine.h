@@ -1,9 +1,11 @@
 #pragma once
 
-#include "../include/Init.h"
-#include "../include/Logging/Logger.h"
-#include "../include/Events/KeyStates.h"
-#include "../include/Rendering/Screen.h"
-#include "../include/Time.h"
+#include "Init.h"
+#include "Logger.h"
+#include "KeyStates.h"
+#include "Screen.h"
+#include "EMUTime.h"
+#include "Contacts.h"
+#include "ContactListeners.h"
 
-#include "../include/EMU.h"
+#include "EMU.h"

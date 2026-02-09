@@ -1,0 +1,123 @@
+name: Package Emu SDK (Win64)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  package-win64:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository (with submodules)
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Ensure CMake is available
+      uses: lukka/get-cmake@latest
+
+    # ---- vcpkg ----
+    - name: Clone vcpkg
+      shell: cmd
+      run: |
+        if not exist Emu\external\vcpkg (
+          git clone https://github.com/microsoft/vcpkg.git Emu\external\vcpkg
+        )
+
+    - name: Bootstrap vcpkg
+      shell: cmd
+      run: |
+        cd Emu\external\vcpkg
+        bootstrap-vcpkg.bat
+
+    - name: Install vcpkg dependencies (x64-windows)
+      shell: cmd
+      run: |
+        cd Emu\external\vcpkg
+        vcpkg install --triplet x64-windows sdl2 sdl2-image sdl2-mixer nlohmann-json
+
+    # ---- Box2D ----
+    # Build & install Release so your Distribution config can link "box2d"
+    - name: Build Box2D (Release install)
+      shell: cmd
+      run: |
+        cd Emu\external\box2d
+        if not exist build mkdir build
+        cd build
+        cmake -DBOX2D_BUILD_DOCS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="install" ..
+        cmake --build . --config Release
+        cmake --build . --config Release --target INSTALL
+
+    # ---- Premake ----
+    - name: Generate solution with Premake (engine only)
+      shell: pwsh
+      run: |
+        .\Emu\external\premake\premake5.exe --engine-only vs2022
+
+    # ---- Build engine ----
+    - name: Build Emu (Distribution x64)
+      shell: pwsh
+      run: |
+        msbuild EMUEngine.sln /t:Emu /p:Configuration=Distribution /p:Platform=x64 /m
+
+    # ---- Package ----
+    - name: Stage SDK folder
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = "Stop"
+
+        $version = "${{ github.ref_name }}"
+        if ([string]::IsNullOrWhiteSpace($version)) { $version = "dev" }
+
+        $root = "dist\EmuSDK-$version-win64"
+        $includeDir = "$root\include"
+        $libDir     = "$root\lib"
+        $binDir     = "$root\bin"
+        $exDir      = "$root\examples\SandBox"
+
+        New-Item -ItemType Directory -Force -Path $includeDir,$libDir,$binDir,$exDir | Out-Null
+
+        # Public headers
+        Copy-Item -Recurse -Force "Emu\public\*"  $includeDir
+
+        # Emu.lib
+        $emuLib = "bin\Distribution-x64\Emu\Emu.lib"
+        if (!(Test-Path $emuLib)) { throw "Expected Emu.lib not found at: $emuLib" }
+        Copy-Item -Force $emuLib $libDir
+
+        # Runtime DLLs needed by apps
+        $vcpkgBin = "Emu\external\vcpkg\installed\x64-windows\bin"
+        if (!(Test-Path $vcpkgBin)) { throw "vcpkg bin folder not found at: $vcpkgBin" }
+
+        Copy-Item -Force "$vcpkgBin\SDL2.dll"       $binDir -ErrorAction SilentlyContinue
+        Copy-Item -Force "$vcpkgBin\SDL2_image.dll" $binDir -ErrorAction SilentlyContinue
+        Copy-Item -Force "$vcpkgBin\SDL2_mixer.dll" $binDir -ErrorAction SilentlyContinue
+        Copy-Item -Force "$vcpkgBin\*.dll"          $binDir
+
+        # Example source (optional but nice)
+        if (Test-Path "SandBox") { Copy-Item -Recurse -Force "SandBox\*" $exDir }
+
+        # README / licenses (optional)
+        if (Test-Path "README.md") { Copy-Item -Force "README.md" $root }
+        if (Test-Path "LICENSE")   { Copy-Item -Force "LICENSE" $root }
+
+    - name: Create zip
+      shell: pwsh
+      run: |
+        $version = "${{ github.ref_name }}"
+        if ([string]::IsNullOrWhiteSpace($version)) { $version = "dev" }
+        $zipPath = "dist\EmuSDK-$version-win64.zip"
+        if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+        Compress-Archive -Path "dist\EmuSDK-$version-win64\*" -DestinationPath $zipPath
+
+    - name: Upload SDK zip artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: EmuSDK-win64
+        path: dist/*.zip

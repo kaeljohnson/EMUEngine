@@ -1,7 +1,5 @@
 #pragma once
 
-#include "ContactSystem.h"
-
 namespace Engine
 {
 	/**

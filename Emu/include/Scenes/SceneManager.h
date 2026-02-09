@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../Includes.h"
+#include "../../Public/Includes.h"
 #include "../ECS/ECS.h"
 #include "Scene.h"
 #include "../AssetManager.h"
-#include "../Logging/Logger.h"
+#include "../../Public/Logger.h"
 #include "../Events/IOEventSystem.h"
 
 namespace Engine
@@ -136,21 +136,27 @@ namespace Engine
 		* @param componentArgs The arguments to pass to the component constructor.
 		*/
 		template <typename T, typename... Args>
-		void AddComponent(const std::string sceneName, const size_t tileId, Args&&... componentArgs)
+		void AddComponent(const std::string& sceneName, size_t tileId, Args&&... componentArgs)
 		{
 			auto it = m_scenes.find(sceneName);
 			if (it == m_scenes.end())
 			{
-				ENGINE_CRITICAL_D("Scene not found in SceneManager");
+				ENGINE_CRITICAL_D("Scene not found in SceneManager: {}", sceneName);
 				return;
 			}
 
-			const std::vector<Entity>& entities = it->second.GetTileMapEntities(tileId);
+			const auto& entities = it->second.GetTileMapEntities(tileId);
+
+			auto stored = std::make_tuple(std::forward<Args>(componentArgs)...);
+
 			for (Entity entity : entities)
 			{
-				m_refECS.AddComponent<T>(entity, std::forward<Args>(componentArgs)...);
+				std::apply([&](auto&... xs) {
+					m_refECS.AddComponent<T>(entity, xs...);
+					}, stored);
 			}
 		}
+
 
 		void AddIOEvent(const std::string& sceneName, IOEventType type);
 		void RemoveIOEvent(const std::string& sceneName, IOEventType type);
