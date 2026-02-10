@@ -152,6 +152,7 @@ if not _OPTIONS["engine-only"] then
         includedirs
         {
             "Emu/public",
+            "Emu/include", -- fine to include internal headers in tests.
             "Emu/external/vcpkg/installed/x64-windows/include"
         }
 

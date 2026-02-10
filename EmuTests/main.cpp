@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <random>
 #include "Engine.h"
+#include "ECS/ECS.h"
+#include"Components.h"
 #include <gtest/gtest.h>
 
 
@@ -28,7 +30,7 @@ static Engine::ECS mediumECS;
 static Engine::ECS largeECS;
 static std::vector<Engine::Entity> entitiesForSparseSet;
 
-TEST(ECS, Initialize)
+TEST(ECSTest, Initialize)
 {
 	smallECS.Initialize(1);
 	tenEntityECS.Initialize(10);
@@ -37,19 +39,19 @@ TEST(ECS, Initialize)
 }
 
 // Sample test case
-TEST(ECS, CreateEntityTest) 
+TEST(ECSTest, CreateEntityTest)
 {
 	Engine::Entity entity = smallECS.CreateEntity();
 	EXPECT_EQ(entity, 0);
 }
 
-TEST(ECS, HasEntity)
+TEST(ECSTest, HasEntity)
 {
 	EXPECT_TRUE(smallECS.HasEntity(0));
 	EXPECT_FALSE(smallECS.HasEntity(1));
 }
 
-TEST(ECS, CreateMultipleEntities)
+TEST(ECSTest, CreateMultipleEntities)
 {
 	bool allIDsCorrect = true;
 
@@ -63,7 +65,7 @@ TEST(ECS, CreateMultipleEntities)
 	EXPECT_EQ(mediumECS.GetNumEntities(), 1000);
 }
 
-TEST(ECS, TooManyEntities)
+TEST(ECSTest, TooManyEntities)
 {
 	try
 	{
@@ -77,7 +79,7 @@ TEST(ECS, TooManyEntities)
 	EXPECT_EQ(smallECS.GetNumEntities(), 1);
 }
 
-TEST(ECS, ComponentManagerRegistration)
+TEST(ECSTest, ComponentManagerRegistration)
 {
 	EXPECT_FALSE(smallECS.HasComponentManager<TestComponent>());
 	EXPECT_FALSE(tenEntityECS.HasComponentManager<TestComponent>());
@@ -95,7 +97,7 @@ TEST(ECS, ComponentManagerRegistration)
 	EXPECT_TRUE(largeECS.HasComponentManager<TestComponent>());
 }
 
-TEST(ECS, ComponentAdditionWithoutCorrespondingEntity)
+TEST(ECSTest, ComponentAdditionWithoutCorrespondingEntity)
 {
 	try
 	{
@@ -111,13 +113,13 @@ TEST(ECS, ComponentAdditionWithoutCorrespondingEntity)
 	
 }
 
-TEST(ECS, AddComponent)
+TEST(ECSTest, AddComponent)
 {
 	smallECS.AddComponent<TestComponent>(0, 42);
 	EXPECT_TRUE(smallECS.HasComponent<TestComponent>(0));
 }
 
-TEST(ECS, AddTwoComponentsToSameEntity)
+TEST(ECSTest, AddTwoComponentsToSameEntity)
 {
 	try
 	{
@@ -129,7 +131,7 @@ TEST(ECS, AddTwoComponentsToSameEntity)
 	}
 }
 
-TEST(ECS, ComponentActivationAndDeactivation)
+TEST(ECSTest, ComponentActivationAndDeactivation)
 {
 
 	auto start = std::chrono::high_resolution_clock::now();
@@ -146,18 +148,18 @@ TEST(ECS, ComponentActivationAndDeactivation)
 	EXPECT_FALSE(smallECS.IsActive<TestComponent>(0));
 }
 
-TEST(ECS, TestComponentRetrieval)
+TEST(ECSTest, TestComponentRetrieval)
 {
 	EXPECT_EQ(smallECS.GetComponent<TestComponent>(0)->m_value, 42);
 }
 
-TEST(ECS, TestComponentDestruction)
+TEST(ECSTest, TestComponentDestruction)
 {
 	smallECS.DestroyComponent<TestComponent>(0);
 	EXPECT_FALSE(smallECS.HasComponent<TestComponent>(0));
 }
 
-TEST(ECS, TestSparseArrayIteration)
+TEST(ECSTest, TestSparseArrayIteration)
 {
 	for (size_t i = 0; i < 10000; ++i)
 	{
@@ -179,7 +181,7 @@ TEST(ECS, TestSparseArrayIteration)
 	std::cout << "Sparse set iteration: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
 }
 
-TEST(ECS, TestDenseArrayIteration)
+TEST(ECSTest, TestDenseArrayIteration)
 {
 	auto start = std::chrono::high_resolution_clock::now();
 	auto& hotComponents = largeECS.GetHotComponents<TestComponent>();
@@ -192,7 +194,7 @@ TEST(ECS, TestDenseArrayIteration)
 	std::cout << "Dense set iteration: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
 }
 
-TEST(ECS, TestComponentRearranging)
+TEST(ECSTest, TestComponentRearranging)
 {
 	for (size_t i = 0; i < 10; ++i)
 	{
@@ -253,7 +255,7 @@ TEST(ECS, TestComponentRearranging)
 	}
 }
 
-TEST(ECS, ComponentManagerNotFound)
+TEST(ECSTest, ComponentManagerNotFound)
 {
 	try
 	{
@@ -265,7 +267,7 @@ TEST(ECS, ComponentManagerNotFound)
 	}
 }
 
-TEST(ECS, EntityActivation)
+TEST(ECSTest, EntityActivation)
 {
 	for (size_t i = 0; i < 1000; ++i)
 	{
@@ -304,14 +306,14 @@ TEST(ECS, EntityActivation)
 	}
 }
 
-TEST(MATH, Point2DCreation)
+TEST(MATH2DTest, Point2DCreation)
 {
 	Math2D::Point2D vec(3.0f, 4.0f);
 	EXPECT_FLOAT_EQ(vec.X, 3.0f);
 	EXPECT_FLOAT_EQ(vec.Y, 4.0f);
 }
 
-TEST(MATH, Point2DAddition)
+TEST(MATH2DTest, Point2DAddition)
 {
 	Math2D::Point2D vec1(1.0f, 2.0f);
 	Math2D::Point2D vec2(3.0f, 4.0f);
@@ -320,7 +322,7 @@ TEST(MATH, Point2DAddition)
 	EXPECT_FLOAT_EQ(result.Y, 6.0f);
 }
 
-TEST(MATH, Point2DSubtraction)
+TEST(MATH2DTest, Point2DSubtraction)
 {
 	Math2D::Point2D vec1(5.0f, 7.0f);
 	Math2D::Point2D vec2(3.0f, 4.0f);
@@ -329,7 +331,7 @@ TEST(MATH, Point2DSubtraction)
 	EXPECT_FLOAT_EQ(result.Y, 3.0f);
 }
 
-TEST(MATH, Point2DScalarMultiplication)
+TEST(MATH2DTest, Point2DScalarMultiplication)
 {
 	Math2D::Point2D vec(2.0f, 3.0f);
 	float scalar = 4.0f;
@@ -338,7 +340,7 @@ TEST(MATH, Point2DScalarMultiplication)
 	EXPECT_FLOAT_EQ(result.Y, 12.0f);
 }
 
-TEST(MATH, Point2DScalarDivision)
+TEST(MATH2DTest, Point2DScalarDivision)
 {
 	Math2D::Point2D vec(8.0f, 12.0f);
 	float scalar = 4.0f;
@@ -347,7 +349,7 @@ TEST(MATH, Point2DScalarDivision)
 	EXPECT_FLOAT_EQ(result.Y, 3.0f);
 }
 
-TEST(MATH, Point2DCompoundAddition)
+TEST(MATH2DTest, Point2DCompoundAddition)
 {
 	Math2D::Point2D vec(1.0f, 2.0f);
 	Math2D::Point2D toAdd(3.0f, 4.0f);
@@ -356,7 +358,7 @@ TEST(MATH, Point2DCompoundAddition)
 	EXPECT_FLOAT_EQ(vec.Y, 6.0f);
 }
 
-TEST(MATH, Point2DCompoundSubtraction)
+TEST(MATH2DTest, Point2DCompoundSubtraction)
 {
 	Math2D::Point2D vec(5.0f, 7.0f);
 	Math2D::Point2D toSub(3.0f, 4.0f);
@@ -365,7 +367,7 @@ TEST(MATH, Point2DCompoundSubtraction)
 	EXPECT_FLOAT_EQ(vec.Y, 3.0f);
 }
 
-TEST(MATH, Point2DCompoundMultiplication)
+TEST(MATH2DTest, Point2DCompoundMultiplication)
 {
 	Math2D::Point2D vec(2.0f, 3.0f);
 	float scalar = 4.0f;
@@ -374,7 +376,7 @@ TEST(MATH, Point2DCompoundMultiplication)
 	EXPECT_FLOAT_EQ(vec.Y, 12.0f);
 }
 
-TEST(MATH, Point2DCompoundDivision)
+TEST(MATH2DTest, Point2DCompoundDivision)
 {
 	Math2D::Point2D vec(8.0f, 12.0f);
 	float scalar = 4.0f;
@@ -383,7 +385,7 @@ TEST(MATH, Point2DCompoundDivision)
 	EXPECT_FLOAT_EQ(vec.Y, 3.0f);
 }
 
-TEST(MATH, Lerp)
+TEST(MATH2DTest, Lerp)
 {
 	Math2D::Point2D vec1(0.0f, 0.0f);
 	Math2D::Point2D vec2(10.0f, 10.0f);
