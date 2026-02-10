@@ -103,7 +103,7 @@ jobs:
         Copy-Item -Force "$vcpkgBin\SDL2_mixer.dll" $binDir -ErrorAction SilentlyContinue
         Copy-Item -Force "$vcpkgBin\*.dll"          $binDir
 
-        Copy-Item -Force "$vcpkgBin\*.lib"          $libDir
+        Copy-Item -Force "$vcpkgLib\*.lib"          $libDir
 
         # Example source
         if (Test-Path "SandBox") { Copy-Item -Recurse -Force "SandBox\*" $exDir }
