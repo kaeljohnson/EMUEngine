@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ECS/Component.h"
-#include "Physics/BodyTypes.h"
+#include "../Public/BodyTypes.h"
 #include "AppState.h"
 #include "../Public/Includes.h"
 #include "../Public/MathUtil.h"

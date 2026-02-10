@@ -2,7 +2,7 @@
 
 #include "../../Public/MathUtil.h"
 #include "../ECS/ECS.h"
-#include "BodyTypes.h"
+#include "../../Public/BodyTypes.h"
 #include "../Components.h"
 
 namespace Engine

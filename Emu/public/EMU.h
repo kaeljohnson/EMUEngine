@@ -1,11 +1,8 @@
 #pragma once
 
 #include "EMUIOEvent.h"
-#include "../include/Physics/PhysicsInterface.h"
-#include "../include/Camera/CameraInterface.h"
-#include "../include/TransformInterface.h"
-#include "../include/Animations/AnimationInterface.h"
 #include "Contacts.h"
+#include "BodyTypes.h"
 
 namespace Engine
 {
@@ -332,14 +329,6 @@ namespace Engine
 		const Math2D::Point2D<float> Physics_GetDimensions(Entity entity);
 
 		/**
-		 * @brief Gets the dimensions of the specified physics body.
-		 *
-		 * @param body The physics body whose dimensions are to be retrieved.
-		 * @return The dimensions of the physics body.
-		 */
-		const Math2D::Point2D<float> Physics_GetDimensions(PhysicsBody& body);
-
-		/**
 		 * @brief Enables or disables gravity for the physics body of the given entity.
 		 *
 		 * @param entity The entity whose physics body gravity setting is to be modified.
@@ -537,14 +526,6 @@ namespace Engine
 		* @return The previous position of the transform in world units.
 		*/
 		const Math2D::Point2D<float> Transform_GetPrevPosition(Entity entity);
-
-		/**
-		 * @brief Gets the previous position of the specified transform.
-		 *
-		 * @param transform The transform whose previous position is to be retrieved.
-		 * @return The previous position of the transform in world units.
-		 */
-		const Math2D::Point2D<float> Transform_GetPrevPosition(Transform& transform);
 
 		/**
 		 * @brief Sets the position of the transform component for the given entity.
@@ -796,17 +777,9 @@ namespace Engine
 		static void Init(const size_t numEntities);
 		~EMU();
 		
-	public:
-		EMU(const size_t numEntities);
-
-		ECS m_ecs;
-		
-		AnimationInterface m_animationInterface;
-		PhysicsInterface m_physicsInterface;
-		CameraInterface m_cameraInterface;
-		TransformInterface m_transformInterface;
-		
 		std::unique_ptr<Application> m_application;
-	};
 
+	private:
+		EMU(const size_t numEntities);
+	};
 } // namespace Engine

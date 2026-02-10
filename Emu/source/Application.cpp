@@ -9,15 +9,31 @@
 namespace Engine
 {
 
-	Application::Application(ECS& refECS)
-		: m_refECS(refECS), 
-		m_sceneManager(m_refECS), 
+	Application::Application(size_t numEntities)
+		: m_ecs(), 
+		m_sceneManager(m_ecs), 
 		m_assetManager(), 
-		m_audioSystem(m_refECS, m_assetManager),
-		m_IRenderer(refECS, m_assetManager), 
+		m_audioSystem(m_ecs, m_assetManager),
+		m_IRenderer(m_ecs, m_assetManager), 
 		m_IOEventSystem(), 
-		m_animationSystem(refECS)
+		m_animationSystem(m_ecs),
+		m_animationInterface(m_ecs),
+		m_transformInterface(m_ecs),
+		m_cameraInterface(m_ecs),
+		m_physicsInterface(m_ecs)
 	{
+		m_ecs.Initialize(numEntities);
+
+		m_ecs.RegisterComponentManager<PhysicsUpdater>();
+		m_ecs.RegisterComponentManager<CameraUpdater>();
+		m_ecs.RegisterComponentManager<PhysicsBody>();
+		m_ecs.RegisterComponentManager<ChainCollider>();
+		m_ecs.RegisterComponentManager<Transform>();
+		m_ecs.RegisterComponentManager<Camera>();
+		m_ecs.RegisterComponentManager<Sprite>();
+		m_ecs.RegisterComponentManager<Animations>();
+		m_ecs.RegisterComponentManager<AudioSource>();
+
 		m_IOEventSystem.Initialize();
 	}
 	void Application::Start()
