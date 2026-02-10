@@ -95,10 +95,15 @@ jobs:
         $vcpkgBin = "Emu\external\vcpkg\installed\x64-windows\bin"
         if (!(Test-Path $vcpkgBin)) { throw "vcpkg bin folder not found at: $vcpkgBin" }
 
+        $vcpkgLib = "Emu\external\vcpkg\installed\x64-windows\lib"
+        if (!(Test-Path $vcpkgLib)) { throw "vcpkg lib folder not found at: $vcpkgLib" }
+
         Copy-Item -Force "$vcpkgBin\SDL2.dll"       $binDir -ErrorAction SilentlyContinue
         Copy-Item -Force "$vcpkgBin\SDL2_image.dll" $binDir -ErrorAction SilentlyContinue
         Copy-Item -Force "$vcpkgBin\SDL2_mixer.dll" $binDir -ErrorAction SilentlyContinue
         Copy-Item -Force "$vcpkgBin\*.dll"          $binDir
+
+        Copy-Item -Force "$vcpkgBin\*.lib"          $libDir
 
         # Example source
         if (Test-Path "SandBox") { Copy-Item -Recurse -Force "SandBox\*" $exDir }
