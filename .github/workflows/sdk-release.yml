@@ -122,11 +122,16 @@ jobs:
         $vcpkgLib = "Emu\external\vcpkg\installed\x64-windows\lib"
         if (!(Test-Path $vcpkgLib)) { throw "vcpkg lib folder not found at: $vcpkgLib" }
 
+        #box2d lib
+        $box2dLib = "Emu\external\box2d\build\install\lib"
+        if (!(Test-Path $box2dLib)) { throw "box2d lib folder not found at: $box2dLib" }
+
         # DLLs needed to run examples
         Copy-Item -Force "$vcpkgBin\*.dll" $binDir
 
         # Import libs. Copying all for now.
         Copy-Item -Force "$vcpkgLib\*.lib" $libDir
+        Copy-Item -Force "$box2dLib\*.lib" $libDir
 
         # Example source
         if (Test-Path "SandBox") { Copy-Item -Recurse -Force "SandBox\*" $exDir }
