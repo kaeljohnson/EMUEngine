@@ -21,14 +21,21 @@ jobs:
     - name: Ensure CMake is available
       uses: lukka/get-cmake@latest
 
-    # ---- vcpkg ----
+    - name: Ensure PowerShell 7 is available (vcpkg requirement)
+      shell: pwsh
+      run: |
+        if (-not (Get-Command pwsh -ErrorAction SilentlyContinue)) {
+          choco install powershell-core -y
+        }
+        pwsh -v
+
+    # vcpkg
     - name: Clone vcpkg
       shell: cmd
       run: |
         if not exist Emu\external\vcpkg (
-        git clone https://github.com/microsoft/vcpkg.git Emu\external\vcpkg
+          git clone https://github.com/microsoft/vcpkg.git Emu\external\vcpkg
         )
-
 
     - name: Bootstrap vcpkg
       shell: cmd
@@ -36,35 +43,51 @@ jobs:
         cd Emu\external\vcpkg
         bootstrap-vcpkg.bat
 
-    - name: Install vcpkg dependencies
-      shell: cmd
+    - name: Install vcpkg dependencies (x64-windows) (retry)
+      shell: pwsh
       run: |
-        cd Emu\external\vcpkg
-        vcpkg install sdl2 sdl2-image sdl2-mixer gtest nlohmann-json
+        $ErrorActionPreference = "Stop"
+        cd Emu/external/vcpkg
 
-    # ---- Box2D ----
-    - name: Build Box2D (Debug)
+        $cmd = '.\vcpkg.exe install --triplet x64-windows sdl2 sdl2-image sdl2-mixer gtest nlohmann-json'
+        $tries = 3
+        for ($i=1; $i -le $tries; $i++) {
+          try {
+            Write-Host "Attempt $i/$tries: $cmd"
+            iex $cmd
+            break
+          } catch {
+            if ($i -eq $tries) { throw }
+            Start-Sleep -Seconds (20 * $i)
+          }
+        }
+
+    # Box2D Debug for now
+    - name: Build Box2D (Debug install)
       shell: cmd
       run: |
         cd Emu\external\box2d
-        if exist build\bin\release rmdir /s /q build\bin\release
         if not exist build mkdir build
         cd build
-        cmake -DBOX2D_BUILD_DOCS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="install" ..
-        cmake --build .
+        cmake -DBOX2D_BUILD_DOCS=OFF -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="install" ..
+        cmake --build . --config Debug
         cmake --build . --config Debug --target INSTALL
 
-    # ---- Premake ----
-    - name: Generate solution with Premake
+    # Premake
+    - name: Generate solution with Premake (tests)
+      shell: pwsh
       run: |
         .\Emu\external\premake\premake5.exe --tests vs2022
 
-    # ---- Build tests ----
+    # Build tests
     - name: Build EmuTests (Debug x64)
+      shell: pwsh
       run: |
         msbuild EMUEngine.sln /t:EmuTests /p:Configuration=Debug /p:Platform=x64 /m
 
-    # ---- Run tests ----
+    # Run tests
     - name: Run EmuTests
+      shell: pwsh
       run: |
         .\bin\Debug-x86_64\EmuTests\EmuTests.exe --gtest_color=yes
+

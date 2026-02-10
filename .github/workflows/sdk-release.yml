@@ -6,6 +6,10 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write   # needed to create/upload Release assets
+  actions: read
+
 jobs:
   package-win64:
     runs-on: windows-latest
@@ -22,7 +26,15 @@ jobs:
     - name: Ensure CMake is available
       uses: lukka/get-cmake@latest
 
-    # ---- vcpkg ----
+    - name: Ensure PowerShell 7 is available (vcpkg requirement)
+      shell: pwsh
+      run: |
+        if (-not (Get-Command pwsh -ErrorAction SilentlyContinue)) {
+          choco install powershell-core -y
+        }
+        pwsh -v
+
+    # vcpkg 
     - name: Clone vcpkg
       shell: cmd
       run: |
@@ -36,14 +48,26 @@ jobs:
         cd Emu\external\vcpkg
         bootstrap-vcpkg.bat
 
-    - name: Install vcpkg dependencies (x64-windows)
-      shell: cmd
+    - name: Install vcpkg dependencies (x64-windows) (retry)
+      shell: pwsh
       run: |
-        cd Emu\external\vcpkg
-        vcpkg install --triplet x64-windows sdl2 sdl2-image sdl2-mixer nlohmann-json
+        $ErrorActionPreference = "Stop"
+        cd Emu/external/vcpkg
 
-    # ---- Box2D ----
-    # Build & install Release so your Distribution config can link "box2d"
+        $cmd = '.\vcpkg.exe install --triplet x64-windows sdl2 sdl2-image sdl2-mixer nlohmann-json'
+        $tries = 3
+        for ($i=1; $i -le $tries; $i++) {
+          try {
+            Write-Host "Attempt $i/$tries: $cmd"
+            iex $cmd
+            break
+          } catch {
+            if ($i -eq $tries) { throw }
+            Start-Sleep -Seconds (20 * $i)
+          }
+        }
+
+    # Box2D Release
     - name: Build Box2D (Release install)
       shell: cmd
       run: |
@@ -54,19 +78,19 @@ jobs:
         cmake --build . --config Release
         cmake --build . --config Release --target INSTALL
 
-    # ---- Premake ----
+    # Premake
     - name: Generate solution with Premake (engine only)
       shell: pwsh
       run: |
         .\Emu\external\premake\premake5.exe --engine-only vs2022
 
-    # ---- Build engine ----
+    # Build engine
     - name: Build Emu (Distribution x64)
       shell: pwsh
       run: |
         msbuild EMUEngine.sln /t:Emu /p:Configuration=Distribution /p:Platform=x64 /m
 
-    # ---- Package ----
+    # Package
     - name: Stage SDK folder
       shell: pwsh
       run: |
@@ -84,39 +108,40 @@ jobs:
         New-Item -ItemType Directory -Force -Path $includeDir,$libDir,$binDir,$exDir | Out-Null
 
         # Public headers
-        Copy-Item -Recurse -Force "Emu\public\*"  $includeDir
+        Copy-Item -Recurse -Force "Emu\public\*" $includeDir
 
         # Emu.lib
         $emuLib = "bin\Distribution-x86_64\Emu\Emu.lib"
         if (!(Test-Path $emuLib)) { throw "Expected Emu.lib not found at: $emuLib" }
         Copy-Item -Force $emuLib $libDir
 
-        # Runtime DLLs needed by apps
+        # Runtime + link libs
         $vcpkgBin = "Emu\external\vcpkg\installed\x64-windows\bin"
         if (!(Test-Path $vcpkgBin)) { throw "vcpkg bin folder not found at: $vcpkgBin" }
 
         $vcpkgLib = "Emu\external\vcpkg\installed\x64-windows\lib"
         if (!(Test-Path $vcpkgLib)) { throw "vcpkg lib folder not found at: $vcpkgLib" }
 
-        Copy-Item -Force "$vcpkgBin\SDL2.dll"       $binDir -ErrorAction SilentlyContinue
-        Copy-Item -Force "$vcpkgBin\SDL2_image.dll" $binDir -ErrorAction SilentlyContinue
-        Copy-Item -Force "$vcpkgBin\SDL2_mixer.dll" $binDir -ErrorAction SilentlyContinue
-        Copy-Item -Force "$vcpkgBin\*.dll"          $binDir
+        # DLLs needed to run examples
+        Copy-Item -Force "$vcpkgBin\*.dll" $binDir
 
-        Copy-Item -Force "$vcpkgLib\*.lib"          $libDir
+        # Import libs. Copying all for now.
+        Copy-Item -Force "$vcpkgLib\*.lib" $libDir
 
         # Example source
         if (Test-Path "SandBox") { Copy-Item -Recurse -Force "SandBox\*" $exDir }
 
-        # README / licenses 
+        # README / license
         if (Test-Path "README.md") { Copy-Item -Force "README.md" $root }
         if (Test-Path "LICENSE")   { Copy-Item -Force "LICENSE" $root }
 
     - name: Create zip
       shell: pwsh
       run: |
+        $ErrorActionPreference = "Stop"
         $version = "${{ github.ref_name }}"
         if ([string]::IsNullOrWhiteSpace($version)) { $version = "dev" }
+
         $zipPath = "dist\EmuSDK-$version-win64.zip"
         if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
         Compress-Archive -Path "dist\EmuSDK-$version-win64\*" -DestinationPath $zipPath
@@ -126,3 +151,13 @@ jobs:
       with:
         name: EmuSDK-win64
         path: dist/*.zip
+
+    # Attach to GitHub Release on tag pushes
+    - name: Attach zip to GitHub Release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: dist/*.zip
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
