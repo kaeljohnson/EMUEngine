@@ -53,7 +53,7 @@ jobs:
         $tries = 3
         for ($i=1; $i -le $tries; $i++) {
           try {
-            Write-Host "Attempt $i/$tries: $cmd"
+            Write-Host "Attempt ${i}/${tries}: ${cmd}"
             iex $cmd
             break
           } catch {
