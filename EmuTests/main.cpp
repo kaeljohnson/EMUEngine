@@ -467,6 +467,7 @@ static inline bool checkChainsEquality(const std::vector<Math2D::Chain>& merged,
 	bool foundMatch = false;
 	for (const auto& expectedChain : expected)
 	{
+		foundMatch = false;
 		for (const auto& mergedChain : merged)
 		{
 			if (checkChainEquality(mergedChain, expectedChain))

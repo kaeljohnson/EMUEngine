@@ -149,7 +149,7 @@ namespace Engine
 
 		m_levelDimensionsInUnits = Math2D::Point2D<int>(m_tileMap.GetWidth(), m_tileMap.GetHeight());
 
-		ENGINE_CRITICAL_D("Map width: {}, Map height: {}", m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y);
+		ENGINE_INFO_D("Map width: {}, Map height: {}", m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y);
 
 		m_hasTileMap = true;
 
@@ -163,7 +163,7 @@ namespace Engine
 	{
 		if (m_entities.contains(entity))
 		{
-			ENGINE_INFO("Entity already exists in the scene: {}", entity);
+			ENGINE_LOG("Entity already exists in the scene: {}", entity);
 			return;
 		}
 
@@ -174,7 +174,7 @@ namespace Engine
 	{
 		if (!m_entities.contains(entity))
 		{
-			ENGINE_INFO("Entity does not exist in the current scene: {}", entity);
+			ENGINE_LOG("Entity does not exist in the current scene: {}", entity);
 			return;
 		}
 
@@ -193,7 +193,7 @@ namespace Engine
 	{
 		if (!m_entities.contains(entity))
 		{
-			ENGINE_INFO("Entity does not exist in the current scene: {}", entity);
+			ENGINE_LOG("Entity does not exist in the current scene: {}", entity);
 			return;
 		}
 
@@ -227,7 +227,7 @@ namespace Engine
 	{
 		if (m_hasTileMap)
 		{
-			ENGINE_INFO_D("Scene already has a tile map. Cannot override map dimensions!");
+			ENGINE_LOG("Scene already has a tile map. Cannot override map dimensions!");
 			return;
 		}
 
@@ -297,7 +297,7 @@ namespace Engine
 		if (!inFile.is_open())
 		{
 			ENGINE_ERROR("Failed to open rules file.");
-			throw std::runtime_error("Failed to open rules file: " + m_rulesFileName);
+			std::exit(1);
 		}
 
 		try
@@ -307,7 +307,7 @@ namespace Engine
 		catch (const json::parse_error& e)
 		{
 			ENGINE_ERROR("Failed to parse rules JSON: {}", e.what());
-			throw std::runtime_error("Failed to parse rules JSON: " + std::string(e.what()));
+			std::exit(1);
 		}
 
 		auto& sceneName = rulesJson.begin().key();
@@ -330,12 +330,20 @@ namespace Engine
 		}
 
 		const json* audioFilePathJson = getJson(*audioJson, "PathToAudioFiles");
-		if (!audioFilePathJson) throw std::runtime_error("PathToAudioFiles not found in rules file.");
+		if (!audioFilePathJson)
+		{
+			ENGINE_ERROR("PathToAudioFiles not found in rules file.");
+			std::exit(1);
+		}
 
 		std::string audioFilePath = audioFilePathJson->get<std::string>();
 
 		const json* soundsJson = getJson(*audioJson, "Sounds");
-		if (!soundsJson) throw std::runtime_error("Sounds section not found in rules file.");
+		if (!soundsJson)
+		{
+			ENGINE_ERROR("Sounds section not found in rules file.");
+			std::exit(1);
+		}
 
 		json j = json::parse(soundsJson->dump());
 
@@ -352,7 +360,11 @@ namespace Engine
 	template<typename T>
 	static Math2D::Point2D<T> ExtractPoint2DFromJSON(const json& j, const std::string& key, Math2D::Point2D<T> ioVec)
 	{
-		if (!j.contains(key)) throw std::runtime_error("Invalid Rules File. Field Not Found: " + key);
+		if (!j.contains(key))
+		{
+			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}", key);
+			std::exit(1);
+		}
 
 		const auto& arr = j.at(key);
 		if (!arr.is_array() || arr.size() != 2) return ioVec;
@@ -377,7 +389,7 @@ namespace Engine
 		if (!j.contains(key))
 		{
 			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
-			throw std::runtime_error("Invalid Rules File. Field Not Found: " + key);
+			std::exit(1);
 		}
 
 		const auto& value = j.at(key);
@@ -395,28 +407,28 @@ namespace Engine
 		return defaultValue;
 	}
 
-	static std::array<size_t, 3> ExtractColorArrayFromJSON(const json& j, const std::string& key, std::array<size_t, 3> defaultValue)
+	static std::array<int, 3> ExtractColorArrayFromJSON(const json& j, const std::string& key, std::array<int, 3> defaultValue)
 	{
 		if (!j.contains(key))
 		{
 			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
-			throw std::runtime_error("Invalid Rules File. Field Not Found: " + key);
+			std::exit(1);
 		}
 		const auto& arr = j.at(key);
 		if (!arr.is_array() || arr.size() != 3) return defaultValue;
-		std::array<size_t, 3> colorArray = defaultValue;
+		std::array<int, 3> colorArray = defaultValue;
 		for (size_t i = 0; i < 3; ++i)
 		{
-			if (arr[i].is_number_unsigned()) colorArray[i] = arr[i].get<size_t>();
+			if (arr[i].is_number_unsigned()) colorArray[i] = arr[i].get<int>();
 			else if (arr[i].is_number_integer())
 			{
 				int intValue = arr[i].get<int>();
-				if (intValue >= 0) colorArray[i] = static_cast<size_t>(intValue);
+				if (intValue >= 0) colorArray[i] = static_cast<int>(intValue);
 			}
 			else if (arr[i].is_number())
 			{
 				double doubleValue = arr[i].get<double>();
-				if (doubleValue >= 0.0) colorArray[i] = static_cast<size_t>(doubleValue);
+				if (doubleValue >= 0.0) colorArray[i] = static_cast<int>(doubleValue);
 			}
 		}
 		return colorArray;
@@ -469,7 +481,7 @@ namespace Engine
 		
 		size_t order = entityCameraTemplate->contains("order") ? getJson(*entityCameraTemplate, "order")->get<size_t>() : 1;
 
-		std::array<size_t, 3> backgroundColor = ExtractColorArrayFromJSON(*entityCameraTemplate, "backgroundColor", { 0, 0, 0 });
+		std::array<int, 3> backgroundColor = ExtractColorArrayFromJSON(*entityCameraTemplate, "backgroundColor", { 0, 0, 0 });
 		ENGINE_CRITICAL_D("Camera Background Color RGB: {}, {}, {}", backgroundColor[0], backgroundColor[1], backgroundColor[2]);
 
 		Math2D::Point2D<float> screenRatio = { 1.0f, 1.0f };
@@ -817,7 +829,7 @@ namespace Engine
 			if (spriteDir.empty() || !fs::exists(spriteDir) || !fs::is_directory(spriteDir))
 			{
 				ENGINE_ERROR("Invalid or missing sprite sheet directory: {}", spriteDir);
-				throw std::runtime_error("Invalid or missing sprite sheet directory: " + spriteDir);
+				std::exit(1);
 			}
 
 			if (spriteRules->contains("Textures"))
@@ -829,14 +841,14 @@ namespace Engine
 					if (!fs::exists(fullPath))
 					{
 						ENGINE_ERROR("Missing texture file: {}", fullPath);
-						throw std::runtime_error("Missing texture file: " + fullPath);
+						std::exit(1);
 					}
 				}
 			}
 			else
 			{
 				ENGINE_ERROR("Missing 'Textures' section in 'Sprites'.");
-				throw std::runtime_error("Missing 'Textures' section in 'Sprites'.");
+				std::exit(1);
 			}
 		}
 
@@ -849,7 +861,7 @@ namespace Engine
 			if (audioDir.empty() || !fs::exists(audioDir) || !fs::is_directory(audioDir))
 			{
 				ENGINE_ERROR("Invalid or missing audio directory: {}", audioDir);
-				throw std::runtime_error("Invalid or missing audio directory: " + audioDir);
+				std::exit(1);
 			}
 
 			if (audioRules->contains("Sounds"))
@@ -861,14 +873,14 @@ namespace Engine
 					if (!fs::exists(fullPath))
 					{
 						ENGINE_ERROR("Missing sound file: {}", fullPath);
-						throw std::runtime_error("Missing sound file: " + fullPath);
+						std::exit(1);
 					}
 				}
 			}
 			else
 			{
 				ENGINE_ERROR("Missing 'Sounds' section in 'Audio'.");
-				throw std::runtime_error("Missing 'Sounds' section in 'Audio'.");
+				std::exit(1);
 			}
 		}
 	}
@@ -892,7 +904,7 @@ namespace Engine
 			catch (const std::exception& e)
 			{
 				ENGINE_ERROR("Invalid tile ID key in character rules: {}. Error: {}", key, e.what());
-				throw std::runtime_error("Invalid tile ID key in character rules: " + key + ". Error: " + e.what());
+				std::exit(1);
 			}
 
 			// Look for Physics -> template -> Category == "MAP"
@@ -944,7 +956,7 @@ namespace Engine
 		if (!sceneRules)
 		{
 			ENGINE_ERROR("No scene rules found for scene: {}", sceneName);
-			throw std::runtime_error("No scene rules found for scene: " + sceneName);
+			std::exit(1);
 		}
 
 		// Load the physics rules.
@@ -957,7 +969,7 @@ namespace Engine
 			if (!physicsRules)
 			{
 				ENGINE_ERROR("No physics rules found for world in scene: {}", sceneName);
-				throw std::runtime_error("No physics rules found for world in scene: " + sceneName);
+				std::exit(1);
 			}
 
 			SetGravity(ExtractPoint2DFromJSON<float>(*physicsRules, "Gravity", { 0.0f, 0.0f }));
@@ -980,14 +992,14 @@ namespace Engine
 		if (!characterRules)
 		{
 			ENGINE_ERROR("No character rules found for scene: {}", sceneName);
-			throw std::runtime_error("No character rules found for scene: " + sceneName);
+			std::exit(1);
 		}
 
 		const json* componentTemplates = getJson(*sceneRules, "ComponentTemplates");
 		if (!componentTemplates)
 		{
 			ENGINE_ERROR("No component templates found for scene: {}", sceneName);
-			throw std::runtime_error("No component templates found for scene: " + sceneName);
+			std::exit(1);
 		}
 
 		std::unordered_set<size_t> isMap = determineMapTiles(*characterRules, *componentTemplates);

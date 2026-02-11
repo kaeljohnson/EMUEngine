@@ -24,7 +24,7 @@ namespace Engine
 	}
 
 	static void prepareForRendering(Camera& refCamera, AssetManager& refAssetManager, ECS& refECS,
-		const Math2D::Point2D<int> windowSizeInPixels, const float scale)
+		const Math2D::Point2D<int> windowSizeInPixels, const int scale)
 	{
 		// auto start = std::chrono::high_resolution_clock::now();
 
@@ -33,13 +33,12 @@ namespace Engine
 		auto& debugLineBuckets = refCamera.m_debugLinesRenderBucket;
 		auto& pointBuckets = refCamera.m_debugPointsRenderBucket;
 
-		const float scaleX = refCamera.m_pixelsPerUnit * scale;
-		const float scaleY = refCamera.m_pixelsPerUnit * scale;
+		const size_t scaleInPixels = refCamera.m_pixelsPerUnit * scale;
 
 		// Camera setup
 		const Math2D::Point2D<float> windowSizeInTiles(
-			windowSizeInPixels.X / (refCamera.m_pixelsPerUnit * scale),
-			windowSizeInPixels.Y / (refCamera.m_pixelsPerUnit * scale)
+			windowSizeInPixels.X / scaleInPixels,
+			windowSizeInPixels.Y / scaleInPixels
 		);
 
 		// Bounds of what to render in world space. For each camera, 
@@ -48,8 +47,8 @@ namespace Engine
 		// coordinates. Same for height.
 		const float leftRenderBound = refCamera.m_offset.X;
 		const float topRenderBound = refCamera.m_offset.Y;
-		const float rightRenderBound = leftRenderBound + refCamera.m_viewportSizeInPercentageOfScreen.X * windowSizeInTiles.X;
-		const float bottomRenderBound = topRenderBound + refCamera.m_viewportSizeInPercentageOfScreen.Y * windowSizeInTiles.Y;
+		const float rightRenderBound = leftRenderBound + refCamera.m_viewportSizeInPercentageOfScreen.X * windowSizeInTiles.X + 1.0f;
+		const float bottomRenderBound = topRenderBound + refCamera.m_viewportSizeInPercentageOfScreen.Y * windowSizeInTiles.Y + 1.0f;
 
 		const float renderAreaWidth = rightRenderBound - leftRenderBound;
 		const float renderAreaHeight = bottomRenderBound - topRenderBound;
@@ -79,8 +78,8 @@ namespace Engine
 				if (!isVisible)
 					continue;
 
-				int width = int(ptrSpriteComponent->m_sizeInUnits.X * scaleX);
-				int height = int(ptrSpriteComponent->m_sizeInUnits.Y * scaleY);
+				int width = int(ptrSpriteComponent->m_sizeInUnits.X * scaleInPixels);
+				int height = int(ptrSpriteComponent->m_sizeInUnits.Y * scaleInPixels);
 
 				float offsetFromTransformX = ptrSpriteComponent->m_offsetFromTransform.X;
 				float offsetFromTransformY = ptrSpriteComponent->m_offsetFromTransform.Y;
@@ -97,9 +96,9 @@ namespace Engine
 
 				// Screen-space coordinates
 				const int locationInPixelsOnScreenX =
-					int((lerpedX - refCamera.m_offset.X + offsetFromTransformX) * scaleX);
+					int((lerpedX - refCamera.m_offset.X + offsetFromTransformX) * scaleInPixels);
 				const int locationInPixelsOnScreenY =
-					int((lerpedY - refCamera.m_offset.Y + offsetFromTransformY) * scaleY);
+					int((lerpedY - refCamera.m_offset.Y + offsetFromTransformY) * scaleInPixels);
 
 				renderBuckets[refTransform.m_zIndex].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are within 1-10
 					refTransform.m_entity,
@@ -116,8 +115,8 @@ namespace Engine
 					pointBuckets[refTransform.m_zIndex].emplace_back(
 						refTransform.m_entity,
 						Math2D::Point2D<int>(
-							int((lerpedX - refCamera.m_offset.X) * scaleX),
-							int((lerpedY - refCamera.m_offset.Y) * scaleY)
+							int((lerpedX - refCamera.m_offset.X) * scaleInPixels),
+							int((lerpedY - refCamera.m_offset.Y) * scaleInPixels)
 						),
 						refTransform.m_debugColor
 					);
@@ -161,12 +160,12 @@ namespace Engine
 					refTransform.m_entity,
 					ptrPhysicsBody->m_fillRect,
 					Math2D::Point2D<int>(
-						int((lerpedX - refCamera.m_offset.X) * scaleX),
-						int((lerpedY - refCamera.m_offset.Y) * scaleY)
+						int((lerpedX - refCamera.m_offset.X) * scaleInPixels),
+						int((lerpedY - refCamera.m_offset.Y) * scaleInPixels)
 					),
 					Math2D::Point2D<int>(
-						int((ptrPhysicsBody->m_dimensions.X * scaleX)), // Need transform m_dimensions, not animation m_dimensions
-						int((ptrPhysicsBody->m_dimensions.Y * scaleY))
+						int((ptrPhysicsBody->m_dimensions.X * scaleInPixels)), // Need transform m_dimensions, not animation m_dimensions
+						int((ptrPhysicsBody->m_dimensions.Y * scaleInPixels))
 					),
 					ptrPhysicsBody->m_debugColor
 				);
@@ -178,11 +177,11 @@ namespace Engine
 		auto submitEdgeForRendering = [&](auto& refEdge)
 			{
 				// Transform to screen space
-				const int edgePointAInPixelsX = static_cast<int>((refEdge.m_startPoint.X - refCamera.m_offset.X) * scaleX);
-				const int edgePointAInPixelsY = static_cast<int>((refEdge.m_startPoint.Y - refCamera.m_offset.Y) * scaleY);
+				const int edgePointAInPixelsX = static_cast<int>((refEdge.m_startPoint.X - refCamera.m_offset.X) * scaleInPixels);
+				const int edgePointAInPixelsY = static_cast<int>((refEdge.m_startPoint.Y - refCamera.m_offset.Y) * scaleInPixels);
 				const Math2D::Point2D<int> edgePointAInPixels(edgePointAInPixelsX, edgePointAInPixelsY);
-				const int edgePointBInPixelsX = static_cast<int>((refEdge.m_endPoint.X - refCamera.m_offset.X) * scaleX);
-				const int edgePointBInPixelsY = static_cast<int>((refEdge.m_endPoint.Y - refCamera.m_offset.Y) * scaleY);
+				const int edgePointBInPixelsX = static_cast<int>((refEdge.m_endPoint.X - refCamera.m_offset.X) * scaleInPixels);
+				const int edgePointBInPixelsY = static_cast<int>((refEdge.m_endPoint.Y - refCamera.m_offset.Y) * scaleInPixels);
 				const Math2D::Point2D<int> edgePointBInPixels(edgePointBInPixelsX, edgePointBInPixelsY);
 
 				debugLineBuckets[0].emplace_back(
@@ -244,9 +243,8 @@ namespace Engine
 
 		if (activeCameras.size() == 0)
 		{
-			ENGINE_CRITICAL("No active cameras in the scene. Cannot frame camera.");
-			std::runtime_error("No active cameras in the scene. Cannot frame camera.");
-			return;
+			ENGINE_ERROR("No active cameras in the scene. Cannot frame camera.");
+			std::exit(1);
 		}
 
 		for (auto& refCamera : activeCameras)

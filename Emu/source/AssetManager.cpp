@@ -46,16 +46,16 @@ namespace Engine
 		// Check if renderer is valid
 		if (!m_ptrRenderer) 
 		{
-			ENGINE_CRITICAL("Renderer is not initialized.");
-			return nullptr;
+			ENGINE_ERROR("Renderer is not initialized.");
+			std::exit(1);
 		}
 
 		// Load texture
 		SDLTexture* ptrTexture = IMG_LoadTexture((SDL_Renderer*)m_ptrRenderer, filePath.c_str());
 		if (!ptrTexture) 
 		{
-			ENGINE_CRITICAL("Failed to load texture: {}, SDL_Error: {}", filePath, SDL_GetError());
-			return nullptr;
+			ENGINE_ERROR("Failed to load texture: {}, SDL_Error: {}", filePath, SDL_GetError());
+			std::exit(1);
 		}
 
 		// Store texture

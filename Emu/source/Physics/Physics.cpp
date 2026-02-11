@@ -375,7 +375,11 @@ namespace Engine
 		Entity entity = refPhysicsBody.m_entity;
 		b2ShapeId* shapeId = m_refECS.GetComponent<PhysicsBody>(entity)->m_shapeId;
 
-		if (shapeId == nullptr) ENGINE_CRITICAL_D("Shape ID is null in ProcessSimpleContacts for entity {}!", entity);
+		if (shapeId == nullptr)
+		{
+			ENGINE_CRITICAL_D("Shape ID is null in ProcessSimpleContacts for entity {}!", entity);
+			return;
+		}
 
 		b2ContactData contactData[10];
 		int shapeContactCount = b2Shape_GetContactData(*shapeId, contactData, 10);
@@ -395,23 +399,19 @@ namespace Engine
 
 			if (normal.y < -0.5) // Collision from above `this`
 			{
-				// ENGINE_CRITICAL_D("Contact Above!");
 				refPhysicsBody.m_contactAbove = true;
 			}
 			else if (normal.y > 0.5) // Collision from below `this`
 			{
-				// ENGINE_CRITICAL_D("Contact Below!");
 				refPhysicsBody.m_contactBelow = true;
 			}
 			
 			if (normal.x > 0.5) // Collision from the Right of `this`
 			{
-				// ENGINE_CRITICAL_D("Contact Right!");
 				refPhysicsBody.m_contactRight = true;
 			}
 			else if (normal.x < -0.5) // Collision from the Left of `this`
 			{
-				// ENGINE_CRITICAL_D("Contact Left!");
 				refPhysicsBody.m_contactLeft = true;
 			}
 		}

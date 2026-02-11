@@ -16,9 +16,9 @@ namespace Engine
 	bool Screen::WINDOW_RESIZE_REQUEST =				false;
 	bool Screen::TOGGLE_FULLSCREEN_REQUEST =			false;
 	Math2D::Point2D<int> Screen::WINDOW_SIZE =			Math2D::Point2D<int>(0, 0);
-	int Screen::SCALE =									0.0f;
+	int Screen::SCALE =									0;
 	Math2D::Point2D<int> Screen::DISPLAY_RESOLUTION =	Math2D::Point2D<int>(0, 0);
-	int Screen::VIRTUAL_HEIGHT =						720.0f;
+	int Screen::VIRTUAL_HEIGHT =						720;
 
 	IRenderer::IRenderer(ECS& refECS, AssetManager& refAssetManager) 
 		: m_rendererCreated(false), m_ptrWindow(nullptr), m_ptrRenderer(nullptr), m_refECS(refECS), m_refAssetManager(refAssetManager), m_lastDebugColor(DebugColor::Black)
@@ -63,7 +63,8 @@ namespace Engine
 		m_ptrRenderer = ISDL::CreateRenderer((SDLWindow*)m_ptrWindow, -1, SDL_RENDERER_ACCELERATED);
 		if (m_ptrRenderer == nullptr)
 		{
-			ENGINE_CRITICAL("Renderer could not be created! SDL Error: {}", ISDL::GetError());
+			ENGINE_ERROR("Renderer could not be created! SDL Error: {}", ISDL::GetError());
+			std::exit(1);
 		}
 
 		ISDL::SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
@@ -327,7 +328,7 @@ namespace Engine
 		int windowPosInPixelsX, windowPosInPixelsY;
 		SDL_GetWindowPosition((SDLWindow*)m_ptrWindow, &windowPosInPixelsX, &windowPosInPixelsY);
 
-		return Math2D::Point2D<int>(static_cast<float>(windowPosInPixelsX), static_cast<float>(windowPosInPixelsY));
+		return Math2D::Point2D<int>(windowPosInPixelsX, windowPosInPixelsY);
 	}
 
 	void IRenderer::setWindowScale()

@@ -30,8 +30,8 @@ namespace Engine
         std::ifstream file(mapFile);
         if (!file)
         {
-            ENGINE_CRITICAL("Failed to open map file: {}", mapFile);
-            return;
+            ENGINE_ERROR("Failed to open map file: {}", mapFile);
+            std::exit(1);
         }
 
         size_t numEntities = 0;
@@ -77,8 +77,8 @@ namespace Engine
             }
             else if (tokens.size() != static_cast<size_t>(m_mapDimensions.X))
             {
-                ENGINE_CRITICAL("Map is not a rectangle on line {}", m_mapDimensions.Y + 1);
-                throw std::runtime_error("Map is not a rectangle");
+                ENGINE_ERROR("Map is not a rectangle on line {}", m_mapDimensions.Y + 1);
+                std::exit(1);
             }
 
             // Store tiles
@@ -91,7 +91,7 @@ namespace Engine
                 if (numEntities >= MAX_SIZE)
                 {
                     ENGINE_CRITICAL("Map size exceeds maximum size {}", MAX_SIZE);
-                    break;
+                    std::exit(1);
                 }
 
                 Entity tileEntity = m_refECS.CreateEntity();

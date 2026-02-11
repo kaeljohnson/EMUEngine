@@ -250,7 +250,7 @@ namespace Engine
 		Math2D::Point2D<int> m_bounds;							 /// Bounds of the camera in pixels.
 		bool m_borderOn;										 /// Flag indicating whether to draw a border around the camera view.
 		size_t m_numLayers;										 /// Number of layers for rendering.
-		std::array<size_t, 3> m_backgroundColor;				 /// Background color of the camera in RGB format.
+		std::array<int, 3> m_backgroundColor;				 /// Background color of the camera in RGB format.
 
 		RenderBucket m_renderBucket;							 /// Bucket for storing renderable objects. Maps zIndex to vector of RenderObjects.
 		DebugRenderBucket m_debugRenderBucket;					 /// Bucket for storing renderable debug objects. Maps zIndex to vector of DebugObjects.
@@ -266,7 +266,7 @@ namespace Engine
 			Component(entity) {}
 
 		Camera(Entity entity, Math2D::Point2D<float> size, Math2D::Point2D<float> screenRatio, 
-			Math2D::Point2D<float> position, size_t pixelsPerUnit, bool clampingOn, bool border, std::array<size_t, 3> backgroundColor, size_t numLayers)
+			Math2D::Point2D<float> position, size_t pixelsPerUnit, bool clampingOn, bool border, std::array<int, 3> backgroundColor, size_t numLayers)
 			: m_size(size), m_viewportSizeInPercentageOfScreen(screenRatio), m_viewPortPositionInPercentageOfScreen(position),
 			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0), 
 			m_borderOn(border), m_renderBucket(numLayers, std::vector<RenderObject>()), m_backgroundColor(backgroundColor),
