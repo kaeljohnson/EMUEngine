@@ -161,11 +161,34 @@ namespace Engine
 		/**
 		* @brief Adds a tile map to the scene with the given name using the specified map and rules files.
 		* 
+		* @note: Tilemap encompasses the physics layer of the simulation. This is where all physics bodies will live.
+		* Attempting to add physics bodies to other layers will not work.
+		* 
 		* @param name: The name of the scene to which the tile map is to be added.
 		* @param mapFileName: The filename of the tile map.
 		* @param rulesFileName: The filename of the rules for the tile map.
 		*/
 		void Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName);
+
+		/**
+		* @brief Adds a background layer to the simulation.
+		* 
+		* @param name: The name of the scene to which the background is to be added.
+		* @param zIndex: The id of the layer and order of rendering. Indices are rendered in descending order.
+		* @param parallax: The parallax factor the background is to be rendered using. The physics layer will always have a parallax of 1
+		*/
+		void Scenes_AddBackgroundLayer(const std::string& name, const size_t zIndex, const float parallax);
+
+		/**
+		* @brief Adds a tilemap to a background layer.
+		* 
+		* @note This tile map will consist only of transforms and animations. There is no physics done on this layer.
+		* 
+		* @param name: The name of the scene to which the background is to be added.
+		* @param mapFileName: The name of the map file to be added.
+		*/
+		void Scenes_AddBackgroundTileMap();
+
 
 		/**
 		* @brief Gets the first entity corresponding to the specified tile character from the tile map

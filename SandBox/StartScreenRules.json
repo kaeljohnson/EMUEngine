@@ -59,6 +59,13 @@
                 {
                     "ZIndex": 2,
                     "DrawDebug": "red"
+                },
+                "GenericBackgroundTransform": 
+                {
+                  "ZIndex": 3,
+                  "ParallaxFactor": 0.25,
+                  "DrawDebug": "red",
+                  "enabled": true
                 }
             },
             "Physics": 
@@ -293,7 +300,8 @@
             "37": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "LeftInteriorGrassNarrowHorizontal",    "SpriteSheet": "GrassTileSet" },
             "38": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "CentralInteriorGrassNarrowHorizontal", "SpriteSheet": "GrassTileSet" },
             "39": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "RightInteriorGrassNarrowHorizontal",   "SpriteSheet": "GrassTileSet" },
-            "40": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1"                                                                                                                                            }
+            "40": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1"                                                                                                                                            },
+            "41": { "Transform": "GenericBackgroundTransform",                                                                                         "Animations": "BlackCenterInteriorWall",              "SpriteSheet": "GrassTileSet" }
         }
     }
 }

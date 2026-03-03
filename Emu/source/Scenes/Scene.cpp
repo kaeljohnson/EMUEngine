@@ -441,6 +441,7 @@ namespace Engine
 
 		bool drawDebug = entityTransformTemplate->contains("DrawDebug");
 		std::string debugColor = entityTransformTemplate->value("DrawDebug", "red");
+		float parallaxFactor = entityTransformTemplate->value("ParallaxFactor", 1.0);
 
 		DebugColor debugColorEnum;
 
@@ -464,7 +465,7 @@ namespace Engine
 		refECS.AddComponent<Transform>(
 			entity,
 			Math2D::Point2D<float>(x * (float)numUnitsPerTile, y * (float)numUnitsPerTile),
-			1.0f, 1, zIndex, drawDebug, debugColorEnum
+			1.0f, 1, zIndex, parallaxFactor, drawDebug, debugColorEnum
 		);
 	}
 

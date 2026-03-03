@@ -36,22 +36,16 @@ namespace Engine
 		const size_t scaleInPixels = refCamera.m_pixelsPerUnit * scale;
 
 		// Camera setup
-		const Math2D::Point2D<float> windowSizeInTiles(
+		const Math2D::Point2D<float> windowSizeInUnits(
 			windowSizeInPixels.X / scaleInPixels,
 			windowSizeInPixels.Y / scaleInPixels
 		);
 
-		// Bounds of what to render in world space. For each camera, 
-		// user sees the left side of the camera's world coordinates
-		// offset all the way to the width of the camera in world 
-		// coordinates. Same for height.
-		const float leftRenderBound = refCamera.m_offset.X;
-		const float topRenderBound = refCamera.m_offset.Y;
-		const float rightRenderBound = leftRenderBound + refCamera.m_viewportSizeInPercentageOfScreen.X * windowSizeInTiles.X + 1.0f;
-		const float bottomRenderBound = topRenderBound + refCamera.m_viewportSizeInPercentageOfScreen.Y * windowSizeInTiles.Y + 1.0f;
-
-		const float renderAreaWidth = rightRenderBound - leftRenderBound;
-		const float renderAreaHeight = bottomRenderBound - topRenderBound;
+		// Render bound is simply the size of the screen in units
+		const float leftRenderBound = 0.0f;
+		const float topRenderBound = 0.0f;
+		const float rightRenderBound = refCamera.m_viewportSizeInPercentageOfScreen.X * windowSizeInUnits.X + 1.0f;
+		const float bottomRenderBound = refCamera.m_viewportSizeInPercentageOfScreen.Y * windowSizeInUnits.Y + 1.0f;
 
 		auto& transformManager = refECS.GetHotComponents<Transform>();
 		for (Transform& refTransform : transformManager)
@@ -65,24 +59,24 @@ namespace Engine
 
 			if (Sprite* ptrSpriteComponent = refECS.GetComponent<Sprite>(refTransform.m_entity))
 			{
+				float offsetFromTransformX = ptrSpriteComponent->m_offsetFromTransform.X;
+				float offsetFromTransformY = ptrSpriteComponent->m_offsetFromTransform.Y;
+
 				// 1. Culling
-				const float objectLeft = refTransform.m_position.X + ptrSpriteComponent->m_offsetFromTransform.X;
+				const float objectLeft = lerpedX + offsetFromTransformX - refCamera.m_offset.X * refTransform.m_parallaxFactor;
 				const float objectRight = objectLeft + ptrSpriteComponent->m_sizeInUnits.X;
-				const float objectTop = refTransform.m_position.Y + ptrSpriteComponent->m_offsetFromTransform.Y;
+				const float objectTop = lerpedY + offsetFromTransformY - refCamera.m_offset.Y * refTransform.m_parallaxFactor;
 				const float objectBottom = objectTop + ptrSpriteComponent->m_sizeInUnits.Y;
 
 				const bool isVisible =
-					objectRight >= leftRenderBound && objectLeft <= rightRenderBound &&
-					objectBottom >= topRenderBound && objectTop <= bottomRenderBound;
+					objectRight - 1 >= leftRenderBound && objectLeft + 2 <= rightRenderBound &&
+					objectBottom - 1 >= topRenderBound && objectTop + 1 <= bottomRenderBound;
 
 				if (!isVisible)
 					continue;
 
 				int width = int(ptrSpriteComponent->m_sizeInUnits.X * scaleInPixels);
 				int height = int(ptrSpriteComponent->m_sizeInUnits.Y * scaleInPixels);
-
-				float offsetFromTransformX = ptrSpriteComponent->m_offsetFromTransform.X;
-				float offsetFromTransformY = ptrSpriteComponent->m_offsetFromTransform.Y;
 
 				SDLTexture* spriteTexture = (SDLTexture*)ptrSpriteComponent->m_ptrLoadedTexture;
 				if (spriteTexture == nullptr)
@@ -96,9 +90,9 @@ namespace Engine
 
 				// Screen-space coordinates
 				const int locationInPixelsOnScreenX =
-					int((lerpedX - refCamera.m_offset.X + offsetFromTransformX) * scaleInPixels);
+					int(objectLeft * scaleInPixels);
 				const int locationInPixelsOnScreenY =
-					int((lerpedY - refCamera.m_offset.Y + offsetFromTransformY) * scaleInPixels);
+					int(objectTop * scaleInPixels);
 
 				renderBuckets[refTransform.m_zIndex].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are within 1-10
 					refTransform.m_entity,
@@ -115,8 +109,8 @@ namespace Engine
 					pointBuckets[refTransform.m_zIndex].emplace_back(
 						refTransform.m_entity,
 						Math2D::Point2D<int>(
-							int((lerpedX - refCamera.m_offset.X) * scaleInPixels),
-							int((lerpedY - refCamera.m_offset.Y) * scaleInPixels)
+							int(objectLeft * scaleInPixels),
+							int(objectTop * scaleInPixels)
 						),
 						refTransform.m_debugColor
 					);
@@ -137,9 +131,9 @@ namespace Engine
 #ifndef NDEBUG
 			if (PhysicsBody* ptrPhysicsBody = refECS.GetComponent<PhysicsBody>(refTransform.m_entity))
 			{
-				const float objectLeft = refTransform.m_position.X;
+				const float objectLeft = refTransform.m_position.X - refCamera.m_offset.X * refTransform.m_parallaxFactor;
 				const float objectRight = objectLeft + ptrPhysicsBody->m_dimensions.X;
-				const float objectTop = refTransform.m_position.Y;
+				const float objectTop = refTransform.m_position.Y - refCamera.m_offset.Y * refTransform.m_parallaxFactor;
 				const float objectBottom = objectTop + ptrPhysicsBody->m_dimensions.Y;
 
 				const bool isVisible =
@@ -160,8 +154,8 @@ namespace Engine
 					refTransform.m_entity,
 					ptrPhysicsBody->m_fillRect,
 					Math2D::Point2D<int>(
-						int((lerpedX - refCamera.m_offset.X) * scaleInPixels),
-						int((lerpedY - refCamera.m_offset.Y) * scaleInPixels)
+						int(objectLeft * scaleInPixels),
+						int(objectTop * scaleInPixels)
 					),
 					Math2D::Point2D<int>(
 						int((ptrPhysicsBody->m_dimensions.X * scaleInPixels)), // Need transform m_dimensions, not animation m_dimensions

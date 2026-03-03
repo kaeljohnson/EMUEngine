@@ -39,19 +39,20 @@ namespace Engine
 		Math2D::Point2D<float> m_velocity;	   /// Current velocity of the entity's physics body.
 
 		size_t m_zIndex;			/// Z-index for rendering order.
+		float m_parallaxFactor;		/// The parallax factor the object will get multiplied by when getting rendered.
 		float m_rotation;			/// Rotation of the entity in degrees.
 		int m_directionFacing;		/// Direction the entity is facing (1 for right, -1 for left).
 		bool m_drawDebug;			/// Flag indicating whether to draw debug information for this entity.
 		DebugColor m_debugColor;	/// Color to use for debug rendering.
 
 		Transform(Entity entity) : m_prevPosition(0.0f, 0.0f), m_position(0.0f, 0.0f),
-			m_rotation(0.0f), m_directionFacing(1), m_zIndex(0), 
+			m_rotation(0.0f), m_directionFacing(1), m_zIndex(0), m_parallaxFactor(1.0f),
 			m_drawDebug(false), m_debugColor(DebugColor::Red), Component(entity) {}
 
 		Transform(Entity entity, Math2D::Point2D<float> position, float rotation, 
-			int direction, size_t zIndex, const bool drawDebug, DebugColor debugColor) :
+			int direction, size_t zIndex, float parallaxFactor, const bool drawDebug, DebugColor debugColor) :
 			m_prevPosition(position), m_position(position), m_rotation(rotation), 
-			m_directionFacing(direction), m_zIndex(zIndex), m_drawDebug(drawDebug),
+			m_directionFacing(direction), m_zIndex(zIndex), m_parallaxFactor(parallaxFactor), m_drawDebug(drawDebug),
 			m_debugColor(debugColor),
 			Component(entity) {}
 

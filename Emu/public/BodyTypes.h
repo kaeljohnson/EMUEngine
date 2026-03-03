@@ -18,9 +18,9 @@ namespace Engine
 	*/
 	enum Filter
 	{
-		NONE = 0x00000000,		/// No collision.
-		PLAYER = 0x00000002, 	/// Player collision.
-		MAP = 0x00000004,		/// Map collision.
-		ALL = 0xFFFFFFFF		/// Collide with all.
+		NONE = 0x00000000,		 /// No collision.
+		PLAYER = 0x00000002, 	 /// Player collision.
+		MAP = 0x00000004,		 /// Map collision.
+		ALL = 0xFFFFFFFF		 /// Collide with all.
 	};
 }
