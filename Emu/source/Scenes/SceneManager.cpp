@@ -229,7 +229,7 @@ namespace Engine
 		}
 	}
 
-	void SceneManager::AddLayer(std::string& sceneName, int layerId, int layerIdx, float parallaxFactor, bool hasPhysics)
+	void SceneManager::AddLayer(std::string& sceneName, int layerId, float parallaxFactor, bool hasPhysics)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())

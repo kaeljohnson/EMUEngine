@@ -146,6 +146,12 @@ namespace Engine
 
 	void Scene::AddTileMap(std::string mapFileName, std::string rulesFileName)
 	{
+		if (m_physicsLayer == -1)
+		{
+			ENGINE_CRITICAL("Cannot add a tilemap without a physics layer.");
+			exit(1);
+		}
+
 		m_mapFileName = mapFileName;
 		m_rulesFileName = rulesFileName;
 
@@ -157,15 +163,17 @@ namespace Engine
 
 		m_hasTileMap = true;
 
+		ENGINE_CRITICAL_D("physics layer: {}", m_physicsLayer);
 		for (auto& [coords, info] : m_tileMap.GetMap())
 		{	
+			// only the physics layer can have a tilemap.
 			add(m_physicsLayer, info.first);
 		}
 	}
 
 	void Scene::AddLayer(std::string& sceneName, int layerId, float parallaxFactor, bool hasPhysics)
 	{
-		if (hasPhysics && m_physicsLayer == -1)
+		if (hasPhysics && m_physicsLayer != -1)
 		{
 			ENGINE_WARN("Cannot add multiple physics layers!!!");
 			return;
@@ -176,10 +184,17 @@ namespace Engine
 		}
 
 		m_layerOrganizedEntities.try_emplace(layerId);
+		m_parallaxValuesForLayer[layerId] = parallaxFactor;
 	}
 
 	void Scene::add(int layerId, Entity entity)
 	{
+		if (layerId < 0)
+		{
+			ENGINE_CRITICAL("Invalid layer id");
+			exit(1);
+		}
+
 		if (m_layerOrganizedEntities[layerId].contains(entity))
 		{
 			ENGINE_LOG("Entity already exists in the scene: {}", entity);
@@ -463,14 +478,14 @@ namespace Engine
 		return colorArray;
 	}
 
-	static void addTransformComponent(ECS& refECS, Entity entity, const json& transformTemplates, std::string templateKey, int x, int y, size_t numUnitsPerTile)
+	static void addTransformComponent(ECS& refECS, Entity entity, const json& transformTemplates, std::string templateKey, int x, int y, size_t numUnitsPerTile, float parallaxFactor)
 	{
 		const json* entityTransformTemplate = getJson(transformTemplates, templateKey);
 		size_t zIndex = ExtractSizeTFromJSON(*entityTransformTemplate, "ZIndex", 0);
 
 		bool drawDebug = entityTransformTemplate->contains("DrawDebug");
 		std::string debugColor = entityTransformTemplate->value("DrawDebug", "red");
-		float parallaxFactor = entityTransformTemplate->value("ParallaxFactor", 1.0);
+		// float parallaxFactor = entityTransformTemplate->value("ParallaxFactor", 1.0);
 
 		DebugColor debugColorEnum;
 
@@ -1057,7 +1072,7 @@ namespace Engine
 				std::string transformTemplateKey = characterTransformJson->get<std::string>();
 				const json* transformTemplates = getJson(*componentTemplates, "Transforms");
 				if (transformTemplates)
-					addTransformComponent(m_refECS, tileEntity, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile);
+					addTransformComponent(m_refECS, tileEntity, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile, m_parallaxValuesForLayer[m_physicsLayer]);
 			}
 			else ENGINE_ERROR("Transform component is required for all entities. Missing for tile: " + tileKey);
 

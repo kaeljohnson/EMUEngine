@@ -129,7 +129,7 @@ namespace Engine
 		* @param hasPhysics A bool indicating if the layer has physics.
 		* 
 		*/
-		void AddLayer(std::string& sceneName, int layerId, int layerIdx, float parallaxFactor, bool hasPhysics = false);
+		void AddLayer(std::string& sceneName, int layerId, float parallaxFactor, bool hasPhysics);
 
 		/**
 		* @brief Sets the level dimensions for a given scene.

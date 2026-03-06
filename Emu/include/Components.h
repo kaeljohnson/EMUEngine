@@ -238,7 +238,6 @@ namespace Engine
 	using LinesRenderLayers = std::map<int, LinesRenderBucket>;
 	using DebugPointRenderLayers = std::map<int, DebugPointRenderBucket>;
 
-
 	/**
 	* @struct Camera
 	*

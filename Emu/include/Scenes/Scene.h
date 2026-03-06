@@ -204,7 +204,7 @@ namespace Engine
 		* @param parallaxFactor The parallax factor to be multiplied by at rendering.
 		* @param hasPhysics.
 		*/
-		void AddLayer(std::string& sceneName, int layerId, float parallaxFactor, bool hasPhysics = false);
+		void AddLayer(std::string& sceneName, int layerId, float parallaxFactor, bool hasPhysics);
 
 	private:
 		ECS& m_refECS;						/// Reference to the ECS instance.
@@ -233,6 +233,7 @@ namespace Engine
 
 		int m_physicsLayer = -1;
 		std::map<int, std::unordered_map<Entity, bool>> m_layerOrganizedEntities;
+		std::map<int, float> m_parallaxValuesForLayer;
 	private:
 
 		/**
