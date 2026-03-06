@@ -42,6 +42,14 @@ static size_t totalAllocated = 0;
 //	free(ptr);
 //}
 
+enum LayerId
+{
+	FOREGROUND = 0,
+	PHYSICSSIM = 1,
+	BACKGROUND1 = 2,
+	BACKGROUND2 = 3
+};
+
 int main(int argc, char* args[])
 {
 	Engine::Init(10000);
@@ -52,6 +60,7 @@ int main(int argc, char* args[])
 
 	engine->Scenes_Create("StartScreen");
 	engine->Scenes_Create("Level1");
+	engine->Scenes_AddLayer("Level1", LayerId::PHYSICSSIM, 1.0f, true);
 
 	//// Need physcis to scale with pixels per unit.
 	engine->Scenes_SetGravity("StartScreen", Math2D::Point2D(0.0f, 100.0f));

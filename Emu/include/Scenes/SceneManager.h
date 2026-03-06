@@ -120,6 +120,18 @@ namespace Engine
 		void AddTileMap(const std::string& sceneName, const std::string& mapFileName, const std::string& rulesFileName);
 
 		/**
+		* @brief Adds a layer to specified scene.
+		* 
+		* @param sceneName The name of the scene.
+		* @param layerName The name of the layer.
+		* @param layerIdx The index layer. 
+		* @param parallaxFactor The parallax factor of the layer
+		* @param hasPhysics A bool indicating if the layer has physics.
+		* 
+		*/
+		void AddLayer(std::string& sceneName, int layerId, int layerIdx, float parallaxFactor, bool hasPhysics = false);
+
+		/**
 		* @brief Sets the level dimensions for a given scene.
 		* 
 		* @param sceneName The name of the scene.

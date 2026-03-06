@@ -130,48 +130,28 @@ namespace Engine
 
 			SDL_RenderSetViewport((SDL_Renderer*)m_ptrRenderer, &vp);
 
-
-			for (auto ptrToVec = refCamera.m_renderBucket.rbegin(); ptrToVec != refCamera.m_renderBucket.rend(); ++ptrToVec)
-			{
-				for (auto& value : *ptrToVec)
+			auto processLayers = [this](auto& layers)
 				{
-					draw(value);
-				}
+					for (auto it = layers.rbegin(); it != layers.rend(); ++it)
+					{
+						auto& [layer, bucket] = *it;
 
-				ptrToVec->clear();
-			}
+						for (auto& vector : bucket)
+						{
+							for (auto& value : vector)
+								draw(value);
 
-#ifndef NDEBUG // DO NOT ADD DEBUG OBJECTS WHEN NOT IN DEBUG AS THE QUEUES WILL GROW INDEFINITELY.
-			for (auto ptrToVec = refCamera.m_debugRenderBucket.rbegin(); ptrToVec != refCamera.m_debugRenderBucket.rend(); ++ptrToVec)
-			{
-				for (auto& value : *ptrToVec)
-				{
-					draw(value);
-				}
+							vector.clear();
+						}
+					}
+				};
 
-				ptrToVec->clear();
-			}
+			processLayers(refCamera.m_renderLayers);
 
-
-			for (auto ptrToVec = refCamera.m_debugLinesRenderBucket.rbegin(); ptrToVec != refCamera.m_debugLinesRenderBucket.rend(); ++ptrToVec)
-			{
-				for (auto& value : *ptrToVec)
-				{
-					draw(value);
-				}
-
-				ptrToVec->clear();
-			}
-
-			for (auto ptrToVec = refCamera.m_debugPointsRenderBucket.rbegin(); ptrToVec != refCamera.m_debugPointsRenderBucket.rend(); ++ptrToVec)
-			{
-				for (auto& value : *ptrToVec)
-				{
-					draw(value);
-				}
-
-				ptrToVec->clear();
-			}
+#ifndef NDEBUG
+			processLayers(refCamera.m_debugRenderLayers);
+			processLayers(refCamera.m_debugLinesRenderLayers);
+			processLayers(refCamera.m_debugPointsRenderLayers);
 #endif
 			// Reset background color. Temp for now.
 			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);

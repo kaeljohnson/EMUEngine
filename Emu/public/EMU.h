@@ -159,6 +159,20 @@ namespace Engine
 		void Scenes_Remove(const std::string& name, Entity entity) {}
 
 		/**
+		* @brief Adds a layer to the scene. Layers are at their core, a way to order rendering. 
+		* Furthermore, renders each have their own parallax set by the client.
+		* 
+		* @note Cannot be called at runtime.
+		* 
+		* @param sceneName The scene name
+		* @param layerName The layer name
+		* @param orderIdx The index that this layer is processed. Processing of layers happens in descending order.
+		* @param parallaxFactor The parallax factor that each object's position is multiplied by during rendering.
+		* @param hasPhysics An optional bool indicating if this is the physics layer or not.
+		*/
+		void Scenes_AddLayer(std::string sceneName, int layerId, float parallaxFactor, bool hasPhysics = false);
+
+		/**
 		* @brief Adds a tile map to the scene with the given name using the specified map and rules files.
 		* 
 		* @note: Tilemap encompasses the physics layer of the simulation. This is where all physics bodies will live.

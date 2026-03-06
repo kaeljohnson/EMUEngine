@@ -113,6 +113,12 @@ namespace Engine
 	void EMU::Scenes_SetGravity(const std::string& name, const Math2D::Point2D<float> gravity) { m_application->m_sceneManager.SetGravity(name, gravity); }
 	// void EMU::Scenes_Add(const std::string& name, Entity entity) { getScene(name).Add(entity); }
 	// void EMU::Scenes_Remove(const std::string& name, Entity entity) { getScene(name).Remove(entity); m_ecs.Deactivate(entity); }
+	void EMU::Scenes_AddLayer(std::string sceneName, int layerId, float parallaxFactor, bool hasPhysics)
+	{
+		// Need to somehow update the max number of layers if the layerId is greater than the current number of layers.
+		// Hopefully the client fills all layers up to the new layer but if not there will have to be a "ghost" layer.
+		m_application->m_sceneManager.AddLayer(sceneName, layerId, parallaxFactor, hasPhysics);
+	}
 	void EMU::Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName) { m_application->m_sceneManager.AddTileMap(name, mapFileName, rulesFileName); }
 	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const size_t tileId) { return m_application->m_sceneManager.GetEntity(name, tileId); }
 	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const size_t tileId) { return m_application->m_sceneManager.GetTileMapEntities(name, tileId); }

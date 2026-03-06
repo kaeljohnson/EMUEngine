@@ -23,9 +23,7 @@ namespace Engine
 		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), m_hasTileMap(false), m_tileMap(m_refECS), 
 		m_physicsSimulation(refECS, m_tileMap), m_refAssetManager(refAssetManager), m_refIOEventSystem(refIOEventSystem),
 		m_cameraSystem(refECS)
-	{
-		m_entities.reserve(50000);
-	}
+	{}
 
 	Scene::~Scene()
 	{
@@ -72,21 +70,22 @@ namespace Engine
 		// 4. Activate entities with camera first.
 		for (auto& pair : m_cameraOrder)
 		{
-			Activate(pair.second);
+			Activate(m_physicsLayer, pair.second);
 		}
 
 		// 5. Activate the rest of the entities
-		for (auto& pair : m_entities)
+		for (auto& layer : m_layerOrganizedEntities)
 		{
-			if (pair.second == true) // entity active on start.
-				Activate(pair.first);
+			for (auto& entity : layer.second)
+			if (entity.second == true) // entity active on start.
+				Activate(layer.first, entity.first);
 		}
 
 		// 6. Frame the cameras
 		m_cameraSystem.Frame(Math2D::Point2D<int>(m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y));
 		
 		// 7. Physics bodies need to be added to the world after they are activated and pooled.
-		m_physicsSimulation.AddPhysicsBodiesToWorld(m_entities);
+		m_physicsSimulation.AddPhysicsBodiesToWorld(m_layerOrganizedEntities[m_physicsLayer]);
 		m_physicsSimulation.AddChainCollidersToWorld();
 
 		// 8. Contact callbacks need to be activated.
@@ -136,8 +135,13 @@ namespace Engine
 		// Deactivate all entities and destroy all components.
 		m_refECS.DeactivateEntities();
 
-		for (auto& pair : m_entities)
-			m_refECS.DestroyComponents(pair.first);
+		for (auto& layer : m_layerOrganizedEntities)
+		{
+			for (auto& entity : layer.second)
+			{
+				m_refECS.DestroyComponents(entity.first);
+			}
+		}
 	}
 
 	void Scene::AddTileMap(std::string mapFileName, std::string rulesFileName)
@@ -155,24 +159,39 @@ namespace Engine
 
 		for (auto& [coords, info] : m_tileMap.GetMap())
 		{	
-			add(info.first);
+			add(m_physicsLayer, info.first);
 		}
 	}
 
-	void Scene::add(Entity entity)
+	void Scene::AddLayer(std::string& sceneName, int layerId, float parallaxFactor, bool hasPhysics)
 	{
-		if (m_entities.contains(entity))
+		if (hasPhysics && m_physicsLayer == -1)
+		{
+			ENGINE_WARN("Cannot add multiple physics layers!!!");
+			return;
+		}
+		else if (hasPhysics)
+		{
+			m_physicsLayer = layerId;
+		}
+
+		m_layerOrganizedEntities.try_emplace(layerId);
+	}
+
+	void Scene::add(int layerId, Entity entity)
+	{
+		if (m_layerOrganizedEntities[layerId].contains(entity))
 		{
 			ENGINE_LOG("Entity already exists in the scene: {}", entity);
 			return;
 		}
 
-		m_entities.emplace(entity, true);
+		m_layerOrganizedEntities[layerId].emplace(entity, true);
 	}
 
-	void Scene::Activate(Entity entity)
+	void Scene::Activate(int layerId, Entity entity)
 	{
-		if (!m_entities.contains(entity))
+		if (!m_layerOrganizedEntities[layerId].contains(entity))
 		{
 			ENGINE_LOG("Entity does not exist in the current scene: {}", entity);
 			return;
@@ -183,15 +202,20 @@ namespace Engine
 		activatePhysics(entity);
 	}
 
+	void Scene::Activate(Entity entity)
+	{
+		// Todo
+	}
+
 	void Scene::activatePhysics(Entity entity)
 	{
 		m_physicsSimulation.ActivateBody(entity);
 		m_physicsSimulation.ActivateChains(entity);
 	}
 
-	void Scene::Deactivate(Entity entity)
+	void Scene::Deactivate(int layerId, Entity entity)
 	{
-		if (!m_entities.contains(entity))
+		if (!m_layerOrganizedEntities[layerId].contains(entity))
 		{
 			ENGINE_LOG("Entity does not exist in the current scene: {}", entity);
 			return;
@@ -208,6 +232,11 @@ namespace Engine
 		deactivatePhysics(entity);
 
 		m_refECS.Deactivate(entity);
+	}
+
+	void Scene::Deactivate(Entity entity)
+	{
+		// Todo
 	}
 
 	void Scene::deactivatePhysics(Entity entity)
@@ -944,7 +973,7 @@ namespace Engine
 				true, MAP, ALL, true, DebugColor::Red);
 
 			// refECS.Activate(chainEntity);
-			add(chainEntity);
+			add(m_physicsLayer, chainEntity);
 		}
 	}
 
@@ -965,7 +994,7 @@ namespace Engine
 		size_t numLayers = 5;
 		if (const json* worldRules = getJson(*sceneRules, "World"))
 		{
-			numLayers = ExtractSizeTFromJSON(*worldRules, "NumLayers", 5);
+			numLayers = ExtractSizeTFromJSON(*worldRules, "NumLayers", 10);
 			const json* physicsRules = getJson(*worldRules, "Physics");
 			if (!physicsRules)
 			{

@@ -100,7 +100,15 @@ namespace Engine
 		* when an entity is activated so they can initialize any required data structures.
 		* Physics system needs to create physics bodies, ecs, etc.
 		* 
+		* @param layerId The layerId the entity belongs to.
 		* @param entity The Entity to be activated.
+		*/
+		void Activate(int layerId, Entity entity);
+
+		/**
+		* @brief Activates an entity within the scene. This version must find the layer the entity belongs to first.
+		* 
+		* @param entity The entity to be activated.
 		*/
 		void Activate(Entity entity);
 
@@ -109,7 +117,15 @@ namespace Engine
 		* when an entity is deactivated so they can clean up any required data structures.
 		* Physics system needs to destroy physics bodies, ecs, etc.
 		* 
+		* @param layerId The layer id the entity belongs to.
 		* @param entity The Entity to be deactivated.
+		*/
+		void Deactivate(int layerId, Entity entity);
+
+		/**
+		* @brief Deactivate an entity within the scene. This version must find what layer the entity belongs to.
+		* 
+		* @param entity The entity to be deactivated.
 		*/
 		void Deactivate(Entity entity);
 
@@ -179,6 +195,17 @@ namespace Engine
 		*/
 		void RemoveIOEvent(IOEventType type);
 
+		/**
+		* @brief Add layer to scene.
+		*
+		* @param sceneName The name of the scene.
+		* @param layerName The name of the layer.
+		* @param layerIdx The layer index.
+		* @param parallaxFactor The parallax factor to be multiplied by at rendering.
+		* @param hasPhysics.
+		*/
+		void AddLayer(std::string& sceneName, int layerId, float parallaxFactor, bool hasPhysics = false);
+
 	private:
 		ECS& m_refECS;						/// Reference to the ECS instance.
 		AssetManager& m_refAssetManager;	/// Reference to the AssetManager instance.
@@ -203,6 +230,9 @@ namespace Engine
 		std::unordered_set<IOEventType> m_sceneRuntimeIOEvents;		/// All the IOEvents this scene has callbacks assigned to in the io system.
 
 		std::map<size_t, Entity> m_cameraOrder;					/// Set to render camera order correctly.
+
+		int m_physicsLayer = -1;
+		std::map<int, std::unordered_map<Entity, bool>> m_layerOrganizedEntities;
 	private:
 
 		/**
@@ -243,6 +273,6 @@ namespace Engine
 		* 
 		* @param entity The entity to add.
 		*/
-		void add(Entity entity);
+		void add(int layderId, Entity entity);
 	}; 
 }
