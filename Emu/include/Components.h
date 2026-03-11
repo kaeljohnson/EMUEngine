@@ -47,14 +47,14 @@ namespace Engine
 		DebugColor m_debugColor;	/// Color to use for debug rendering.
 
 		Transform(Entity entity) : m_prevPosition(0.0f, 0.0f), m_position(0.0f, 0.0f),
-			m_rotation(0.0f), m_directionFacing(1), m_zIndex(0), m_parallaxFactor(1.0f),
+			m_rotation(0.0f), m_directionFacing(1), m_zIndex(0), m_layerNum(1), m_parallaxFactor(1.0f),
 			m_drawDebug(false), m_debugColor(DebugColor::Red), 
 			Component(entity) {}
 
 		Transform(Entity entity, Math2D::Point2D<float> position, float rotation, 
-			int direction, size_t zIndex, float parallaxFactor, const bool drawDebug, DebugColor debugColor) :
+			int direction, size_t zIndex, int layerNum, float parallaxFactor, const bool drawDebug, DebugColor debugColor) :
 			m_prevPosition(position), m_position(position), m_rotation(rotation), 
-			m_directionFacing(direction), m_zIndex(zIndex), m_parallaxFactor(parallaxFactor), m_drawDebug(drawDebug),
+			m_directionFacing(direction), m_zIndex(zIndex), m_layerNum(layerNum), m_parallaxFactor(parallaxFactor), m_drawDebug(drawDebug),
 			m_debugColor(debugColor),
 			Component(entity) {}
 
@@ -281,10 +281,10 @@ namespace Engine
 		{
 			for (int i = 0; i < m_numLayers; ++i)
 			{
-				m_renderLayers.emplace(i, RenderBucket(m_numLayers));
-				m_debugRenderLayers.emplace(i, DebugRenderBucket(m_numLayers));
-				m_debugLinesRenderLayers.emplace(i, LinesRenderBucket(m_numLayers));
-				m_debugPointsRenderLayers.emplace(i, DebugPointRenderBucket(m_numLayers));
+				m_renderLayers.emplace(i, RenderBucket(10));						// No one should need more than 10 indices
+				m_debugRenderLayers.emplace(i, DebugRenderBucket(10));
+				m_debugLinesRenderLayers.emplace(i, LinesRenderBucket(10));
+				m_debugPointsRenderLayers.emplace(i, DebugPointRenderBucket(10));
 			}
 		}
 
@@ -311,10 +311,10 @@ namespace Engine
 		{
 			for (size_t i = 0; i < m_numLayers; ++i)
 			{
-				m_renderLayers.emplace(i, RenderBucket(m_numLayers));
-				m_debugRenderLayers.emplace(i, DebugRenderBucket(m_numLayers));
-				m_debugLinesRenderLayers.emplace(i, LinesRenderBucket(m_numLayers));
-				m_debugPointsRenderLayers.emplace(i, DebugPointRenderBucket(m_numLayers));
+				m_renderLayers.emplace(i, RenderBucket(10));						// No one should need more than 10 indices
+				m_debugRenderLayers.emplace(i, DebugRenderBucket(10));
+				m_debugLinesRenderLayers.emplace(i, LinesRenderBucket(10));
+				m_debugPointsRenderLayers.emplace(i, DebugPointRenderBucket(10));
 			}
 		}
 	};

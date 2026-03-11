@@ -60,10 +60,11 @@ int main(int argc, char* args[])
 
 	engine->Scenes_Create("StartScreen");
 	engine->Scenes_AddLayer("StartScreen", LayerId::PHYSICSSIM, 1.0f, true);
+	engine->Scenes_AddLayer("StartScreen", LayerId::BACKGROUND1, 0.5f);
 
 	engine->Scenes_Create("Level1");
 	engine->Scenes_AddLayer("Level1", LayerId::PHYSICSSIM, 1.0f, true);
-	engine->Scenes_AddLayer("Level1", LayerId::BACKGROUND1, 0.5f);
+	engine->Scenes_AddLayer("Level1", LayerId::BACKGROUND1, 1.0f);
 
 	//// Need physcis to scale with pixels per unit.
 	engine->Scenes_SetGravity("StartScreen", Math2D::Point2D(0.0f, 100.0f));

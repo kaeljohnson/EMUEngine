@@ -104,8 +104,6 @@ namespace Engine
         }
     }
 
-
-
     const std::pair<Entity, size_t>* TileMap::GetTile(int x, int y) const
     {
 		std::pair<int, int> key = std::make_pair(x, y);

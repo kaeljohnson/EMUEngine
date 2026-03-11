@@ -63,7 +63,7 @@ namespace Engine
 				float offsetFromTransformY = ptrSpriteComponent->m_offsetFromTransform.Y;
 
 				// 1. Culling
-				const float objectLeft = lerpedX + offsetFromTransformX - refCamera.m_offset.X * refTransform.m_parallaxFactor;
+				const float objectLeft = lerpedX + offsetFromTransformX - refCamera.m_offset.X * refTransform.m_parallaxFactor;                                                                                                                                                                                                                
 				const float objectRight = objectLeft + ptrSpriteComponent->m_sizeInUnits.X;
 				const float objectTop = lerpedY + offsetFromTransformY - refCamera.m_offset.Y * refTransform.m_parallaxFactor;
 				const float objectBottom = objectTop + ptrSpriteComponent->m_sizeInUnits.Y;
@@ -94,7 +94,7 @@ namespace Engine
 				const int locationInPixelsOnScreenY =
 					int(objectTop * scaleInPixels);
 
-				renderLayers[1][refTransform.m_zIndex].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are within 1-10
+ 				renderLayers[refTransform.m_layerNum][refTransform.m_zIndex].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are within 1-10
 					refTransform.m_entity,
 					Math2D::Point2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
 					Math2D::Point2D<int>(width, height),
@@ -106,7 +106,7 @@ namespace Engine
 				// debug objects when in debug mode.
 				if (refTransform.m_drawDebug)
 				{
-					pointLayers[1][refTransform.m_zIndex].emplace_back(
+					pointLayers[refTransform.m_layerNum][refTransform.m_zIndex].emplace_back(
 						refTransform.m_entity,
 						Math2D::Point2D<int>(
 							int(objectLeft * scaleInPixels),
@@ -117,7 +117,7 @@ namespace Engine
 				}
 				if (ptrSpriteComponent->m_drawDebug)
 				{
-					debugLayers[1][refTransform.m_zIndex].emplace_back(
+					debugLayers[refTransform.m_layerNum][refTransform.m_zIndex].emplace_back(
 						refTransform.m_entity,
 						false,
 						Math2D::Point2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
@@ -150,7 +150,7 @@ namespace Engine
 
 				// submit debug border
 				// debug objects when in debug mode.
-				debugLayers[1][refTransform.m_zIndex].emplace_back(
+				debugLayers[refTransform.m_layerNum][refTransform.m_zIndex].emplace_back(
 					refTransform.m_entity,
 					ptrPhysicsBody->m_fillRect,
 					Math2D::Point2D<int>(

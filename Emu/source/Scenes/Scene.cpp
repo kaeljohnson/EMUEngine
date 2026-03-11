@@ -67,6 +67,8 @@ namespace Engine
 		//    This function also activates the entites in the ECS.
 		loadSceneEntitiesFromTileMap();
 
+		// loadLayerTextures();
+
 		// 4. Activate entities with camera first.
 		for (auto& pair : m_cameraOrder)
 		{
@@ -77,8 +79,12 @@ namespace Engine
 		for (auto& layer : m_layerOrganizedEntities)
 		{
 			for (auto& entity : layer.second)
-			if (entity.second == true) // entity active on start.
-				Activate(layer.first, entity.first);
+			{
+				if (layer.first == 2)
+					ENGINE_CRITICAL_D("hurky: {}, {}", layer.first, entity.first);
+				if (entity.second == true) // entity active on start.
+					Activate(layer.first, entity.first);
+			}
 		}
 
 		// 6. Frame the cameras
@@ -169,22 +175,6 @@ namespace Engine
 			// only the physics layer can have a tilemap.
 			add(m_physicsLayer, info.first);
 		}
-	}
-
-	void Scene::AddLayer(std::string& sceneName, int layerId, float parallaxFactor, bool hasPhysics)
-	{
-		if (hasPhysics && m_physicsLayer != -1)
-		{
-			ENGINE_WARN("Cannot add multiple physics layers!!!");
-			return;
-		}
-		else if (hasPhysics)
-		{
-			m_physicsLayer = layerId;
-		}
-
-		m_layerOrganizedEntities.try_emplace(layerId);
-		m_parallaxValuesForLayer[layerId] = parallaxFactor;
 	}
 
 	void Scene::add(int layerId, Entity entity)
@@ -451,6 +441,48 @@ namespace Engine
 		return defaultValue;
 	}
 
+	static float ExtractFloatFromJSON(const json& j, const std::string& key, float defaultValue)
+	{
+		if (!j.contains(key))
+		{
+			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
+			std::exit(1);
+		}
+
+		const auto& value = j.at(key);
+		if (value.is_number_unsigned()) return value.get<float>();
+		else if (value.is_number_integer())
+		{
+			int intValue = value.get<int>();
+			if (intValue >= 0) return static_cast<float>(intValue);
+		}
+		else if (value.is_number())
+		{
+			double doubleValue = value.get<double>();
+			if (doubleValue >= 0.0) return static_cast<float>(doubleValue);
+		}
+		return defaultValue;
+	}
+
+	static std::string ExtractStringFromJSON(const json& j, const std::string& key, const std::string& defaultValue)
+	{
+		if (!j.contains(key))
+		{
+			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
+			std::exit(1);
+		}
+
+		const auto& value = j.at(key);
+
+		if (!value.is_string())
+		{
+			ENGINE_ERROR("Invalid Rules File. Field '{}' is not a string.", key);
+			return defaultValue;
+		}
+
+		return value.get<std::string>();
+	}
+
 	static std::array<int, 3> ExtractColorArrayFromJSON(const json& j, const std::string& key, std::array<int, 3> defaultValue)
 	{
 		if (!j.contains(key))
@@ -478,14 +510,39 @@ namespace Engine
 		return colorArray;
 	}
 
-	static void addTransformComponent(ECS& refECS, Entity entity, const json& transformTemplates, std::string templateKey, int x, int y, size_t numUnitsPerTile, float parallaxFactor)
+	static void addTransformComponent(ECS& refECS, Entity entity, const json& layersTemplate, const json& transformTemplates, std::string templateKey, int x, int y, size_t numUnitsPerTile)
 	{
 		const json* entityTransformTemplate = getJson(transformTemplates, templateKey);
 		size_t zIndex = ExtractSizeTFromJSON(*entityTransformTemplate, "ZIndex", 0);
 
+		// get the layer of the transfrom and if it is not set in the rules file set 
+		// the layer and parallax to 0, 1.0f respectively
+		int layer = 0;
+		float parallaxFactor = 1.0f;
+		const std::string layerName = ExtractStringFromJSON(*entityTransformTemplate, "Layer", "");
+		if (layerName == "")
+		{
+			ENGINE_ERROR("Layer field not found for: {}", templateKey);
+			std::exit(1);
+		}
+
+		const json* layerTemplate = getJson(layersTemplate, layerName);
+
+		if (layerTemplate == nullptr)
+		{
+			ENGINE_ERROR("Layer field not found for: {}", templateKey);
+			std::exit(1);
+		}
+		
+		layer = ExtractSizeTFromJSON(*layerTemplate, "id", 0);
+		parallaxFactor = ExtractFloatFromJSON(*layerTemplate, "ParallaxFactor", 1.0f);
+		if (layer == 2)
+		{
+			ENGINE_CRITICAL_D("Layer {}, parallax: {}", layer, parallaxFactor);
+		}
+
 		bool drawDebug = entityTransformTemplate->contains("DrawDebug");
 		std::string debugColor = entityTransformTemplate->value("DrawDebug", "red");
-		// float parallaxFactor = entityTransformTemplate->value("ParallaxFactor", 1.0);
 
 		DebugColor debugColorEnum;
 
@@ -509,7 +566,7 @@ namespace Engine
 		refECS.AddComponent<Transform>(
 			entity,
 			Math2D::Point2D<float>(x * (float)numUnitsPerTile, y * (float)numUnitsPerTile),
-			1.0f, 1, zIndex, parallaxFactor, drawDebug, debugColorEnum
+			1.0f, 1, zIndex, layer, parallaxFactor, drawDebug, debugColorEnum
 		);
 	}
 
@@ -1071,8 +1128,9 @@ namespace Engine
 			{
 				std::string transformTemplateKey = characterTransformJson->get<std::string>();
 				const json* transformTemplates = getJson(*componentTemplates, "Transforms");
+				const json* layerTemplate = getJson(*sceneRules, "Layers");
 				if (transformTemplates)
-					addTransformComponent(m_refECS, tileEntity, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile, m_parallaxValuesForLayer[m_physicsLayer]);
+					addTransformComponent(m_refECS, tileEntity, *layerTemplate, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile);
 			}
 			else ENGINE_ERROR("Transform component is required for all entities. Missing for tile: " + tileKey);
 
@@ -1090,7 +1148,8 @@ namespace Engine
 				std::string transformTemplateKey = characterTransformJson->get<std::string>();
 				const json* transformTemplates = getJson(*componentTemplates, "Transforms");
 				if (physicsTemplates)
-					addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileId, *physicsTemplates, physicsTemplateKey, x, y, numUnitsPerTile, isMap, edges);
+					addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileId, *physicsTemplates, physicsTemplateKey, x, y, numUnitsPerTile, isMap, edges); // EDGES AND PHYSICS BODIES NEED TO KNOW THE LAYER TOO FOR DEBUG RENDERING.
+
 			}
 			if (const json* characterSpriteSheetJson = getJson(*characterComponents, "SpriteSheet"))
 			{

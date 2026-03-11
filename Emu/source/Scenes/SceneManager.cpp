@@ -234,7 +234,7 @@ namespace Engine
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
 		{
-			it->second.AddLayer(sceneName, layerId, parallaxFactor, hasPhysics);
+			//it->second.AddLayer(sceneName, layerId, parallaxFactor, hasPhysics);
 		}
 		else
 		{

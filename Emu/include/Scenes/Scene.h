@@ -138,6 +138,8 @@ namespace Engine
 		*/
 		void AddTileMap(std::string mapFileName, std::string rulesFileName);
 
+		void AddSprite(int layerId, const std::string& sceneName);
+
 		/**
 		* @brief Gets the entity associated with a specific character in the tile map.
 		* 
@@ -195,17 +197,6 @@ namespace Engine
 		*/
 		void RemoveIOEvent(IOEventType type);
 
-		/**
-		* @brief Add layer to scene.
-		*
-		* @param sceneName The name of the scene.
-		* @param layerName The name of the layer.
-		* @param layerIdx The layer index.
-		* @param parallaxFactor The parallax factor to be multiplied by at rendering.
-		* @param hasPhysics.
-		*/
-		void AddLayer(std::string& sceneName, int layerId, float parallaxFactor, bool hasPhysics);
-
 	private:
 		ECS& m_refECS;						/// Reference to the ECS instance.
 		AssetManager& m_refAssetManager;	/// Reference to the AssetManager instance.
@@ -231,9 +222,9 @@ namespace Engine
 
 		std::map<size_t, Entity> m_cameraOrder;					/// Set to render camera order correctly.
 
-		int m_physicsLayer = -1;
+		int m_physicsLayer = 1;
 		std::map<int, std::unordered_map<Entity, bool>> m_layerOrganizedEntities;
-		std::map<int, float> m_parallaxValuesForLayer;
+
 	private:
 
 		/**

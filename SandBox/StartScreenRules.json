@@ -10,6 +10,24 @@
                 "NumUnitsPerTile": 1
             }
         },
+        "Layers": 
+        {
+          "Foreground": 
+          {
+            "id": 0,
+            "ParallaxFactor": 1
+          },
+          "Physics": 
+          {
+            "id": 1,
+            "ParallaxFactor": 1
+          },
+          "Background": 
+          {
+            "id": 2,
+            "ParallaxFactor": 0.5
+          }
+        },
         "Assets": 
         {
             "Sprites":
@@ -18,7 +36,8 @@
                 "Textures":
                 {
                     "PlayerSprite": "Guy.png",
-                    "GrassTileMap": "GrassTileSet32x32.png"
+                    "GrassTileMap": "GrassTileSet32x32.png",
+                    "BackgroundSprite": "Sandbox.png"
                 }
             },
             "Audio":
@@ -37,33 +56,38 @@
             {
                 "Player":  
                 {
+                  "Layer": "Physics",
                   "ZIndex": 1,
                   "DrawDebug": "green",
                   "enabled": true
                 },
                 "MiniMapTracker":
                 {
+                  "Layer":  "Foreground",
                   "ZIndex": 1,
                   "enabled": true
                 },
                 "GenericTransform1":
                 {
-                    "ZIndex": 2,
-                    "DrawDebug": "green"
+                  "Layer":  "Physics",
+                  "ZIndex": 2,
+                  "DrawDebug": "green"
                 },
                 "GenericTransformNoDebug":
                 {
-                    "ZIndex": 2
+                  "Layer":  "Physics",
+                  "ZIndex": 2
                 },
                 "GenericDoubleSizeTransform":
                 {
-                    "ZIndex": 2,
-                    "DrawDebug": "red"
+                  "Layer": "Physics",
+                  "ZIndex": 2,
+                  "DrawDebug": "red"
                 },
                 "GenericBackgroundTransform": 
                 {
-                  "ZIndex": 3,
-                  "ParallaxFactor": 0.25,
+                  "Layer": "Background",
+                  "ZIndex": 1,
                   "DrawDebug": "red",
                   "enabled": true
                 }
@@ -184,6 +208,15 @@
                     "OffsetFromTransform": [0.0, 0.0],
                     "Height": 5,
                     "Width": 8
+                },
+                "BackgroundSprite": 
+                {
+                  "Path": "BackgroundSprite",
+                  "SizeInUnits": [ 60, 12 ],
+                  "PixelsPerFrame": [ 1152, 1152 ],
+                  "OffsetFromTransform": [ 0.0, 0.0 ],
+                  "Height": 1,
+                  "Width": 1
                 }
             },
             "Animations": {
@@ -256,7 +289,8 @@
               "TopLeftExteriorGrass":                    { "Idle": { "id": 0, "Frames": [35], "FrameTime": 20, "Loop": true } },
               "LeftInteriorGrassNarrowHorizontal":       { "Idle": { "id": 0, "Frames": [36], "FrameTime": 20, "Loop": true } },
               "CentralInteriorGrassNarrowHorizontal":    { "Idle": { "id": 0, "Frames": [37], "FrameTime": 20, "Loop": true } },
-              "RightInteriorGrassNarrowHorizontal":      { "Idle": { "id": 0, "Frames": [38], "FrameTime": 20, "Loop": true } }
+              "RightInteriorGrassNarrowHorizontal":      { "Idle": { "id": 0, "Frames": [38], "FrameTime": 20, "Loop": true } },
+              "BackgroundTexture":                       { "Idle": { "id": 0, "Frames": [0],  "FrameTime": 20, "Loop": true } }
             }
         },
         "CharacterRules": 
@@ -301,7 +335,7 @@
             "38": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "CentralInteriorGrassNarrowHorizontal", "SpriteSheet": "GrassTileSet" },
             "39": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "RightInteriorGrassNarrowHorizontal",   "SpriteSheet": "GrassTileSet" },
             "40": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1"                                                                                                                                            },
-            "41": { "Transform": "GenericBackgroundTransform",                                                                                         "Animations": "BlackCenterInteriorWall",              "SpriteSheet": "GrassTileSet" }
+            "41": { "Transform": "GenericBackgroundTransform",                                                                                         "Animations": "BackgroundTexture",                    "SpriteSheet": "BackgroundSprite" }
         }
     }
 }

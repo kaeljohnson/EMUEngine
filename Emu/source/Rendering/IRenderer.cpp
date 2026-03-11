@@ -132,16 +132,17 @@ namespace Engine
 
 			auto processLayers = [this](auto& layers)
 				{
-					for (auto it = layers.rbegin(); it != layers.rend(); ++it)
+					for (auto layersIt = layers.rbegin(); layersIt != layers.rend(); ++layersIt)
 					{
-						auto& [layer, bucket] = *it;
+						auto& [layer, bucket] = *layersIt;
 
-						for (auto& vector : bucket)
+						// Need to also iterate through the bucket vectors backward to render the zIndex it descending order.
+						for (auto zIndexIt = bucket.rbegin(); zIndexIt != bucket.rend(); ++zIndexIt)
 						{
-							for (auto& value : vector)
+							for (auto& value : *zIndexIt)
 								draw(value);
 
-							vector.clear();
+							zIndexIt->clear();
 						}
 					}
 				};
@@ -154,7 +155,7 @@ namespace Engine
 			processLayers(refCamera.m_debugPointsRenderLayers);
 #endif
 			// Reset background color. Temp for now.
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+			//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 
 			if (true)
 			{
