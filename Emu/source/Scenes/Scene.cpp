@@ -131,8 +131,8 @@ namespace Engine
 	}
 
 	Scene::Scene(std::string rulesFileName, ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
-		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), m_hasTileMap(false), m_tileMap(m_refECS), m_rulesFileName(rulesFileName),
-		m_physicsSimulation(refECS, m_tileMap), m_refAssetManager(refAssetManager), m_refIOEventSystem(refIOEventSystem),
+		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), m_hasTileMap(false), m_rulesFileName(rulesFileName),
+		m_physicsSimulation(refECS), m_refAssetManager(refAssetManager), m_refIOEventSystem(refIOEventSystem),
 		m_cameraSystem(refECS)
 	{
 		m_entities.reserve(50000);
@@ -306,17 +306,32 @@ namespace Engine
 
 	void Scene::AddTileMap(std::string mapFileName)
 	{
-		m_mapFileName = mapFileName;
+		// count up all the layers by iterating throught the items in the world layers then create
+		// a tile map for each layer.
+		for (auto& [layerName, layerJson] : worldLayers.items())
+		{
+			const int layerId = layerJson["id"].get<int>();
 
-		m_tileMap.CreateMap(mapFileName);
+			if (layerJson.contains("TileMapPath"))
+			{
+				const std::string tileMapPath = layerJson["TileMapPath"].get<std::string>();
 
-		m_levelDimensionsInUnits = Math2D::Point2D<int>(m_tileMap.GetWidth(), m_tileMap.GetHeight());
+				auto [it, inserted] = m_tileMaps.emplace(layerId, TileMap(&m_refECS));
+
+				it->second.CreateMap(tileMapPath); // assuming you load after construction
+			}
+		}
+		
+
+		m_levelDimensionsInUnits = Math2D::Point2D<int>(m_tileMaps[1].GetWidth(), m_tileMaps[1].GetHeight());
 
 		ENGINE_INFO_D("Map width: {}, Map height: {}", m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y);
 
 		m_hasTileMap = true;
 
-		for (auto& [coords, info] : m_tileMap.GetMap())
+		m_physicsSimulation.AddPhysicsTileMap(&m_tileMaps[1]);
+
+		for (auto& [coords, info] : m_tileMaps[1].GetMap())
 		{	
 			add(info.first);
 		}
@@ -438,7 +453,7 @@ namespace Engine
 
 	const Entity Scene::GetTileMapEntity(size_t tileId) const
 	{
-		return m_tileMap.GetEntity(tileId);
+		return m_tileMaps.at(1).GetEntity(tileId);
 	}
 
 	void Scene::loadAudioFiles()
@@ -1054,7 +1069,7 @@ namespace Engine
 		std::unordered_set<size_t> isMap = determineMapTiles(*characterRules, *componentTemplates);
 		std::vector<Math2D::Edge> edges;
 
-		for (auto& [coords, info] : m_tileMap.GetMap())
+		for (auto& [coords, info] : m_tileMaps.at(1).GetMap())
 		{
 			const size_t tileId = info.second;
 			const int x = coords.first;
@@ -1094,7 +1109,7 @@ namespace Engine
 				std::string transformTemplateKey = characterTransformJson->get<std::string>();
 				const json* transformTemplates = getJson(*componentTemplates, "Transforms");
 				if (physicsTemplates)
-					addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileId, *physicsTemplates, physicsTemplateKey, x, y, numUnitsPerTile, isMap, edges);
+					addPhysicsComponent(m_refECS, m_tileMaps.at(1), tileEntity, tileId, *physicsTemplates, physicsTemplateKey, x, y, numUnitsPerTile, isMap, edges);
 			}
 			if (const json* characterSpriteSheetJson = getJson(*characterComponents, "SpriteSheet"))
 			{

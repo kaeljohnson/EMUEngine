@@ -53,6 +53,8 @@ int main(int argc, char* args[])
 	engine->Scenes_Create("StartScreenRules.json", "StartScreen");
 	// engine->Scenes_Create("Level1");
 
+	engine->Scenes_SetGravity("StartScreen", { 0.0f, 100.0f });
+
 	Player player;
 
 	engine->Scenes_RegisterContactCallback("StartScreen", Engine::BEGIN_SENSOR, 1, 40, [](const Engine::Contact event)

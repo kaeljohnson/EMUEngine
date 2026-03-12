@@ -22,9 +22,8 @@ namespace Engine
 		* @brief Constructor
 		* 
 		* @param refECS Reference to the ECS
-		* @param tileMap Reference to the TileMap
 		*/
-		PhysicsSimulation(ECS& refECS, TileMap& tileMap);
+		PhysicsSimulation(ECS& refECS);
 
 		/**
 		* @brief Create box2D world.
@@ -37,6 +36,8 @@ namespace Engine
 		* @param gravity Gravity vector.
 		*/
 		void UpdateGravity(const Math2D::Point2D<float> gravity);
+
+		void AddPhysicsTileMap(TileMap* ptrTileMap) { m_contactSystem.AddPhysicsTileMap(ptrTileMap); }
 
 		/**
 		* @brief Add physics bodies from entities to the world.

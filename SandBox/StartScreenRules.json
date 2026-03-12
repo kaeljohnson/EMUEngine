@@ -19,8 +19,7 @@
           "Background": 
           {
             "id": 2,
-            "ParallaxFactor": 0.5,
-            "TileMapPath":  "Backgrounds/StartScreenBackground.txt"
+            "ParallaxFactor": 0.5
           }
         },
         "Assets": 

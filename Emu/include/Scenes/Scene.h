@@ -140,7 +140,7 @@ namespace Engine
 		*/
 		inline const std::vector<Entity>& GetTileMapEntities(const size_t tileId) const
 		{
-			return m_tileMap.GetEntities(tileId);
+			return m_tileMaps.at(1).GetEntities(tileId);
 		}
 
 		/**
@@ -185,14 +185,13 @@ namespace Engine
 		IOEventSystem& m_refIOEventSystem;	/// Reference to the io event system.
 
 		bool m_hasTileMap;					/// Flag indicating if the scene has a tile map.
-		std::string m_mapFileName;			/// The filename of the tile map file.
 		std::string m_rulesFileName;		/// The filename of the rules file that defines entity mappings.
 
 		std::vector<std::function<void()>> m_clientOnScenePlayEvents; /// Client defined functions to be called when the scene starts playing.
 		std::vector<std::function<void()>> m_clientOnSceneEndEvents;  /// Client defined functions to be called when the scene ends.
 
 		Math2D::Point2D<int> m_levelDimensionsInUnits;			/// The dimensions of the level in units.
-		TileMap m_tileMap;				 					    /// The tile map		
+		std::map<int, TileMap> m_tileMaps;						/// Each layers tile map.
 
 		PhysicsSimulation m_physicsSimulation;   				/// The physics simulation for the scene.
 		CameraSystem m_cameraSystem;							/// The camera system for the scene.

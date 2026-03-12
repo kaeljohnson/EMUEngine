@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	ContactSystem::ContactSystem(ECS& refECS, TileMap& tileMap) : m_refECS(refECS), m_refTileMap(tileMap) {}
+	ContactSystem::ContactSystem(ECS& refECS) : m_refECS(refECS), m_ptrTileMap(nullptr) {}
 
 	// This function is allocating memory dynamically. Why?
 	void ContactSystem::ProcessContacts(void* ptrWorldId)
@@ -146,7 +146,7 @@ namespace Engine
 	{
 		for (auto& tuple : m_singleEntityContactCallbacks)
 		{
-			Entity entityA = m_refTileMap.GetEntity(std::get<1>(tuple));
+			Entity entityA = m_ptrTileMap->GetEntity(std::get<1>(tuple));
 			ContactType contactType = std::get<0>(tuple);
 			ContactCallback callback = std::get<2>(tuple);
 			if (entityA != m_refECS.INVALID_ENTITY)
@@ -161,8 +161,8 @@ namespace Engine
 
 		for (auto& tuple : m_multiContactCallbacks)
 		{
-			Entity entityA = m_refTileMap.GetEntity(std::get<1>(tuple));
-			Entity entityB = m_refTileMap.GetEntity(std::get<2>(tuple));
+			Entity entityA = m_ptrTileMap->GetEntity(std::get<1>(tuple));
+			Entity entityB = m_ptrTileMap->GetEntity(std::get<2>(tuple));
 			ContactType contactType = std::get<0>(tuple);
 			ContactCallback callback = std::get<3>(tuple);
 			if (entityA != m_refECS.INVALID_ENTITY && entityB != m_refECS.INVALID_ENTITY)

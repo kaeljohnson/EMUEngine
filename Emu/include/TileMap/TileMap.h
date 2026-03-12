@@ -27,12 +27,14 @@ namespace Engine
 	class TileMap
 	{
 	public:
+
+		TileMap();
 		/**
 		* @brief Constructor for the TileMap class.
 		* 
 		* @param refECS Reference to the ECS instance.
 		*/
-		TileMap(ECS& refECS);
+		TileMap(ECS* ptrECS);
 		~TileMap() = default;
 
 		/**
@@ -107,6 +109,6 @@ namespace Engine
 		std::unordered_map<size_t, std::vector<Entity>> m_groupedEntitiesByNumMap;					/// Map of characters to their associated entities.
 
 		Math2D::Point2D<int> m_mapDimensions;														/// Dimensions of the map in tiles.	
-		ECS& m_refECS;																				/// Reference to the ECS instance.
+		ECS* m_ptrECS;																				/// Reference to the ECS instance.
 	};
 }
