@@ -21,6 +21,8 @@ namespace Engine
 	public:
 		using ContactCallback = std::function<void(const Contact&)>; /// Callback function type for contact events
 
+		void AddPhysicsTileMap(TileMap* tileMap);
+
 		/**
 		* @brief Registers a contact callback for a specific contact type and tile ID.
 		* 
@@ -66,7 +68,7 @@ namespace Engine
 		* @param refECS Reference to the ECS
 		* @param tileMap Reference to the TileMap
 		*/
-		ContactSystem(ECS& refECS, TileMap& tileMap);
+		ContactSystem(ECS& refECS);
 		~ContactSystem() = default;
 
 		/**
@@ -88,7 +90,7 @@ namespace Engine
 
 	private:
 		ECS& m_refECS;				/// Reference to the ECS
-		TileMap& m_refTileMap;		/// Reference to the TileMap
+		TileMap* m_ptrTileMap;		/// Reference to the TileMap
 
 		std::vector<std::tuple<ContactType, const size_t, ContactCallback>> m_singleEntityContactCallbacks;			/// Single entity contact callbacks
 		std::vector<std::tuple<ContactType, const size_t, const size_t, ContactCallback>> m_multiContactCallbacks;	/// Multi-entity contact callbacks

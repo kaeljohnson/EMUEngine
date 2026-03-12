@@ -28,10 +28,10 @@ namespace Engine
 	{
 		// auto start = std::chrono::high_resolution_clock::now();
 
-		auto& renderBuckets = refCamera.m_renderBucket;
-		auto& debugBuckets = refCamera.m_debugRenderBucket;
-		auto& debugLineBuckets = refCamera.m_debugLinesRenderBucket;
-		auto& pointBuckets = refCamera.m_debugPointsRenderBucket;
+		auto& renderLayers = refCamera.m_renderLayers;
+		auto& debugLayers = refCamera.m_debugRenderLayers;
+		auto& debugLineLayers = refCamera.m_debugLinesRenderLayers;
+		auto& pointLayers = refCamera.m_debugPointsRenderLayers;
 
 		const size_t scaleInPixels = refCamera.m_pixelsPerUnit * scale;
 
@@ -63,7 +63,7 @@ namespace Engine
 				float offsetFromTransformY = ptrSpriteComponent->m_offsetFromTransform.Y;
 
 				// 1. Culling
-				const float objectLeft = lerpedX + offsetFromTransformX - refCamera.m_offset.X * refTransform.m_parallaxFactor;
+				const float objectLeft = lerpedX + offsetFromTransformX - refCamera.m_offset.X * refTransform.m_parallaxFactor;                                                                                                                                                                                                                
 				const float objectRight = objectLeft + ptrSpriteComponent->m_sizeInUnits.X;
 				const float objectTop = lerpedY + offsetFromTransformY - refCamera.m_offset.Y * refTransform.m_parallaxFactor;
 				const float objectBottom = objectTop + ptrSpriteComponent->m_sizeInUnits.Y;
@@ -94,7 +94,7 @@ namespace Engine
 				const int locationInPixelsOnScreenY =
 					int(objectTop * scaleInPixels);
 
-				renderBuckets[refTransform.m_zIndex].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are within 1-10
+ 				renderLayers[refTransform.m_layerNum][refTransform.m_zIndex].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are within 1-10
 					refTransform.m_entity,
 					Math2D::Point2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
 					Math2D::Point2D<int>(width, height),
@@ -106,7 +106,7 @@ namespace Engine
 				// debug objects when in debug mode.
 				if (refTransform.m_drawDebug)
 				{
-					pointBuckets[refTransform.m_zIndex].emplace_back(
+					pointLayers[refTransform.m_layerNum][refTransform.m_zIndex].emplace_back(
 						refTransform.m_entity,
 						Math2D::Point2D<int>(
 							int(objectLeft * scaleInPixels),
@@ -117,7 +117,7 @@ namespace Engine
 				}
 				if (ptrSpriteComponent->m_drawDebug)
 				{
-					debugBuckets[refTransform.m_zIndex].emplace_back(
+					debugLayers[refTransform.m_layerNum][refTransform.m_zIndex].emplace_back(
 						refTransform.m_entity,
 						false,
 						Math2D::Point2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
@@ -150,7 +150,7 @@ namespace Engine
 
 				// submit debug border
 				// debug objects when in debug mode.
-				debugBuckets[refTransform.m_zIndex].emplace_back(
+				debugLayers[refTransform.m_layerNum][refTransform.m_zIndex].emplace_back(
 					refTransform.m_entity,
 					ptrPhysicsBody->m_fillRect,
 					Math2D::Point2D<int>(
@@ -178,7 +178,7 @@ namespace Engine
 				const int edgePointBInPixelsY = static_cast<int>((refEdge.m_endPoint.Y - refCamera.m_offset.Y) * scaleInPixels);
 				const Math2D::Point2D<int> edgePointBInPixels(edgePointBInPixelsX, edgePointBInPixelsY);
 
-				debugLineBuckets[0].emplace_back(
+				debugLineLayers[1][0].emplace_back( // NEED TO GET ACTUAL PHYSICS LAYER
 					-1,
 					edgePointAInPixels,
 					edgePointBInPixels,

@@ -19,17 +19,165 @@ static json rulesJson; // Only one rules file per game for now so this will work
 
 namespace Engine
 {
-	Scene::Scene(ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
-		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), m_hasTileMap(false), m_tileMap(m_refECS), 
-		m_physicsSimulation(refECS, m_tileMap), m_refAssetManager(refAssetManager), m_refIOEventSystem(refIOEventSystem),
+	Scene::Scene(const std::string& rulesFileName, ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
+		: m_rulesFileName(rulesFileName), m_refECS(refECS), m_levelDimensionsInUnits(32, 32), m_tileMaps(),
+		m_physicsSimulation(refECS), m_refAssetManager(refAssetManager), m_refIOEventSystem(refIOEventSystem),
 		m_cameraSystem(refECS)
 	{
-		m_entities.reserve(50000);
+		// Open and parse the rules file
+		std::ifstream inFile(rulesFileName);
+		if (!inFile.is_open())
+		{
+			ENGINE_ERROR("Failed to open rules file.");
+			std::exit(1);
+		}
+
+		try
+		{
+			inFile >> rulesJson;
+		}
+		catch (const json::parse_error& e)
+		{
+			ENGINE_ERROR("Failed to parse rules JSON: {}", e.what());
+			std::exit(1);
+		}
+
+		checkForTileMaps(); // Check if the client setup tilemaps in the rules json.
 	}
 
 	Scene::~Scene()
 	{
 		m_physicsSimulation.Cleanup();
+	}
+
+	// j must out live the pointer returned.
+	static const json* getJson(const json& j, const std::string& key)
+	{
+		auto it = j.find(key);
+		if (it == j.end())
+		{
+			return nullptr;
+		}
+		return &(*it);
+	}
+
+	template<typename T>
+	static Math2D::Point2D<T> ExtractPoint2DFromJSON(const json& j, const std::string& key, Math2D::Point2D<T> ioVec)
+	{
+		if (!j.contains(key))
+		{
+			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}", key);
+			std::exit(1);
+		}
+
+		const auto& arr = j.at(key);
+		if (!arr.is_array() || arr.size() != 2) return ioVec;
+
+		if constexpr (std::is_floating_point_v<T>)
+		{
+			if (arr[0].is_number()) ioVec.X = static_cast<T>(arr[0].get<double>());
+			if (arr[1].is_number()) ioVec.Y = static_cast<T>(arr[1].get<double>());
+		}
+		else if constexpr (std::is_integral_v<T>)
+		{
+			if (arr[0].is_number_integer()) ioVec.X = static_cast<T>(arr[0].get<long long>());
+			else if (arr[0].is_number()) ioVec.X = static_cast<T>(arr[0].get<long long>());
+			if (arr[1].is_number_integer()) ioVec.Y = static_cast<T>(arr[1].get<long long>());
+			else if (arr[1].is_number()) ioVec.Y = static_cast<T>(arr[1].get<long long>());
+		}
+		return ioVec;
+	}
+
+	static size_t ExtractSizeTFromJSON(const json& j, const std::string& key, int defaultValue)
+	{
+		if (!j.contains(key))
+		{
+			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
+			std::exit(1);
+		}
+
+		const auto& value = j.at(key);
+		if (value.is_number_unsigned()) return value.get<size_t>();
+		else if (value.is_number_integer())
+		{
+			int intValue = value.get<int>();
+			if (intValue >= 0) return static_cast<size_t>(intValue);
+		}
+		else if (value.is_number())
+		{
+			double doubleValue = value.get<double>();
+			if (doubleValue >= 0.0) return static_cast<size_t>(doubleValue);
+		}
+		return defaultValue;
+	}
+
+	static float ExtractFloatFromJSON(const json& j, const std::string& key, float defaultValue)
+	{
+		if (!j.contains(key))
+		{
+			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
+			std::exit(1);
+		}
+
+		const auto& value = j.at(key);
+		if (value.is_number_unsigned()) return value.get<float>();
+		else if (value.is_number_integer())
+		{
+			int intValue = value.get<int>();
+			if (intValue >= 0) return static_cast<float>(intValue);
+		}
+		else if (value.is_number())
+		{
+			double doubleValue = value.get<double>();
+			if (doubleValue >= 0.0) return static_cast<float>(doubleValue);
+		}
+		return defaultValue;
+	}
+
+	static std::string ExtractStringFromJSON(const json& j, const std::string& key, const std::string& defaultValue)
+	{
+		if (!j.contains(key))
+		{
+			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
+			std::exit(1);
+		}
+
+		const auto& value = j.at(key);
+
+		if (!value.is_string())
+		{
+			ENGINE_ERROR("Invalid Rules File. Field '{}' is not a string.", key);
+			return defaultValue;
+		}
+
+		return value.get<std::string>();
+	}
+
+	static std::array<int, 3> ExtractColorArrayFromJSON(const json& j, const std::string& key, std::array<int, 3> defaultValue)
+	{
+		if (!j.contains(key))
+		{
+			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
+			std::exit(1);
+		}
+		const auto& arr = j.at(key);
+		if (!arr.is_array() || arr.size() != 3) return defaultValue;
+		std::array<int, 3> colorArray = defaultValue;
+		for (size_t i = 0; i < 3; ++i)
+		{
+			if (arr[i].is_number_unsigned()) colorArray[i] = arr[i].get<int>();
+			else if (arr[i].is_number_integer())
+			{
+				int intValue = arr[i].get<int>();
+				if (intValue >= 0) colorArray[i] = static_cast<int>(intValue);
+			}
+			else if (arr[i].is_number())
+			{
+				double doubleValue = arr[i].get<double>();
+				if (doubleValue >= 0.0) colorArray[i] = static_cast<int>(doubleValue);
+			}
+		}
+		return colorArray;
 	}
 	
 	void Scene::RegisterContactCallback(ContactType contactType, const size_t entityA, const size_t entityB, ContactCallback callback)
@@ -67,26 +215,33 @@ namespace Engine
 		// 3. Load the entities associated with the characters in the tile map.
 		//	  Adds components defined in the rules file and adds them to the ECS.
 		//    This function also activates the entites in the ECS.
-		loadSceneEntitiesFromTileMap();
+		loadSceneEntitiesFromTileMaps();
+
+		// loadLayerTextures();
 
 		// 4. Activate entities with camera first.
 		for (auto& pair : m_cameraOrder)
 		{
-			Activate(pair.second);
+			Activate(m_physicsLayer, pair.second);
 		}
 
 		// 5. Activate the rest of the entities
-		for (auto& pair : m_entities)
+		for (auto& layer : m_layerOrganizedEntities)
 		{
-			if (pair.second == true) // entity active on start.
-				Activate(pair.first);
+			for (auto& entity : layer.second)
+			{
+				if (layer.first == 2)
+					ENGINE_CRITICAL_D("hurky: {}, {}", layer.first, entity.first);
+				if (entity.second == true) // entity active on start.
+					Activate(layer.first, entity.first);
+			}
 		}
 
 		// 6. Frame the cameras
-		m_cameraSystem.Frame(Math2D::Point2D<int>(m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y));
+		m_cameraSystem.Frame(Math2D::Point2D<int>(m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y)); // CAMERA SHOULD FRAME A CLIENT DEFINED BOUND.
 		
 		// 7. Physics bodies need to be added to the world after they are activated and pooled.
-		m_physicsSimulation.AddPhysicsBodiesToWorld(m_entities);
+		m_physicsSimulation.AddPhysicsBodiesToWorld(m_layerOrganizedEntities[m_physicsLayer]);
 		m_physicsSimulation.AddChainCollidersToWorld();
 
 		// 8. Contact callbacks need to be activated.
@@ -136,43 +291,79 @@ namespace Engine
 		// Deactivate all entities and destroy all components.
 		m_refECS.DeactivateEntities();
 
-		for (auto& pair : m_entities)
-			m_refECS.DestroyComponents(pair.first);
-	}
-
-	void Scene::AddTileMap(std::string mapFileName, std::string rulesFileName)
-	{
-		m_mapFileName = mapFileName;
-		m_rulesFileName = rulesFileName;
-
-		m_tileMap.CreateMap(mapFileName);
-
-		m_levelDimensionsInUnits = Math2D::Point2D<int>(m_tileMap.GetWidth(), m_tileMap.GetHeight());
-
-		ENGINE_INFO_D("Map width: {}, Map height: {}", m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y);
-
-		m_hasTileMap = true;
-
-		for (auto& [coords, info] : m_tileMap.GetMap())
-		{	
-			add(info.first);
+		for (auto& layer : m_layerOrganizedEntities)
+		{
+			for (auto& entity : layer.second)
+			{
+				m_refECS.DestroyComponents(entity.first);
+			}
 		}
 	}
 
-	void Scene::add(Entity entity)
+	void Scene::AddTileMap(std::string rulesFileName, const std::string& layerName, int layerId, const std::string& tileMapFileName)
 	{
-		if (m_entities.contains(entity))
+		const std::string& sceneName = rulesJson.begin().key();
+		ENGINE_LOG("Loading scene entities for scene: {}", sceneName);
+
+		const json* sceneRules = getJson(rulesJson, sceneName);
+		if (!sceneRules)
+		{
+			ENGINE_ERROR("No scene rules found for scene: {}", sceneName);
+			std::exit(1);
+		}
+
+		const json* worldLayers = getJson(*sceneRules, "WorldLayers");
+		if (!worldLayers)
+		{
+			ENGINE_CRITICAL("No world layers json defined.");
+			std::exit(1);
+		}
+
+		m_rulesFileName = rulesFileName;
+
+		m_tileMaps.try_emplace(layerId, TileMap(tileMapFileName, &m_refECS));
+
+		if (layerName == "Physics")
+		{
+			m_physicsLayer = layerId;
+			m_levelDimensionsInUnits = Math2D::Point2D<int>(m_tileMaps[m_physicsLayer].GetWidth(), m_tileMaps[m_physicsLayer].GetHeight()); // TEMP
+			m_physicsSimulation.AddPhysicsTileMap(&m_tileMaps[layerId]); // If the m_tileMaps vector resizes, passing this as a pointer could be a problem.
+
+			const json* physicsRules = getJson(*worldLayers, "Physics"); // Client must have a layer called Physics
+
+			SetGravity(ExtractPoint2DFromJSON<float>(*physicsRules, "Gravity", { 0.0f, 0.0f }));
+		}
+
+
+		ENGINE_INFO_D("Map width: {}, Map height: {}", m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y);
+
+		ENGINE_CRITICAL_D("physics layer: {}", m_physicsLayer);
+		for (auto& [coords, info] : m_tileMaps[layerId].GetMap())
+		{	
+			add(layerId, info.first);
+		}
+	}
+
+	void Scene::add(int layerId, Entity entity)
+	{
+		if (layerId < 0)
+		{
+			ENGINE_CRITICAL("Invalid layer id");
+			exit(1);
+		}
+
+		if (m_layerOrganizedEntities[layerId].contains(entity))
 		{
 			ENGINE_LOG("Entity already exists in the scene: {}", entity);
 			return;
 		}
 
-		m_entities.emplace(entity, true);
+		m_layerOrganizedEntities[layerId].emplace(entity, true);
 	}
 
-	void Scene::Activate(Entity entity)
+	void Scene::Activate(int layerId, Entity entity)
 	{
-		if (!m_entities.contains(entity))
+		if (!m_layerOrganizedEntities[layerId].contains(entity))
 		{
 			ENGINE_LOG("Entity does not exist in the current scene: {}", entity);
 			return;
@@ -183,15 +374,20 @@ namespace Engine
 		activatePhysics(entity);
 	}
 
+	void Scene::Activate(Entity entity)
+	{
+		// Todo
+	}
+
 	void Scene::activatePhysics(Entity entity)
 	{
 		m_physicsSimulation.ActivateBody(entity);
 		m_physicsSimulation.ActivateChains(entity);
 	}
 
-	void Scene::Deactivate(Entity entity)
+	void Scene::Deactivate(int layerId, Entity entity)
 	{
-		if (!m_entities.contains(entity))
+		if (!m_layerOrganizedEntities[layerId].contains(entity))
 		{
 			ENGINE_LOG("Entity does not exist in the current scene: {}", entity);
 			return;
@@ -210,6 +406,11 @@ namespace Engine
 		m_refECS.Deactivate(entity);
 	}
 
+	void Scene::Deactivate(Entity entity)
+	{
+		// Todo
+	}
+
 	void Scene::deactivatePhysics(Entity entity)
 	{
 		m_physicsSimulation.DeactivateBody(entity);
@@ -222,17 +423,6 @@ namespace Engine
 	//	m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());
 	//	m_refECS.Deactivate(entity);
 	//}
-
-	void Scene::SetLevelDimensions(const Math2D::Point2D<int> levelDimensions)
-	{
-		if (m_hasTileMap)
-		{
-			ENGINE_LOG("Scene already has a tile map. Cannot override map dimensions!");
-			return;
-		}
-
-		m_levelDimensionsInUnits = levelDimensions;
-	}
 
 	void Scene::UpdatePhysics()
 	{
@@ -275,18 +465,8 @@ namespace Engine
 
 	const Entity Scene::GetTileMapEntity(size_t tileId) const
 	{
-		return m_tileMap.GetEntity(tileId);
-	}
-
-	// j must out live the pointer returned.
-	static const json* getJson(const json& j, const std::string& key)
-	{
-		auto it = j.find(key);
-		if (it == j.end())
-		{
-			return nullptr;
-		}
-		return &(*it);
+		// return m_tileMap.GetEntity(tileId);
+		return -1;
 	}
 
 
@@ -357,91 +537,34 @@ namespace Engine
 		}
 	}
 
-	template<typename T>
-	static Math2D::Point2D<T> ExtractPoint2DFromJSON(const json& j, const std::string& key, Math2D::Point2D<T> ioVec)
-	{
-		if (!j.contains(key))
-		{
-			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}", key);
-			std::exit(1);
-		}
-
-		const auto& arr = j.at(key);
-		if (!arr.is_array() || arr.size() != 2) return ioVec;
-
-		if constexpr (std::is_floating_point_v<T>)
-		{
-			if (arr[0].is_number()) ioVec.X = static_cast<T>(arr[0].get<double>());
-			if (arr[1].is_number()) ioVec.Y = static_cast<T>(arr[1].get<double>());
-		}
-		else if constexpr (std::is_integral_v<T>)
-		{
-			if (arr[0].is_number_integer()) ioVec.X = static_cast<T>(arr[0].get<long long>());
-			else if (arr[0].is_number()) ioVec.X = static_cast<T>(arr[0].get<long long>());
-			if (arr[1].is_number_integer()) ioVec.Y = static_cast<T>(arr[1].get<long long>());
-			else if (arr[1].is_number()) ioVec.Y = static_cast<T>(arr[1].get<long long>());
-		}
-		return ioVec;
-	}
-
-	static size_t ExtractSizeTFromJSON(const json& j, const std::string& key, size_t defaultValue)
-	{
-		if (!j.contains(key))
-		{
-			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
-			std::exit(1);
-		}
-
-		const auto& value = j.at(key);
-		if (value.is_number_unsigned()) return value.get<size_t>();
-		else if (value.is_number_integer())
-		{
-			int intValue = value.get<int>();
-			if (intValue >= 0) return static_cast<size_t>(intValue);
-		}
-		else if (value.is_number())
-		{
-			double doubleValue = value.get<double>();
-			if (doubleValue >= 0.0) return static_cast<size_t>(doubleValue);
-		}
-		return defaultValue;
-	}
-
-	static std::array<int, 3> ExtractColorArrayFromJSON(const json& j, const std::string& key, std::array<int, 3> defaultValue)
-	{
-		if (!j.contains(key))
-		{
-			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
-			std::exit(1);
-		}
-		const auto& arr = j.at(key);
-		if (!arr.is_array() || arr.size() != 3) return defaultValue;
-		std::array<int, 3> colorArray = defaultValue;
-		for (size_t i = 0; i < 3; ++i)
-		{
-			if (arr[i].is_number_unsigned()) colorArray[i] = arr[i].get<int>();
-			else if (arr[i].is_number_integer())
-			{
-				int intValue = arr[i].get<int>();
-				if (intValue >= 0) colorArray[i] = static_cast<int>(intValue);
-			}
-			else if (arr[i].is_number())
-			{
-				double doubleValue = arr[i].get<double>();
-				if (doubleValue >= 0.0) colorArray[i] = static_cast<int>(doubleValue);
-			}
-		}
-		return colorArray;
-	}
-
-	static void addTransformComponent(ECS& refECS, Entity entity, const json& transformTemplates, std::string templateKey, int x, int y, size_t numUnitsPerTile)
+	static void addTransformComponent(ECS& refECS, Entity entity, const json& layersTemplate, std::string& layerName, const json& transformTemplates, std::string templateKey, int x, int y, size_t numUnitsPerTile)
 	{
 		const json* entityTransformTemplate = getJson(transformTemplates, templateKey);
 		size_t zIndex = ExtractSizeTFromJSON(*entityTransformTemplate, "ZIndex", 0);
 
+		// get the layer of the transfrom and if it is not set in the rules file set 
+		// the layer and parallax to 0, 1.0f respectively
+		int layer = 0;
+		float parallaxFactor = 1.0f;
+		
+
+		const json* layerTemplate = getJson(layersTemplate, layerName);
+
+		if (layerTemplate == nullptr)
+		{
+			ENGINE_ERROR("Layer field not found for: {}", templateKey);
+			std::exit(1);
+		}
+		
+		layer = ExtractSizeTFromJSON(*layerTemplate, "id", 0);
+		parallaxFactor = ExtractFloatFromJSON(*layerTemplate, "ParallaxFactor", 1.0f);
+		if (layer == 2)
+		{
+			ENGINE_CRITICAL_D("Layer {}, parallax: {}", layer, parallaxFactor);
+		}
+
 		bool drawDebug = entityTransformTemplate->contains("DrawDebug");
 		std::string debugColor = entityTransformTemplate->value("DrawDebug", "red");
-		float parallaxFactor = entityTransformTemplate->value("ParallaxFactor", 1.0);
 
 		DebugColor debugColorEnum;
 
@@ -465,7 +588,7 @@ namespace Engine
 		refECS.AddComponent<Transform>(
 			entity,
 			Math2D::Point2D<float>(x * (float)numUnitsPerTile, y * (float)numUnitsPerTile),
-			1.0f, 1, zIndex, parallaxFactor, drawDebug, debugColorEnum
+			1.0f, 1, zIndex, layer, parallaxFactor, drawDebug, debugColorEnum
 		);
 	}
 
@@ -944,11 +1067,50 @@ namespace Engine
 				true, MAP, ALL, true, DebugColor::Red);
 
 			// refECS.Activate(chainEntity);
-			add(chainEntity);
+			add(m_physicsLayer, chainEntity);
 		}
 	}
 
-	void Scene::loadSceneEntitiesFromTileMap()
+	void Scene::checkForTileMaps()
+	{
+		const std::string& sceneName = rulesJson.begin().key();
+
+		const json* sceneRules = getJson(rulesJson, sceneName);
+		if (!sceneRules)
+		{
+			ENGINE_ERROR("No scene rules found for scene: {}", sceneName);
+			std::exit(1);
+		}
+
+		const json* worldLayers = getJson(*sceneRules, "WorldLayers");
+		if (!worldLayers)
+		{
+			ENGINE_CRITICAL("No world layers json defined.");
+			std::exit(1);
+		}
+
+		int layerCount = 0;
+		for (const auto& [layerName, layerData] : worldLayers->items())
+		{
+			if (layerData.contains("TileMapPath"))
+			{
+				const std::string& tileMapFileName = ExtractStringFromJSON(layerData, "TileMapPath", "");
+				if (tileMapFileName == "")
+				{
+					ENGINE_CRITICAL("Tile map file name invalid");
+					std::exit(1);
+				}
+
+				int layerId = ExtractSizeTFromJSON(layerData, "id", 0);
+
+				AddTileMap(m_rulesFileName, layerName, layerId, tileMapFileName);
+			}
+			++layerCount;
+		}
+		m_layerCount = layerCount;
+	}
+
+	void Scene::loadSceneEntitiesFromTileMaps()
 	{
 		const std::string& sceneName = rulesJson.begin().key();
 		ENGINE_LOG("Loading scene entities for scene: {}", sceneName);
@@ -960,21 +1122,11 @@ namespace Engine
 			std::exit(1);
 		}
 
-		// Load the physics rules.
-		size_t numUnitsPerTile = 1;
-		size_t numLayers = 5;
-		if (const json* worldRules = getJson(*sceneRules, "World"))
+		const json* worldLayers = getJson(*sceneRules, "WorldLayers");
+		if (!worldLayers)
 		{
-			numLayers = ExtractSizeTFromJSON(*worldRules, "NumLayers", 5);
-			const json* physicsRules = getJson(*worldRules, "Physics");
-			if (!physicsRules)
-			{
-				ENGINE_ERROR("No physics rules found for world in scene: {}", sceneName);
-				std::exit(1);
-			}
-
-			SetGravity(ExtractPoint2DFromJSON<float>(*physicsRules, "Gravity", { 0.0f, 0.0f }));
-			numUnitsPerTile = ExtractSizeTFromJSON(*physicsRules, "NumUnitsPerTile", 1);
+			ENGINE_CRITICAL("No world layers json defined.");
+			std::exit(1);
 		}
 
 		// Load Assets.
@@ -1006,66 +1158,80 @@ namespace Engine
 		std::unordered_set<size_t> isMap = determineMapTiles(*characterRules, *componentTemplates);
 		std::vector<Math2D::Edge> edges;
 
-		for (auto& [coords, info] : m_tileMap.GetMap())
+		int numUnitsPerTile = 1; // TEMP
+
+		for (auto& layer : m_tileMaps)
 		{
-			const size_t tileId = info.second;
-			const int x = coords.first;
-			const int y = coords.second;
-			Entity tileEntity = info.first;
+			for (auto& [coords, info] : layer.second.GetMap())
+			{
+				const size_t tileId = info.second;
+				const int x = coords.first;
+				const int y = coords.second;
+				Entity tileEntity = info.first;
 
-			std::string tileKey = std::to_string(tileId);
+				std::string tileKey = std::to_string(tileId);
 
-			const json* characterComponents = nullptr;
-			if (!(characterComponents = getJson(*characterRules, tileKey)))
-			{
-				ENGINE_INFO("Tile ID {} at ({}, {}) has no character rules defined. Skipping entity creation.", tileId, x, y);
-				continue;
+				const json* characterComponents = nullptr;
+				if (!(characterComponents = getJson(*characterRules, tileKey)))
+				{
+					ENGINE_INFO("Tile ID {} at ({}, {}) has no character rules defined. Skipping entity creation.", tileId, x, y);
+					continue;
+				}
+
+				const json* characterTransformJson = nullptr;
+				if (characterTransformJson = getJson(*characterComponents, "Transform"))
+				{
+					std::string transformTemplateKey = characterTransformJson->get<std::string>();
+					const json* transformTemplates = getJson(*componentTemplates, "Transforms");
+					const json* layerTemplate = getJson(*sceneRules, "WorldLayers");
+					std::string layerName = ExtractStringFromJSON(*characterComponents, "Layer", "");
+					if (layerName == "")
+					{
+						ENGINE_CRITICAL("Tile needs a layer: {}", tileId);
+						std::exit(1);
+					}
+						
+					if (transformTemplates)
+						addTransformComponent(m_refECS, tileEntity, *layerTemplate, layerName, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile);
+				}
+				else ENGINE_ERROR("Transform component is required for all entities. Missing for tile: " + tileKey);
+
+				if (const json* characterCameraJson = getJson(*characterComponents, "Camera"))
+				{
+					std::string cameraTemplateKey = characterCameraJson->get<std::string>();
+					const json* cameraTemplates = getJson(*componentTemplates, "Camera");
+					if (cameraTemplates)
+						m_cameraOrder.emplace(addCameraComponent(m_refECS, tileEntity, *cameraTemplates, cameraTemplateKey, m_layerCount));
+				}
+				if (const json* characterPhysicsJson = getJson(*characterComponents, "Physics"))
+				{
+					std::string physicsTemplateKey = characterPhysicsJson->get<std::string>();
+					const json* physicsTemplates = getJson(*componentTemplates, "Physics");
+					std::string transformTemplateKey = characterTransformJson->get<std::string>();
+					const json* transformTemplates = getJson(*componentTemplates, "Transforms");
+					if (physicsTemplates)
+						addPhysicsComponent(m_refECS, layer.second, tileEntity, tileId, *physicsTemplates, physicsTemplateKey, x, y, numUnitsPerTile, isMap, edges); // EDGES AND PHYSICS BODIES NEED TO KNOW THE LAYER TOO FOR DEBUG RENDERING.
+
+				}
+				if (const json* characterSpriteSheetJson = getJson(*characterComponents, "SpriteSheet"))
+				{
+					std::string spriteSheetTemplateKey = characterSpriteSheetJson->get<std::string>();
+					const json* spriteSheetTemplates = getJson(*componentTemplates, "SpriteSheets");
+
+					if (spriteSheetTemplates && assetsRules)
+						addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, *spriteSheetTemplates, spriteSheetTemplateKey, *getJson(*assetsRules, "Sprites"));
+				}
+				if (const json* characterAnimationsJson = getJson(*characterComponents, "Animations"))
+				{
+					std::string animationsTemplateKey = characterAnimationsJson->get<std::string>();
+					const json* animationsTemplate = getJson(*componentTemplates, "Animations");
+					if (animationsTemplate)
+						addAnimationsComponent(m_refECS, m_refAssetManager, tileEntity, *animationsTemplate, animationsTemplateKey);
+				}
 			}
 
-			const json* characterTransformJson = nullptr;
-			if (characterTransformJson = getJson(*characterComponents, "Transform"))
-			{
-				std::string transformTemplateKey = characterTransformJson->get<std::string>();
-				const json* transformTemplates = getJson(*componentTemplates, "Transforms");
-				if (transformTemplates)
-					addTransformComponent(m_refECS, tileEntity, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile);
-			}
-			else ENGINE_ERROR("Transform component is required for all entities. Missing for tile: " + tileKey);
-
-			if (const json* characterCameraJson = getJson(*characterComponents, "Camera"))
-			{
-				std::string cameraTemplateKey = characterCameraJson->get<std::string>();
-				const json* cameraTemplates = getJson(*componentTemplates, "Camera");
-				if (cameraTemplates)
-					m_cameraOrder.emplace(addCameraComponent(m_refECS, tileEntity, *cameraTemplates, cameraTemplateKey, numLayers));
-			}
-			if (const json* characterPhysicsJson = getJson(*characterComponents, "Physics"))
-			{
-				std::string physicsTemplateKey = characterPhysicsJson->get<std::string>();
-				const json* physicsTemplates = getJson(*componentTemplates, "Physics");
-				std::string transformTemplateKey = characterTransformJson->get<std::string>();
-				const json* transformTemplates = getJson(*componentTemplates, "Transforms");
-				if (physicsTemplates)
-					addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileId, *physicsTemplates, physicsTemplateKey, x, y, numUnitsPerTile, isMap, edges);
-			}
-			if (const json* characterSpriteSheetJson = getJson(*characterComponents, "SpriteSheet"))
-			{
-				std::string spriteSheetTemplateKey = characterSpriteSheetJson->get<std::string>();
-				const json* spriteSheetTemplates = getJson(*componentTemplates, "SpriteSheets");
-
-				if (spriteSheetTemplates && assetsRules)
-					addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, *spriteSheetTemplates, spriteSheetTemplateKey, *getJson(*assetsRules, "Sprites"));
-			}
-			if (const json* characterAnimationsJson = getJson(*characterComponents, "Animations"))
-			{
-				std::string animationsTemplateKey = characterAnimationsJson->get<std::string>();
-				const json* animationsTemplate = getJson(*componentTemplates, "Animations");
-				if (animationsTemplate)
-					addAnimationsComponent(m_refECS, m_refAssetManager, tileEntity, *animationsTemplate, animationsTemplateKey);
-			}
+			m_staticChains = Math2D::MergeGridLinesIntoChains(edges);
+			createChainColliders(m_staticChains);
 		}
-
-		m_staticChains = Math2D::MergeGridLinesIntoChains(edges);
-		createChainColliders(m_staticChains);
 	}
 }

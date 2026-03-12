@@ -38,7 +38,8 @@ namespace Engine
 		Math2D::Point2D<float> m_position;	   /// Current position of the entity's physics body.
 		Math2D::Point2D<float> m_velocity;	   /// Current velocity of the entity's physics body.
 
-		size_t m_zIndex;			/// Z-index for rendering order.
+		int m_layerNum;				/// Render layer associated with a parallax.
+		size_t m_zIndex;			/// Z-index for rendering order. This is intra layer ordering.
 		float m_parallaxFactor;		/// The parallax factor the object will get multiplied by when getting rendered.
 		float m_rotation;			/// Rotation of the entity in degrees.
 		int m_directionFacing;		/// Direction the entity is facing (1 for right, -1 for left).
@@ -46,13 +47,14 @@ namespace Engine
 		DebugColor m_debugColor;	/// Color to use for debug rendering.
 
 		Transform(Entity entity) : m_prevPosition(0.0f, 0.0f), m_position(0.0f, 0.0f),
-			m_rotation(0.0f), m_directionFacing(1), m_zIndex(0), m_parallaxFactor(1.0f),
-			m_drawDebug(false), m_debugColor(DebugColor::Red), Component(entity) {}
+			m_rotation(0.0f), m_directionFacing(1), m_zIndex(0), m_layerNum(1), m_parallaxFactor(1.0f),
+			m_drawDebug(false), m_debugColor(DebugColor::Red), 
+			Component(entity) {}
 
 		Transform(Entity entity, Math2D::Point2D<float> position, float rotation, 
-			int direction, size_t zIndex, float parallaxFactor, const bool drawDebug, DebugColor debugColor) :
+			int direction, size_t zIndex, int layerNum, float parallaxFactor, const bool drawDebug, DebugColor debugColor) :
 			m_prevPosition(position), m_position(position), m_rotation(rotation), 
-			m_directionFacing(direction), m_zIndex(zIndex), m_parallaxFactor(parallaxFactor), m_drawDebug(drawDebug),
+			m_directionFacing(direction), m_zIndex(zIndex), m_layerNum(layerNum), m_parallaxFactor(parallaxFactor), m_drawDebug(drawDebug),
 			m_debugColor(debugColor),
 			Component(entity) {}
 
@@ -230,6 +232,12 @@ namespace Engine
 	using LinesRenderBucket = std::vector<std::vector<LineObject>>;				/// Vector index is the zIndex.
 	using DebugPointRenderBucket = std::vector<std::vector<DebugPointObject>>;  /// Vector index is the zIndex.
 	
+	/// Structure for holding the render info fore each layer in a scene
+	using RenderLayers = std::map<int, RenderBucket>;                       
+	using DebugRenderLayers = std::map<int, DebugRenderBucket>;						
+	using LinesRenderLayers = std::map<int, LinesRenderBucket>;
+	using DebugPointRenderLayers = std::map<int, DebugPointRenderBucket>;
+
 	/**
 	* @struct Camera
 	*
@@ -251,29 +259,64 @@ namespace Engine
 		Math2D::Point2D<int> m_bounds;							 /// Bounds of the camera in pixels.
 		bool m_borderOn;										 /// Flag indicating whether to draw a border around the camera view.
 		size_t m_numLayers;										 /// Number of layers for rendering.
-		std::array<int, 3> m_backgroundColor;				 /// Background color of the camera in RGB format.
+		std::array<int, 3> m_backgroundColor;					 /// Background color of the camera in RGB format.
 
-		RenderBucket m_renderBucket;							 /// Bucket for storing renderable objects. Maps zIndex to vector of RenderObjects.
-		DebugRenderBucket m_debugRenderBucket;					 /// Bucket for storing renderable debug objects. Maps zIndex to vector of DebugObjects.
-		LinesRenderBucket m_debugLinesRenderBucket;				 /// Bucket for storing renderable debug lines. Maps zIndex to vector of lines.
-		DebugPointRenderBucket m_debugPointsRenderBucket;		 /// Bucket for storing renderable point objects. Maps zIndex to vector of debug points.
+		RenderLayers m_renderLayers;								 /// Bucket for storing renderable objects. Maps zIndex to vector of RenderObjects.
+		DebugRenderLayers m_debugRenderLayers;					 /// Bucket for storing renderable debug objects. Maps zIndex to vector of DebugObjects.
+		LinesRenderLayers m_debugLinesRenderLayers;				 /// Bucket for storing renderable debug lines. Maps zIndex to vector of lines.
+		DebugPointRenderLayers m_debugPointsRenderLayers;			 /// Bucket for storing renderable point objects. Maps zIndex to vector of debug points.
 
 		Camera(Entity entity)
-			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_viewportSizeInPercentageOfScreen(1.0f, 1.0f), m_numLayers(10),
-			m_viewPortPositionInPercentageOfScreen(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), m_borderOn(false),
-			m_bounds(0, 0), m_renderBucket(10, std::vector<RenderObject>()), m_backgroundColor({ 0, 0, 0 }),
-			m_debugRenderBucket(10, std::vector<DebugObject>()), m_debugLinesRenderBucket(10, std::vector<LineObject>()),
-			m_debugPointsRenderBucket(10, std::vector<DebugPointObject>()),
-			Component(entity) {}
+			: Component(entity),
+			m_offset(0.0f, 0.0f),
+			m_size(0.0f, 0.0f),
+			m_viewportSizeInPercentageOfScreen(1.0f, 1.0f),
+			m_viewPortPositionInPercentageOfScreen(0.0f, 0.0f),
+			m_pixelsPerUnit(32),
+			m_clampingOn(true),
+			m_borderOn(false),
+			m_bounds(0, 0),
+			m_numLayers(10),
+			m_backgroundColor({ 0, 0, 0 })
+		{
+			for (int i = 0; i < m_numLayers; ++i)
+			{
+				m_renderLayers.emplace(i, RenderBucket(10));						// No one should need more than 10 indices
+				m_debugRenderLayers.emplace(i, DebugRenderBucket(10));
+				m_debugLinesRenderLayers.emplace(i, LinesRenderBucket(10));
+				m_debugPointsRenderLayers.emplace(i, DebugPointRenderBucket(10));
+			}
+		}
 
-		Camera(Entity entity, Math2D::Point2D<float> size, Math2D::Point2D<float> screenRatio, 
-			Math2D::Point2D<float> position, size_t pixelsPerUnit, bool clampingOn, bool border, std::array<int, 3> backgroundColor, size_t numLayers)
-			: m_size(size), m_viewportSizeInPercentageOfScreen(screenRatio), m_viewPortPositionInPercentageOfScreen(position),
-			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0), 
-			m_borderOn(border), m_renderBucket(numLayers, std::vector<RenderObject>()), m_backgroundColor(backgroundColor),
-			m_numLayers(numLayers), m_debugRenderBucket(numLayers, std::vector<DebugObject>()), 
-			m_debugLinesRenderBucket(numLayers, std::vector<LineObject>()), m_debugPointsRenderBucket(numLayers, std::vector<DebugPointObject>()),
-			Component(entity) {}
+		Camera(Entity entity,
+			Math2D::Point2D<float> size,
+			Math2D::Point2D<float> screenRatio,
+			Math2D::Point2D<float> position,
+			size_t pixelsPerUnit,
+			bool clampingOn,
+			bool border,
+			std::array<int, 3> backgroundColor,
+			size_t numLayers)
+			: Component(entity),
+			m_size(size),
+			m_viewportSizeInPercentageOfScreen(screenRatio),
+			m_viewPortPositionInPercentageOfScreen(position),
+			m_pixelsPerUnit(pixelsPerUnit),
+			m_clampingOn(clampingOn),
+			m_offset(0.0f, 0.0f),
+			m_bounds(0, 0),
+			m_borderOn(border),
+			m_backgroundColor(backgroundColor),
+			m_numLayers(numLayers)
+		{
+			for (size_t i = 0; i < m_numLayers; ++i)
+			{
+				m_renderLayers.emplace(i, RenderBucket(10));						// No one should need more than 10 indices
+				m_debugRenderLayers.emplace(i, DebugRenderBucket(10));
+				m_debugLinesRenderLayers.emplace(i, LinesRenderBucket(10));
+				m_debugPointsRenderLayers.emplace(i, DebugPointRenderBucket(10));
+			}
+		}
 	};
 
 	/**

@@ -9,10 +9,12 @@ static const int MAX_SIZE = 50000;
 
 namespace Engine
 {
-	TileMap::TileMap(ECS& refECS)
+    TileMap::TileMap() : m_refECS(nullptr) {}
+	TileMap::TileMap(const std::string& mapFileName, ECS* refECS)
 		: m_refECS(refECS), m_mapDimensions(0, 0)
 	{
-    m_tileMap.reserve(MAX_SIZE);
+        m_tileMap.reserve(MAX_SIZE);
+        CreateMap(mapFileName);
     }
 
     Entity TileMap::GetEntity(size_t tileId) const
@@ -22,7 +24,7 @@ namespace Engine
 			return m_groupedEntitiesByNumMap.at(tileId).front(); // Return the first entity with this character.
 		}
 
-        return m_refECS.INVALID_ENTITY;
+        return m_refECS->INVALID_ENTITY;
     }
 
     void TileMap::CreateMap(const std::string mapFile)
@@ -94,7 +96,7 @@ namespace Engine
                     std::exit(1);
                 }
 
-                Entity tileEntity = m_refECS.CreateEntity();
+                Entity tileEntity = m_refECS->CreateEntity();
                 m_tileMap[{x, m_mapDimensions.Y}] = { tileEntity, tileValue };
                 m_groupedEntitiesByNumMap[tileValue].push_back(tileEntity);
                 numEntities++;
@@ -103,8 +105,6 @@ namespace Engine
             m_mapDimensions.Y++;
         }
     }
-
-
 
     const std::pair<Entity, size_t>* TileMap::GetTile(int x, int y) const
     {

@@ -42,6 +42,14 @@ static size_t totalAllocated = 0;
 //	free(ptr);
 //}
 
+enum LayerId
+{
+	FOREGROUND = 0,
+	PHYSICSSIM = 1,
+	BACKGROUND1 = 2,
+	BACKGROUND2 = 3
+};
+
 int main(int argc, char* args[])
 {
 	Engine::Init(10000);
@@ -50,15 +58,20 @@ int main(int argc, char* args[])
 
 	CLIENT_INFO_D("Client Running!");
 
-	engine->Scenes_Create("StartScreen");
-	engine->Scenes_Create("Level1");
+	engine->Scenes_Create("StartScreen", "StartScreenRules.json");
+	engine->Scenes_AddLayer("StartScreen", LayerId::PHYSICSSIM, 1.0f, true);
+	engine->Scenes_AddLayer("StartScreen", LayerId::BACKGROUND1, 0.5f);
+
+	// engine->Scenes_Create("Level1");
+	// engine->Scenes_AddLayer("Level1", LayerId::PHYSICSSIM, 1.0f, true);
+	// engine->Scenes_AddLayer("Level1", LayerId::BACKGROUND1, 1.0f);
 
 	//// Need physcis to scale with pixels per unit.
-	engine->Scenes_SetGravity("StartScreen", Math2D::Point2D(0.0f, 100.0f));
-	engine->Scenes_SetGravity("Level1", Math2D::Point2D(0.0f, 100.0f));
+	// engine->Scenes_SetGravity("StartScreen", Math2D::Point2D(0.0f, 100.0f));
+	// engine->Scenes_SetGravity("Level1", Math2D::Point2D(0.0f, 100.0f));
 
-	engine->Scenes_AddTileMap("StartScreen", "StartScreen.txt", "StartScreenRules.json");
-	engine->Scenes_AddTileMap("Level1", "TestMap1.txt", "Level1Rules.json");
+	//engine->Scenes_AddTileMap("StartScreen", "StartScreenRules.json");
+	// engine->Scenes_AddTileMap("Level1", "Level1Rules.json");
 
 	Player player;
 

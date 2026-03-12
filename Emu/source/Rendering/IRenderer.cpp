@@ -130,51 +130,32 @@ namespace Engine
 
 			SDL_RenderSetViewport((SDL_Renderer*)m_ptrRenderer, &vp);
 
-
-			for (auto ptrToVec = refCamera.m_renderBucket.rbegin(); ptrToVec != refCamera.m_renderBucket.rend(); ++ptrToVec)
-			{
-				for (auto& value : *ptrToVec)
+			auto processLayers = [this](auto& layers)
 				{
-					draw(value);
-				}
+					for (auto layersIt = layers.rbegin(); layersIt != layers.rend(); ++layersIt)
+					{
+						auto& [layer, bucket] = *layersIt;
 
-				ptrToVec->clear();
-			}
+						// Need to also iterate through the bucket vectors backward to render the zIndex it descending order.
+						for (auto zIndexIt = bucket.rbegin(); zIndexIt != bucket.rend(); ++zIndexIt)
+						{
+							for (auto& value : *zIndexIt)
+								draw(value);
 
-#ifndef NDEBUG // DO NOT ADD DEBUG OBJECTS WHEN NOT IN DEBUG AS THE QUEUES WILL GROW INDEFINITELY.
-			for (auto ptrToVec = refCamera.m_debugRenderBucket.rbegin(); ptrToVec != refCamera.m_debugRenderBucket.rend(); ++ptrToVec)
-			{
-				for (auto& value : *ptrToVec)
-				{
-					draw(value);
-				}
+							zIndexIt->clear();
+						}
+					}
+				};
 
-				ptrToVec->clear();
-			}
+			processLayers(refCamera.m_renderLayers);
 
-
-			for (auto ptrToVec = refCamera.m_debugLinesRenderBucket.rbegin(); ptrToVec != refCamera.m_debugLinesRenderBucket.rend(); ++ptrToVec)
-			{
-				for (auto& value : *ptrToVec)
-				{
-					draw(value);
-				}
-
-				ptrToVec->clear();
-			}
-
-			for (auto ptrToVec = refCamera.m_debugPointsRenderBucket.rbegin(); ptrToVec != refCamera.m_debugPointsRenderBucket.rend(); ++ptrToVec)
-			{
-				for (auto& value : *ptrToVec)
-				{
-					draw(value);
-				}
-
-				ptrToVec->clear();
-			}
+#ifndef NDEBUG
+			processLayers(refCamera.m_debugRenderLayers);
+			processLayers(refCamera.m_debugLinesRenderLayers);
+			processLayers(refCamera.m_debugPointsRenderLayers);
 #endif
 			// Reset background color. Temp for now.
-			SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+			//SDL_SetRenderDrawColor((SDLRenderer*)m_ptrRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 
 			if (true)
 			{

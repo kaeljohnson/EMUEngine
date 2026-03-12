@@ -26,7 +26,7 @@ namespace Engine
 		* @param refAssetManager Reference to the AssetManager instance.
 		* @param refIOEventSystem Reference to the IOEventSystem instance.
 		*/
-		void AddScene(std::string sceneName, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem);
+		void AddScene(std::string sceneName, const std::string& rulesFileName, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem);
 
 		/**
 		* @brief Gets a pointer to the current active scene.
@@ -117,7 +117,19 @@ namespace Engine
 		* @param mapFileName The file name of the tile map.
 		* @param rulesFileName The file name of the tile map rules.
 		*/
-		void AddTileMap(const std::string& sceneName, const std::string& mapFileName, const std::string& rulesFileName);
+		void AddTileMap(const std::string& sceneName, const std::string& rulesFileName);
+
+		/**
+		* @brief Adds a layer to specified scene.
+		* 
+		* @param sceneName The name of the scene.
+		* @param layerName The name of the layer.
+		* @param layerIdx The index layer. 
+		* @param parallaxFactor The parallax factor of the layer
+		* @param hasPhysics A bool indicating if the layer has physics.
+		* 
+		*/
+		void AddLayer(std::string& sceneName, int layerId, float parallaxFactor, bool hasPhysics);
 
 		/**
 		* @brief Sets the level dimensions for a given scene.

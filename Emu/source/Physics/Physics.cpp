@@ -222,9 +222,14 @@ namespace Engine
 	}
 
 	// Physics Simulation
-	PhysicsSimulation::PhysicsSimulation(ECS& refECS, TileMap& tileMap)
-		: m_refECS(refECS), m_ptrWorldId(nullptr), m_contactSystem(refECS, tileMap), m_gravity(0.0f, 9.81f)
+	PhysicsSimulation::PhysicsSimulation(ECS& refECS)
+		: m_refECS(refECS), m_ptrWorldId(nullptr), m_contactSystem(refECS), m_gravity(0.0f, 9.81f)
 	{}
+
+	void PhysicsSimulation::AddPhysicsTileMap(TileMap* tileMap)
+	{
+		m_contactSystem.AddPhysicsTileMap(tileMap);
+	}
 
 	void PhysicsSimulation::CreateWorld()
 	{
