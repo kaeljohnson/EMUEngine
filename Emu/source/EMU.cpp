@@ -98,7 +98,7 @@ namespace Engine
 	
 	void EMU::Scenes_Activate(Entity entity) { m_application->m_sceneManager.GetCurrentScene()->Activate(entity); }
 	void EMU::Scenes_Deactivate(Entity entity) { m_application->m_sceneManager.GetCurrentScene()->Deactivate(entity); }
-	void EMU::Scenes_Create(const std::string& name) { m_application->m_sceneManager.AddScene(name, m_application->m_assetManager, m_application->m_IOEventSystem); }
+	void EMU::Scenes_Create(const std::string& rulesFileName, const std::string& name) { m_application->m_sceneManager.AddScene(name, rulesFileName, m_application->m_assetManager, m_application->m_IOEventSystem); }
 	void EMU::Scenes_Load(const std::string& name) { m_application->m_sceneManager.QueueNewScene(name); }
 	void EMU::Scenes_RegisterOnPlayEvent(const std::string& name, std::function<void()> func) { m_application->m_sceneManager.RegisterOnScenePlayEvent(name, func); }
 	void EMU::Scenes_RegisterOnEndEvent(const std::string& name, std::function<void()> func) { m_application->m_sceneManager.RegisterOnSceneEndEvent(name, func); }
@@ -113,7 +113,6 @@ namespace Engine
 	void EMU::Scenes_SetGravity(const std::string& name, const Math2D::Point2D<float> gravity) { m_application->m_sceneManager.SetGravity(name, gravity); }
 	// void EMU::Scenes_Add(const std::string& name, Entity entity) { getScene(name).Add(entity); }
 	// void EMU::Scenes_Remove(const std::string& name, Entity entity) { getScene(name).Remove(entity); m_ecs.Deactivate(entity); }
-	void EMU::Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName) { m_application->m_sceneManager.AddTileMap(name, mapFileName, rulesFileName); }
 	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const size_t tileId) { return m_application->m_sceneManager.GetEntity(name, tileId); }
 	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const size_t tileId) { return m_application->m_sceneManager.GetTileMapEntities(name, tileId); }
 	void EMU::Scenes_SetLevelDimensions(const std::string& name, const Math2D::Point2D<int> levelWidthInUnits) { m_application->m_sceneManager.SetLevelDimensions(name, levelWidthInUnits); }

@@ -30,7 +30,7 @@ namespace Engine
 		* @param refECS Reference to the ECS instance.
 		* @param refAssetManager Reference to the AssetManager instance.
 		*/
-		Scene(ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem);
+		Scene(std::string rulesFileName, ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem);
 		~Scene();
 
 		/**
@@ -120,7 +120,7 @@ namespace Engine
 		* @param mapFileName The filename of the tile map file.
 		* @param rulesFileName The filename of the rules file that defines entity mappings.
 		*/
-		void AddTileMap(std::string mapFileName, std::string rulesFileName);
+		void AddTileMap(std::string mapFileName);
 
 		/**
 		* @brief Gets the entity associated with a specific character in the tile map.

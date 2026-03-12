@@ -42,7 +42,7 @@ namespace Engine
 		* @brief Create a new scene with the given name.
 		* * @param name: The name of the scene to be created.
 		*/
-		void Scenes_Create(const std::string& name);
+		void Scenes_Create(const std::string& rulesFileName, const std::string& name);
 
 		/**
 		* @brief Load the scene with the given name. Calling this ends the current scene
@@ -157,18 +157,6 @@ namespace Engine
 		* @param entity: The entity to be removed from the scene.
 		*/
 		void Scenes_Remove(const std::string& name, Entity entity) {}
-
-		/**
-		* @brief Adds a tile map to the scene with the given name using the specified map and rules files.
-		* 
-		* @note: Tilemap encompasses the physics layer of the simulation. This is where all physics bodies will live.
-		* Attempting to add physics bodies to other layers will not work.
-		* 
-		* @param name: The name of the scene to which the tile map is to be added.
-		* @param mapFileName: The filename of the tile map.
-		* @param rulesFileName: The filename of the rules for the tile map.
-		*/
-		void Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName);
 
 		/**
 		* @brief Adds a background layer to the simulation.

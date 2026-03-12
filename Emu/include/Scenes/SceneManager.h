@@ -26,7 +26,7 @@ namespace Engine
 		* @param refAssetManager Reference to the AssetManager instance.
 		* @param refIOEventSystem Reference to the IOEventSystem instance.
 		*/
-		void AddScene(std::string sceneName, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem);
+		void AddScene(std::string sceneName, const std::string& rulesFileName, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem);
 
 		/**
 		* @brief Gets a pointer to the current active scene.
@@ -109,15 +109,6 @@ namespace Engine
 		* @param gravity A Math2D::Point2D<float> representing the gravity vector.
 		*/
 		void SetGravity(const std::string& sceneName, const Math2D::Point2D<float> gravity);
-
-		/**
-		* @brief Adds a tile map to a given scene.
-		* 
-		* @param sceneName The name of the scene.
-		* @param mapFileName The file name of the tile map.
-		* @param rulesFileName The file name of the tile map rules.
-		*/
-		void AddTileMap(const std::string& sceneName, const std::string& mapFileName, const std::string& rulesFileName);
 
 		/**
 		* @brief Sets the level dimensions for a given scene.

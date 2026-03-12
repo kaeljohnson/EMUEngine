@@ -1,14 +1,27 @@
 {
-    "Level1":
+    "StartScreen":
     {
-        "World": 
+        "WorldLayers": 
         {
-            "NumLayers": 5,
-            "Physics":
-            {
-                "Gravity": [0.0, 100.0],
-                "NumUnitsPerTile": 1
-            }
+          "Foreground": 
+          {
+            "id": 0,
+            "ParallaxFactor": 1
+          },
+          "Physics": 
+          {
+            "id": 1,
+            "ParallaxFactor": 1,
+            "Gravity": [0.0, 100.0],
+            "NumUnitsPerTile": 1,
+            "TileMapPath":  "Tilemaps/StartScreenPhysics.txt"
+          },
+          "Background": 
+          {
+            "id": 2,
+            "ParallaxFactor": 0.5,
+            "TileMapPath":  "Backgrounds/StartScreenBackground.txt"
+          }
         },
         "Assets": 
         {

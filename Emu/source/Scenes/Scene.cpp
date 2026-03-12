@@ -16,15 +16,179 @@ using json = nlohmann::json;
 namespace fs = std::filesystem;
 
 static json rulesJson; // Only one rules file per game for now so this will work.
+static json sceneRules;
+static json worldLayers;
+static json sceneAssets;
+static json componentTemplates;
+static json characterRules;
 
 namespace Engine
 {
-	Scene::Scene(ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
-		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), m_hasTileMap(false), m_tileMap(m_refECS), 
+	// j must out live the pointer returned.
+	static const json* getJson(const json& j, const std::string& key)
+	{
+		auto it = j.find(key);
+		if (it == j.end())
+		{
+			return nullptr;
+		}
+		return &(*it);
+	}
+
+	template<typename T>
+	static Math2D::Point2D<T> ExtractPoint2DFromJSON(const json& j, const std::string& key, Math2D::Point2D<T> ioVec)
+	{
+		if (!j.contains(key))
+		{
+			ENGINE_WARN("Field Not Found: {}", key);
+			return ioVec;
+		}
+
+		const auto& arr = j.at(key);
+		if (!arr.is_array() || arr.size() != 2) return ioVec;
+
+		if constexpr (std::is_floating_point_v<T>)
+		{
+			if (arr[0].is_number()) ioVec.X = static_cast<T>(arr[0].get<double>());
+			if (arr[1].is_number()) ioVec.Y = static_cast<T>(arr[1].get<double>());
+		}
+		else if constexpr (std::is_integral_v<T>)
+		{
+			if (arr[0].is_number_integer()) ioVec.X = static_cast<T>(arr[0].get<long long>());
+			else if (arr[0].is_number()) ioVec.X = static_cast<T>(arr[0].get<long long>());
+			if (arr[1].is_number_integer()) ioVec.Y = static_cast<T>(arr[1].get<long long>());
+			else if (arr[1].is_number()) ioVec.Y = static_cast<T>(arr[1].get<long long>());
+		}
+		return ioVec;
+	}
+
+	static size_t ExtractSizeTFromJSON(const json& j, const std::string& key, size_t defaultValue)
+	{
+		if (!j.contains(key))
+		{
+			ENGINE_WARN("Field Not Found: {}", key);
+			return defaultValue;
+		}
+
+		const auto& value = j.at(key);
+		if (value.is_number_unsigned()) return value.get<size_t>();
+		else if (value.is_number_integer())
+		{
+			int intValue = value.get<int>();
+			if (intValue >= 0) return static_cast<size_t>(intValue);
+		}
+		else if (value.is_number())
+		{
+			double doubleValue = value.get<double>();
+			if (doubleValue >= 0.0) return static_cast<size_t>(doubleValue);
+		}
+		return defaultValue;
+	}
+
+	static std::array<int, 3> ExtractColorArrayFromJSON(const json& j, const std::string& key, std::array<int, 3> defaultValue)
+	{
+		if (!j.contains(key))
+		{
+			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
+			std::exit(1);
+		}
+		const auto& arr = j.at(key);
+		if (!arr.is_array() || arr.size() != 3) return defaultValue;
+		std::array<int, 3> colorArray = defaultValue;
+		for (size_t i = 0; i < 3; ++i)
+		{
+			if (arr[i].is_number_unsigned()) colorArray[i] = arr[i].get<int>();
+			else if (arr[i].is_number_integer())
+			{
+				int intValue = arr[i].get<int>();
+				if (intValue >= 0) colorArray[i] = static_cast<int>(intValue);
+			}
+			else if (arr[i].is_number())
+			{
+				double doubleValue = arr[i].get<double>();
+				if (doubleValue >= 0.0) colorArray[i] = static_cast<int>(doubleValue);
+			}
+		}
+		return colorArray;
+	}
+	static std::string ExtractStringFromJSON(const json& j, const std::string& key, const std::string& defaultValue)
+	{
+		if (!j.contains(key))
+		{
+			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
+			std::exit(1);
+		}
+
+		const auto& value = j.at(key);
+
+		if (!value.is_string())
+		{
+			ENGINE_ERROR("Invalid Rules File. Field '{}' is not a string.", key);
+			return defaultValue;
+		}
+
+		return value.get<std::string>();
+	}
+
+	Scene::Scene(std::string rulesFileName, ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
+		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), m_hasTileMap(false), m_tileMap(m_refECS), m_rulesFileName(rulesFileName),
 		m_physicsSimulation(refECS, m_tileMap), m_refAssetManager(refAssetManager), m_refIOEventSystem(refIOEventSystem),
 		m_cameraSystem(refECS)
 	{
 		m_entities.reserve(50000);
+
+		// Open and parse the rules file
+		std::ifstream inFile(m_rulesFileName);
+		if (!inFile.is_open())
+		{
+			ENGINE_ERROR("Failed to open rules file.");
+			std::exit(1);
+		}
+
+		try
+		{
+			inFile >> rulesJson;
+		}
+		catch (const json::parse_error& e)
+		{
+			ENGINE_ERROR("Failed to parse rules JSON: {}", e.what());
+			std::exit(1);
+		}
+
+		auto& sceneName = rulesJson.begin().key();
+		ENGINE_LOG_D("Loading audio files for scene: {}", sceneName);
+
+		sceneRules = *getJson(rulesJson, sceneName);
+
+		worldLayers = *getJson(sceneRules, "WorldLayers");
+
+		sceneAssets = *getJson(sceneRules, "Assets");
+
+		componentTemplates = *getJson(sceneRules, "ComponentTemplates");
+
+		characterRules = *getJson(sceneRules, "CharacterRules");
+
+		// TEMP
+		const json* physicsLayer = getJson(worldLayers, "Physics");
+
+		if (physicsLayer == nullptr)
+		{
+			ENGINE_ERROR("Invalid Rules File. No Physics Layer Found.");
+			std::exit(1);
+		}
+
+		for (auto& [key, value] : physicsLayer->items())
+		{
+			ENGINE_CRITICAL_D("Physics Layer Properties: {}", key);
+		}
+
+		const std::string tileMapFileName = ExtractStringFromJSON(*physicsLayer, "TileMapPath", "");
+		if (tileMapFileName != "")
+		{
+			ENGINE_INFO("Tilemap found.");
+			// no tile map in scene.
+			AddTileMap(tileMapFileName);
+		}
 	}
 
 	Scene::~Scene()
@@ -140,10 +304,9 @@ namespace Engine
 			m_refECS.DestroyComponents(pair.first);
 	}
 
-	void Scene::AddTileMap(std::string mapFileName, std::string rulesFileName)
+	void Scene::AddTileMap(std::string mapFileName)
 	{
 		m_mapFileName = mapFileName;
-		m_rulesFileName = rulesFileName;
 
 		m_tileMap.CreateMap(mapFileName);
 
@@ -278,44 +441,9 @@ namespace Engine
 		return m_tileMap.GetEntity(tileId);
 	}
 
-	// j must out live the pointer returned.
-	static const json* getJson(const json& j, const std::string& key)
-	{
-		auto it = j.find(key);
-		if (it == j.end())
-		{
-			return nullptr;
-		}
-		return &(*it);
-	}
-
-
 	void Scene::loadAudioFiles()
 	{
-		// Open and parse the rules file
-		std::ifstream inFile(m_rulesFileName);
-		if (!inFile.is_open())
-		{
-			ENGINE_ERROR("Failed to open rules file.");
-			std::exit(1);
-		}
-
-		try
-		{
-			inFile >> rulesJson;
-		}
-		catch (const json::parse_error& e)
-		{
-			ENGINE_ERROR("Failed to parse rules JSON: {}", e.what());
-			std::exit(1);
-		}
-
-		auto& sceneName = rulesJson.begin().key();
-		ENGINE_LOG_D("Loading audio files for scene: {}", sceneName);
-
-		const json* sceneRules = getJson(rulesJson, sceneName);
-
-		const json* assetsJson = getJson(*sceneRules, "Assets");
+		const json* assetsJson = getJson(sceneRules, "Assets");
 		if (!assetsJson)
 		{
 			ENGINE_CRITICAL("Assets section not found in rules file. Continuing without.");
@@ -355,83 +483,6 @@ namespace Engine
 			std::string fullPath = audioFilePath + file;
 			m_refAssetManager.LoadSound(idxInt, fullPath);
 		}
-	}
-
-	template<typename T>
-	static Math2D::Point2D<T> ExtractPoint2DFromJSON(const json& j, const std::string& key, Math2D::Point2D<T> ioVec)
-	{
-		if (!j.contains(key))
-		{
-			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}", key);
-			std::exit(1);
-		}
-
-		const auto& arr = j.at(key);
-		if (!arr.is_array() || arr.size() != 2) return ioVec;
-
-		if constexpr (std::is_floating_point_v<T>)
-		{
-			if (arr[0].is_number()) ioVec.X = static_cast<T>(arr[0].get<double>());
-			if (arr[1].is_number()) ioVec.Y = static_cast<T>(arr[1].get<double>());
-		}
-		else if constexpr (std::is_integral_v<T>)
-		{
-			if (arr[0].is_number_integer()) ioVec.X = static_cast<T>(arr[0].get<long long>());
-			else if (arr[0].is_number()) ioVec.X = static_cast<T>(arr[0].get<long long>());
-			if (arr[1].is_number_integer()) ioVec.Y = static_cast<T>(arr[1].get<long long>());
-			else if (arr[1].is_number()) ioVec.Y = static_cast<T>(arr[1].get<long long>());
-		}
-		return ioVec;
-	}
-
-	static size_t ExtractSizeTFromJSON(const json& j, const std::string& key, size_t defaultValue)
-	{
-		if (!j.contains(key))
-		{
-			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
-			std::exit(1);
-		}
-
-		const auto& value = j.at(key);
-		if (value.is_number_unsigned()) return value.get<size_t>();
-		else if (value.is_number_integer())
-		{
-			int intValue = value.get<int>();
-			if (intValue >= 0) return static_cast<size_t>(intValue);
-		}
-		else if (value.is_number())
-		{
-			double doubleValue = value.get<double>();
-			if (doubleValue >= 0.0) return static_cast<size_t>(doubleValue);
-		}
-		return defaultValue;
-	}
-
-	static std::array<int, 3> ExtractColorArrayFromJSON(const json& j, const std::string& key, std::array<int, 3> defaultValue)
-	{
-		if (!j.contains(key))
-		{
-			ENGINE_ERROR("Invalid Rules File. Field Not Found: {}.", key);
-			std::exit(1);
-		}
-		const auto& arr = j.at(key);
-		if (!arr.is_array() || arr.size() != 3) return defaultValue;
-		std::array<int, 3> colorArray = defaultValue;
-		for (size_t i = 0; i < 3; ++i)
-		{
-			if (arr[i].is_number_unsigned()) colorArray[i] = arr[i].get<int>();
-			else if (arr[i].is_number_integer())
-			{
-				int intValue = arr[i].get<int>();
-				if (intValue >= 0) colorArray[i] = static_cast<int>(intValue);
-			}
-			else if (arr[i].is_number())
-			{
-				double doubleValue = arr[i].get<double>();
-				if (doubleValue >= 0.0) colorArray[i] = static_cast<int>(doubleValue);
-			}
-		}
-		return colorArray;
 	}
 
 	static void addTransformComponent(ECS& refECS, Entity entity, const json& transformTemplates, std::string templateKey, int x, int y, size_t numUnitsPerTile)
@@ -963,19 +1014,16 @@ namespace Engine
 		// Load the physics rules.
 		size_t numUnitsPerTile = 1;
 		size_t numLayers = 5;
-		if (const json* worldRules = getJson(*sceneRules, "World"))
-		{
-			numLayers = ExtractSizeTFromJSON(*worldRules, "NumLayers", 5);
-			const json* physicsRules = getJson(*worldRules, "Physics");
-			if (!physicsRules)
-			{
-				ENGINE_ERROR("No physics rules found for world in scene: {}", sceneName);
-				std::exit(1);
-			}
 
-			SetGravity(ExtractPoint2DFromJSON<float>(*physicsRules, "Gravity", { 0.0f, 0.0f }));
-			numUnitsPerTile = ExtractSizeTFromJSON(*physicsRules, "NumUnitsPerTile", 1);
+		const json* physicsRules = getJson(worldLayers, "Physics");
+		if (!physicsRules)
+		{
+			ENGINE_ERROR("No physics layer found for world in scene: {}", sceneName);
+			std::exit(1);
 		}
+
+		SetGravity(ExtractPoint2DFromJSON<float>(*physicsRules, "Gravity", { 0.0f, 0.0f }));
+		numUnitsPerTile = ExtractSizeTFromJSON(*physicsRules, "NumUnitsPerTile", 1);
 
 		// Load Assets.
 		const json* assetsRules = getJson(*sceneRules, "Assets");

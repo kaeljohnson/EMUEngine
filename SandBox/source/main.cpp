@@ -50,15 +50,8 @@ int main(int argc, char* args[])
 
 	CLIENT_INFO_D("Client Running!");
 
-	engine->Scenes_Create("StartScreen");
-	engine->Scenes_Create("Level1");
-
-	//// Need physcis to scale with pixels per unit.
-	engine->Scenes_SetGravity("StartScreen", Math2D::Point2D(0.0f, 100.0f));
-	engine->Scenes_SetGravity("Level1", Math2D::Point2D(0.0f, 100.0f));
-
-	engine->Scenes_AddTileMap("StartScreen", "StartScreen.txt", "StartScreenRules.json");
-	engine->Scenes_AddTileMap("Level1", "TestMap1.txt", "Level1Rules.json");
+	engine->Scenes_Create("StartScreenRules.json", "StartScreen");
+	// engine->Scenes_Create("Level1");
 
 	Player player;
 
