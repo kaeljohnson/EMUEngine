@@ -30,7 +30,7 @@ namespace Engine
 		* @param refECS Reference to the ECS instance.
 		* @param refAssetManager Reference to the AssetManager instance.
 		*/
-		Scene(ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem);
+		Scene(const std::string& rulesFileName, ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem);
 		~Scene();
 
 		/**
@@ -133,12 +133,12 @@ namespace Engine
 		* @brief Adds a tile map to the scene. The tile map defines the layout of the level
 		* and the entities that should be instantiated based on the map characters.
 		*
-		* @param mapFileName The filename of the tile map file.
 		* @param rulesFileName The filename of the rules file that defines entity mappings.
+		* @param layer this tilemap belongs to.
+		* @param layerId The layerId.
+		* @param tileMapFileName
 		*/
-		void AddTileMap(std::string mapFileName, std::string rulesFileName);
-
-		void AddSprite(int layerId, const std::string& sceneName);
+		void AddTileMap(std::string rulesFileName, const std::string& layerName, int layerId, const std::string& tileMapFileName);
 
 		/**
 		* @brief Gets the entity associated with a specific character in the tile map.
@@ -147,7 +147,7 @@ namespace Engine
 		* 
 		* @return The Entity associated with the specified character.
 		*/
-		const Entity GetTileMapEntity(size_t tileId) const;
+		const Entity GetTileMapEntity(size_t tileId) const; // remove this function.
 
 		/**
 		* @brief Gets all entities associated with a specific character in the tile map.
@@ -158,7 +158,7 @@ namespace Engine
 		*/
 		inline const std::vector<Entity>& GetTileMapEntities(const size_t tileId) const
 		{
-			return m_tileMap.GetEntities(tileId);
+			return m_tileMaps.at(m_physicsLayer).GetEntities(tileId); // TEMP
 		}
 
 		/**
@@ -167,7 +167,7 @@ namespace Engine
 		* 
 		* @param levelWidthInUnits A Math::Math2D::Point2D<int> representing the width and height of the level in units.
 		*/
-		void SetLevelDimensions(const Math2D::Point2D<int> levelDimInUnits);
+		// void SetLevelDimensions(const Math2D::Point2D<int> levelDimInUnits);
 
 		/**
 		* @brief Updates the physics simulation for the scene.
@@ -202,15 +202,15 @@ namespace Engine
 		AssetManager& m_refAssetManager;	/// Reference to the AssetManager instance.
 		IOEventSystem& m_refIOEventSystem;	/// Reference to the io event system.
 
-		bool m_hasTileMap;					/// Flag indicating if the scene has a tile map.
-		std::string m_mapFileName;			/// The filename of the tile map file.
 		std::string m_rulesFileName;		/// The filename of the rules file that defines entity mappings.
 
 		std::vector<std::function<void()>> m_clientOnScenePlayEvents; /// Client defined functions to be called when the scene starts playing.
 		std::vector<std::function<void()>> m_clientOnSceneEndEvents;  /// Client defined functions to be called when the scene ends.
 
 		Math2D::Point2D<int> m_levelDimensionsInUnits;			/// The dimensions of the level in units.
-		TileMap m_tileMap;				 					    /// The tile map		
+		std::map<int, TileMap> m_tileMaps;				 		/// The tile maps for each layer.
+
+		int m_physicsLayer = 1;									// TEMP.
 
 		PhysicsSimulation m_physicsSimulation;   				/// The physics simulation for the scene.
 		CameraSystem m_cameraSystem;							/// The camera system for the scene.
@@ -222,10 +222,13 @@ namespace Engine
 
 		std::map<size_t, Entity> m_cameraOrder;					/// Set to render camera order correctly.
 
-		int m_physicsLayer = 1;
 		std::map<int, std::unordered_map<Entity, bool>> m_layerOrganizedEntities;
 
+		int m_layerCount = 0;
+
 	private:
+
+		void checkForTileMaps();
 
 		/**
 		* @brief Activates physics for the given entity by creating its physics body/chains
@@ -244,9 +247,9 @@ namespace Engine
 		void deactivatePhysics(Entity entity);
 
 		/**
-		* @brief Loads all entities defined in the scene's tile map.
+		* @brief Loads all entities defined in the scene's tile maps.
 		*/
-		void loadSceneEntitiesFromTileMap();
+		void loadSceneEntitiesFromTileMaps();
 
 		/**
 		* @brief Loads audio files required for the Level.

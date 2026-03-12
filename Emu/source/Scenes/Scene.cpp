@@ -19,315 +19,13 @@ static json rulesJson; // Only one rules file per game for now so this will work
 
 namespace Engine
 {
-	Scene::Scene(ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
-		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), m_hasTileMap(false), m_tileMap(m_refECS), 
-		m_physicsSimulation(refECS, m_tileMap), m_refAssetManager(refAssetManager), m_refIOEventSystem(refIOEventSystem),
+	Scene::Scene(const std::string& rulesFileName, ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
+		: m_rulesFileName(rulesFileName), m_refECS(refECS), m_levelDimensionsInUnits(32, 32), m_tileMaps(),
+		m_physicsSimulation(refECS), m_refAssetManager(refAssetManager), m_refIOEventSystem(refIOEventSystem),
 		m_cameraSystem(refECS)
-	{}
-
-	Scene::~Scene()
-	{
-		m_physicsSimulation.Cleanup();
-	}
-	
-	void Scene::RegisterContactCallback(ContactType contactType, const size_t entityA, const size_t entityB, ContactCallback callback)
-	{
-		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entityA, entityB, callback);
-	}
-
-	void Scene::RegisterContactCallback(ContactType contactType, const size_t entity, ContactCallback callback)
-	{
-		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entity, callback);
-	}
-
-	void Scene::RegisterOnScenePlayEvent(std::function<void()> func)
-	{
-		// Register a function to be called when the scene starts playing.
-		// This can be used to initialize things that need to be set up when the scene starts.
-		m_clientOnScenePlayEvents.push_back(std::move(func));
-	}
-
-	void Scene::RegisterOnSceneEndEvent(std::function<void()> func)
-	{
-		m_clientOnSceneEndEvents.push_back(std::move(func));
-	}
-
-	void Scene::OnScenePlay()
-	{
-		// Order matters here.
-
-		// 1. Create the world.
-		m_physicsSimulation.CreateWorld();
-
-		// 2. Load audio files for the scene.
-		loadAudioFiles();
-
-		// 3. Load the entities associated with the characters in the tile map.
-		//	  Adds components defined in the rules file and adds them to the ECS.
-		//    This function also activates the entites in the ECS.
-		loadSceneEntitiesFromTileMap();
-
-		// loadLayerTextures();
-
-		// 4. Activate entities with camera first.
-		for (auto& pair : m_cameraOrder)
-		{
-			Activate(m_physicsLayer, pair.second);
-		}
-
-		// 5. Activate the rest of the entities
-		for (auto& layer : m_layerOrganizedEntities)
-		{
-			for (auto& entity : layer.second)
-			{
-				if (layer.first == 2)
-					ENGINE_CRITICAL_D("hurky: {}, {}", layer.first, entity.first);
-				if (entity.second == true) // entity active on start.
-					Activate(layer.first, entity.first);
-			}
-		}
-
-		// 6. Frame the cameras
-		m_cameraSystem.Frame(Math2D::Point2D<int>(m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y));
-		
-		// 7. Physics bodies need to be added to the world after they are activated and pooled.
-		m_physicsSimulation.AddPhysicsBodiesToWorld(m_layerOrganizedEntities[m_physicsLayer]);
-		m_physicsSimulation.AddChainCollidersToWorld();
-
-		// 8. Contact callbacks need to be activated.
-		m_physicsSimulation.ActivateContactCallbacks();
-
-		// 9. Deactivate all components that should not be active at the start of the scene?
-
-		// process items client wants to do.
-		for (auto& func : m_clientOnScenePlayEvents)
-		{
-			func();
-		}
-
-		AppState::IN_SCENE = true;
-	}
-
-	void Scene::OnSceneEnd()
-	{
-		// Could be problematic if this is called mid frame.
-		AppState::IN_SCENE = false;
-
-		// Call client defined OnSceneEndEvents.
-		for (auto& func : m_clientOnSceneEndEvents)
-		{
-			func();
-		}
-
-		m_physicsSimulation.Cleanup();
-
-		// Should unload assets here to potentially be reloaded next scene?
-		// Or should there be a more detailed check so assets that might transfer
-		// to next scene are not unloaded? This takes awhile.
-		m_refAssetManager.UnloadTextures();
-		for (auto& animations : m_refECS.GetHotComponents<Sprite>())
-		{
-			// Free texture pointer associated with sprite.
-			animations.m_ptrLoadedTexture = nullptr;
-		}
-
-		for (auto& eventType : m_sceneRuntimeIOEvents)
-		{
-			m_refIOEventSystem.UnRegisterIOEventListener(eventType);
-		}
-
-		m_refAssetManager.UnloadSounds();
-
-		// Deactivate all entities and destroy all components.
-		m_refECS.DeactivateEntities();
-
-		for (auto& layer : m_layerOrganizedEntities)
-		{
-			for (auto& entity : layer.second)
-			{
-				m_refECS.DestroyComponents(entity.first);
-			}
-		}
-	}
-
-	void Scene::AddTileMap(std::string mapFileName, std::string rulesFileName)
-	{
-		if (m_physicsLayer == -1)
-		{
-			ENGINE_CRITICAL("Cannot add a tilemap without a physics layer.");
-			exit(1);
-		}
-
-		m_mapFileName = mapFileName;
-		m_rulesFileName = rulesFileName;
-
-		m_tileMap.CreateMap(mapFileName);
-
-		m_levelDimensionsInUnits = Math2D::Point2D<int>(m_tileMap.GetWidth(), m_tileMap.GetHeight());
-
-		ENGINE_INFO_D("Map width: {}, Map height: {}", m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y);
-
-		m_hasTileMap = true;
-
-		ENGINE_CRITICAL_D("physics layer: {}", m_physicsLayer);
-		for (auto& [coords, info] : m_tileMap.GetMap())
-		{	
-			// only the physics layer can have a tilemap.
-			add(m_physicsLayer, info.first);
-		}
-	}
-
-	void Scene::add(int layerId, Entity entity)
-	{
-		if (layerId < 0)
-		{
-			ENGINE_CRITICAL("Invalid layer id");
-			exit(1);
-		}
-
-		if (m_layerOrganizedEntities[layerId].contains(entity))
-		{
-			ENGINE_LOG("Entity already exists in the scene: {}", entity);
-			return;
-		}
-
-		m_layerOrganizedEntities[layerId].emplace(entity, true);
-	}
-
-	void Scene::Activate(int layerId, Entity entity)
-	{
-		if (!m_layerOrganizedEntities[layerId].contains(entity))
-		{
-			ENGINE_LOG("Entity does not exist in the current scene: {}", entity);
-			return;
-		}
-
-		m_refECS.Activate(entity);
-
-		activatePhysics(entity);
-	}
-
-	void Scene::Activate(Entity entity)
-	{
-		// Todo
-	}
-
-	void Scene::activatePhysics(Entity entity)
-	{
-		m_physicsSimulation.ActivateBody(entity);
-		m_physicsSimulation.ActivateChains(entity);
-	}
-
-	void Scene::Deactivate(int layerId, Entity entity)
-	{
-		if (!m_layerOrganizedEntities[layerId].contains(entity))
-		{
-			ENGINE_LOG("Entity does not exist in the current scene: {}", entity);
-			return;
-		}
-
-		// @todo temp solution to avoid deactivating entities with cameras. 
-		// Real solution might include making cameras separate from components.
-		if (m_refECS.HasComponent<Camera>(entity))
-		{
-			ENGINE_CRITICAL("Cannot deactivate entity with camera component: {}. Consider creating a separate entity which has the camera attached and follows the entity you are trying to deactivate.", entity);
-			return;
-		}
-
-		deactivatePhysics(entity);
-
-		m_refECS.Deactivate(entity);
-	}
-
-	void Scene::Deactivate(Entity entity)
-	{
-		// Todo
-	}
-
-	void Scene::deactivatePhysics(Entity entity)
-	{
-		m_physicsSimulation.DeactivateBody(entity);
-		m_physicsSimulation.DeactivateChains(entity);
-	}
-
-	//void Scene::Remove(Entity entity)
-	//{
-	//	// Remove entity from the scene. Do not remove the entity from the ECS, just deactivate it.
-	//	m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());
-	//	m_refECS.Deactivate(entity);
-	//}
-
-	void Scene::SetLevelDimensions(const Math2D::Point2D<int> levelDimensions)
-	{
-		if (m_hasTileMap)
-		{
-			ENGINE_LOG("Scene already has a tile map. Cannot override map dimensions!");
-			return;
-		}
-
-		m_levelDimensionsInUnits = levelDimensions;
-	}
-
-	void Scene::UpdatePhysics()
-	{
-		m_physicsSimulation.Update();
-	}
-
-	void Scene::UpdateCamera(AssetManager& refAssetManager)
-	{
-		m_cameraSystem.Update(refAssetManager);
-	}
-
-	void Scene::AddIOEvent(IOEventType type)
-	{
-		if (m_sceneRuntimeIOEvents.contains(type) != 0)
-		{
-			ENGINE_WARN("Event of type {} is already associated with a client callback function in scene.", static_cast<int>(type));
-			return;
-		}
-
-		m_sceneRuntimeIOEvents.insert(type);
-	}
-
-	void Scene::RemoveIOEvent(IOEventType type)
-	{
-		if (m_sceneRuntimeIOEvents.contains(type) == 0)
-		{
-			ENGINE_INFO("Event of type {} is not present in current runtime io events.");
-			return;
-		}
-
-		m_sceneRuntimeIOEvents.erase(type);
-	}
-
-	void Scene::SetGravity(const Math2D::Point2D<float> gravity)
-	{
-		ENGINE_INFO_D("Setting gravity: {}, {}", gravity.X, gravity.Y);
-
-		m_physicsSimulation.UpdateGravity(gravity);
-	}
-
-	const Entity Scene::GetTileMapEntity(size_t tileId) const
-	{
-		return m_tileMap.GetEntity(tileId);
-	}
-
-	// j must out live the pointer returned.
-	static const json* getJson(const json& j, const std::string& key)
-	{
-		auto it = j.find(key);
-		if (it == j.end())
-		{
-			return nullptr;
-		}
-		return &(*it);
-	}
-
-
-	void Scene::loadAudioFiles()
 	{
 		// Open and parse the rules file
-		std::ifstream inFile(m_rulesFileName);
+		std::ifstream inFile(rulesFileName);
 		if (!inFile.is_open())
 		{
 			ENGINE_ERROR("Failed to open rules file.");
@@ -344,51 +42,23 @@ namespace Engine
 			std::exit(1);
 		}
 
-		auto& sceneName = rulesJson.begin().key();
-		ENGINE_LOG_D("Loading audio files for scene: {}", sceneName);
+		checkForTileMaps(); // Check if the client setup tilemaps in the rules json.
+	}
 
-		const json* sceneRules = getJson(rulesJson, sceneName);
+	Scene::~Scene()
+	{
+		m_physicsSimulation.Cleanup();
+	}
 
-		const json* assetsJson = getJson(*sceneRules, "Assets");
-		if (!assetsJson)
+	// j must out live the pointer returned.
+	static const json* getJson(const json& j, const std::string& key)
+	{
+		auto it = j.find(key);
+		if (it == j.end())
 		{
-			ENGINE_CRITICAL("Assets section not found in rules file. Continuing without.");
-			return;
+			return nullptr;
 		}
-
-		const json* audioJson = getJson(*assetsJson, "Audio");
-		if (!audioJson)
-		{
-			ENGINE_CRITICAL("Audio section not found in rules file. Continuing without.");
-			return;
-		}
-
-		const json* audioFilePathJson = getJson(*audioJson, "PathToAudioFiles");
-		if (!audioFilePathJson)
-		{
-			ENGINE_ERROR("PathToAudioFiles not found in rules file.");
-			std::exit(1);
-		}
-
-		std::string audioFilePath = audioFilePathJson->get<std::string>();
-
-		const json* soundsJson = getJson(*audioJson, "Sounds");
-		if (!soundsJson)
-		{
-			ENGINE_ERROR("Sounds section not found in rules file.");
-			std::exit(1);
-		}
-
-		json j = json::parse(soundsJson->dump());
-
-		m_refAssetManager.PrepareSoundStorage(j.size());
-
-		for (auto& [file, idx] : j.items())
-		{
-			int idxInt = idx.get<int>();
-			std::string fullPath = audioFilePath + file;
-			m_refAssetManager.LoadSound(idxInt, fullPath);
-		}
+		return &(*it);
 	}
 
 	template<typename T>
@@ -418,7 +88,7 @@ namespace Engine
 		return ioVec;
 	}
 
-	static size_t ExtractSizeTFromJSON(const json& j, const std::string& key, size_t defaultValue)
+	static size_t ExtractSizeTFromJSON(const json& j, const std::string& key, int defaultValue)
 	{
 		if (!j.contains(key))
 		{
@@ -509,8 +179,365 @@ namespace Engine
 		}
 		return colorArray;
 	}
+	
+	void Scene::RegisterContactCallback(ContactType contactType, const size_t entityA, const size_t entityB, ContactCallback callback)
+	{
+		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entityA, entityB, callback);
+	}
 
-	static void addTransformComponent(ECS& refECS, Entity entity, const json& layersTemplate, const json& transformTemplates, std::string templateKey, int x, int y, size_t numUnitsPerTile)
+	void Scene::RegisterContactCallback(ContactType contactType, const size_t entity, ContactCallback callback)
+	{
+		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entity, callback);
+	}
+
+	void Scene::RegisterOnScenePlayEvent(std::function<void()> func)
+	{
+		// Register a function to be called when the scene starts playing.
+		// This can be used to initialize things that need to be set up when the scene starts.
+		m_clientOnScenePlayEvents.push_back(std::move(func));
+	}
+
+	void Scene::RegisterOnSceneEndEvent(std::function<void()> func)
+	{
+		m_clientOnSceneEndEvents.push_back(std::move(func));
+	}
+
+	void Scene::OnScenePlay()
+	{
+		// Order matters here.
+
+		// 1. Create the world.
+		m_physicsSimulation.CreateWorld();
+
+		// 2. Load audio files for the scene.
+		loadAudioFiles();
+
+		// 3. Load the entities associated with the characters in the tile map.
+		//	  Adds components defined in the rules file and adds them to the ECS.
+		//    This function also activates the entites in the ECS.
+		loadSceneEntitiesFromTileMaps();
+
+		// loadLayerTextures();
+
+		// 4. Activate entities with camera first.
+		for (auto& pair : m_cameraOrder)
+		{
+			Activate(m_physicsLayer, pair.second);
+		}
+
+		// 5. Activate the rest of the entities
+		for (auto& layer : m_layerOrganizedEntities)
+		{
+			for (auto& entity : layer.second)
+			{
+				if (layer.first == 2)
+					ENGINE_CRITICAL_D("hurky: {}, {}", layer.first, entity.first);
+				if (entity.second == true) // entity active on start.
+					Activate(layer.first, entity.first);
+			}
+		}
+
+		// 6. Frame the cameras
+		m_cameraSystem.Frame(Math2D::Point2D<int>(m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y)); // CAMERA SHOULD FRAME A CLIENT DEFINED BOUND.
+		
+		// 7. Physics bodies need to be added to the world after they are activated and pooled.
+		m_physicsSimulation.AddPhysicsBodiesToWorld(m_layerOrganizedEntities[m_physicsLayer]);
+		m_physicsSimulation.AddChainCollidersToWorld();
+
+		// 8. Contact callbacks need to be activated.
+		m_physicsSimulation.ActivateContactCallbacks();
+
+		// 9. Deactivate all components that should not be active at the start of the scene?
+
+		// process items client wants to do.
+		for (auto& func : m_clientOnScenePlayEvents)
+		{
+			func();
+		}
+
+		AppState::IN_SCENE = true;
+	}
+
+	void Scene::OnSceneEnd()
+	{
+		// Could be problematic if this is called mid frame.
+		AppState::IN_SCENE = false;
+
+		// Call client defined OnSceneEndEvents.
+		for (auto& func : m_clientOnSceneEndEvents)
+		{
+			func();
+		}
+
+		m_physicsSimulation.Cleanup();
+
+		// Should unload assets here to potentially be reloaded next scene?
+		// Or should there be a more detailed check so assets that might transfer
+		// to next scene are not unloaded? This takes awhile.
+		m_refAssetManager.UnloadTextures();
+		for (auto& animations : m_refECS.GetHotComponents<Sprite>())
+		{
+			// Free texture pointer associated with sprite.
+			animations.m_ptrLoadedTexture = nullptr;
+		}
+
+		for (auto& eventType : m_sceneRuntimeIOEvents)
+		{
+			m_refIOEventSystem.UnRegisterIOEventListener(eventType);
+		}
+
+		m_refAssetManager.UnloadSounds();
+
+		// Deactivate all entities and destroy all components.
+		m_refECS.DeactivateEntities();
+
+		for (auto& layer : m_layerOrganizedEntities)
+		{
+			for (auto& entity : layer.second)
+			{
+				m_refECS.DestroyComponents(entity.first);
+			}
+		}
+	}
+
+	void Scene::AddTileMap(std::string rulesFileName, const std::string& layerName, int layerId, const std::string& tileMapFileName)
+	{
+		const std::string& sceneName = rulesJson.begin().key();
+		ENGINE_LOG("Loading scene entities for scene: {}", sceneName);
+
+		const json* sceneRules = getJson(rulesJson, sceneName);
+		if (!sceneRules)
+		{
+			ENGINE_ERROR("No scene rules found for scene: {}", sceneName);
+			std::exit(1);
+		}
+
+		const json* worldLayers = getJson(*sceneRules, "WorldLayers");
+		if (!worldLayers)
+		{
+			ENGINE_CRITICAL("No world layers json defined.");
+			std::exit(1);
+		}
+
+		m_rulesFileName = rulesFileName;
+
+		m_tileMaps.try_emplace(layerId, TileMap(tileMapFileName, &m_refECS));
+
+		if (layerName == "Physics")
+		{
+			m_physicsLayer = layerId;
+			m_levelDimensionsInUnits = Math2D::Point2D<int>(m_tileMaps[m_physicsLayer].GetWidth(), m_tileMaps[m_physicsLayer].GetHeight()); // TEMP
+			m_physicsSimulation.AddPhysicsTileMap(&m_tileMaps[layerId]); // If the m_tileMaps vector resizes, passing this as a pointer could be a problem.
+
+			const json* physicsRules = getJson(*worldLayers, "Physics"); // Client must have a layer called Physics
+
+			SetGravity(ExtractPoint2DFromJSON<float>(*physicsRules, "Gravity", { 0.0f, 0.0f }));
+		}
+
+
+		ENGINE_INFO_D("Map width: {}, Map height: {}", m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y);
+
+		ENGINE_CRITICAL_D("physics layer: {}", m_physicsLayer);
+		for (auto& [coords, info] : m_tileMaps[layerId].GetMap())
+		{	
+			add(layerId, info.first);
+		}
+	}
+
+	void Scene::add(int layerId, Entity entity)
+	{
+		if (layerId < 0)
+		{
+			ENGINE_CRITICAL("Invalid layer id");
+			exit(1);
+		}
+
+		if (m_layerOrganizedEntities[layerId].contains(entity))
+		{
+			ENGINE_LOG("Entity already exists in the scene: {}", entity);
+			return;
+		}
+
+		m_layerOrganizedEntities[layerId].emplace(entity, true);
+	}
+
+	void Scene::Activate(int layerId, Entity entity)
+	{
+		if (!m_layerOrganizedEntities[layerId].contains(entity))
+		{
+			ENGINE_LOG("Entity does not exist in the current scene: {}", entity);
+			return;
+		}
+
+		m_refECS.Activate(entity);
+
+		activatePhysics(entity);
+	}
+
+	void Scene::Activate(Entity entity)
+	{
+		// Todo
+	}
+
+	void Scene::activatePhysics(Entity entity)
+	{
+		m_physicsSimulation.ActivateBody(entity);
+		m_physicsSimulation.ActivateChains(entity);
+	}
+
+	void Scene::Deactivate(int layerId, Entity entity)
+	{
+		if (!m_layerOrganizedEntities[layerId].contains(entity))
+		{
+			ENGINE_LOG("Entity does not exist in the current scene: {}", entity);
+			return;
+		}
+
+		// @todo temp solution to avoid deactivating entities with cameras. 
+		// Real solution might include making cameras separate from components.
+		if (m_refECS.HasComponent<Camera>(entity))
+		{
+			ENGINE_CRITICAL("Cannot deactivate entity with camera component: {}. Consider creating a separate entity which has the camera attached and follows the entity you are trying to deactivate.", entity);
+			return;
+		}
+
+		deactivatePhysics(entity);
+
+		m_refECS.Deactivate(entity);
+	}
+
+	void Scene::Deactivate(Entity entity)
+	{
+		// Todo
+	}
+
+	void Scene::deactivatePhysics(Entity entity)
+	{
+		m_physicsSimulation.DeactivateBody(entity);
+		m_physicsSimulation.DeactivateChains(entity);
+	}
+
+	//void Scene::Remove(Entity entity)
+	//{
+	//	// Remove entity from the scene. Do not remove the entity from the ECS, just deactivate it.
+	//	m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());
+	//	m_refECS.Deactivate(entity);
+	//}
+
+	void Scene::UpdatePhysics()
+	{
+		m_physicsSimulation.Update();
+	}
+
+	void Scene::UpdateCamera(AssetManager& refAssetManager)
+	{
+		m_cameraSystem.Update(refAssetManager);
+	}
+
+	void Scene::AddIOEvent(IOEventType type)
+	{
+		if (m_sceneRuntimeIOEvents.contains(type) != 0)
+		{
+			ENGINE_WARN("Event of type {} is already associated with a client callback function in scene.", static_cast<int>(type));
+			return;
+		}
+
+		m_sceneRuntimeIOEvents.insert(type);
+	}
+
+	void Scene::RemoveIOEvent(IOEventType type)
+	{
+		if (m_sceneRuntimeIOEvents.contains(type) == 0)
+		{
+			ENGINE_INFO("Event of type {} is not present in current runtime io events.");
+			return;
+		}
+
+		m_sceneRuntimeIOEvents.erase(type);
+	}
+
+	void Scene::SetGravity(const Math2D::Point2D<float> gravity)
+	{
+		ENGINE_INFO_D("Setting gravity: {}, {}", gravity.X, gravity.Y);
+
+		m_physicsSimulation.UpdateGravity(gravity);
+	}
+
+	const Entity Scene::GetTileMapEntity(size_t tileId) const
+	{
+		// return m_tileMap.GetEntity(tileId);
+		return -1;
+	}
+
+
+	void Scene::loadAudioFiles()
+	{
+		// Open and parse the rules file
+		std::ifstream inFile(m_rulesFileName);
+		if (!inFile.is_open())
+		{
+			ENGINE_ERROR("Failed to open rules file.");
+			std::exit(1);
+		}
+
+		try
+		{
+			inFile >> rulesJson;
+		}
+		catch (const json::parse_error& e)
+		{
+			ENGINE_ERROR("Failed to parse rules JSON: {}", e.what());
+			std::exit(1);
+		}
+
+		auto& sceneName = rulesJson.begin().key();
+		ENGINE_LOG_D("Loading audio files for scene: {}", sceneName);
+
+		const json* sceneRules = getJson(rulesJson, sceneName);
+
+		const json* assetsJson = getJson(*sceneRules, "Assets");
+		if (!assetsJson)
+		{
+			ENGINE_CRITICAL("Assets section not found in rules file. Continuing without.");
+			return;
+		}
+
+		const json* audioJson = getJson(*assetsJson, "Audio");
+		if (!audioJson)
+		{
+			ENGINE_CRITICAL("Audio section not found in rules file. Continuing without.");
+			return;
+		}
+
+		const json* audioFilePathJson = getJson(*audioJson, "PathToAudioFiles");
+		if (!audioFilePathJson)
+		{
+			ENGINE_ERROR("PathToAudioFiles not found in rules file.");
+			std::exit(1);
+		}
+
+		std::string audioFilePath = audioFilePathJson->get<std::string>();
+
+		const json* soundsJson = getJson(*audioJson, "Sounds");
+		if (!soundsJson)
+		{
+			ENGINE_ERROR("Sounds section not found in rules file.");
+			std::exit(1);
+		}
+
+		json j = json::parse(soundsJson->dump());
+
+		m_refAssetManager.PrepareSoundStorage(j.size());
+
+		for (auto& [file, idx] : j.items())
+		{
+			int idxInt = idx.get<int>();
+			std::string fullPath = audioFilePath + file;
+			m_refAssetManager.LoadSound(idxInt, fullPath);
+		}
+	}
+
+	static void addTransformComponent(ECS& refECS, Entity entity, const json& layersTemplate, std::string& layerName, const json& transformTemplates, std::string templateKey, int x, int y, size_t numUnitsPerTile)
 	{
 		const json* entityTransformTemplate = getJson(transformTemplates, templateKey);
 		size_t zIndex = ExtractSizeTFromJSON(*entityTransformTemplate, "ZIndex", 0);
@@ -519,12 +546,7 @@ namespace Engine
 		// the layer and parallax to 0, 1.0f respectively
 		int layer = 0;
 		float parallaxFactor = 1.0f;
-		const std::string layerName = ExtractStringFromJSON(*entityTransformTemplate, "Layer", "");
-		if (layerName == "")
-		{
-			ENGINE_ERROR("Layer field not found for: {}", templateKey);
-			std::exit(1);
-		}
+		
 
 		const json* layerTemplate = getJson(layersTemplate, layerName);
 
@@ -1049,7 +1071,46 @@ namespace Engine
 		}
 	}
 
-	void Scene::loadSceneEntitiesFromTileMap()
+	void Scene::checkForTileMaps()
+	{
+		const std::string& sceneName = rulesJson.begin().key();
+
+		const json* sceneRules = getJson(rulesJson, sceneName);
+		if (!sceneRules)
+		{
+			ENGINE_ERROR("No scene rules found for scene: {}", sceneName);
+			std::exit(1);
+		}
+
+		const json* worldLayers = getJson(*sceneRules, "WorldLayers");
+		if (!worldLayers)
+		{
+			ENGINE_CRITICAL("No world layers json defined.");
+			std::exit(1);
+		}
+
+		int layerCount = 0;
+		for (const auto& [layerName, layerData] : worldLayers->items())
+		{
+			if (layerData.contains("TileMapPath"))
+			{
+				const std::string& tileMapFileName = ExtractStringFromJSON(layerData, "TileMapPath", "");
+				if (tileMapFileName == "")
+				{
+					ENGINE_CRITICAL("Tile map file name invalid");
+					std::exit(1);
+				}
+
+				int layerId = ExtractSizeTFromJSON(layerData, "id", 0);
+
+				AddTileMap(m_rulesFileName, layerName, layerId, tileMapFileName);
+			}
+			++layerCount;
+		}
+		m_layerCount = layerCount;
+	}
+
+	void Scene::loadSceneEntitiesFromTileMaps()
 	{
 		const std::string& sceneName = rulesJson.begin().key();
 		ENGINE_LOG("Loading scene entities for scene: {}", sceneName);
@@ -1061,21 +1122,11 @@ namespace Engine
 			std::exit(1);
 		}
 
-		// Load the physics rules.
-		size_t numUnitsPerTile = 1;
-		size_t numLayers = 5;
-		if (const json* worldRules = getJson(*sceneRules, "World"))
+		const json* worldLayers = getJson(*sceneRules, "WorldLayers");
+		if (!worldLayers)
 		{
-			numLayers = ExtractSizeTFromJSON(*worldRules, "NumLayers", 10);
-			const json* physicsRules = getJson(*worldRules, "Physics");
-			if (!physicsRules)
-			{
-				ENGINE_ERROR("No physics rules found for world in scene: {}", sceneName);
-				std::exit(1);
-			}
-
-			SetGravity(ExtractPoint2DFromJSON<float>(*physicsRules, "Gravity", { 0.0f, 0.0f }));
-			numUnitsPerTile = ExtractSizeTFromJSON(*physicsRules, "NumUnitsPerTile", 1);
+			ENGINE_CRITICAL("No world layers json defined.");
+			std::exit(1);
 		}
 
 		// Load Assets.
@@ -1107,68 +1158,80 @@ namespace Engine
 		std::unordered_set<size_t> isMap = determineMapTiles(*characterRules, *componentTemplates);
 		std::vector<Math2D::Edge> edges;
 
-		for (auto& [coords, info] : m_tileMap.GetMap())
+		int numUnitsPerTile = 1; // TEMP
+
+		for (auto& layer : m_tileMaps)
 		{
-			const size_t tileId = info.second;
-			const int x = coords.first;
-			const int y = coords.second;
-			Entity tileEntity = info.first;
-
-			std::string tileKey = std::to_string(tileId);
-
-			const json* characterComponents = nullptr;
-			if (!(characterComponents = getJson(*characterRules, tileKey)))
+			for (auto& [coords, info] : layer.second.GetMap())
 			{
-				ENGINE_INFO("Tile ID {} at ({}, {}) has no character rules defined. Skipping entity creation.", tileId, x, y);
-				continue;
+				const size_t tileId = info.second;
+				const int x = coords.first;
+				const int y = coords.second;
+				Entity tileEntity = info.first;
+
+				std::string tileKey = std::to_string(tileId);
+
+				const json* characterComponents = nullptr;
+				if (!(characterComponents = getJson(*characterRules, tileKey)))
+				{
+					ENGINE_INFO("Tile ID {} at ({}, {}) has no character rules defined. Skipping entity creation.", tileId, x, y);
+					continue;
+				}
+
+				const json* characterTransformJson = nullptr;
+				if (characterTransformJson = getJson(*characterComponents, "Transform"))
+				{
+					std::string transformTemplateKey = characterTransformJson->get<std::string>();
+					const json* transformTemplates = getJson(*componentTemplates, "Transforms");
+					const json* layerTemplate = getJson(*sceneRules, "WorldLayers");
+					std::string layerName = ExtractStringFromJSON(*characterComponents, "Layer", "");
+					if (layerName == "")
+					{
+						ENGINE_CRITICAL("Tile needs a layer: {}", tileId);
+						std::exit(1);
+					}
+						
+					if (transformTemplates)
+						addTransformComponent(m_refECS, tileEntity, *layerTemplate, layerName, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile);
+				}
+				else ENGINE_ERROR("Transform component is required for all entities. Missing for tile: " + tileKey);
+
+				if (const json* characterCameraJson = getJson(*characterComponents, "Camera"))
+				{
+					std::string cameraTemplateKey = characterCameraJson->get<std::string>();
+					const json* cameraTemplates = getJson(*componentTemplates, "Camera");
+					if (cameraTemplates)
+						m_cameraOrder.emplace(addCameraComponent(m_refECS, tileEntity, *cameraTemplates, cameraTemplateKey, m_layerCount));
+				}
+				if (const json* characterPhysicsJson = getJson(*characterComponents, "Physics"))
+				{
+					std::string physicsTemplateKey = characterPhysicsJson->get<std::string>();
+					const json* physicsTemplates = getJson(*componentTemplates, "Physics");
+					std::string transformTemplateKey = characterTransformJson->get<std::string>();
+					const json* transformTemplates = getJson(*componentTemplates, "Transforms");
+					if (physicsTemplates)
+						addPhysicsComponent(m_refECS, layer.second, tileEntity, tileId, *physicsTemplates, physicsTemplateKey, x, y, numUnitsPerTile, isMap, edges); // EDGES AND PHYSICS BODIES NEED TO KNOW THE LAYER TOO FOR DEBUG RENDERING.
+
+				}
+				if (const json* characterSpriteSheetJson = getJson(*characterComponents, "SpriteSheet"))
+				{
+					std::string spriteSheetTemplateKey = characterSpriteSheetJson->get<std::string>();
+					const json* spriteSheetTemplates = getJson(*componentTemplates, "SpriteSheets");
+
+					if (spriteSheetTemplates && assetsRules)
+						addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, *spriteSheetTemplates, spriteSheetTemplateKey, *getJson(*assetsRules, "Sprites"));
+				}
+				if (const json* characterAnimationsJson = getJson(*characterComponents, "Animations"))
+				{
+					std::string animationsTemplateKey = characterAnimationsJson->get<std::string>();
+					const json* animationsTemplate = getJson(*componentTemplates, "Animations");
+					if (animationsTemplate)
+						addAnimationsComponent(m_refECS, m_refAssetManager, tileEntity, *animationsTemplate, animationsTemplateKey);
+				}
 			}
 
-			const json* characterTransformJson = nullptr;
-			if (characterTransformJson = getJson(*characterComponents, "Transform"))
-			{
-				std::string transformTemplateKey = characterTransformJson->get<std::string>();
-				const json* transformTemplates = getJson(*componentTemplates, "Transforms");
-				const json* layerTemplate = getJson(*sceneRules, "Layers");
-				if (transformTemplates)
-					addTransformComponent(m_refECS, tileEntity, *layerTemplate, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile);
-			}
-			else ENGINE_ERROR("Transform component is required for all entities. Missing for tile: " + tileKey);
-
-			if (const json* characterCameraJson = getJson(*characterComponents, "Camera"))
-			{
-				std::string cameraTemplateKey = characterCameraJson->get<std::string>();
-				const json* cameraTemplates = getJson(*componentTemplates, "Camera");
-				if (cameraTemplates)
-					m_cameraOrder.emplace(addCameraComponent(m_refECS, tileEntity, *cameraTemplates, cameraTemplateKey, numLayers));
-			}
-			if (const json* characterPhysicsJson = getJson(*characterComponents, "Physics"))
-			{
-				std::string physicsTemplateKey = characterPhysicsJson->get<std::string>();
-				const json* physicsTemplates = getJson(*componentTemplates, "Physics");
-				std::string transformTemplateKey = characterTransformJson->get<std::string>();
-				const json* transformTemplates = getJson(*componentTemplates, "Transforms");
-				if (physicsTemplates)
-					addPhysicsComponent(m_refECS, m_tileMap, tileEntity, tileId, *physicsTemplates, physicsTemplateKey, x, y, numUnitsPerTile, isMap, edges); // EDGES AND PHYSICS BODIES NEED TO KNOW THE LAYER TOO FOR DEBUG RENDERING.
-
-			}
-			if (const json* characterSpriteSheetJson = getJson(*characterComponents, "SpriteSheet"))
-			{
-				std::string spriteSheetTemplateKey = characterSpriteSheetJson->get<std::string>();
-				const json* spriteSheetTemplates = getJson(*componentTemplates, "SpriteSheets");
-
-				if (spriteSheetTemplates && assetsRules)
-					addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, *spriteSheetTemplates, spriteSheetTemplateKey, *getJson(*assetsRules, "Sprites"));
-			}
-			if (const json* characterAnimationsJson = getJson(*characterComponents, "Animations"))
-			{
-				std::string animationsTemplateKey = characterAnimationsJson->get<std::string>();
-				const json* animationsTemplate = getJson(*componentTemplates, "Animations");
-				if (animationsTemplate)
-					addAnimationsComponent(m_refECS, m_refAssetManager, tileEntity, *animationsTemplate, animationsTemplateKey);
-			}
+			m_staticChains = Math2D::MergeGridLinesIntoChains(edges);
+			createChainColliders(m_staticChains);
 		}
-
-		m_staticChains = Math2D::MergeGridLinesIntoChains(edges);
-		createChainColliders(m_staticChains);
 	}
 }

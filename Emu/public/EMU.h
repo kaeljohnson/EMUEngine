@@ -42,7 +42,7 @@ namespace Engine
 		* @brief Create a new scene with the given name.
 		* * @param name: The name of the scene to be created.
 		*/
-		void Scenes_Create(const std::string& name);
+		void Scenes_Create(const std::string& name, const std::string& rulesFileName);
 
 		/**
 		* @brief Load the scene with the given name. Calling this ends the current scene
@@ -182,7 +182,7 @@ namespace Engine
 		* @param mapFileName: The filename of the tile map.
 		* @param rulesFileName: The filename of the rules for the tile map.
 		*/
-		void Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName);
+		void Scenes_AddTileMap(const std::string& name, const std::string& rulesFileName);
 
 		/**
 		* @brief Gets the first entity corresponding to the specified tile character from the tile map

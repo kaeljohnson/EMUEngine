@@ -24,7 +24,9 @@ namespace Engine
 		* @param refECS Reference to the ECS
 		* @param tileMap Reference to the TileMap
 		*/
-		PhysicsSimulation(ECS& refECS, TileMap& tileMap);
+		PhysicsSimulation(ECS& refECS);
+
+		void AddPhysicsTileMap(TileMap* tileMap);
 
 		/**
 		* @brief Create box2D world.

@@ -12,11 +12,11 @@ namespace Engine
 		m_scenes.reserve(200);
 	}
 
-	void SceneManager::AddScene(std::string sceneName, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
+	void SceneManager::AddScene(std::string sceneName, const std::string& rulesFileName, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
 	{
 		m_scenes.emplace(std::piecewise_construct,
 			std::forward_as_tuple(sceneName),
-			std::forward_as_tuple(m_refECS, refAssetManager, refIOEventSystem));
+			std::forward_as_tuple(rulesFileName, m_refECS, refAssetManager, refIOEventSystem));
 	}
 
 	bool SceneManager::IsSceneChanging()
@@ -203,12 +203,12 @@ namespace Engine
 		}
 	}
 
-	void SceneManager::AddTileMap(const std::string& sceneName, const std::string& mapFileName, const std::string& rulesFileName)
+	void SceneManager::AddTileMap(const std::string& sceneName, const std::string& rulesFileName)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
 		{
-			it->second.AddTileMap(mapFileName, rulesFileName);
+			// it->second.AddTileMap(rulesFileName);
 		}
 		else
 		{
@@ -221,7 +221,7 @@ namespace Engine
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
 		{
-			it->second.SetLevelDimensions(dimensions);
+			// it->second.SetLevelDimensions(dimensions);
 		}
 		else
 		{

@@ -98,7 +98,7 @@ namespace Engine
 	
 	void EMU::Scenes_Activate(Entity entity) { m_application->m_sceneManager.GetCurrentScene()->Activate(entity); }
 	void EMU::Scenes_Deactivate(Entity entity) { m_application->m_sceneManager.GetCurrentScene()->Deactivate(entity); }
-	void EMU::Scenes_Create(const std::string& name) { m_application->m_sceneManager.AddScene(name, m_application->m_assetManager, m_application->m_IOEventSystem); }
+	void EMU::Scenes_Create(const std::string& name, const std::string& rulesFileName) { m_application->m_sceneManager.AddScene(name, rulesFileName, m_application->m_assetManager, m_application->m_IOEventSystem); }
 	void EMU::Scenes_Load(const std::string& name) { m_application->m_sceneManager.QueueNewScene(name); }
 	void EMU::Scenes_RegisterOnPlayEvent(const std::string& name, std::function<void()> func) { m_application->m_sceneManager.RegisterOnScenePlayEvent(name, func); }
 	void EMU::Scenes_RegisterOnEndEvent(const std::string& name, std::function<void()> func) { m_application->m_sceneManager.RegisterOnSceneEndEvent(name, func); }
@@ -119,7 +119,7 @@ namespace Engine
 		// Hopefully the client fills all layers up to the new layer but if not there will have to be a "ghost" layer.
 		m_application->m_sceneManager.AddLayer(sceneName, layerId, parallaxFactor, hasPhysics);
 	}
-	void EMU::Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName) { m_application->m_sceneManager.AddTileMap(name, mapFileName, rulesFileName); }
+	void EMU::Scenes_AddTileMap(const std::string& name, const std::string& rulesFileName) { m_application->m_sceneManager.AddTileMap(name, rulesFileName); }
 	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const size_t tileId) { return m_application->m_sceneManager.GetEntity(name, tileId); }
 	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const size_t tileId) { return m_application->m_sceneManager.GetTileMapEntities(name, tileId); }
 	void EMU::Scenes_SetLevelDimensions(const std::string& name, const Math2D::Point2D<int> levelWidthInUnits) { m_application->m_sceneManager.SetLevelDimensions(name, levelWidthInUnits); }
