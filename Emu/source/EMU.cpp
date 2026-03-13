@@ -115,8 +115,6 @@ namespace Engine
 	// void EMU::Scenes_Remove(const std::string& name, Entity entity) { getScene(name).Remove(entity); m_ecs.Deactivate(entity); }
 	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const size_t tileId) { return m_application->m_sceneManager.GetEntity(name, tileId); }
 	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const size_t tileId) { return m_application->m_sceneManager.GetTileMapEntities(name, tileId); }
-	void EMU::Scenes_SetLevelDimensions(const std::string& name, const Math2D::Point2D<int> levelWidthInUnits) { m_application->m_sceneManager.SetLevelDimensions(name, levelWidthInUnits); }
-
 	void EMU::Camera_SetPixelsPerUnit(Entity entity, const int pixelsPerUnit) { m_application->m_cameraInterface.SetPixelsPerUnit(entity, pixelsPerUnit); }
 	const size_t EMU::Camera_GetPixelsPerUnit(Entity entity) { return m_application->m_cameraInterface.GetPixelsPerUnit(entity); }
 	void EMU::Camera_SetOffset(Entity entity, const Math2D::Point2D<float> offset) { m_application->m_cameraInterface.SetOffset(entity, offset); }

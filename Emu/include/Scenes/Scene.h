@@ -116,11 +116,8 @@ namespace Engine
 		/**
 		* @brief Adds a tile map to the scene. The tile map defines the layout of the level
 		* and the entities that should be instantiated based on the map characters.
-		*
-		* @param mapFileName The filename of the tile map file.
-		* @param rulesFileName The filename of the rules file that defines entity mappings.
 		*/
-		void AddTileMap(std::string mapFileName);
+		void AddTileMaps();
 
 		/**
 		* @brief Gets the entity associated with a specific character in the tile map.
@@ -142,14 +139,6 @@ namespace Engine
 		{
 			return m_tileMaps.at(1).GetEntities(tileId);
 		}
-
-		/**
-		* @brief Not really supported right now since tile map is required.
-		* Sets the level dimensions in units when there is no tile map.
-		* 
-		* @param levelWidthInUnits A Math::Math2D::Point2D<int> representing the width and height of the level in units.
-		*/
-		void SetLevelDimensions(const Math2D::Point2D<int> levelDimInUnits);
 
 		/**
 		* @brief Updates the physics simulation for the scene.
@@ -184,13 +173,11 @@ namespace Engine
 		AssetManager& m_refAssetManager;	/// Reference to the AssetManager instance.
 		IOEventSystem& m_refIOEventSystem;	/// Reference to the io event system.
 
-		bool m_hasTileMap;					/// Flag indicating if the scene has a tile map.
 		std::string m_rulesFileName;		/// The filename of the rules file that defines entity mappings.
 
 		std::vector<std::function<void()>> m_clientOnScenePlayEvents; /// Client defined functions to be called when the scene starts playing.
 		std::vector<std::function<void()>> m_clientOnSceneEndEvents;  /// Client defined functions to be called when the scene ends.
 
-		Math2D::Point2D<int> m_levelDimensionsInUnits;			/// The dimensions of the level in units.
 		std::map<int, TileMap> m_tileMaps;						/// Each layers tile map.
 
 		PhysicsSimulation m_physicsSimulation;   				/// The physics simulation for the scene.

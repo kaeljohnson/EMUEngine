@@ -111,14 +111,6 @@ namespace Engine
 		void SetGravity(const std::string& sceneName, const Math2D::Point2D<float> gravity);
 
 		/**
-		* @brief Sets the level dimensions for a given scene.
-		* 
-		* @param sceneName The name of the scene.
-		* @param dimensions A Math2D::Point2D<int> representing the level dimensions.
-		*/
-		void SetLevelDimensions(const std::string& sceneName, const Math2D::Point2D<int> dimensions);
-
-		/**
 		* @brief Adds a component to all entities associated with a specific tile ID in a given scene.
 		* 
 		* @tparam T The type of component to add.

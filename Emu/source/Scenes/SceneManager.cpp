@@ -202,17 +202,4 @@ namespace Engine
 			ENGINE_CRITICAL("Scene not found in SceneManager: {}", sceneName);
 		}
 	}
-
-	void SceneManager::SetLevelDimensions(const std::string& sceneName, const Math2D::Point2D<int> dimensions)
-	{
-		auto it = m_scenes.find(sceneName);
-		if (it != m_scenes.end())
-		{
-			it->second.SetLevelDimensions(dimensions);
-		}
-		else
-		{
-			ENGINE_CRITICAL("Scene not found in SceneManager: {}", sceneName);
-		}
-	}
 }

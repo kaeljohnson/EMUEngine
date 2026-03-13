@@ -131,7 +131,7 @@ namespace Engine
 	}
 
 	Scene::Scene(std::string rulesFileName, ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
-		: m_refECS(refECS), m_levelDimensionsInUnits(32, 32), m_hasTileMap(false), m_rulesFileName(rulesFileName),
+		: m_refECS(refECS), m_rulesFileName(rulesFileName),
 		m_physicsSimulation(refECS), m_refAssetManager(refAssetManager), m_refIOEventSystem(refIOEventSystem),
 		m_cameraSystem(refECS)
 	{
@@ -187,7 +187,7 @@ namespace Engine
 		{
 			ENGINE_INFO("Tilemap found.");
 			// no tile map in scene.
-			AddTileMap(tileMapFileName);
+			AddTileMaps();
 		}
 	}
 
@@ -247,7 +247,7 @@ namespace Engine
 		}
 
 		// 6. Frame the cameras
-		m_cameraSystem.Frame(Math2D::Point2D<int>(m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y));
+		m_cameraSystem.Frame(Math2D::Point2D<int>(141, 22)); // TEMP
 		
 		// 7. Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld(m_entities);
@@ -304,7 +304,7 @@ namespace Engine
 			m_refECS.DestroyComponents(pair.first);
 	}
 
-	void Scene::AddTileMap(std::string mapFileName)
+	void Scene::AddTileMaps()
 	{
 		// count up all the layers by iterating throught the items in the world layers then create
 		// a tile map for each layer.
@@ -319,21 +319,14 @@ namespace Engine
 				auto [it, inserted] = m_tileMaps.emplace(layerId, TileMap(&m_refECS));
 
 				it->second.CreateMap(tileMapPath); // assuming you load after construction
+
+				m_physicsSimulation.AddPhysicsTileMap(&m_tileMaps[layerId]);
+
+				for (auto& [coords, info] : m_tileMaps[layerId].GetMap())
+				{
+					add(info.first);
+				}
 			}
-		}
-		
-
-		m_levelDimensionsInUnits = Math2D::Point2D<int>(m_tileMaps[1].GetWidth(), m_tileMaps[1].GetHeight());
-
-		ENGINE_INFO_D("Map width: {}, Map height: {}", m_levelDimensionsInUnits.X, m_levelDimensionsInUnits.Y);
-
-		m_hasTileMap = true;
-
-		m_physicsSimulation.AddPhysicsTileMap(&m_tileMaps[1]);
-
-		for (auto& [coords, info] : m_tileMaps[1].GetMap())
-		{	
-			add(info.first);
 		}
 	}
 
@@ -400,17 +393,6 @@ namespace Engine
 	//	m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());
 	//	m_refECS.Deactivate(entity);
 	//}
-
-	void Scene::SetLevelDimensions(const Math2D::Point2D<int> levelDimensions)
-	{
-		if (m_hasTileMap)
-		{
-			ENGINE_LOG("Scene already has a tile map. Cannot override map dimensions!");
-			return;
-		}
-
-		m_levelDimensionsInUnits = levelDimensions;
-	}
 
 	void Scene::UpdatePhysics()
 	{
@@ -1019,12 +1001,6 @@ namespace Engine
 		const std::string& sceneName = rulesJson.begin().key();
 		ENGINE_LOG("Loading scene entities for scene: {}", sceneName);
 
-		const json* sceneRules = getJson(rulesJson, sceneName);
-		if (!sceneRules)
-		{
-			ENGINE_ERROR("No scene rules found for scene: {}", sceneName);
-			std::exit(1);
-		}
 
 		// Load the physics rules.
 		size_t numUnitsPerTile = 1;
@@ -1041,25 +1017,18 @@ namespace Engine
 		numUnitsPerTile = ExtractSizeTFromJSON(*physicsRules, "NumUnitsPerTile", 1);
 
 		// Load Assets.
-		const json* assetsRules = getJson(*sceneRules, "Assets");
 
-		if (assetsRules) 
-		{
-			verifyAssetPaths(*assetsRules);
-		}
-		else
-		{
-			ENGINE_CRITICAL("No assets rules found for scene. Continuing with debug ojects only: {}", sceneName);
-		}
+		
+		verifyAssetPaths(sceneAssets);
 
-		const json* characterRules = getJson(*sceneRules, "CharacterRules");
+		const json* characterRules = getJson(sceneRules, "CharacterRules");
 		if (!characterRules)
 		{
 			ENGINE_ERROR("No character rules found for scene: {}", sceneName);
 			std::exit(1);
 		}
 
-		const json* componentTemplates = getJson(*sceneRules, "ComponentTemplates");
+		const json* componentTemplates = getJson(sceneRules, "ComponentTemplates");
 		if (!componentTemplates)
 		{
 			ENGINE_ERROR("No component templates found for scene: {}", sceneName);
@@ -1069,62 +1038,65 @@ namespace Engine
 		std::unordered_set<size_t> isMap = determineMapTiles(*characterRules, *componentTemplates);
 		std::vector<Math2D::Edge> edges;
 
-		for (auto& [coords, info] : m_tileMaps.at(1).GetMap())
+		for (auto& layer : m_tileMaps)
 		{
-			const size_t tileId = info.second;
-			const int x = coords.first;
-			const int y = coords.second;
-			Entity tileEntity = info.first;
+			for (auto& [coords, info] : layer.second.GetMap())
+			{
+				const size_t tileId = info.second;
+				const int x = coords.first;
+				const int y = coords.second;
+				Entity tileEntity = info.first;
 
-			std::string tileKey = std::to_string(tileId);
+				std::string tileKey = std::to_string(tileId);
 
-			const json* characterComponents = nullptr;
-			if (!(characterComponents = getJson(*characterRules, tileKey)))
-			{
-				ENGINE_INFO("Tile ID {} at ({}, {}) has no character rules defined. Skipping entity creation.", tileId, x, y);
-				continue;
-			}
+				const json* characterComponents = nullptr;
+				if (!(characterComponents = getJson(*characterRules, tileKey)))
+				{
+					ENGINE_INFO("Tile ID {} at ({}, {}) has no character rules defined. Skipping entity creation.", tileId, x, y);
+					continue;
+				}
 
-			const json* characterTransformJson = nullptr;
-			if (characterTransformJson = getJson(*characterComponents, "Transform"))
-			{
-				std::string transformTemplateKey = characterTransformJson->get<std::string>();
-				const json* transformTemplates = getJson(*componentTemplates, "Transforms");
-				if (transformTemplates)
-					addTransformComponent(m_refECS, tileEntity, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile);
-			}
-			else ENGINE_ERROR("Transform component is required for all entities. Missing for tile: " + tileKey);
+				const json* characterTransformJson = nullptr;
+				if (characterTransformJson = getJson(*characterComponents, "Transform"))
+				{
+					std::string transformTemplateKey = characterTransformJson->get<std::string>();
+					const json* transformTemplates = getJson(*componentTemplates, "Transforms");
+					if (transformTemplates)
+						addTransformComponent(m_refECS, tileEntity, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile);
+				}
+				else ENGINE_ERROR("Transform component is required for all entities. Missing for tile: " + tileKey);
 
-			if (const json* characterCameraJson = getJson(*characterComponents, "Camera"))
-			{
-				std::string cameraTemplateKey = characterCameraJson->get<std::string>();
-				const json* cameraTemplates = getJson(*componentTemplates, "Camera");
-				if (cameraTemplates)
-					m_cameraOrder.emplace(addCameraComponent(m_refECS, tileEntity, *cameraTemplates, cameraTemplateKey, numLayers));
-			}
-			if (const json* characterPhysicsJson = getJson(*characterComponents, "Physics"))
-			{
-				std::string physicsTemplateKey = characterPhysicsJson->get<std::string>();
-				const json* physicsTemplates = getJson(*componentTemplates, "Physics");
-				std::string transformTemplateKey = characterTransformJson->get<std::string>();
-				const json* transformTemplates = getJson(*componentTemplates, "Transforms");
-				if (physicsTemplates)
-					addPhysicsComponent(m_refECS, m_tileMaps.at(1), tileEntity, tileId, *physicsTemplates, physicsTemplateKey, x, y, numUnitsPerTile, isMap, edges);
-			}
-			if (const json* characterSpriteSheetJson = getJson(*characterComponents, "SpriteSheet"))
-			{
-				std::string spriteSheetTemplateKey = characterSpriteSheetJson->get<std::string>();
-				const json* spriteSheetTemplates = getJson(*componentTemplates, "SpriteSheets");
+				if (const json* characterCameraJson = getJson(*characterComponents, "Camera"))
+				{
+					std::string cameraTemplateKey = characterCameraJson->get<std::string>();
+					const json* cameraTemplates = getJson(*componentTemplates, "Camera");
+					if (cameraTemplates)
+						m_cameraOrder.emplace(addCameraComponent(m_refECS, tileEntity, *cameraTemplates, cameraTemplateKey, numLayers));
+				}
+				if (const json* characterPhysicsJson = getJson(*characterComponents, "Physics"))
+				{
+					std::string physicsTemplateKey = characterPhysicsJson->get<std::string>();
+					const json* physicsTemplates = getJson(*componentTemplates, "Physics");
+					std::string transformTemplateKey = characterTransformJson->get<std::string>();
+					const json* transformTemplates = getJson(*componentTemplates, "Transforms");
+					if (physicsTemplates)
+						addPhysicsComponent(m_refECS, m_tileMaps.at(layer.first), tileEntity, tileId, *physicsTemplates, physicsTemplateKey, x, y, numUnitsPerTile, isMap, edges);
+				}
+				if (const json* characterSpriteSheetJson = getJson(*characterComponents, "SpriteSheet"))
+				{
+					std::string spriteSheetTemplateKey = characterSpriteSheetJson->get<std::string>();
+					const json* spriteSheetTemplates = getJson(*componentTemplates, "SpriteSheets");
 
-				if (spriteSheetTemplates && assetsRules)
-					addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, *spriteSheetTemplates, spriteSheetTemplateKey, *getJson(*assetsRules, "Sprites"));
-			}
-			if (const json* characterAnimationsJson = getJson(*characterComponents, "Animations"))
-			{
-				std::string animationsTemplateKey = characterAnimationsJson->get<std::string>();
-				const json* animationsTemplate = getJson(*componentTemplates, "Animations");
-				if (animationsTemplate)
-					addAnimationsComponent(m_refECS, m_refAssetManager, tileEntity, *animationsTemplate, animationsTemplateKey);
+					if (spriteSheetTemplates)
+						addSpriteComponent(m_refECS, m_refAssetManager, tileEntity, *spriteSheetTemplates, spriteSheetTemplateKey, *getJson(sceneAssets, "Sprites"));
+				}
+				if (const json* characterAnimationsJson = getJson(*characterComponents, "Animations"))
+				{
+					std::string animationsTemplateKey = characterAnimationsJson->get<std::string>();
+					const json* animationsTemplate = getJson(*componentTemplates, "Animations");
+					if (animationsTemplate)
+						addAnimationsComponent(m_refECS, m_refAssetManager, tileEntity, *animationsTemplate, animationsTemplateKey);
+				}
 			}
 		}
 

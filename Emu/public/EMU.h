@@ -197,15 +197,6 @@ namespace Engine
 		*/
 		const std::vector<Entity>& Scenes_GetTileMapEntities(const std::string& name, const size_t tileId);
 
-		/**
-		 * @brief Sets the level dimensions for a scene that does not use a tile map.
-		 *
-		 * @param name The name of the scene for which to set the level dimensions.
-		 * @param levelWidthInUnits The dimensions of the level in world units.
-		 */
-		void Scenes_SetLevelDimensions(const std::string& name, const Math2D::Point2D<int> levelWidthInUnits);
-
-
 		////////////////////////////////////////////////////
 
 		// Audio Interface functions
