@@ -161,8 +161,8 @@ namespace Engine
 	const Math2D::Point2D<float> EMU::Transform_GetPrevPosition(Entity entity) { return m_application->m_transformInterface.GetPrevPosition(entity); }
 	void EMU::Transform_SetPosition(Entity entity, const Math2D::Point2D<float> position) { m_application->m_transformInterface.SetPosition(entity, position); }
 	const Math2D::Point2D<float> EMU::Transform_GetPosition(Entity entity) { return m_application->m_transformInterface.GetPosition(entity); }
-	void EMU::Transform_SetZIndex(Entity entity, const int zIndex) { m_application->m_transformInterface.SetZIndex(entity, zIndex); }
-	const size_t EMU::Transform_GetZIndex(Entity entity) { return m_application->m_transformInterface.GetZIndex(entity); }
+	void EMU::Transform_SetLayer(Entity entity, const int layer) { m_application->m_transformInterface.SetLayer(entity, layer); }
+	const size_t EMU::Transform_GetLayer(Entity entity) { return m_application->m_transformInterface.GetLayer(entity); }
 	void EMU::Transform_SetRotation(Entity entity, const float rotation) { m_application->m_transformInterface.SetRotation(entity, rotation); }
 	const float EMU::Transform_GetRotation(Entity entity) { return m_application->m_transformInterface.GetRotation(entity); }
 	void EMU::Transform_SetDirectionFacing(Entity entity, const int direction) { m_application->m_transformInterface.SetDirectionFacing(entity, direction); }

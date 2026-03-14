@@ -15,6 +15,19 @@ struct b2WorldId;
 namespace Engine
 {
 	/**
+	* @brief Represents a layer in the scene. Each layer can have its own tile map and entities.
+	* The layer grouping is primarily used for rendering order and parallax effects. 
+	* Examples of layers include background, physics, foreground, etc.
+	*
+	*/
+	struct Layer
+	{
+		bool m_hasTileMap;			  /// Indicates whether the layer has an associated tile map.
+		TileMap m_tileMap;			  /// The tile map associated with the layer, if any.
+		float m_parallaxFactor;		  /// The parallax factor for the layer, used for parallax scrolling effects.
+	};
+
+	/**
 	* @class Scene
 	* 
 	* @brief Represents a game scene or level.
@@ -137,7 +150,7 @@ namespace Engine
 		*/
 		inline const std::vector<Entity>& GetTileMapEntities(const size_t tileId) const
 		{
-			return m_tileMaps.at(1).GetEntities(tileId);
+			return m_layers.at(1).m_tileMap.GetEntities(tileId);
 		}
 
 		/**
@@ -178,7 +191,7 @@ namespace Engine
 		std::vector<std::function<void()>> m_clientOnScenePlayEvents; /// Client defined functions to be called when the scene starts playing.
 		std::vector<std::function<void()>> m_clientOnSceneEndEvents;  /// Client defined functions to be called when the scene ends.
 
-		std::map<int, TileMap> m_tileMaps;						/// Each layers tile map.
+		std::map<int, Layer> m_layers;							/// Each layer. TEMP: Make this a vector where index is the layer id for easier access.
 
 		PhysicsSimulation m_physicsSimulation;   				/// The physics simulation for the scene.
 		CameraSystem m_cameraSystem;							/// The camera system for the scene.

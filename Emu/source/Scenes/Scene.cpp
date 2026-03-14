@@ -312,20 +312,35 @@ namespace Engine
 		{
 			const int layerId = layerJson["id"].get<int>();
 
-			if (layerJson.contains("TileMapPath"))
+			const float parallaxFactor =
+				layerJson.contains("ParallaxFactor")
+				? static_cast<float>(layerJson["ParallaxFactor"].get<double>())
+				: 1.0f;
+
+			const std::string tileMapPath =
+				layerJson.contains("TileMapPath")
+				? ExtractStringFromJSON(layerJson, "TileMapPath", "")
+				: "";
+
+			bool hasTileMap = !tileMapPath.empty();
+
+			auto [it, inserted] = m_layers.emplace(
+				layerId,
+				Layer{ hasTileMap, TileMap(&m_refECS), parallaxFactor }
+			);
+
+			if (!hasTileMap)
+				continue;
+
+			Layer& layer = it->second;
+
+			layer.m_tileMap.CreateMap(tileMapPath);
+
+			m_physicsSimulation.AddPhysicsTileMap(&layer.m_tileMap);
+
+			for (auto& [coords, info] : layer.m_tileMap.GetMap())
 			{
-				const std::string tileMapPath = layerJson["TileMapPath"].get<std::string>();
-
-				auto [it, inserted] = m_tileMaps.emplace(layerId, TileMap(&m_refECS));
-
-				it->second.CreateMap(tileMapPath); // assuming you load after construction
-
-				m_physicsSimulation.AddPhysicsTileMap(&m_tileMaps[layerId]);
-
-				for (auto& [coords, info] : m_tileMaps[layerId].GetMap())
-				{
-					add(info.first);
-				}
+				add(info.first);
 			}
 		}
 	}
@@ -435,7 +450,7 @@ namespace Engine
 
 	const Entity Scene::GetTileMapEntity(size_t tileId) const
 	{
-		return m_tileMaps.at(1).GetEntity(tileId);
+		return m_layers.at(1).m_tileMap.GetEntity(tileId);
 	}
 
 	void Scene::loadAudioFiles()
@@ -482,14 +497,12 @@ namespace Engine
 		}
 	}
 
-	static void addTransformComponent(ECS& refECS, Entity entity, const json& transformTemplates, std::string templateKey, int x, int y, size_t numUnitsPerTile)
+	static void addTransformComponent(ECS& refECS, Entity entity, int layer, float parallaxFactor, const json& transformTemplates, std::string templateKey, int x, int y, size_t numUnitsPerTile)
 	{
 		const json* entityTransformTemplate = getJson(transformTemplates, templateKey);
-		size_t zIndex = ExtractSizeTFromJSON(*entityTransformTemplate, "ZIndex", 0);
 
 		bool drawDebug = entityTransformTemplate->contains("DrawDebug");
 		std::string debugColor = entityTransformTemplate->value("DrawDebug", "red");
-		float parallaxFactor = entityTransformTemplate->value("ParallaxFactor", 1.0);
 
 		DebugColor debugColorEnum;
 
@@ -513,7 +526,7 @@ namespace Engine
 		refECS.AddComponent<Transform>(
 			entity,
 			Math2D::Point2D<float>(x * (float)numUnitsPerTile, y * (float)numUnitsPerTile),
-			1.0f, 1, zIndex, parallaxFactor, drawDebug, debugColorEnum
+			1.0f, 1, layer, parallaxFactor, drawDebug, debugColorEnum
 		);
 	}
 
@@ -1038,9 +1051,18 @@ namespace Engine
 		std::unordered_set<size_t> isMap = determineMapTiles(*characterRules, *componentTemplates);
 		std::vector<Math2D::Edge> edges;
 
-		for (auto& layer : m_tileMaps)
+		for (auto& layer : m_layers)
 		{
-			for (auto& [coords, info] : layer.second.GetMap())
+			const float parallaxFactor = layer.second.m_parallaxFactor;
+			const int layerIndex = layer.first;
+
+			// if theres no tilemap in this layer, skip it.
+			if (!layer.second.m_hasTileMap)
+				continue;
+
+			TileMap& refTileMap = layer.second.m_tileMap;
+
+			for (auto& [coords, info] : layer.second.m_tileMap.GetMap())
 			{
 				const size_t tileId = info.second;
 				const int x = coords.first;
@@ -1062,7 +1084,7 @@ namespace Engine
 					std::string transformTemplateKey = characterTransformJson->get<std::string>();
 					const json* transformTemplates = getJson(*componentTemplates, "Transforms");
 					if (transformTemplates)
-						addTransformComponent(m_refECS, tileEntity, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile);
+						addTransformComponent(m_refECS, tileEntity, layerIndex, parallaxFactor, *transformTemplates, transformTemplateKey, x, y, numUnitsPerTile);
 				}
 				else ENGINE_ERROR("Transform component is required for all entities. Missing for tile: " + tileKey);
 
@@ -1080,7 +1102,7 @@ namespace Engine
 					std::string transformTemplateKey = characterTransformJson->get<std::string>();
 					const json* transformTemplates = getJson(*componentTemplates, "Transforms");
 					if (physicsTemplates)
-						addPhysicsComponent(m_refECS, m_tileMaps.at(layer.first), tileEntity, tileId, *physicsTemplates, physicsTemplateKey, x, y, numUnitsPerTile, isMap, edges);
+						addPhysicsComponent(m_refECS, refTileMap, tileEntity, tileId, *physicsTemplates, physicsTemplateKey, x, y, numUnitsPerTile, isMap, edges);
 				}
 				if (const json* characterSpriteSheetJson = getJson(*characterComponents, "SpriteSheet"))
 				{

@@ -162,10 +162,10 @@ namespace Engine
 		* @brief Adds a background layer to the simulation.
 		* 
 		* @param name: The name of the scene to which the background is to be added.
-		* @param zIndex: The id of the layer and order of rendering. Indices are rendered in descending order.
+		* @param layer: The id of the layer and order of rendering. Indices are rendered in descending order.
 		* @param parallax: The parallax factor the background is to be rendered using. The physics layer will always have a parallax of 1
 		*/
-		void Scenes_AddBackgroundLayer(const std::string& name, const size_t zIndex, const float parallax);
+		void Scenes_AddBackgroundLayer(const std::string& name, const size_t layer, const float parallax);
 
 		/**
 		* @brief Adds a tilemap to a background layer.
@@ -548,23 +548,23 @@ namespace Engine
 		const Math2D::Point2D<float> Transform_GetPosition(Entity entity);
 
 		/**
-		 * @brief Sets the Z index of the transform component for the given entity.
+		 * @brief Sets the layer of the transform component for the given entity.
 		 *
-		 * The Z index controls render order, where higher values are rendered in front
+		 * The layer controls render order, where higher values are rendered in front
 		 * of lower values.
 		 *
-		 * @param entity The entity whose transform Z index is to be set.
-		 * @param zIndex The Z index value to assign.
+		 * @param entity The entity whose transform layer is to be set.
+		 * @param layer The layer value to assign.
 		 */
-		void Transform_SetZIndex(Entity entity, const int zIndex);
+		void Transform_SetLayer(Entity entity, const int layer);
 
 		/**
-		 * @brief Gets the Z index of the transform component for the given entity.
+		 * @brief Gets the layer of the transform component for the given entity.
 		 *
-		 * @param entity The entity whose transform Z index is to be retrieved.
-		 * @return The Z index of the transform.
+		 * @param entity The entity whose transform layer is to be retrieved.
+		 * @return The layer of the transform.
 		 */
-		const size_t Transform_GetZIndex(Entity entity);
+		const size_t Transform_GetLayer(Entity entity);
 
 		/**
 		 * @brief Sets the rotation of the transform component for the given entity.
@@ -723,7 +723,7 @@ namespace Engine
 		void Scenes_AddChainColliderComponent(const std::string& sceneName, size_t tileId, Math2D::Chain refPoints,
 			const bool enabled, Filter category, Filter mask, bool drawDebug, DebugColor debugColor);
 		void Scenes_AddTransformComponent(const std::string& sceneName, size_t tileId, Math2D::Point2D<float> position, float rotation,
-			int direction, size_t zIndex, const bool drawDebug, DebugColor debugColor);
+			int direction, size_t layer, const bool drawDebug, DebugColor debugColor);
 		void Scenes_AddCameraComponent(const std::string& sceneName, size_t tileId, Math2D::Point2D<float> size, Math2D::Point2D<float> screenRatio,
 			Math2D::Point2D<float> position, size_t pixelsPerUnit, bool clampingOn, bool border, std::array<size_t, 3> backgroundColor, size_t numLayers);
 		void Scenes_AddSpriteComponent(const std::string& sceneName, size_t tileId, void* ptrLoadedTexture, Math2D::Point2D<int> pixelsPerFrame,

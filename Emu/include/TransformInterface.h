@@ -51,21 +51,21 @@ namespace Engine
 		const Math2D::Point2D<float> GetPosition(Entity entity);
 
 		/**
-		* @brief Set Z index of an entity's transform.
+		* @brief Set layer of an entity's transform.
 		* 
-		* @param entity The entity whose transform to set the Z index of.
-		* @param zIndex The new Z index of the entity's transform.
+		* @param entity The entity whose transform to set the layer of.
+		* @param layer The new layer of the entity's transform.
 		*/
-		void SetZIndex(Entity entity, const int zIndex);
+		void SetLayer(Entity entity, const int layer);
 
 		/**
-		* @brief Get Z index of an entity's transform.
+		* @brief Get layer of an entity's transform.
 		* 
-		* @param entity The entity whose transform to get the Z index of.
+		* @param entity The entity whose transform to get the layer of.
 		* 
-		* @return The Z index of the entity's transform.
+		* @return The layer of the entity's transform.
 		*/
-		const size_t GetZIndex(Entity entity);
+		const size_t GetLayer(Entity entity);
 
 		/**
 		* @brief Set rotation of an entity's transform.

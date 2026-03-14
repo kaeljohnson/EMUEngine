@@ -8,9 +8,15 @@
             "id": 0,
             "ParallaxFactor": 1
           },
-          "Physics": 
+          "Player": 
           {
             "id": 1,
+            "ParallaxFactor": 1,
+            "TileMapPath": "Tilemaps/PlayerMap.txt"
+          },
+          "Physics": 
+          {
+            "id": 2,
             "ParallaxFactor": 1,
             "Gravity": [0.0, 100.0],
             "NumUnitsPerTile": 1,
@@ -18,7 +24,7 @@
           },
           "Background": 
           {
-            "id": 2,
+            "id": 3,
             "ParallaxFactor": 0.5,
             "TileMapPath": "Backgrounds/StartScreenBackground.txt"
           }
@@ -51,32 +57,27 @@
             {
                 "Player":  
                 {
-                  "ZIndex": 1,
                   "DrawDebug": "green",
                   "enabled": true
                 },
                 "MiniMapTracker":
                 {
-                  "ZIndex": 1,
                   "enabled": true
                 },
                 "GenericTransform1":
                 {
-                    "ZIndex": 2,
                     "DrawDebug": "green"
                 },
                 "GenericTransformNoDebug":
                 {
-                    "ZIndex": 2
+                  "enabled": true
                 },
                 "GenericDoubleSizeTransform":
                 {
-                    "ZIndex": 2,
                     "DrawDebug": "red"
                 },
                 "GenericBackgroundTransform": 
                 {
-                  "ZIndex": 3,
                   "ParallaxFactor": 0.25,
                   "DrawDebug": "red",
                   "enabled": true
@@ -286,7 +287,7 @@
         },
         "CharacterRules": 
         {
-            "1": { "Transform":  "Player",                          "Layer": "Physics",                    "Physics": "Player",                   "Camera": "Player",                         "Animations": "Player",                               "SpriteSheet": "Player"       },
+            "1": { "Transform":  "Player",                          "Layer": "Player",                    "Physics": "Player",                    "Camera": "Player",                         "Animations": "Player",                               "SpriteSheet": "Player"       },
             "2": { "Transform":  "MiniMapTracker",                  "Layer": "Foreground",                                                        "Camera": "MiniMap"                                                                                                             },
             "3": { "Transform":  "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "BottomRightOutsideGrassCorner",        "SpriteSheet": "GrassTileSet" },
             "4": { "Transform":  "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "UpwardFacingGrass",                    "SpriteSheet": "GrassTileSet" },
@@ -294,7 +295,7 @@
             "6": { "Transform":  "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "TopLeftInteriorCorner",                "SpriteSheet": "GrassTileSet" },
             "7": { "Transform":  "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "TopCenterInteriorGrass",               "SpriteSheet": "GrassTileSet" },
             "8": { "Transform":  "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "TopRightInteriorGrass",                "SpriteSheet": "GrassTileSet" },
-            "9": { "Transform":  "GenericTransform1",               "Layer":  "Physics",                  "Physics": "GenericSensor1",                                                       "Animations": "TopNarrowOpenGrass",                   "SpriteSheet": "GrassTileSet" },
+            "9": { "Transform":  "GenericTransform1",               "Layer": "Physics",                  "Physics": "GenericSensor1",                                                       "Animations": "TopNarrowOpenGrass",                    "SpriteSheet": "GrassTileSet" },
             "10": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "TopNarrowInteriorGrass",               "SpriteSheet": "GrassTileSet" },
             "11": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "LeftFacingGrass",                      "SpriteSheet": "GrassTileSet" },
             "12": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "CenterInteriorWallWithGrass",          "SpriteSheet": "GrassTileSet" },

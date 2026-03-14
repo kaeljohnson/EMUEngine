@@ -94,7 +94,7 @@ namespace Engine
 				const int locationInPixelsOnScreenY =
 					int(objectTop * scaleInPixels);
 
-				renderBuckets[refTransform.m_zIndex].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are within 1-10
+				renderBuckets[refTransform.m_layer].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are within 1-10
 					refTransform.m_entity,
 					Math2D::Point2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
 					Math2D::Point2D<int>(width, height),
@@ -106,7 +106,7 @@ namespace Engine
 				// debug objects when in debug mode.
 				if (refTransform.m_drawDebug)
 				{
-					pointBuckets[refTransform.m_zIndex].emplace_back(
+					pointBuckets[refTransform.m_layer].emplace_back(
 						refTransform.m_entity,
 						Math2D::Point2D<int>(
 							int(objectLeft * scaleInPixels),
@@ -117,7 +117,7 @@ namespace Engine
 				}
 				if (ptrSpriteComponent->m_drawDebug)
 				{
-					debugBuckets[refTransform.m_zIndex].emplace_back(
+					debugBuckets[refTransform.m_layer].emplace_back(
 						refTransform.m_entity,
 						false,
 						Math2D::Point2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),
@@ -150,7 +150,7 @@ namespace Engine
 
 				// submit debug border
 				// debug objects when in debug mode.
-				debugBuckets[refTransform.m_zIndex].emplace_back(
+				debugBuckets[refTransform.m_layer].emplace_back(
 					refTransform.m_entity,
 					ptrPhysicsBody->m_fillRect,
 					Math2D::Point2D<int>(

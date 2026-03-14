@@ -27,16 +27,16 @@ namespace Engine
 		return ptrTransform->m_position;
 	}
 
-	void TransformInterface::SetZIndex(Entity entity, const int zIndex)
+	void TransformInterface::SetLayer(Entity entity, const int layer)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		ptrTransform->m_zIndex = zIndex;
+		ptrTransform->m_layer = layer;
 	}
 
-	const size_t TransformInterface::GetZIndex(Entity entity)
+	const size_t TransformInterface::GetLayer(Entity entity)
 	{
 		Transform* ptrTransform = GetTransform(entity);
-		return ptrTransform->m_zIndex;
+		return ptrTransform->m_layer;
 	}
 
 	void TransformInterface::SetRotation(Entity entity, const float rotation)

@@ -38,7 +38,7 @@ namespace Engine
 		Math2D::Point2D<float> m_position;	   /// Current position of the entity's physics body.
 		Math2D::Point2D<float> m_velocity;	   /// Current velocity of the entity's physics body.
 
-		size_t m_zIndex;			/// Z-index for rendering order.
+		size_t m_layer;				/// layer for rendering order.
 		float m_parallaxFactor;		/// The parallax factor the object will get multiplied by when getting rendered.
 		float m_rotation;			/// Rotation of the entity in degrees.
 		int m_directionFacing;		/// Direction the entity is facing (1 for right, -1 for left).
@@ -46,13 +46,13 @@ namespace Engine
 		DebugColor m_debugColor;	/// Color to use for debug rendering.
 
 		Transform(Entity entity) : m_prevPosition(0.0f, 0.0f), m_position(0.0f, 0.0f),
-			m_rotation(0.0f), m_directionFacing(1), m_zIndex(0), m_parallaxFactor(1.0f),
+			m_rotation(0.0f), m_directionFacing(1), m_layer(0), m_parallaxFactor(1.0f),
 			m_drawDebug(false), m_debugColor(DebugColor::Red), Component(entity) {}
 
 		Transform(Entity entity, Math2D::Point2D<float> position, float rotation, 
-			int direction, size_t zIndex, float parallaxFactor, const bool drawDebug, DebugColor debugColor) :
+			int direction, size_t layer, float parallaxFactor, const bool drawDebug, DebugColor debugColor) :
 			m_prevPosition(position), m_position(position), m_rotation(rotation), 
-			m_directionFacing(direction), m_zIndex(zIndex), m_parallaxFactor(parallaxFactor), m_drawDebug(drawDebug),
+			m_directionFacing(direction), m_layer(layer), m_parallaxFactor(parallaxFactor), m_drawDebug(drawDebug),
 			m_debugColor(debugColor),
 			Component(entity) {}
 
@@ -225,10 +225,10 @@ namespace Engine
 			: m_entity(entity), m_locationInPixelsOnScreen(pointInPixelsOnScreen), m_debugColor(debugColor) {}
 	};
 
-	using RenderBucket = std::vector<std::vector<RenderObject>>;				/// Vector index is the zIndex.
-	using DebugRenderBucket = std::vector<std::vector<DebugObject>>;			/// Vector index is the zIndex.
-	using LinesRenderBucket = std::vector<std::vector<LineObject>>;				/// Vector index is the zIndex.
-	using DebugPointRenderBucket = std::vector<std::vector<DebugPointObject>>;  /// Vector index is the zIndex.
+	using RenderBucket = std::vector<std::vector<RenderObject>>;				/// Vector index is the layer.
+	using DebugRenderBucket = std::vector<std::vector<DebugObject>>;			/// Vector index is the layer.
+	using LinesRenderBucket = std::vector<std::vector<LineObject>>;				/// Vector index is the layer.
+	using DebugPointRenderBucket = std::vector<std::vector<DebugPointObject>>;  /// Vector index is the layer.
 	
 	/**
 	* @struct Camera
@@ -253,10 +253,10 @@ namespace Engine
 		size_t m_numLayers;										 /// Number of layers for rendering.
 		std::array<int, 3> m_backgroundColor;				 /// Background color of the camera in RGB format.
 
-		RenderBucket m_renderBucket;							 /// Bucket for storing renderable objects. Maps zIndex to vector of RenderObjects.
-		DebugRenderBucket m_debugRenderBucket;					 /// Bucket for storing renderable debug objects. Maps zIndex to vector of DebugObjects.
-		LinesRenderBucket m_debugLinesRenderBucket;				 /// Bucket for storing renderable debug lines. Maps zIndex to vector of lines.
-		DebugPointRenderBucket m_debugPointsRenderBucket;		 /// Bucket for storing renderable point objects. Maps zIndex to vector of debug points.
+		RenderBucket m_renderBucket;							 /// Bucket for storing renderable objects. Maps layer to vector of RenderObjects.
+		DebugRenderBucket m_debugRenderBucket;					 /// Bucket for storing renderable debug objects. Maps layer to vector of DebugObjects.
+		LinesRenderBucket m_debugLinesRenderBucket;				 /// Bucket for storing renderable debug lines. Maps layer to vector of lines.
+		DebugPointRenderBucket m_debugPointsRenderBucket;		 /// Bucket for storing renderable point objects. Maps layer to vector of debug points.
 
 		Camera(Entity entity)
 			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_viewportSizeInPercentageOfScreen(1.0f, 1.0f), m_numLayers(10),
