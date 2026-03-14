@@ -22,9 +22,8 @@ namespace Engine
 	*/
 	struct Layer
 	{
-		bool m_hasTileMap;			  /// Indicates whether the layer has an associated tile map.
-		TileMap m_tileMap;			  /// The tile map associated with the layer, if any.
-		float m_parallaxFactor;		  /// The parallax factor for the layer, used for parallax scrolling effects.
+		std::optional<TileMap> m_tileMap;	/// The tile map associated with the layer, if any.
+		float m_parallaxFactor;				/// The parallax factor for the layer, used for parallax scrolling effects.
 	};
 
 	/**
@@ -127,10 +126,10 @@ namespace Engine
 		void Deactivate(Entity entity);
 
 		/**
-		* @brief Adds a tile map to the scene. The tile map defines the layout of the level
+		* @brief Adds a Layer to the scene. The tile map defines the layout of the level
 		* and the entities that should be instantiated based on the map characters.
 		*/
-		void AddTileMaps();
+		void AddLayers();
 
 		/**
 		* @brief Gets the entity associated with a specific character in the tile map.
@@ -150,7 +149,7 @@ namespace Engine
 		*/
 		inline const std::vector<Entity>& GetTileMapEntities(const size_t tileId) const
 		{
-			return m_layers.at(1).m_tileMap.GetEntities(tileId);
+			return m_layers.at(1).m_tileMap->GetEntities(tileId);
 		}
 
 		/**
@@ -191,7 +190,7 @@ namespace Engine
 		std::vector<std::function<void()>> m_clientOnScenePlayEvents; /// Client defined functions to be called when the scene starts playing.
 		std::vector<std::function<void()>> m_clientOnSceneEndEvents;  /// Client defined functions to be called when the scene ends.
 
-		std::map<int, Layer> m_layers;							/// Each layer. TEMP: Make this a vector where index is the layer id for easier access.
+		std::vector<Layer> m_layers;							/// Each layer. TEMP: Make this a vector where index is the layer id for easier access.
 
 		PhysicsSimulation m_physicsSimulation;   				/// The physics simulation for the scene.
 		CameraSystem m_cameraSystem;							/// The camera system for the scene.
