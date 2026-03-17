@@ -116,7 +116,7 @@ namespace Engine
 		* 
 		* @param tileId: The tile id.
 		*/
-		Entity Scenes_GetCurrentRuntimeEntity(const size_t tileId);
+		Entity Scenes_GetCurrentRuntimeEntity(const int layer, const size_t tileId);
 
 		/**
 		* @brief Gets the first entity with the given character in the specified scene.
@@ -124,7 +124,7 @@ namespace Engine
 		* @param sceneName: The name of the scene from which to retrieve the entity.
 		* @param tileId: The tileId representing the entity to be retrieved.
 		*/
-		Entity Scenes_GetEntityById(const std::string& sceneName, const size_t tileId);
+		Entity Scenes_GetEntityById(const std::string& sceneName, const int layer, const size_t tileId);
 
 		/**
 		* @brief Gets all entities with the given character in the specified scene.
@@ -132,7 +132,7 @@ namespace Engine
 		* @param sceneName: The name of the scene from which to retrieve the entities.
 		* @param tileId: The number representing the entities to be retrieved.
 		*/
-		const std::vector<Entity>& Scenes_GetEntitiesById(const std::string& sceneName, const size_t tileId);
+		const std::vector<Entity>& Scenes_GetEntitiesById(const std::string& sceneName, const int layer, const size_t tileId);
 
 		/**
 		* @brief Activates the specified entity in the scene with the given name.
@@ -185,7 +185,7 @@ namespace Engine
 		* @param name: The name of the scene from which to retrieve the entity.
 		* @param tileId: The character representing the tile for which to retrieve the entity.
 		*/
-		const Entity Scenes_GetTileMapEntity(const std::string& name, const size_t tileId);
+		const Entity Scenes_GetTileMapEntity(const std::string& name, const int layer, const size_t tileId);
 
 		/**
 		* @brief Gets all entities corresponding to the specified tile ID from the tile map
@@ -195,7 +195,7 @@ namespace Engine
 		* @param tileId The tile ID representing the entities to retrieve.
 		* @return A reference to a vector of entities matching the tile ID.
 		*/
-		const std::vector<Entity>& Scenes_GetTileMapEntities(const std::string& name, const size_t tileId);
+		const std::vector<Entity>& Scenes_GetTileMapEntities(const std::string& name, const int layer, const size_t tileId);
 
 		////////////////////////////////////////////////////
 
@@ -205,6 +205,15 @@ namespace Engine
 		void PlaySound(int soundIndex, int volume, const bool loop = false);
 
 		//////////// Camera Interface Functions ////////////
+
+		/**
+		* @brief Checks if the given entity is within the camera's view frame.
+		* 
+		* @param entity The entity to check for being within the camera's frame.
+		* 
+		* returns True if the entity's sprite is within the camera's frame, false otherwise.
+		*/
+		const bool Camera_InFrame(Entity entity);
 
 		/**
 		* @brief Sets the pixels-per-unit value for the camera component of the given entity.
@@ -357,20 +366,14 @@ namespace Engine
 		void Physics_SetPosition(Entity entity, const Math2D::Point2D<float> position);
 
 		/**
-		 * @brief Gets the current position of the physics body for the given entity.
-		 *
-		 * @param entity The entity whose physics body position is to be retrieved.
-		 * @return The position of the physics body in world units.
-		 */
-		const Math2D::Point2D<float> Physics_GetPosition(Entity entity);
-
-		/**
 		 * @brief Gets the top-left position of the physics body for the given entity.
 		 *
 		 * @param entity The entity whose physics body top-left position is to be retrieved.
 		 * @return The top-left position of the physics body in world units.
 		 */
-		const Math2D::Point2D<float> Physics_GetTopLeftPosition(Entity entity);
+		const Math2D::Point2D<float> Physics_GetPosition(Entity entity);
+
+		const Math2D::Point2D<int> Camera_GetTransformPosition(Entity entity);
 
 		/**
 		 * @brief Applies a force to the physics body of the given entity.
@@ -703,7 +706,7 @@ namespace Engine
 		* @param tileId The number that identifies the tile in the map.
 		* @param updaterCallback The callback to be executed.
 		*/
-		void Scenes_AddPhysicsUpdaterComponent(const std::string& sceneName, size_t tileId, std::function<void(Entity entity)> updaterCallback);
+		void Scenes_AddPhysicsUpdaterComponent(const std::string& sceneName, const int layer, size_t tileId, std::function<void(Entity entity)> updaterCallback);
 
 		/**
 		* @brief Registers an "on scene play event" which adds a component of
@@ -717,7 +720,7 @@ namespace Engine
 		* @param tileId The number that identifies the tile in the map.
 		* @param updaterCallback The callback to be executed.
 		*/
-		void Scenes_AddCameraUpdaterComponent(const std::string& sceneName, size_t tileId, std::function<void(Entity entity)> updaterCallback);
+		void Scenes_AddCameraUpdaterComponent(const std::string& sceneName, const int layer, size_t tileId, std::function<void(Entity entity)> updaterCallback);
 		/*void Scenes_AddPhysicsBodyComponent(const std::string& sceneName, size_t tileId, const bool enabled, BodyType bodyType, Filter category, Filter mask,
 			Math2D::Point2D<float> dimensions, Math2D::Point2D<float> startingPosition, float rotation, bool gravityOn, bool checkSimpleContacts, bool drawDebug, bool fillRect, DebugColor debugColor);
 		void Scenes_AddChainColliderComponent(const std::string& sceneName, size_t tileId, Math2D::Chain refPoints,

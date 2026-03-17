@@ -43,7 +43,7 @@ namespace Engine
 		* 
 		* @return A vector of entities associated with the specified tile ID.
 		*/
-		const std::vector<Entity>& GetTileMapEntities(const std::string& sceneName, const size_t tileId) const;
+		const std::vector<Entity>& GetTileMapEntities(const std::string& sceneName, const int layer, const size_t tileId) const;
 
 		/**
 		* @brief Gets the entity associated with a specific tile ID in a given scene.
@@ -53,7 +53,7 @@ namespace Engine
 		* 
 		* @return The entity associated with the specified tile ID.
 		*/
-		const Entity GetEntity(const std::string& sceneName, const size_t tileId);
+		const Entity GetEntity(const std::string& sceneName, const int layer, const size_t tileId);
 
 		/**
 		* @brief Gets the entities associated with a specific tile ID in a given scene.
@@ -63,7 +63,7 @@ namespace Engine
 		* 
 		* @return A vector of entities associated with the specified tile ID.
 		*/
-		const std::vector<Entity>& GetEntities(const std::string& sceneName, const size_t tileId);
+		const std::vector<Entity>& GetEntities(const std::string& sceneName, const int layer, const size_t tileId);
 
 		/**
 		* @brief Registers a function to be called when the scene starts playing.
@@ -119,7 +119,7 @@ namespace Engine
 		* @param componentArgs The arguments to pass to the component constructor.
 		*/
 		template <typename T, typename... Args>
-		void AddComponent(const std::string& sceneName, size_t tileId, Args&&... componentArgs)
+		void AddComponent(const std::string& sceneName, const int layer, size_t tileId, Args&&... componentArgs)
 		{
 			auto it = m_scenes.find(sceneName);
 			if (it == m_scenes.end())
@@ -128,12 +128,14 @@ namespace Engine
 				return;
 			}
 
-			const auto& entities = it->second.GetTileMapEntities(tileId);
+			const auto& entities = it->second.GetTileMapEntities(layer, tileId);
 
 			auto stored = std::make_tuple(std::forward<Args>(componentArgs)...);
 
 			for (Entity entity : entities)
 			{
+
+				ENGINE_CRITICAL_D("TILE ID: {}, ENTITY: {}", tileId, entity);
 				std::apply([&](auto&... xs) {
 					m_refECS.AddComponent<T>(entity, xs...);
 					}, stored);

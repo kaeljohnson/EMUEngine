@@ -81,19 +81,19 @@ namespace Engine
 
 	// Scene management
 
-	Entity EMU::Scenes_GetEntityById(const std::string& sceneName, const size_t tileId)
+	Entity EMU::Scenes_GetEntityById(const std::string& sceneName, const int layer, const size_t tileId)
 	{
-		return m_application->m_sceneManager.GetEntity(sceneName, tileId);
+		return m_application->m_sceneManager.GetEntity(sceneName, layer, tileId);
 	}
 
-	const std::vector<Entity>& EMU::Scenes_GetEntitiesById(const std::string& sceneName, const size_t id)
+	const std::vector<Entity>& EMU::Scenes_GetEntitiesById(const std::string& sceneName, const int layer, const size_t id)
 	{
-		return m_application->m_sceneManager.GetEntities(sceneName, id);
+		return m_application->m_sceneManager.GetEntities(sceneName, layer, id);
 	}
 
-	Entity EMU::Scenes_GetCurrentRuntimeEntity(const size_t tileId)
+	Entity EMU::Scenes_GetCurrentRuntimeEntity(const int layer, const size_t tileId)
 	{
-		return m_application->m_sceneManager.GetCurrentScene()->GetTileMapEntity(tileId);
+		return m_application->m_sceneManager.GetCurrentScene()->GetTileMapEntity(layer, tileId);
 	}
 	
 	void EMU::Scenes_Activate(Entity entity) { m_application->m_sceneManager.GetCurrentScene()->Activate(entity); }
@@ -113,8 +113,10 @@ namespace Engine
 	void EMU::Scenes_SetGravity(const std::string& name, const Math2D::Point2D<float> gravity) { m_application->m_sceneManager.SetGravity(name, gravity); }
 	// void EMU::Scenes_Add(const std::string& name, Entity entity) { getScene(name).Add(entity); }
 	// void EMU::Scenes_Remove(const std::string& name, Entity entity) { getScene(name).Remove(entity); m_ecs.Deactivate(entity); }
-	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const size_t tileId) { return m_application->m_sceneManager.GetEntity(name, tileId); }
-	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const size_t tileId) { return m_application->m_sceneManager.GetTileMapEntities(name, tileId); }
+	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const int layer, const size_t tileId) { return m_application->m_sceneManager.GetEntity(name, layer, tileId); }
+	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const int layer, const size_t tileId) { return m_application->m_sceneManager.GetTileMapEntities(name, layer, tileId); }
+
+	const bool EMU::Camera_InFrame(Entity entity) { return m_application->m_cameraInterface.InFrame(entity); }
 	void EMU::Camera_SetPixelsPerUnit(Entity entity, const int pixelsPerUnit) { m_application->m_cameraInterface.SetPixelsPerUnit(entity, pixelsPerUnit); }
 	const size_t EMU::Camera_GetPixelsPerUnit(Entity entity) { return m_application->m_cameraInterface.GetPixelsPerUnit(entity); }
 	void EMU::Camera_SetOffset(Entity entity, const Math2D::Point2D<float> offset) { m_application->m_cameraInterface.SetOffset(entity, offset); }
@@ -135,7 +137,7 @@ namespace Engine
 	void EMU::Physics_SetStartingPosition(Entity entity, const Math2D::Point2D<float> position) { m_application->m_physicsInterface.SetStartingPosition(entity, position); }
 	void EMU::Physics_SetPosition(Entity entity, const Math2D::Point2D<float> position) { m_application->m_physicsInterface.SetPosition(entity, position); }
 	const Math2D::Point2D<float> EMU::Physics_GetPosition(Entity entity) { return m_application->m_physicsInterface.GetPosition(entity); }
-	const Math2D::Point2D<float> EMU::Physics_GetTopLeftPosition(Entity entity) { return m_application->m_physicsInterface.GetTopLeftPosition(entity); }
+	const Math2D::Point2D<int> EMU::Camera_GetTransformPosition(Entity entity) { return m_application->m_cameraInterface.GetScreenPosition(entity); }
 	void EMU::Physics_ApplyForceToBody(Entity entity, Math2D::Point2D<float> force) { m_application->m_physicsInterface.ApplyForceToBody(entity, force); }
 	void EMU::Physics_ApplyImpulseToBody(Entity entity, Math2D::Point2D<float> impulse) { m_application->m_physicsInterface.ApplyImpulseToBody(entity, impulse); }
 	void EMU::Physics_SetVelocity(Entity entity, const Math2D::Point2D<float> velocity) { m_application->m_physicsInterface.SetVelocity(entity, velocity); }
@@ -175,24 +177,32 @@ namespace Engine
 	// const Math2D::Point2D<int> EMU::GetVirtualSize() { return Screen::GetVirtualSize(); }
 	const int EMU::GetScale() { return Screen::GetScale(); }
 	const Math2D::Point2D<int> EMU::GetWindowSize() { return Screen::GetWindowSize(); }
-	void EMU::SetWindowSize(const Math2D::Point2D<int>& size) { Screen::SetWindowSize(size); }
+	void EMU::SetWindowSize(const Math2D::Point2D<int>& size) 
+	{ 
+		Screen::SetWindowSize(size);
+		ENGINE_CRITICAL_D("New size: {}", size.X);
+		
+		m_application->m_cameraInterface.SetSize(size);
+		
+	}
 	void EMU::SetFullscreen() { Screen::SetFullscreen(); }
 
 
 	
 	template<class ComponentType, class... Args>
-	void RegisterAddOnPlay(EMU* emu, const std::string& sceneName, size_t tileId, Args&&... args)
+	void RegisterAddOnPlay(EMU* emu, const std::string& sceneName, const int layer, size_t tileId, Args&&... args)
 	{
 		auto packed = std::make_tuple(std::forward<Args>(args)...);
 
 		emu->Scenes_RegisterOnPlayEvent(
 			sceneName,
-			[emu, sceneName, tileId, packed = std::move(packed)]() mutable
+			[emu, sceneName, layer, tileId, packed = std::move(packed)]() mutable
 			{
 				std::apply([&](auto&... unpacked)
 					{
 						emu->m_application->m_sceneManager.AddComponent<ComponentType>(
 							sceneName,
+							layer,
 							tileId,
 							unpacked...);
 					}, packed);
@@ -201,24 +211,28 @@ namespace Engine
 
 	void EMU::Scenes_AddPhysicsUpdaterComponent(
 		const std::string& sceneName,
+		const int layer,
 		size_t tileId,
 		std::function<void(Entity)> updaterCallback)
 	{
 		RegisterAddOnPlay<PhysicsUpdater>(
 			this,
 			sceneName,
+			layer,
 			tileId,
 			updaterCallback
 		);
 	}
 
 	void EMU::Scenes_AddCameraUpdaterComponent(const std::string& sceneName, 
+		const int layer,
 		size_t tileId, 
 		std::function<void(Entity entity)> updaterCallback) 
 	{
 		RegisterAddOnPlay<CameraUpdater>(
 			this,
 			sceneName,
+			layer,
 			tileId,
 			updaterCallback
 		);

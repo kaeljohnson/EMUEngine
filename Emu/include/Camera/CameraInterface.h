@@ -47,6 +47,12 @@ namespace Engine
 		*/
 		const Math2D::Point2D<float> GetOffset(Entity entity);
 
+		const Math2D::Point2D<int> GetScreenPosition(Entity entity);
+
+		const bool InFrame(Entity entity);
+
+		void SetSize(const Math2D::Point2D<int> size);
+
 		/**
 		* @brief Sets whether clamping is enabled for the entity's camera.
 		* 

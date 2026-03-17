@@ -41,7 +41,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 
 	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::G_KEY_DOWN, [](Engine::IOEvent& e)
 		{
-			Engine::Entity entity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
+			Engine::Entity entity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1, 1);
 			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::G_KEY_DOWN));
 			Engine::EMU::GetInstance()->Camera_SetPixelsPerUnit(entity, 16);
 			e.Handled = true;
@@ -49,7 +49,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 
 	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::H_KEY_DOWN, [](Engine::IOEvent& e)
 		{
-			Engine::Entity entity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
+			Engine::Entity entity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1, 1);
 			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::H_KEY_DOWN));
 			Engine::EMU::GetInstance()->Camera_SetPixelsPerUnit(entity, 32);
 			e.Handled = true;
@@ -58,21 +58,21 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::O_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			CLIENT_LOG_D("Handled event O KEY DOWN: {}", static_cast<int>(Engine::O_KEY_DOWN));
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(40);
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(2, 40);
 			Engine::EMU::GetInstance()->Scenes_Deactivate(testEntity);
 			CLIENT_LOG_D("Done with O key down listener");
 		});
 
 	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::O_KEY_UP, [](Engine::IOEvent& e)
 		{
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(40);
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(2, 40);
 			Engine::EMU::GetInstance()->Scenes_Activate(testEntity);
 		});
 
 	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::B_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::B_KEY_DOWN));
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1, 1);
 			Engine::EMU::GetInstance()->Physics_SetDimensions(testEntity, Math2D::Point2D<float>(0.5f, 1.7f));
 			e.Handled = true;
 		});
@@ -80,7 +80,7 @@ AppManagementEventHandlers::AppManagementEventHandlers()
 	Engine::EMU::GetInstance()->Global_RegisterIOEventListener(Engine::N_KEY_DOWN, [](Engine::IOEvent& e)
 		{
 			CLIENT_LOG_D("Handled event: {}", static_cast<int>(Engine::N_KEY_DOWN));
-			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1);
+			Engine::Entity testEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1, 1);
 			Engine::EMU::GetInstance()->Physics_SetDimensions(testEntity, Math2D::Point2D<float>(0.5f, 0.85));
 			e.Handled = true;
 		});

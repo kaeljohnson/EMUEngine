@@ -444,9 +444,9 @@ namespace Engine
 		m_physicsSimulation.UpdateGravity(gravity);
 	}
 
-	const Entity Scene::GetTileMapEntity(size_t tileId) const
+	const Entity Scene::GetTileMapEntity(int layer, size_t tileId) const
 	{
-		return m_layers.at(1).m_tileMap->GetEntity(tileId);
+		return m_layers.at(layer).m_tileMap->GetEntity(tileId);
 	}
 
 	void Scene::loadAudioFiles()

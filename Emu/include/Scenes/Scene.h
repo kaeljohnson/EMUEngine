@@ -138,7 +138,7 @@ namespace Engine
 		* 
 		* @return The Entity associated with the specified character.
 		*/
-		const Entity GetTileMapEntity(size_t tileId) const;
+		const Entity GetTileMapEntity(int layer, size_t tileId) const;
 
 		/**
 		* @brief Gets all entities associated with a specific character in the tile map.
@@ -147,9 +147,9 @@ namespace Engine
 		* 
 		* @return A vector of Entities associated with the specified character.
 		*/
-		inline const std::vector<Entity>& GetTileMapEntities(const size_t tileId) const
+		inline const std::vector<Entity>& GetTileMapEntities(const int layer, const size_t tileId) const
 		{
-			return m_layers.at(1).m_tileMap->GetEntities(tileId);
+			return m_layers.at(layer).m_tileMap->GetEntities(tileId);
 		}
 
 		/**

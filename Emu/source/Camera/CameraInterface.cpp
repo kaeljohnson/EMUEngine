@@ -41,6 +41,12 @@ namespace Engine
 		return m_refECS.GetComponent<Camera>(entity)->m_offset;
 	}
 
+	const Math2D::Point2D<int> CameraInterface::GetScreenPosition(Entity entity)
+	{
+		Transform* ptrTransform = m_refECS.GetComponent<Transform>(entity);
+		return ptrTransform->m_positionOnScreen;
+	}
+
 	void CameraInterface::SetClampingOn(Entity entity, const bool clampingOn)
 	{
 		m_refECS.GetComponent<Camera>(entity)->m_clampingOn = clampingOn;
@@ -49,5 +55,39 @@ namespace Engine
 	const bool CameraInterface::GetClampingOn(Entity entity)
 	{
 		return m_refECS.GetComponent<Camera>(entity)->m_clampingOn;
+	}
+
+	void CameraInterface::SetSize(const Math2D::Point2D<int> size)
+	{
+		std::vector<Camera>& activeCameras = m_refECS.GetHotComponents<Camera>();
+		if (activeCameras.size() == 0)
+		{
+			ENGINE_ERROR("No active cameras in the scene. Cannot set camera size.");
+			std::exit(1);
+		}
+		for (auto& refCamera : activeCameras)
+		{
+			refCamera.m_size = Math2D::Point2D<float>((Screen::WINDOW_SIZE.X * refCamera.m_viewportSizeInPercentageOfScreen.X) / (refCamera.m_pixelsPerUnit * Screen::SCALE),
+				(Screen::WINDOW_SIZE.Y * refCamera.m_viewportSizeInPercentageOfScreen.Y) / (refCamera.m_pixelsPerUnit * Screen::SCALE));
+		}
+	}
+
+	const bool CameraInterface::InFrame(Entity entity)
+	{
+		Transform* ptrTransform = m_refECS.GetComponent<Transform>(entity);
+		if (!ptrTransform)
+			return false;
+
+		std::vector<Camera>& activeCameras = m_refECS.GetHotComponents<Camera>();
+		for (auto& refCamera : activeCameras)
+		{
+			const bool inHorizontalBounds = ptrTransform->m_position.X + refCamera.m_size.X >= refCamera.m_offset.X &&
+				ptrTransform->m_position.X <= refCamera.m_offset.X + refCamera.m_size.X;
+			const bool inVerticalBounds = ptrTransform->m_position.Y + refCamera.m_size.Y >= refCamera.m_offset.Y &&
+				ptrTransform->m_position.Y <= refCamera.m_offset.Y + refCamera.m_size.Y;
+			if (inHorizontalBounds && inVerticalBounds)
+				return true;
+		}
+		return false;
 	}
 }

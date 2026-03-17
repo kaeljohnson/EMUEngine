@@ -72,20 +72,20 @@ namespace Engine
 
 	void PhysicsInterface::SetPosition(Entity entity, Math2D::Point2D<float> position)
 	{
-		b2BodyId bodyId = *GetBody(entity)->m_bodyId;
+		PhysicsBody* ptrBody = GetBody(entity);
+		b2BodyId bodyId = *ptrBody->m_bodyId;
 		b2Rot rotation = b2Body_GetRotation(bodyId);
-		b2Body_SetTransform(bodyId, b2Vec2(position.X, position.Y), rotation);
+
+		// Box2D uses the center of the body as the position, but we want to set the position based on the top-left corner for our rendering and logic, so we need to offset it by the half dimensions of the body.
+		b2Body_SetTransform(bodyId, b2Vec2(position.X - ptrBody->m_halfDimensions.X, position.Y - ptrBody->m_halfDimensions.Y), rotation);
 	}
 
 	const Math2D::Point2D<float> PhysicsInterface::GetPosition(Entity entity)
 	{
-		return GetBody(entity)->m_position;
-	}
-
-	const Math2D::Point2D<float> PhysicsInterface::GetTopLeftPosition(Entity entity)
-	{
 		PhysicsBody* ptrBody = GetBody(entity);
 		b2Vec2 position = b2Body_GetPosition(*ptrBody->m_bodyId);
+
+		// Box2D gives the position of the center of the body, but we want the top-left corner for our rendering and logic, so we need to offset it by the half dimensions of the body.
 		return Math2D::Point2D<float>(position.x - ptrBody->m_halfDimensions.X, position.y - ptrBody->m_halfDimensions.Y);
 	}
 

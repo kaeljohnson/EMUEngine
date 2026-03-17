@@ -17,11 +17,11 @@
         m_currentState(PlayerState::Idle), m_currentDirection(PlayerDirection::Right)
     {
         CLIENT_CRITICAL_D("Adding player");
-        Engine::EMU::GetInstance()->Scenes_AddPhysicsUpdaterComponent("StartScreen", 1, 
+        Engine::EMU::GetInstance()->Scenes_AddPhysicsUpdaterComponent("StartScreen", 1, 1, 
             [this](Engine::Entity entity) { Update(entity); });
 
-        Engine::EMU::GetInstance()->Scenes_AddPhysicsUpdaterComponent("Level1", 1,
-            [this](Engine::Entity entity) { Update(entity); });
+        //Engine::EMU::GetInstance()->Scenes_AddPhysicsUpdaterComponent("Level1", 1,
+        //    [this](Engine::Entity entity) { Update(entity); });
 		
         // Engine::EMU::GetInstance()->Scenes_AddComponent<Engine::PhysicsUpdater>("Level2", 1,
         //    [this](Engine::Entity entity) { Update(entity); });	

@@ -94,6 +94,8 @@ namespace Engine
 				const int locationInPixelsOnScreenY =
 					int(objectTop * scaleInPixels);
 
+				refTransform.m_positionOnScreen = Math2D::Point2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY);
+
 				renderBuckets[refTransform.m_layer].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are within 1-10
 					refTransform.m_entity,
 					Math2D::Point2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY),

@@ -4,6 +4,7 @@
 #include "../include/EventHandlers/AppManagementEventHandlers.h"
 #include "../include/Player/Player.h"
 #include "../include/Camera/PlayerCamera.h"
+#include "../include/Clouds/Cloud.h"
 
 #include <iostream>
 #include <mutex>
@@ -71,6 +72,8 @@ int main(int argc, char* args[])
 			Engine::EMU::GetInstance()->Scenes_UnRegisterIOEventListener("StartScreen", Engine::W_KEY_DOWN);
 		});
 
+
+	Cloud cloud;
 	PlayerCamera playerCamera;
 
 	engine->Scenes_Load("StartScreen");

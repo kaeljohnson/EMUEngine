@@ -85,22 +85,13 @@ namespace Engine
 		void SetPosition(Entity entity, const Math2D::Point2D<float> position);
 
 		/**
-		* @brief Get the position of an entity's physics body.
-		*
-		* @param entity The entity to get the position for.
-		*
-		* @return The position of the physics body.
-		*/
-		const Math2D::Point2D<float> GetPosition(Entity entity);
-
-		/**
 		* @brief Get the top-left position of an entity's physics body.
 		*
 		* @param entity The entity to get the top-left position for.
 		*
 		* @return The top-left position of the physics body.
 		*/
-		const Math2D::Point2D<float> GetTopLeftPosition(Entity entity);
+		const Math2D::Point2D<float> GetPosition(Entity entity);
 
 		/**
 		* @brief Apply a force to an entity's physics body.

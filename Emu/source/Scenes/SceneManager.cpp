@@ -46,12 +46,12 @@ namespace Engine
 		}
 	}
 
-	const Entity SceneManager::GetEntity(const std::string& sceneName, const size_t tileId)
+	const Entity SceneManager::GetEntity(const std::string& sceneName, const int layer, const size_t tileId)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
 		{
-			return it->second.GetTileMapEntity(tileId);
+			return it->second.GetTileMapEntity(layer, tileId);
 		}
 		else
 		{
@@ -60,12 +60,12 @@ namespace Engine
 		}
 	}
 
-	const std::vector<Entity>& SceneManager::GetEntities(const std::string& sceneName, const size_t tileId)
+	const std::vector<Entity>& SceneManager::GetEntities(const std::string& sceneName, const int layer, const size_t tileId)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
 		{
-			return it->second.GetTileMapEntities(tileId);
+			return it->second.GetTileMapEntities(layer, tileId);
 		}
 		else
 		{
@@ -93,12 +93,12 @@ namespace Engine
 		m_scenes.clear();
 	}
 
-	const std::vector<Entity>& SceneManager::GetTileMapEntities(const std::string& sceneName, const size_t tileId) const 
+	const std::vector<Entity>& SceneManager::GetTileMapEntities(const std::string& sceneName, const int layer, const size_t tileId) const 
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end()) 
 		{
-			return it->second.GetTileMapEntities(tileId);
+			return it->second.GetTileMapEntities(layer, tileId);
 		}
 		else 
 		{

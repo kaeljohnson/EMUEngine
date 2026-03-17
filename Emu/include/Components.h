@@ -44,6 +44,7 @@ namespace Engine
 		int m_directionFacing;		/// Direction the entity is facing (1 for right, -1 for left).
 		bool m_drawDebug;			/// Flag indicating whether to draw debug information for this entity.
 		DebugColor m_debugColor;	/// Color to use for debug rendering.
+		Math2D::Point2D<int> m_positionOnScreen;		/// The position of the transform on the screen in pixels. This is updated by the camera system each tick.
 
 		Transform(Entity entity) : m_prevPosition(0.0f, 0.0f), m_position(0.0f, 0.0f),
 			m_rotation(0.0f), m_directionFacing(1), m_layer(0), m_parallaxFactor(1.0f),
