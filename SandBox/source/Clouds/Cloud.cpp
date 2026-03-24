@@ -20,22 +20,24 @@ Cloud::Cloud()
 // this is especially hard when parallax effect is involved. 
 void Cloud::Update(Engine::Entity entity)
 {
+	// CLIENT_CRITICAL("Entity: {}", entity);
 	Engine::Entity playerEntity = Engine::EMU::GetInstance()->Scenes_GetTileMapEntity("StartScreen", 1, 1);
-	const float cameraLeft = Engine::EMU::GetInstance()->Camera_GetOffset(playerEntity).X;
-	const float cameraRight = cameraLeft + Engine::EMU::GetInstance()->Camera_GetSize(playerEntity).X;
+	// const float cameraLeft = Engine::EMU::GetInstance()->Camera_GetOffset(playerEntity).X * 0.6f;
+	// const float cameraRight = cameraLeft + Engine::EMU::GetInstance()->Camera_GetSize(playerEntity).X;
 
-	const float cloudLeft = Engine::EMU::GetInstance()->Transform_GetPosition(entity).X;
+	const float cloudLeft = Engine::EMU::GetInstance()->Transform_GetPosition(entity).X; // Need a function like "GetSCreenPosition" that takes parallax into account so we don't have to do this math in client code.
 	const float cloudRight = cloudLeft + Engine::EMU::GetInstance()->Physics_GetDimensions(entity).X;
 
 	const float cloudY = Engine::EMU::GetInstance()->Transform_GetPosition(entity).Y;
 
-	CLIENT_CRITICAL_D("Camera left: {}, size: {}", cameraLeft, cameraRight);
-	CLIENT_CRITICAL_D("Cloud left on screen: {}, size: {}", cloudLeft, cloudRight);
+	// CLIENT_CRITICAL_D("Camera left: {}, size: {}", cameraLeft, cameraRight);
+	//CLIENT_CRITICAL_D("Cloud pos world space: {}x{}, size: {}", cloudLeft, cloudY, cloudRight);
 
 	// If the cloud has moved off the left side of the screen, reset its position to the right side
-	if (!Engine::EMU::GetInstance()->Camera_InFrame(entity))
+	//if (!Engine::EMU::GetInstance()->Camera_InFrame(entity))
+	if (cloudRight < 0.0f)
 	{
-		Engine::EMU::GetInstance()->Physics_SetPosition(entity, Math2D::Point2D<float>(cameraRight, cloudY));
+		Engine::EMU::GetInstance()->Physics_SetPosition(entity, Math2D::Point2D<float>(141.0f, cloudY));
 	}
 
 	/*if (cloudLeft > cameraRight)

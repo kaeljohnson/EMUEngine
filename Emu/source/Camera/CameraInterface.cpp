@@ -31,20 +31,14 @@ namespace Engine
 		return m_refECS.GetComponent<Camera>(entity)->m_size;
 	}
 
-	void CameraInterface::SetOffset(Entity entity, const Math2D::Point2D<float> offset)
+	void CameraInterface::SetPosition(Entity entity, const Math2D::Point2D<float> position)
 	{
-		m_refECS.GetComponent<Camera>(entity)->m_offset = offset;
+		m_refECS.GetComponent<Camera>(entity)->m_centerInWorldUnits = position;
 	}
 
-	const Math2D::Point2D<float> CameraInterface::GetOffset(Entity entity)
+	const Math2D::Point2D<float> CameraInterface::GetPosition(Entity entity)
 	{
-		return m_refECS.GetComponent<Camera>(entity)->m_offset;
-	}
-
-	const Math2D::Point2D<int> CameraInterface::GetScreenPosition(Entity entity)
-	{
-		Transform* ptrTransform = m_refECS.GetComponent<Transform>(entity);
-		return ptrTransform->m_positionOnScreen;
+		return m_refECS.GetComponent<Camera>(entity)->m_centerInWorldUnits;
 	}
 
 	void CameraInterface::SetClampingOn(Entity entity, const bool clampingOn)
@@ -69,25 +63,20 @@ namespace Engine
 		{
 			refCamera.m_size = Math2D::Point2D<float>((Screen::WINDOW_SIZE.X * refCamera.m_viewportSizeInPercentageOfScreen.X) / (refCamera.m_pixelsPerUnit * Screen::SCALE),
 				(Screen::WINDOW_SIZE.Y * refCamera.m_viewportSizeInPercentageOfScreen.Y) / (refCamera.m_pixelsPerUnit * Screen::SCALE));
+
+			ENGINE_CRITICAL("Camera size {}x{}", refCamera.m_size.X, refCamera.m_size.Y);
 		}
+		
 	}
 
 	const bool CameraInterface::InFrame(Entity entity)
 	{
-		Transform* ptrTransform = m_refECS.GetComponent<Transform>(entity);
-		if (!ptrTransform)
-			return false;
-
 		std::vector<Camera>& activeCameras = m_refECS.GetHotComponents<Camera>();
 		for (auto& refCamera : activeCameras)
 		{
-			const bool inHorizontalBounds = ptrTransform->m_position.X + refCamera.m_size.X >= refCamera.m_offset.X &&
-				ptrTransform->m_position.X <= refCamera.m_offset.X + refCamera.m_size.X;
-			const bool inVerticalBounds = ptrTransform->m_position.Y + refCamera.m_size.Y >= refCamera.m_offset.Y &&
-				ptrTransform->m_position.Y <= refCamera.m_offset.Y + refCamera.m_size.Y;
-			if (inHorizontalBounds && inVerticalBounds)
-				return true;
+			return refCamera.m_currentFramedEntities.find(entity) != refCamera.m_currentFramedEntities.end();
 		}
+
 		return false;
 	}
 }

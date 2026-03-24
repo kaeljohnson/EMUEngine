@@ -52,14 +52,16 @@ int main(int argc, char* args[])
 	CLIENT_INFO_D("Client Running!");
 
 	engine->Scenes_Create("StartScreenRules.json", "StartScreen");
-	// engine->Scenes_Create("Level1");
+	engine->Scenes_Create("Level1Rules.json", "Level1");
 
 	engine->Scenes_SetGravity("StartScreen", { 0.0f, 100.0f });
 
 	Player player;
 
-	engine->Scenes_RegisterContactCallback("StartScreen", Engine::BEGIN_SENSOR, 1, 40, [](const Engine::Contact event)
+	engine->Scenes_RegisterContactCallback("StartScreen", Engine::BEGIN_SENSOR, Math2D::Point2D<size_t>(1, 1), Math2D::Point2D<size_t>(2, 40), [](const Engine::Contact event)
 		{
+
+			CLIENT_INFO("At door");
 			Engine::EMU::GetInstance()->Scenes_RegisterIOEventListener("StartScreen", Engine::W_KEY_DOWN, [](Engine::IOEvent& e)
 				{
 					Engine::EMU::GetInstance()->Scenes_Load("Level1");
@@ -67,7 +69,7 @@ int main(int argc, char* args[])
 				});
 		});
 
-	engine->Scenes_RegisterContactCallback("StartScreen", Engine::END_SENSOR, 1, 40, [](const Engine::Contact event)
+	engine->Scenes_RegisterContactCallback("StartScreen", Engine::END_SENSOR, Math2D::Point2D<size_t>(1, 1), Math2D::Point2D<size_t>(2, 40), [](const Engine::Contact event)
 		{
 			Engine::EMU::GetInstance()->Scenes_UnRegisterIOEventListener("StartScreen", Engine::W_KEY_DOWN);
 		});

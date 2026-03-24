@@ -21,7 +21,7 @@ namespace Engine
 	public:
 		using ContactCallback = std::function<void(const Contact&)>; /// Callback function type for contact events
 
-		void AddPhysicsTileMap(TileMap* ptrTileMap) { m_ptrTileMap = ptrTileMap; }
+		void AddTileMap(size_t layerNum, TileMap* ptrTileMap) { m_tileMaps[layerNum] = ptrTileMap; }
 
 		/**
 		* @brief Registers a contact callback for a specific contact type and tile ID.
@@ -30,7 +30,7 @@ namespace Engine
 		* @param tileIdA The tile ID of the first entity
 		* @param callback The callback function to register
 		*/
-		void RegisterContactCallback(ContactType contactType, const size_t tileIdA, ContactCallback callback);
+		void RegisterContactCallback(ContactType contactType, const Math2D::Point2D<size_t> tileIdA, ContactCallback callback);
 
 		/**
 		* @brief Activates a contact callback for a specific contact type and entities.
@@ -50,7 +50,7 @@ namespace Engine
 		* @param tileIdB The tile ID of the second entity
 		* @param callback The callback function to register
 		*/
-		void RegisterContactCallback(ContactType contactType, const size_t tileIdA, const size_t tileIdB, ContactCallback callback);
+		void RegisterContactCallback(ContactType contactType, const Math2D::Point2D<size_t> tileIdA, const Math2D::Point2D<size_t> tileIdB, ContactCallback callback);
 
 		/**
 		* @brief Activates a contact callback for a specific contact type and entity.
@@ -60,6 +60,8 @@ namespace Engine
 		* @param callback The callback function to activate
 		*/
 		void ActivateContactCallback(ContactType contactType, Entity entityA, ContactCallback callback);
+
+		void SetNumLayers(size_t numLayers);
 
 	public:
 		/**
@@ -90,10 +92,13 @@ namespace Engine
 
 	private:
 		ECS& m_refECS;				/// Reference to the ECS
-		TileMap* m_ptrTileMap;		/// Reference to the TileMap
 
-		std::vector<std::tuple<ContactType, const size_t, ContactCallback>> m_singleEntityContactCallbacks;			/// Single entity contact callbacks
-		std::vector<std::tuple<ContactType, const size_t, const size_t, ContactCallback>> m_multiContactCallbacks;	/// Multi-entity contact callbacks
+		std::vector<TileMap*> m_tileMaps;	/// Vector of pointers to TileMaps for each layer
+		// TileMap* m_ptrTileMap;		/// Reference to the TileMap
+
+
+		std::vector<std::tuple<ContactType, const Math2D::Point2D<size_t>, ContactCallback>> m_singleEntityContactCallbacks;			/// Single entity contact callbacks
+		std::vector<std::tuple<ContactType, const Math2D::Point2D<size_t>, const Math2D::Point2D<size_t>, ContactCallback>> m_multiContactCallbacks;	/// Multi-entity contact callbacks
 
 		std::unordered_map<SingleEntityBeginContactKey, ContactCallback> m_beginSingleEntityContactCallbacks;		/// Single entity begin contact callbacks
 		std::unordered_map<SingleEntityBeginContactKey, ContactCallback> m_beginSingleEntitySensingCallbacks;		/// Single entity begin sensing callbacks

@@ -37,7 +37,7 @@ namespace Engine
 		*/
 		void UpdateGravity(const Math2D::Point2D<float> gravity);
 
-		void AddPhysicsTileMap(TileMap* ptrTileMap) { m_contactSystem.AddPhysicsTileMap(ptrTileMap); }
+		void AddPhysicsTileMap(size_t layerNum, TileMap* ptrTileMap) { m_contactSystem.AddTileMap(layerNum, ptrTileMap); }
 
 		/**
 		* @brief Add physics bodies from entities to the world.

@@ -34,21 +34,21 @@ void PlayerCamera::Update(Engine::Entity entity)
 	Math2D::Point2D<float> cameraSize = Engine::EMU::GetInstance()->Camera_GetSize(entity);
 
 	// Calculate the desired camera position based on the target's position
-	float desiredCameraTopLeftX = targetPos.X - (cameraSize.X / 2.0f);
-	float desiredCameraTopLeftY = targetPos.Y - (cameraSize.Y / 2.0f);
+	float desiredCameraCenterX = targetPos.X; // -(cameraSize.X / 2.0f);
+	float desiredCameraCenterY = targetPos.Y; // -(cameraSize.Y / 2.0f);
 
 	// Set the camera offset to the desired position
-	Engine::EMU::GetInstance()->Camera_SetOffset(entity, Math2D::Point2D<float>(desiredCameraTopLeftX, desiredCameraTopLeftY));
+	Engine::EMU::GetInstance()->Camera_SetPosition(entity, Math2D::Point2D<float>(desiredCameraCenterX, desiredCameraCenterY));
 
 	// Update minimap
-	Engine::Entity miniMapEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1, 2);
+	/*Engine::Entity miniMapEntity = Engine::EMU::GetInstance()->Scenes_GetCurrentRuntimeEntity(1, 2);
 
 	Math2D::Point2D<float> miniMapSize = Engine::EMU::GetInstance()->Camera_GetSize(miniMapEntity);
 
 	float desiredCameraTopLeftXMiniMap = targetPos.X - (miniMapSize.X / 2.0f);
 	float desiredCameraTopLeftYMiniMap = targetPos.Y - (miniMapSize.Y / 2.0f);
 
-	Engine::EMU::GetInstance()->Camera_SetOffset(miniMapEntity, Math2D::Point2D<float>(desiredCameraTopLeftXMiniMap, desiredCameraTopLeftYMiniMap));
+	Engine::EMU::GetInstance()->Camera_SetOffset(miniMapEntity, Math2D::Point2D<float>(desiredCameraTopLeftXMiniMap, desiredCameraTopLeftYMiniMap));*/
 
     return;
 }

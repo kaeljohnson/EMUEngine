@@ -90,7 +90,7 @@ namespace Engine
 		* @param entityB The second entity involved in the contact.
 		* @param callback The callback function to be invoked when the contact event occurs.
 		*/
-		void RegisterContactCallback(const std::string& sceneName, ContactType contactType, const size_t entityA, const size_t entityB, Scene::ContactCallback callback);
+		void RegisterContactCallback(const std::string& sceneName, ContactType contactType, const Math2D::Point2D<size_t> tileIdA, const Math2D::Point2D<size_t> tileIdB, Scene::ContactCallback callback);
 
 		/**
 		* @brief Registers a contact callback for a specific entity in a given scene.
@@ -100,7 +100,7 @@ namespace Engine
 		* @param entity The entity involved in the contact.
 		* @param callback The callback function to be invoked when the contact event occurs.
 		*/
-		void RegisterContactCallback(const std::string& sceneName, ContactType contactType, const size_t entity, Scene::ContactCallback callback);
+		void RegisterContactCallback(const std::string& sceneName, ContactType contactType, const Math2D::Point2D<size_t> tileId, Scene::ContactCallback callback);
 
 		/**
 		* @brief Sets the gravity for the physics simulation in a given scene.

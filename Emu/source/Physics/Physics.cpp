@@ -76,8 +76,12 @@ namespace Engine
 		b2BodyId bodyId = *ptrBody->m_bodyId;
 		b2Rot rotation = b2Body_GetRotation(bodyId);
 
+		// This function will artifact the body across the screen and can cause problems with collision detection.
+		// Any calls to this function should be put off until after the world step is complete, and should be used sparingly. 
+		// It's best to use this function for teleportation or other non-physical movement, and to use forces or impulses for regular movement.
+
 		// Box2D uses the center of the body as the position, but we want to set the position based on the top-left corner for our rendering and logic, so we need to offset it by the half dimensions of the body.
-		b2Body_SetTransform(bodyId, b2Vec2(position.X - ptrBody->m_halfDimensions.X, position.Y - ptrBody->m_halfDimensions.Y), rotation);
+		b2Body_SetTransform(bodyId, b2Vec2(position.X + ptrBody->m_halfDimensions.X, position.Y + ptrBody->m_halfDimensions.Y), rotation);
 	}
 
 	const Math2D::Point2D<float> PhysicsInterface::GetPosition(Entity entity)

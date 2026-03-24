@@ -14,6 +14,7 @@ namespace Engine
 
 	void SceneManager::AddScene(std::string sceneName, const std::string& rulesFileName, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
 	{
+		ENGINE_INFO("Adding scene: {}", sceneName);
 		m_scenes.emplace(std::piecewise_construct,
 			std::forward_as_tuple(sceneName),
 			std::forward_as_tuple(rulesFileName, m_refECS, refAssetManager, refIOEventSystem));
@@ -134,12 +135,12 @@ namespace Engine
 		}
 	}
 
-	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const size_t entityA, const size_t entityB, Scene::ContactCallback callback)
+	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const Math2D::Point2D<size_t> tileIdA, const Math2D::Point2D<size_t> tileIdB, Scene::ContactCallback callback)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
 		{
-			it->second.RegisterContactCallback(contactType, entityA, entityB, callback);
+			it->second.RegisterContactCallback(contactType, tileIdA, tileIdB, callback);
 		}
 		else
 		{
@@ -148,12 +149,12 @@ namespace Engine
 		}
 	}
 
-	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const size_t entity, Scene::ContactCallback callback)
+	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const Math2D::Point2D<size_t> tileId, Scene::ContactCallback callback)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
 		{
-			it->second.RegisterContactCallback(contactType, entity, callback);
+			it->second.RegisterContactCallback(contactType, tileId, callback);
 		}
 		else
 		{

@@ -44,7 +44,6 @@ namespace Engine
 		int m_directionFacing;		/// Direction the entity is facing (1 for right, -1 for left).
 		bool m_drawDebug;			/// Flag indicating whether to draw debug information for this entity.
 		DebugColor m_debugColor;	/// Color to use for debug rendering.
-		Math2D::Point2D<int> m_positionOnScreen;		/// The position of the transform on the screen in pixels. This is updated by the camera system each tick.
 
 		Transform(Entity entity) : m_prevPosition(0.0f, 0.0f), m_position(0.0f, 0.0f),
 			m_rotation(0.0f), m_directionFacing(1), m_layer(0), m_parallaxFactor(1.0f),
@@ -244,7 +243,8 @@ namespace Engine
 		Math2D::Point2D<float> m_viewPortPositionInPercentageOfScreen;				 /// Position of the camera in fraction of screen size (0.0 - 1.0).
 		Math2D::Point2D<float> m_viewportSizeInPercentageOfScreen;					 /// Screen ratio of the camera (width / height).
 
-		Math2D::Point2D<float> m_offset;						 /// Top left position of the camera in world units.
+		Math2D::Point2D<float> m_cameraTopLeftInWorldUnits;		 /// Top left position of the camera in world units.
+		Math2D::Point2D<float> m_centerInWorldUnits;			 /// Center position of the camera in world units. Calculated each frame based on m_cameraPosInWorldUnits and m_size.
 		Math2D::Point2D<float> m_size;							 /// Size of the camera in world units.
 
 		size_t m_pixelsPerUnit;									 /// Number of pixels per world unit.
@@ -252,7 +252,9 @@ namespace Engine
 		Math2D::Point2D<int> m_bounds;							 /// Bounds of the camera in pixels.
 		bool m_borderOn;										 /// Flag indicating whether to draw a border around the camera view.
 		size_t m_numLayers;										 /// Number of layers for rendering.
-		std::array<int, 3> m_backgroundColor;				 /// Background color of the camera in RGB format.
+		std::array<int, 3> m_backgroundColor;					 /// Background color of the camera in RGB format.
+
+		std::set<Entity> m_currentFramedEntities;				 /// TEMP data structure. Set of entities currently within the camera's view frame.
 
 		RenderBucket m_renderBucket;							 /// Bucket for storing renderable objects. Maps layer to vector of RenderObjects.
 		DebugRenderBucket m_debugRenderBucket;					 /// Bucket for storing renderable debug objects. Maps layer to vector of DebugObjects.
@@ -260,8 +262,8 @@ namespace Engine
 		DebugPointRenderBucket m_debugPointsRenderBucket;		 /// Bucket for storing renderable point objects. Maps layer to vector of debug points.
 
 		Camera(Entity entity)
-			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_viewportSizeInPercentageOfScreen(1.0f, 1.0f), m_numLayers(10),
-			m_viewPortPositionInPercentageOfScreen(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), m_borderOn(false),
+			: m_cameraTopLeftInWorldUnits(0.0f, 0.0f), m_size(0.0f, 0.0f), m_viewportSizeInPercentageOfScreen(1.0f, 1.0f), m_numLayers(10),
+			m_viewPortPositionInPercentageOfScreen(0.0f, 0.0f), m_pixelsPerUnit(16), m_clampingOn(true), m_borderOn(false),
 			m_bounds(0, 0), m_renderBucket(10, std::vector<RenderObject>()), m_backgroundColor({ 0, 0, 0 }),
 			m_debugRenderBucket(10, std::vector<DebugObject>()), m_debugLinesRenderBucket(10, std::vector<LineObject>()),
 			m_debugPointsRenderBucket(10, std::vector<DebugPointObject>()),
@@ -270,7 +272,7 @@ namespace Engine
 		Camera(Entity entity, Math2D::Point2D<float> size, Math2D::Point2D<float> screenRatio, 
 			Math2D::Point2D<float> position, size_t pixelsPerUnit, bool clampingOn, bool border, std::array<int, 3> backgroundColor, size_t numLayers)
 			: m_size(size), m_viewportSizeInPercentageOfScreen(screenRatio), m_viewPortPositionInPercentageOfScreen(position),
-			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0), 
+			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_cameraTopLeftInWorldUnits(0.0f, 0.0f), m_bounds(0, 0),
 			m_borderOn(border), m_renderBucket(numLayers, std::vector<RenderObject>()), m_backgroundColor(backgroundColor),
 			m_numLayers(numLayers), m_debugRenderBucket(numLayers, std::vector<DebugObject>()), 
 			m_debugLinesRenderBucket(numLayers, std::vector<LineObject>()), m_debugPointsRenderBucket(numLayers, std::vector<DebugPointObject>()),

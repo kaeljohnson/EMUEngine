@@ -15,12 +15,7 @@
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 
-static json rulesJson; // Only one rules file per game for now so this will work.
-static json sceneRules;
-static json worldLayers;
-static json sceneAssets;
-static json componentTemplates;
-static json characterRules;
+
 
 namespace Engine
 {
@@ -147,7 +142,7 @@ namespace Engine
 
 		try
 		{
-			inFile >> rulesJson;
+			inFile >> m_rulesJson;
 		}
 		catch (const json::parse_error& e)
 		{
@@ -155,18 +150,20 @@ namespace Engine
 			std::exit(1);
 		}
 
-		auto& sceneName = rulesJson.begin().key();
+		auto& sceneName = m_rulesJson.begin().key();
 		ENGINE_LOG_D("Loading audio files for scene: {}", sceneName);
 
-		sceneRules = *getJson(rulesJson, sceneName);
+		m_sceneRules = *getJson(m_rulesJson, sceneName);
 
-		worldLayers = *getJson(sceneRules, "WorldLayers");
+		m_worldLayers = *getJson(m_sceneRules, "WorldLayers");
 
-		sceneAssets = *getJson(sceneRules, "Assets");
+		m_sceneAssets = *getJson(m_sceneRules, "Assets");
 
-		componentTemplates = *getJson(sceneRules, "ComponentTemplates");
+		m_componentTemplates = *getJson(m_sceneRules, "ComponentTemplates");
 
-		characterRules = *getJson(sceneRules, "CharacterRules");
+		m_characterRules = *getJson(m_sceneRules, "CharacterRules");
+
+		m_physicsSimulation.m_contactSystem.SetNumLayers(m_worldLayers.size());
 
 		AddLayers();
 	}
@@ -176,14 +173,19 @@ namespace Engine
 		m_physicsSimulation.Cleanup();
 	}
 	
-	void Scene::RegisterContactCallback(ContactType contactType, const size_t entityA, const size_t entityB, ContactCallback callback)
+	void Scene::RegisterContactCallback(ContactType contactType, const Math2D::Point2D<size_t> tileIdA, const Math2D::Point2D<size_t> tileIdB, ContactCallback callback)
 	{
-		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entityA, entityB, callback);
+		// Entity entityA = GetTileMapEntity(layerId, tileIdA);
+		// Entity entityB = GetTileMapEntity(layerId, tileIdB);
+
+		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, tileIdA, tileIdB, callback);
 	}
 
-	void Scene::RegisterContactCallback(ContactType contactType, const size_t entity, ContactCallback callback)
+	void Scene::RegisterContactCallback(ContactType contactType, const Math2D::Point2D<size_t> tileId, ContactCallback callback)
 	{
-		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, entity, callback);
+		// Entity entity = GetTileMapEntity(layerId, tileId);
+
+		m_physicsSimulation.m_contactSystem.RegisterContactCallback(contactType, tileId, callback);
 	}
 
 	void Scene::RegisterOnScenePlayEvent(std::function<void()> func)
@@ -211,7 +213,7 @@ namespace Engine
 		// 3. Load the entities associated with the characters in the tile map.
 		//	  Adds components defined in the rules file and adds them to the ECS.
 		//    This function also activates the entites in the ECS.
-		loadSceneEntitiesFromTileMap();
+		loadSceneEntitiesFromTileMaps();
 
 		// 4. Activate entities with camera first.
 		for (auto& pair : m_cameraOrder)
@@ -227,7 +229,7 @@ namespace Engine
 		}
 
 		// 6. Frame the cameras
-		m_cameraSystem.Frame(Math2D::Point2D<int>(141, 22)); // TEMP
+		m_cameraSystem.Frame(Math2D::Point2D<int>(141, 42)); // TEMP
 		
 		// 7. Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld(m_entities);
@@ -286,12 +288,12 @@ namespace Engine
 
 	void Scene::AddLayers()
 	{
-		m_layers.resize(worldLayers.size()); // default layers
+		m_layers.resize(m_worldLayers.size()); // default layers
 
 		std::unordered_set<int> usedLayerIds;
 		std::unordered_set<std::string> usedTileMapPaths;
 
-		for (auto& [layerName, layerJson] : worldLayers.items())
+		for (auto& [layerName, layerJson] : m_worldLayers.items())
 		{
 			const int layerId = layerJson["id"].get<int>();
 
@@ -329,10 +331,12 @@ namespace Engine
 				std::exit(1);
 			}
 
+			ENGINE_INFO("Loading tile map for layer {} from path: {}", layerName, tileMapPath);
+
 			layer.m_tileMap.emplace(&m_refECS);
 			layer.m_tileMap->CreateMap(tileMapPath);
 
-			m_physicsSimulation.AddPhysicsTileMap(&(*layer.m_tileMap));
+			m_physicsSimulation.AddPhysicsTileMap(layerId, &(*layer.m_tileMap));
 
 			for (auto& [coords, info] : layer.m_tileMap->GetMap())
 			{
@@ -451,7 +455,7 @@ namespace Engine
 
 	void Scene::loadAudioFiles()
 	{
-		const json* assetsJson = getJson(sceneRules, "Assets");
+		const json* assetsJson = getJson(m_sceneRules, "Assets");
 		if (!assetsJson)
 		{
 			ENGINE_CRITICAL("Assets section not found in rules file. Continuing without.");
@@ -687,6 +691,8 @@ namespace Engine
 
 		if (physicsComponentTemplate.contains(physicsTemplateKey))
 		{
+			//std::string physicsBodyTemplate = ExtractStringFromJSON(physicsComponentTemplate, physicsTemplateKey, "");
+
 			json characterPhysicsRulesJson = physicsComponentTemplate[physicsTemplateKey];
 
 			// Physics library needs to know if the body is enabled or not.
@@ -1005,9 +1011,9 @@ namespace Engine
 		}
 	}
 
-	void Scene::loadSceneEntitiesFromTileMap()
+	void Scene::loadSceneEntitiesFromTileMaps()
 	{
-		const std::string& sceneName = rulesJson.begin().key();
+		const std::string& sceneName = m_rulesJson.begin().key();
 		ENGINE_LOG("Loading scene entities for scene: {}", sceneName);
 
 
@@ -1015,7 +1021,7 @@ namespace Engine
 		size_t numUnitsPerTile = 1;
 		size_t numLayers = 5;
 
-		const json* physicsRules = getJson(worldLayers, "Physics");
+		const json* physicsRules = getJson(m_worldLayers, "Physics");
 		if (!physicsRules)
 		{
 			ENGINE_ERROR("No physics layer found for world in scene: {}", sceneName);
@@ -1028,16 +1034,16 @@ namespace Engine
 		// Load Assets.
 
 		
-		verifyAssetPaths(sceneAssets);
+		verifyAssetPaths(m_sceneAssets);
 
-		const json* characterRules = getJson(sceneRules, "CharacterRules");
+		const json* characterRules = getJson(m_sceneRules, "CharacterRules");
 		if (!characterRules)
 		{
 			ENGINE_ERROR("No character rules found for scene: {}", sceneName);
 			std::exit(1);
 		}
 
-		const json* componentTemplates = getJson(sceneRules, "ComponentTemplates");
+		const json* componentTemplates = getJson(m_sceneRules, "ComponentTemplates");
 		if (!componentTemplates)
 		{
 			ENGINE_ERROR("No component templates found for scene: {}", sceneName);
@@ -1151,7 +1157,7 @@ namespace Engine
 							tileEntity,
 							*spriteSheetTemplates,
 							spriteSheetTemplateKey,
-							*getJson(sceneAssets, "Sprites")
+							*getJson(m_sceneAssets, "Sprites")
 						);
 				}
 

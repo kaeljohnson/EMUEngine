@@ -78,7 +78,7 @@ namespace Engine
 		* @param entityA: The character representing the first entity involved in the contact.
 		* @param entityB: The character representing the second entity involved in the contact.
 		*/
-		void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const size_t entityA, const size_t entityB, ContactCallback callback);
+		void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const Math2D::Point2D<size_t> tileIdA, const Math2D::Point2D<size_t> tileIdB, ContactCallback callback);
 
 		/**
 		* @brief Register a contact callback for a single entity identified by its character.
@@ -90,7 +90,7 @@ namespace Engine
 		* @param entity: The character representing the entity involved in the contact.
 		* @param callback: The function to be called when the contact event occurs.
 		*/
-		void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const size_t entity, ContactCallback callback);
+		void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const Math2D::Point2D<size_t> tileId, ContactCallback callback);
 
 		/**
 		* @brief Sets the physics simulation parameters for the scene with the given name.
@@ -239,7 +239,7 @@ namespace Engine
 		 * @param entity The entity whose camera offset is to be set.
 		 * @param offset The offset vector in world units.
 		 */
-		void Camera_SetOffset(Entity entity, const Math2D::Point2D<float> offset);
+		void Camera_SetPosition(Entity entity, const Math2D::Point2D<float> offset);
 
 		/**
 		 * @brief Gets the camera offset in world units.
@@ -247,7 +247,7 @@ namespace Engine
 		 * @param entity The entity whose camera offset is to be retrieved.
 		 * @return The offset vector in world units.
 		 */
-		const Math2D::Point2D<float> Camera_GetOffset(Entity entity);
+		const Math2D::Point2D<float> Camera_GetPosition(Entity entity);
 
 		/**
 		 * @brief Enables or disables camera clamping.
@@ -372,8 +372,6 @@ namespace Engine
 		 * @return The top-left position of the physics body in world units.
 		 */
 		const Math2D::Point2D<float> Physics_GetPosition(Entity entity);
-
-		const Math2D::Point2D<int> Camera_GetTransformPosition(Entity entity);
 
 		/**
 		 * @brief Applies a force to the physics body of the given entity.

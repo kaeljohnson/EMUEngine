@@ -16,24 +16,34 @@ namespace Engine
 
 	static void clamp(Camera& refCamera)
 	{
-		if (refCamera.m_offset.X < 0) { refCamera.m_offset.X = 0; }
-		if (refCamera.m_offset.X + refCamera.m_size.X > refCamera.m_bounds.X) { refCamera.m_offset.X = refCamera.m_bounds.X - refCamera.m_size.X; }
+		const Math2D::Point2D<float> offset = refCamera.m_size / 2.0f;
+		
 
-		if (refCamera.m_offset.Y < 0) { refCamera.m_offset.Y = 0; }
-		if (refCamera.m_offset.Y + refCamera.m_size.Y > refCamera.m_bounds.Y) { refCamera.m_offset.Y = refCamera.m_bounds.Y - refCamera.m_size.Y; }
+		// Clamp X
+		if (refCamera.m_centerInWorldUnits.X - offset.X < 0)
+			refCamera.m_centerInWorldUnits.X = offset.X;
+
+		if (refCamera.m_centerInWorldUnits.X + offset.X > refCamera.m_bounds.X)
+			refCamera.m_centerInWorldUnits.X = refCamera.m_bounds.X - offset.X;
+
+		// Clamp Y
+		if (refCamera.m_centerInWorldUnits.Y - offset.Y < 0)
+			refCamera.m_centerInWorldUnits.Y = offset.Y;
+
+		if (refCamera.m_centerInWorldUnits.Y + offset.Y > refCamera.m_bounds.Y)
+			refCamera.m_centerInWorldUnits.Y = refCamera.m_bounds.Y - offset.Y;
 	}
 
 	static void prepareForRendering(Camera& refCamera, AssetManager& refAssetManager, ECS& refECS,
 		const Math2D::Point2D<int> windowSizeInPixels, const int scale)
 	{
 		// auto start = std::chrono::high_resolution_clock::now();
-
 		auto& renderBuckets = refCamera.m_renderBucket;
 		auto& debugBuckets = refCamera.m_debugRenderBucket;
 		auto& debugLineBuckets = refCamera.m_debugLinesRenderBucket;
 		auto& pointBuckets = refCamera.m_debugPointsRenderBucket;
 
-		const size_t scaleInPixels = refCamera.m_pixelsPerUnit * scale;
+		size_t scaleInPixels = refCamera.m_pixelsPerUnit * scale;
 
 		// Camera setup
 		const Math2D::Point2D<float> windowSizeInUnits(
@@ -54,26 +64,39 @@ namespace Engine
 
 			// Get interpolated position of transform.
 			const float interpolation = Time::GetInterpolationFactor();
-			const float lerpedX = Math2D::Lerp(refTransform.m_prevPosition.X, refTransform.m_position.X, interpolation);
-			const float lerpedY = Math2D::Lerp(refTransform.m_prevPosition.Y, refTransform.m_position.Y, interpolation);
+			float lerpedX = Math2D::Lerp(refTransform.m_prevPosition.X, refTransform.m_position.X, interpolation);
+			float lerpedY = Math2D::Lerp(refTransform.m_prevPosition.Y, refTransform.m_position.Y, interpolation);
+
+			Math2D::Point2D<float> offset = { (refCamera.m_size / 2.0f) };
+
+			// refCamera.m_cameraTopLeftInWorldUnits = refCamera.m_centerInWorldUnits - offset;
 
 			if (Sprite* ptrSpriteComponent = refECS.GetComponent<Sprite>(refTransform.m_entity))
 			{
 				float offsetFromTransformX = ptrSpriteComponent->m_offsetFromTransform.X;
 				float offsetFromTransformY = ptrSpriteComponent->m_offsetFromTransform.Y;
 
+				// screenPos = (worldPos - cameraPosition * parallax) * zoom + screenCenter;
+
 				// 1. Culling
-				const float objectLeft = lerpedX + offsetFromTransformX - refCamera.m_offset.X * refTransform.m_parallaxFactor;
-				const float objectRight = objectLeft + ptrSpriteComponent->m_sizeInUnits.X;
-				const float objectTop = lerpedY + offsetFromTransformY - refCamera.m_offset.Y * refTransform.m_parallaxFactor;
-				const float objectBottom = objectTop + ptrSpriteComponent->m_sizeInUnits.Y;
+				const float objectLeftInCameraFrame = (lerpedX + offsetFromTransformX) - refCamera.m_centerInWorldUnits.X * refTransform.m_parallaxFactor + offset.X;
+				const float objectRightInCameraFrame = objectLeftInCameraFrame + ptrSpriteComponent->m_sizeInUnits.X;
+				const float objectTopInCameraFrame = (lerpedY + offsetFromTransformY) - refCamera.m_centerInWorldUnits.Y * refTransform.m_parallaxFactor + offset.Y;
+				const float objectBottomInCameraFrame = objectTopInCameraFrame + ptrSpriteComponent->m_sizeInUnits.Y;
 
 				const bool isVisible =
-					objectRight - 1 >= leftRenderBound && objectLeft + 2 <= rightRenderBound &&
-					objectBottom - 1 >= topRenderBound && objectTop + 1 <= bottomRenderBound;
+					objectRightInCameraFrame - 1 >= leftRenderBound && objectLeftInCameraFrame + 2 <= rightRenderBound &&
+					objectBottomInCameraFrame - 1 >= topRenderBound && objectTopInCameraFrame + 1 <= bottomRenderBound;
 
 				if (!isVisible)
+				{
+					refCamera.m_currentFramedEntities.erase(refTransform.m_entity); // Entity is not in frame, remove it from camera's in frame set if it exists.
 					continue;
+				}
+
+				// Entity is in frame, add it to render bucket along with camera's in frame set.
+
+				refCamera.m_currentFramedEntities.insert(refTransform.m_entity);
 
 				int width = int(ptrSpriteComponent->m_sizeInUnits.X * scaleInPixels);
 				int height = int(ptrSpriteComponent->m_sizeInUnits.Y * scaleInPixels);
@@ -90,11 +113,12 @@ namespace Engine
 
 				// Screen-space coordinates
 				const int locationInPixelsOnScreenX =
-					int(objectLeft * scaleInPixels);
+					int(objectLeftInCameraFrame * scaleInPixels);
 				const int locationInPixelsOnScreenY =
-					int(objectTop * scaleInPixels);
+					int(objectTopInCameraFrame * scaleInPixels);
 
-				refTransform.m_positionOnScreen = Math2D::Point2D<int>(locationInPixelsOnScreenX, locationInPixelsOnScreenY);
+				//if (refTransform.m_entity == 1)
+					// ENGINE_CRITICAL("Cloud screen pos: {}, {}", locationInPixelsOnScreenX, locationInPixelsOnScreenY);
 
 				renderBuckets[refTransform.m_layer].emplace_back( // No check if index is in bounds. Client needs to make sure all z indices are within 1-10
 					refTransform.m_entity,
@@ -111,8 +135,8 @@ namespace Engine
 					pointBuckets[refTransform.m_layer].emplace_back(
 						refTransform.m_entity,
 						Math2D::Point2D<int>(
-							int(objectLeft * scaleInPixels),
-							int(objectTop * scaleInPixels)
+							int(objectLeftInCameraFrame * scaleInPixels),
+							int(objectTopInCameraFrame * scaleInPixels)
 						),
 						refTransform.m_debugColor
 					);
@@ -133,9 +157,19 @@ namespace Engine
 #ifndef NDEBUG
 			if (PhysicsBody* ptrPhysicsBody = refECS.GetComponent<PhysicsBody>(refTransform.m_entity))
 			{
-				const float objectLeft = refTransform.m_position.X - refCamera.m_offset.X * refTransform.m_parallaxFactor;
+
+				const float objectLeft =
+					refTransform.m_position.X
+					- refCamera.m_centerInWorldUnits.X * refTransform.m_parallaxFactor
+					+ offset.X;
+
 				const float objectRight = objectLeft + ptrPhysicsBody->m_dimensions.X;
-				const float objectTop = refTransform.m_position.Y - refCamera.m_offset.Y * refTransform.m_parallaxFactor;
+
+				const float objectTop =
+					refTransform.m_position.Y
+					- refCamera.m_centerInWorldUnits.Y * refTransform.m_parallaxFactor
+					+ offset.Y;
+
 				const float objectBottom = objectTop + ptrPhysicsBody->m_dimensions.Y;
 
 				const bool isVisible =
@@ -172,13 +206,29 @@ namespace Engine
 #ifndef NDEBUG
 		auto submitEdgeForRendering = [&](auto& refEdge)
 			{
-				// Transform to screen space
-				const int edgePointAInPixelsX = static_cast<int>((refEdge.m_startPoint.X - refCamera.m_offset.X) * scaleInPixels);
-				const int edgePointAInPixelsY = static_cast<int>((refEdge.m_startPoint.Y - refCamera.m_offset.Y) * scaleInPixels);
-				const Math2D::Point2D<int> edgePointAInPixels(edgePointAInPixelsX, edgePointAInPixelsY);
-				const int edgePointBInPixelsX = static_cast<int>((refEdge.m_endPoint.X - refCamera.m_offset.X) * scaleInPixels);
-				const int edgePointBInPixelsY = static_cast<int>((refEdge.m_endPoint.Y - refCamera.m_offset.Y) * scaleInPixels);
-				const Math2D::Point2D<int> edgePointBInPixels(edgePointBInPixelsX, edgePointBInPixelsY);
+
+				Math2D::Point2D<float> offset = { (refCamera.m_size / 2.0f) };
+
+				const float ax =
+					(refEdge.m_startPoint.X - refCamera.m_centerInWorldUnits.X) + offset.X;
+				const float ay =
+					(refEdge.m_startPoint.Y - refCamera.m_centerInWorldUnits.Y) + offset.Y;
+
+				const float bx =
+					(refEdge.m_endPoint.X - refCamera.m_centerInWorldUnits.X) + offset.X;
+				const float by =
+					(refEdge.m_endPoint.Y - refCamera.m_centerInWorldUnits.Y) + offset.Y;
+
+				const Math2D::Point2D<int> edgePointAInPixels(
+					int(ax* scaleInPixels),
+					int(ay* scaleInPixels)
+				);
+
+				const Math2D::Point2D<int> edgePointBInPixels(
+					int(bx* scaleInPixels),
+					int(by* scaleInPixels)
+				);
+
 
 				debugLineBuckets[0].emplace_back(
 					-1,
@@ -254,8 +304,8 @@ namespace Engine
 			if (m_refECS.HasComponent<Transform>(refCamera.m_entity))
 			{
 				Transform* ptrTransform = m_refECS.GetComponent<Transform>(refCamera.m_entity);
-				refCamera.m_offset.X = ptrTransform->m_position.X - (refCamera.m_size.X) / 2;
-				refCamera.m_offset.Y = ptrTransform->m_position.Y - (refCamera.m_size.Y) / 2;
+				refCamera.m_cameraTopLeftInWorldUnits.X = ptrTransform->m_position.X - (refCamera.m_size.X) / 2;
+				refCamera.m_cameraTopLeftInWorldUnits.Y = ptrTransform->m_position.Y - (refCamera.m_size.Y) / 2;
 			}
 
 			clamp(refCamera);

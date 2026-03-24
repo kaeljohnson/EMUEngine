@@ -17,20 +17,20 @@
           "Physics": 
           {
             "id": 2,
-            "ParallaxFactor": 1,
+            "ParallaxFactor": 1.0,
             "Gravity": [0.0, 100.0],
             "TileMapPath":  "Tilemaps/StartScreenPhysics.txt"
           },
           "Cloud": 
           {
             "id": 3,
-            "ParallaxFactor": 0.6,
+            "ParallaxFactor": 0.8,
             "TileMapPath": "Tilemaps/StartScreenCloud.txt"
           },
           "Background": 
           {
             "id": 4,
-            "ParallaxFactor": 0.5,
+            "ParallaxFactor": 0.6,
             "TileMapPath": "Backgrounds/StartScreenBackground.txt"
           }
         },
@@ -44,7 +44,8 @@
                   "PlayerSprite": "Guy.png",
                   "GrassTileMap": "GrassTileSet32x32.png",
                   "BackgroundSprite": "Sandbox.png",
-                  "Cloud": "Cloud8x5Tiles.png"
+                  "Cloud": "Cloud8x5Tiles.png",
+                  "Door": "Door.png"
                 }
             },
             "Audio":
@@ -84,7 +85,6 @@
                 },
                 "GenericBackgroundTransform": 
                 {
-                  "ParallaxFactor": 0.25,
                   "DrawDebug": "red",
                   "enabled": true
                 },
@@ -166,6 +166,18 @@
                     "CheckSimpleContacts": false,
                     "DrawDebug": "red",
                     "enabled": true
+                },
+                "Door": 
+                {
+                  "SizeInUnits": [1.0, 2.0],
+                  "BodyType": "SENSOR",
+                  "Category" : "ALL",
+                  "Mask" : "ALL",
+                  "Rotation": 0.0,
+                  "GravityOn": false,
+                  "CheckSimpleContacts": false,
+                  "DrawDebug": "red",
+                  "enabled": true
                 }
             },
             "Camera": 
@@ -179,7 +191,7 @@
                         "Width": 1.0,
                         "Height": 1.0
                     },
-                    "PixelsPerUnit": 32,
+                    "PixelsPerUnit": 16,
                     "ClampingOn": true,
                     "enabled": true,
                     "border": true,
@@ -192,8 +204,8 @@
                     {
                         "X": 0.025,
                         "Y": 0.05,
-                        "Width": 0.125,
-                        "Height": 0.21
+                        "Width": 0.2,
+                        "Height": 0.2
                     },
                     "PixelsPerUnit": 8,
                     "ClampingOn": true,
@@ -237,6 +249,15 @@
                   "Path": "Cloud",
                   "SizeInUnits": [ 8, 5 ],
                   "PixelsPerFrame": [ 256, 160 ],
+                  "Height": 1,
+                  "Width": 1,
+                  "OffsetFromTransform": [ 0.0, 0.0 ]
+                },
+                "Door": 
+                {
+                  "Path": "Door",
+                  "SizeInUnits": [ 1.0, 2.0 ],
+                  "PixelsPerFrame": [ 32, 64 ],
                   "Height": 1,
                   "Width": 1,
                   "OffsetFromTransform": [ 0.0, 0.0 ]
@@ -314,54 +335,57 @@
               "CentralInteriorGrassNarrowHorizontal":    { "Idle": { "id": 0, "Frames": [37], "FrameTime": 20, "Loop": true } },
               "RightInteriorGrassNarrowHorizontal":      { "Idle": { "id": 0, "Frames": [38], "FrameTime": 20, "Loop": true } },
               "BackgroundTexture":                       { "Idle": { "id": 0, "Frames": [0],  "FrameTime": 20, "Loop": true } },
-              "Cloud":                                   { "Idle": { "id": 0, "Frames": [0],  "FrameTime": 20, "Loop": true } }
+              "Cloud":                                   { "Idle": { "id": 0, "Frames": [0],  "FrameTime": 20, "Loop": true } },
+              "Door":                                    { "Idle": { "id": 0, "Frames": [0],  "FrameTime": 20, "Loop": true } }
+
 
             }
         },
         "CharacterRules": 
         {
-            "1": { "Transform":  "Player",                          "Layer": "Player",                    "Physics": "Player",                    "Camera": "Player",                        "Animations": "Player",                               "SpriteSheet": "Player"       },
-            "2": { "Transform":  "MiniMapTracker",                  "Layer": "Foreground",                                                        "Camera": "MiniMap"                                                                                                             },
-            "3": { "Transform":  "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "BottomRightOutsideGrassCorner",        "SpriteSheet": "GrassTileSet" },
-            "4": { "Transform":  "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "UpwardFacingGrass",                    "SpriteSheet": "GrassTileSet" },
-            "5": { "Transform":  "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "BottomLeftOutsideGrassCorner",         "SpriteSheet": "GrassTileSet" },
-            "6": { "Transform":  "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "TopLeftInteriorCorner",                "SpriteSheet": "GrassTileSet" },
-            "7": { "Transform":  "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "TopCenterInteriorGrass",               "SpriteSheet": "GrassTileSet" },
-            "8": { "Transform":  "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "TopRightInteriorGrass",                "SpriteSheet": "GrassTileSet" },
-            "9": { "Transform":  "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "TopNarrowOpenGrass",                    "SpriteSheet": "GrassTileSet" },
-            "10": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "TopNarrowInteriorGrass",               "SpriteSheet": "GrassTileSet" },
-            "11": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "LeftFacingGrass",                      "SpriteSheet": "GrassTileSet" },
-            "12": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "CenterInteriorWallWithGrass",          "SpriteSheet": "GrassTileSet" },
-            "13": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "LeftInteriorGrass",                    "SpriteSheet": "GrassTileSet" },
-            "14": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "BlackCenterInteriorWall",              "SpriteSheet": "GrassTileSet" },
-            "15": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "RightInteriorGrass",                   "SpriteSheet": "GrassTileSet" },
-            "16": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "CentralVerticalExteriorNarrowGrass",   "SpriteSheet": "GrassTileSet" },
-            "17": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "CentralVerticalInteriorNarrowGrass",   "SpriteSheet": "GrassTileSet" },
-            "18": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "TopRightExteriorGrassCorner",          "SpriteSheet": "GrassTileSet" },
-            "19": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "BottomFacingGrass",                    "SpriteSheet": "GrassTileSet" },
-            "20": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "TopLeftExteriorGrassCorner",           "SpriteSheet": "GrassTileSet" },
-            "21": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "BottomLeftInteriorGrass",              "SpriteSheet": "GrassTileSet" },
-            "22": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "BottomInteriorGrass",                  "SpriteSheet": "GrassTileSet" },
-            "23": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "BottomRightInteriorGrass",             "SpriteSheet": "GrassTileSet" },
-            "24": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "BottomNarrowExteriorGrass",            "SpriteSheet": "GrassTileSet" },
-            "25": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "BottomNarrowInteriorGrass",            "SpriteSheet": "GrassTileSet" },
-            "26": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "TopLeftWrappedGrass",                  "SpriteSheet": "GrassTileSet" },
-            "27": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "TopRightWrappedGrass",                 "SpriteSheet": "GrassTileSet" },
-            "28": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "BottomRightExteriorGrass",             "SpriteSheet": "GrassTileSet" },
-            "29": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "BottomLeftExteriorGrass",              "SpriteSheet": "GrassTileSet" },
-            "30": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "LeftExteriorGrassNarrowHorizontal",    "SpriteSheet": "GrassTileSet" },
-            "31": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "CentralExteriorGrassNarrowHorizontal", "SpriteSheet": "GrassTileSet" },
-            "32": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "RightExteriorGrassNarrowHorizontal",   "SpriteSheet": "GrassTileSet" },
-            "33": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "BottomLeftWrappedGrass",               "SpriteSheet": "GrassTileSet" },
-            "34": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1",                                                       "Animations": "BottomRightWrappedGrass",              "SpriteSheet": "GrassTileSet" },
-            "35": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "TopRightExteriorGrass",                "SpriteSheet": "GrassTileSet" },
-            "36": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "TopLeftExteriorGrass",                 "SpriteSheet": "GrassTileSet" },
-            "37": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "LeftInteriorGrassNarrowHorizontal",    "SpriteSheet": "GrassTileSet" },
-            "38": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "CentralInteriorGrassNarrowHorizontal", "SpriteSheet": "GrassTileSet" },
-            "39": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericStatic1",                                                       "Animations": "RightInteriorGrassNarrowHorizontal",   "SpriteSheet": "GrassTileSet" },
-            "40": { "Transform": "GenericTransform1",               "Layer": "Physics",                   "Physics": "GenericSensor1"                                                                                                                                            },
-            "41": { "Transform": "GenericBackgroundTransform",      "Layer": "Background",                                                                                                   "Animations": "BackgroundTexture",                    "SpriteSheet": "BackgroundSprite" },
-            "42": { "Transform": "CloudTransform",                  "Layer": "Cloud",                     "Physics": "Cloud",                                                                "Animations": "Cloud",                                "SpriteSheet": "Cloud" }
+            "1": { "Transform":  "Player",                          "Physics": "Player",                    "Camera": "Player",                        "Animations": "Player",                               "SpriteSheet": "Player"       },
+            "2": { "Transform":  "MiniMapTracker",                                                          "Camera": "MiniMap"                                                                                                            },
+            "3": { "Transform":  "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "BottomRightOutsideGrassCorner",        "SpriteSheet": "GrassTileSet" },
+            "4": { "Transform":  "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "UpwardFacingGrass",                    "SpriteSheet": "GrassTileSet" },
+            "5": { "Transform":  "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "BottomLeftOutsideGrassCorner",         "SpriteSheet": "GrassTileSet" },
+            "6": { "Transform":  "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "TopLeftInteriorCorner",                "SpriteSheet": "GrassTileSet" },
+            "7": { "Transform":  "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "TopCenterInteriorGrass",               "SpriteSheet": "GrassTileSet" },
+            "8": { "Transform":  "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "TopRightInteriorGrass",                "SpriteSheet": "GrassTileSet" },
+            "9": { "Transform":  "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "TopNarrowOpenGrass",                    "SpriteSheet": "GrassTileSet"},
+            "10": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "TopNarrowInteriorGrass",               "SpriteSheet": "GrassTileSet" },
+            "11": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "LeftFacingGrass",                      "SpriteSheet": "GrassTileSet" },
+            "12": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "CenterInteriorWallWithGrass",          "SpriteSheet": "GrassTileSet" },
+            "13": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "LeftInteriorGrass",                    "SpriteSheet": "GrassTileSet" },
+            "14": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "BlackCenterInteriorWall",              "SpriteSheet": "GrassTileSet" },
+            "15": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "RightInteriorGrass",                   "SpriteSheet": "GrassTileSet" },
+            "16": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "CentralVerticalExteriorNarrowGrass",   "SpriteSheet": "GrassTileSet" },
+            "17": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "CentralVerticalInteriorNarrowGrass",   "SpriteSheet": "GrassTileSet" },
+            "18": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "TopRightExteriorGrassCorner",          "SpriteSheet": "GrassTileSet" },
+            "19": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "BottomFacingGrass",                    "SpriteSheet": "GrassTileSet" },
+            "20": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "TopLeftExteriorGrassCorner",           "SpriteSheet": "GrassTileSet" },
+            "21": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "BottomLeftInteriorGrass",              "SpriteSheet": "GrassTileSet" },
+            "22": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "BottomInteriorGrass",                  "SpriteSheet": "GrassTileSet" },
+            "23": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "BottomRightInteriorGrass",             "SpriteSheet": "GrassTileSet" },
+            "24": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "BottomNarrowExteriorGrass",            "SpriteSheet": "GrassTileSet" },
+            "25": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "BottomNarrowInteriorGrass",            "SpriteSheet": "GrassTileSet" },
+            "26": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "TopLeftWrappedGrass",                  "SpriteSheet": "GrassTileSet" },
+            "27": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "TopRightWrappedGrass",                 "SpriteSheet": "GrassTileSet" },
+            "28": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "BottomRightExteriorGrass",             "SpriteSheet": "GrassTileSet" },
+            "29": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "BottomLeftExteriorGrass",              "SpriteSheet": "GrassTileSet" },
+            "30": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "LeftExteriorGrassNarrowHorizontal",    "SpriteSheet": "GrassTileSet" },
+            "31": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "CentralExteriorGrassNarrowHorizontal", "SpriteSheet": "GrassTileSet" },
+            "32": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "RightExteriorGrassNarrowHorizontal",   "SpriteSheet": "GrassTileSet" },
+            "33": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "BottomLeftWrappedGrass",               "SpriteSheet": "GrassTileSet" },
+            "34": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "BottomRightWrappedGrass",              "SpriteSheet": "GrassTileSet" },
+            "35": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "TopRightExteriorGrass",                "SpriteSheet": "GrassTileSet" },
+            "36": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "TopLeftExteriorGrass",                 "SpriteSheet": "GrassTileSet" },
+            "37": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "LeftInteriorGrassNarrowHorizontal",    "SpriteSheet": "GrassTileSet" },
+            "38": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "CentralInteriorGrassNarrowHorizontal", "SpriteSheet": "GrassTileSet" },
+            "39": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "RightInteriorGrassNarrowHorizontal",   "SpriteSheet": "GrassTileSet" },
+            "40": { "Transform": "GenericTransform1",               "Physics": "Door",                                                                 "Animations": "Door",                                 "SpriteSheet": "Door"         },
+            "41": { "Transform": "GenericBackgroundTransform",                                                                                         "Animations": "BackgroundTexture",                    "SpriteSheet": "BackgroundSprite" },
+            "42": { "Transform": "CloudTransform",                  "Physics": "Cloud",                                                                "Animations": "Cloud",                                "SpriteSheet": "Cloud" },
+            "43": { "Transform": "GenericBackgroundTransform",      "Physics": "GenericSensor1",                                                       "Animations": "BlackCenterInteriorWall",              "SpriteSheet": "GrassTileSet" }
         }
     }
 }

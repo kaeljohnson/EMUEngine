@@ -37,7 +37,7 @@ namespace Engine
 		* @param entity The entity whose camera component to modify.
 		* @param offset The new offset value.
 		*/
-		void SetOffset(Entity entity, const Math2D::Point2D<float> offset);
+		void SetPosition(Entity entity, const Math2D::Point2D<float> offset);
 
 		/**
 		* @brief Gets the offset for the entity's camera.
@@ -45,9 +45,7 @@ namespace Engine
 		* @param entity The entity whose camera component to query.
 		* @return The current offset value.
 		*/
-		const Math2D::Point2D<float> GetOffset(Entity entity);
-
-		const Math2D::Point2D<int> GetScreenPosition(Entity entity);
+		const Math2D::Point2D<float> GetPosition(Entity entity);
 
 		const bool InFrame(Entity entity);
 

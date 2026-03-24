@@ -10,6 +10,9 @@
 #include "../../Public/MathUtil.h"
 #include "../Events/IOEventSystem.h"
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 struct b2WorldId;
 
 namespace Engine
@@ -84,7 +87,7 @@ namespace Engine
 		* @param entityB The character representing the second entity involved in the contact.
 		* @param callback The callback function to be invoked when the contact event occurs.
 		*/
-		void RegisterContactCallback(ContactType contactType, const size_t entityA, const size_t entityB, ContactCallback callback);
+		void RegisterContactCallback(ContactType contactType, const Math2D::Point2D<size_t> tileIdA, const Math2D::Point2D<size_t> tileIdB, ContactCallback callback);
 
 		/**
 		* @brief Register a contact callback for a specific entity identified by its tileId.
@@ -95,7 +98,7 @@ namespace Engine
 		* @param entity The character representing the entity involved in the contact.
 		* @param callback The callback function to be invoked when the contact event occurs.
 		*/
-		void RegisterContactCallback(ContactType contactType, const size_t entity, ContactCallback callback);
+		void RegisterContactCallback(ContactType contactType, const Math2D::Point2D<size_t> tileId, ContactCallback callback);
 
 		/**
 		* @brief Sets the physics simulation parameters for the scene.
@@ -201,6 +204,15 @@ namespace Engine
 		std::unordered_set<IOEventType> m_sceneRuntimeIOEvents;		/// All the IOEvents this scene has callbacks assigned to in the io system.
 
 		std::map<size_t, Entity> m_cameraOrder;					/// Set to render camera order correctly.
+
+		// json rules.
+		json m_rulesJson; // Only one rules file per game for now so this will work.
+		json m_sceneRules;
+		json m_worldLayers;
+		json m_sceneAssets;
+		json m_componentTemplates;
+		json m_characterRules;
+
 	private:
 
 		/**
@@ -222,7 +234,7 @@ namespace Engine
 		/**
 		* @brief Loads all entities defined in the scene's tile map.
 		*/
-		void loadSceneEntitiesFromTileMap();
+		void loadSceneEntitiesFromTileMaps();
 
 		/**
 		* @brief Loads audio files required for the Level.
