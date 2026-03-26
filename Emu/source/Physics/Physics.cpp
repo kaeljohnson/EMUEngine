@@ -243,14 +243,18 @@ namespace Engine
 
 	void PhysicsSimulation::UpdateGravity(const Math2D::Point2D<float> gravity)
 	{
-		if (AppState::IN_SCENE)
+		//if (AppState::IN_SCENE)
+		if (true)
 		{
+			ENGINE_CRITICAL("flep");
+			m_gravity = gravity;
 			b2WorldDef worldDef = b2DefaultWorldDef();
 			worldDef.gravity = { gravity.X, gravity.Y };
 			b2World_SetGravity(*m_ptrWorldId, worldDef.gravity);
 		}
 		else
 		{
+			ENGINE_CRITICAL_D("BLEEEE");
 			m_gravity = gravity;
 		}
 	}

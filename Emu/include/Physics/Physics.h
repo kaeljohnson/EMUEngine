@@ -111,6 +111,8 @@ namespace Engine
 		*/
 		void Cleanup();
 
+		const Math2D::Point2D<float>& GetGravity() const { return m_gravity; }
+
 		ContactSystem m_contactSystem;	/// Contact system for handling collisions
 
 	private:

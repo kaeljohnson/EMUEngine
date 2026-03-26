@@ -1,6 +1,8 @@
 {
     "StartScreen":
     {
+        "Gravity": [0.0, 100.0],
+        "NumUnitsPerTile": [1.0, 1.0],
         "WorldLayers": 
         {
           "Foreground": 
@@ -18,7 +20,6 @@
           {
             "id": 2,
             "ParallaxFactor": 1.0,
-            "Gravity": [0.0, 100.0],
             "TileMapPath":  "Tilemaps/StartScreenPhysics.txt"
           },
           "Cloud": 
@@ -196,7 +197,8 @@
                     "enabled": true,
                     "border": true,
                     "order": 1,
-                    "backgroundColor": [ 173, 216, 230 ]
+                    "backgroundColor": [ 173, 216, 230 ],
+                    "FrameBounds":  [141, 42]
                 },
                 "MiniMap":
                 {

@@ -13,6 +13,9 @@ Cloud::Cloud()
 
 	Engine::EMU::GetInstance()->Scenes_AddPhysicsUpdaterComponent("StartScreen", 3, 42,
 		[this](Engine::Entity entity) { Update(entity); });
+
+	Engine::EMU::GetInstance()->Scenes_AddPhysicsUpdaterComponent("Level1", 3, 42,
+		[this](Engine::Entity entity) { Update(entity); });
 }
 
 // TODO: Add a Scenes_AddTransformUpdater function and remove physics from clouds. This will make it easier to control cloud movement on screen.

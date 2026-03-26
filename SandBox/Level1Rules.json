@@ -1,6 +1,8 @@
 {
     "Level1":
     {
+        "Gravity": [0.0, 100.0],
+        "NumUnitsPerTile": [1.0, 1.0],
         "WorldLayers": 
         {
           "Foreground": 
@@ -178,7 +180,8 @@
                     "enabled": true,
                     "border": true,
                     "order": 1,
-                    "backgroundColor": [ 173, 216, 230 ]
+                    "backgroundColor": [ 173, 216, 230 ],
+                    "FrameBounds":  [141, 42]
                 },
                 "MiniMap":
                 {

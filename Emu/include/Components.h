@@ -246,10 +246,10 @@ namespace Engine
 		Math2D::Point2D<float> m_cameraTopLeftInWorldUnits;		 /// Top left position of the camera in world units.
 		Math2D::Point2D<float> m_centerInWorldUnits;			 /// Center position of the camera in world units. Calculated each frame based on m_cameraPosInWorldUnits and m_size.
 		Math2D::Point2D<float> m_size;							 /// Size of the camera in world units.
+		Math2D::Point2D<int> m_frameBounds;						 /// Bounds of the camera frame in pixels. Used for clamping.
 
 		size_t m_pixelsPerUnit;									 /// Number of pixels per world unit.
 		bool m_clampingOn;										 /// Flag indicating whether clamping is enabled for the camera.
-		Math2D::Point2D<int> m_bounds;							 /// Bounds of the camera in pixels.
 		bool m_borderOn;										 /// Flag indicating whether to draw a border around the camera view.
 		size_t m_numLayers;										 /// Number of layers for rendering.
 		std::array<int, 3> m_backgroundColor;					 /// Background color of the camera in RGB format.
@@ -264,17 +264,17 @@ namespace Engine
 		Camera(Entity entity)
 			: m_cameraTopLeftInWorldUnits(0.0f, 0.0f), m_size(0.0f, 0.0f), m_viewportSizeInPercentageOfScreen(1.0f, 1.0f), m_numLayers(10),
 			m_viewPortPositionInPercentageOfScreen(0.0f, 0.0f), m_pixelsPerUnit(16), m_clampingOn(true), m_borderOn(false),
-			m_bounds(0, 0), m_renderBucket(10, std::vector<RenderObject>()), m_backgroundColor({ 0, 0, 0 }),
+			m_renderBucket(10, std::vector<RenderObject>()), m_backgroundColor({ 0, 0, 0 }), m_frameBounds(0, 0),
 			m_debugRenderBucket(10, std::vector<DebugObject>()), m_debugLinesRenderBucket(10, std::vector<LineObject>()),
 			m_debugPointsRenderBucket(10, std::vector<DebugPointObject>()),
 			Component(entity) {}
 
 		Camera(Entity entity, Math2D::Point2D<float> size, Math2D::Point2D<float> screenRatio, 
-			Math2D::Point2D<float> position, size_t pixelsPerUnit, bool clampingOn, bool border, std::array<int, 3> backgroundColor, size_t numLayers)
+			Math2D::Point2D<float> position, size_t pixelsPerUnit, bool clampingOn, bool border, std::array<int, 3> backgroundColor, size_t numLayers, Math2D::Point2D<int> frameBounds)
 			: m_size(size), m_viewportSizeInPercentageOfScreen(screenRatio), m_viewPortPositionInPercentageOfScreen(position),
-			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_cameraTopLeftInWorldUnits(0.0f, 0.0f), m_bounds(0, 0),
+			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_cameraTopLeftInWorldUnits(0.0f, 0.0f),
 			m_borderOn(border), m_renderBucket(numLayers, std::vector<RenderObject>()), m_backgroundColor(backgroundColor),
-			m_numLayers(numLayers), m_debugRenderBucket(numLayers, std::vector<DebugObject>()), 
+			m_numLayers(numLayers), m_debugRenderBucket(numLayers, std::vector<DebugObject>()), m_frameBounds(frameBounds),
 			m_debugLinesRenderBucket(numLayers, std::vector<LineObject>()), m_debugPointsRenderBucket(numLayers, std::vector<DebugPointObject>()),
 			Component(entity) {}
 	};

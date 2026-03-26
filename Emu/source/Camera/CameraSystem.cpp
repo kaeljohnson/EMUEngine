@@ -23,15 +23,15 @@ namespace Engine
 		if (refCamera.m_centerInWorldUnits.X - offset.X < 0)
 			refCamera.m_centerInWorldUnits.X = offset.X;
 
-		if (refCamera.m_centerInWorldUnits.X + offset.X > refCamera.m_bounds.X)
-			refCamera.m_centerInWorldUnits.X = refCamera.m_bounds.X - offset.X;
+		if (refCamera.m_centerInWorldUnits.X + offset.X > refCamera.m_frameBounds.X)
+			refCamera.m_centerInWorldUnits.X = refCamera.m_frameBounds.X - offset.X;
 
 		// Clamp Y
 		if (refCamera.m_centerInWorldUnits.Y - offset.Y < 0)
 			refCamera.m_centerInWorldUnits.Y = offset.Y;
 
-		if (refCamera.m_centerInWorldUnits.Y + offset.Y > refCamera.m_bounds.Y)
-			refCamera.m_centerInWorldUnits.Y = refCamera.m_bounds.Y - offset.Y;
+		if (refCamera.m_centerInWorldUnits.Y + offset.Y > refCamera.m_frameBounds.Y)
+			refCamera.m_centerInWorldUnits.Y = refCamera.m_frameBounds.Y - offset.Y;
 	}
 
 	static void prepareForRendering(Camera& refCamera, AssetManager& refAssetManager, ECS& refECS,
@@ -283,7 +283,7 @@ namespace Engine
 		// ENGINE_TRACE_D("CameraSystem Update took " + std::to_string(elapsed.count()) + " ms");
     }
 
-    void CameraSystem::Frame(const Math2D::Point2D<int> mapBounds)
+    void CameraSystem::Frame()
     {
 		std::vector<Camera>& activeCameras = m_refECS.GetHotComponents<Camera>();
 
@@ -295,7 +295,6 @@ namespace Engine
 
 		for (auto& refCamera : activeCameras)
 		{
-			refCamera.m_bounds = mapBounds;
 			refCamera.m_size
 				= Math2D::Point2D<float>((Screen::WINDOW_SIZE.X * refCamera.m_viewportSizeInPercentageOfScreen.X) / (refCamera.m_pixelsPerUnit * Screen::SCALE),
 					(Screen::WINDOW_SIZE.Y * refCamera.m_viewportSizeInPercentageOfScreen.Y) / (refCamera.m_pixelsPerUnit * Screen::SCALE));

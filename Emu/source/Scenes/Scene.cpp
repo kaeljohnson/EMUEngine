@@ -229,7 +229,7 @@ namespace Engine
 		}
 
 		// 6. Frame the cameras
-		m_cameraSystem.Frame(Math2D::Point2D<int>(141, 42)); // TEMP
+		m_cameraSystem.Frame();\
 		
 		// 7. Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld(m_entities);
@@ -537,6 +537,8 @@ namespace Engine
 		Math2D::Point2D<float> size = { 0.0f, 0.0f }; // size determined by engine 
 		size_t pixelsPerUnit = ExtractSizeTFromJSON(*entityCameraTemplate, "PixelsPerUnit", 0);
 
+		Math2D::Point2D<int> frameBounds = ExtractPoint2DFromJSON(*entityCameraTemplate, "FrameBounds", Math2D::Point2D<int>(0, 0));
+
 		bool clampingOn = entityCameraTemplate->contains("ClampingOn") ? getJson(*entityCameraTemplate, "ClampingOn")->get<bool>() : false;
 
 		bool borderOn = entityCameraTemplate->contains("border") ? getJson(*entityCameraTemplate, "border")->get<bool>() : false;
@@ -559,7 +561,7 @@ namespace Engine
 
 		ENGINE_INFO_D("Adding camera component with pixelsPerUnit: {}, Position: {}x{}, ScreenRatio: {}x{}", pixelsPerUnit, position.X, position.Y, screenRatio.X, screenRatio.Y);
 
-		refECS.AddComponent<Camera>(entity, size, screenRatio, position, pixelsPerUnit, clampingOn, borderOn, backgroundColor, numLayers);
+		refECS.AddComponent<Camera>(entity, size, screenRatio, position, pixelsPerUnit, clampingOn, borderOn, backgroundColor, numLayers, frameBounds);
 
 		return std::make_pair(order, entity);
 	}
@@ -1018,22 +1020,14 @@ namespace Engine
 
 
 		// Load the physics rules.
-		size_t numUnitsPerTile = 1;
 		size_t numLayers = 5;
 
-		const json* physicsRules = getJson(m_worldLayers, "Physics");
-		if (!physicsRules)
-		{
-			ENGINE_ERROR("No physics layer found for world in scene: {}", sceneName);
-			std::exit(1);
-		}
+		SetGravity(ExtractPoint2DFromJSON<float>(m_sceneRules, "Gravity", { 0.0f, 0.0f }));
+		ENGINE_INFO("Gravity set to: {}, {}", m_physicsSimulation.GetGravity().X, m_physicsSimulation.GetGravity().Y);
 
-		SetGravity(ExtractPoint2DFromJSON<float>(*physicsRules, "Gravity", { 0.0f, 0.0f }));
-		numUnitsPerTile = ExtractSizeTFromJSON(*physicsRules, "NumUnitsPerTile", 1);
+		size_t numUnitsPerTile = ExtractSizeTFromJSON(m_sceneRules, "NumUnitsPerTile", 1);
 
 		// Load Assets.
-
-		
 		verifyAssetPaths(m_sceneAssets);
 
 		const json* characterRules = getJson(m_sceneRules, "CharacterRules");
