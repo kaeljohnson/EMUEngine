@@ -97,6 +97,7 @@ namespace Engine
 	}
 	
 	void EMU::Scenes_Activate(Entity entity) { m_application->m_sceneManager.GetCurrentScene()->Activate(entity); }
+	void EMU::Scenes_Activate(const std::vector<Entity>& entities) { for (const auto& entity : entities) m_application->m_sceneManager.GetCurrentScene()->Activate(entity); }
 	void EMU::Scenes_Deactivate(Entity entity) { m_application->m_sceneManager.GetCurrentScene()->Deactivate(entity); }
 	void EMU::Scenes_Create(const std::string& rulesFileName, const std::string& name) { m_application->m_sceneManager.AddScene(name, rulesFileName, m_application->m_assetManager, m_application->m_IOEventSystem); }
 	void EMU::Scenes_Load(const std::string& name) { m_application->m_sceneManager.QueueNewScene(name); }
@@ -133,7 +134,7 @@ namespace Engine
 	void EMU::Physics_SetBodyType(Entity entity, const BodyType type) { m_application->m_physicsInterface.SetBodyType(entity, type); }
 	void EMU::Physics_SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions) { m_application->m_physicsInterface.SetDimensions(entity, dimensions); }
 	const Math2D::Point2D<float> EMU::Physics_GetDimensions(Entity entity) { return m_application->m_physicsInterface.GetDimensions(entity); }
-	void EMU::Physics_SetGravity(Entity entity, bool enabled) { m_application->m_physicsInterface.SetGravity(entity, enabled); }
+	void EMU::Physics_SetGravity(Entity entity, bool enabled) { m_application->m_physicsInterface.SetGravityEnabled(entity, enabled); }
 	void EMU::Physics_SetStartingPosition(Entity entity, const Math2D::Point2D<float> position) { m_application->m_physicsInterface.SetStartingPosition(entity, position); }
 	void EMU::Physics_SetPosition(Entity entity, const Math2D::Point2D<float> position) { m_application->m_physicsInterface.SetPosition(entity, position); }
 	const Math2D::Point2D<float> EMU::Physics_GetPosition(Entity entity) { return m_application->m_physicsInterface.GetPosition(entity); }
@@ -160,8 +161,9 @@ namespace Engine
 
 	// Transform getter and setter wrappers
 	const Math2D::Point2D<float> EMU::Transform_GetPrevPosition(Entity entity) { return m_application->m_transformInterface.GetPrevPosition(entity); }
-	void EMU::Transform_SetPosition(Entity entity, const Math2D::Point2D<float> position) { m_application->m_transformInterface.SetPosition(entity, position); }
-	const Math2D::Point2D<float> EMU::Transform_GetPosition(Entity entity) { return m_application->m_transformInterface.GetPosition(entity); }
+	void EMU::Transform_SetPosition(Entity entity, const Math2D::Point2D<float> position, bool skipLerp) { m_application->m_transformInterface.SetPosition(entity, position, skipLerp); }
+	const Math2D::Point2D<float> EMU::Transform_GetWorldPosition(Entity entity) { return m_application->m_transformInterface.GetPosition(entity); }
+	const Math2D::Vector2D<float> EMU::Transform_GetPositionOnScreen(Entity entity) { return m_application->m_transformInterface.GetScreenPosition(entity); }
 	void EMU::Transform_SetLayer(Entity entity, const int layer) { m_application->m_transformInterface.SetLayer(entity, layer); }
 	const size_t EMU::Transform_GetLayer(Entity entity) { return m_application->m_transformInterface.GetLayer(entity); }
 	void EMU::Transform_SetRotation(Entity entity, const float rotation) { m_application->m_transformInterface.SetRotation(entity, rotation); }
@@ -179,7 +181,6 @@ namespace Engine
 	void EMU::SetWindowSize(const Math2D::Point2D<int>& size) 
 	{ 
 		Screen::SetWindowSize(size);
-		ENGINE_CRITICAL_D("New size: {}", size.X);
 		
 		m_application->m_cameraInterface.SetSize(size);
 		
@@ -204,17 +205,19 @@ namespace Engine
 							layer,
 							tileId,
 							unpacked...);
+
+						emu->Scenes_Activate(emu->Scenes_GetTileMapEntities(sceneName, layer, tileId));
 					}, packed);
 			});
 	}
 
-	void EMU::Scenes_AddPhysicsUpdaterComponent(
+	void EMU::Scenes_AddUpdaterComponent(
 		const std::string& sceneName,
 		const int layer,
 		size_t tileId,
 		std::function<void(Entity)> updaterCallback)
 	{
-		RegisterAddOnPlay<PhysicsUpdater>(
+		RegisterAddOnPlay<Updater>(
 			this,
 			sceneName,
 			layer,

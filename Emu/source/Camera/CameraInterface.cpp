@@ -63,10 +63,7 @@ namespace Engine
 		{
 			refCamera.m_size = Math2D::Point2D<float>((Screen::WINDOW_SIZE.X * refCamera.m_viewportSizeInPercentageOfScreen.X) / (refCamera.m_pixelsPerUnit * Screen::SCALE),
 				(Screen::WINDOW_SIZE.Y * refCamera.m_viewportSizeInPercentageOfScreen.Y) / (refCamera.m_pixelsPerUnit * Screen::SCALE));
-
-			ENGINE_CRITICAL("Camera size {}x{}", refCamera.m_size.X, refCamera.m_size.Y);
 		}
-		
 	}
 
 	const bool CameraInterface::InFrame(Entity entity)

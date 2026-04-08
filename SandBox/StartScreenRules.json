@@ -353,7 +353,7 @@
             "6": { "Transform":  "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "TopLeftInteriorCorner",                "SpriteSheet": "GrassTileSet" },
             "7": { "Transform":  "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "TopCenterInteriorGrass",               "SpriteSheet": "GrassTileSet" },
             "8": { "Transform":  "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "TopRightInteriorGrass",                "SpriteSheet": "GrassTileSet" },
-            "9": { "Transform":  "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "TopNarrowOpenGrass",                    "SpriteSheet": "GrassTileSet"},
+            "9": { "Transform":  "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "TopNarrowOpenGrass",                   "SpriteSheet": "GrassTileSet"},
             "10": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "TopNarrowInteriorGrass",               "SpriteSheet": "GrassTileSet" },
             "11": { "Transform": "GenericTransform1",               "Physics": "GenericSensor1",                                                       "Animations": "LeftFacingGrass",                      "SpriteSheet": "GrassTileSet" },
             "12": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "CenterInteriorWallWithGrass",          "SpriteSheet": "GrassTileSet" },
@@ -386,7 +386,7 @@
             "39": { "Transform": "GenericTransform1",               "Physics": "GenericStatic1",                                                       "Animations": "RightInteriorGrassNarrowHorizontal",   "SpriteSheet": "GrassTileSet" },
             "40": { "Transform": "GenericTransform1",               "Physics": "Door",                                                                 "Animations": "Door",                                 "SpriteSheet": "Door"         },
             "41": { "Transform": "GenericBackgroundTransform",                                                                                         "Animations": "BackgroundTexture",                    "SpriteSheet": "BackgroundSprite" },
-            "42": { "Transform": "CloudTransform",                  "Physics": "Cloud",                                                                "Animations": "Cloud",                                "SpriteSheet": "Cloud" },
+            "42": { "Transform": "CloudTransform",                                                                                                     "Animations": "Cloud",                                "SpriteSheet": "Cloud" },
             "43": { "Transform": "GenericBackgroundTransform",      "Physics": "GenericSensor1",                                                       "Animations": "BlackCenterInteriorWall",              "SpriteSheet": "GrassTileSet" }
         }
     }

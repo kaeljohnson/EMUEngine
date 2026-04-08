@@ -13,7 +13,16 @@ namespace Engine
 	class CameraSystem
 	{
 	public:
+		/**
+		* @brief Constructs the CameraSystem with a reference to the ECS.
+		*
+		* @param refECS Reference to the Entity Component System.
+		*/
 		CameraSystem(ECS& refECS);
+
+		/**
+		* @brief Default destructor.
+		*/
 		~CameraSystem() = default;
 
 		/**

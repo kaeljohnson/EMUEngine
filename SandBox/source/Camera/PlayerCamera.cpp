@@ -28,7 +28,7 @@ void PlayerCamera::Update(Engine::Entity entity)
     const float interpFactor = Engine::Time::GetInterpolationFactor();
 
 	const Math2D::Point2D<float> targetPrevPosition = Engine::EMU::GetInstance()->Transform_GetPrevPosition(entity);
-	const Math2D::Point2D<float> targetPosition = Engine::EMU::GetInstance()->Transform_GetPosition(entity);
+	const Math2D::Point2D<float> targetPosition = Engine::EMU::GetInstance()->Transform_GetWorldPosition(entity);
 
     Math2D::Point2D<float> targetPos = Math2D::Lerp(targetPrevPosition, targetPosition, interpFactor);
 	Math2D::Point2D<float> cameraSize = Engine::EMU::GetInstance()->Camera_GetSize(entity);

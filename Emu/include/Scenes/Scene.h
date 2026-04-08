@@ -40,16 +40,27 @@ namespace Engine
 	{
 	public:
 		/**
-		* @brief Constructor for the Scene class.
+		* @brief Callback function type for contact events.
+		*/
+		using ContactCallback = std::function<void(const Contact&)>;
+
+		/**
+		* @brief Constructs a Scene.
 		* 
+		* @param rulesFileName The filename of the rules JSON that defines entity mappings.
 		* @param refECS Reference to the ECS instance.
 		* @param refAssetManager Reference to the AssetManager instance.
+		* @param refIOEventSystem Reference to the IOEventSystem instance.
 		*/
 		Scene(std::string rulesFileName, ECS& refECS, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem);
+
+		/**
+		* @brief Destructor for the Scene class.
+		*/
 		~Scene();
 
 		/**
-		* @brief Called when the scene starts playing. loads all the map entities and 
+		* @brief Called when the scene starts playing. Loads all the map entities and 
 		* instantiates physics world. Also calls client defined OnScenePlay function.
 		* Loads audio files and textures as well.
 		*/
@@ -75,40 +86,34 @@ namespace Engine
 		*/
 		void RegisterOnSceneEndEvent(std::function<void()> function);
 
-		using ContactCallback = std::function<void(const Contact&)>; /// Type definition for contact callback functions.
+		/**
+		* @brief Adds layers to the scene. The tile map defines the layout of the level
+		* and the entities that should be instantiated based on the map characters.
+		*/
+		void AddLayers();
 
 		/**
-		* @brief Register a contact callback between two entities identified by their tileId.
-		* Call this function to add a behavior that should be triggered when two entities
-		* come into contact.
+		* @brief Gets the entity associated with a specific tile ID in the tile map.
 		* 
-		* @param contactType The type of contact event (e.g., BEGIN_CONTACT, END_CONTACT).
-		* @param entityA The character representing the first entity involved in the contact.
-		* @param entityB The character representing the second entity involved in the contact.
-		* @param callback The callback function to be invoked when the contact event occurs.
-		*/
-		void RegisterContactCallback(ContactType contactType, const Math2D::Point2D<size_t> tileIdA, const Math2D::Point2D<size_t> tileIdB, ContactCallback callback);
-
-		/**
-		* @brief Register a contact callback for a specific entity identified by its tileId.
-		* Call this function to add a behavior that should be triggered when the specified
-		* entity comes into contact with any other entity.
+		* @param layer The layer index to query.
+		* @param tileId The ID representing the entity in the tile map.
 		* 
-		* @param contactType The type of contact event (e.g., BEGIN_CONTACT, END_CONTACT).
-		* @param entity The character representing the entity involved in the contact.
-		* @param callback The callback function to be invoked when the contact event occurs.
+		* @return The Entity associated with the specified tile ID.
 		*/
-		void RegisterContactCallback(ContactType contactType, const Math2D::Point2D<size_t> tileId, ContactCallback callback);
+		const Entity GetTileMapEntity(int layer, size_t tileId) const;
 
 		/**
-		* @brief Sets the physics simulation parameters for the scene.
-		*
-		* @param gravity A Math2D::Point2D<float> representing the gravity vector for the physics simulation.
+		* @brief Gets all entities associated with a specific tile ID in the tile map.
+		* 
+		* @param layer The layer index to query.
+		* @param tileId The ID representing the entities in the tile map.
+		* 
+		* @return A vector of Entities associated with the specified tile ID.
 		*/
-		void SetGravity(const Math2D::Point2D<float> gravity);
-
-		/// void Add(Entity entity); /// @todo No support for manually adding entities to scene for now. All entities must be added via tile map prior to runtime.
-		/// void Remove(Entity entity); /// @todo No support for manually removing entities from scene for now. All entities will be removed when scene ends.
+		inline const std::vector<Entity>& GetTileMapEntities(const int layer, const size_t tileId) const
+		{
+			return m_layers.at(layer).m_tileMap->GetEntities(tileId);
+		}
 
 		/**
 		* @brief Activates an entity within the scene. There are various systems that need to be notified
@@ -129,31 +134,34 @@ namespace Engine
 		void Deactivate(Entity entity);
 
 		/**
-		* @brief Adds a Layer to the scene. The tile map defines the layout of the level
-		* and the entities that should be instantiated based on the map characters.
+		* @brief Sets the gravity vector for the scene's physics simulation.
+		*
+		* @param gravity The gravity vector for the physics simulation.
 		*/
-		void AddLayers();
+		void SetGravity(const Math2D::Point2D<float> gravity);
 
 		/**
-		* @brief Gets the entity associated with a specific character in the tile map.
+		* @brief Register a contact callback between two entities identified by their tile IDs.
+		* Call this function to add a behavior that should be triggered when two entities
+		* come into contact.
 		* 
-		* @param tileId The id representing the entity in the tile map.
-		* 
-		* @return The Entity associated with the specified character.
+		* @param contactType The type of contact event (e.g., BEGIN_CONTACT, END_CONTACT).
+		* @param tileIdA The tile ID of the first entity involved in the contact.
+		* @param tileIdB The tile ID of the second entity involved in the contact.
+		* @param callback The callback function to be invoked when the contact event occurs.
 		*/
-		const Entity GetTileMapEntity(int layer, size_t tileId) const;
+		void RegisterContactCallback(ContactType contactType, const Math2D::Point2D<size_t> tileIdA, const Math2D::Point2D<size_t> tileIdB, ContactCallback callback);
 
 		/**
-		* @brief Gets all entities associated with a specific character in the tile map.
+		* @brief Register a contact callback for a specific entity identified by its tile ID.
+		* Call this function to add a behavior that should be triggered when the specified
+		* entity comes into contact with any other entity.
 		* 
-		* @param tileId The character representing the entities in the tile map.
-		* 
-		* @return A vector of Entities associated with the specified character.
+		* @param contactType The type of contact event (e.g., BEGIN_CONTACT, END_CONTACT).
+		* @param tileId The tile ID of the entity involved in the contact.
+		* @param callback The callback function to be invoked when the contact event occurs.
 		*/
-		inline const std::vector<Entity>& GetTileMapEntities(const int layer, const size_t tileId) const
-		{
-			return m_layers.at(layer).m_tileMap->GetEntities(tileId);
-		}
+		void RegisterContactCallback(ContactType contactType, const Math2D::Point2D<size_t> tileId, ContactCallback callback);
 
 		/**
 		* @brief Updates the physics simulation for the scene.
@@ -183,6 +191,9 @@ namespace Engine
 		*/
 		void RemoveIOEvent(IOEventType type);
 
+		/// void Add(Entity entity); /// @todo No support for manually adding entities to scene for now. All entities must be added via tile map prior to runtime.
+		/// void Remove(Entity entity); /// @todo No support for manually removing entities from scene for now. All entities will be removed when scene ends.
+
 	private:
 		ECS& m_refECS;						/// Reference to the ECS instance.
 		AssetManager& m_refAssetManager;	/// Reference to the AssetManager instance.
@@ -193,7 +204,7 @@ namespace Engine
 		std::vector<std::function<void()>> m_clientOnScenePlayEvents; /// Client defined functions to be called when the scene starts playing.
 		std::vector<std::function<void()>> m_clientOnSceneEndEvents;  /// Client defined functions to be called when the scene ends.
 
-		std::vector<Layer> m_layers;							/// Each layer. TEMP: Make this a vector where index is the layer id for easier access.
+		std::vector<Layer> m_layers;							/// Each layer. Index is the layer number.
 
 		PhysicsSimulation m_physicsSimulation;   				/// The physics simulation for the scene.
 		CameraSystem m_cameraSystem;							/// The camera system for the scene.
@@ -212,8 +223,6 @@ namespace Engine
 		json m_sceneAssets;
 		json m_componentTemplates;
 		json m_characterRules;
-
-	private:
 
 		/**
 		* @brief Activates physics for the given entity by creating its physics body/chains
@@ -254,5 +263,5 @@ namespace Engine
 		* @param entity The entity to add.
 		*/
 		void add(Entity entity);
-	}; 
+	};
 }

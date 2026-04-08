@@ -15,10 +15,12 @@ namespace Engine
 		return transform.m_prevPosition;
 	}
 
-	void TransformInterface::SetPosition(Entity entity, const Math2D::Point2D<float> position)
+	void TransformInterface::SetPosition(Entity entity, const Math2D::Point2D<float> position, bool skipLerp)
 	{
 		Transform* ptrTransform = GetTransform(entity);
+		ptrTransform->m_prevPosition = ptrTransform->m_position;
 		ptrTransform->m_position = position;
+		ptrTransform->m_skipLerp = skipLerp;
 	}
 
 	const Math2D::Point2D<float> TransformInterface::GetPosition(Entity entity)
@@ -66,6 +68,11 @@ namespace Engine
 	Transform* TransformInterface::GetTransform(Entity entity)
 	{
 		return m_refECS.GetComponent<Transform>(entity);
+	}
+
+	const Math2D::Point2D<float> TransformInterface::GetRenderPosition(Entity entity) 
+	{
+		return GetTransform(entity)->m_renderPosition;
 	}
 
 	TransformInterface::TransformInterface(ECS& refEcs) : m_refECS(refEcs)

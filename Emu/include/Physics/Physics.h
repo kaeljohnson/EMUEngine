@@ -19,16 +19,26 @@ namespace Engine
 	{
 	public:
 		/**
-		* @brief Constructor
+		* @brief Constructs the PhysicsSimulation with a reference to the ECS.
 		* 
-		* @param refECS Reference to the ECS
+		* @param refECS Reference to the ECS.
 		*/
 		PhysicsSimulation(ECS& refECS);
 
 		/**
-		* @brief Create box2D world.
+		* @brief Create the Box2D world.
 		*/
 		void CreateWorld();
+
+		/**
+		* @brief Destroy the physics world.
+		*/
+		void DestroyWorld();
+
+		/**
+		* @brief Cleanup the physics simulation.
+		*/
+		void Cleanup();
 
 		/**
 		* @brief Update the world's gravity vector.
@@ -37,6 +47,19 @@ namespace Engine
 		*/
 		void UpdateGravity(const Math2D::Point2D<float> gravity);
 
+		/**
+		* @brief Gets the current gravity vector.
+		* 
+		* @return A const reference to the gravity vector.
+		*/
+		const Math2D::Point2D<float>& GetGravity() const { return m_gravity; }
+
+		/**
+		* @brief Adds a TileMap pointer for a specific layer number to the contact system.
+		* 
+		* @param layerNum The layer number for which the TileMap is being added.
+		* @param ptrTileMap Pointer to the TileMap to be added for the specified layer.
+		*/
 		void AddPhysicsTileMap(size_t layerNum, TileMap* ptrTileMap) { m_contactSystem.AddTileMap(layerNum, ptrTileMap); }
 
 		/**
@@ -49,7 +72,7 @@ namespace Engine
 		/**
 		* @brief Add a single physics body to the world.
 		* 
-		* @param refPhysicsBody Reference to physics body
+		* @param refPhysicsBody Reference to physics body.
 		*/
 		void AddPhysicsBodyToWorld(PhysicsBody& refPhysicsBody);
 
@@ -57,11 +80,6 @@ namespace Engine
 		* @brief Add chain colliders to the world.
 		*/
 		void AddChainCollidersToWorld();
-
-		/**
-		* @brief Activate contact callbacks in contact system.
-		*/
-		void ActivateContactCallbacks();
 
 		/**
 		* @brief Activate physics bodies and chains in the world.
@@ -79,15 +97,22 @@ namespace Engine
 
 		/**
 		* @brief Deactivate physics bodies and chains in the world.
+		* 
 		* @param entity Entity to deactivate.
 		*/
 		void DeactivateBody(Entity entity);
 
 		/**
 		* @brief Deactivate physics chains in the world.
+		* 
 		* @param entity Entity to deactivate.
 		*/
 		void DeactivateChains(Entity entity);
+
+		/**
+		* @brief Activate contact callbacks in contact system.
+		*/
+		void ActivateContactCallbacks();
 
 		/**
 		* @brief Update the physics world.
@@ -101,23 +126,11 @@ namespace Engine
 		*/
 		void ProcessSimpleContacts(PhysicsBody& refPhysicsBody);
 
-		/**
-		* @brief Destroy the physics world.
-		*/
-		void DestroyWorld();
-
-		/**
-		* @brief Cleanup the physics simulation.
-		*/
-		void Cleanup();
-
-		const Math2D::Point2D<float>& GetGravity() const { return m_gravity; }
-
 		ContactSystem m_contactSystem;	/// Contact system for handling collisions
 
 	private:
 		b2WorldId* m_ptrWorldId;			/// Pointer to the Box2D world ID
-		
+
 		ECS& m_refECS;						/// Reference to the ECS
 
 		Math2D::Point2D<float> m_gravity;	/// Gravity vector

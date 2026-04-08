@@ -106,7 +106,7 @@ namespace Engine
 	}
 
 	// PhysicsBody2d getter and setter wrappers
-	void PhysicsInterface::SetGravity(Entity entity, bool enabled)
+	void PhysicsInterface::SetGravityEnabled(Entity entity, bool enabled)
 	{
 		PhysicsBody* ptrBody = GetBody(entity);
 		ptrBody->m_gravityOn = enabled;
@@ -453,11 +453,6 @@ namespace Engine
 				ptrTransform->m_position = refPhysicsBody.m_position;
 				ptrTransform->m_rotation = refPhysicsBody.m_rotation;
 			}
-
-			// Is this the best place for this?
-			PhysicsUpdater* ptrPhysicsUpdater = m_refECS.GetComponent<PhysicsUpdater>(refPhysicsBody.m_entity);
-			if (ptrPhysicsUpdater)
-				ptrPhysicsUpdater->Update(refPhysicsBody.m_entity);
 		}
 
 		// auto end = std::chrono::high_resolution_clock::now();

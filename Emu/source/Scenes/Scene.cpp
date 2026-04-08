@@ -190,6 +190,7 @@ namespace Engine
 
 	void Scene::RegisterOnScenePlayEvent(std::function<void()> func)
 	{
+		ENGINE_CRITICAL("FLUIP");
 		// Register a function to be called when the scene starts playing.
 		// This can be used to initialize things that need to be set up when the scene starts.
 		m_clientOnScenePlayEvents.push_back(std::move(func));
@@ -229,7 +230,7 @@ namespace Engine
 		}
 
 		// 6. Frame the cameras
-		m_cameraSystem.Frame();\
+		m_cameraSystem.Frame();
 		
 		// 7. Physics bodies need to be added to the world after they are activated and pooled.
 		m_physicsSimulation.AddPhysicsBodiesToWorld(m_entities);

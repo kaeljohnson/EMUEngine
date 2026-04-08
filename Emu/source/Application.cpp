@@ -24,7 +24,7 @@ namespace Engine
 	{
 		m_ecs.Initialize(numEntities);
 
-		m_ecs.RegisterComponentManager<PhysicsUpdater>();
+		m_ecs.RegisterComponentManager<Updater>();
 		m_ecs.RegisterComponentManager<CameraUpdater>();
 		m_ecs.RegisterComponentManager<PhysicsBody>();
 		m_ecs.RegisterComponentManager<ChainCollider>();
@@ -71,6 +71,14 @@ namespace Engine
 			while (accumulator >= timeStep)
 			{
 				m_sceneManager.GetCurrentScene()->UpdatePhysics();
+
+				// update scripts.
+				auto& hotScripts = m_ecs.GetHotComponents<Updater>();
+				for (auto& script : hotScripts)
+				{	
+					script.Update(script.m_entity);
+				}
+
 				m_animationSystem.Update();
 
 				accumulator -= timeStep;

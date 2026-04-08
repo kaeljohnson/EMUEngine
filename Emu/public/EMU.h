@@ -17,12 +17,25 @@ namespace Engine
 	{
 	public:
 
+		/**
+		* @brief Initializes the EMU engine singleton with the given entity capacity.
+		*
+		* @param numEntities The maximum number of entities supported.
+		*/
+		static void Init(const size_t numEntities);
+
+		/**
+		* @brief Destroys the EMU engine instance and releases all resources.
+		*/
+		~EMU();
+
+		/** @brief Callback type for contact events between entities. */
 		using ContactCallback = std::function<void(const Contact&)>;
 
-		/** 
+		/**
 		* @brief Get the singleton instance of the EMU engine.
-		* 
-		* * @return A pointer to the singleton instance of the EMU engine.
+		*
+		* @return A pointer to the singleton instance of the EMU engine.
 		*/
 		static EMU* GetInstance();
 
@@ -40,23 +53,25 @@ namespace Engine
 
 		/**
 		* @brief Create a new scene with the given name.
-		* * @param name: The name of the scene to be created.
+		*
+		* @param rulesFileName The rules file used to configure the scene.
+		* @param name The name of the scene to be created.
 		*/
 		void Scenes_Create(const std::string& rulesFileName, const std::string& name);
 
 		/**
 		* @brief Load the scene with the given name. Calling this ends the current scene
 		* and unloads it before loading the new scene.
-		* 
-		* * @return name: The name of the scene to be loaded.
+		*
+		* @param name The name of the scene to be loaded.
 		*/
 		void Scenes_Load(const std::string& name);
 
 		/**
 		* @brief Registers a callback function that is triggered when a new scene is played.
-		* 
-		* @param name: The name of the scene for which the callback is to be registered.
-		* @param callback: The function to be called when the scene is played.
+		*
+		* @param name The name of the scene for which the callback is to be registered.
+		* @param callback The function to be called when the scene is played.
 		*/
 		void Scenes_RegisterOnPlayEvent(const std::string& name, std::function<void()> callback);
 
@@ -69,121 +84,117 @@ namespace Engine
 		void Scenes_RegisterOnEndEvent(const std::string& name, std::function<void()> callback);
 
 		/**
-		* @brief Register a contact callback between two entities identified by their tileIds.
+		* @brief Register a contact callback between two entities identified by their tile IDs.
 		* Call this function to add a behavior that should be triggered when two entities
 		* come into contact.
-		*	
-		* @param name: The name of the scene where the contact callback is to be registered.
-		* @param contactType: The type of contact event (e.g., BEGIN_CONTACT, END_CONTACT).
-		* @param entityA: The character representing the first entity involved in the contact.
-		* @param entityB: The character representing the second entity involved in the contact.
+		*
+		* @param name The name of the scene where the contact callback is to be registered.
+		* @param contactType The type of contact event (e.g., BEGIN_CONTACT, END_CONTACT).
+		* @param tileIdA The tile ID representing the first entity involved in the contact.
+		* @param tileIdB The tile ID representing the second entity involved in the contact.
+		* @param callback The function to be called when the contact event occurs.
 		*/
 		void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const Math2D::Point2D<size_t> tileIdA, const Math2D::Point2D<size_t> tileIdB, ContactCallback callback);
 
 		/**
-		* @brief Register a contact callback for a single entity identified by its character.
+		* @brief Register a contact callback for a single entity identified by its tile ID.
 		* Call this function to add a behavior that should be triggered when the specified
 		* entity comes into contact with any other entity.
-		*	
-		* @param name: The name of the scene where the contact callback is to be registered.
-		* @param contactType: The type of contact event (e.g., BEGIN_SENSOR, END_SENSOR).
-		* @param entity: The character representing the entity involved in the contact.
-		* @param callback: The function to be called when the contact event occurs.
+		*
+		* @param name The name of the scene where the contact callback is to be registered.
+		* @param contactType The type of contact event (e.g., BEGIN_SENSOR, END_SENSOR).
+		* @param tileId The tile ID representing the entity involved in the contact.
+		* @param callback The function to be called when the contact event occurs.
 		*/
 		void Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const Math2D::Point2D<size_t> tileId, ContactCallback callback);
 
 		/**
 		* @brief Sets the physics simulation parameters for the scene with the given name.
-		* 
-		* @param name: The name of the scene for which the physics simulation is to be set.
-		* @param gravity: The gravity vector to be applied in the physics simulation.
+		*
+		* @param name The name of the scene for which the physics simulation is to be set.
+		* @param gravity The gravity vector to be applied in the physics simulation.
 		*/
 		void Scenes_SetGravity(const std::string& name, const Math2D::Point2D<float> gravity);
 
 		/**
 		* @brief Adds an entity to the scene with the given name.
 		* If this is called during runtime, the entity must be manually activated by client.
-		*	
+		*
 		* @todo Not supported for now.
-		* 
-		* @param name: The name of the scene to which the entity is to be added.
-		* @param entity: The entity to be added to the scene.
+		*
+		* @param name The name of the scene to which the entity is to be added.
+		* @param entity The entity to be added to the scene.
 		*/
 		void Scenes_Add(const std::string& name, Entity entity) {}
 
 		/**
-		* @brief Gets the first entity with the given character in the current scene.
-		* 
-		* @param tileId: The tile id.
+		* @brief Gets the first entity with the given tile ID in the current scene.
+		*
+		* @param layer The layer from which to retrieve the entity.
+		* @param tileId The tile ID.
+		* @return The entity matching the tile ID.
 		*/
 		Entity Scenes_GetCurrentRuntimeEntity(const int layer, const size_t tileId);
 
 		/**
-		* @brief Gets the first entity with the given character in the specified scene.
-		* 
-		* @param sceneName: The name of the scene from which to retrieve the entity.
-		* @param tileId: The tileId representing the entity to be retrieved.
+		* @brief Gets the first entity with the given tile ID in the specified scene.
+		*
+		* @param sceneName The name of the scene from which to retrieve the entity.
+		* @param layer The layer from which to retrieve the entity.
+		* @param tileId The tile ID representing the entity to be retrieved.
+		* @return The entity matching the tile ID.
 		*/
 		Entity Scenes_GetEntityById(const std::string& sceneName, const int layer, const size_t tileId);
 
 		/**
-		* @brief Gets all entities with the given character in the specified scene.
+		* @brief Gets all entities with the given tile ID in the specified scene.
 		*
-		* @param sceneName: The name of the scene from which to retrieve the entities.
-		* @param tileId: The number representing the entities to be retrieved.
+		* @param sceneName The name of the scene from which to retrieve the entities.
+		* @param layer The layer from which to retrieve the entities.
+		* @param tileId The tile ID representing the entities to be retrieved.
+		* @return A reference to a vector of entities matching the tile ID.
 		*/
 		const std::vector<Entity>& Scenes_GetEntitiesById(const std::string& sceneName, const int layer, const size_t tileId);
 
 		/**
 		* @brief Activates the specified entity in the scene with the given name.
-		* 
-		* @param entity: The entity to be activated in the scene.
+		*
+		* @param entity The entity to be activated in the scene.
 		*/
 		void Scenes_Activate(Entity entity);
 
 		/**
-		* @brief Deactivates the specified entity in the scene with the given name.
+		* @brief Activates the specified entities in the scene with the given name.
 		* 
-		* @param : entity - The entity to be deactivated in the scene.
+		* @param entities The vector of entities to be activated in the scene.
+		*/
+		void Scenes_Activate(const std::vector<Entity>& entities);
+
+		/**
+		* @brief Deactivates the specified entity in the scene with the given name.
+		*
+		* @param entity The entity to be deactivated in the scene.
 		*/
 		void Scenes_Deactivate(Entity entity);
 
 		/**
 		* @brief Removes the specified entity from the scene with the given name.
-		* 
+		*
 		* @todo Not supported for now.
-		* 
-		* @param name: The name of the scene from which the entity is to be removed.
-		* @param entity: The entity to be removed from the scene.
+		*
+		* @param name The name of the scene from which the entity is to be removed.
+		* @param entity The entity to be removed from the scene.
 		*/
 		void Scenes_Remove(const std::string& name, Entity entity) {}
 
 		/**
-		* @brief Adds a background layer to the simulation.
-		* 
-		* @param name: The name of the scene to which the background is to be added.
-		* @param layer: The id of the layer and order of rendering. Indices are rendered in descending order.
-		* @param parallax: The parallax factor the background is to be rendered using. The physics layer will always have a parallax of 1
-		*/
-		void Scenes_AddBackgroundLayer(const std::string& name, const size_t layer, const float parallax);
-
-		/**
-		* @brief Adds a tilemap to a background layer.
-		* 
-		* @note This tile map will consist only of transforms and animations. There is no physics done on this layer.
-		* 
-		* @param name: The name of the scene to which the background is to be added.
-		* @param mapFileName: The name of the map file to be added.
-		*/
-		void Scenes_AddBackgroundTileMap();
-
-
-		/**
-		* @brief Gets the first entity corresponding to the specified tile character from the tile map
+		* @brief Gets the first entity corresponding to the specified tile ID from the tile map
 		* of the scene with the given name.
-		* 
-		* @param name: The name of the scene from which to retrieve the entity.
-		* @param tileId: The character representing the tile for which to retrieve the entity.
+		*
+		* @param name The name of the scene from which to retrieve the entity.
+		* @param layer The layer from which to retrieve the entity.
+		* @param tileId The tile ID for which to retrieve the entity.
+		* @return The entity matching the tile ID.
 		*/
 		const Entity Scenes_GetTileMapEntity(const std::string& name, const int layer, const size_t tileId);
 
@@ -192,6 +203,7 @@ namespace Engine
 		* in the scene with the given name.
 		*
 		* @param name The name of the scene from which to retrieve the entities.
+		* @param layer The layer from which to retrieve the entities.
 		* @param tileId The tile ID representing the entities to retrieve.
 		* @return A reference to a vector of entities matching the tile ID.
 		*/
@@ -199,19 +211,24 @@ namespace Engine
 
 		////////////////////////////////////////////////////
 
-		// Audio Interface functions
+		//////////// Audio Interface Functions /////////////
 
-		// Play a sound once. Take string temporarily as they may cause dynamic allocations.
+		/**
+		* @brief Plays a sound effect.
+		*
+		* @param soundIndex The index of the sound to play.
+		* @param volume The volume level.
+		* @param loop Whether the sound should loop continuously.
+		*/
 		void PlaySound(int soundIndex, int volume, const bool loop = false);
 
 		//////////// Camera Interface Functions ////////////
 
 		/**
 		* @brief Checks if the given entity is within the camera's view frame.
-		* 
+		*
 		* @param entity The entity to check for being within the camera's frame.
-		* 
-		* returns True if the entity's sprite is within the camera's frame, false otherwise.
+		* @return True if the entity's sprite is within the camera's frame, false otherwise.
 		*/
 		const bool Camera_InFrame(Entity entity);
 
@@ -534,19 +551,29 @@ namespace Engine
 		 * @brief Sets the position of the transform component for the given entity.
 		 *
 		 * @note This function has no effect if the entity has an associated physics body.
-		 *
+		 * @note If the client wants to set skip lerp to true, they are responsible for setting it back to false.
+		 * 
+		 * 
 		 * @param entity The entity whose transform position is to be set.
 		 * @param position The position to assign to the transform in world units.
+		 * @param skipLerp If true, the transform will immediately jump to the new position without interpolation. If false, the transform will smoothly interpolate to the new position over time.
 		 */
-		void Transform_SetPosition(Entity entity, const Math2D::Point2D<float> position);
+		void Transform_SetPosition(Entity entity, const Math2D::Point2D<float> position, bool skipLerp = false);
 
 		/**
-		 * @brief Gets the current position of the transform component for the given entity.
+		 * @brief Gets the current position of the transform component for the given entity in world units.
 		 *
 		 * @param entity The entity whose transform position is to be retrieved.
 		 * @return The position of the transform in world units.
 		 */
-		const Math2D::Point2D<float> Transform_GetPosition(Entity entity);
+		const Math2D::Point2D<float> Transform_GetWorldPosition(Entity entity);
+
+		/**
+		* @brief Gets the current position of the transform component for the given entity in screen coordinates.
+		* 
+		* @param entity The entity whose transform position is to be retrieved.
+		*/
+		const Math2D::Vector2D<float> Transform_GetPositionOnScreen(Entity entity);
 
 		/**
 		 * @brief Sets the layer of the transform component for the given entity.
@@ -701,10 +728,11 @@ namespace Engine
 		* will be removed from the public API.
 		*
 		* @param sceneName The name of the scene.
+		* @param layer The layer containing the entities.
 		* @param tileId The number that identifies the tile in the map.
 		* @param updaterCallback The callback to be executed.
 		*/
-		void Scenes_AddPhysicsUpdaterComponent(const std::string& sceneName, const int layer, size_t tileId, std::function<void(Entity entity)> updaterCallback);
+		void Scenes_AddUpdaterComponent(const std::string& sceneName, const int layer, size_t tileId, std::function<void(Entity entity)> updaterCallback);
 
 		/**
 		* @brief Registers an "on scene play event" which adds a component of
@@ -715,6 +743,7 @@ namespace Engine
 		* will be removed from the public API.
 		*
 		* @param sceneName The name of the scene.
+		* @param layer The layer containing the entities.
 		* @param tileId The number that identifies the tile in the map.
 		* @param updaterCallback The callback to be executed.
 		*/
@@ -776,13 +805,14 @@ namespace Engine
 		*/
 		void Global_UnRegisterIOEventListener(IOEventType type);
 
-	public:
-		static void Init(const size_t numEntities);
-		~EMU();
-		
 		std::unique_ptr<Application> m_application;
 
 	private:
+		/**
+		* @brief Constructs the EMU engine with the given entity capacity.
+		*
+		* @param numEntities The maximum number of entities supported.
+		*/
 		EMU(const size_t numEntities);
 	};
 } // namespace Engine

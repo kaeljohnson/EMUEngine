@@ -4,18 +4,19 @@
 
 Cloud::Cloud()
 {
-	Engine::EMU::GetInstance()->Scenes_RegisterOnPlayEvent("StartScreen", [this]() 
+	/*Engine::EMU::GetInstance()->Scenes_RegisterOnPlayEvent("StartScreen", [this]() 
 	{ 
 			std::vector<Engine::Entity> entities = Engine::EMU::GetInstance()->Scenes_GetTileMapEntities("StartScreen", 3, 42);
 			for (auto& entity : entities)
 				Engine::EMU::GetInstance()->Physics_SetXVelocity(entity, -1.0f);
-	});
+	});*/
+	ENGINE_CRITICAL("Creating cloud");
 
-	Engine::EMU::GetInstance()->Scenes_AddPhysicsUpdaterComponent("StartScreen", 3, 42,
+	Engine::EMU::GetInstance()->Scenes_AddUpdaterComponent("StartScreen", 3, 42,
 		[this](Engine::Entity entity) { Update(entity); });
 
-	Engine::EMU::GetInstance()->Scenes_AddPhysicsUpdaterComponent("Level1", 3, 42,
-		[this](Engine::Entity entity) { Update(entity); });
+	/*Engine::EMU::GetInstance()->Scenes_AddPhysicsUpdaterComponent("Level1", 3, 42,
+		[this](Engine::Entity entity) { Update(entity); });*/
 }
 
 // TODO: Add a Scenes_AddTransformUpdater function and remove physics from clouds. This will make it easier to control cloud movement on screen.
@@ -24,27 +25,36 @@ Cloud::Cloud()
 void Cloud::Update(Engine::Entity entity)
 {
 	// CLIENT_CRITICAL("Entity: {}", entity);
-	Engine::Entity playerEntity = Engine::EMU::GetInstance()->Scenes_GetTileMapEntity("StartScreen", 1, 1);
 	// const float cameraLeft = Engine::EMU::GetInstance()->Camera_GetOffset(playerEntity).X * 0.6f;
 	// const float cameraRight = cameraLeft + Engine::EMU::GetInstance()->Camera_GetSize(playerEntity).X;
 
-	const float cloudLeft = Engine::EMU::GetInstance()->Transform_GetPosition(entity).X; // Need a function like "GetSCreenPosition" that takes parallax into account so we don't have to do this math in client code.
-	const float cloudRight = cloudLeft + Engine::EMU::GetInstance()->Physics_GetDimensions(entity).X;
+	const Math2D::Point2D<float> cloudWorldPos = Engine::EMU::GetInstance()->Transform_GetWorldPosition(entity);
 
-	const float cloudY = Engine::EMU::GetInstance()->Transform_GetPosition(entity).Y;
+	const float cloudLeft = cloudWorldPos.X;
 
-	// CLIENT_CRITICAL_D("Camera left: {}, size: {}", cameraLeft, cameraRight);
-	//CLIENT_CRITICAL_D("Cloud pos world space: {}x{}, size: {}", cloudLeft, cloudY, cloudRight);
+	const float cloudRight = Engine::EMU::GetInstance()->Transform_GetWorldPosition(entity).X + 8;
+
+
+	const float cloudY = Engine::EMU::GetInstance()->Transform_GetWorldPosition(entity).Y;
 
 	// If the cloud has moved off the left side of the screen, reset its position to the right side
 	//if (!Engine::EMU::GetInstance()->Camera_InFrame(entity))
-	if (cloudRight < 0.0f)
+	if (cloudRight < -10.0f)
 	{
-		Engine::EMU::GetInstance()->Physics_SetPosition(entity, Math2D::Point2D<float>(141.0f, cloudY));
+		Engine::EMU::GetInstance()->Transform_SetPosition(entity, Math2D::Point2D<float>(141.0f, cloudY), true);
+		return;
 	}
 
-	/*if (cloudLeft > cameraRight)
-	{
-		Engine::EMU::GetInstance()->Physics_SetPosition(entity, -100.0f);
-	}*/
+	const float interpFactor = Engine::Time::GetInterpolationFactor();
+
+	const Math2D::Point2D<float> cloudNextWorldPos = Math2D::Point2D<float>(cloudWorldPos.X - 0.05f, cloudWorldPos.Y);
+
+	Math2D::Point2D<float> targetPos = Math2D::Lerp(cloudWorldPos, cloudNextWorldPos, interpFactor);
+
+
+	// Set the camera offset to the desired position
+	Engine::EMU::GetInstance()->Transform_SetPosition(entity, cloudNextWorldPos);
+
+	// Need to manaully set the cloud position each frame and remove it from the physics system. This will simplify 
+	// cloud logic and make it easier to reset its position.
 }
