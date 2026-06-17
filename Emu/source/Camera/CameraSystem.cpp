@@ -37,11 +37,6 @@ namespace Engine
 		return worldPos - cameraCenter * parallax + halfSize;
 	}
 
-	static Math2D::Point2D<float> screenToWorld(const Math2D::Point2D<float> screenTopLeft, const Math2D::Point2D<float> cameraPos, const Math2D::Point2D<float> halfSize)
-	{
-		return cameraPos - halfSize + screenTopLeft;
-	}
-
 	static Math2D::Point2D<int> toPixels(const Math2D::Point2D<float>& units, size_t scaleInPixels)
 	{
 		return Math2D::Point2D<int>(int(units.X * scaleInPixels), int(units.Y * scaleInPixels));
@@ -81,8 +76,6 @@ namespace Engine
 					lerpedPos + ptrSpriteComponent->m_offsetFromTransform,
 					refCamera.m_centerInWorldUnits, refTransform.m_parallaxFactor, halfSize);
 				const Math2D::Point2D<float> objectBottomRight = objectTopLeft + ptrSpriteComponent->m_sizeInUnits;
-
-				refTransform.m_renderPosition = screenToWorld(objectTopLeft, refCamera.m_centerInWorldUnits, halfSize);						// Store the render position in the transform for use in other systems (e.g. animation system).
 
 				refTransform.m_screenTopLeft = objectTopLeft;			// Temparorly store screen position in Transform for use in other systems (e.g. collision system).
 				refTransform.m_screenBottomRight = objectBottomRight;	// The sprite component should store these as well so the client can specify if it wants the transform or the sprite.

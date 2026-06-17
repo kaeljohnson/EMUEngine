@@ -50,9 +50,6 @@ namespace Engine
 		Math2D::Point2D<float> m_screenTopLeft;		 /// Cached screen position of the top left corner.
 		Math2D::Point2D<float> m_screenBottomRight;  /// Cached screen position of the bottom right corner.
 
-		Math2D::Point2D<float> m_renderPosition;	 /// Cached position used for rendering, which takes into account parallax and camera position.
-
-
 		/**
 		* @brief Default constructor.
 		*

@@ -70,11 +70,6 @@ namespace Engine
 		return m_refECS.GetComponent<Transform>(entity);
 	}
 
-	const Math2D::Point2D<float> TransformInterface::GetRenderPosition(Entity entity) 
-	{
-		return GetTransform(entity)->m_renderPosition;
-	}
-
 	TransformInterface::TransformInterface(ECS& refEcs) : m_refECS(refEcs)
 	{
 	}

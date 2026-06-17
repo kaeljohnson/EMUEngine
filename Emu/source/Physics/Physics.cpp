@@ -246,7 +246,6 @@ namespace Engine
 		//if (AppState::IN_SCENE)
 		if (true)
 		{
-			ENGINE_CRITICAL("flep");
 			m_gravity = gravity;
 			b2WorldDef worldDef = b2DefaultWorldDef();
 			worldDef.gravity = { gravity.X, gravity.Y };
@@ -254,7 +253,6 @@ namespace Engine
 		}
 		else
 		{
-			ENGINE_CRITICAL_D("BLEEEE");
 			m_gravity = gravity;
 		}
 	}

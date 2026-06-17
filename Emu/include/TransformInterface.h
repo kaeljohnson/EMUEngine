@@ -68,15 +68,6 @@ namespace Engine
 		const Math2D::Point2D<float> GetPosition(Entity entity);
 
 		/**
-		* @brief Get the render position of an entity's transform.
-		* 
-		* @param entity The entity whose transform to get the render position of.
-		* 
-		* @return The render position of the entity's transform, which takes into account parallax and camera position.
-		*/
-		const Math2D::Point2D<float> GetRenderPosition(Entity entity);
-
-		/**
 		* @brief Set layer of an entity's transform.
 		* 
 		* @param entity The entity whose transform to set the layer of.
