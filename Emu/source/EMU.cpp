@@ -81,51 +81,51 @@ namespace Engine
 
 	// Scene management
 
-	Entity EMU::Scenes_GetEntityById(const std::string& sceneName, const size_t tileId)
+	Entity EMU::Scenes_GetEntityById(const std::string& sceneName, const int layer, const size_t tileId)
 	{
-		return m_application->m_sceneManager.GetEntity(sceneName, tileId);
+		return m_application->m_sceneManager.GetEntity(sceneName, layer, tileId);
 	}
 
-	const std::vector<Entity>& EMU::Scenes_GetEntitiesById(const std::string& sceneName, const size_t id)
+	const std::vector<Entity>& EMU::Scenes_GetEntitiesById(const std::string& sceneName, const int layer, const size_t id)
 	{
-		return m_application->m_sceneManager.GetEntities(sceneName, id);
+		return m_application->m_sceneManager.GetEntities(sceneName, layer, id);
 	}
 
-	Entity EMU::Scenes_GetCurrentRuntimeEntity(const size_t tileId)
+	Entity EMU::Scenes_GetCurrentRuntimeEntity(const int layer, const size_t tileId)
 	{
-		return m_application->m_sceneManager.GetCurrentScene()->GetTileMapEntity(tileId);
+		return m_application->m_sceneManager.GetCurrentScene()->GetTileMapEntity(layer, tileId);
 	}
 	
 	void EMU::Scenes_Activate(Entity entity) { m_application->m_sceneManager.GetCurrentScene()->Activate(entity); }
+	void EMU::Scenes_Activate(const std::vector<Entity>& entities) { for (const auto& entity : entities) m_application->m_sceneManager.GetCurrentScene()->Activate(entity); }
 	void EMU::Scenes_Deactivate(Entity entity) { m_application->m_sceneManager.GetCurrentScene()->Deactivate(entity); }
-	void EMU::Scenes_Create(const std::string& name) { m_application->m_sceneManager.AddScene(name, m_application->m_assetManager, m_application->m_IOEventSystem); }
+	void EMU::Scenes_Create(const std::string& rulesFileName, const std::string& name) { m_application->m_sceneManager.AddScene(name, rulesFileName, m_application->m_assetManager, m_application->m_IOEventSystem); }
 	void EMU::Scenes_Load(const std::string& name) { m_application->m_sceneManager.QueueNewScene(name); }
 	void EMU::Scenes_RegisterOnPlayEvent(const std::string& name, std::function<void()> func) { m_application->m_sceneManager.RegisterOnScenePlayEvent(name, func); }
 	void EMU::Scenes_RegisterOnEndEvent(const std::string& name, std::function<void()> func) { m_application->m_sceneManager.RegisterOnSceneEndEvent(name, func); }
 
-	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const size_t entityA, const size_t entityB, ContactCallback callback)
+	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const Math2D::Point2D<size_t> tileIdA, const Math2D::Point2D<size_t> tileIdB, ContactCallback callback)
 	{ 
-		m_application->m_sceneManager.RegisterContactCallback(name, contactType, entityA, entityB, callback);
+		m_application->m_sceneManager.RegisterContactCallback(name, contactType, tileIdA, tileIdB, callback);
 	}
-	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const size_t entity, ContactCallback callback) {
-		m_application->m_sceneManager.RegisterContactCallback(name, contactType, entity, callback);
+	void EMU::Scenes_RegisterContactCallback(const std::string& name, ContactType contactType, const Math2D::Point2D<size_t> tileId, ContactCallback callback) {
+		m_application->m_sceneManager.RegisterContactCallback(name, contactType, tileId, callback);
 	}
 	void EMU::Scenes_SetGravity(const std::string& name, const Math2D::Point2D<float> gravity) { m_application->m_sceneManager.SetGravity(name, gravity); }
 	// void EMU::Scenes_Add(const std::string& name, Entity entity) { getScene(name).Add(entity); }
 	// void EMU::Scenes_Remove(const std::string& name, Entity entity) { getScene(name).Remove(entity); m_ecs.Deactivate(entity); }
-	void EMU::Scenes_AddTileMap(const std::string& name, const std::string& mapFileName, const std::string& rulesFileName) { m_application->m_sceneManager.AddTileMap(name, mapFileName, rulesFileName); }
-	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const size_t tileId) { return m_application->m_sceneManager.GetEntity(name, tileId); }
-	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const size_t tileId) { return m_application->m_sceneManager.GetTileMapEntities(name, tileId); }
-	void EMU::Scenes_SetLevelDimensions(const std::string& name, const Math2D::Point2D<int> levelWidthInUnits) { m_application->m_sceneManager.SetLevelDimensions(name, levelWidthInUnits); }
+	const Entity EMU::Scenes_GetTileMapEntity(const std::string& name, const int layer, const size_t tileId) { return m_application->m_sceneManager.GetEntity(name, layer, tileId); }
+	const std::vector<Entity>& EMU::Scenes_GetTileMapEntities(const std::string& name, const int layer, const size_t tileId) { return m_application->m_sceneManager.GetTileMapEntities(name, layer, tileId); }
 
+	const bool EMU::Camera_InFrame(Entity entity) { return m_application->m_cameraInterface.InFrame(entity); }
 	void EMU::Camera_SetPixelsPerUnit(Entity entity, const int pixelsPerUnit) { m_application->m_cameraInterface.SetPixelsPerUnit(entity, pixelsPerUnit); }
 	const size_t EMU::Camera_GetPixelsPerUnit(Entity entity) { return m_application->m_cameraInterface.GetPixelsPerUnit(entity); }
-	void EMU::Camera_SetOffset(Entity entity, const Math2D::Point2D<float> offset) { m_application->m_cameraInterface.SetOffset(entity, offset); }
-	const Math2D::Point2D<float> EMU::Camera_GetOffset(Entity entity) { return m_application->m_cameraInterface.GetOffset(entity); }
+	void EMU::Camera_SetPosition(Entity entity, const Math2D::Point2D<float> offset) { m_application->m_cameraInterface.SetPosition(entity, offset); }
+	const Math2D::Point2D<float> EMU::Camera_GetPosition(Entity entity) { return m_application->m_cameraInterface.GetPosition(entity); }
 	void EMU::Camera_SetClampingOn(Entity entity, const bool clampingOn) { m_application->m_cameraInterface.SetClampingOn(entity, clampingOn); }
 	const bool EMU::Camera_GetClampingOn(Entity entity) { return m_application->m_cameraInterface.GetClampingOn(entity); }
 	const Math2D::Point2D<float> EMU::Camera_GetSize(Entity entity) { return m_application->m_cameraInterface.GetSize(entity); }
-	void EMU::Camera_SetOffsets(Entity entity, const Math2D::Point2D<float> offsets) { m_application->m_cameraInterface.SetOffset(entity, offsets); }
+	void EMU::Camera_SetOffsets(Entity entity, const Math2D::Point2D<float> offsets) { m_application->m_cameraInterface.SetPosition(entity, offsets); }
 	void EMU::Camera_AddShake(Entity entity, const Math2D::Point2D<float> intensity, const Math2D::Point2D<float> duration) { /*Add shaek to camera*/ }
 
 	// PhysicsBody2d getter and setter wrappers
@@ -134,11 +134,10 @@ namespace Engine
 	void EMU::Physics_SetBodyType(Entity entity, const BodyType type) { m_application->m_physicsInterface.SetBodyType(entity, type); }
 	void EMU::Physics_SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions) { m_application->m_physicsInterface.SetDimensions(entity, dimensions); }
 	const Math2D::Point2D<float> EMU::Physics_GetDimensions(Entity entity) { return m_application->m_physicsInterface.GetDimensions(entity); }
-	void EMU::Physics_SetGravity(Entity entity, bool enabled) { m_application->m_physicsInterface.SetGravity(entity, enabled); }
+	void EMU::Physics_SetGravity(Entity entity, bool enabled) { m_application->m_physicsInterface.SetGravityEnabled(entity, enabled); }
 	void EMU::Physics_SetStartingPosition(Entity entity, const Math2D::Point2D<float> position) { m_application->m_physicsInterface.SetStartingPosition(entity, position); }
 	void EMU::Physics_SetPosition(Entity entity, const Math2D::Point2D<float> position) { m_application->m_physicsInterface.SetPosition(entity, position); }
 	const Math2D::Point2D<float> EMU::Physics_GetPosition(Entity entity) { return m_application->m_physicsInterface.GetPosition(entity); }
-	const Math2D::Point2D<float> EMU::Physics_GetTopLeftPosition(Entity entity) { return m_application->m_physicsInterface.GetTopLeftPosition(entity); }
 	void EMU::Physics_ApplyForceToBody(Entity entity, Math2D::Point2D<float> force) { m_application->m_physicsInterface.ApplyForceToBody(entity, force); }
 	void EMU::Physics_ApplyImpulseToBody(Entity entity, Math2D::Point2D<float> impulse) { m_application->m_physicsInterface.ApplyImpulseToBody(entity, impulse); }
 	void EMU::Physics_SetVelocity(Entity entity, const Math2D::Point2D<float> velocity) { m_application->m_physicsInterface.SetVelocity(entity, velocity); }
@@ -162,10 +161,11 @@ namespace Engine
 
 	// Transform getter and setter wrappers
 	const Math2D::Point2D<float> EMU::Transform_GetPrevPosition(Entity entity) { return m_application->m_transformInterface.GetPrevPosition(entity); }
-	void EMU::Transform_SetPosition(Entity entity, const Math2D::Point2D<float> position) { m_application->m_transformInterface.SetPosition(entity, position); }
-	const Math2D::Point2D<float> EMU::Transform_GetPosition(Entity entity) { return m_application->m_transformInterface.GetPosition(entity); }
-	void EMU::Transform_SetZIndex(Entity entity, const int zIndex) { m_application->m_transformInterface.SetZIndex(entity, zIndex); }
-	const size_t EMU::Transform_GetZIndex(Entity entity) { return m_application->m_transformInterface.GetZIndex(entity); }
+	void EMU::Transform_SetPosition(Entity entity, const Math2D::Point2D<float> position, bool skipLerp) { m_application->m_transformInterface.SetPosition(entity, position, skipLerp); }
+	const Math2D::Point2D<float> EMU::Transform_GetWorldPosition(Entity entity) { return m_application->m_transformInterface.GetPosition(entity); }
+	const Math2D::Vector2D<float> EMU::Transform_GetPositionOnScreen(Entity entity) { return m_application->m_transformInterface.GetScreenPosition(entity); }
+	void EMU::Transform_SetLayer(Entity entity, const int layer) { m_application->m_transformInterface.SetLayer(entity, layer); }
+	const size_t EMU::Transform_GetLayer(Entity entity) { return m_application->m_transformInterface.GetLayer(entity); }
 	void EMU::Transform_SetRotation(Entity entity, const float rotation) { m_application->m_transformInterface.SetRotation(entity, rotation); }
 	const float EMU::Transform_GetRotation(Entity entity) { return m_application->m_transformInterface.GetRotation(entity); }
 	void EMU::Transform_SetDirectionFacing(Entity entity, const int direction) { m_application->m_transformInterface.SetDirectionFacing(entity, direction); }
@@ -178,50 +178,63 @@ namespace Engine
 	// const Math2D::Point2D<int> EMU::GetVirtualSize() { return Screen::GetVirtualSize(); }
 	const int EMU::GetScale() { return Screen::GetScale(); }
 	const Math2D::Point2D<int> EMU::GetWindowSize() { return Screen::GetWindowSize(); }
-	void EMU::SetWindowSize(const Math2D::Point2D<int>& size) { Screen::SetWindowSize(size); }
+	void EMU::SetWindowSize(const Math2D::Point2D<int>& size) 
+	{ 
+		Screen::SetWindowSize(size);
+		
+		m_application->m_cameraInterface.SetSize(size);
+		
+	}
 	void EMU::SetFullscreen() { Screen::SetFullscreen(); }
 
 
 	
 	template<class ComponentType, class... Args>
-	void RegisterAddOnPlay(EMU* emu, const std::string& sceneName, size_t tileId, Args&&... args)
+	void RegisterAddOnPlay(EMU* emu, const std::string& sceneName, const int layer, size_t tileId, Args&&... args)
 	{
 		auto packed = std::make_tuple(std::forward<Args>(args)...);
 
 		emu->Scenes_RegisterOnPlayEvent(
 			sceneName,
-			[emu, sceneName, tileId, packed = std::move(packed)]() mutable
+			[emu, sceneName, layer, tileId, packed = std::move(packed)]() mutable
 			{
 				std::apply([&](auto&... unpacked)
 					{
 						emu->m_application->m_sceneManager.AddComponent<ComponentType>(
 							sceneName,
+							layer,
 							tileId,
 							unpacked...);
+
+						emu->Scenes_Activate(emu->Scenes_GetTileMapEntities(sceneName, layer, tileId));
 					}, packed);
 			});
 	}
 
-	void EMU::Scenes_AddPhysicsUpdaterComponent(
+	void EMU::Scenes_AddUpdaterComponent(
 		const std::string& sceneName,
+		const int layer,
 		size_t tileId,
 		std::function<void(Entity)> updaterCallback)
 	{
-		RegisterAddOnPlay<PhysicsUpdater>(
+		RegisterAddOnPlay<Updater>(
 			this,
 			sceneName,
+			layer,
 			tileId,
 			updaterCallback
 		);
 	}
 
 	void EMU::Scenes_AddCameraUpdaterComponent(const std::string& sceneName, 
+		const int layer,
 		size_t tileId, 
 		std::function<void(Entity entity)> updaterCallback) 
 	{
 		RegisterAddOnPlay<CameraUpdater>(
 			this,
 			sceneName,
+			layer,
 			tileId,
 			updaterCallback
 		);

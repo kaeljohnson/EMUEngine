@@ -38,24 +38,68 @@ namespace Engine
 		Math2D::Point2D<float> m_position;	   /// Current position of the entity's physics body.
 		Math2D::Point2D<float> m_velocity;	   /// Current velocity of the entity's physics body.
 
-		size_t m_zIndex;			/// Z-index for rendering order.
+		bool m_skipLerp = false;			   /// Flag indicating whether to skip interpolation when updating the position. Used for teleporting entities.
+
+		size_t m_layer;				/// layer for rendering order.
 		float m_parallaxFactor;		/// The parallax factor the object will get multiplied by when getting rendered.
 		float m_rotation;			/// Rotation of the entity in degrees.
 		int m_directionFacing;		/// Direction the entity is facing (1 for right, -1 for left).
 		bool m_drawDebug;			/// Flag indicating whether to draw debug information for this entity.
 		DebugColor m_debugColor;	/// Color to use for debug rendering.
 
-		Transform(Entity entity) : m_prevPosition(0.0f, 0.0f), m_position(0.0f, 0.0f),
-			m_rotation(0.0f), m_directionFacing(1), m_zIndex(0), m_parallaxFactor(1.0f),
-			m_drawDebug(false), m_debugColor(DebugColor::Red), Component(entity) {}
+		Math2D::Point2D<float> m_screenTopLeft;		 /// Cached screen position of the top left corner.
+		Math2D::Point2D<float> m_screenBottomRight;  /// Cached screen position of the bottom right corner.
 
-		Transform(Entity entity, Math2D::Point2D<float> position, float rotation, 
-			int direction, size_t zIndex, float parallaxFactor, const bool drawDebug, DebugColor debugColor) :
-			m_prevPosition(position), m_position(position), m_rotation(rotation), 
-			m_directionFacing(direction), m_zIndex(zIndex), m_parallaxFactor(parallaxFactor), m_drawDebug(drawDebug),
+		/**
+		* @brief Default constructor.
+		*
+		* @param entity The entity to associate with this component.
+		*/
+		Transform(Entity entity)
+			: m_prevPosition(0.0f, 0.0f),
+			m_position(0.0f, 0.0f),
+			m_rotation(0.0f),
+			m_directionFacing(1),
+			m_layer(0),
+			m_parallaxFactor(1.0f),
+			m_drawDebug(false),
+			m_debugColor(DebugColor::Red),
+			Component(entity) {}
+
+		/**
+		* @brief Parameterized constructor.
+		*
+		* @param entity The entity to associate with this component.
+		* @param position Initial position of the entity.
+		* @param rotation Initial rotation in degrees.
+		* @param direction Direction the entity is facing (1 for right, -1 for left).
+		* @param layer Rendering layer.
+		* @param parallaxFactor Parallax scrolling factor.
+		* @param drawDebug Whether to draw debug information.
+		* @param debugColor Color for debug rendering.
+		*/
+		Transform(
+			Entity entity,
+			Math2D::Point2D<float> position,
+			float rotation,
+			int direction,
+			size_t layer,
+			float parallaxFactor,
+			const bool drawDebug,
+			DebugColor debugColor)
+			: m_prevPosition(position),
+			m_position(position),
+			m_rotation(rotation),
+			m_directionFacing(direction),
+			m_layer(layer),
+			m_parallaxFactor(parallaxFactor),
+			m_drawDebug(drawDebug),
 			m_debugColor(debugColor),
 			Component(entity) {}
 
+		/**
+		* @brief Default destructor.
+		*/
 		~Transform() = default;
 	};
 
@@ -97,33 +141,93 @@ namespace Engine
 
 		bool m_enabled;									/// Flag indicating whether the physics body is enabled.
 
-		PhysicsBody(Entity entity) :
-			m_bodyId(nullptr), m_enabled(true), m_shapeId(nullptr), m_worldId(nullptr),
-			m_bodyType(STATIC), m_dimensions(Math2D::Point2D<float>(1.0f, 1.0f)),
-			m_halfDimensions(Math2D::Point2D<float>(0.5f, 0.5f)), m_startingPosition(Math2D::Point2D<float>(1.0f, 1.0f)),
-			m_position(Math2D::Point2D<float>(0.0f, 0.0f)), m_rotation(0.0f), m_drawDebug(false), m_fillRect(false), 
-			m_debugColor(DebugColor::Red), m_gravityOn(true), m_category(ALL), m_mask(ALL), m_checkSimpleContacts(false), 
+		/**
+		* @brief Default constructor.
+		*
+		* @param entity The entity to associate with this component.
+		*/
+		PhysicsBody(Entity entity)
+			: m_bodyId(nullptr),
+			m_shapeId(nullptr),
+			m_worldId(nullptr),
+			m_bodyType(STATIC),
+			m_category(ALL),
+			m_mask(ALL),
+			m_drawDebug(false),
+			m_fillRect(false),
+			m_debugColor(DebugColor::Red),
+			m_dimensions(Math2D::Point2D<float>(1.0f, 1.0f)),
+			m_halfDimensions(Math2D::Point2D<float>(0.5f, 0.5f)),
+			m_startingPosition(Math2D::Point2D<float>(1.0f, 1.0f)),
+			m_position(Math2D::Point2D<float>(0.0f, 0.0f)),
+			m_rotation(0.0f),
+			m_gravityOn(true),
+			m_checkSimpleContacts(false),
+			m_enabled(true),
 			Component(entity) {}
 
-		PhysicsBody(Entity entity, const bool enabled, BodyType bodyType, Filter category, Filter mask,
-			Math2D::Point2D<float> dimensions, Math2D::Point2D<float> startingPosition,
-			float rotation, bool gravityOn, bool checkSimpleContacts, bool drawDebug, bool fillRect, DebugColor debugColor)
-			: m_bodyId(nullptr), m_enabled(enabled), m_shapeId(nullptr), m_worldId(nullptr),
-			m_bodyType(bodyType), m_category(category), m_mask(mask), m_dimensions(dimensions),
-			m_halfDimensions(dimensions / 2.0f), m_startingPosition(startingPosition), m_drawDebug(drawDebug), 
-			m_fillRect(fillRect), m_debugColor(debugColor), m_rotation(rotation), m_gravityOn(gravityOn), 
-			m_checkSimpleContacts(checkSimpleContacts), Component(entity) {}
+		/**
+		* @brief Parameterized constructor.
+		*
+		* @param entity The entity to associate with this component.
+		* @param enabled Whether the physics body is enabled.
+		* @param bodyType Type of the physics body.
+		* @param category Collision filter category.
+		* @param mask Collision filter mask.
+		* @param dimensions Dimensions of the physics body in world units.
+		* @param startingPosition Starting position in world units.
+		* @param rotation Initial rotation in degrees.
+		* @param gravityOn Whether gravity is applied.
+		* @param checkSimpleContacts Whether to check for simple directional contacts.
+		* @param drawDebug Whether to draw debug information.
+		* @param fillRect Whether to fill the debug rectangle.
+		* @param debugColor Color for debug rendering.
+		*/
+		PhysicsBody(
+			Entity entity,
+			const bool enabled,
+			BodyType bodyType,
+			Filter category,
+			Filter mask,
+			Math2D::Point2D<float> dimensions,
+			Math2D::Point2D<float> startingPosition,
+			float rotation,
+			bool gravityOn,
+			bool checkSimpleContacts,
+			bool drawDebug,
+			bool fillRect,
+			DebugColor debugColor)
+			: m_bodyId(nullptr),
+			m_shapeId(nullptr),
+			m_worldId(nullptr),
+			m_bodyType(bodyType),
+			m_category(category),
+			m_mask(mask),
+			m_drawDebug(drawDebug),
+			m_fillRect(fillRect),
+			m_debugColor(debugColor),
+			m_dimensions(dimensions),
+			m_halfDimensions(dimensions / 2.0f),
+			m_startingPosition(startingPosition),
+			m_rotation(rotation),
+			m_gravityOn(gravityOn),
+			m_checkSimpleContacts(checkSimpleContacts),
+			m_enabled(enabled),
+			Component(entity) {}
 
+		/**
+		* @brief Default destructor.
+		*/
 		~PhysicsBody() = default;
 	};
 
 	/**
-	* @struct PhysicsUpdater
+	* @struct Updater
 	* 
 	* @brief Component that allows for custom physics update logic via a callback function. The physics system calls this function 
 	* after updating the physics bodies each tick, allowing for additional physics-related updates or behaviors to be implemented.
 	*/
-	struct PhysicsUpdater : public Component
+	struct Updater : public Component
 	{
 		using UpdateCallback = std::function<void(Entity entity)>;  /// Callback function type for updating physics.
 
@@ -142,8 +246,22 @@ namespace Engine
 			}
 		}
 
-		PhysicsUpdater(Entity entity, UpdateCallback callback) : m_callback(callback), Component(entity) {}
-		~PhysicsUpdater() = default;
+		/**
+		* @brief Constructs a Updater with a callback function.
+		*
+		* @param entity The entity to associate with this component.
+		* @param callback The callback function for custom physics update logic.
+		*/
+		Updater(
+			Entity entity,
+			UpdateCallback callback)
+			: m_callback(callback),
+			Component(entity) {}
+
+		/**
+		* @brief Default destructor.
+		*/
+		~Updater() = default;
 	};
 
 	/**
@@ -161,10 +279,26 @@ namespace Engine
 		Math2D::Point2D<int> m_locationInPixelsOnSpriteSheet;	/// Location of the render object on the sprite sheet in pixels.
 		Math2D::Point2D<int> m_sizeInPixelsOnSpriteSheet;		/// Size of the render object on the sprite sheet in pixels.
 
-		RenderObject(size_t entity, Math2D::Point2D<int> locationInPixelsOnScreen, Math2D::Point2D<int> sizeInPixelsOnScreen, 
-			Math2D::Point2D<int> locationInPixelsOnSpriteSheet, Math2D::Point2D<int> sizeInPixelsOnSpriteSheet)
-			: m_entity(entity), m_locationInPixelsOnScreen(locationInPixelsOnScreen), m_sizeInPixelsOnScreen(sizeInPixelsOnScreen),
-			m_locationInPixelsOnSpriteSheet(locationInPixelsOnSpriteSheet), m_sizeInPixelsOnSpriteSheet(sizeInPixelsOnSpriteSheet) {}
+		/**
+		* @brief Constructs a RenderObject.
+		*
+		* @param entity Entity ID associated with this render object.
+		* @param locationInPixelsOnScreen Screen position in pixels.
+		* @param sizeInPixelsOnScreen Screen size in pixels.
+		* @param locationInPixelsOnSpriteSheet Sprite sheet position in pixels.
+		* @param sizeInPixelsOnSpriteSheet Sprite sheet frame size in pixels.
+		*/
+		RenderObject(
+			size_t entity,
+			Math2D::Point2D<int> locationInPixelsOnScreen,
+			Math2D::Point2D<int> sizeInPixelsOnScreen,
+			Math2D::Point2D<int> locationInPixelsOnSpriteSheet,
+			Math2D::Point2D<int> sizeInPixelsOnSpriteSheet)
+			: m_entity(entity),
+			m_locationInPixelsOnScreen(locationInPixelsOnScreen),
+			m_sizeInPixelsOnScreen(sizeInPixelsOnScreen),
+			m_locationInPixelsOnSpriteSheet(locationInPixelsOnSpriteSheet),
+			m_sizeInPixelsOnSpriteSheet(sizeInPixelsOnSpriteSheet) {}
 	};
 
 	/**
@@ -182,10 +316,26 @@ namespace Engine
 		Math2D::Point2D<int> m_locationInPixelsOnScreen;	/// Location of the debug object on the screen in pixels.
 		Math2D::Point2D<int> m_sizeInPixelsOnScreen;		/// Size of the debug object on the screen in pixels.
 
-		DebugObject(size_t entity, bool filled, Math2D::Point2D<int> locationInPixelsOnScreen, 
-			Math2D::Point2D<int> sizeInPixelsOnScreen, DebugColor debugColor)
-			: m_entity(entity), m_filled(filled), m_locationInPixelsOnScreen(locationInPixelsOnScreen), 
-			m_sizeInPixelsOnScreen(sizeInPixelsOnScreen), m_debugColor(debugColor) {}
+		/**
+		* @brief Constructs a DebugObject.
+		*
+		* @param entity Entity ID associated with this debug object.
+		* @param filled Whether the debug shape should be filled.
+		* @param locationInPixelsOnScreen Screen position in pixels.
+		* @param sizeInPixelsOnScreen Screen size in pixels.
+		* @param debugColor Color for debug rendering.
+		*/
+		DebugObject(
+			size_t entity,
+			bool filled,
+			Math2D::Point2D<int> locationInPixelsOnScreen,
+			Math2D::Point2D<int> sizeInPixelsOnScreen,
+			DebugColor debugColor)
+			: m_entity(entity),
+			m_filled(filled),
+			m_locationInPixelsOnScreen(locationInPixelsOnScreen),
+			m_sizeInPixelsOnScreen(sizeInPixelsOnScreen),
+			m_debugColor(debugColor) {}
 	};
 
 	/**
@@ -202,10 +352,23 @@ namespace Engine
 		Math2D::Point2D<int> m_endPointInPixelsOnScreen;	/// End point of the line on the screen in pixels.
 		DebugColor m_debugColor;							/// Color to use for debug rendering.
 
-		LineObject(size_t entity, Math2D::Point2D<int> startPointInPixelsOnScreen, 
-			Math2D::Point2D<int> endPointInPixelsOnScreen, DebugColor debugColor)
-			: m_entity(entity), m_startPointInPixelsOnScreen(startPointInPixelsOnScreen), 
-			m_endPointInPixelsOnScreen(endPointInPixelsOnScreen), m_debugColor(debugColor) {}
+		/**
+		* @brief Constructs a LineObject.
+		*
+		* @param entity Entity ID associated with this line object.
+		* @param startPointInPixelsOnScreen Start point on the screen in pixels.
+		* @param endPointInPixelsOnScreen End point on the screen in pixels.
+		* @param debugColor Color for debug rendering.
+		*/
+		LineObject(
+			size_t entity,
+			Math2D::Point2D<int> startPointInPixelsOnScreen,
+			Math2D::Point2D<int> endPointInPixelsOnScreen,
+			DebugColor debugColor)
+			: m_entity(entity),
+			m_startPointInPixelsOnScreen(startPointInPixelsOnScreen),
+			m_endPointInPixelsOnScreen(endPointInPixelsOnScreen),
+			m_debugColor(debugColor) {}
 	};
 
 	/**
@@ -221,14 +384,26 @@ namespace Engine
 		Math2D::Point2D<int> m_locationInPixelsOnScreen;	/// Location of the debug point on the screen in pixels.
 		DebugColor m_debugColor;							/// Color to use for debug rendering.
 
-		DebugPointObject(size_t entity, Math2D::Point2D<int> pointInPixelsOnScreen, DebugColor debugColor)
-			: m_entity(entity), m_locationInPixelsOnScreen(pointInPixelsOnScreen), m_debugColor(debugColor) {}
+		/**
+		* @brief Constructs a DebugPointObject.
+		*
+		* @param entity Entity ID associated with this debug point.
+		* @param pointInPixelsOnScreen Point location on the screen in pixels.
+		* @param debugColor Color for debug rendering.
+		*/
+		DebugPointObject(
+			size_t entity,
+			Math2D::Point2D<int> pointInPixelsOnScreen,
+			DebugColor debugColor)
+			: m_entity(entity),
+			m_locationInPixelsOnScreen(pointInPixelsOnScreen),
+			m_debugColor(debugColor) {}
 	};
 
-	using RenderBucket = std::vector<std::vector<RenderObject>>;				/// Vector index is the zIndex.
-	using DebugRenderBucket = std::vector<std::vector<DebugObject>>;			/// Vector index is the zIndex.
-	using LinesRenderBucket = std::vector<std::vector<LineObject>>;				/// Vector index is the zIndex.
-	using DebugPointRenderBucket = std::vector<std::vector<DebugPointObject>>;  /// Vector index is the zIndex.
+	using RenderBucket = std::vector<std::vector<RenderObject>>;				/// Vector index is the layer.
+	using DebugRenderBucket = std::vector<std::vector<DebugObject>>;			/// Vector index is the layer.
+	using LinesRenderBucket = std::vector<std::vector<LineObject>>;				/// Vector index is the layer.
+	using DebugPointRenderBucket = std::vector<std::vector<DebugPointObject>>;  /// Vector index is the layer.
 	
 	/**
 	* @struct Camera
@@ -243,36 +418,85 @@ namespace Engine
 		Math2D::Point2D<float> m_viewPortPositionInPercentageOfScreen;				 /// Position of the camera in fraction of screen size (0.0 - 1.0).
 		Math2D::Point2D<float> m_viewportSizeInPercentageOfScreen;					 /// Screen ratio of the camera (width / height).
 
-		Math2D::Point2D<float> m_offset;						 /// Top left position of the camera in world units.
+		Math2D::Point2D<float> m_cameraTopLeftInWorldUnits;		 /// Top left position of the camera in world units.
+		Math2D::Point2D<float> m_centerInWorldUnits;			 /// Center position of the camera in world units. Calculated each frame based on m_cameraPosInWorldUnits and m_size.
 		Math2D::Point2D<float> m_size;							 /// Size of the camera in world units.
+		Math2D::Point2D<int> m_frameBounds;						 /// Bounds of the camera frame in pixels. Used for clamping.
 
 		size_t m_pixelsPerUnit;									 /// Number of pixels per world unit.
 		bool m_clampingOn;										 /// Flag indicating whether clamping is enabled for the camera.
-		Math2D::Point2D<int> m_bounds;							 /// Bounds of the camera in pixels.
 		bool m_borderOn;										 /// Flag indicating whether to draw a border around the camera view.
 		size_t m_numLayers;										 /// Number of layers for rendering.
-		std::array<int, 3> m_backgroundColor;				 /// Background color of the camera in RGB format.
+		std::array<int, 3> m_backgroundColor;					 /// Background color of the camera in RGB format.
 
-		RenderBucket m_renderBucket;							 /// Bucket for storing renderable objects. Maps zIndex to vector of RenderObjects.
-		DebugRenderBucket m_debugRenderBucket;					 /// Bucket for storing renderable debug objects. Maps zIndex to vector of DebugObjects.
-		LinesRenderBucket m_debugLinesRenderBucket;				 /// Bucket for storing renderable debug lines. Maps zIndex to vector of lines.
-		DebugPointRenderBucket m_debugPointsRenderBucket;		 /// Bucket for storing renderable point objects. Maps zIndex to vector of debug points.
+		std::set<Entity> m_currentFramedEntities;				 /// TEMP data structure. Set of entities currently within the camera's view frame.
 
+		RenderBucket m_renderBucket;							 /// Bucket for storing renderable objects. Maps layer to vector of RenderObjects.
+		DebugRenderBucket m_debugRenderBucket;					 /// Bucket for storing renderable debug objects. Maps layer to vector of DebugObjects.
+		LinesRenderBucket m_debugLinesRenderBucket;				 /// Bucket for storing renderable debug lines. Maps layer to vector of lines.
+		DebugPointRenderBucket m_debugPointsRenderBucket;		 /// Bucket for storing renderable point objects. Maps layer to vector of debug points.
+
+		/**
+		* @brief Default constructor.
+		*
+		* @param entity The entity to associate with this component.
+		*/
 		Camera(Entity entity)
-			: m_offset(0.0f, 0.0f), m_size(0.0f, 0.0f), m_viewportSizeInPercentageOfScreen(1.0f, 1.0f), m_numLayers(10),
-			m_viewPortPositionInPercentageOfScreen(0.0f, 0.0f), m_pixelsPerUnit(32), m_clampingOn(true), m_borderOn(false),
-			m_bounds(0, 0), m_renderBucket(10, std::vector<RenderObject>()), m_backgroundColor({ 0, 0, 0 }),
-			m_debugRenderBucket(10, std::vector<DebugObject>()), m_debugLinesRenderBucket(10, std::vector<LineObject>()),
+			: m_viewPortPositionInPercentageOfScreen(0.0f, 0.0f),
+			m_viewportSizeInPercentageOfScreen(1.0f, 1.0f),
+			m_cameraTopLeftInWorldUnits(0.0f, 0.0f),
+			m_size(0.0f, 0.0f),
+			m_frameBounds(0, 0),
+			m_pixelsPerUnit(16),
+			m_clampingOn(true),
+			m_borderOn(false),
+			m_numLayers(10),
+			m_backgroundColor({ 0, 0, 0 }),
+			m_renderBucket(10, std::vector<RenderObject>()),
+			m_debugRenderBucket(10, std::vector<DebugObject>()),
+			m_debugLinesRenderBucket(10, std::vector<LineObject>()),
 			m_debugPointsRenderBucket(10, std::vector<DebugPointObject>()),
 			Component(entity) {}
 
-		Camera(Entity entity, Math2D::Point2D<float> size, Math2D::Point2D<float> screenRatio, 
-			Math2D::Point2D<float> position, size_t pixelsPerUnit, bool clampingOn, bool border, std::array<int, 3> backgroundColor, size_t numLayers)
-			: m_size(size), m_viewportSizeInPercentageOfScreen(screenRatio), m_viewPortPositionInPercentageOfScreen(position),
-			m_pixelsPerUnit(pixelsPerUnit), m_clampingOn(clampingOn), m_offset(0.0f, 0.0f), m_bounds(0, 0), 
-			m_borderOn(border), m_renderBucket(numLayers, std::vector<RenderObject>()), m_backgroundColor(backgroundColor),
-			m_numLayers(numLayers), m_debugRenderBucket(numLayers, std::vector<DebugObject>()), 
-			m_debugLinesRenderBucket(numLayers, std::vector<LineObject>()), m_debugPointsRenderBucket(numLayers, std::vector<DebugPointObject>()),
+		/**
+		* @brief Parameterized constructor.
+		*
+		* @param entity The entity to associate with this component.
+		* @param size Size of the camera in world units.
+		* @param screenRatio Viewport size as a fraction of screen size.
+		* @param position Viewport position as a fraction of screen size.
+		* @param pixelsPerUnit Number of pixels per world unit.
+		* @param clampingOn Whether clamping is enabled.
+		* @param border Whether to draw a border around the camera view.
+		* @param backgroundColor Background color in RGB format.
+		* @param numLayers Number of rendering layers.
+		* @param frameBounds Frame bounds used for clamping.
+		*/
+		Camera(
+			Entity entity,
+			Math2D::Point2D<float> size,
+			Math2D::Point2D<float> screenRatio,
+			Math2D::Point2D<float> position,
+			size_t pixelsPerUnit,
+			bool clampingOn,
+			bool border,
+			std::array<int, 3> backgroundColor,
+			size_t numLayers,
+			Math2D::Point2D<int> frameBounds)
+			: m_viewPortPositionInPercentageOfScreen(position),
+			m_viewportSizeInPercentageOfScreen(screenRatio),
+			m_cameraTopLeftInWorldUnits(0.0f, 0.0f),
+			m_size(size),
+			m_frameBounds(frameBounds),
+			m_pixelsPerUnit(pixelsPerUnit),
+			m_clampingOn(clampingOn),
+			m_borderOn(border),
+			m_numLayers(numLayers),
+			m_backgroundColor(backgroundColor),
+			m_renderBucket(numLayers, std::vector<RenderObject>()),
+			m_debugRenderBucket(numLayers, std::vector<DebugObject>()),
+			m_debugLinesRenderBucket(numLayers, std::vector<LineObject>()),
+			m_debugPointsRenderBucket(numLayers, std::vector<DebugPointObject>()),
 			Component(entity) {}
 	};
 
@@ -301,7 +525,21 @@ namespace Engine
 			}
 		}
 
-		CameraUpdater(Entity entity, UpdateCallback callback) : m_callback(callback), Component(entity) {}
+		/**
+		* @brief Constructs a CameraUpdater with a callback function.
+		*
+		* @param entity The entity to associate with this component.
+		* @param callback The callback function for custom camera update logic.
+		*/
+		CameraUpdater(
+			Entity entity,
+			UpdateCallback callback)
+			: m_callback(callback),
+			Component(entity) {}
+
+		/**
+		* @brief Default destructor.
+		*/
 		~CameraUpdater() = default;
 	};
 
@@ -330,10 +568,36 @@ namespace Engine
 
 		bool m_enabled;				/// Flag indicating whether the chain collider is enabled.
 
-		ChainCollider(Entity entity, Math2D::Chain refPoints, 
-			const bool enabled, Filter category, Filter mask, bool drawDebug, DebugColor debugColor)
-			: m_chain(refPoints), m_category(category), m_enabled(enabled), m_mask(mask), 
-			m_drawDebug(true), m_debugColor(debugColor), Component(entity) {}
+		/**
+		* @brief Constructs a ChainCollider.
+		*
+		* @param entity The entity to associate with this component.
+		* @param refPoints Points and edges defining the chain collider.
+		* @param enabled Whether the chain collider is enabled.
+		* @param category Collision filter category.
+		* @param mask Collision filter mask.
+		* @param drawDebug Whether to draw debug information.
+		* @param debugColor Color for debug rendering.
+		*/
+		ChainCollider(
+			Entity entity,
+			Math2D::Chain refPoints,
+			const bool enabled,
+			Filter category,
+			Filter mask,
+			bool drawDebug,
+			DebugColor debugColor)
+			: m_chain(refPoints),
+			m_category(category),
+			m_mask(mask),
+			m_drawDebug(true),
+			m_debugColor(debugColor),
+			m_enabled(enabled),
+			Component(entity) {}
+
+		/**
+		* @brief Default destructor.
+		*/
 		~ChainCollider() = default;
 	};
 
@@ -354,14 +618,40 @@ namespace Engine
 		bool m_drawDebug;										/// Flag indicating whether to draw debug information for this sprite.
 		DebugColor m_debugColor;								/// Color to use for debug rendering.
 
-		Sprite(Entity entity, void* ptrLoadedTexture, Math2D::Point2D<int> pixelsPerFrame,
-			Math2D::Point2D<float> offsetFromTransform, Math2D::Point2D<size_t> dimensions,
-			Math2D::Point2D<float> size, const bool drawDebug, DebugColor debugColor)
-			: m_ptrLoadedTexture(ptrLoadedTexture), m_offsetFromTransform(offsetFromTransform),
-			m_pixelsPerFrame(pixelsPerFrame), m_dimensions(dimensions), m_sizeInUnits(size),
-			m_drawDebug(drawDebug), m_debugColor(debugColor), m_locationInPixelsOnSpriteSheet(0, 0),
+		/**
+		* @brief Constructs a Sprite.
+		*
+		* @param entity The entity to associate with this component.
+		* @param ptrLoadedTexture Pointer to the loaded texture.
+		* @param pixelsPerFrame Size of each frame in pixels.
+		* @param offsetFromTransform Offset from the entity's transform in world units.
+		* @param dimensions Dimensions of the sprite sheet in frames.
+		* @param size Size of the sprite in world units.
+		* @param drawDebug Whether to draw debug information.
+		* @param debugColor Color for debug rendering.
+		*/
+		Sprite(
+			Entity entity,
+			void* ptrLoadedTexture,
+			Math2D::Point2D<int> pixelsPerFrame,
+			Math2D::Point2D<float> offsetFromTransform,
+			Math2D::Point2D<size_t> dimensions,
+			Math2D::Point2D<float> size,
+			const bool drawDebug,
+			DebugColor debugColor)
+			: m_ptrLoadedTexture(ptrLoadedTexture),
+			m_pixelsPerFrame(pixelsPerFrame),
+			m_locationInPixelsOnSpriteSheet(0, 0),
+			m_sizeInUnits(size),
+			m_offsetFromTransform(offsetFromTransform),
+			m_dimensions(dimensions),
+			m_drawDebug(drawDebug),
+			m_debugColor(debugColor),
 			Component(entity) {}
 
+		/**
+		* @brief Default destructor.
+		*/
 		~Sprite() = default;
 	};
 
@@ -382,10 +672,30 @@ namespace Engine
 		size_t m_frameCounter = 0;      /// Tracks the number of frames passed since the last frame change 
 		bool m_loop;					/// Whether the animation should loop.
 
+		/**
+		* @brief Default constructor.
+		*/
 		Animation() = default;
-		Animation(size_t id, std::vector<int> frames, int frameDuration,  bool loop)
-			: m_id(id), m_frames(frames), m_numFrames(frames.size()), m_frameTime(0),
-			m_frameDuration(frameDuration), m_loop(loop) {};
+
+		/**
+		* @brief Parameterized constructor.
+		*
+		* @param id Animation identifier.
+		* @param frames Frame indices in the sprite sheet.
+		* @param frameDuration Duration each frame is displayed (in ticks).
+		* @param loop Whether the animation should loop.
+		*/
+		Animation(
+			size_t id,
+			std::vector<int> frames,
+			int frameDuration,
+			bool loop)
+			: m_id(id),
+			m_frames(frames),
+			m_numFrames(frames.size()),
+			m_frameTime(0),
+			m_frameDuration(frameDuration),
+			m_loop(loop) {};
 	
 	};
 
@@ -400,12 +710,22 @@ namespace Engine
 		std::unordered_map<size_t, Animation> m_animations; /// All animations for this sprite
 		size_t m_currentAnimation;							 /// Name of the current animation being played
 
-		Animations(Entity entity, std::unordered_map<size_t, Animation> animations)
-			:
-			m_animations(animations), 
+		/**
+		* @brief Constructs an Animations component.
+		*
+		* @param entity The entity to associate with this component.
+		* @param animations Map of animation IDs to Animation instances.
+		*/
+		Animations(
+			Entity entity,
+			std::unordered_map<size_t, Animation> animations)
+			: m_animations(animations),
 			m_currentAnimation(0),
 			Component(entity) {}
 
+		/**
+		* @brief Default destructor.
+		*/
 		~Animations() = default;
 	};
 
@@ -422,9 +742,24 @@ namespace Engine
 		int m_volume;				/// 0 - 128
 		std::string m_soundName;	/// Name of the sound to be played by the audio source.
 
-		AudioSource(Entity entity, const std::string& soundName)
-			: m_enabled(false), m_loop(false), m_volume(0), m_soundName(soundName), Component(entity) {}
+		/**
+		* @brief Constructs an AudioSource component.
+		*
+		* @param entity The entity to associate with this component.
+		* @param soundName Name of the sound to be played.
+		*/
+		AudioSource(
+			Entity entity,
+			const std::string& soundName)
+			: m_enabled(false),
+			m_loop(false),
+			m_volume(0),
+			m_soundName(soundName),
+			Component(entity) {}
 
+		/**
+		* @brief Default destructor.
+		*/
 		~AudioSource() = default;
 	};
 }

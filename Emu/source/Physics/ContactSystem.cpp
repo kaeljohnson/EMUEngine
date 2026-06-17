@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	ContactSystem::ContactSystem(ECS& refECS, TileMap& tileMap) : m_refECS(refECS), m_refTileMap(tileMap) {}
+	ContactSystem::ContactSystem(ECS& refECS) : m_refECS(refECS) {}
 
 	// This function is allocating memory dynamically. Why?
 	void ContactSystem::ProcessContacts(void* ptrWorldId)
@@ -142,11 +142,18 @@ namespace Engine
 		}
 	}
 
+	void ContactSystem::SetNumLayers(size_t numLayers)
+	{
+		m_tileMaps.assign(numLayers, nullptr);
+	}
+
 	void ContactSystem::ActivateContactCallbacks()
 	{
 		for (auto& tuple : m_singleEntityContactCallbacks)
 		{
-			Entity entityA = m_refTileMap.GetEntity(std::get<1>(tuple));
+			size_t layerNum = std::get<1>(tuple).X;
+
+			Entity entityA = m_tileMaps[layerNum]->GetEntity(std::get<1>(tuple).Y);
 			ContactType contactType = std::get<0>(tuple);
 			ContactCallback callback = std::get<2>(tuple);
 			if (entityA != m_refECS.INVALID_ENTITY)
@@ -161,8 +168,11 @@ namespace Engine
 
 		for (auto& tuple : m_multiContactCallbacks)
 		{
-			Entity entityA = m_refTileMap.GetEntity(std::get<1>(tuple));
-			Entity entityB = m_refTileMap.GetEntity(std::get<2>(tuple));
+			size_t layerNumA = std::get<1>(tuple).X;
+			size_t layerNumB = std::get<2>(tuple).X;
+
+			Entity entityA = m_tileMaps[layerNumA]->GetEntity(std::get<1>(tuple).Y);
+			Entity entityB = m_tileMaps[layerNumB]->GetEntity(std::get<2>(tuple).Y);
 			ContactType contactType = std::get<0>(tuple);
 			ContactCallback callback = std::get<3>(tuple);
 			if (entityA != m_refECS.INVALID_ENTITY && entityB != m_refECS.INVALID_ENTITY)
@@ -171,7 +181,7 @@ namespace Engine
 			}
 			else
 			{
-				ENGINE_CRITICAL("One or both entities do not exist in the ECS. Cannot register contact callback.");
+				ENGINE_CRITICAL("One or both entities ({}, {}) do not exist in the ECS. Cannot register contact callback.", entityA, entityB);
 			}
 		}
 	}
@@ -214,12 +224,13 @@ namespace Engine
 		}
 	}
 
-	void ContactSystem::RegisterContactCallback(ContactType contactType, const size_t A, const size_t B, ContactCallback callback)
+	void ContactSystem::RegisterContactCallback(ContactType contactType, const Math2D::Point2D<size_t> A, const Math2D::Point2D<size_t> B, ContactCallback callback)
 	{
+		ENGINE_CRITICAL_D("Registering contact callback between tile {} on layer {} and tile {} on layer {}.", A.Y, A.X, B.Y, B.X);
 		m_multiContactCallbacks.emplace_back(contactType, A, B, callback);
 	}
 
-	void ContactSystem::RegisterContactCallback(ContactType contactType, const size_t A, ContactCallback callback)
+	void ContactSystem::RegisterContactCallback(ContactType contactType, const Math2D::Point2D<size_t> A, ContactCallback callback)
 	{
 		m_singleEntityContactCallbacks.emplace_back(contactType, A, callback);
 	}

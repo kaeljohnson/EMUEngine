@@ -12,11 +12,12 @@ namespace Engine
 		m_scenes.reserve(200);
 	}
 
-	void SceneManager::AddScene(std::string sceneName, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
+	void SceneManager::AddScene(std::string sceneName, const std::string& rulesFileName, AssetManager& refAssetManager, IOEventSystem& refIOEventSystem)
 	{
+		ENGINE_INFO("Adding scene: {}", sceneName);
 		m_scenes.emplace(std::piecewise_construct,
 			std::forward_as_tuple(sceneName),
-			std::forward_as_tuple(m_refECS, refAssetManager, refIOEventSystem));
+			std::forward_as_tuple(rulesFileName, m_refECS, refAssetManager, refIOEventSystem));
 	}
 
 	bool SceneManager::IsSceneChanging()
@@ -46,12 +47,12 @@ namespace Engine
 		}
 	}
 
-	const Entity SceneManager::GetEntity(const std::string& sceneName, const size_t tileId)
+	const Entity SceneManager::GetEntity(const std::string& sceneName, const int layer, const size_t tileId)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
 		{
-			return it->second.GetTileMapEntity(tileId);
+			return it->second.GetTileMapEntity(layer, tileId);
 		}
 		else
 		{
@@ -60,12 +61,12 @@ namespace Engine
 		}
 	}
 
-	const std::vector<Entity>& SceneManager::GetEntities(const std::string& sceneName, const size_t tileId)
+	const std::vector<Entity>& SceneManager::GetEntities(const std::string& sceneName, const int layer, const size_t tileId)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
 		{
-			return it->second.GetTileMapEntities(tileId);
+			return it->second.GetTileMapEntities(layer, tileId);
 		}
 		else
 		{
@@ -93,12 +94,12 @@ namespace Engine
 		m_scenes.clear();
 	}
 
-	const std::vector<Entity>& SceneManager::GetTileMapEntities(const std::string& sceneName, const size_t tileId) const 
+	const std::vector<Entity>& SceneManager::GetTileMapEntities(const std::string& sceneName, const int layer, const size_t tileId) const 
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end()) 
 		{
-			return it->second.GetTileMapEntities(tileId);
+			return it->second.GetTileMapEntities(layer, tileId);
 		}
 		else 
 		{
@@ -134,12 +135,12 @@ namespace Engine
 		}
 	}
 
-	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const size_t entityA, const size_t entityB, Scene::ContactCallback callback)
+	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const Math2D::Point2D<size_t> tileIdA, const Math2D::Point2D<size_t> tileIdB, Scene::ContactCallback callback)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
 		{
-			it->second.RegisterContactCallback(contactType, entityA, entityB, callback);
+			it->second.RegisterContactCallback(contactType, tileIdA, tileIdB, callback);
 		}
 		else
 		{
@@ -148,12 +149,12 @@ namespace Engine
 		}
 	}
 
-	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const size_t entity, Scene::ContactCallback callback)
+	void SceneManager::RegisterContactCallback(const std::string& sceneName, ContactType contactType, const Math2D::Point2D<size_t> tileId, Scene::ContactCallback callback)
 	{
 		auto it = m_scenes.find(sceneName);
 		if (it != m_scenes.end())
 		{
-			it->second.RegisterContactCallback(contactType, entity, callback);
+			it->second.RegisterContactCallback(contactType, tileId, callback);
 		}
 		else
 		{
@@ -196,32 +197,6 @@ namespace Engine
 		if (it != m_scenes.end())
 		{
 			it->second.SetGravity(gravity);
-		}
-		else
-		{
-			ENGINE_CRITICAL("Scene not found in SceneManager: {}", sceneName);
-		}
-	}
-
-	void SceneManager::AddTileMap(const std::string& sceneName, const std::string& mapFileName, const std::string& rulesFileName)
-	{
-		auto it = m_scenes.find(sceneName);
-		if (it != m_scenes.end())
-		{
-			it->second.AddTileMap(mapFileName, rulesFileName);
-		}
-		else
-		{
-			ENGINE_CRITICAL("Scene not found in SceneManager: {}", sceneName);
-		}
-	}
-
-	void SceneManager::SetLevelDimensions(const std::string& sceneName, const Math2D::Point2D<int> dimensions)
-	{
-		auto it = m_scenes.find(sceneName);
-		if (it != m_scenes.end())
-		{
-			it->second.SetLevelDimensions(dimensions);
 		}
 		else
 		{

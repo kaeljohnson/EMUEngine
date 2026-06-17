@@ -13,6 +13,13 @@ namespace Engine
 	class TransformInterface
 	{
 	public:
+		/**
+		* @brief Constructs the TransformInterface with a reference to the ECS.
+		* 
+		* @param refEcs Reference to the ECS instance.
+		*/
+		TransformInterface(ECS& refEcs);
+
 		/** 
 		* @brief Get previous position of an entity's transform in world space.
 		* 
@@ -31,6 +38,15 @@ namespace Engine
 		*/
 		const Math2D::Point2D<float> GetPrevPosition(Transform& transform);
 
+		/**
+		* @brief Get the position of the transform on the screen. This is used for rendering and is calculated by the camera system.
+		* 
+		* @param entity The entity whose transform to get the screen position of.
+		* 
+		* @return The screen position of the entity's transform.
+		*/
+		const Math2D::Vector2D<float> GetScreenPosition(Entity entity) { return { GetTransform(entity)->m_screenTopLeft, GetTransform(entity)->m_screenBottomRight }; }
+
 		/** 
 		* @brief Set position of transform.
 		* 
@@ -38,8 +54,9 @@ namespace Engine
 		* 
 		* @param entity The entity whose transform to set the position of.
 		* @param position The new position of the entity's transform in world space.
+		* @param skipLerp If true, the transform will immediately jump to the new position without interpolation. If false, the transform will smoothly interpolate to the new position over time.
 		*/
-		void SetPosition(Entity entity, const Math2D::Point2D<float> position);
+		void SetPosition(Entity entity, const Math2D::Point2D<float> position, bool skipLerp);
 
 		/**
 		* @brief Get position of an entity's transform in world space.
@@ -51,21 +68,21 @@ namespace Engine
 		const Math2D::Point2D<float> GetPosition(Entity entity);
 
 		/**
-		* @brief Set Z index of an entity's transform.
+		* @brief Set layer of an entity's transform.
 		* 
-		* @param entity The entity whose transform to set the Z index of.
-		* @param zIndex The new Z index of the entity's transform.
+		* @param entity The entity whose transform to set the layer of.
+		* @param layer The new layer of the entity's transform.
 		*/
-		void SetZIndex(Entity entity, const int zIndex);
+		void SetLayer(Entity entity, const int layer);
 
 		/**
-		* @brief Get Z index of an entity's transform.
+		* @brief Get layer of an entity's transform.
 		* 
-		* @param entity The entity whose transform to get the Z index of.
+		* @param entity The entity whose transform to get the layer of.
 		* 
-		* @return The Z index of the entity's transform.
+		* @return The layer of the entity's transform.
 		*/
-		const size_t GetZIndex(Entity entity);
+		const size_t GetLayer(Entity entity);
 
 		/**
 		* @brief Set rotation of an entity's transform.
@@ -109,13 +126,6 @@ namespace Engine
 		* @return Pointer to the entity's transform component.
 		*/
 		Transform* GetTransform(Entity entity);
-
-		/**
-		* @brief Constructor for TransformInterface.
-		* 
-		* @param refEcs Reference to the ECS instance.
-		*/
-		TransformInterface(ECS& refEcs);
 
 	private:
 		ECS& m_refECS;

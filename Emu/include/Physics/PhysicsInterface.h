@@ -7,9 +7,21 @@
 
 namespace Engine
 {
+	/**
+	* @class PhysicsInterface
+	*
+	* @brief Provides methods to interact with physics body components in the ECS.
+	*/
 	class PhysicsInterface
 	{
 	public:
+		/**
+		* @brief Constructs the PhysicsInterface with a reference to the ECS.
+		*
+		* @param refECS Reference to the Entity Component System.
+		*/
+		PhysicsInterface(ECS& refECS);
+
 		/**
 		* @brief Create a physics body for an entity.
 		*
@@ -27,6 +39,22 @@ namespace Engine
 		const bool HasBody(Entity entity);
 
 		/**
+		* @brief Get the physics body of an entity.
+		*
+		* @param entity The entity to get the body for.
+		*
+		* @return Pointer to the physics body.
+		*/
+		PhysicsBody* GetBody(Entity entity);
+
+		/**
+		* @brief Remove the physics body of an entity from the world.
+		*
+		* @param entity The entity to remove the body for.
+		*/
+		void RemoveBodyFromWorld(Entity entity);
+
+		/**
 		* @brief Set the body type for an entity's physics body.
 		*
 		* @param entity The entity to set the body type for.
@@ -35,9 +63,9 @@ namespace Engine
 		void SetBodyType(Entity entity, const BodyType type);
 
 		/**
-		* @brief Get the body type of an entity's physics body.
+		* @brief Set the dimensions for an entity's physics body.
 		*
-		* @param entity The entity to get the body type for.
+		* @param entity The entity to set the dimensions for.
 		* @param dimensions The dimensions to set for the body.
 		*/
 		void SetDimensions(Entity entity, const Math2D::Point2D<float> dimensions);
@@ -61,14 +89,6 @@ namespace Engine
 		const Math2D::Point2D<float> GetDimensions(PhysicsBody& body);
 
 		/**
-		* @brief Enable or disable gravity for an entity's physics body.
-		*
-		* @param entity The entity to set gravity for.
-		* @param enabled True to enable gravity, false to disable.
-		*/
-		void SetGravity(Entity entity, bool enabled);
-
-		/**
 		* @brief Set the starting position for an entity's physics body.
 		*
 		* @param entity The entity to set the starting position for.
@@ -85,38 +105,13 @@ namespace Engine
 		void SetPosition(Entity entity, const Math2D::Point2D<float> position);
 
 		/**
-		* @brief Get the position of an entity's physics body.
-		*
-		* @param entity The entity to get the position for.
-		*
-		* @return The position of the physics body.
-		*/
-		const Math2D::Point2D<float> GetPosition(Entity entity);
-
-		/**
 		* @brief Get the top-left position of an entity's physics body.
 		*
 		* @param entity The entity to get the top-left position for.
 		*
 		* @return The top-left position of the physics body.
 		*/
-		const Math2D::Point2D<float> GetTopLeftPosition(Entity entity);
-
-		/**
-		* @brief Apply a force to an entity's physics body.
-		*
-		* @param entity The entity to apply the force to.
-		* @param force The force to apply.
-		*/
-		void ApplyForceToBody(Entity entity, Math2D::Point2D<float> force);
-
-		/**
-		* @brief Apply an impulse to an entity's physics body.
-		*
-		* @param entity The entity to apply the impulse to.
-		* @param impulse The impulse to apply.
-		*/
-		void ApplyImpulseToBody(Entity entity, Math2D::Point2D<float> impulse);
+		const Math2D::Point2D<float> GetPosition(Entity entity);
 
 		/**
 		* @brief Set the velocity for an entity's physics body.
@@ -143,15 +138,6 @@ namespace Engine
 		void SetYVelocity(Entity entity, const float yVelocity);
 
 		/**
-		* @brief Set the linear damping for an entity's physics body.
-		*
-		* @param entity The entity to set the linear damping for.
-		*
-		* @param decel The linear damping to set.
-		*/
-		void SetDeceleration(Entity entity, const float decel);
-
-		/**
 		* @brief Get the velocity of an entity's physics body.
 		*
 		* @param entity The entity to get the velocity for.
@@ -161,9 +147,33 @@ namespace Engine
 		const Math2D::Point2D<float> GetVelocity(Entity entity);
 
 		/**
-		* @brief Set the restitution, density, and friction for an entity's physics body.
+		* @brief Apply a force to an entity's physics body.
 		*
-		* @param entity The entity to set the properties for.
+		* @param entity The entity to apply the force to.
+		* @param force The force to apply.
+		*/
+		void ApplyForceToBody(Entity entity, Math2D::Point2D<float> force);
+
+		/**
+		* @brief Apply an impulse to an entity's physics body.
+		*
+		* @param entity The entity to apply the impulse to.
+		* @param impulse The impulse to apply.
+		*/
+		void ApplyImpulseToBody(Entity entity, Math2D::Point2D<float> impulse);
+
+		/**
+		* @brief Set the deceleration (linear damping) for an entity's physics body.
+		*
+		* @param entity The entity to set the linear damping for.
+		* @param decel The linear damping to set.
+		*/
+		void SetDeceleration(Entity entity, const float decel);
+
+		/**
+		* @brief Set the restitution for an entity's physics body.
+		*
+		* @param entity The entity to set the restitution for.
 		* @param restitution The restitution to set.
 		*/
 		void SetRestitution(Entity entity, const float restitution);
@@ -185,6 +195,14 @@ namespace Engine
 		void SetFriction(Entity entity, const float friction);
 
 		/**
+		* @brief Enable or disable gravity for an entity's physics body.
+		*
+		* @param entity The entity to set gravity for.
+		* @param enabled True to enable gravity, false to disable.
+		*/
+		void SetGravityEnabled(Entity entity, bool enabled);
+
+		/**
 		* @brief Set whether the rotation of an entity's physics body is fixed.
 		*
 		* @param entity The entity to set the fixed rotation for.
@@ -193,29 +211,22 @@ namespace Engine
 		void SetFixedRotation(Entity entity, bool fixed);
 
 		/**
-		* @brief Set the angle for an entity's physics body in degrees.
+		* @brief Get the angle of an entity's physics body in radians.
 		*
-		* @param entity The entity to set the angle for.
+		* @param entity The entity to get the angle for.
 		*
 		* @return The angle in radians.
 		*/
 		const float GetAngleInRadians(Entity entity);
 
 		/**
-		* @brief Get the angle for an entity's physics body in degrees.
+		* @brief Get the angle of an entity's physics body in degrees.
 		*
 		* @param entity The entity to get the angle for.
 		*
 		* @return The angle in degrees.
 		*/
 		const float GetAngleInDegrees(Entity entity);
-
-		/**
-		* @brief Remove the physics body of an entity from the world.
-		*
-		* @param entity The entity to remove the body for.
-		*/
-		void RemoveBodyFromWorld(Entity entity);
 
 		/**
 		* @brief Check for contact below the entity's physics body.
@@ -253,21 +264,6 @@ namespace Engine
 		*/
 		const bool HasContactRight(Entity entity);
 
-		/**
-		* @brief Get the physics body of an entity.
-		*
-		* @param entity The entity to get the body for.
-		*
-		* @return Pointer to the physics body.
-		*/
-		PhysicsBody* GetBody(Entity entity);
-
-		/**
-		* @brief Constructor
-		*
-		* @param refEcs Reference to the ECS instance.
-		*/
-		PhysicsInterface(ECS& refEcs);
 	private:
 		ECS& m_refECS;
 	};

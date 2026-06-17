@@ -4,6 +4,7 @@
 #include "../include/EventHandlers/AppManagementEventHandlers.h"
 #include "../include/Player/Player.h"
 #include "../include/Camera/PlayerCamera.h"
+#include "../include/Clouds/Cloud.h"
 
 #include <iostream>
 #include <mutex>
@@ -50,20 +51,15 @@ int main(int argc, char* args[])
 
 	CLIENT_INFO_D("Client Running!");
 
-	engine->Scenes_Create("StartScreen");
-	engine->Scenes_Create("Level1");
-
-	//// Need physcis to scale with pixels per unit.
-	engine->Scenes_SetGravity("StartScreen", Math2D::Point2D(0.0f, 100.0f));
-	engine->Scenes_SetGravity("Level1", Math2D::Point2D(0.0f, 100.0f));
-
-	engine->Scenes_AddTileMap("StartScreen", "StartScreen.txt", "StartScreenRules.json");
-	engine->Scenes_AddTileMap("Level1", "TestMap1.txt", "Level1Rules.json");
+	engine->Scenes_Create("StartScreenRules.json", "StartScreen");
+	engine->Scenes_Create("Level1Rules.json", "Level1");
 
 	Player player;
 
-	engine->Scenes_RegisterContactCallback("StartScreen", Engine::BEGIN_SENSOR, 1, 40, [](const Engine::Contact event)
+	engine->Scenes_RegisterContactCallback("StartScreen", Engine::BEGIN_SENSOR, Math2D::Point2D<size_t>(1, 1), Math2D::Point2D<size_t>(2, 40), [](const Engine::Contact event)
 		{
+
+			CLIENT_INFO("At door");
 			Engine::EMU::GetInstance()->Scenes_RegisterIOEventListener("StartScreen", Engine::W_KEY_DOWN, [](Engine::IOEvent& e)
 				{
 					Engine::EMU::GetInstance()->Scenes_Load("Level1");
@@ -71,11 +67,13 @@ int main(int argc, char* args[])
 				});
 		});
 
-	engine->Scenes_RegisterContactCallback("StartScreen", Engine::END_SENSOR, 1, 40, [](const Engine::Contact event)
+	engine->Scenes_RegisterContactCallback("StartScreen", Engine::END_SENSOR, Math2D::Point2D<size_t>(1, 1), Math2D::Point2D<size_t>(2, 40), [](const Engine::Contact event)
 		{
 			Engine::EMU::GetInstance()->Scenes_UnRegisterIOEventListener("StartScreen", Engine::W_KEY_DOWN);
 		});
 
+
+	Cloud cloud;
 	PlayerCamera playerCamera;
 
 	engine->Scenes_Load("StartScreen");
